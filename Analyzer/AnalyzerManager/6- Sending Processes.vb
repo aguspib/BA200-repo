@@ -4,13 +4,8 @@ Option Strict On
 Imports System.Data.SqlClient
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.BL
-Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.Calculations
-Imports Biosystems.Ax00.InfoAnalyzer
-Imports System.Timers
 Imports System.Data
-Imports System.ComponentModel 'AG 20/04/2011 - added when create instance to an BackGroundWorker
 Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 
@@ -52,8 +47,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 If SensorValuesAttribute.ContainsKey(GlobalEnumerates.AnalyzerSensors.CONNECTED) Then
                     SensorValuesAttribute.Remove(GlobalEnumerates.AnalyzerSensors.CONNECTED)
                 End If
-                If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.COMMS_ERR) Then
-                    myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.COMMS_ERR)
+                If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.COMMS_ERR) Then
+                    myAlarmListAttribute.Remove(AlarmEnumerates.Alarms.COMMS_ERR)
                 End If
                 'myUI_RefreshEvent.Clear()
                 'myUI_RefreshDS.Clear()
@@ -227,6 +222,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         'The next instruction to be sent has not been found yet by Software. It has to Search + Send
                         'CASE (example the 1st request received in RUNNING)
                         myGlobal = Me.SearchNextPreparation(Nothing, pNextWell, ISEModuleIsReadyAttribute) 'Search for next instruction to be sent ... and sent it!!
+                        GlobalBase.CreateLogActivity("Other: " + pNextWell.ToString, "AnalyzerManager.ManageSendAndSearchNext", EventLogEntryType.Information, False)
                         If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then '(1)
                             myNextPreparationToSendDS = CType(myGlobal.SetDatos, AnalyzerManagerDS)
                             '' PROVA XB !!!
@@ -308,7 +304,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 If iseInstalledFlag Then
                     'Ise damaged (ERR) or switch off (WARN)
-                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.ISE_FAILED_ERR) OrElse myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR) Then
+                    If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.ISE_FAILED_ERR) OrElse myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.ISE_OFF_ERR) Then
                         iseStatusOK = False
                     Else
                         iseStatusOK = True
@@ -648,10 +644,8 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' AG 12/07/2012 - add parameter (optional pLookForISEExecutionsFlag). This parameter is informed only when call this method from ManageSendAndSearchNext
         '''                 and the ise requests is FALSE (I:0)
         ''' </remarks>
-        Private Function SearchNextPreparation(ByVal pDBConnection As SqlConnection, ByVal pNextWell As Integer, Optional ByVal pLookForISEExecutionsFlag As Boolean = True) As GlobalDataTO
-
-            'Dim resultData As New GlobalDataTO
-            'Dim dbConnection As New SqlClient.SqlConnection
+        Public Function SearchNextPreparation(ByVal pDBConnection As SqlConnection, ByVal pNextWell As Integer, Optional ByVal pLookForISEExecutionsFlag As Boolean = True) As GlobalDataTO _
+            Implements IAnalyzerManager.SearchNextPreparation
 
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlConnection = Nothing
@@ -659,7 +653,6 @@ Namespace Biosystems.Ax00.Core.Entities
             Try
                 Dim StartTimeTotal As DateTime = Now
                 Dim StartTime As DateTime = Now 'AG 11/06/2012 - time estimation
-                'Dim myLogAcciones As New ApplicationLogManager()
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
 
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then '(1)
@@ -669,15 +662,10 @@ Namespace Biosystems.Ax00.Core.Entities
                         Dim nextPreparationDS As New AnalyzerManagerDS
                         Dim nextRow As AnalyzerManagerDS.nextPreparationRow
 
-                        ''''''
-                        ''1st: Check if next cuvette is optically rejected 
-                        ''''''
-
-                        '''''
                         'AG 24/11/2011 change order: 1st cuvette contamination, 2on optically rejected (first version was inverted)
                         '1st: Check if next cuvette requires washing (cuvette contamination)
                         '2on: Check if next cuvette is optically rejected 
-                        '''''
+
                         Dim rejectedWell As Boolean = False
                         Dim contaminatedWell As Boolean = False
                         Dim WashSol1 As String = ""
@@ -689,7 +677,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             StartTime = Now
 
                             If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then '(2.1)
-                                wellContaminatedWithWashSent = 0 'AG 24/11/2011
+                                wellContaminatedWithWashSentAttr = 0 'AG 24/11/2011
 
                                 Debug.Print("Step 1 - SearchNextPreparation -> pNextWell = " & pNextWell.ToString & _
                                             "; contaminatedWell = " & contaminatedWell & _
@@ -697,7 +685,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                             "; WashSol2 = " & WashSol2.ToString)
 
                                 If contaminatedWell Then
-                                    wellContaminatedWithWashSent = pNextWell 'AG 24/11/2011
+                                    wellContaminatedWithWashSentAttr = pNextWell 'AG 24/11/2011
 
                                     nextRow = nextPreparationDS.nextPreparation.NewnextPreparationRow
                                     nextRow.CuvetteContaminationFlag = True
@@ -751,7 +739,6 @@ Namespace Biosystems.Ax00.Core.Entities
                                 Dim FoundPreparation As ExecutionsDS
                                 FoundPreparation = CType(resultData.SetDatos, ExecutionsDS)
 
-                                'RH 26/06/2012 Get data from returned DS
                                 If FoundPreparation.twksWSExecutions.Rows.Count > 0 Then
                                     Dim myRow As ExecutionsDS.twksWSExecutionsRow = FoundPreparation.twksWSExecutions(0)
 
@@ -801,24 +788,15 @@ Namespace Biosystems.Ax00.Core.Entities
                                         nextRow.WashSolution1 = WashSol1
                                         nextRow.WashSolution2 = WashSol1 'AG 24/02/2012
                                     End If
-                                    'AG 24/02/2012 - reagent contamination uses only one bottle or none but not two
-                                    'If WashSol2 = "" Then
-                                    '    nextRow.SetWashSolution2Null()
-                                    'Else
-                                    '    nextRow.WashSolution2 = WashSol2
-                                    'End If
-                                    'nextRow.ExecutionID = executionFound 'AG + DL 06/07/2012 - Inform the next execution to be sent when the wash was performed
                                     nextRow.CuvetteOpticallyRejectedFlag = False
                                     nextRow.CuvetteContaminationFlag = False
 
-                                    'AG 28/09/2012
-                                    'nextRow.ExecutionID = 0
-                                    'nextRow.ExecutionType = ""
                                     nextRow.ExecutionID = executionFound 'Execution that requires the washing
                                     nextRow.ExecutionType = "PREP_STD"
-                                    'AG 28/09/2012
 
                                     nextPreparationDS.nextPreparation.AddnextPreparationRow(nextRow)
+
+                                    GlobalBase.CreateLogActivity("SearchNextSTDPreparation (Check if exist reagents contaminations): " + nextRow.ExecutionID.ToString, "AnalyzerManager.SearchNextPreparation", EventLogEntryType.Information, False)
 
                                 Else 'STD execution or NO_PENDING_PREPARATION_FOUND
                                     nextRow = nextPreparationDS.nextPreparation.NewnextPreparationRow
@@ -833,6 +811,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                     nextRow.SetWashSolution2Null()
 
                                     nextPreparationDS.nextPreparation.AddnextPreparationRow(nextRow)
+                                    GlobalBase.CreateLogActivity("SearchNextSTDPreparation (STD execution or NO_PENDING_PREPARATION_FOUND): " + nextRow.ExecutionID.ToString, "AnalyzerManager.SearchNextPreparation", EventLogEntryType.Information, False)
                                 End If '(4.2)
                             End If '(4.1)
                         End If '(4.0
@@ -851,10 +830,9 @@ Namespace Biosystems.Ax00.Core.Entities
             Catch ex As Exception
                 resultData = New GlobalDataTO()
                 resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SearchNextPreparation", EventLogEntryType.Error, False)
             End Try
 
@@ -865,61 +843,62 @@ Namespace Biosystems.Ax00.Core.Entities
 
         End Function
 
+#Region "Unused Code"
+        ' ''' <summary>
+        ' ''' Checks the next well and determine if is optically rejected or not
+        ' ''' </summary>
+        ' ''' <param name="pDBConnection"></param>
+        ' ''' <param name="pNextWell"></param>
+        ' ''' <param name="pRejected " ></param>
+        ' ''' <returns>GlobalDataTo with error or not. ByRef prejected updated</returns>
+        ' ''' <remarks>AG 17/01/2011</remarks>
+        'Private Function CheckOpticalNextWell(ByVal pDBConnection As SqlConnection, ByVal pNextWell As Integer, ByRef pRejected As Boolean) As GlobalDataTO
+        '    Dim resultData As New GlobalDataTO
+        '    Dim dbConnection As New SqlConnection
 
-        ''' <summary>
-        ''' Checks the next well and determine if is optically rejected or not
-        ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pNextWell"></param>
-        ''' <param name="pRejected " ></param>
-        ''' <returns>GlobalDataTo with error or not. ByRef prejected updated</returns>
-        ''' <remarks>AG 17/01/2011</remarks>
-        Private Function CheckOpticalNextWell(ByVal pDBConnection As SqlConnection, ByVal pNextWell As Integer, ByRef pRejected As Boolean) As GlobalDataTO
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlConnection
+        '    Try
+        '        resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+        '        If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
+        '            dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
 
-            Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-                If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
+        '            If (Not dbConnection Is Nothing) Then
+        '                pRejected = False
 
-                    If (Not dbConnection Is Nothing) Then
-                        pRejected = False
+        '                Dim reactionsDlgt As New ReactionsRotorDelegate
+        '                'Get only the last RotorNumber
+        '                resultData = reactionsDlgt.ReadWellHistoricalUse(dbConnection, WorkSessionIDAttribute, AnalyzerIDAttribute, pNextWell, False)
 
-                        Dim reactionsDlgt As New ReactionsRotorDelegate
-                        'Get only the last RotorNumber
-                        resultData = reactionsDlgt.ReadWellHistoricalUse(dbConnection, WorkSessionIDAttribute, AnalyzerIDAttribute, pNextWell, False)
+        '                If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
+        '                    Dim myReactionsDS As New ReactionsRotorDS
+        '                    myReactionsDS = CType(resultData.SetDatos, ReactionsRotorDS)
 
-                        If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                            Dim myReactionsDS As New ReactionsRotorDS
-                            myReactionsDS = CType(resultData.SetDatos, ReactionsRotorDS)
+        '                    If myReactionsDS.twksWSReactionsRotor.Rows.Count > 0 Then
+        '                        If Not myReactionsDS.twksWSReactionsRotor(0).IsRejectedFlagNull Then
+        '                            If myReactionsDS.twksWSReactionsRotor(0).RejectedFlag Then
+        '                                pRejected = True
+        '                            End If
+        '                        End If
 
-                            If myReactionsDS.twksWSReactionsRotor.Rows.Count > 0 Then
-                                If Not myReactionsDS.twksWSReactionsRotor(0).IsRejectedFlagNull Then
-                                    If myReactionsDS.twksWSReactionsRotor(0).RejectedFlag Then
-                                        pRejected = True
-                                    End If
-                                End If
+        '                    End If
+        '                End If
 
-                            End If
-                        End If
+        '            End If
+        '        End If
+        '    Catch ex As Exception
+        '        resultData.HasError = True
+        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+        '        resultData.ErrorMessage = ex.Message
 
-                    End If
-                End If
-            Catch ex As Exception
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                resultData.ErrorMessage = ex.Message
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.CheckOpticalNextWell", EventLogEntryType.Error, False)
 
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.CheckOpticalNextWell", EventLogEntryType.Error, False)
+        '    Finally
+        '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
+        '    End Try
 
-            Finally
-                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-
-            Return resultData
-        End Function
+        '    Return resultData
+        'End Function
+#End Region
 
         ''' <summary>
         ''' Checks if next well is contaminated by last reagent used on it or if next well is optically rejected
@@ -965,63 +944,6 @@ Namespace Biosystems.Ax00.Core.Entities
                                     End If
                                 End If
 
-                                'AG 24/11/2011
-                                'If Not pRejectedWell Then
-                                '    'Search if next well is reagent contaminated by his last execution on it
-                                '    Dim listSTDtest As New List(Of ReactionsRotorDS.twksWSReactionsRotorRow)
-                                '    listSTDtest = (From a As ReactionsRotorDS.twksWSReactionsRotorRow In myReactionsDS.twksWSReactionsRotor _
-                                '                   Where a.WellContent = "C" Select a).ToList
-
-                                '    If listSTDtest.Count > 0 Then
-                                '        'Search the last execution performed in this well
-                                '        listSTDtest = (From a As ReactionsRotorDS.twksWSReactionsRotorRow In myReactionsDS.twksWSReactionsRotor _
-                                '                       Where Not a.IsExecutionIDNull Select a).ToList
-
-                                '        If listSTDtest.Count > 0 Then
-                                '            'Look if the last test prepared in this well is a well contaminator or not and his washing mode
-                                '            Dim myExecutionsDlgte As New ExecutionsDelegate
-                                '            resultData = myExecutionsDlgte.GetExecutionContaminationCuvette(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute, listSTDtest(0).ExecutionID)
-
-                                '            If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                                '                Dim myLocalDS As New AnalyzerManagerDS
-                                '                myLocalDS = CType(resultData.SetDatos, AnalyzerManagerDS)
-
-                                '                If myLocalDS.searchNext.Rows.Count > 0 Then
-                                '                    If Not myLocalDS.searchNext(0).IsContaminationIDNull Then
-                                '                        'Last TEST is a well contaminator test ... look if a wash cuvette cycle has been already sent
-                                '                        'Else activate Contaminated Well flag
-                                '                        Dim myWellContaminatorExecutionID As Integer = myLocalDS.searchNext(0).ExecutionID
-                                '                        Dim washAlreadySend As Boolean = False
-
-                                '                        For Each itemRow As ReactionsRotorDS.twksWSReactionsRotorRow In myReactionsDS.twksWSReactionsRotor.Rows
-                                '                            If Not itemRow.IsExecutionIDNull Then
-                                '                                If itemRow.ExecutionID = myWellContaminatorExecutionID Then Exit For
-                                '                            End If
-
-                                '                            'If thw washFlag is TRUE means the cuvette has been washed
-                                '                            If itemRow.WashedFlag Then 'Wash cuvette contaminator has been sent after sending myWellContaminatorExecutionID
-                                '                                washAlreadySend = True
-                                '                                Exit For
-                                '                            End If
-                                '                        Next
-
-                                '                        If Not washAlreadySend Then
-                                '                            pContaminatedWell = True
-                                '                            If Not myLocalDS.searchNext(0).IsWashingSolution1Null Then pWashSol1 = myLocalDS.searchNext(0).WashingSolution1
-                                '                            If Not myLocalDS.searchNext(0).IsWashingSolution2Null Then pWashSol2 = myLocalDS.searchNext(0).WashingSolution2
-
-                                '                            wellContaminatedWithWashSent = myWellContaminatorExecutionID 'Inform the class variable for use it into method MarkWashRunningAccepted
-                                '                        End If
-
-                                '                    End If
-                                '                End If
-                                '            End If
-
-                                '        End If
-                                '    End If 'If listSTDtest.Count > 0 Then
-
-                                'End If 'If Not pRejectedWell Then
-
                                 'Search if next well is reagent contaminated by his last execution on it
                                 Dim listSTDtest As New List(Of ReactionsRotorDS.twksWSReactionsRotorRow)
                                 Dim rotorTurnWithWellContamination As Integer = 0
@@ -1059,7 +981,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.CheckRejectedContaminatedNextWell", EventLogEntryType.Error, False)
 
             Finally
@@ -1068,51 +989,51 @@ Namespace Biosystems.Ax00.Core.Entities
             Return resultData
         End Function
 
+#Region "Unused Code"
+        ' ''' <summary>
+        ' ''' Search if Sw has to send a new ISE execution
+        ' ''' Requires de ISEModule is ready, search execution inside current patient or inside previous ones
+        ' ''' </summary>
+        ' ''' <param name="pDBConnection"></param>
+        ' ''' <param name="pExecutionISEFound"></param>
+        ' ''' <returns>GolbalDataTo indicates if error or not. If no error use the byref parameters</returns>
+        ' ''' <remarks>AG 18/01/2011</remarks>
+        'Private Function SearchNextISEPreparation(ByVal pDBConnection As SqlConnection, ByRef pExecutionISEFound As Integer) As GlobalDataTO
+        '    Dim resultData As New GlobalDataTO
+        '    Dim dbConnection As New SqlConnection
 
-        ''' <summary>
-        ''' Search if Sw has to send a new ISE execution
-        ''' Requires de ISEModule is ready, search execution inside current patient or inside previous ones
-        ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pExecutionISEFound"></param>
-        ''' <returns>GolbalDataTo indicates if error or not. If no error use the byref parameters</returns>
-        ''' <remarks>AG 18/01/2011</remarks>
-        Private Function SearchNextISEPreparation(ByVal pDBConnection As SqlConnection, ByRef pExecutionISEFound As Integer) As GlobalDataTO
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlConnection
+        '    Try
+        '        resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+        '        If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then '(1)
+        '            dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
 
-            Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-                If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then '(1)
-                    dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
+        '            If (Not dbConnection Is Nothing) Then '(2)
+        '                If ISEModuleIsReadyAttribute Then '(3) 'Search ISE prep only when the ISE module is ready
+        '                    Dim execDel As New ExecutionsDelegate
+        '                    resultData = execDel.GetNextPendingISEPatientExecution(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute)
 
-                    If (Not dbConnection Is Nothing) Then '(2)
-                        If ISEModuleIsReadyAttribute Then '(3) 'Search ISE prep only when the ISE module is ready
-                            Dim execDel As New ExecutionsDelegate
-                            resultData = execDel.GetNextPendingISEPatientExecution(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute)
+        '                    If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
+        '                        pExecutionISEFound = CType(resultData.SetDatos, Integer)
+        '                    End If
 
-                            If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                                pExecutionISEFound = CType(resultData.SetDatos, Integer)
-                            End If
+        '                End If '(3)
+        '            End If '(2)
+        '        End If '(1)
 
-                        End If '(3)
-                    End If '(2)
-                End If '(1)
+        '    Catch ex As Exception
+        '        resultData.HasError = True
+        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+        '        resultData.ErrorMessage = ex.Message
 
-            Catch ex As Exception
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                resultData.ErrorMessage = ex.Message
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SearchNextISEPreparation", EventLogEntryType.Error, False)
 
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SearchNextISEPreparation", EventLogEntryType.Error, False)
-
-            Finally
-                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-            Return resultData
-        End Function
-
+        '    Finally
+        '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
+        '    End Try
+        '    Return resultData
+        'End Function
+#End Region
 
         ''' <summary>
         ''' Search if Sw has to send a new ISE execution
@@ -1222,8 +1143,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 Dim contaminationsDataDS As ContaminationsDS = Nothing
                                 Dim highContaminationPersitance As Integer = 0
 
-                                Dim myContaminationsDelegate As New ContaminationsDelegate
-                                resultData = myContaminationsDelegate.GetContaminationsByType(dbConnection, "R1")
+                                resultData = ContaminationsDelegate.GetContaminationsByType(dbConnection, "R1")
                                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                                     contaminationsDataDS = DirectCast(resultData.SetDatos, ContaminationsDS)
 
@@ -1255,22 +1175,18 @@ Namespace Biosystems.Ax00.Core.Entities
                                     '//Sorting by SampleClass search myStatFlag executions with the different OrderID-SampleType as lastOrderID-lastSampleType
                                     '// (priority without contaminations with the last sent)
                                     If Not resultData.HasError And Not found Then
-                                        'resultData = GetNextExecutionUntil28112011(found, myExecList, "", "", myStatFlag, "BLANK")
                                         resultData = GetNextExecution(dbConnection, found, myExecList, "", "", myStatFlag, "BLANK", contaminationsDataDS, highContaminationPersitance)
                                     End If
 
                                     If Not resultData.HasError And Not found Then
-                                        'resultData = GetNextExecutionUntil28112011(found, myExecList, "", "", myStatFlag, "CALIB")
                                         resultData = GetNextExecution(dbConnection, found, myExecList, "", "", myStatFlag, "CALIB", contaminationsDataDS, highContaminationPersitance)
                                     End If
 
                                     If Not resultData.HasError And Not found Then
-                                        'resultData = GetNextExecutionUntil28112011(found, myExecList, "", "", myStatFlag, "CTRL")
                                         resultData = GetNextExecution(dbConnection, found, myExecList, "", "", myStatFlag, "CTRL", contaminationsDataDS, highContaminationPersitance)
                                     End If
 
                                     If Not resultData.HasError And Not found Then
-                                        'resultData = GetNextExecutionUntil28112011(found, myExecList, "", "", myStatFlag, "PATIENT")
                                         resultData = GetNextExecution(dbConnection, found, myExecList, "", "", myStatFlag, "PATIENT", contaminationsDataDS, highContaminationPersitance)
                                     End If
 
@@ -1313,7 +1229,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SearchNextSTDPreparation", EventLogEntryType.Error, False)
 
             Finally
@@ -1481,7 +1396,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SearchNextSTDPreparation", EventLogEntryType.Error, False)
 
                 'Finally
@@ -1530,179 +1444,31 @@ Namespace Biosystems.Ax00.Core.Entities
                     dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then '(2)
+                        Dim toSendList = GetExecutionsToSend(pSTDExecutionList, pOrderID, pSampleType, pStatFlag, pSampleClass)
 
-                        'Get the list of pending executions depending the entry parameters case
-                        'Apply different LINQ (where clause)
-                        Dim toSendList As New List(Of ExecutionsDS.twksWSExecutionsRow)
-                        If pOrderID <> "" And pSampleType <> "" Then '(3)
-                            toSendList = (From a As ExecutionsDS.twksWSExecutionsRow In pSTDExecutionList.twksWSExecutions _
-                                            Where a.OrderID = pOrderID AndAlso a.SampleType = pSampleType AndAlso a.StatFlag = pStatFlag _
-                                            Select a).ToList
-                        ElseIf pOrderID <> "" And pSampleType <> "" And pSampleClass <> "" Then '(1)
-                            toSendList = (From a As ExecutionsDS.twksWSExecutionsRow In pSTDExecutionList.twksWSExecutions _
-                                            Where a.OrderID = pOrderID AndAlso a.SampleType = pSampleType AndAlso a.StatFlag = pStatFlag AndAlso a.SampleClass = pSampleClass _
-                                            Select a).ToList
+                        'CALIB, CTRLS and PATIENTS can not leave the current element until finish with it
+                        'Besides, the PATIENTS must follow the creationorder
+                        'We must edit the toSendList and add the ElementID information <CalibratorID (calibrators) or ControlID (controls) or CreationOrder (patients)>
+                        If toSendList.Any() AndAlso pSampleClass <> "BLANK" Then
+                            toSendList = InformElementID(toSendList, dbConnection)
+                        End If
 
-                        ElseIf pSampleClass <> "" Then '(1)
-                            toSendList = (From a As ExecutionsDS.twksWSExecutionsRow In pSTDExecutionList.twksWSExecutions _
-                                            Where a.StatFlag = pStatFlag AndAlso a.SampleClass = pSampleClass _
-                                            Select a).ToList
+                        If toSendList.Any() Then '(3)
+                            Dim nextExecutionFound As Boolean = False
+                            Dim indexNextToSend As Integer = 0
+                            Dim previousReagentIDSentList As New List(Of AnalyzerManagerDS.sentPreparationsRow) 'The last reagents used are in the higher array indexes
+                            Dim contaminationFound = SeachContaminationBetweenPreviousAndFirsToSend(previousReagentIDSentList, pContaminationsDS, toSendList(0).ReagentID, pHighContaminationPersitance)
 
-                        Else '(3)
-                            toSendList = (From a As ExecutionsDS.twksWSExecutionsRow In pSTDExecutionList.twksWSExecutions _
-                                            Where a.StatFlag = pStatFlag _
-                                            Select a).ToList
-
-                        End If '(End 3)
-
-                        'AG 02/03/2012 - CALIB, CTRLS and PATIENTS can not leave the current element until finish with it
-                        '                Besides, the PATIENTS must follow the creationorder
-                        '                We must edit the toSendList and add the ElementID information <CalibratorID (calibrators) or ControlID (controls) or CreationOrder (patients)>
-                        If toSendList.Count > 0 AndAlso pSampleClass <> "BLANK" Then
-                            Dim allOrderTestsDS As OrderTestsForExecutionsDS
-                            Dim myWSOrderTestsDelegate As New WSOrderTestsDelegate
-
-                            resultData = myWSOrderTestsDelegate.GetInfoOrderTestsForExecutions(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute)
-                            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                allOrderTestsDS = DirectCast(resultData.SetDatos, OrderTestsForExecutionsDS)
-
-                                Dim auxOrderTestID As Integer = -1
-                                Dim otInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow) = Nothing
-
-                                For Each row As ExecutionsDS.twksWSExecutionsRow In toSendList
-                                    If row.OrderTestID <> auxOrderTestID Then
-                                        auxOrderTestID = row.OrderTestID
-                                        'Search information for the Calibrator or control or patient ordertest
-                                        otInfo = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
-                                                    Where a.OrderTestID = auxOrderTestID _
-                                                   Select a).ToList()
-                                    End If
-
-                                    If otInfo.Count >= 1 Then 'AG 10/04/2012 old condition fails when same test has 2 control levels (If otInfo.Count = 1 Then)
-                                        row.BeginEdit()
-                                        If pSampleClass = "PATIENT" Then
-                                            row.ElementID = otInfo(0).CreationOrder
-                                        Else
-                                            row.ElementID = otInfo(0).ElementID 'CalibratorID or ControlID
-                                        End If
-                                        row.AcceptChanges()
-                                        row.EndEdit()
-                                    End If
-                                Next
-                                otInfo = Nothing
-
-                                Dim auxElementID As Integer = -1
-                                auxElementID = toSendList(0).ElementID 'Apply linq using the same ElementID as the first item in toSendLinq previous results
-
-                                toSendList = (From a As ExecutionsDS.twksWSExecutionsRow In toSendList _
-                                              Where a.ElementID = auxElementID Select a).ToList
+#If DEBUG Then
+                            If contaminationFound Then
+                                Debug.Print(String.Format("Contamination found between PreviousReagentIDSentList and toSendList(0).ReagentID = {0} \n", toSendList(0).ReagentID.ToString()))
                             End If
 
-                        End If
-                        'AG 02/03/2012
-
-
-                        Dim nextExecutionFound As Boolean = False
-                        Dim indexNextToSend As Integer = 0
-
-                        If toSendList.Count > 0 Then '(3)
-
-                            '1) Search contamination between previous reagents and the first in toSendList
-                            Dim previousReagentIDSentList As List(Of AnalyzerManagerDS.sentPreparationsRow) 'The last reagents used are in the higher array indexes
-                            Dim contaminations As List(Of ContaminationsDS.tparContaminationsRow) = Nothing
-                            Dim contaminationFound As Boolean = False
-                            'Dim myLogAcciones As New ApplicationLogManager() 'Add temporal traces 'AG 28/03/2014 - #1563
-
-                            previousReagentIDSentList = (From a As AnalyzerManagerDS.sentPreparationsRow In mySentPreparationsDS.sentPreparations _
-                                                     Where a.ExecutionType = "PREP_STD" Select a).ToList
-
-                            If previousReagentIDSentList.Count > 0 Then '(3.bis)
-                                '1.1) Check if exists contamination between last reagent and next reagent (LOW or HIGH contamiantion)
-                                contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                                        Where wse.ReagentContaminatorID = previousReagentIDSentList(previousReagentIDSentList.Count - 1).ReagentID _
-                                                        AndAlso wse.ReagentContaminatedID = toSendList(0).ReagentID _
-                                                        Select wse).ToList()
-
-                                If contaminations.Count > 0 Then '(4)
-                                    contaminationFound = True 'LOW or HIGH contamination found
-
-                                    'Check if the required wash has been already sent or not
-                                    Dim requiredWash As String = ""
-                                    If Not previousReagentIDSentList(previousReagentIDSentList.Count - 1).IsWashSolution1Null Then requiredWash = previousReagentIDSentList(previousReagentIDSentList.Count - 1).WashSolution1
-
-                                    'AG 28/03/2014 - #1563 it is not necessary modify the next line , ExecutionID can not be NULL because the list has been get using Linq where executionType = PREP_STD
-                                    Dim previousExecutionsIDSent As Integer = previousReagentIDSentList(previousReagentIDSentList.Count - 1).ExecutionID
-
-                                    Dim i As Integer = 0
-                                    'DL 04/07/2012. Begin
-                                    'Search the proper row in mySentPreparationsDS.sentPreparations
-                                    'For i = 0 To mySentPreparationsDS.sentPreparations.Rows.Count - 1
-                                    'If previousExecutionsIDSent = mySentPreparationsDS.sentPreparations(i).ExecutionID Then
-                                    'Exit For
-                                    'End If
-                                    'Next i
-                                    'DL 04/07/2012. End
-
-                                    'Search if the proper wash has been already sent or not
-                                    For i = i To mySentPreparationsDS.sentPreparations.Rows.Count - 1
-                                        If mySentPreparationsDS.sentPreparations(i).ReagentWashFlag = True AndAlso _
-                                            mySentPreparationsDS.sentPreparations(i).WashSolution1 = requiredWash Then
-                                            contaminationFound = False
-                                            Exit For
-                                        End If
-                                    Next
-
-                                ElseIf pHighContaminationPersitance > 0 Then '(4)
-                                    '1.2) If no LOW contamination exists between the last reagent used and next take care about the previous due the high contamination
-                                    'has persistance > 1
-                                    Dim highIndex As Integer = 0
-                                    For highIndex = previousReagentIDSentList.Count - pHighContaminationPersitance To previousReagentIDSentList.Count - 2 'The index -1 has already been evaluated
-                                        If highIndex >= 0 Then 'Avoid overflow
-                                            contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                                              Where wse.ReagentContaminatorID = previousReagentIDSentList(highIndex).ReagentID _
-                                                              AndAlso wse.ReagentContaminatedID = toSendList(0).ReagentID _
-                                                              AndAlso Not wse.IsWashingSolutionR1Null _
-                                                              Select wse).ToList()
-                                            If contaminations.Count > 0 Then
-                                                contaminationFound = True 'HIGH contamination found
-
-                                                'Check if the required wash has been already sent or not
-                                                Dim requiredWash As String = ""
-                                                If Not previousReagentIDSentList(highIndex).IsWashSolution1Null Then requiredWash = previousReagentIDSentList(highIndex).WashSolution1
-
-                                                'AG 28/03/2014 - #1563 it is not necessary modify the next line , ExecutionID can not be NULL because the list has been get using Linq where executionType = PREP_STD
-                                                Dim previousExecutionsIDSent As Integer = previousReagentIDSentList(highIndex).ExecutionID
-
-                                                Dim i As Integer = 0
-                                                'Search the proper row in mySentPreparationsDS.sentPreparations
-                                                For i = 0 To mySentPreparationsDS.sentPreparations.Rows.Count - 1
-                                                    'AG 28/03/2014 - #1563 evaluate that ExecutionID is not NULL
-                                                    'If previousExecutionsIDSent = mySentPreparationsDS.sentPreparations(i).ExecutionID Then
-                                                    If Not mySentPreparationsDS.sentPreparations(i).IsExecutionIDNull AndAlso previousExecutionsIDSent = mySentPreparationsDS.sentPreparations(i).ExecutionID Then
-                                                        Exit For
-                                                    ElseIf mySentPreparationsDS.sentPreparations(i).IsExecutionIDNull Then
-                                                        GlobalBase.CreateLogActivity("Protection! Otherwise the bug #1563 was triggered", "AnalyzerManager.GetNextExecution", EventLogEntryType.Information, False)
-                                                    End If
-                                                    'AG 28/03/2014 - #1563 
-                                                Next
-
-                                                'Search if the proper wash has been already sent or not
-                                                For i = i To mySentPreparationsDS.sentPreparations.Rows.Count - 1
-                                                    If mySentPreparationsDS.sentPreparations(i).ReagentWashFlag = True AndAlso _
-                                                        mySentPreparationsDS.sentPreparations(i).WashSolution1 = requiredWash Then
-                                                        contaminationFound = False
-                                                        Exit For
-                                                    End If
-                                                Next
-
-                                            End If
-                                        End If
-
-                                        If contaminationFound Then Exit For
-                                    Next
-
-                                End If '(EndIf 4)
-                            End If '(3.bis)
+                            For Each element In previousReagentIDSentList
+                                Debug.Print(String.Format("Elem: ExecutionID={0}; ReagentID={1}; OrderID={2}; OrderTestID={3} \n",
+                                                          element.ExecutionID.ToString(), element.ReagentID.ToString(), element.OrderID.ToString(), element.OrderTestID.ToString()))
+                            Next
+#End If
 
                             '2) If exists contamination between previous reagents sent and next in list, so sort the pending executions using the same algortihm 
                             'as in WS Creation and try found a better solution, then send the FIRST
@@ -1712,213 +1478,34 @@ Namespace Biosystems.Ax00.Core.Entities
                             Dim myContaminationID As Integer = -1
                             Dim myWashSolutionType As String = ""
 
-                            If contaminationFound Then '(4)
-                                Dim myExDlgte As New ExecutionsDelegate
-                                Dim contaminNumber As Integer = 0
-
-                                '2.1) Calculate contaminations number with current executions sort
-                                contaminNumber = 1 + myExDlgte.GetContaminationNumber(pContaminationsDS, toSendList, pHighContaminationPersitance)
-
-                                If contaminNumber > 0 Then '(5)
-                                    Dim bestResultList As List(Of ExecutionsDS.twksWSExecutionsRow)
-                                    Dim currentResultList As List(Of ExecutionsDS.twksWSExecutionsRow)
-                                    Dim bestContaminationNumber As Integer = 0
-                                    Dim currentContaminationNumber As Integer = 0
-
-                                    'AG 19/12/2011
-                                    Dim myReagentsIDList As New List(Of Integer) 'List of previous reagents sent before the current previousElementLastReagentID, 
-                                    '                                                   remember this information in order to check the high contamination persistance (One Item for each different OrderTest)
-                                    Dim myMaxReplicatesList As New List(Of Integer) 'AG 19/12/2011 - Same item number as previous list, indicates the replicate number for each item in previous list
-
-                                    'Transform previousReagentIDSentList List(Of AnalyzerManagerDS.sentPreparationsRow) into List (Of Integer): PreviousReagentsIDList and previousMaxReplicatesList
-                                    '(the nearest reagents use the higher indexs)
-                                    Dim maxReplicates As Integer = 0
-                                    For i = 0 To previousReagentIDSentList.Count - 1
-                                        If myReagentsIDList.Count = 0 Then myReagentsIDList.Add(previousReagentIDSentList(i).ReagentID)
-                                        maxReplicates += 1
-
-                                        'When change reagent inform max replicates into previousMaxReplicatesList
-                                        If myReagentsIDList(myReagentsIDList.Count - 1) <> previousReagentIDSentList(i).ReagentID Then
-                                            myMaxReplicatesList.Add(maxReplicates) 'Previous reagent max replicates
-                                            myReagentsIDList.Add(previousReagentIDSentList(i).ReagentID) 'New reagent
-                                            maxReplicates = 1 'Initialize max replicates
-                                        End If
-                                    Next
-                                    If myReagentsIDList.Count > 0 Then
-                                        myMaxReplicatesList.Add(maxReplicates) 'Last reagent max replicates
-                                    End If
-                                    'AG 19/12/2011
-
-                                    '2.2) If contaminations: ApplyOptimizationPolicyANew, ApplyOptimizationPolicyBNew, ApplyOptimizationPolicyCNew and ApplyOptimizationPolicyDNew
-                                    'and choose the best solution
-
-                                    'Original sort result
-                                    currentResultList = toSendList.ToList() 'Initial order
-                                    bestContaminationNumber = contaminNumber
-                                    currentContaminationNumber = contaminNumber
-                                    bestResultList = toSendList.ToList()
-
-                                    'Apply Optimization Policy A (move contaminated OrderTest down until it becomes no contaminated)
-                                    currentContaminationNumber = myExDlgte.ApplyOptimizationPolicyANew(pContaminationsDS, currentResultList, pHighContaminationPersitance, myReagentsIDList, myMaxReplicatesList)
-
-                                    'Accept policy A only when improves '' Assume it is the best result.
-                                    If currentContaminationNumber < bestContaminationNumber Then
-                                        bestContaminationNumber = currentContaminationNumber
-                                        bestResultList = currentResultList
-                                    End If
-
-                                    'Apply Optimization Policy B.(move contaminated OrderTest up until it becomes no contaminated)
-                                    If currentContaminationNumber > 0 Then
-                                        currentResultList = toSendList.ToList() 'Initial order.ToList()
-                                        currentContaminationNumber = myExDlgte.ApplyOptimizationPolicyBNew(pContaminationsDS, currentResultList, pHighContaminationPersitance, myReagentsIDList, myMaxReplicatesList)
-
-                                        If currentContaminationNumber < bestContaminationNumber Then
-                                            bestContaminationNumber = currentContaminationNumber
-                                            bestResultList = currentResultList
-                                        End If
-                                    End If
-
-                                    'Apply Optimization Policy C. (move contaminator OrderTest down until it no contaminates)
-                                    If currentContaminationNumber > 0 Then
-                                        currentResultList = toSendList.ToList() 'Initial order.ToList()
-                                        currentContaminationNumber = myExDlgte.ApplyOptimizationPolicyCNew(pContaminationsDS, currentResultList, pHighContaminationPersitance, myReagentsIDList, myMaxReplicatesList)
-                                        If currentContaminationNumber < bestContaminationNumber Then
-                                            bestContaminationNumber = currentContaminationNumber
-                                            bestResultList = currentResultList
-                                        End If
-                                    End If
-
-                                    'Apply Optimization Policy D. (move contaminator OrderTest up until it no contaminates)
-                                    If currentContaminationNumber > 0 Then
-                                        currentResultList = toSendList.ToList() 'Initial order.ToList()
-                                        currentContaminationNumber = myExDlgte.ApplyOptimizationPolicyDNew(pContaminationsDS, currentResultList, pHighContaminationPersitance, myReagentsIDList, myMaxReplicatesList)
-                                        If currentContaminationNumber < bestContaminationNumber Then
-                                            bestContaminationNumber = currentContaminationNumber
-                                            bestResultList = currentResultList
-                                        End If
-                                    End If
-
-                                    toSendList = bestResultList
-
-                                    '2.3) Finally check if exists contamination between last reagents used and next reagent that will be used (High or Low contamination)
-                                    'If contamination sent Wash, else sent toSendList(0).ExecutionID
-                                    'NOTE: previousReagentIDSentList contains the last reagents used, the nearest in time used are the higher array indexes
-                                    Dim highIndex As Integer = 0
-                                    'For highIndex = previousReagentIDSentList.Count - pHighContaminationPersitance To previousReagentIDSentList.Count - 1
-                                    For highIndex = previousReagentIDSentList.Count - 1 To previousReagentIDSentList.Count - pHighContaminationPersitance Step -1
-                                        If highIndex < 0 Then
-
-                                        Else
-                                            If highIndex < previousReagentIDSentList.Count - 1 Then 'Evaluate only High contamination
-                                                contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                                                  Where wse.ReagentContaminatorID = previousReagentIDSentList(highIndex).ReagentID _
-                                                                  AndAlso wse.ReagentContaminatedID = toSendList(0).ReagentID _
-                                                                  AndAlso Not wse.IsWashingSolutionR1Null _
-                                                                  Select wse).ToList()
-
-                                            Else 'With the last reagents sent evaluate both High or Low contamination
-                                                contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                                                  Where wse.ReagentContaminatorID = previousReagentIDSentList(highIndex).ReagentID _
-                                                                  AndAlso wse.ReagentContaminatedID = toSendList(0).ReagentID _
-                                                                  Select wse).ToList()
-                                            End If
-
-                                            If contaminations.Count > 0 Then
-                                                'Check if the required wash has been already sent or not
-                                                If Not contaminations(0).IsContaminationIDNull Then myContaminationID = contaminations(0).ContaminationID
-
-                                                myWashSolutionType = ""
-                                                'If Not previousReagentIDSentList(highIndex).IsWashSolution1Null Then myWashSolutionType = previousReagentIDSentList(highIndex).WashSolution1
-                                                If Not contaminations(0).IsWashingSolutionR1Null Then myWashSolutionType = contaminations(0).WashingSolutionR1
-
-                                                'AG 28/03/2014 - #1563 it is not necessary modify the next line , ExecutionID can not be NULL because the list has been get using Linq where executionType = PREP_STD
-                                                Dim previousExecutionsIDSent As Integer = previousReagentIDSentList(highIndex).ExecutionID
-
-                                                Dim i As Integer = 0
-                                                'Search the proper row in mySentPreparationsDS.sentPreparations
-                                                For i = 0 To mySentPreparationsDS.sentPreparations.Rows.Count - 1
-                                                    'AG 28/03/2014 - #1563 evaluate that ExecutionID is not NULL
-                                                    'If previousExecutionsIDSent = mySentPreparationsDS.sentPreparations(i).ExecutionID Then
-                                                    If Not mySentPreparationsDS.sentPreparations(i).IsExecutionIDNull AndAlso previousExecutionsIDSent = mySentPreparationsDS.sentPreparations(i).ExecutionID Then
-                                                        Exit For
-                                                    ElseIf mySentPreparationsDS.sentPreparations(i).IsExecutionIDNull Then
-                                                        GlobalBase.CreateLogActivity("Protection! Otherwise the bug #1563 was triggered", "AnalyzerManager.GetNextExecution", EventLogEntryType.Information, False)
-                                                    End If
-                                                    'AG 28/03/2014 - #1563 
-                                                Next
-
-                                                'Search if the proper wash has been already sent or not
-                                                contaminationFound = True
-                                                nextExecutionFound = False
-                                                For i = i To mySentPreparationsDS.sentPreparations.Rows.Count - 1
-                                                    If mySentPreparationsDS.sentPreparations(i).ReagentWashFlag = True AndAlso _
-                                                        mySentPreparationsDS.sentPreparations(i).WashSolution1 = myWashSolutionType Then
-
-                                                        contaminationFound = False
-                                                        nextExecutionFound = True
-                                                        indexNextToSend = 0
-                                                        Exit For
-                                                    End If
-                                                Next
-
-                                                If contaminationFound Then Exit For
-
-                                            End If
-                                        End If
-                                    Next
-
-                                    'AG 24/02/2012 - This code is placed because before in this case the Sw do not send anything an Fw do a Dummy
-                                    If Not contaminations Is Nothing AndAlso contaminations.Count = 0 Then
-                                        nextExecutionFound = True
-                                        indexNextToSend = 0
-                                    End If
-                                    'AG 24/02/2012
-
-                                Else '(5) (If contaminNumber = 0 Then)
-                                    nextExecutionFound = True
-                                    indexNextToSend = 0
-                                End If
-
+                            If contaminationFound Then
+                                ObtainNextPreparationOrWash(myContaminationID, myWashSolutionType, indexNextToSend, nextExecutionFound, pContaminationsDS, toSendList,
+                                                            pHighContaminationPersitance, previousReagentIDSentList, dbConnection)
                             Else '(4) If contaminationFound Then
-                                'If no contamination between previous reagents sent and the next one so sent it
+                                'If no contamination between previous reagents sent and the next one so send it
                                 nextExecutionFound = True
                                 indexNextToSend = 0
-
                             End If '(End 4)If contaminationFound Then
 
-
-                            'Once the best option is found prepare the variable to return
-                            Dim myReturn As New AnalyzerManagerDS
-                            Dim myRow As AnalyzerManagerDS.searchNextRow
-
-                            pFound = True ' Inform something is found to be sent: execution or wash
-                            If nextExecutionFound Then '(4)
-                                'Prepare output DS with the proper information (execution to be sent)
-                                myRow = myReturn.searchNext.NewsearchNextRow
-                                myRow.ExecutionID = toSendList(indexNextToSend).ExecutionID
-                                myRow.SampleClass = toSendList(indexNextToSend).SampleClass
-                                myRow.SetContaminationIDNull()
-                                myRow.SetWashingSolution1Null()
-                                myReturn.searchNext.AddsearchNextRow(myRow)
+#If DEBUG Then
+                            If contaminationFound Then
+                                Debug.Print("Contamination Found after ObtainNextPreparationOrWash method \n")
 
                             Else
-                                'Contamination (wash has to be sent)
-                                myRow = myReturn.searchNext.NewsearchNextRow
-                                myRow.ExecutionID = toSendList(indexNextToSend).ExecutionID 'AG + DL 06/07/2012 'GlobalConstants.NO_PENDING_PREPARATION_FOUND
-                                myRow.SetSampleClassNull()
-                                myRow.ContaminationID = myContaminationID
-                                myRow.WashingSolution1 = myWashSolutionType
-                                myReturn.searchNext.AddsearchNextRow(myRow)
-                            End If '(4)
-                            resultData.SetDatos = myReturn
+                                Debug.Print("Contamination NOT found after ObtainNextPreparationOrWash method \n")
 
-                            contaminations = Nothing 'AG 02/08/2012 release memory
-                            previousReagentIDSentList = Nothing 'AG 02/08/2012 release memory
+                            End If
+#End If
+                            'Once the best option is found prepare the variable to return
+                            resultData.SetDatos = ReturnNextExecution(toSendList, myContaminationID, myWashSolutionType, nextExecutionFound, indexNextToSend, pFound)
 
-                            'Else '(3) If toSendList.Count > 0 Then
-                            'No exectution matches with linq where criteria
+#If DEBUG Then
+                            Debug.Print(String.Format("Those are the results from ReturnNextExecution: toSendList = {0}; myContaminationID = {1}; myWashSolutionType = {2}; nextExecutionFound = {3}; indexNextToSend = {4}; pFound = {5}",
+                                                      toSendList.Count().ToString(), myContaminationID.ToString(), myWashSolutionType.ToString(), nextExecutionFound.ToString(), indexNextToSend.ToString(), pFound.ToString()))
+
+#End If
+                            previousReagentIDSentList.Clear()
                         End If '(End 3)
-                        toSendList = Nothing 'AG 02/08/2012 release memory
                     End If '(End 2)
                 End If '(End 1)
 
@@ -1931,6 +1518,167 @@ Namespace Biosystems.Ax00.Core.Entities
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.GetNextExecution", EventLogEntryType.Error, False)
             End Try
             Return resultData
+        End Function
+
+        Private Function InformElementID(ByVal toSendList As List(Of ExecutionsDS.twksWSExecutionsRow), ByVal dbConnection As SqlConnection) As List(Of ExecutionsDS.twksWSExecutionsRow)
+            Dim allOrderTestsDS As OrderTestsForExecutionsDS
+            Dim myWSOrderTestsDelegate As New WSOrderTestsDelegate
+            Dim resultData = myWSOrderTestsDelegate.GetInfoOrderTestsForExecutions(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute)
+            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                allOrderTestsDS = DirectCast(resultData.SetDatos, OrderTestsForExecutionsDS)
+
+                Dim auxOrderTestID As Integer = -1
+                Dim otInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow) = Nothing
+
+                otInfo = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
+                                    Where a.OrderTestID = toSendList(0).OrderTestID _
+                                   Select a).ToList()
+
+                For Each row As ExecutionsDS.twksWSExecutionsRow In toSendList
+                    If row.OrderTestID <> auxOrderTestID Then
+                        auxOrderTestID = row.OrderTestID
+                        'Search information for the Calibrator or control or patient ordertest
+                        otInfo = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
+                                    Where a.OrderTestID = auxOrderTestID _
+                                   Select a).ToList()
+                    End If
+
+                    If otInfo.Count >= 1 Then 'AG 10/04/2012 old condition fails when same test has 2 control levels (If otInfo.Count = 1 Then)
+                        row.BeginEdit()
+                        row.ElementID = otInfo(0).ElementID
+                        row.AcceptChanges()
+                        row.EndEdit()
+                    End If
+                Next
+                otInfo = Nothing
+
+                Dim auxElementID = toSendList(0).ElementID 'Apply linq using the same ElementID as the first item in toSendLinq previous results
+
+                toSendList = (From a As ExecutionsDS.twksWSExecutionsRow In toSendList _
+                              Where a.ElementID = auxElementID Select a).ToList
+            End If
+            Return toSendList
+        End Function
+
+        Private Function GetExecutionsToSend(pSTDExecutionList As ExecutionsDS, ByVal pOrderId As String, ByVal pSampleType As String, ByVal pStatFlag As Boolean, ByVal pSampleClass As String) As List(Of ExecutionsDS.twksWSExecutionsRow)
+            'Get the list of pending executions depending the entry parameters case
+            'Apply different LINQ (where clause)
+            Dim toSendList As List(Of ExecutionsDS.twksWSExecutionsRow)
+            If pOrderId <> "" And pSampleType <> "" Then '(3)
+                toSendList = (From a As ExecutionsDS.twksWSExecutionsRow In pSTDExecutionList.twksWSExecutions _
+                                Where a.OrderID = pOrderId AndAlso a.SampleType = pSampleType AndAlso a.StatFlag = pStatFlag _
+                                Select a).ToList
+            ElseIf pOrderId <> "" And pSampleType <> "" And pSampleClass <> "" Then '(1)
+                toSendList = (From a As ExecutionsDS.twksWSExecutionsRow In pSTDExecutionList.twksWSExecutions _
+                                Where a.OrderID = pOrderId AndAlso a.SampleType = pSampleType AndAlso a.StatFlag = pStatFlag AndAlso a.SampleClass = pSampleClass _
+                                Select a).ToList
+
+            ElseIf pSampleClass <> "" Then '(1)
+                toSendList = (From a As ExecutionsDS.twksWSExecutionsRow In pSTDExecutionList.twksWSExecutions _
+                                Where a.StatFlag = pStatFlag AndAlso a.SampleClass = pSampleClass _
+                                Select a).ToList
+
+            Else
+                toSendList = (From a As ExecutionsDS.twksWSExecutionsRow In pSTDExecutionList.twksWSExecutions _
+                                Where a.StatFlag = pStatFlag _
+                                Select a).ToList
+
+            End If
+            Return toSendList
+        End Function
+
+        Private Function SeachContaminationBetweenPreviousAndFirsToSend(ByRef previousReagentIDSentList As List(Of AnalyzerManagerDS.sentPreparationsRow), pContaminationsDS As ContaminationsDS, ReagentID As Integer, pHighContaminationPersitance As Integer) As Boolean
+            '1) Search contamination between previous reagents and the first in toSendList
+            Dim contaminations As List(Of ContaminationsDS.tparContaminationsRow) = Nothing
+            Dim contaminationFound As Boolean = False
+
+            Dim auxList = (From a As AnalyzerManagerDS.sentPreparationsRow In mySentPreparationsDS.sentPreparations _
+                                     Where a.ExecutionType = "PREP_STD" Select a).ToList
+
+            If auxList.Any() Then '(3.bis)
+                '1.1) Check if exists contamination between last reagent and next reagent (LOW or HIGH contamiantion)
+                contaminations = (From wse In pContaminationsDS.tparContaminations _
+                                        Where wse.ReagentContaminatorID = auxList(auxList.Count - 1).ReagentID _
+                                        AndAlso wse.ReagentContaminatedID = ReagentID _
+                                        Select wse).ToList()
+
+                If contaminations.Any() Then '(4)
+                    contaminationFound = True 'LOW or HIGH contamination found
+
+                    'Check if the required wash has been already sent or not
+                    Dim requiredWash As String = ""
+                    If Not auxList(auxList.Count - 1).IsWashSolution1Null Then requiredWash = auxList(auxList.Count - 1).WashSolution1
+
+                    Dim previousExecutionsIDSent As Integer = auxList(auxList.Count - 1).ExecutionID
+
+                    Dim i As Integer = 0
+
+                    'Search if the proper wash has been already sent or not
+                    For aux_i = i To mySentPreparationsDS.sentPreparations.Rows.Count - 1
+                        If mySentPreparationsDS.sentPreparations(aux_i).ReagentWashFlag = True AndAlso _
+                            mySentPreparationsDS.sentPreparations(aux_i).WashSolution1 = requiredWash Then
+                            contaminationFound = False
+                            Exit For
+                        End If
+                    Next
+
+                ElseIf pHighContaminationPersitance > 0 Then '(4)
+                    '1.2) If no LOW contamination exists between the last reagent used and next take care about the previous due the high contamination
+                    'has persistance > 1
+                    Dim highIndex As Integer = 0
+                    For highIndex = auxList.Count - pHighContaminationPersitance To auxList.Count - 2 'The index -1 has already been evaluated
+                        If highIndex >= 0 Then 'Avoid overflow
+                            contaminations = (From wse In pContaminationsDS.tparContaminations _
+                                              Where wse.ReagentContaminatorID = auxList(highIndex).ReagentID _
+                                              AndAlso wse.ReagentContaminatedID = ReagentID _
+                                              AndAlso Not wse.IsWashingSolutionR1Null _
+                                              Select wse).ToList()
+                            If contaminations.Count > 0 Then
+                                contaminationFound = True 'HIGH contamination found
+
+                                'Check if the required wash has been already sent or not
+                                Dim requiredWash As String = ""
+                                If Not auxList(highIndex).IsWashSolution1Null Then requiredWash = auxList(highIndex).WashSolution1
+
+                                'AG 28/03/2014 - #1563 it is not necessary modify the next line , ExecutionID can not be NULL because the list has been get using Linq where executionType = PREP_STD
+                                Dim previousExecutionsIDSent As Integer = auxList(highIndex).ExecutionID
+
+                                Dim i As Integer = 0
+                                'Search the proper row in mySentPreparationsDS.sentPreparations
+                                For aux_i = 0 To mySentPreparationsDS.sentPreparations.Rows.Count - 1
+                                    'AG 28/03/2014 - #1563 evaluate that ExecutionID is not NULL
+                                    'If previousExecutionsIDSent = mySentPreparationsDS.sentPreparations(i).ExecutionID Then
+                                    If Not mySentPreparationsDS.sentPreparations(aux_i).IsExecutionIDNull AndAlso previousExecutionsIDSent = mySentPreparationsDS.sentPreparations(aux_i).ExecutionID Then
+                                        Exit For
+                                    ElseIf mySentPreparationsDS.sentPreparations(aux_i).IsExecutionIDNull Then
+                                        GlobalBase.CreateLogActivity("Protection! Otherwise the bug #1563 was triggered", "AnalyzerManager.GetNextExecution", EventLogEntryType.Information, False)
+                                    End If
+                                    'AG 28/03/2014 - #1563 
+                                    i = aux_i
+                                Next
+
+                                'Search if the proper wash has been already sent or not
+                                For aux_i = i To mySentPreparationsDS.sentPreparations.Rows.Count - 1
+                                    If mySentPreparationsDS.sentPreparations(aux_i).ReagentWashFlag = True AndAlso _
+                                        mySentPreparationsDS.sentPreparations(aux_i).WashSolution1 = requiredWash Then
+                                        contaminationFound = False
+                                        Exit For
+                                    End If
+                                Next
+
+                            End If
+                        End If
+
+                        If contaminationFound Then Exit For
+                    Next
+
+                End If '(EndIf 4)
+
+            End If
+
+            previousReagentIDSentList = auxList
+
+            Return contaminationFound
         End Function
 
 #End Region
@@ -2311,6 +2059,224 @@ Namespace Biosystems.Ax00.Core.Entities
             Return myGlobal
         End Function
 #End Region
+
+        Private Sub ObtainNextPreparationOrWash(ByRef myContaminationID As Integer, ByRef myWashSolutionType As String, ByRef indexNextToSend As Integer, ByRef nextExecutionFound As Boolean,
+                                                ByVal pContaminationsDS As ContaminationsDS, ByVal toSendList As List(Of ExecutionsDS.twksWSExecutionsRow), ByVal pHighContaminationPersitance As Integer,
+                                                ByVal previousReagentIDSentList As List(Of AnalyzerManagerDS.sentPreparationsRow), ByVal dbConnection As SqlConnection)
+            Dim contaminNumber As Integer = 0
+
+            '2.1) Calculate contaminations number with current executions sort
+            contaminNumber = 1 + ExecutionsDelegate.GetContaminationNumber(pContaminationsDS, toSendList, pHighContaminationPersitance)
+
+            If contaminNumber > 0 Then '(5)
+                Dim myReagentsIDList As New List(Of Integer) 'List of previous reagents sent before the current previousElementLastReagentID, 
+                '                                                   remember this information in order to check the high contamination persistance (One Item for each different OrderTest)
+                Dim myMaxReplicatesList As New List(Of Integer) 'Same item number as previous list, indicates the replicate number for each item in previous list
+                GetMaxReplicatesList(myReagentsIDList, myMaxReplicatesList, previousReagentIDSentList)
+
+#If DEBUG Then
+                Debug.Print(String.Format("After GetMaxReplicatesList: myReagentsIDList = {0}; myMaxReplicatesList = {1}; previousReagentIDSentList = {2} \n",
+                                          myReagentsIDList.Count, myMaxReplicatesList.Count, previousReagentIDSentList.Count))
+#End If
+
+                '2.2) If contaminations: apply Backtracking algorithm for handling contaminations, and choose the best solution
+                Dim currentResultList As List(Of ExecutionsDS.twksWSExecutionsRow)
+                currentResultList = toSendList.ToList() 'Initial order                                    
+                toSendList = ExecutionsDelegate.ManageContaminationsForRunningAndStatic(ActiveAnalyzer, dbConnection, pContaminationsDS, currentResultList, pHighContaminationPersitance, contaminNumber, myReagentsIDList, myMaxReplicatesList)
+
+#If DEBUG Then
+                Debug.Print(String.Format("Executed backtraking algorithm. toSendList = {0} \n", toSendList.Count().ToString()))
+#End If
+
+                '2.3) Finally check if exists contamination between last reagents used and next reagent that will be used (High or Low contamination)
+                CheckIfContaminationStillExist(previousReagentIDSentList, pHighContaminationPersitance, myContaminationID, myWashSolutionType, indexNextToSend, nextExecutionFound, pContaminationsDS, toSendList)
+            Else '(5) (If contaminNumber = 0 Then)
+                nextExecutionFound = True
+                indexNextToSend = 0
+            End If
+        End Sub
+
+        Private Sub GetMaxReplicatesList(ByRef myReagentsIDList As List(Of Integer), ByRef myMaxReplicatesList As List(Of Integer), previousReagentIDSentList As List(Of AnalyzerManagerDS.sentPreparationsRow))
+            'Transform previousReagentIDSentList List(Of AnalyzerManagerDS.sentPreparationsRow) into List (Of Integer): PreviousReagentsIDList and previousMaxReplicatesList
+            '(the nearest reagents use the higher indexs)
+            Dim maxReplicates As Integer = 0
+            For i = 0 To previousReagentIDSentList.Count - 1
+                If myReagentsIDList.Count = 0 Then myReagentsIDList.Add(previousReagentIDSentList(i).ReagentID)
+                maxReplicates += 1
+
+                'When change reagent inform max replicates into previousMaxReplicatesList
+                If myReagentsIDList(myReagentsIDList.Count - 1) <> previousReagentIDSentList(i).ReagentID Then
+                    myMaxReplicatesList.Add(maxReplicates) 'Previous reagent max replicates
+                    myReagentsIDList.Add(previousReagentIDSentList(i).ReagentID) 'New reagent
+                    maxReplicates = 1 'Initialize max replicates
+                End If
+            Next
+            If myReagentsIDList.Count > 0 Then
+                myMaxReplicatesList.Add(maxReplicates) 'Last reagent max replicates
+            End If
+        End Sub
+
+        Private Sub CheckIfContaminationStillExist(previousReagentIDSentList As List(Of AnalyzerManagerDS.sentPreparationsRow), pHighContaminationPersitance As Integer, ByRef myContaminationID As Integer,
+                                                   ByRef myWashSolutionType As String, ByRef indexNextToSend As Integer, ByRef nextExecutionFound As Boolean, ByVal pContaminationsDS As ContaminationsDS,
+                                                   ByVal toSendList As List(Of ExecutionsDS.twksWSExecutionsRow))
+            'If contamination sent Wash, else sent toSendList(0).ExecutionID
+            'NOTE: previousReagentIDSentList contains the last reagents used, the nearest in time used are the higher array indexes
+            Dim highIndex As Integer = 0
+            Dim contaminations As List(Of ContaminationsDS.tparContaminationsRow) = Nothing
+
+#If DEBUG Then
+            Debug.Print(String.Format("Number of elements previousReagentIDSentList = {0}; pHighContaminationPersistance = {1} \n", previousReagentIDSentList.Count().ToString(),
+                                       pHighContaminationPersitance.ToString()))
+
+#End If
+            For highIndex = previousReagentIDSentList.Count - 1 To previousReagentIDSentList.Count - pHighContaminationPersitance Step -1
+                If highIndex >= 0 Then
+                    If highIndex < previousReagentIDSentList.Count - 1 Then 'Evaluate only High contamination
+                        contaminations = (From wse In pContaminationsDS.tparContaminations _
+                                          Where wse.ReagentContaminatorID = previousReagentIDSentList(highIndex).ReagentID _
+                                          AndAlso wse.ReagentContaminatedID = toSendList(0).ReagentID _
+                                          AndAlso Not wse.IsWashingSolutionR1Null _
+                                          Select wse).ToList()
+
+                    Else 'With the last reagents sent evaluate both High or Low contamination
+                        contaminations = (From wse In pContaminationsDS.tparContaminations _
+                                          Where wse.ReagentContaminatorID = previousReagentIDSentList(highIndex).ReagentID _
+                                          AndAlso wse.ReagentContaminatedID = toSendList(0).ReagentID _
+                                          Select wse).ToList()
+                    End If
+
+                    If contaminations.Any() Then
+                        'Check if the required wash has been already sent or not
+                        If Not contaminations(0).IsContaminationIDNull Then myContaminationID = contaminations(0).ContaminationID
+
+                        myWashSolutionType = ""
+                        'If Not previousReagentIDSentList(highIndex).IsWashSolution1Null Then myWashSolutionType = previousReagentIDSentList(highIndex).WashSolution1
+                        If Not contaminations(0).IsWashingSolutionR1Null Then myWashSolutionType = contaminations(0).WashingSolutionR1
+
+                        'AG 28/03/2014 - #1563 it is not necessary modify the next line , ExecutionID can not be NULL because the list has been get using Linq where executionType = PREP_STD
+                        Dim previousExecutionsIDSent As Integer = previousReagentIDSentList(highIndex).ExecutionID
+
+#If DEBUG Then
+                        Try
+                            Debug.Print(String.Format("CheckIfContaminationStillExist: Washing Solution Found={0}; previousExeutionsIDSent to find={1} \n", myWashSolutionType, previousExecutionsIDSent.ToString()))
+                        Catch ex As Exception
+                        End Try
+#End If
+
+                        Dim aux As Integer = 0
+                        'Search the proper row in mySentPreparationsDS.sentPreparations
+                        For i = 0 To mySentPreparationsDS.sentPreparations.Rows.Count - 1
+                            'AG 28/03/2014 - #1563 evaluate that ExecutionID is not NULL
+                            If Not mySentPreparationsDS.sentPreparations(i).IsExecutionIDNull AndAlso previousExecutionsIDSent = mySentPreparationsDS.sentPreparations(i).ExecutionID Then
+                                aux = i
+                                Exit For
+                            ElseIf mySentPreparationsDS.sentPreparations(i).IsExecutionIDNull Then
+                                GlobalBase.CreateLogActivity("Protection! Otherwise the bug #1563 was triggered", "AnalyzerManager.GetNextExecution", EventLogEntryType.Information, False)
+                            End If
+                            'AG 28/03/2014 - #1563 
+                            aux = i
+                        Next
+
+#If DEBUG Then
+                        Try
+                            Debug.Print(String.Format("CheckIfContaminationStillExist: Value for aux = {0} \n", aux.ToString()))
+                        Catch ex As Exception
+                        End Try
+#End If
+
+                        'Search if the proper wash has been already sent or not
+                        Dim contaminationFound = True
+                        nextExecutionFound = False
+                        For i = aux To mySentPreparationsDS.sentPreparations.Rows.Count - 1
+#If DEBUG Then
+                            Try
+                                Debug.Print(String.Format("Inside the For. Loop variable i = {0}; SentPreparations(i).ReagentWashFlag = {1}; SentPreparations(i).WashSolution1 = {2}; SentPreparations(i).ExecutionID = {3} ",
+                                                          i.ToString(), mySentPreparationsDS.sentPreparations(i).ReagentWashFlag.ToString(), mySentPreparationsDS.sentPreparations(i).WashSolution1.ToString(), mySentPreparationsDS.sentPreparations(i).ExecutionID.ToString()))
+                            Catch ex As Exception
+
+                            End Try
+#End If
+                            If mySentPreparationsDS.sentPreparations(i).ReagentWashFlag = True AndAlso _
+                                mySentPreparationsDS.sentPreparations(i).WashSolution1 = myWashSolutionType Then
+
+                                contaminationFound = False
+                                nextExecutionFound = True
+                                indexNextToSend = 0
+#If DEBUG Then
+                                Try
+                                    Debug.Print(String.Format("CheckIfContaminationStillExist: Found proper wash already sent in step {0} \n", i.ToString()))
+                                Catch ex As Exception
+                                End Try
+#End If
+                                Exit For
+                            End If
+                        Next
+
+                        If contaminationFound Then Exit For
+
+                    Else
+#If DEBUG Then
+                        Try
+                            Debug.Print("There aren't any contamination (inside the for loop)... highIndex = {0} \n", highIndex.ToString())
+                        Catch ex As Exception
+                        End Try
+#End If
+                    End If
+                Else
+#If DEBUG Then
+                    Try
+                        Debug.Print("highIndex is negative = {0} \n", highIndex.ToString())
+                    Catch ex As Exception
+                    End Try
+#End If
+                End If
+            Next
+
+            'This code is placed because before in this case the Sw do not send anything and Fw do a Dummy
+            If Not contaminations Is Nothing AndAlso contaminations.Count = 0 Then
+                nextExecutionFound = True
+                indexNextToSend = 0
+            End If
+
+#If DEBUG Then
+            Debug.Print(String.Format("Quitting CheckIfContaminationStillExist, values: nextExecutionFound = {0}; indexNextToSend = {1} \n", nextExecutionFound.ToString(), indexNextToSend.ToString()))
+#End If
+        End Sub
+
+        Private Function ReturnNextExecution(toSendList As List(Of ExecutionsDS.twksWSExecutionsRow), myContaminationID As Integer, myWashSolutionType As String,
+                                             nextExecutionFound As Boolean, indexNextToSend As Integer, ByRef pFound As Boolean) As AnalyzerManagerDS
+            'Once the best option is found prepare the variable to return
+            Dim myReturn As New AnalyzerManagerDS
+            Dim myRow As AnalyzerManagerDS.searchNextRow
+
+            pFound = True ' Inform something is found to be sent: execution or wash
+            If nextExecutionFound Then '(4)
+                'Prepare output DS with the proper information (execution to be sent)
+                myRow = myReturn.searchNext.NewsearchNextRow
+                myRow.ExecutionID = toSendList(indexNextToSend).ExecutionID
+                myRow.SampleClass = toSendList(indexNextToSend).SampleClass
+                myRow.SetContaminationIDNull()
+                myRow.SetWashingSolution1Null()
+                myReturn.searchNext.AddsearchNextRow(myRow)
+#If DEBUG Then
+                Debug.Print(String.Format("Next execution sent: {0}, sample class {1}", myRow.ExecutionID.ToString(), myRow.SampleClass))
+#End If
+            Else
+                'Contamination (wash has to be sent)
+                myRow = myReturn.searchNext.NewsearchNextRow
+                myRow.ExecutionID = toSendList(indexNextToSend).ExecutionID 'AG + DL 06/07/2012 'GlobalConstants.NO_PENDING_PREPARATION_FOUND
+                myRow.SetSampleClassNull()
+                myRow.ContaminationID = myContaminationID
+                myRow.WashingSolution1 = myWashSolutionType
+                myReturn.searchNext.AddsearchNextRow(myRow)
+
+#If DEBUG Then
+                Debug.Print(String.Format("Next Wash sent: {0}, sample class {1}, contamination {2}", myRow.ExecutionID.ToString(), myRow.SampleClass, myRow.ContaminationID.ToString()))
+#End If
+
+            End If '(4)
+            Return myReturn
+        End Function
 
     End Class
 

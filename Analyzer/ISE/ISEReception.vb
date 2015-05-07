@@ -423,7 +423,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             Dim myResultAlarmsDelegate As New ResultAlarmsDelegate
 
                             'Other local variables
-                            Dim myAlarmID As Alarms
+                            Dim myAlarmID As AlarmEnumerates.Alarms
                             Dim myAverage As Single = 0
                             Dim myControlID As Integer = -1
                             Dim alarmExists As Boolean = False
@@ -517,18 +517,18 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                             If (ISEError.IsCancelError) Then
                                                 Select Case (pISEResult.Errors(0).CancelErrorCode)
-                                                    Case ISEErrorTO.ISECancelErrorCodes.A : myAlarmID = Alarms.ISE_ERROR_A
-                                                    Case ISEErrorTO.ISECancelErrorCodes.B : myAlarmID = Alarms.ISE_ERROR_B
-                                                    Case ISEErrorTO.ISECancelErrorCodes.C : myAlarmID = Alarms.ISE_ERROR_C
-                                                    Case ISEErrorTO.ISECancelErrorCodes.D : myAlarmID = Alarms.ISE_ERROR_D
-                                                    Case ISEErrorTO.ISECancelErrorCodes.F : myAlarmID = Alarms.ISE_ERROR_F
-                                                    Case ISEErrorTO.ISECancelErrorCodes.M : myAlarmID = Alarms.ISE_ERROR_M
-                                                    Case ISEErrorTO.ISECancelErrorCodes.N : myAlarmID = Alarms.ISE_ERROR_N
-                                                    Case ISEErrorTO.ISECancelErrorCodes.P : myAlarmID = Alarms.ISE_ERROR_P
-                                                    Case ISEErrorTO.ISECancelErrorCodes.R : myAlarmID = Alarms.ISE_ERROR_R
-                                                    Case ISEErrorTO.ISECancelErrorCodes.S : myAlarmID = Alarms.ISE_ERROR_S
-                                                    Case ISEErrorTO.ISECancelErrorCodes.T : myAlarmID = Alarms.ISE_ERROR_T
-                                                    Case ISEErrorTO.ISECancelErrorCodes.W : myAlarmID = Alarms.ISE_ERROR_W
+                                                    Case ISEErrorTO.ISECancelErrorCodes.A : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_A
+                                                    Case ISEErrorTO.ISECancelErrorCodes.B : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_B
+                                                    Case ISEErrorTO.ISECancelErrorCodes.C : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_C
+                                                    Case ISEErrorTO.ISECancelErrorCodes.D : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_D
+                                                    Case ISEErrorTO.ISECancelErrorCodes.F : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_F
+                                                    Case ISEErrorTO.ISECancelErrorCodes.M : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_M
+                                                    Case ISEErrorTO.ISECancelErrorCodes.N : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_N
+                                                    Case ISEErrorTO.ISECancelErrorCodes.P : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_P
+                                                    Case ISEErrorTO.ISECancelErrorCodes.R : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_R
+                                                    Case ISEErrorTO.ISECancelErrorCodes.S : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_S
+                                                    Case ISEErrorTO.ISECancelErrorCodes.T : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_T
+                                                    Case ISEErrorTO.ISECancelErrorCodes.W : myAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_W
                                                 End Select
                                                 myExecutionAlarmsRow.AlarmID = myAlarmID.ToString
                                             Else
@@ -2598,20 +2598,20 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 If pISEError.IsCancelError Then
                     'Independent ERC error
-                    Dim myAlarm As Alarms
+                    Dim myAlarm As AlarmEnumerates.Alarms
                     Select Case pISEError.CancelErrorCode
-                        Case ISEErrorTO.ISECancelErrorCodes.A : myAlarm = Alarms.ISE_ERROR_A
-                        Case ISEErrorTO.ISECancelErrorCodes.B : myAlarm = Alarms.ISE_ERROR_B
-                        Case ISEErrorTO.ISECancelErrorCodes.C : myAlarm = Alarms.ISE_ERROR_C
-                        Case ISEErrorTO.ISECancelErrorCodes.S : myAlarm = Alarms.ISE_ERROR_S
-                        Case ISEErrorTO.ISECancelErrorCodes.F : myAlarm = Alarms.ISE_ERROR_F
-                        Case ISEErrorTO.ISECancelErrorCodes.R : myAlarm = Alarms.ISE_ERROR_R
-                        Case ISEErrorTO.ISECancelErrorCodes.W : myAlarm = Alarms.ISE_ERROR_W
-                        Case ISEErrorTO.ISECancelErrorCodes.T : myAlarm = Alarms.ISE_ERROR_T
-                        Case ISEErrorTO.ISECancelErrorCodes.N : myAlarm = Alarms.ISE_ERROR_N
-                        Case ISEErrorTO.ISECancelErrorCodes.D : myAlarm = Alarms.ISE_ERROR_D
-                        Case ISEErrorTO.ISECancelErrorCodes.P : myAlarm = Alarms.ISE_ERROR_P
-                        Case ISEErrorTO.ISECancelErrorCodes.M : myAlarm = Alarms.ISE_ERROR_M
+                        Case ISEErrorTO.ISECancelErrorCodes.A : myAlarm = AlarmEnumerates.Alarms.ISE_ERROR_A
+                        Case ISEErrorTO.ISECancelErrorCodes.B : myAlarm = AlarmEnumerates.Alarms.ISE_ERROR_B
+                        Case ISEErrorTO.ISECancelErrorCodes.C : myAlarm = AlarmEnumerates.Alarms.ISE_ERROR_C
+                        Case ISEErrorTO.ISECancelErrorCodes.S : myAlarm = AlarmEnumerates.Alarms.ISE_ERROR_S
+                        Case ISEErrorTO.ISECancelErrorCodes.F : myAlarm = AlarmEnumerates.Alarms.ISE_ERROR_F
+                        Case ISEErrorTO.ISECancelErrorCodes.R : myAlarm = AlarmEnumerates.Alarms.ISE_ERROR_R
+                        Case ISEErrorTO.ISECancelErrorCodes.W : myAlarm = AlarmEnumerates.Alarms.ISE_ERROR_W
+                        Case ISEErrorTO.ISECancelErrorCodes.T : myAlarm = AlarmEnumerates.Alarms.ISE_ERROR_T
+                        Case ISEErrorTO.ISECancelErrorCodes.N : myAlarm = AlarmEnumerates.Alarms.ISE_ERROR_N
+                        Case ISEErrorTO.ISECancelErrorCodes.D : myAlarm = AlarmEnumerates.Alarms.ISE_ERROR_D
+                        Case ISEErrorTO.ISECancelErrorCodes.P : myAlarm = AlarmEnumerates.Alarms.ISE_ERROR_P
+                        Case ISEErrorTO.ISECancelErrorCodes.M : myAlarm = AlarmEnumerates.Alarms.ISE_ERROR_M
                         Case ISEErrorTO.ISECancelErrorCodes.None : myGlobal.SetDatos = "" : Exit Try
 
                     End Select
@@ -2623,37 +2623,37 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 Else
                     'result error
-                    Dim myAlarm As Alarms
+                    Dim myAlarm As AlarmEnumerates.Alarms
                     Select Case pISEError.ResultErrorCode
                         Case ISEErrorTO.ISEResultErrorCodes.mvOut_CalBSample
-                            myAlarm = Alarms.ISE_mVOutB
+                            myAlarm = AlarmEnumerates.Alarms.ISE_mVOutB
 
                         Case ISEErrorTO.ISEResultErrorCodes.mvOut_CalASample_CalBUrine
                             If Not pIsUrine Then
-                                myAlarm = Alarms.ISE_mVOutA_SER
+                                myAlarm = AlarmEnumerates.Alarms.ISE_mVOutA_SER
                             Else
-                                myAlarm = Alarms.ISE_mVOutB_URI
+                                myAlarm = AlarmEnumerates.Alarms.ISE_mVOutB_URI
                             End If
 
                         Case ISEErrorTO.ISEResultErrorCodes.mvNoise_CalBSample
-                            myAlarm = Alarms.ISE_mVNoiseB
+                            myAlarm = AlarmEnumerates.Alarms.ISE_mVNoiseB
 
                         Case ISEErrorTO.ISEResultErrorCodes.mvNoise_CalBSample_CalBUrine
                             If Not pIsUrine Then
-                                myAlarm = Alarms.ISE_mVNoiseA_SER
+                                myAlarm = AlarmEnumerates.Alarms.ISE_mVNoiseA_SER
                             Else
-                                myAlarm = Alarms.ISE_mVNoiseB_URI
+                                myAlarm = AlarmEnumerates.Alarms.ISE_mVNoiseB_URI
                             End If
 
                         Case ISEErrorTO.ISEResultErrorCodes.Drift_CalASample
                             If Not pIsCalibration Then
-                                myAlarm = Alarms.ISE_Drift_SER
+                                myAlarm = AlarmEnumerates.Alarms.ISE_Drift_SER
                             Else
-                                myAlarm = Alarms.ISE_Drift_CAL
+                                myAlarm = AlarmEnumerates.Alarms.ISE_Drift_CAL
                             End If
 
                         Case ISEErrorTO.ISEResultErrorCodes.OutOfSlope_MachineRanges
-                            myAlarm = Alarms.ISE_OutSlope
+                            myAlarm = AlarmEnumerates.Alarms.ISE_OutSlope
 
                         Case ISEErrorTO.ISEResultErrorCodes.None
                             myGlobal.SetDatos = "" : Exit Try

@@ -143,15 +143,24 @@
     <Compile Include="AnalyzerManager\5- Well base line calculations.vb" />
     <Compile Include="AnalyzerManager\6- Sending Processes.vb" />
     <Compile Include="AnalyzerManager\7- Recovery Results.vb" />
+    <Compile Include="AnalyzerManager\Actions\AnalyzerManager.SendEvents.vb" />
+    <Compile Include="AnalyzerManager\Actions\AnalyzerThreadEventManagement.vb" />
+    <Compile Include="AnalyzerManager\Actions\AnalyzerAlarms.vb" />
+    <Compile Include="AnalyzerManager\Actions\ProcessArmStatusRecived.vb" />
+    <Compile Include="AnalyzerManager\Actions\ProcessStatusReceived.vb" />
     <Compile Include="AnalyzerManager\AnalyzerEntity.vb" />
-    <Compile Include="AnalyzerManager\BA200AnalyzerEntity.vb" />
-    <Compile Include="AnalyzerManager\BA400AnalyzerEntity.vb" />
     <Compile Include="AnalyzerManager\DynamicBaseLineEntity.vb" />
+    <Compile Include="AnalyzerManager\Shared\ConstantParameters.vb" />
+    <Compile Include="AnalyzerManager\Shared\Preparation.vb" />
     <Compile Include="AnalyzerManager\SN- Temporal Testing and Old Methods.vb" />
     <Compile Include="AnalyzerManager\StaticBaseLineEntity.vb" />
     <Compile Include="AnalyzerManager\ToIntegrate.vb" />
+    <Compile Include="Interfaces\IAnalyzerContaminationSpecification.vb" />
     <Compile Include="Interfaces\IAnalyzerManager.vb" />
+    <Compile Include="Interfaces\IDispensingContaminationDescription.vb" />
     <Compile Include="Interfaces\IISEManager.vb" />
+    <Compile Include="Interfaces\IReagentDispensing.vb" />
+    <Compile Include="Interfaces\IWashingDescription.vb" />
     <Compile Include="ISE\ISEManager.vb" />
     <Compile Include="ISE\ISEReception.vb" />
     <Compile Include="ISE\ToIntegrate.vb" />
@@ -181,6 +190,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AnalyzerManager\Actions\AnalizerManager.ReceivedEvents.vb" />
     <None Include="BioSystems.pfx" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
@@ -191,6 +201,7 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="CommAx00.exe">
@@ -198,6 +209,10 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Ax00.CrossCutting\Ax00.CrossCutting.vbproj">
+      <Project>{b23d6aff-a359-4d3e-87bf-820167228fe5}</Project>
+      <Name>Ax00.CrossCutting</Name>
+    </ProjectReference>
     <ProjectReference Include="..\AX00Types\AX00Types.vbproj">
       <Project>{3B617EBF-0488-46BD-AB56-094F81D0E4C3}</Project>
       <Name>AX00Types</Name>
@@ -245,7 +260,11 @@
       <Isolated>False</Isolated>
     </COMReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>call "$(SolutionDir)\Tools\SolutionTools.exe"</PreBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

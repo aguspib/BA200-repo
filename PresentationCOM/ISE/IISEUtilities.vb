@@ -8,7 +8,7 @@ Imports Biosystems.Ax00.FwScriptsManagement
 Imports Biosystems.Ax00.BL
 Imports System.Windows.Forms
 Imports System.Drawing
-Imports Biosystems.Ax00.CommunicationsSwFw
+Imports Biosystems.Ax00.Global.AlarmEnumerates
 Imports System.IO
 Imports System.Runtime.InteropServices 'WIN32
 Imports Biosystems.Ax00.App
@@ -2196,7 +2196,7 @@ Public Class UiISEUtilities
                         myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.GetISEAlarmsForUtilities(myPendingCal)
                         If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                             Dim myAlarms As List(Of Alarms) = CType(myGlobal.SetDatos, List(Of Alarms))
-                            Me.AppendISEAlarmsText(Me.BsRichTextBox1, myAlarms, myPendingCal)
+                            Me.AppendISEAlarmsText(BsRichTextBox1, myAlarms, myPendingCal)
                         End If
                         Exit Sub
                     End If
@@ -2530,8 +2530,10 @@ Public Class UiISEUtilities
                                         isReady = Not (CBool(myGlobal.SetDatos) And myAffectedElectrodes Is Nothing)
                                     End If
                                     GlobalBase.CreateLogActivity("Launch CreateWSExecutions !", Me.Name & ".PrepareTestedMode", EventLogEntryType.Information, False) 'AG 31/03/2014 - #1565
-                                    myGlobal = myExecutionDelegate.CreateWSExecutions(Nothing, AnalyzerController.Instance.Analyzer.ActiveAnalyzer, MyClass.WorkSessionIDAttribute, _
-                                                                                  createWSInRunning, -1, String.Empty, isReady, myAffectedElectrodes, pauseMode) 'AG 30/05/2014 #1644 - Redesing correction #1584 for avoid DeadLocks (new parameter pauseMode)
+                                    'myGlobal = myExecutionDelegate.CreateWSExecutions(Nothing, AnalyzerController.Instance.Analyzer.ActiveAnalyzer, MyClass.WorkSessionIDAttribute, _
+                                    '                                              createWSInRunning, -1, String.Empty, isReady, myAffectedElectrodes, pauseMode) 'AG 30/05/2014 #1644 - Redesing correction #1584 for avoid DeadLocks (new parameter pauseMode)
+                                    myGlobal = DelegatesToCoreBusinesGlue.CreateWS(Nothing, AnalyzerController.Instance.Analyzer.ActiveAnalyzer, WorkSessionIDAttribute, _
+                                                                                  createWSInRunning, -1, String.Empty, isReady, myAffectedElectrodes, pauseMode)
                                     If Not isReady Then Me.DisplayMessage(Messages.ISE_NOT_READY.ToString)
                                     'end SGM 25/09/2012
                                     myAffectedElectrodes = Nothing 'AG 19/02/2014 - #1514
@@ -2547,7 +2549,7 @@ Public Class UiISEUtilities
 
                             End If
                             'Me.AppendAnalyzerResponseText(Me.BsRichTextBox1, myText)
-                            MyClass.PrepareReadyForTestingMode()
+                            PrepareReadyForTestingMode()
 
 
                         Case OPERATIONS.PRIME_CALIBRATION 'SGM 11/06/2012
@@ -3201,7 +3203,7 @@ Public Class UiISEUtilities
     ''' <param name="RTC"></param>
     ''' <param name="pAlarmsList"></param>
     ''' <remarks></remarks>
-    Private Sub AppendISEAlarmsText(ByVal RTC As RichTextBox, ByVal pAlarmsList As List(Of GlobalEnumerates.Alarms), _
+    Private Sub AppendISEAlarmsText(ByVal RTC As RichTextBox, ByVal pAlarmsList As List(Of Alarms), _
                                     ByVal pPendingCalibrations As List(Of ISEManager.MaintenanceOperations))
         Try
 
@@ -4020,7 +4022,7 @@ Public Class UiISEUtilities
             If Not AnalyzerController.Instance.Analyzer Is Nothing Then
 
                 'Dim resultData As New GlobalDataTO
-                Dim myAlarms As New List(Of GlobalEnumerates.Alarms)
+                Dim myAlarms As New List(Of Alarms)
 
                 ' AG+XBC 24/05/2012
                 'Dim myAx00Status As GlobalEnumerates.AnalyzerManagerStatus = GlobalEnumerates.AnalyzerManagerStatus.SLEEPING
@@ -4102,7 +4104,7 @@ Public Class UiISEUtilities
                         myStatus = False
                     End If
                 Else
-                    If myAlarms.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR) Then
+                    If myAlarms.Contains(Alarms.ISE_OFF_ERR) Then
                         myStatus = False
                     End If
                 End If
@@ -4658,8 +4660,10 @@ Public Class UiISEUtilities
                         If isReady Then ' XBC 15/04/2013 - if ISE still Not Ready, is no need re-generate executions because there no changes and it is long time process
                             GlobalBase.CreateLogActivity("Launch CreateWSExecutions !", Me.Name & ".BsExitButton.Click ", EventLogEntryType.Information, False) 'AG 31/03/2014 - #1565
                             Dim myExecutionDelegate As New ExecutionsDelegate
-                            myGlobal = myExecutionDelegate.CreateWSExecutions(Nothing, AnalyzerController.Instance.Analyzer.ActiveAnalyzer, MyClass.WorkSessionIDAttribute, _
-                                                                              createWSInRunning, -1, String.Empty, isReady, myAffectedElectrodes, pauseMode) 'AG 30/05/2014 #1644 - Redesing correction #1584 for avoid DeadLocks (new parameter pauseMode)
+                            'myGlobal = myExecutionDelegate.CreateWSExecutions(Nothing, AnalyzerController.Instance.Analyzer.ActiveAnalyzer, MyClass.WorkSessionIDAttribute, _
+                            '                                                  createWSInRunning, -1, String.Empty, isReady, myAffectedElectrodes, pauseMode) 'AG 30/05/2014 #1644 - Redesing correction #1584 for avoid DeadLocks (new parameter pauseMode)
+                            myGlobal = DelegatesToCoreBusinesGlue.CreateWS(Nothing, AnalyzerController.Instance.Analyzer.ActiveAnalyzer, WorkSessionIDAttribute, _
+                                                                              createWSInRunning, -1, String.Empty, isReady, myAffectedElectrodes, pauseMode)
                         End If
                         If Not isReady Then Me.DisplayMessage(Messages.ISE_NOT_READY.ToString)
                         'end SGM 25/09/2012

@@ -1,9 +1,8 @@
 ﻿Imports Biosystems.Ax00.Core.Interfaces
-Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.BL
-Imports Biosystems.Ax00.Types
-Imports System.Globalization
 Imports Biosystems.Ax00.Core.Services
+Imports Biosystems.Ax00.App.PresentationLayerListener
+Imports Biosystems.Ax00.Core.Entities.Enums
+Imports Biosystems.Ax00.Core.Services.Interfaces
 
 Namespace Biosystems.Ax00.App
 
@@ -18,10 +17,9 @@ Namespace Biosystems.Ax00.App
 
         Private Shared ReadOnly _instance As New Lazy(Of AnalyzerController)(Function() New AnalyzerController(), System.Threading.LazyThreadSafetyMode.ExecutionAndPublication)
         Private _factory As IAnalyzerFactory
-        Private _rotorChangeServices As RotorChangeServices 'BA-2143
+        Private _rotorChangeServices As RotorChangeService 'BA-2143
+        Private _warmUpServices As IWarmUpService
 
-        Private Sub New()
-        End Sub
 
 #Region "Properties"
 
@@ -51,6 +49,11 @@ Namespace Biosystems.Ax00.App
             End Get
         End Property
 
+        ''' <summary>
+        ''' This property contains the PresentationLayerInterface that can be used to send async notifications to the presentation layer in a clean and abstracted way.
+        ''' </summary>
+        Public Shared Property PresentationLayerInterface As IPresentationLayerListener
+
 #End Region
 
 #Region "Public Methods"
@@ -58,7 +61,6 @@ Namespace Biosystems.Ax00.App
         ''' <summary>
         ''' 
         ''' </summary>
-        ''' <param name="model"></param>
         ''' <param name="assemblyName"></param>
         ''' <param name="analyzerModel"></param>
         ''' <param name="startingApplication"></param>
@@ -85,44 +87,88 @@ Namespace Biosystems.Ax00.App
 
         End Function
 
+#Region "WarmUp Service"
+
         ''' <summary>
         ''' 
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>
-        ''' Created by: IT 01/12/2014 - BA-2075
+        ''' Created by: IT 26/03/2015 - BA-2406
         ''' </remarks>
-        Public Function StartWarmUpProcess() As GlobalDataTO
+        Public Function StartWarmUpProcess(ByVal isInRecovering As Boolean, reuseRotorContentsForFlight As Action(Of BaseLineService.ReuseRotorResponse)) As Boolean
+            Try
 
-            Dim myGlobal As New GlobalDataTO
-            Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
-
-            If (IsAnalyzerInstantiated) Then
-                Analyzer.StopAnalyzerRinging() 'AG 29/05/2012 - Stop Analyzer sound
-
-                Dim activateButtonsFlag As Boolean = False
-                Dim myCurrentAlarms As List(Of GlobalEnumerates.Alarms)
-                myCurrentAlarms = Analyzer.Alarms
-
-                Analyzer.ISEAnalyzer.IsAnalyzerWarmUp = True
-                'DL 17/05/2012
-
-                If (CheckStatusWarmUp()) Then
-                    Analyzer.ValidateWarmUpProcess(myAnalyzerFlagsDS, GlobalEnumerates.WarmUpProcessFlag.StartInstrument)
-
-                    'If (Not myGlobal.HasError) Then
-                    If Analyzer.Connected Then
-                        'Start instrument instruction send OK (initialize wup UI flags)
-                        myGlobal = InitializeStartInstrument()
-                    Else
-                        Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = ""
-                    End If
+                If (_warmUpServices Is Nothing) Then
+                    _warmUpServices = New WarmUpService(Analyzer)
                 End If
-            End If
+                _warmUpServices.ReuseContentsForBaseLineCallback = reuseRotorContentsForFlight 'reuseRotorContentsForFlight
+                If (Not isInRecovering) Then
+                    Return _warmUpServices.StartService()
+                Else
+                    Return _warmUpServices.RecoverProcess()
+                End If
 
-            Return myGlobal
+            Catch ex As Exception
+                Throw
+            End Try
 
         End Function
+
+
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <remarks></remarks>
+        Public Sub PauseWarmUpService()
+            Try
+
+                If _warmUpServices IsNot Nothing Then
+                    _warmUpServices.PauseService()
+                End If
+
+            Catch ex As Exception
+                Throw
+            End Try
+        End Sub
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <remarks></remarks>
+        Public Sub ReStartWarmUpService()
+            Try
+
+                If _warmUpServices IsNot Nothing Then
+                    _warmUpServices.RestartService()
+                End If
+
+            Catch ex As Exception
+                Throw
+            End Try
+        End Sub
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <remarks>
+        ''' Modified by:  IT 26/03/2014 - BA-2406
+        ''' </remarks>
+        Public Sub WarmUpCloseProcess()
+            Try
+                If _warmUpServices IsNot Nothing Then
+                    _warmUpServices.Dispose()
+                    _warmUpServices = Nothing
+                End If
+            Catch ex As Exception
+                Throw ex
+            End Try
+        End Sub
+
+#End Region
+
+#Region "Change Rotor Service"
 
         ''' <summary>
         ''' 
@@ -132,13 +178,14 @@ Namespace Biosystems.Ax00.App
         ''' Modified by:  IT 19/12/2014 - BA-2143
         '''               IT 30/01/2015 - BA-2216
         ''' </remarks>
-        Public Function ChangeRotorStartProcess(ByVal isInRecovering As Boolean) As Boolean
+        Public Function ChangeRotorStartProcess() As Boolean
             Try
                 If (_rotorChangeServices Is Nothing) Then
-                    _rotorChangeServices = New RotorChangeServices(Analyzer)
+                    _rotorChangeServices = New RotorChangeService(Analyzer, _warmUpServices)
                 End If
 
-                Return _rotorChangeServices.StartService(isInRecovering)
+                Return _rotorChangeServices.StartService()
+
             Catch ex As Exception
                 Throw ex
             End Try
@@ -155,10 +202,14 @@ Namespace Biosystems.Ax00.App
         Public Function ChangeRotorContinueProcess(ByVal isInRecovering As Boolean) As Boolean
             Try
                 If (_rotorChangeServices Is Nothing) Then
-                    _rotorChangeServices = New RotorChangeServices(Analyzer)
+                    _rotorChangeServices = New RotorChangeService(Analyzer, _warmUpServices)
                 End If
 
-                Return _rotorChangeServices.ContinueProcess(isInRecovering)
+                If (Not isInRecovering) Then
+                    Return _rotorChangeServices.ContinueProcess()
+                Else
+                    Return _rotorChangeServices.RecoverProcess()
+                End If
             Catch ex As Exception
                 Throw ex
             End Try
@@ -174,7 +225,7 @@ Namespace Biosystems.Ax00.App
         Public Sub ChangeRotorRepeatDynamicBaseLineReadStep()
             Try
                 If (_rotorChangeServices Is Nothing) Then
-                    _rotorChangeServices = New RotorChangeServices(Analyzer)
+                    _rotorChangeServices = New RotorChangeService(Analyzer, _warmUpServices)
                 End If
 
                 _rotorChangeServices.RepeatDynamicBaseLineReadStep()
@@ -193,7 +244,7 @@ Namespace Biosystems.Ax00.App
         Public Sub ChangeRotorFinalizeProcess()
             Try
                 If (_rotorChangeServices Is Nothing) Then
-                    _rotorChangeServices = New RotorChangeServices(Analyzer)
+                    _rotorChangeServices = New RotorChangeService(Analyzer, _warmUpServices)
                 End If
 
                 _rotorChangeServices.EmptyAndFinalizeProcess()
@@ -210,8 +261,10 @@ Namespace Biosystems.Ax00.App
         ''' </remarks>
         Public Sub ChangeRotorCloseProcess()
             Try
-                _rotorChangeServices.Dispose()
-                _rotorChangeServices = Nothing
+                If _rotorChangeServices IsNot Nothing Then
+                    _rotorChangeServices.Dispose()
+                    _rotorChangeServices = Nothing
+                End If
             Catch ex As Exception
                 Throw ex
             End Try
@@ -219,134 +272,34 @@ Namespace Biosystems.Ax00.App
 
 #End Region
 
-#Region "Private Methods"
-
+#Region "Baseline Service"
         ''' <summary>
         ''' 
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>
-        ''' Modified by XB 30/01/2013 - DateTime to Invariant Format (Bugs tracking #1121)
-        '''             IT 01/12/2014 - BA-2075
+        ''' AC BA-2437
         ''' </remarks>
-        Private Function InitializeStartInstrument() As GlobalDataTO
-            Dim myGlobal As GlobalDataTO = Nothing
-            'Dim dbConnection As SqlClient.SqlConnection = Nothing
-
+        Public Function IsValidBaseline() As Boolean
             Try
-                'DL 09/09/2011
-                'Set Enable (or set visible meeting 12/09/2011 ??) frame time W-Up in common Monitor
-                'IMonitor.bsWamUpGroupBox.Enabled = True
-                Dim swParams As New SwParametersDelegate
-
-                ' Read W-Up full time configuration
-                myGlobal = swParams.ReadByAnalyzerModel(Nothing, Analyzer.Model)
-
-                If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-                    Dim myParametersDS As New ParametersDS
-
-                    myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
-                    Dim myList As New List(Of ParametersDS.tfmwSwParametersRow)
-
-                    myList = (From a As ParametersDS.tfmwSwParametersRow In myParametersDS.tfmwSwParameters _
-                              Where String.Equals(a.ParameterName, GlobalEnumerates.SwParameters.WUPFULLTIME.ToString) _
-                              Select a).ToList
-
-                    Dim WUPFullTime As Single
-                    If myList.Count > 0 Then WUPFullTime = myList(0).ValueNumeric '= DateTime.Now.ToString("yyyyMMdd hh-mm") & "_" & myList(0).ValueText
+                If AnalyzerController.Instance.Analyzer.GetModelValue(AnalyzerController.Instance.Analyzer.ActiveAnalyzer) = AnalyzerModelEnum.A200.ToString AndAlso _
+                    Analyzer.ValidALIGHT AndAlso Analyzer.ValidFLIGHT Then
+                    Return True
+                ElseIf AnalyzerController.Instance.Analyzer.GetModelValue(AnalyzerController.Instance.Analyzer.ActiveAnalyzer) = AnalyzerModelEnum.A400.ToString AndAlso _
+                    Analyzer.ValidALIGHT Then
+                    Return True
                 End If
-
-                ' Save initial states when press over w-up
-                If Not myGlobal.HasError Then
-                    Dim myAnalyzerSettingsDS As New AnalyzerSettingsDS
-                    Dim myAnalyzerSettingsRow As AnalyzerSettingsDS.tcfgAnalyzerSettingsRow
-
-                    'WUPCOMPLETEFLAG
-                    myAnalyzerSettingsRow = myAnalyzerSettingsDS.tcfgAnalyzerSettings.NewtcfgAnalyzerSettingsRow
-                    With myAnalyzerSettingsRow
-                        .AnalyzerID = Analyzer.ActiveAnalyzer
-                        .SettingID = GlobalEnumerates.AnalyzerSettingsEnum.WUPCOMPLETEFLAG.ToString()
-                        .CurrentValue = "0"
-                    End With
-                    myAnalyzerSettingsDS.tcfgAnalyzerSettings.Rows.Add(myAnalyzerSettingsRow)
-
-                    'WUPCOMPLETEFLAG
-                    myAnalyzerSettingsRow = myAnalyzerSettingsDS.tcfgAnalyzerSettings.NewtcfgAnalyzerSettingsRow
-                    With myAnalyzerSettingsRow
-                        .AnalyzerID = Analyzer.ActiveAnalyzer
-                        .SettingID = GlobalEnumerates.AnalyzerSettingsEnum.WUPSTARTDATETIME.ToString()
-                        ''.CurrentValue = Now.ToString 'AG + SA 05/10/2012
-                        '.CurrentValue = Now.ToString("yyyy/MM/dd HH:mm:ss")
-                        .CurrentValue = Now.ToString(CultureInfo.InvariantCulture)
-                    End With
-                    myAnalyzerSettingsDS.tcfgAnalyzerSettings.Rows.Add(myAnalyzerSettingsRow)
-
-                    Dim myAnalyzerSettings As New AnalyzerSettingsDelegate
-                    myGlobal = myAnalyzerSettings.Save(Nothing, Analyzer.ActiveAnalyzer, myAnalyzerSettingsDS, Nothing)
-
-                End If
-
-                AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsAnalyzerWarmUp = True 'SGM 13/04/2012 
-
+                Return False
             Catch ex As Exception
                 Throw ex
             End Try
-
-            Return myGlobal
         End Function
+#End Region
 
-        ''' <summary>
-        ''' 
-        ''' </summary>
-        ''' <returns></returns>
-        ''' <remarks>
-        ''' Created by: IT 01/12/2014 - BA-2075
-        ''' </remarks>
-        Private Function CheckStatusWarmUp() As Boolean
+#End Region
 
-            If (Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "PAUSED") Then
+#Region "Private Methods"
 
-                If Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.StartInstrument) = "END" AndAlso
-                    Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.Washing) = "CANCELED" Then
-                    Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "INPROCESS"
-                    Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.Washing) = ""
-                    Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess) = ""
-                End If
-
-                If Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.Washing) = "END" AndAlso
-                    Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine) = "CANCELED" Then
-                    Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "INPROCESS"
-                    Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine) = ""
-                    Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess) = ""
-                End If
-
-                If Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine) = "END" AndAlso
-                Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill) = "CANCELED" Then
-                    Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "INPROCESS"
-                    Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill) = ""
-                    Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess) = ""
-                End If
-
-                If Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read) = "END" AndAlso
-                Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty) = "CANCELED" Then
-                    Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "INPROCESS"
-                    Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty) = ""
-                    Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess) = ""
-                End If
-
-                Return False
-
-            Else
-                Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.WARMUP_MANEUVERS_FINISHED) = 0 'clear sensor
-                Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess) = "" 'Reset flag
-                Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.Washing) = "" 'Reset flag
-                Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine) = "" 'Reset flag
-                Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "INPROCESS"
-
-                Return True
-            End If
-
-        End Function
 
 #End Region
 

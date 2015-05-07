@@ -4,19 +4,16 @@ Option Infer On
 
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.GlobalEnumerates
+Imports Biosystems.Ax00.Global.AlarmEnumerates
 Imports Biosystems.Ax00.BL
 Imports System.Windows.Forms
 Imports System.Drawing
 Imports System.Globalization
+Imports Biosystems.Ax00.Global.GlobalEnumerates
 
 Public Class UiHisAlarms
 
-#Region "Events definitions"
-
-#End Region
-
-#Region " Structures "
+#Region "Structures"
     Public Structure SearchFilter
         Public dateFrom As Date
         Public dateTo As Date
@@ -25,39 +22,37 @@ Public Class UiHisAlarms
     End Structure
 #End Region
 
-#Region "Attributes"
-    Private AnalyzerIDAttribute As String = String.Empty
-#End Region
-
 #Region "Declarations"
     Private myCultureInfo As CultureInfo
     Private myWSAlarmHistory As HisWSAnalyzerAlarmsDelegate
     Private myWSAlarmsDelegate As WSAnalyzerAlarmsDelegate
 
-    ' Language
+    'Language
     Private currentLanguage As String
 
-    'Multi language resources
+    'Dictionaries for Code + Multilanguage Description
     Private mImageDict As Dictionary(Of String, Image)
     Private mTextDict As Dictionary(Of String, String)
+    Private mAlarmTypes As Dictionary(Of String, String)
+    Private SampleClassDict As New Dictionary(Of String, String)
+    Private BlankModeDict As New Dictionary(Of String, String)
+    Private SolutionCodeDict As New Dictionary(Of String, String)
 
-    Private mAlarmTypes As Dictionary(Of String, String) ' The alarm Typles: {AlarmType, Multilanguage Text}
+    'List of Analyzers with Historical Alarms information
     Private mAnalyzers As List(Of String)
 
     'Images for the alarms
     Private NoImage As Byte() = Nothing
     Private ERRORImage As Byte() = Nothing
     Private WARNINGImage As Byte() = Nothing
-    Private SOLVEDimage As Byte() = Nothing
+    Private SOLVEDImage As Byte() = Nothing
     Private SOLVEDWarningImage As Byte() = Nothing
     Private SOLVEDErrorImage As Byte() = Nothing
-
-
-    Private SampleClassDict As New Dictionary(Of String, String)
-    Private BlankModeDict As New Dictionary(Of String, String)
-    Private SolutionCodeDict As New Dictionary(Of String, String)
 #End Region
 
+#Region "Attributes"
+    Private AnalyzerIDAttribute As String = String.Empty
+#End Region
 
 #Region "Properties"
     Public WriteOnly Property AnalyzerID() As String
@@ -66,13 +61,11 @@ Public Class UiHisAlarms
         End Set
     End Property
 
-#Region "Text definitions"
+#Region " Properties for Text definitions "
     ''' <summary>
-    ''' Used for compatibility with code in IMonitor
+    ''' Used for compatibility with code in UiMonitor
     ''' Text: "LBL_WSPrep_SampleClass"
     ''' </summary>
-    ''' <value></value>
-    ''' <returns></returns>
     ''' <remarks>
     ''' Created by: JB 01/10/2012
     ''' </remarks>
@@ -83,11 +76,9 @@ Public Class UiHisAlarms
     End Property
 
     ''' <summary>
-    ''' Used for compatibility with code in IMonitor
+    ''' Used for compatibility with code in UiMonitor
     ''' Text: "LBL_Name"
     ''' </summary>
-    ''' <value></value>
-    ''' <returns></returns>
     ''' <remarks>
     ''' Created by: JB 01/10/2012
     ''' </remarks>
@@ -98,11 +89,9 @@ Public Class UiHisAlarms
     End Property
 
     ''' <summary>
-    ''' Used for compatibility with code in IMonitor
+    ''' Used for compatibility with code in UiMonitor
     ''' Text: "LBL_Test_Singular"
     ''' </summary>
-    ''' <value></value>
-    ''' <returns></returns>
     ''' <remarks>
     ''' Created by: JB 01/10/2012
     ''' </remarks>
@@ -113,11 +102,9 @@ Public Class UiHisAlarms
     End Property
 
     ''' <summary>
-    ''' Used for compatibility with code in IMonitor
+    ''' Used for compatibility with code in UiMonitor
     ''' Text: "LBL_CurveReplicate_Rep"
     ''' </summary>
-    ''' <value></value>
-    ''' <returns></returns>
     ''' <remarks>
     ''' Created by: JB 01/10/2012
     ''' </remarks>
@@ -128,11 +115,9 @@ Public Class UiHisAlarms
     End Property
 
     ''' <summary>
-    ''' Used for compatibility with code in IMonitor
+    ''' Used for compatibility with code in UiMonitor
     ''' Text: "LBL_SRV_POSITION"
     ''' </summary>
-    ''' <value></value>
-    ''' <returns></returns>
     ''' <remarks>
     ''' Created by: JB 01/10/2012
     ''' </remarks>
@@ -143,11 +128,9 @@ Public Class UiHisAlarms
     End Property
 
     ''' <summary>
-    ''' Used for compatibility with code in IMonitor
+    ''' Used for compatibility with code in UiMonitor
     ''' Text: "PMD_TUBE_CONTENTS_REAGENT"
     ''' </summary>
-    ''' <value></value>
-    ''' <returns></returns>
     ''' <remarks>
     ''' Created by: JB 01/10/2012
     ''' </remarks>
@@ -158,11 +141,9 @@ Public Class UiHisAlarms
     End Property
 
     ''' <summary>
-    ''' Used for compatibility with code in IMonitor
+    ''' Used for compatibility with code in UiMonitor
     ''' Text: "LBL_Solution"
     ''' </summary>
-    ''' <value></value>
-    ''' <returns></returns>
     ''' <remarks>
     ''' Created by: JB 01/10/2012
     ''' </remarks>
@@ -173,11 +154,9 @@ Public Class UiHisAlarms
     End Property
 
     ''' <summary>
-    ''' Used for compatibility with code in IMonitor
+    ''' Used for compatibility with code in UiMonitor
     ''' Text: "LBL_RotorPos_WashingSol"
     ''' </summary>
-    ''' <value></value>
-    ''' <returns></returns>
     ''' <remarks>
     ''' Created by: JB 01/10/2012
     ''' </remarks>
@@ -188,11 +167,9 @@ Public Class UiHisAlarms
     End Property
 
     ''' <summary>
-    ''' Used for compatibility with code in IMonitor
+    ''' Used for compatibility with code in UiMonitor
     ''' Text: "PMD_TUBE_CONTENTS_SPEC_SOL"
     ''' </summary>
-    ''' <value></value>
-    ''' <returns></returns>
     ''' <remarks>
     ''' Created by: JB 01/10/2012
     ''' </remarks>
@@ -203,153 +180,124 @@ Public Class UiHisAlarms
     End Property
 #End Region
 
-#Region "Format definitions"
+#Region " Properties for Format definitions "
     ''' <summary>
-    ''' Defined for compatibility with code in IMonitor
+    ''' Defined for compatibility with code in UiMonitor
     ''' </summary>
-    ''' <value></value>
-    ''' <returns></returns>
     ''' <remarks>
     ''' Created by: JB 01/10/2012
     ''' </remarks>
     Protected ReadOnly Property S_NO_VOLUME_Format() As String
         Get
-            Return String.Format("- {0}: {1}, {2}: {3}, {4}: {5}", _
-                                 lblSampleClass, "{0}", _
-                                 lblName, "{1}", _
-                                 lblRotorPosition, "{2}")
+            Return String.Format("- {0}: {1}, {2}: {3}, {4}: {5}", lblSampleClass, "{0}", lblName, "{1}", lblRotorPosition, "{2}")
         End Get
     End Property
 
     ''' <summary>
-    ''' Defined for compatibility with code in IMonitor
+    ''' Defined for compatibility with code in UiMonitor
     ''' </summary>
-    ''' <value></value>
-    ''' <returns></returns>
     ''' <remarks>
     ''' Created by: JB 01/10/2012
     ''' </remarks>
     Protected ReadOnly Property S_NO_VOLUME_BLANK_Format() As String
         Get
-            Return String.Format("- {0}: {1}, {2}: {3}, {4}: {5}", _
-                                 lblSampleClass, "{0}", _
-                                 lblSolution, "{1}", _
-                                 lblRotorPosition, "{2}")
+            Return String.Format("- {0}: {1}, {2}: {3}, {4}: {5}", lblSampleClass, "{0}", lblSolution, "{1}", lblRotorPosition, "{2}")
         End Get
     End Property
 
     ''' <summary>
-    ''' Defined for compatibility with code in IMonitor
+    ''' Defined for compatibility with code in UiMonitor
     ''' </summary>
-    ''' <value></value>
-    ''' <returns></returns>
     ''' <remarks>
     ''' Created by: JB 01/10/2012
     ''' </remarks>
     Protected ReadOnly Property PREP_LOCKED_Format() As String
         Get
-            Return String.Format("- {0}, {1}, {2}: {3}", _
-                                 "{0}", "{1}", _
-                                 lblTest, "{2}")
+            Return String.Format("- {0}, {1}, {2}: {3}", "{0}", "{1}", lblTest, "{2}")
         End Get
     End Property
 
     ''' <summary>
-    ''' Defined for compatibility with code in IMonitor
+    ''' Defined for compatibility with code in UiMonitor
     ''' </summary>
-    ''' <value></value>
-    ''' <returns></returns>
     ''' <remarks>
     ''' Created by: JB 01/10/2012
     ''' </remarks>
     Protected ReadOnly Property PREP_LOCKED_BLANK_Format() As String
         Get
-            Return String.Format("- {0}, {1}: {2}, {3}: {4}", _
-                                 "{0}", lblSolution, _
-                                 "{1}", lblTest, "{2}")
+            Return String.Format("- {0}, {1}: {2}, {3}: {4}", "{0}", lblSolution, "{1}", lblTest, "{2}")
         End Get
     End Property
 
     ''' <summary>
-    ''' Defined for compatibility with code in IMonitor
+    ''' Defined for compatibility with code in UiMonitor
     ''' </summary>
-    ''' <value></value>
-    ''' <returns></returns>
     ''' <remarks>
     ''' Created by: JB 01/10/2012
     ''' </remarks>
     Protected ReadOnly Property PREP_WITH_CLOT_Format() As String
         Get
-            Return String.Format("- {0}, {1}, {2}: {3}, {4}: {5}", _
-                                 "{0}", "{1}", _
-                                 lblTest, "{2}", _
-                                 lblReplicateNumber, "{3}")
+            Return String.Format("- {0}, {1}, {2}: {3}, {4}: {5}", "{0}", "{1}", lblTest, "{2}", lblReplicateNumber, "{3}")
         End Get
     End Property
 
     ''' <summary>
-    ''' Defined for compatibility with code in IMonitor
+    ''' Defined for compatibility with code in UiMonitor
     ''' </summary>
-    ''' <value></value>
-    ''' <returns></returns>
     ''' <remarks>
     ''' Created by: JB 01/10/2012
     ''' </remarks>
     Protected ReadOnly Property PREP_WITH_CLOT_BLANK_Format() As String
         Get
-            Return String.Format("- {0}, {1}: {2}, {3}: {4}, {5}: {6}", _
-                                 "{0}", lblSolution, _
-                                 "{1}", lblTest, _
-                                 "{2}", lblReplicateNumber, _
-                                 "{3}")
+            Return String.Format("- {0}, {1}: {2}, {3}: {4}, {5}: {6}", "{0}", lblSolution, "{1}", lblTest, "{2}", lblReplicateNumber, "{3}")
         End Get
     End Property
 
     ''' <summary>
-    ''' Defined for compatibility with code in IMonitor
+    ''' Defined for compatibility with code in UiMonitor
     ''' </summary>
-    ''' <value></value>
-    ''' <returns></returns>
     ''' <remarks>
     ''' Created by: JB 01/10/2012
     ''' </remarks>
     Protected ReadOnly Property R_NO_VOLUME_Format() As String
         Get
-            Return String.Format("- {0}: {1}, {2}: {3}", _
-                                 lblReagent, "{0}", _
-                                 lblRotorPosition, "{1}")
+            Return String.Format("- {0}: {1}, {2}: {3}", lblReagent, "{0}", lblRotorPosition, "{1}")
         End Get
     End Property
 
     ''' <summary>
-    ''' Defined for compatibility with code in IMonitor
+    ''' Defined for compatibility with code in UiMonitor
     ''' </summary>
-    ''' <value></value>
-    ''' <returns></returns>
     ''' <remarks>
     ''' Created by: JB 01/10/2012
     ''' </remarks>
     Protected ReadOnly Property WASH_SOL_Format() As String
         Get
-            Return String.Format("- {0}: {1}, {2}: {3}", _
-                                 lblWashingSolution, "{0}", _
-                                 lblRotorPosition, "{1}")
+            Return String.Format("- {0}: {1}, {2}: {3}", lblWashingSolution, "{0}", lblRotorPosition, "{1}")
         End Get
     End Property
 
     ''' <summary>
-    ''' Defined for compatibility with code in IMonitor
+    ''' Defined for compatibility with code in UiMonitor
     ''' </summary>
-    ''' <value></value>
-    ''' <returns></returns>
     ''' <remarks>
     ''' Created by: JB 01/10/2012
     ''' </remarks>
     Protected ReadOnly Property SPEC_SOL_Format() As String
         Get
-            Return String.Format("- {0}: {1}, {2}: {3}", _
-                                 lblSpecialSolution, "{0}", _
-                                 lblRotorPosition, "{1}")
+            Return String.Format("- {0}: {1}, {2}: {3}", lblSpecialSolution, "{0}", lblRotorPosition, "{1}")
+        End Get
+    End Property
+
+    ''' <summary>
+    ''' Defined for compatibility with code in UiMonitor
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by: SA 01/04/2015 - BA-2384 ==> Management of Alarm BOTTLE_LOCKED_WARN was missing in Historic Module
+    ''' </remarks>
+    Protected ReadOnly Property BOTTLE_LOCKED_Format() As String
+        Get
+            Return String.Format("- {0}: {1}, {2}: {3}", lblReagent, "{0}", lblRotorPosition, "{1}")
         End Get
     End Property
 #End Region
@@ -366,18 +314,10 @@ Public Class UiHisAlarms
     End Sub
 #End Region
 
-#Region "Public Methods"
-
-#End Region
-
-#Region "Private Methods"
-#Region " Multilanguage Support "
+#Region "Private Methods to load local Dictionaries and Lists"
     ''' <summary>
-    ''' Gets the image by its key
-    ''' Only reads from file once for key
+    ''' Gets the image by its key. Only reads from file once for key
     ''' </summary>
-    ''' <param name="pKey"></param>
-    ''' <returns></returns>
     ''' <remarks>
     ''' Created by: IR 28/09/2012 
     ''' </remarks>
@@ -391,6 +331,7 @@ Public Class UiHisAlarms
 
         Return mImageDict.Item(pKey)
     End Function
+
     Private Sub SetImageToDictionary(ByVal pKey As String)
         Dim auxIconName As String = ""
         Dim iconPath As String = MyBase.IconsPath
@@ -403,15 +344,11 @@ Public Class UiHisAlarms
                 mImageDict.Add(pKey, ImageUtilities.ImageFromFile(iconPath & auxIconName))
             End If
         End If
-
     End Sub
 
     ''' <summary>
-    ''' Gets the multilanguage text by its key
-    ''' Only reads from DataBase once for key
+    ''' Gets the multilanguage text by its key. Only reads from DataBase once for key
     ''' </summary>
-    ''' <param name="pKey"></param>
-    ''' <returns></returns>
     ''' <remarks>
     ''' Created by: IR 28/09/2012 
     ''' </remarks>
@@ -424,19 +361,192 @@ Public Class UiHisAlarms
         End If
         Return mTextDict.Item(pKey)
     End Function
+
     Private Sub SetTextToDictionary(ByVal pKey As String)
         Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
-        Dim text As String = myMultiLangResourcesDelegate.GetResourceText(Nothing, pKey, currentLanguage)
-        If String.IsNullOrEmpty(text) Then text = "*" & pKey
+        Dim myText = myMultiLangResourcesDelegate.GetResourceText(Nothing, pKey, currentLanguage)
+
+        If (String.IsNullOrEmpty(myText)) Then myText = "*" & pKey
         If mTextDict.ContainsKey(pKey) Then
-            mTextDict.Item(pKey) = text
+            mTextDict.Item(pKey) = myText
         Else
-            mTextDict.Add(pKey, text)
+            mTextDict.Add(pKey, myText)
         End If
+    End Sub
+
+    ''' <summary>
+    ''' Load all the Alarm Types availables (with its multilanguage text)
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by: JB 28/09/2012
+    ''' </remarks>
+    Private Sub GetAlarmTypes()
+        mAlarmTypes.Clear()
+        mAlarmTypes.Add("", GetText("LBL_SRV_All"))
+        mAlarmTypes.Add("ERROR", GetText("LBL_ERROR"))
+        mAlarmTypes.Add("WARNING", GetText("LBL_WARNING"))
+    End Sub
+
+    ''' <summary>
+    ''' Read the list of Analyzers for which there are Historic Alarms in DB and load the global Analyzers list
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by:  JB 28/09/2012
+    ''' Modified by: IR 04/10/2012
+    '''              SA 01/04/2015 - BA-2384 ==> Call function GetDistinctAnalyzers in HisAnalyzerWorkSessionsDelegate instead of the function 
+    '''                                          with the same name in AnalyzerDelegate class (which read Analyzers from table thisWSAnalyzerAlarms).
+    '''                                          If the connected Analyzer is not in the list, it is added to the Analyzer ComboBox
+    ''' </remarks>
+    Private Sub GetAnalyzerList()
+        Try
+            Dim myGlobalData As New GlobalDataTO
+            Dim myHisAnalyzerWSDelegate As New HisAnalyzerWorkSessionsDelegate
+
+            'Get the list of Analyzers for which there are Historic Alarms in DB 
+            myGlobalData = myHisAnalyzerWSDelegate.GetDistinctAnalyzers(Nothing)
+            If (Not myGlobalData.HasError AndAlso Not myGlobalData.SetDatos Is Nothing) Then
+                Dim myAnalyzers = DirectCast(myGlobalData.SetDatos, AnalyzersDS)
+
+                Dim addConnectedAnalyzer = True
+                If (myAnalyzers.tcfgAnalyzers.Rows.Count > 0) Then
+                    'Add all of them to the the Analyzers list
+                    For Each row As AnalyzersDS.tcfgAnalyzersRow In myAnalyzers.tcfgAnalyzers
+                        mAnalyzers.Add(row.AnalyzerID)
+                    Next
+
+                    'If the connected Analyzer is not in the returned list, it has to be added to it 
+                    addConnectedAnalyzer = ((myAnalyzers.tcfgAnalyzers.ToList.Where(Function(a) a.AnalyzerID = AnalyzerIDAttribute)).Count = 0)
+                End If
+
+                'Add the connected Analyzer to the list although there are not Historic Alarms for it yet
+                If (addConnectedAnalyzer) Then mAnalyzers.Add(AnalyzerIDAttribute)
+            End If
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex)
+            ShowMessage(Me.Name & ".GetAnalyzerList ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+
+        'Dim myAnalyzerDelegate As New AnalyzersDelegate
+        'Dim myGlobalDataTO As New GlobalDataTO
+        'Dim myAnalyzerData As List(Of String)
+        ''Let the user select more than one analyzer if available. We must read data from thisWSAnalyzerAlarmsDAO
+        'myGlobalDataTO = myAnalyzerDelegate.GetDistinctAnalyzers(Nothing)
+        'If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+        '    myAnalyzerData = DirectCast(myGlobalDataTO.SetDatos, List(Of String))
+        '    'mAnalyzers = (From a In myAnalyzerData.tcfgAnalyzers _
+        '    '              Where Not a.Generic _
+        '    '              Order By a.Active Descending _
+        '    '              Select a.AnalyzerID).ToList
+
+        '    Dim o As String
+        '    For Each o In myAnalyzerData
+        '        mAnalyzers.Add(o.ToString)
+        '    Next
+
+        '    'mAnalyzers = myGlobalDataTO.SetDatos
+        'End If
+        ''End IR 04/10/2012
+    End Sub
+
+    ''' <summary>
+    ''' Gets all the preloaded images
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by: JB 28/09/2012
+    ''' </remarks>
+    Private Sub GetPreloadedImages()
+        Try
+            Dim preloadedDataConfig As New PreloadedMasterDataDelegate
+            Dim auxIconName As String = String.Empty
+
+            'ERROR Image
+            auxIconName = GetIconName("WARNINGSMALL")
+            If Not String.IsNullOrEmpty(auxIconName) Then ERRORImage = preloadedDataConfig.GetIconImage("WARNINGSMALL")
+
+            'WARNING Image
+            auxIconName = GetIconName("STUS_WITHERRS")
+            If Not String.IsNullOrEmpty(auxIconName) Then WARNINGImage = preloadedDataConfig.GetIconImage("STUS_WITHERRS")
+
+            'SOLVED ALARM Image
+            SOLVEDImage = NoImage
+            auxIconName = GetIconName("SOLVEDSMALL")
+            If Not String.IsNullOrEmpty(auxIconName) Then SOLVEDImage = preloadedDataConfig.GetIconImage("SOLVEDSMALL")
+
+            'WARNING Disable Image 
+            auxIconName = GetIconName("WRNGSMLDIS")
+            If Not String.IsNullOrEmpty(auxIconName) Then SOLVEDErrorImage = preloadedDataConfig.GetIconImage("WRNGSMLDIS")
+
+            'ALERT Disable Image 
+            auxIconName = GetIconName("ALRTSMLDIS")
+            If Not String.IsNullOrEmpty(auxIconName) Then SOLVEDWarningImage = preloadedDataConfig.GetIconImage("ALRTSMLDIS")
+
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex)
+            ShowMessage(Me.Name & ".GetPreloadedImages ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", MsgParent)
+        End Try
+    End Sub
+
+    ''' <summary>
+    '''  Gets all label texts for Alarms
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by:  JB 28/09/2012 - Adapted from UiMonitorAlarmsTab.vb -> GetAlarmsTabLabels()
+    ''' Modified by: SA 01/04/2015 - BA-2384 ==> Code to fill the global Dictionary of Additional Solution Codes moved to a new function 
+    '''                                          FillSolutionCodesDictionary
+    ''' </remarks>
+    Private Sub InitializeAlarmTexts()
+        Try
+            'Fill the Dictionary of Sample Classes Codes
+            SampleClassDict("BLANK") = GetText("PMD_SAMPLE_CLASSES_BLANK")
+            SampleClassDict("CALIB") = GetText("PMD_SAMPLE_CLASSES_CALIB")
+            SampleClassDict("CTRL") = GetText("PMD_SAMPLE_CLASSES_CTRL")
+            SampleClassDict("PATIENT") = GetText("PMD_SAMPLE_CLASSES_PATIENT")
+
+            'Fill the Dictionary of Special Solutions used for Blanks
+            BlankModeDict("SALINESOL") = GetText("PMD_SPECIAL_SOLUTIONS_SALINESOL")
+            BlankModeDict("DISTW") = GetText("PMD_SPECIAL_SOLUTIONS_DISTW")
+            BlankModeDict("REAGENT") = GetText("PMD_BLANK_MODES_REAGENT")
+
+            'BA-2384: Fill the Dictionary of Additional Solution Codes with all Dilution, Special and Washing Solutions
+            FillSolutionCodesDictionary(GlobalEnumerates.PreloadedMasterDataEnum.DIL_SOLUTIONS)
+            FillSolutionCodesDictionary(GlobalEnumerates.PreloadedMasterDataEnum.SPECIAL_SOLUTIONS)
+            FillSolutionCodesDictionary(GlobalEnumerates.PreloadedMasterDataEnum.WASHING_SOLUTIONS)
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex)
+            ShowMessage(Me.Name & ".InitializeAlarmTexts", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", MsgParent)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Fill the Dictionary of Additional Solution Codes with the type of Additional Solution informed; Dilution, Special or Washing Solutions
+    ''' </summary>
+    ''' <param name="pAdditionalSolutionType">Unique identifier of the Sub Table of the Preloaded Master Data from which the data will be obtained</param>
+    ''' <remarks>
+    ''' Created by:  SA 01/04/2015 - Code extracted from function InitializeAlarmTexts
+    ''' </remarks>
+    Private Sub FillSolutionCodesDictionary(ByVal pAdditionalSolutionType As PreloadedMasterDataEnum)
+        Try
+            Dim myGlobalData As New GlobalDataTO
+            Dim myPreloadedMasterDataDelegate As New PreloadedMasterDataDelegate
+
+            myGlobalData = myPreloadedMasterDataDelegate.GetList(Nothing, pAdditionalSolutionType)
+            If (Not myGlobalData.HasError AndAlso Not myGlobalData.SetDatos Is Nothing) Then
+                Dim myMasterDataDS As PreloadedMasterDataDS = DirectCast(myGlobalData.SetDatos, PreloadedMasterDataDS)
+
+                For Each solutionCode As PreloadedMasterDataDS.tfmwPreloadedMasterDataRow In myMasterDataDS.tfmwPreloadedMasterData
+                    If (Not SolutionCodeDict.ContainsKey(solutionCode.ItemID)) Then
+                        SolutionCodeDict(solutionCode.ItemID) = solutionCode.FixedItemDesc
+                    End If
+                Next
+            End If
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex)
+            ShowMessage(Me.Name & ".FillSolutionCodesDictionary", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", MsgParent)
+        End Try
     End Sub
 #End Region
 
-#Region " Initializations "
+#Region "Private Methods to initialize the screen"
     ''' <summary>
     ''' Get texts in the current application language for all screen controls
     ''' </summary>
@@ -453,8 +563,8 @@ Public Class UiHisAlarms
             bsAnalyzerIDLabel.Text = GetText("LBL_SCRIPT_EDIT_Analyzer") & ":"
 
         Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".GetScreenLabels", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+            GlobalBase.CreateLogActivity(ex)
+            ShowMessage(Me.Name & ".GetScreenLabels", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
@@ -480,60 +590,8 @@ Public Class UiHisAlarms
             myToolTipsControl.SetToolTip(bsHistoryDelete, GetText("BTN_Delete"))
 
         Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".PrepareButtons", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-        End Try
-    End Sub
-
-    ''' <summary>
-    ''' Load all the Alarm Types availables (with its multilanguage text)
-    ''' </summary>
-    ''' <remarks>
-    ''' Created by: JB 28/09/2012
-    ''' </remarks>
-    Private Sub GetAlarmTypes()
-        mAlarmTypes.Clear()
-        mAlarmTypes.Add("", GetText("LBL_SRV_All"))
-        mAlarmTypes.Add("ERROR", GetText("LBL_ERROR"))
-        mAlarmTypes.Add("WARNING", GetText("LBL_WARNING"))
-    End Sub
-
-    ''' <summary>
-    ''' Load all the Analyzers
-    ''' </summary>
-    ''' <remarks>
-    ''' Created by: JB 28/09/2012
-    ''' Modified by: IR 04/10/2012
-    ''' </remarks>
-    Private Sub GetAnalyzerList()
-        Dim myAnalyzerDelegate As New AnalyzersDelegate
-        Dim myGlobalDataTO As New GlobalDataTO
-        'Dim myAnalyzerData As AnalyzersDS
-        Dim myAnalyzerData As List(Of String)
-        Try
-            'Begin IR 04/10/2012 Let the user select more than one analyzer if available. We must read data from thisWSAnalyzerAlarmsDAO
-            'myGlobalDataTO = myAnalyzerDelegate.GetAllAnalyzers(Nothing)
-            myGlobalDataTO = myAnalyzerDelegate.GetDistinctAnalyzers(Nothing)
-            If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                'myAnalyzerData = DirectCast(myGlobalDataTO.SetDatos, AnalyzersDS)
-                myAnalyzerData = DirectCast(myGlobalDataTO.SetDatos, List(Of String))
-                'mAnalyzers = (From a In myAnalyzerData.tcfgAnalyzers _
-                '              Where Not a.Generic _
-                '              Order By a.Active Descending _
-                '              Select a.AnalyzerID).ToList
-
-                Dim o As String
-                For Each o In myAnalyzerData
-                    mAnalyzers.Add(o.ToString)
-                Next
-
-                'mAnalyzers = myGlobalDataTO.SetDatos
-            End If
-            'End IR 04/10/2012
-
-        Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetAnalyzerList ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".GetAnalyzerList ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+            GlobalBase.CreateLogActivity(ex)
+            ShowMessage(Me.Name & ".PrepareButtons", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
@@ -541,7 +599,8 @@ Public Class UiHisAlarms
     '''  Fills the DropDownLists
     ''' </summary>
     ''' <remarks>
-    ''' Created by: JB 28/09/2012
+    ''' Created by:  JB 28/09/2012
+    ''' Modified by: JB 16/10/2012 - ComboBox of Analyzers is not visible when there is only one Analyzer in the list 
     ''' </remarks>
     Private Sub FillDropDownLists()
         GetAlarmTypes()
@@ -551,46 +610,8 @@ Public Class UiHisAlarms
         bsAnalyzerIDComboBox.DataSource = mAnalyzers
 
         bsAnalyzerIDComboBox.Enabled = mAnalyzers.Count > 1
-        bsAnalyzerIDComboBox.Visible = bsAnalyzerIDComboBox.Enabled 'JB 16/10/2012 Not visible if only one analyzer
-        bsAnalyzerIDLabel.Visible = bsAnalyzerIDComboBox.Visible 'JB 16/10/2012 Not visible if only one analyzer
-    End Sub
-
-    ''' <summary>
-    ''' Gets all the preloaded images
-    ''' </summary>
-    ''' <remarks>
-    ''' Created by: JB 28/09/2012
-    ''' </remarks>
-    Private Sub GetPreloadedImages()
-        Try
-            Dim preloadedDataConfig As New PreloadedMasterDataDelegate
-            Dim auxIconName As String = ""
-
-            'ERROR Image
-            auxIconName = GetIconName("WARNINGSMALL")
-            If Not String.IsNullOrEmpty(auxIconName) Then ERRORImage = preloadedDataConfig.GetIconImage("WARNINGSMALL")
-
-            'WARNING Image
-            auxIconName = GetIconName("STUS_WITHERRS")
-            If Not String.IsNullOrEmpty(auxIconName) Then WARNINGImage = preloadedDataConfig.GetIconImage("STUS_WITHERRS")
-
-            'SOLVED ALARM Image
-            SOLVEDimage = NoImage
-            auxIconName = GetIconName("SOLVEDSMALL")
-            If Not String.IsNullOrEmpty(auxIconName) Then SOLVEDimage = preloadedDataConfig.GetIconImage("SOLVEDSMALL")
-
-            'WARNING Disable Image 
-            auxIconName = GetIconName("WRNGSMLDIS")
-            If Not String.IsNullOrEmpty(auxIconName) Then SOLVEDErrorImage = preloadedDataConfig.GetIconImage("WRNGSMLDIS")
-
-            'ALERT Disable Image 
-            auxIconName = GetIconName("ALRTSMLDIS")
-            If Not String.IsNullOrEmpty(auxIconName) Then SOLVEDWarningImage = preloadedDataConfig.GetIconImage("ALRTSMLDIS")
-
-        Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetPreloadedImages ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Me.Name & ".GetPreloadedImages ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", MsgParent)
-        End Try
+        bsAnalyzerIDComboBox.Visible = bsAnalyzerIDComboBox.Enabled
+        bsAnalyzerIDLabel.Visible = bsAnalyzerIDComboBox.Visible
     End Sub
 
     ''' <summary>
@@ -607,9 +628,8 @@ Public Class UiHisAlarms
                 .NextPage.Hint = GetText("BTN_GoToNext")
                 .Last.Hint = GetText("BTN_GoToLast")
             End With
-
         Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeGridNavigator ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex)
             ShowMessage(Me.Name & ".InitializeGridNavigator ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", MsgParent)
         End Try
     End Sub
@@ -636,9 +656,8 @@ Public Class UiHisAlarms
 
 
             With xtraHistoryGridView
-                .Columns.AddRange(New DevExpress.XtraGrid.Columns.GridColumn() _
-                            {TypeColumn, DateColumn, TimeColumn, _
-                             NameColumn, DescriptionColumn, SolutionColumn, AnalyzerColumn})
+                .Columns.AddRange(New DevExpress.XtraGrid.Columns.GridColumn() {TypeColumn, DateColumn, TimeColumn, NameColumn, _
+                                                                                DescriptionColumn, SolutionColumn, AnalyzerColumn})
 
                 .OptionsView.AllowCellMerge = False
                 .OptionsView.GroupDrawMode = DevExpress.XtraGrid.Views.Grid.GroupDrawMode.Default
@@ -646,21 +665,14 @@ Public Class UiHisAlarms
                 .OptionsView.ColumnAutoWidth = False
                 .OptionsView.RowAutoHeight = True
                 .OptionsView.ShowIndicator = False
-
                 .Appearance.Row.TextOptions.VAlignment = DevExpress.Utils.VertAlignment.Center
-                '.Appearance.FocusedRow.ForeColor = Color.White
-                '.Appearance.FocusedRow.BackColor = Color.LightSlateGray
-
                 .OptionsHint.ShowColumnHeaderHints = False
-
                 .OptionsBehavior.Editable = False
                 .OptionsBehavior.ReadOnly = True
                 .OptionsCustomization.AllowFilter = False
                 .OptionsCustomization.AllowSort = True
-
                 .OptionsSelection.EnableAppearanceFocusedRow = True
                 .OptionsSelection.MultiSelect = True
-
                 .ColumnPanelRowHeight = 30
                 .GroupCount = 0
                 .OptionsMenu.EnableColumnMenu = False
@@ -778,8 +790,8 @@ Public Class UiHisAlarms
             SolutionColumn.ColumnEdit = largeTextEdit
 
         Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeAlarmsHistoryGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".InitializeAlarmsHistoryGrid", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", MsgParent)
+            GlobalBase.CreateLogActivity(ex)
+            ShowMessage(Me.Name & ".InitializeAlarmsHistoryGrid", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", MsgParent)
         End Try
     End Sub
 
@@ -799,76 +811,13 @@ Public Class UiHisAlarms
 
             bsTypeComboBox.SelectedIndex = 0
 
-            If bsAnalyzerIDComboBox.Items.Count > 0 Then
+            If (bsAnalyzerIDComboBox.Items.Count > 0) Then
                 bsAnalyzerIDComboBox.SelectedIndex = 0
             End If
 
         Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeFilterSearch ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".InitializeFilterSearch", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
-        End Try
-    End Sub
-
-    ''' <summary>
-    '''  Gets all label texts for Alarms
-    ''' </summary>
-    ''' <remarks>
-    ''' Created by:  JB 28/09/2012 (Addapted from IMonitorAlarmsTab.vb -> GetAlarmsTabLabels() )
-    ''' </remarks>
-    Private Sub InitializeAlarmTexts()
-        Try
-            SampleClassDict("BLANK") = GetText("PMD_SAMPLE_CLASSES_BLANK")
-            SampleClassDict("CALIB") = GetText("PMD_SAMPLE_CLASSES_CALIB")
-            SampleClassDict("CTRL") = GetText("PMD_SAMPLE_CLASSES_CTRL")
-            SampleClassDict("PATIENT") = GetText("PMD_SAMPLE_CLASSES_PATIENT")
-
-            BlankModeDict("SALINESOL") = GetText("PMD_SPECIAL_SOLUTIONS_SALINESOL")
-            BlankModeDict("DISTW") = GetText("PMD_SPECIAL_SOLUTIONS_DISTW")
-            BlankModeDict("REAGENT") = GetText("PMD_BLANK_MODES_REAGENT") 'AG 29/01/2014 - #1479 3b) Blank only with reagent
-
-            'SGM 06/09/2012 - Automation of filling Solution Codes dictionary
-            Dim myGlobalDataTO As New GlobalDataTO
-            Dim myPreloadedMasterDataDelegate As New PreloadedMasterDataDelegate
-
-            'Dilution Solution Codes
-            myGlobalDataTO = myPreloadedMasterDataDelegate.GetList(Nothing, GlobalEnumerates.PreloadedMasterDataEnum.DIL_SOLUTIONS)
-            If (Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing) Then
-                Dim myDilutionCodesMasterDataDS As PreloadedMasterDataDS = CType(myGlobalDataTO.SetDatos, PreloadedMasterDataDS)
-                For Each S As PreloadedMasterDataDS.tfmwPreloadedMasterDataRow In myDilutionCodesMasterDataDS.tfmwPreloadedMasterData
-                    If Not SolutionCodeDict.ContainsKey(S.ItemID.ToUpper) Then
-                        SolutionCodeDict(S.ItemID.ToUpper) = S.FixedItemDesc
-                    End If
-                Next
-            End If
-
-            'Special Solution Codes
-            myGlobalDataTO = myPreloadedMasterDataDelegate.GetList(Nothing, GlobalEnumerates.PreloadedMasterDataEnum.SPECIAL_SOLUTIONS)
-            If (Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing) Then
-                Dim mySpecialCodesMasterDataDS As PreloadedMasterDataDS = CType(myGlobalDataTO.SetDatos, PreloadedMasterDataDS)
-                For Each S As PreloadedMasterDataDS.tfmwPreloadedMasterDataRow In mySpecialCodesMasterDataDS.tfmwPreloadedMasterData
-                    If Not SolutionCodeDict.ContainsKey(S.ItemID.ToUpper) Then
-                        SolutionCodeDict(S.ItemID.ToUpper) = S.FixedItemDesc
-                    End If
-                Next
-            End If
-
-            'Washing Solution Codes
-            myGlobalDataTO = myPreloadedMasterDataDelegate.GetList(Nothing, GlobalEnumerates.PreloadedMasterDataEnum.WASHING_SOLUTIONS)
-            If (Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing) Then
-                Dim myWashingCodesMasterDataDS As PreloadedMasterDataDS = CType(myGlobalDataTO.SetDatos, PreloadedMasterDataDS)
-                For Each S As PreloadedMasterDataDS.tfmwPreloadedMasterDataRow In myWashingCodesMasterDataDS.tfmwPreloadedMasterData
-                    If Not SolutionCodeDict.ContainsKey(S.ItemID.ToUpper) Then
-                        SolutionCodeDict(S.ItemID.ToUpper) = S.FixedItemDesc
-                    End If
-                Next
-            End If
-            'end SGM 06/09/2012
-
-
-        Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeAlarmTexts ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Me.Name & ".InitializeAlarmTexts", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", MsgParent)
-
+            GlobalBase.CreateLogActivity(ex)
+            ShowMessage(Me.Name & ".InitializeFilterSearch", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
 
@@ -887,12 +836,9 @@ Public Class UiHisAlarms
             mAnalyzers = New List(Of String)
 
             'Get the current Language from the current Application Session
-            'Dim currentLanguageGlobal As New GlobalBase
             currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString()
 
-
-            'SGM 31/05/2013 - Get Level of the connected User
-            'Dim myGlobalbase As New GlobalBase
+            'SG 31/05/2013 - Get Level of the connected User
             CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
             ScreenStatusByUserLevel()
 
@@ -904,24 +850,20 @@ Public Class UiHisAlarms
             InitializeAlarmsHistoryGrid()
 
             InitializeFilterSearch()
-
             FindHistoricalResults()
-
         Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".InitializeScreen ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+            GlobalBase.CreateLogActivity(ex)
+            ShowMessage(Me.Name & ".InitializeScreen ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
-    ''' <summary>
-    ''' 
-    ''' </summary>
+    ''' <summary></summary>
     ''' <remarks>
-    ''' created by SG 31/05/2013
+    ''' Created by: SG 31/05/2013
     ''' </remarks>
     Private Sub ScreenStatusByUserLevel()
         Try
-            Select Case CurrentUserLevel    '.ToUpper()
+            Select Case CurrentUserLevel
                 Case "SUPERVISOR"
                     Exit Select
 
@@ -929,42 +871,41 @@ Public Class UiHisAlarms
                     bsHistoryDelete.Enabled = False
                     Exit Select
             End Select
-
         Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ScreenStatusByUserLevel ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".ScreenStatusByUserLevel ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+            GlobalBase.CreateLogActivity(ex)
+            ShowMessage(Me.Name & ".ScreenStatusByUserLevel ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
-
 #End Region
 
-#Region " Search "
+#Region "Private Methods for searching Historic Alarms and load the grid"
     ''' <summary>
     ''' Returns the selected search filter
     ''' </summary>
-    ''' <returns></returns>
-    ''' <remarks></remarks>
+    ''' <returns>Structure SearchFilter filled with all values selected in Search Area in the screen</returns>
+    ''' <remarks>
+    ''' Created by: JB 28/09/2012
+    ''' </remarks>
     Private Function GetSearchFilter() As SearchFilter
         Dim filter As New SearchFilter
         With filter
             .analyzerId = bsAnalyzerIDComboBox.SelectedItem.ToString
 
-            If bsDateFromDateTimePick.Checked Then
+            If (bsDateFromDateTimePick.Checked) Then
                 .dateFrom = bsDateFromDateTimePick.Value
             Else
                 .dateFrom = Nothing
             End If
-            If bsDateToDateTimePick.Checked Then
+            If (bsDateToDateTimePick.Checked) Then
                 .dateTo = bsDateToDateTimePick.Value.AddDays(1)
             Else
                 .dateTo = Nothing
             End If
 
             .alarmType = (From kvp As KeyValuePair(Of String, String) In mAlarmTypes _
-                          Where kvp.Value = bsTypeComboBox.SelectedItem.ToString _
-                          Select kvp.Key).FirstOrDefault
+                         Where kvp.Value = bsTypeComboBox.SelectedItem.ToString _
+                        Select kvp.Key).FirstOrDefault
         End With
-
         Return filter
     End Function
 
@@ -975,239 +916,28 @@ Public Class UiHisAlarms
     ''' Created by: JB 28/09/2012
     ''' </remarks>
     Private Sub FindHistoricalResults()
-        Dim myGlobalDataTO As New GlobalDataTO
-        Dim myHisWSAnalyzerAlarmsDS As HisWSAnalyzerAlarmsDS
-
         xtraHistoryGrid.DataSource = Nothing
-        Try
-            If bsAnalyzerIDComboBox.Items.Count > 0 Then
 
+        Try
+            If (bsAnalyzerIDComboBox.Items.Count > 0) Then
                 Dim filter As SearchFilter = GetSearchFilter()
 
-                myGlobalDataTO = myWSAlarmHistory.GetAlarmsMonitor(Nothing, filter.analyzerId, filter.dateFrom, filter.dateTo, filter.alarmType)
-                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                    myHisWSAnalyzerAlarmsDS = DirectCast(myGlobalDataTO.SetDatos, HisWSAnalyzerAlarmsDS)
+                Dim myGlobalData As New GlobalDataTO
+                myGlobalData = myWSAlarmHistory.GetAlarmsMonitor(Nothing, filter.analyzerId, filter.dateFrom, filter.dateTo, filter.alarmType)
+
+                If (Not myGlobalData.HasError AndAlso Not myGlobalData.SetDatos Is Nothing) Then
+                    Dim myHisWSAnalyzerAlarmsDS As HisWSAnalyzerAlarmsDS = DirectCast(myGlobalData.SetDatos, HisWSAnalyzerAlarmsDS)
 
                     PrepareAndSetDataToGrid(myHisWSAnalyzerAlarmsDS.vwksAlarmsMonitor)
                 End If
             End If
             UpdateFormBehavior()
-
         Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FindHistoricalResults ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex)
             ShowMessage(Name & ".FindHistoricalResults ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
-    ''' <summary>
-    ''' Decodes the image of the alarm type
-    ''' </summary>
-    ''' <param name="pRow"></param>
-    ''' <remarks>
-    ''' Created by: JB 28/09/2012 (addapted from IMonitorAlarmsTab.vb -> UpdateAlarmsTab() )
-    ''' </remarks>
-    Private Sub DecodeAlarmTypeImage(ByRef pRow As HisWSAnalyzerAlarmsDS.vwksAlarmsMonitorRow)
-        Dim myGlobalDataTO As New GlobalDataTO
-        Try
-            Select Case pRow.AlarmType
-                Case "ERROR"
-                    If pRow.AlarmStatus Then
-                        pRow.AlarmTypeImage = ERRORImage
-                    Else
-                        pRow.AlarmTypeImage = SOLVEDErrorImage
-                    End If
-                Case "WARNING"
-                    If pRow.AlarmStatus Then
-                        pRow.AlarmTypeImage = WARNINGImage
-                    Else
-                        pRow.AlarmTypeImage = SOLVEDWarningImage
-                    End If
-                Case Else
-                    pRow.AlarmTypeImage = NoImage
-            End Select
-
-        Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DecodeAlarmTypeImage ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".DecodeAlarmTypeImage ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-        End Try
-    End Sub
-
-    ''' <summary>
-    ''' Decodes the alarm description
-    ''' </summary>
-    ''' <param name="pRow"></param>
-    ''' <remarks>
-    ''' Created by:  JB 28/09/2012 (addapted from IMonitorAlarmsTab.vb -> UpdateAlarmsTab() )
-    ''' Modified by: JV 27/01/2014 #1463
-    ''' AG 09/12/2014 BA-2236 show the error code when informed 'Alarm Description [error code]' it is stored in AdditionalInfo column
-    ''' </remarks>
-    Private Sub DecodeAlarmDescription(ByRef pRow As HisWSAnalyzerAlarmsDS.vwksAlarmsMonitorRow)
-        Dim myGlobalDataTO As New GlobalDataTO
-        Dim additionalInfoDS As WSAnalyzerAlarmsDS
-        Dim additionalInfo As String
-
-        Try
-            'RH 30/01/2012 Decode Additional Info
-            If Not String.IsNullOrEmpty(pRow.AdditionalInfo) Then
-                'SGM 30/07/2012 ISE aditional Info
-                If pRow.AlarmID = Alarms.ISE_CALIB_ERROR.ToString Or _
-                   pRow.AlarmID = Alarms.ISE_ERROR_A.ToString Or _
-                   pRow.AlarmID = Alarms.ISE_ERROR_B.ToString Or _
-                   pRow.AlarmID = Alarms.ISE_ERROR_C.ToString Or _
-                   pRow.AlarmID = Alarms.ISE_ERROR_D.ToString Or _
-                   pRow.AlarmID = Alarms.ISE_ERROR_S.ToString Or _
-                   pRow.AlarmID = Alarms.ISE_ERROR_F.ToString Or _
-                   pRow.AlarmID = Alarms.ISE_ERROR_M.ToString Or _
-                   pRow.AlarmID = Alarms.ISE_ERROR_N.ToString Or _
-                   pRow.AlarmID = Alarms.ISE_ERROR_R.ToString Or _
-                   pRow.AlarmID = Alarms.ISE_ERROR_W.ToString Or _
-                   pRow.AlarmID = Alarms.ISE_ERROR_P.ToString Or _
-                   pRow.AlarmID = Alarms.ISE_ERROR_T.ToString Then
-                    'SGM 27/07/2012
-                    Dim additionalISEInfoDS As WSAnalyzerAlarmsDS
-
-                    myGlobalDataTO = myWSAlarmsDelegate.DecodeISEAdditionalInfo(pRow.AlarmID, pRow.AdditionalInfo, pRow.AnalyzerID)
-                    If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
-                        additionalISEInfoDS = DirectCast(myGlobalDataTO.SetDatos, WSAnalyzerAlarmsDS)
-
-                        For Each adISERow As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In additionalISEInfoDS.twksWSAnalyzerAlarms.Rows
-                            If adISERow.AdditionalInfo.Trim.Length > 0 Then
-                                additionalInfo = adISERow.AlarmID & " " & adISERow.AdditionalInfo
-                                pRow.Description &= Environment.NewLine & additionalInfo
-                            Else
-                                pRow.Description = adISERow.AlarmID
-                            End If
-                        Next
-
-                    End If
-                ElseIf pRow.AlarmID = Alarms.WS_PAUSE_MODE_WARN.ToString Then 'JV 27/01/2014 #1463
-                    pRow.Description &= pRow.AdditionalInfo
-                Else
-                    myGlobalDataTO = myWSAlarmsDelegate.DecodeAdditionalInfo(pRow.AlarmID, pRow.AdditionalInfo)
-                    If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
-                        Dim adRow As WSAnalyzerAlarmsDS.AdditionalInfoPrepLockedRow
-
-                        additionalInfoDS = DirectCast(myGlobalDataTO.SetDatos, WSAnalyzerAlarmsDS)
-
-                        adRow = additionalInfoDS.AdditionalInfoPrepLocked(0)
-
-                        If String.Equals(adRow.SampleClass, "CALIB") Then
-                            If String.Equals(adRow.NumberOfCalibrators, "1") Then
-                                Name = adRow.Name
-                            Else
-                                Name = String.Format("{0}-{1}", adRow.Name, adRow.MultiItemNumber)
-                            End If
-                        Else
-                            Name = adRow.Name
-                        End If
-
-                        additionalInfo = String.Empty
-
-                        Select Case pRow.AlarmID
-                            Case GlobalEnumerates.Alarms.S_NO_VOLUME_WARN.ToString()
-                                If String.Equals(adRow.SampleClass, "BLANK") Then
-                                    additionalInfo = String.Format(S_NO_VOLUME_BLANK_Format, _
-                                                                   SampleClassDict(adRow.SampleClass), _
-                                                                   BlankModeDict(Name), _
-                                                                   adRow.RotorPosition)
-                                Else
-                                    additionalInfo = String.Format(S_NO_VOLUME_Format, _
-                                                                   SampleClassDict(adRow.SampleClass), _
-                                                                   Name, _
-                                                                   adRow.RotorPosition)
-                                End If
-
-                            Case GlobalEnumerates.Alarms.PREP_LOCKED_WARN.ToString()
-                                If String.Equals(adRow.SampleClass, "BLANK") Then
-                                    additionalInfo = String.Format(PREP_LOCKED_BLANK_Format, _
-                                                                   SampleClassDict(adRow.SampleClass), _
-                                                                   BlankModeDict(Name), _
-                                                                   adRow.TestName) ', adRow.ReplicateNumber) 'AG 18/06/2012 - do not shown the replicate number
-                                Else
-                                    additionalInfo = String.Format(PREP_LOCKED_Format, _
-                                                                   SampleClassDict(adRow.SampleClass), _
-                                                                   Name, _
-                                                                   adRow.TestName) ', adRow.ReplicateNumber)'AG 18/06/2012 - do not shown the replicate number
-                                End If
-
-                                'AG 25/07/2012
-                            Case GlobalEnumerates.Alarms.CLOT_DETECTION_ERR.ToString(), GlobalEnumerates.Alarms.CLOT_DETECTION_WARN.ToString()
-                                If String.Equals(adRow.SampleClass, "BLANK") Then
-                                    additionalInfo = String.Format(PREP_WITH_CLOT_BLANK_Format, _
-                                                                   SampleClassDict(adRow.SampleClass), _
-                                                                   BlankModeDict(Name), _
-                                                                   adRow.TestName, adRow.ReplicateNumber)
-                                Else
-                                    additionalInfo = String.Format(PREP_WITH_CLOT_Format, _
-                                                                   SampleClassDict(adRow.SampleClass), _
-                                                                   Name, _
-                                                                   adRow.TestName, adRow.ReplicateNumber)
-                                End If
-                                'AG 25/07/2012
-
-                            Case GlobalEnumerates.Alarms.R1_NO_VOLUME_WARN.ToString(), _
-                                 GlobalEnumerates.Alarms.R2_NO_VOLUME_WARN.ToString()
-                                'RH 18/05/2012
-                                Select Case adRow.TubeContent
-                                    Case "SPEC_SOL"
-                                        additionalInfo = String.Format(SPEC_SOL_Format, _
-                                                                       SolutionCodeDict(adRow.SolutionCode), _
-                                                                       adRow.RotorPosition)
-                                    Case "WASH_SOL"
-                                        additionalInfo = String.Format(WASH_SOL_Format, _
-                                                                       SolutionCodeDict(adRow.SolutionCode), _
-                                                                       adRow.RotorPosition)
-                                    Case Else
-                                        additionalInfo = String.Format(R_NO_VOLUME_Format, _
-                                                                       adRow.TestName, _
-                                                                       adRow.RotorPosition)
-                                End Select
-                                'RH 18/05/2012 - END
-                        End Select
-
-                        pRow.Description &= Environment.NewLine & additionalInfo
-
-                        'AG 09/12/2014 BA-2236 - AdditionalInfo = ErrorCode
-                    ElseIf Not myGlobalDataTO.HasError AndAlso IsNumeric(pRow.AdditionalInfo) Then
-                        pRow.Description &= " - [" & pRow.AdditionalInfo.ToString & "]"
-                        'AG 09/12/2014 BA-2236
-
-                    End If
-                End If
-            End If
-            'END RH 30/01/2012
-        Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DecodeAlarmDescription ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".DecodeAlarmDescription ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-        End Try
-    End Sub
-
-    ''' <summary>
-    ''' Prepare the DataSet with friendly data (as Monitor tab) and sets to Grid
-    ''' </summary>
-    ''' <param name="pAlarmsDataTable"></param>
-    ''' <remarks>
-    ''' Created by: JB 28/09/2012
-    ''' </remarks>
-    Private Sub PrepareAndSetDataToGrid(ByVal pAlarmsDataTable As HisWSAnalyzerAlarmsDS.vwksAlarmsMonitorDataTable)
-        Dim myGlobalDataTO As New GlobalDataTO
-
-        Try
-            For Each row As HisWSAnalyzerAlarmsDS.vwksAlarmsMonitorRow In pAlarmsDataTable
-                DecodeAlarmTypeImage(row)
-                DecodeAlarmDescription(row)
-            Next
-
-            xtraHistoryGrid.DataSource = pAlarmsDataTable
-
-        Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareAndSetDataToGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".PrepareAndSetDataToGrid ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-        End Try
-    End Sub
-#End Region
-
-#Region "Behavior"
     ''' <summary>
     ''' Updates the Form Behavior: enable buttons, show actions...
     ''' </summary>
@@ -1220,122 +950,397 @@ Public Class UiHisAlarms
             bsSearchGroup.Enabled = bsAnalyzerIDComboBox.Items.Count > 0
             ScreenStatusByUserLevel()
         Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".UpdateFormBehavior ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".UpdateFormBehavior ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+            GlobalBase.CreateLogActivity(ex)
+            ShowMessage(Me.Name & ".UpdateFormBehavior ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+    End Sub
+#End Region
+
+#Region "Private Methods to Decode Image and Description of all Alarms loaded"
+    ''' <summary>
+    ''' Decodes the alarm description
+    ''' </summary>
+    ''' <param name="pRow">Row of a typed DataSet HisWSAnalyzerAlarmsDS containing data of the Alarm that has to be shown</param>
+    ''' <remarks>
+    ''' Created by:  JB 28/09/2012 (addapted from IMonitorAlarmsTab.vb -> UpdateAlarmsTab() )
+    ''' Modified by: JV 27/01/2014 - BA-1463 ==> For Alarm WS_PAUSE_MODE_WARN is not needed to decode field AdditionalInfo; the content of the
+    '''                                          field is added to the Alarm Description
+    '''              SA 01/04/2015 - BA-2384 ==> Based on implementation of BA-2236 for BA-200. When field AdditionalInfo is informed and contains 
+    '''                                          a numeric value, it means that value is the FW Error Code for the Alarm and it is added to the Alarm
+    '''                                          Description between brackets. Changes in the code to call new functions GetDescriptionForISEAlarms 
+    '''                                          and GetDescriptionForOtherAlarms.
+    ''' </remarks>
+    Private Sub DecodeAlarmDescription(ByRef pRow As HisWSAnalyzerAlarmsDS.vwksAlarmsMonitorRow)
+        Try
+            If (Not String.IsNullOrEmpty(pRow.AdditionalInfo)) Then
+                Dim myGlobalData As New GlobalDataTO
+
+                If (pRow.AlarmID = Alarms.ISE_CALIB_ERROR.ToString OrElse pRow.AlarmID = Alarms.ISE_ERROR_A.ToString OrElse _
+                    pRow.AlarmID = Alarms.ISE_ERROR_B.ToString OrElse pRow.AlarmID = Alarms.ISE_ERROR_C.ToString OrElse _
+                    pRow.AlarmID = Alarms.ISE_ERROR_D.ToString OrElse pRow.AlarmID = Alarms.ISE_ERROR_S.ToString OrElse _
+                    pRow.AlarmID = Alarms.ISE_ERROR_F.ToString OrElse pRow.AlarmID = Alarms.ISE_ERROR_M.ToString OrElse _
+                    pRow.AlarmID = Alarms.ISE_ERROR_N.ToString OrElse pRow.AlarmID = Alarms.ISE_ERROR_R.ToString OrElse _
+                    pRow.AlarmID = Alarms.ISE_ERROR_W.ToString OrElse pRow.AlarmID = Alarms.ISE_ERROR_P.ToString OrElse _
+                    pRow.AlarmID = Alarms.ISE_ERROR_T.ToString) Then
+                    'Decode field AdditionalInfo for ISE Alarms
+                    myGlobalData = GetDescriptionForISEAlarms(pRow)
+
+                ElseIf (pRow.AlarmID = Alarms.WS_PAUSE_MODE_WARN.ToString) Then
+                    'BA-1463: For this Alarm field AdditionalInfo does not need to be decoded
+                    pRow.Description &= pRow.AdditionalInfo
+
+                ElseIf (IsNumeric(pRow.AdditionalInfo.Replace(",", ""))) Then
+                    'BA-2384: When field AdditionalInfo is NUMERIC, it contains the FW Error Code for the Alarm (field can contain
+                    '         also a list of FW Error Codes divided by commas, when the Alarm is linked to several Error Codes and
+                    '         the Analyzer has sent all of them). The value is shown between brackets following the Alarm Description
+                    pRow.Description &= " - [" & pRow.AdditionalInfo.ToString & "]"
+                Else
+                    'Decode field Additional Info for other types of Alarms
+                    myGlobalData = GetDescriptionForOtherAlarms(pRow)
+                End If
+
+                If (myGlobalData.HasError) Then
+                    'If an error has happened, show it
+                    ShowMessage(Me.Name & ".DecodeAlarmDescription", myGlobalData.ErrorCode, myGlobalData.ErrorMessage, MsgParent)
+                End If
+            End If
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex)
+            ShowMessage(Me.Name & ".DecodeAlarmDescription ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
     ''' <summary>
+    ''' According the type of Alarm, show the Error Icon or the Warning Icon. Additionally, if the Alarm Status is True, it means
+    ''' the Alarm has been solved, and in this case the Icon has a different BackColor 
+    ''' </summary>
+    ''' <param name="pRow">Row of a typed DataSet HisWSAnalyzerAlarmsDS containing data of the Alarm that has to be shown</param>
+    ''' <remarks>
+    ''' Created by: JB 28/09/2012 (adapted from UiMonitorAlarmsTab.vb -> UpdateAlarmsTab())
+    ''' </remarks>
+    Private Sub DecodeAlarmTypeImage(ByRef pRow As HisWSAnalyzerAlarmsDS.vwksAlarmsMonitorRow)
+        Try
+            Select Case pRow.AlarmType
+                Case "ERROR"
+                    If (pRow.AlarmStatus) Then
+                        pRow.AlarmTypeImage = ERRORImage
+                    Else
+                        pRow.AlarmTypeImage = SOLVEDErrorImage
+                    End If
+                Case "WARNING"
+                    If (pRow.AlarmStatus) Then
+                        pRow.AlarmTypeImage = WARNINGImage
+                    Else
+                        pRow.AlarmTypeImage = SOLVEDWarningImage
+                    End If
+                Case Else
+                    pRow.AlarmTypeImage = NoImage
+            End Select
+
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex)
+            ShowMessage(Me.Name & ".DecodeAlarmTypeImage ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Get the formatted additional information to show for alarm PREP_LOCKED_WARN 
+    ''' </summary>
+    ''' <param name="pAddInfoPreparationRow">Row of typed DataSet WSAnalyzerAlarmsDS (sub-table AdditionalInfoPrepLocked) containing all data needed 
+    '''                                      to build the Additional Information field for this type of Alarm</param>
+    ''' <param name="pElementName">Name of the affected Element</param>
+    ''' <returns>String formatted with all additional information that has to be shown</returns>
+    ''' <remarks>
+    ''' Created by: SA 01/04/2015 - BA-2384 ==> Adapted from function with the same name in UiMonitorAlarmsTab.vb
+    ''' </remarks>
+    Private Function GetAdditionalInfoForAlarmPREP_LOCKED_WARN(ByVal pAddInfoPreparationRow As WSAnalyzerAlarmsDS.AdditionalInfoPrepLockedRow, ByVal pElementName As String) As String
+        Dim additionalInfo As String = String.Empty
+
+        Try
+            If (pAddInfoPreparationRow.SampleClass = "BLANK") Then
+                additionalInfo = String.Format(PREP_LOCKED_BLANK_Format, SampleClassDict(pAddInfoPreparationRow.SampleClass), BlankModeDict(pElementName), _
+                                               pAddInfoPreparationRow.TestName)
+            Else
+                additionalInfo = String.Format(PREP_LOCKED_Format, SampleClassDict(pAddInfoPreparationRow.SampleClass), pElementName, pAddInfoPreparationRow.TestName)
+            End If
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex)
+            ShowMessage(Me.Name & ".GetAdditionalInfoForAlarmPREP_LOCKED_WARN", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", MsgParent)
+        End Try
+        Return additionalInfo
+    End Function
+
+    ''' <summary>
+    ''' Get the formatted additional information to show for alarm S_NO_VOLUME_WARN (depleted Sample Tube)
+    ''' </summary>
+    ''' <param name="pAddInfoPreparationRow">Row of typed DataSet WSAnalyzerAlarmsDS (sub-table AdditionalInfoPrepLocked) containing all data needed 
+    '''                                      to build the Additional Information field for this type of Alarm</param>
+    ''' <param name="pElementName">Name of the affected Element</param>
+    ''' <returns>String formatted with all additional information that has to be shown</returns>
+    ''' <remarks>
+    ''' Created by: SA 01/04/2015 - BA-2384 ==> Adapted from function with the same name in UiMonitorAlarmsTab.vb
+    ''' </remarks>
+    Private Function GetAdditionalInfoForAlarmS_NO_VOLUME_WARN(ByVal pAddInfoPreparationRow As WSAnalyzerAlarmsDS.AdditionalInfoPrepLockedRow, ByVal pElementName As String) As String
+        Dim additionalInfo As String = String.Empty
+
+        Try
+            If (pAddInfoPreparationRow.SampleClass = "BLANK") Then
+                additionalInfo = String.Format(S_NO_VOLUME_BLANK_Format, SampleClassDict(pAddInfoPreparationRow.SampleClass), BlankModeDict(pElementName), _
+                                               pAddInfoPreparationRow.RotorPosition)
+            Else
+                additionalInfo = String.Format(S_NO_VOLUME_Format, SampleClassDict(pAddInfoPreparationRow.SampleClass), pElementName, pAddInfoPreparationRow.RotorPosition)
+            End If
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex)
+            ShowMessage(Me.Name & ".GetAdditionalInfoForAlarmS_NO_VOLUME_WARN", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", MsgParent)
+        End Try
+        Return additionalInfo
+    End Function
+
+    ''' <summary>
+    ''' Get the formatted additional information to show for both Clot Detection Alarms: CLOT_DETECTION_ERR and CLOT_DETECTION_WARN
+    ''' </summary>
+    ''' <param name="pAddInfoPreparationRow">Row of typed DataSet WSAnalyzerAlarmsDS (sub-table AdditionalInfoPrepLocked) containing all data needed 
+    '''                                      to build the Additional Information field for this type of Alarm</param>
+    ''' <param name="pElementName">Name of the affected Element</param>
+    ''' <returns>String formatted with all additional information that has to be shown</returns>
+    ''' <remarks>
+    ''' Created by: SA 01/04/2015 - BA-2384 ==> Adapted from function with the same name in UiMonitorAlarmsTab.vb
+    ''' </remarks>
+    Private Function GetAdditionalInfoForAlarmsCLOT_DETECTION(ByVal pAddInfoPreparationRow As WSAnalyzerAlarmsDS.AdditionalInfoPrepLockedRow, ByVal pElementName As String) As String
+        Dim additionalInfo As String = String.Empty
+
+        Try
+            If (pAddInfoPreparationRow.SampleClass = "BLANK") Then
+                additionalInfo = String.Format(PREP_WITH_CLOT_BLANK_Format, SampleClassDict(pAddInfoPreparationRow.SampleClass), BlankModeDict(pElementName), _
+                                               pAddInfoPreparationRow.TestName, pAddInfoPreparationRow.ReplicateNumber)
+            Else
+                additionalInfo = String.Format(PREP_WITH_CLOT_Format, SampleClassDict(pAddInfoPreparationRow.SampleClass), pElementName, pAddInfoPreparationRow.TestName, _
+                                               pAddInfoPreparationRow.ReplicateNumber)
+            End If
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex)
+            ShowMessage(Me.Name & ".GetAdditionalInfoForAlarmsCLOT_DETECTION", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", MsgParent)
+        End Try
+        Return additionalInfo
+    End Function
+
+    ''' <summary>
+    ''' Get the formatted additional information to show for both Depleted Reagent Alarms: R1_NO_VOLUME_WARN and R2_NO_VOLUME_WARN
+    ''' </summary>
+    ''' <param name="pAddInfoPreparationRow">Row of typed DataSet WSAnalyzerAlarmsDS (sub-table AdditionalInfoPrepLocked) containing all data needed 
+    '''                                      to build the Additional Information field for this type of Alarm</param>
+    ''' <param name="pElementName">Name of the affected Element</param>
+    ''' <returns>String formatted with all additional information that has to be shown</returns>
+    ''' <remarks>
+    ''' Created by: SA 01/04/2015 - BA-2384 ==> Adapted from function with the same name in UiMonitorAlarmsTab.vb
+    ''' </remarks>
+    Private Function GetAdditionalInfoForAlarmsREAGENT_NO_VOLUME(ByVal pAddInfoPreparationRow As WSAnalyzerAlarmsDS.AdditionalInfoPrepLockedRow, ByVal pElementName As String) As String
+        Dim additionalInfo As String = String.Empty
+
+        Try
+            Select Case (pAddInfoPreparationRow.TubeContent)
+                Case "SPEC_SOL"
+                    additionalInfo = String.Format(SPEC_SOL_Format, SolutionCodeDict(pAddInfoPreparationRow.SolutionCode), pAddInfoPreparationRow.RotorPosition)
+
+                Case "WASH_SOL"
+                    additionalInfo = String.Format(WASH_SOL_Format, SolutionCodeDict(pAddInfoPreparationRow.SolutionCode), pAddInfoPreparationRow.RotorPosition)
+
+                Case Else
+                    additionalInfo = String.Format(R_NO_VOLUME_Format, pAddInfoPreparationRow.TestName, pAddInfoPreparationRow.RotorPosition)
+            End Select
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex)
+            ShowMessage(Me.Name & ".GetAdditionalInfoForAlarmsREAGENT_NO_VOLUME", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", MsgParent)
+        End Try
+        Return additionalInfo
+    End Function
+
+    ''' <summary>
+    ''' For ISE Alarms, decode field AdditionalInfo and inform it in Description field
+    ''' </summary>
+    ''' <param name="pAlarmMonitorRow">Row of a typed DataSet HisWSAnalyzerAlarmsDS containing data of the Alarm that has to be shown</param>
+    ''' <returns>GlobalDataTO containing success/error information</returns>
+    ''' <remarks>
+    ''' Created by: SA 31/03/2015 - BA-2384 ==> Adapted from function with the same name in UiMonitorAlarmsTab.vb
+    ''' </remarks>
+    Private Function GetDescriptionForISEAlarms(ByVal pAlarmMonitorRow As HisWSAnalyzerAlarmsDS.vwksAlarmsMonitorRow) As GlobalDataTO
+        Dim myGloblaData As New GlobalDataTO
+
+        Try
+            Dim myAnalyzerAlarmsDelegate As New WSAnalyzerAlarmsDelegate
+            myGloblaData = myAnalyzerAlarmsDelegate.DecodeISEAdditionalInfo(pAlarmMonitorRow.AlarmID, pAlarmMonitorRow.AdditionalInfo, pAlarmMonitorRow.AnalyzerID)
+
+            If (Not myGloblaData.HasError AndAlso Not myGloblaData.SetDatos Is Nothing) Then
+                Dim myAdditionalInfoDS = DirectCast(myGloblaData.SetDatos, WSAnalyzerAlarmsDS)
+
+                For Each row As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In myAdditionalInfoDS.twksWSAnalyzerAlarms.Rows
+                    If (row.AdditionalInfo.Trim.Length > 0) Then
+                        pAlarmMonitorRow.Description &= Environment.NewLine & row.AlarmID & " " & row.AdditionalInfo
+                    Else
+                        pAlarmMonitorRow.Description = row.AlarmID
+                    End If
+                Next
+                pAlarmMonitorRow.AcceptChanges()
+            End If
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex)
+            ShowMessage(Me.Name & ".GetDescriptionForISEAlarms", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", MsgParent)
+        End Try
+        Return myGloblaData
+    End Function
+
+    ''' <summary>
+    ''' Decode content of field Additional Info for all types of Alarms that have this field informed
+    ''' </summary>
+    ''' <param name="pAlarmMonitorRow">Row of a typed DataSet HisWSAnalyzerAlarmsDS containing data of the Alarm that has to be shown</param>
+    ''' <returns>GlobalDataTO containing success/error information</returns>
+    ''' <remarks>
+    ''' Created by: SA 31/03/2015 - BA-2384 ==> Adapted from function with the same name in UiMonitorAlarmsTab.vb
+    ''' </remarks>
+    Private Function GetDescriptionForOtherAlarms(ByVal pAlarmMonitorRow As HisWSAnalyzerAlarmsDS.vwksAlarmsMonitorRow) As GlobalDataTO
+        Dim myGlobalData As New GlobalDataTO
+        Try
+            Dim myWSAlarmsDelegate As New WSAnalyzerAlarmsDelegate
+            myGlobalData = myWSAlarmsDelegate.DecodeAdditionalInfo(pAlarmMonitorRow.AlarmID, pAlarmMonitorRow.AdditionalInfo)
+
+            If (Not myGlobalData.HasError AndAlso Not myGlobalData.SetDatos Is Nothing) Then
+                Dim additionalInfoDS As WSAnalyzerAlarmsDS = DirectCast(myGlobalData.SetDatos, WSAnalyzerAlarmsDS)
+
+                If (additionalInfoDS.AdditionalInfoPrepLocked.Rows.Count > 0) Then
+                    Dim adRow As WSAnalyzerAlarmsDS.AdditionalInfoPrepLockedRow = additionalInfoDS.AdditionalInfoPrepLocked(0)
+
+                    Dim elementName As String = adRow.Name
+                    If (adRow.SampleClass = "CALIB" AndAlso adRow.NumberOfCalibrators <> "1") Then
+                        elementName = String.Format("{0}-{1}", adRow.Name, adRow.MultiItemNumber)
+                    End If
+
+                    'Get the formatted Additional Information to show according the type of Alarm
+                    Dim additionalInfo As String = String.Empty
+                    Select Case (pAlarmMonitorRow.AlarmID)
+                        Case Alarms.S_NO_VOLUME_WARN.ToString()
+                            additionalInfo = GetAdditionalInfoForAlarmS_NO_VOLUME_WARN(adRow, elementName)
+
+                        Case Alarms.PREP_LOCKED_WARN.ToString()
+                            additionalInfo = GetAdditionalInfoForAlarmPREP_LOCKED_WARN(adRow, elementName)
+
+                        Case Alarms.CLOT_DETECTION_ERR.ToString(), Alarms.CLOT_DETECTION_WARN.ToString()
+                            additionalInfo = GetAdditionalInfoForAlarmsCLOT_DETECTION(adRow, elementName)
+
+                        Case Alarms.R1_NO_VOLUME_WARN.ToString(), Alarms.R2_NO_VOLUME_WARN.ToString()
+                            additionalInfo = GetAdditionalInfoForAlarmsREAGENT_NO_VOLUME(adRow, elementName)
+
+                        Case Alarms.BOTTLE_LOCKED_WARN.ToString()
+                            additionalInfo = String.Format(BOTTLE_LOCKED_Format, adRow.TestName, adRow.RotorPosition)
+                    End Select
+
+                    'Finally, add the formatted Additional Information in a new line of Description field
+                    pAlarmMonitorRow.Description &= Environment.NewLine & additionalInfo
+                    pAlarmMonitorRow.AcceptChanges()
+                End If
+            End If
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex)
+            ShowMessage(Me.Name & ".GetDescriptionForOtherAlarms", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", MsgParent)
+        End Try
+        Return myGlobalData
+    End Function
+
+    ''' <summary>
+    ''' Prepare the DataSet with friendly data (as Monitor tab) and sets to Grid
+    ''' </summary>
+    ''' <param name="pAlarmsDataTable"></param>
+    ''' <remarks>
+    ''' Created by: JB 28/09/2012
+    ''' </remarks>
+    Private Sub PrepareAndSetDataToGrid(ByVal pAlarmsDataTable As HisWSAnalyzerAlarmsDS.vwksAlarmsMonitorDataTable)
+        Try
+            For Each row As HisWSAnalyzerAlarmsDS.vwksAlarmsMonitorRow In pAlarmsDataTable
+                DecodeAlarmTypeImage(row)
+                DecodeAlarmDescription(row)
+            Next
+            xtraHistoryGrid.DataSource = pAlarmsDataTable
+
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex)
+            ShowMessage(Me.Name & ".PrepareAndSetDataToGrid ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+    End Sub
+#End Region
+
+#Region "Private Methods for deleting selected Historic Alarms"
+    ''' <summary>
     ''' Delete all selected rows in the grid
     ''' </summary>
     ''' <remarks>
-    ''' Created by: JB 02/10/2012
-    ''' Modified by: JV 27/01/2014 #1463
+    ''' Created by:  JB 02/10/2012
+    ''' Modified by: JV 27/01/2014 -BA-1463
     ''' </remarks>
     Private Sub DeleteSelectedRowsFromGrid(ByVal pGrid As DevExpress.XtraGrid.Views.Grid.GridView)
-        Dim myGlobalDataTO As New GlobalDataTO
-
         Try
-            If pGrid.SelectedRowsCount = 0 Then Exit Sub
+            If (pGrid.SelectedRowsCount = 0) Then Exit Sub
 
             'Show delete confirmation message 
-            If (ShowMessage(Name & ".DeleteSelectedRowsFromGrid ", GlobalEnumerates.Messages.DELETE_CONFIRMATION.ToString) <> Windows.Forms.DialogResult.Yes) Then Exit Sub
+            If (ShowMessage(Me.Name & ".DeleteSelectedRowsFromGrid ", GlobalEnumerates.Messages.DELETE_CONFIRMATION.ToString) <> Windows.Forms.DialogResult.Yes) Then Exit Sub
 
             Dim myHisWSAnalyzerAlarmDS As New HisWSAnalyzerAlarmsDS
             Dim vAlarmMonitorRow As HisWSAnalyzerAlarmsDS.vwksAlarmsMonitorRow
+
             'For each row, creates a new "HistoryAlarm"
             For i As Integer = 0 To pGrid.SelectedRowsCount() - 1
                 If (pGrid.GetSelectedRows()(i) >= 0) Then
                     vAlarmMonitorRow = DirectCast(pGrid.GetDataRow(pGrid.GetSelectedRows()(i)), HisWSAnalyzerAlarmsDS.vwksAlarmsMonitorRow)
                     With vAlarmMonitorRow
-                        If .IsOKDateTimeNull Then .OKDateTime = Nothing
+                        If (.IsOKDateTimeNull) Then .OKDateTime = Nothing
 
                         'Creates the new row HisWSAnalyzerAlarmsDS
-                        myHisWSAnalyzerAlarmDS.thisWSAnalyzerAlarms.AddthisWSAnalyzerAlarmsRow(.AlarmID, _
-                                                                                               .AnalyzerID, _
-                                                                                               .AlarmDateTime, _
-                                                                                               .AlarmItem, _
-                                                                                               .AlarmType, _
-                                                                                               .WorkSessionID, _
-                                                                                               .AdditionalInfo, _
-                                                                                               .AlarmStatus, _
-                                                                                               .OKDateTime,
-                                                                                               Nothing) 'JV 27/01/2014 #1463
+                        myHisWSAnalyzerAlarmDS.thisWSAnalyzerAlarms.AddthisWSAnalyzerAlarmsRow(.AlarmID, .AnalyzerID, .AlarmDateTime, .AlarmItem, _
+                                                                                               .AlarmType, .WorkSessionID, .AdditionalInfo, _
+                                                                                               .AlarmStatus, .OKDateTime, Nothing)
                     End With
                 End If
             Next
             myHisWSAnalyzerAlarmDS.thisWSAnalyzerAlarms.AcceptChanges()
 
-            myGlobalDataTO = myWSAlarmHistory.Delete(Nothing, myHisWSAnalyzerAlarmDS)
+            'Delete all selected Alarms from DB
+            Dim myGlobalData As New GlobalDataTO
+            myGlobalData = myWSAlarmHistory.Delete(Nothing, myHisWSAnalyzerAlarmDS)
 
+            If (myGlobalData.HasError) Then
+                'If an error has happened, show it
+                ShowMessage(Me.Name & ".DeleteSelectedRowsFromGrid", myGlobalData.ErrorCode, myGlobalData.ErrorMessage, MsgParent)
+            End If
+
+            'Reload the grid
             FindHistoricalResults()
-
         Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DeleteSelectedRowsFromGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".DeleteSelectedRowsFromGrid ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+            GlobalBase.CreateLogActivity(ex)
+            ShowMessage(Me.Name & ".DeleteSelectedRowsFromGrid ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
-
-#End Region
 #End Region
 
 #Region "Events"
 #Region " Screen Events "
     Private Sub IHisAlarms_KeyDown(ByVal sender As System.Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
         Try
-            If (e.KeyCode = Keys.Escape) Then
-                'If (Not bsRejectionNumeric.Focused AndAlso Not bsNumberOfSeriesNumeric.Focused) Then
-                '    bsExitButton.PerformClick()
-
-                'ElseIf (bsRejectionNumeric.Focused AndAlso bsRejectionNumeric.Text = String.Empty) Then
-                '    bsRejectionNumeric.Text = bsRejectionNumeric.Value.ToString()
-                '    bsResultErrorProv.Clear()
-
-                'ElseIf (bsNumberOfSeriesNumeric.Focused AndAlso bsNumberOfSeriesNumeric.Text = String.Empty) Then
-                '    bsNumberOfSeriesNumeric.Text = bsNumberOfSeriesNumeric.Value.ToString()
-                '    bsResultErrorProv.Clear()
-                'Else
-                bsExitButton.PerformClick()
-                'End If
-            End If
+            If (e.KeyCode = Keys.Escape) Then bsExitButton.PerformClick()
         Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IHisAlarms_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".IHisAlarms_KeyDown ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+            GlobalBase.CreateLogActivity(ex)
+            ShowMessage(Me.Name & ".IHisAlarms_KeyDown ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
     Private Sub IHisAlarms_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Try
-            If Me.DesignMode Then Exit Sub
+            If (Me.DesignMode) Then Exit Sub
 
             InitializeScreen()
-
             ResetBorder()
             Application.DoEvents()
-
         Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IHisAlarms_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".IHisAlarms_Load ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-        End Try
-    End Sub
-
-    Private Sub IHisAlarms_Shown(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Shown
-        Try
-            'If (bsTestSampleListView.Items.Count > 0) Then
-            '    If (QCTestSampleIDAttribute > 0) Then
-            '        'Select the Test/SampleType on the ListView
-            '        SelectQCTestSampleID(QCTestSampleIDAttribute)
-            '    Else
-            '        'Select the first Test/SampleType on the ListView
-            '        bsTestSampleListView.Items(0).Selected = True
-            '    End If
-
-            '    'TR 20/04/2012 - Validate the user level to activate/desactivate functionalities
-            '    ScreenStatusByUserLevel()
-            'End If
-        Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IHisAlarms_Shown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".IHisAlarms_Shown ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+            GlobalBase.CreateLogActivity(ex)
+            ShowMessage(Me.Name & ".IHisAlarms_Load ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 #End Region
@@ -1351,8 +1356,8 @@ Public Class UiHisAlarms
                 UiAx00MainMDI.OpenMonitorForm(Me)
             End If
         Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ExitButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".ExitButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+            GlobalBase.CreateLogActivity(ex)
+            ShowMessage(Me.Name & ".ExitButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
@@ -1389,5 +1394,4 @@ Public Class UiHisAlarms
     End Sub
 #End Region
 #End Region
-
 End Class

@@ -6,7 +6,7 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Calculations
-Imports Biosystems.Ax00.DAL
+Imports Biosystems.Ax00.Global.AlarmEnumerates
 Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 
@@ -72,7 +72,7 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim wellUsed As List(Of Integer) 'Well used in the well base line control well (1 .. 10) = value <integer>
             Dim rejected As List(Of Boolean) 'Well is rejected in the well base line control well (1 .. 10) = value <boolean>
 
-            Dim alarm As GlobalEnumerates.Alarms
+            Dim alarm As Alarms
             Dim initializationParameterItem As Integer 'Initialitzation parameter iteration number
             Dim initRejected As Boolean 'Initialization rejected
             Dim wellsNotUsedAfterALight As Integer 'After ALIGHT the first BL well can not be used due are not filled
@@ -134,7 +134,9 @@ Namespace Biosystems.Ax00.Core.Entities
         Private swParametersAttribute As New ParametersDS
         Private instrumentAdjustments As New SRVAdjustmentsDS
         Private validAlightAttribute As Boolean = False
+        Private validFlightAttribute As Boolean = False
         Private existsAlightResultsAttribute As Boolean = False 'AG 20/06/2012
+        Private existsFlightResultsAttribute As Boolean = False
 
         Private adjustBL As New AdjustBaseLine
         Private wellBL As New wellBaseLine
@@ -180,6 +182,15 @@ Namespace Biosystems.Ax00.Core.Entities
             End Get
             Set(ByVal value As Boolean)
                 validAlightAttribute = value
+            End Set
+        End Property
+
+        Public Property validFLight() As Boolean Implements IBaseLineEntity.validFLight
+            Get
+                Return validFlightAttribute
+            End Get
+            Set(ByVal value As Boolean)
+                validFlightAttribute = value
             End Set
         End Property
 
@@ -243,7 +254,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         InitStructures(True, True)
 
                         'Get latest base line with adjust 
-                        Dim myAlarm As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
+                        Dim myAlarm As Alarms = Alarms.NONE
 
                         'AG 04/11/2014 BA-2065 refactoring
                         'Dim blinesDelg As New WSBLinesDelegate
@@ -260,11 +271,12 @@ Namespace Biosystems.Ax00.Core.Entities
                                 resultData = ControlAdjustBaseLine(dbConnection, ALineDS)
 
                                 If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                                    myAlarm = CType(resultData.SetDatos, GlobalEnumerates.Alarms)
+                                    myAlarm = CType(resultData.SetDatos, Alarms)
 
                                     'AG 28/11/2014 BA-2081
-                                    If myAlarm = GlobalEnumerates.Alarms.NONE Then
+                                    If myAlarm = Alarms.NONE Then
                                         ' 2. Last DYNAMIC base lines calculated with FLIGHT
+                                        validFlightAttribute = False
                                         resultData = ValidateDynamicBaseLinesResults(dbConnection, pAnalyzerID)
                                         If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
 
@@ -396,7 +408,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         '    myAlarm = CType(resultData.SetDatos, GlobalEnumerates.Alarms)
                         'End If
 
-                        Dim myAlarm As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
+                        Dim myAlarm As Alarms = Alarms.NONE
                         Dim singleWellDS As New BaseLinesDS
                         Dim linqRes As List(Of BaseLinesDS.twksWSBaseLinesRow)
                         Dim linqResWells As List(Of Integer)
@@ -419,12 +431,12 @@ Namespace Biosystems.Ax00.Core.Entities
                                 resultData = ControlWellBaseLine(Nothing, True, singleWellDS, BaseLineTypeForWellReject)
                                 If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                                     'If there is still not alarm informed --> Get it
-                                    If myAlarm = GlobalEnumerates.Alarms.NONE Then
-                                        myAlarm = DirectCast(resultData.SetDatos, GlobalEnumerates.Alarms)
+                                    If myAlarm = Alarms.NONE Then
+                                        myAlarm = DirectCast(resultData.SetDatos, Alarms)
 
                                         'Alarm can change from WARM to ERROR but not from ERROR to WARN
-                                    ElseIf myAlarm <> GlobalEnumerates.Alarms.BASELINE_INIT_ERR Then
-                                        myAlarm = DirectCast(resultData.SetDatos, GlobalEnumerates.Alarms)
+                                    ElseIf myAlarm <> Alarms.BASELINE_INIT_ERR Then
+                                        myAlarm = DirectCast(resultData.SetDatos, Alarms)
 
                                     End If
                                 Else
@@ -586,14 +598,14 @@ Namespace Biosystems.Ax00.Core.Entities
                                     'Exit For
                                 End If
 
-                                Dim myAlarm As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
+                                Dim myAlarm As Alarms = Alarms.NONE
                                 'rejected = False   'AG 18/05/2011 - comment after testing
                                 If resultsRejected Then
                                     GlobalBase.CreateLogActivity("ALIGHT Rejected", "BaseLineCalculations.ControlAdjustBaseLine", EventLogEntryType.Information, False) 'AG 14/05/2012 - Add more information
-                                    myAlarm = GlobalEnumerates.Alarms.BASELINE_INIT_ERR
+                                    myAlarm = Alarms.BASELINE_INIT_ERR
                                 End If
 
-                                If myAlarm = GlobalEnumerates.Alarms.NONE Then validAlightAttribute = True
+                                If myAlarm = Alarms.NONE Then validAlightAttribute = True
                                 resultData.SetDatos = myAlarm
                             End If
 
@@ -934,7 +946,7 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim temporalValue As Integer = rejectionParameters.wellsNotUsedAfterALight 'AG 17/12/2014 (2) store the value of this property that will be restored after Finally...
 
             Try
-                Dim myAlarm As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
+                Dim myAlarm As Alarms = Alarms.NONE
 
                 resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
@@ -1027,14 +1039,14 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                         'Evaluate the result: no alarm, base line WARN or base line ERR
                                         If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-                                            If DirectCast(resultData.SetDatos, GlobalEnumerates.Alarms) <> GlobalEnumerates.Alarms.NONE Then
+                                            If DirectCast(resultData.SetDatos, Alarms) <> Alarms.NONE Then
                                                 'If there is still not alarm informed --> Get it
-                                                If myAlarm = GlobalEnumerates.Alarms.NONE Then
-                                                    myAlarm = DirectCast(resultData.SetDatos, GlobalEnumerates.Alarms)
+                                                If myAlarm = Alarms.NONE Then
+                                                    myAlarm = DirectCast(resultData.SetDatos, Alarms)
 
                                                     'Alarm can change from WARM to ERROR but not from ERROR to WARN
-                                                ElseIf myAlarm <> GlobalEnumerates.Alarms.BASELINE_INIT_ERR Then
-                                                    myAlarm = DirectCast(resultData.SetDatos, GlobalEnumerates.Alarms)
+                                                ElseIf myAlarm <> Alarms.BASELINE_INIT_ERR Then
+                                                    myAlarm = DirectCast(resultData.SetDatos, Alarms)
 
                                                 End If
                                             End If
@@ -1198,7 +1210,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         If Not .wellUsed Is Nothing Then .wellUsed.Clear() Else .wellUsed = New List(Of Integer)
                         If Not .rejected Is Nothing Then .rejected.Clear() Else .rejected = New List(Of Boolean)
 
-                        .alarm = GlobalEnumerates.Alarms.NONE
+                        .alarm = Alarms.NONE
                         .initializationParameterItem = 0
                         .initRejected = False
 
@@ -1318,6 +1330,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         'Inform dat to return
                         resultData.SetDatos = validValuesFlag
+                        validFlightAttribute = validValuesFlag
 
                         'Release memory
                         listOfLeds = Nothing
@@ -1596,7 +1609,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                     If consecutiveRejectedWells >= BL_CONSECUTIVEREJECTED_WELL Then
                         If exitRunningTypeAttribute = 0 Then
-                            .alarm = GlobalEnumerates.Alarms.BASELINE_INIT_ERR
+                            .alarm = Alarms.BASELINE_INIT_ERR
                             exitRunningTypeAttribute = 2
                             'Dim myLogAcciones As New ApplicationLogManager()
                             GlobalBase.CreateLogActivity("Max consecutive initializations rejected limit!!", "BaseLineCalculations.TreatInitializationResults", EventLogEntryType.Information, False)
@@ -1697,7 +1710,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             'Dim myLogAcciones As New ApplicationLogManager()
                             GlobalBase.CreateLogActivity("Update wells rejection parameters (FIFO) rejected. " & infoRejection, "BaseLineCalculations.TreatWellRejectionResults", EventLogEntryType.Information, False) 'AG 14/05/2012 - Add more information
 
-                            .alarm = GlobalEnumerates.Alarms.BASELINE_WELL_WARN
+                            .alarm = Alarms.BASELINE_WELL_WARN
                             '.initRejected = True '????
                         End If
                     Else
@@ -1709,7 +1722,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         consecutiveRejectedWells += 1 'Increment counter
                         If consecutiveRejectedWells >= BL_CONSECUTIVEREJECTED_WELL Then
                             If exitRunningTypeAttribute = 0 Then
-                                .alarm = GlobalEnumerates.Alarms.BASELINE_INIT_ERR
+                                .alarm = Alarms.BASELINE_INIT_ERR
                                 exitRunningTypeAttribute = 1
                                 GlobalBase.CreateLogActivity("Max consecutive rejected wells limit!!", "BaseLineCalculations.TreatWellRejectionResults", EventLogEntryType.Information, False)
                             End If
@@ -1783,14 +1796,14 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                 'Evaluate if alarm or not (current rejected wells > limit)
                                 'AG 07/09/2012 - add not baseline error condition
-                                If Not resultData.HasError AndAlso rejectionParameters.alarm <> GlobalEnumerates.Alarms.BASELINE_INIT_ERR _
+                                If Not resultData.HasError AndAlso rejectionParameters.alarm <> Alarms.BASELINE_INIT_ERR _
                                    AndAlso wellRejectedCount > MAX_REJECTED_WELLS Then
                                     'If Not resultData.HasError Andalso wellRejectedCount > MAX_REJECTED_WELLS Then
 
-                                    rejectionParameters.alarm = GlobalEnumerates.Alarms.BASELINE_WELL_WARN
+                                    rejectionParameters.alarm = Alarms.BASELINE_WELL_WARN
                                 End If
 
-                                If rejectionParameters.alarm <> GlobalEnumerates.Alarms.NONE Then
+                                If rejectionParameters.alarm <> Alarms.NONE Then
                                     .BLParametersRejected = True
                                 Else
                                     .BLParametersRejected = False

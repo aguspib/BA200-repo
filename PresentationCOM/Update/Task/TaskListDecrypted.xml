@@ -1211,5 +1211,79 @@
       END
       GO
     </UpdateScript>
-  </AppVersion >
+  </AppVersion>
+  <AppVersion>
+    <Version>3.07</Version>
+    <StructureScript>
+      ALTER TABLE [tcfgAnalyzers] ALTER COLUMN [FirmwareVersion] varchar(10)
+    </StructureScript>
+
+    <UpdateScript>
+      --|====================|
+      --| BA200: v3.07     	 |
+      --|====================|
+      UPDATE dbo.tfmwVersions SET UserSoftware = '3.0.7', ServiceSoftware = '1.2.4', FirmwareScripts = '1.3.0', Firmware = '0.44.2'
+      GO
+
+      -- BA-2396 ERR560
+      IF((SELECT COUNT(*) FROM dbo.tfmwAlarms WHERE AlarmID LIKE 'GLF_BOARD_FBLD_ERR') = 0)
+      BEGIN
+      INSERT INTO dbo.tfmwAlarms ([AlarmID],[AlarmSource],[AlarmType],[Name],[NameResourceID],[Description],[DescResourceID],[Solution],[SolResourceID],[Sound],[OnRunningSound],[Freeze],[OKType],[LISValue])
+      VALUES ('GLF_BOARD_FBLD_ERR','INS','ERROR','Photometric board error during FBLD','GLF_BOARD_ERR','Photometric board does not respond','ALM_GLF_BOARD_ERR','Switch off the analyzer and the application, wait 30 seconds and then switch them on both again. Then press the Connect button','SOL_RECOVER_ERR',0,0,'RESET',1,0)
+      END
+      GO
+      IF((SELECT COUNT(*) FROM dbo.tfmwAlarmErrorCodes WHERE AlarmID LIKE 'GLF_BOARD_FBLD_ERR') = 0)
+      BEGIN
+      INSERT INTO dbo.tfmwAlarmErrorCodes (AlarmID, ErrorCode, ManagementID)
+      VALUES ('GLF_BOARD_FBLD_ERR',560,'3_RECOVER_ERROR')
+      END
+      GO
+
+      -- BA-2358 ERR551
+
+      IF((SELECT COUNT(*) FROM dbo.tfmwAlarms WHERE AlarmID LIKE 'FBLD_ROTOR_FULL') = 0)
+      BEGIN
+      INSERT INTO dbo.tfmwAlarms ([AlarmID],[AlarmSource],[AlarmType],[Name],[NameResourceID],[Description],[DescResourceID],[Solution],[SolResourceID],[Sound],[OnRunningSound],[Freeze],[OKType],[LISValue])
+      VALUES ('FBLD_ROTOR_FULL','INS','REMARK','Photometric Rotor full','FBLD_ROTOR_FULL','Photometric Rotor is full','ALM_FBLD_ROTOR_FULL',NULL,NULL,0,0,NULL,0,0)
+      END
+      GO
+      IF((SELECT COUNT(*) FROM dbo.tfmwAlarmErrorCodes WHERE AlarmID LIKE 'FBLD_ROTOR_FULL') = 0)
+      BEGIN
+      INSERT INTO dbo.tfmwAlarmErrorCodes (AlarmID, ErrorCode, ManagementID)
+      VALUES ('FBLD_ROTOR_FULL',551,'6_OMMIT_ERROR')
+      END
+      GO
+
+      -- BA-2358 ERR552
+
+      IF((SELECT COUNT(*) FROM dbo.tfmwAlarms WHERE AlarmID LIKE 'UNKNOW_ROTOR_FULL') = 0)
+      BEGIN
+      INSERT INTO dbo.tfmwAlarms ([AlarmID],[AlarmSource],[AlarmType],[Name],[NameResourceID],[Description],[DescResourceID],[Solution],[SolResourceID],[Sound],[OnRunningSound],[Freeze],[OKType],[LISValue])
+      VALUES ('UNKNOW_ROTOR_FULL','INS','REMARK','Unknow Photometric rotor state','UNKNOW_ROTOR_FULL','Photometric Rotor has some wells full','ALM_UNKNOW_ROTOR_FULL',NULL,NULL,0,0,NULL,0,0)
+      END
+      GO
+      IF((SELECT COUNT(*) FROM dbo.tfmwAlarmErrorCodes WHERE AlarmID LIKE 'UNKNOW_ROTOR_FULL') = 0)
+      BEGIN
+      INSERT INTO dbo.tfmwAlarmErrorCodes (AlarmID, ErrorCode, ManagementID)
+      VALUES ('UNKNOW_ROTOR_FULL',552,'2_FATAL_ERROR')
+      END
+      GO
+
+      -- BA-2358
+      IF((SELECT COUNT(*) FROM dbo.tfmwGeneralSettings WHERE SettingID LIKE 'FLIGHT_FULL_ROTOR_CADUCITY') = 0)
+      BEGIN
+      INSERT INTO dbo.tfmwGeneralSettings (SettingID, FixedItemDesc, CurrentValue, Status)
+      VALUES ('FLIGHT_FULL_ROTOR_CADUCITY','Minutes that a full clean rotor is considered good to be read in a FLIGHT operation','30', 1)
+      END
+      GO
+
+      -- BA-2406
+      IF((SELECT COUNT(*) FROM dbo.tfmwSwFlags WHERE FlagID LIKE 'Barcode') = 0)
+      BEGIN
+      INSERT INTO [Ax00].[dbo].[tfmwSwFlags] VALUES ('Barcode', 'INI, END, CANCELED or NULL')
+      END
+      GO
+
+    </UpdateScript>
+  </AppVersion>
 </TaskListDS>

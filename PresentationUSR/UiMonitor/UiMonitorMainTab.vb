@@ -11,6 +11,7 @@ Imports Biosystems.Ax00.Global
 Imports DevExpress.XtraEditors.Controls
 Imports System.IO
 Imports Biosystems.Ax00.App
+Imports Biosystems.Ax00.Global.AlarmEnumerates
 
 Partial Public Class UiMonitor
 
@@ -80,9 +81,9 @@ Partial Public Class UiMonitor
 
                 'AG 20/07/2012
                 If (AnalyzerController.IsAnalyzerInstantiated) AndAlso (Not AnalyzerController.Instance.Analyzer.Connected OrElse _
-                   (Not AnalyzerController.Instance.Analyzer.Alarms Is Nothing AndAlso AnalyzerController.Instance.Analyzer.Alarms.Contains(GlobalEnumerates.Alarms.COMMS_ERR))) Then
+                   (Not AnalyzerController.Instance.Analyzer.Alarms Is Nothing AndAlso AnalyzerController.Instance.Analyzer.Alarms.Contains(AlarmEnumerates.Alarms.COMMS_ERR))) Then
                     'Leave globe alarms empty 
-                    Dim globeAlarmsList As New List(Of GlobalEnumerates.Alarms)
+                    Dim globeAlarmsList As New List(Of AlarmEnumerates.Alarms)
                     UpdateCoverImages(globeAlarmsList)
                 Else
                     UpdateCoverImages(AnalyzerController.Instance.Analyzer.Alarms)
@@ -141,17 +142,17 @@ Partial Public Class UiMonitor
     ''' <remarks>RH
     ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
-    Public Sub UpdateGlobesInMainTab(ByVal pAlarms As List(Of GlobalEnumerates.Alarms))
+    Public Sub UpdateGlobesInMainTab(ByVal pAlarms As List(Of AlarmEnumerates.Alarms))
         Try
 
             'AG 21/05/2012 - if not communications do not remove analyzermanager alarms, only do not show them
-            Dim globeAlarmsList As New List(Of GlobalEnumerates.Alarms)
-            If (Not pAlarms Is Nothing AndAlso pAlarms.Contains(GlobalEnumerates.Alarms.COMMS_ERR)) OrElse _
+            Dim globeAlarmsList As New List(Of AlarmEnumerates.Alarms)
+            If (Not pAlarms Is Nothing AndAlso pAlarms.Contains(AlarmEnumerates.Alarms.COMMS_ERR)) OrElse _
                ((AnalyzerController.IsAnalyzerInstantiated) AndAlso Not AnalyzerController.Instance.Analyzer.Connected) Then
                 'If no comms leave globe alarms empty 
             Else
                 'Sleeping status DOES NOT SHOW globes
-                For Each idAlarm As GlobalEnumerates.Alarms In pAlarms
+                For Each idAlarm As AlarmEnumerates.Alarms In pAlarms
                     globeAlarmsList.Add(idAlarm)
                 Next
             End If
@@ -167,20 +168,20 @@ Partial Public Class UiMonitor
                 Application.DoEvents()
             End While
             'TR 25/09/2013 -#memory declare outside the for.
-            Dim AlertAlarms As List(Of GlobalEnumerates.Alarms) = Nothing
+            Dim AlertAlarms As List(Of AlarmEnumerates.Alarms) = Nothing
             For Each Alert As bsAlert In MainMDI.AlertList 'Loops through all bsAlert form dialogs
                 'TR 25/09/2013 -#memory Set declaration Outside the for.
-                'Dim AlertAlarms As List(Of GlobalEnumerates.Alarms) = CType(Alert.Tag, List(Of GlobalEnumerates.Alarms)) 'Gets associated alarms
+                'Dim AlertAlarms As List(Of AlarmEnumerates.Alarms) = CType(Alert.Tag, List(Of AlarmEnumerates.Alarms)) 'Gets associated alarms
                 'TR 25/09/2013 -#memory Set value to nothing and set the new value.
 
                 AlertAlarms = Nothing
-                AlertAlarms = CType(Alert.Tag, List(Of GlobalEnumerates.Alarms)) 'Gets associated alarms
+                AlertAlarms = CType(Alert.Tag, List(Of AlarmEnumerates.Alarms)) 'Gets associated alarms
 
                 Alert.ClearDescription()
 
-                For Each Alarm As GlobalEnumerates.Alarms In AlertAlarms
+                For Each Alarm As AlarmEnumerates.Alarms In AlertAlarms
                     If globeAlarmsList.Contains(Alarm) Then 'AG 23/05/2012 use local list, not the parameter list (pAlarms)
-                        If Alarm = GlobalEnumerates.Alarms.BASELINE_INIT_ERR AndAlso (AnalyzerController.IsAnalyzerInstantiated) Then
+                        If Alarm = AlarmEnumerates.Alarms.BASELINE_INIT_ERR AndAlso (AnalyzerController.IsAnalyzerInstantiated) Then
                             'AG 06/09/2012 - The property ShowBaseLineInitializationFailedMessage has to be used only in StandBy
                             '                in others status as Running the globe must appear
                             'If AnalyzerController.Instance.Analyzer.ShowBaseLineInitializationFailedMessage Then
@@ -230,22 +231,22 @@ Partial Public Class UiMonitor
     End Sub
 
     'RH 22/03/2012
-    Private Sub UpdateCoverImages(ByVal pAlarms As List(Of GlobalEnumerates.Alarms))
+    Private Sub UpdateCoverImages(ByVal pAlarms As List(Of AlarmEnumerates.Alarms))
         'If Not MainTabEnabled Then Return 'AG 18/05/2012
 
-        CoverOffPicture.Visible = (pAlarms.Contains(GlobalEnumerates.Alarms.MAIN_COVER_WARN) OrElse _
-                                   pAlarms.Contains(GlobalEnumerates.Alarms.MAIN_COVER_ERR))
+        CoverOffPicture.Visible = (pAlarms.Contains(AlarmEnumerates.Alarms.MAIN_COVER_WARN) OrElse _
+                                   pAlarms.Contains(AlarmEnumerates.Alarms.MAIN_COVER_ERR))
 
         CoverOnPicture.Visible = Not CoverOffPicture.Visible
 
-        CoverReactionsPicture.Visible = Not (pAlarms.Contains(GlobalEnumerates.Alarms.REACT_COVER_WARN) OrElse _
-                                      pAlarms.Contains(GlobalEnumerates.Alarms.REACT_COVER_ERR))
+        CoverReactionsPicture.Visible = Not (pAlarms.Contains(AlarmEnumerates.Alarms.REACT_COVER_WARN) OrElse _
+                                      pAlarms.Contains(AlarmEnumerates.Alarms.REACT_COVER_ERR))
 
-        CoverSamplesPicture.Visible = Not (pAlarms.Contains(GlobalEnumerates.Alarms.S_COVER_WARN) OrElse _
-                                      pAlarms.Contains(GlobalEnumerates.Alarms.S_COVER_ERR))
+        CoverSamplesPicture.Visible = Not (pAlarms.Contains(AlarmEnumerates.Alarms.S_COVER_WARN) OrElse _
+                                      pAlarms.Contains(AlarmEnumerates.Alarms.S_COVER_ERR))
 
-        CoverReagentsPicture.Visible = Not (pAlarms.Contains(GlobalEnumerates.Alarms.FRIDGE_COVER_WARN) OrElse _
-                                      pAlarms.Contains(GlobalEnumerates.Alarms.FRIDGE_COVER_ERR))
+        CoverReagentsPicture.Visible = Not (pAlarms.Contains(AlarmEnumerates.Alarms.FRIDGE_COVER_WARN) OrElse _
+                                      pAlarms.Contains(AlarmEnumerates.Alarms.FRIDGE_COVER_ERR))
 
         Application.DoEvents()
 
@@ -327,11 +328,11 @@ Partial Public Class UiMonitor
         'chart2.Series("Series1").Points(2).YValues(0) = rnd.Next Mod 101
 
         'Real Code
-        'Dim myAlarms As New List(Of GlobalEnumerates.Alarms)
+        'Dim myAlarms As New List(Of AlarmEnumerates.Alarms)
 
         If (IsDisposed) Then Return 'IT 03/06/2014 - #1644 No refresh if screen is disposed
 
-        Dim myAlarms As List(Of GlobalEnumerates.Alarms)
+        Dim myAlarms As List(Of AlarmEnumerates.Alarms)
         myAlarms = AnalyzerController.Instance.Analyzer.Alarms 'Get the current alarms in analyzer
 
         Dim sensorValue As Single = 0

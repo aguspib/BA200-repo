@@ -2,7 +2,7 @@
 Option Explicit On
 
 Imports System.Text
-Imports Biosystems.Ax00.DAL
+Imports Biosystems.Ax00.Global.AlarmEnumerates
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.DAL.DAO
@@ -1402,11 +1402,11 @@ Namespace Biosystems.Ax00.BL
                                                             If (Convert.ToSingle(offSystemTestResult.ResultValue) < _
                                                                 myTestRefRangesDS.tparTestRefRanges(0).NormalLowerLimit) Then
                                                                 'set lower alarm value.
-                                                                myResultAlarmRow.AlarmID = GlobalEnumerates.Alarms.CONC_REMARK7.ToString
+                                                                myResultAlarmRow.AlarmID = Alarms.CONC_REMARK7.ToString
                                                             ElseIf (Convert.ToSingle(offSystemTestResult.ResultValue) > _
                                                                     myTestRefRangesDS.tparTestRefRanges(0).NormalUpperLimit) Then
                                                                 'set hight alarm value.
-                                                                myResultAlarmRow.AlarmID = GlobalEnumerates.Alarms.CONC_REMARK8.ToString
+                                                                myResultAlarmRow.AlarmID = Alarms.CONC_REMARK8.ToString
                                                             End If
                                                             'TR 19/07/2012 -END
                                                             myResultAlarmRow.AlarmDateTime = Now
@@ -3394,7 +3394,7 @@ Namespace Biosystems.Ax00.BL
                                 .WorkSessionID = pWorkSessionID
 
                                 'JV 27/01/2014 - #1463
-                                If (alarmRow.AlarmID = GlobalEnumerates.Alarms.WS_PAUSE_MODE_WARN.ToString() AndAlso (Not alarmRow.IsAlarmPeriodSECNull)) Then
+                                If (alarmRow.AlarmID = Alarms.WS_PAUSE_MODE_WARN.ToString() AndAlso (Not alarmRow.IsAlarmPeriodSECNull)) Then
                                     If alarmRow.AlarmPeriodSEC > 0 Then
                                         Dim mySeconds As Integer = alarmRow.AlarmPeriodSEC
                                         Dim myMinutes As Integer = 0
@@ -5498,9 +5498,9 @@ Namespace Biosystems.Ax00.BL
 
                                             'TR 27/05/2013 -Get a list of sample types separated by commas
                                             Dim SampleTypes() As String = Nothing
-                                            Dim myMasterDataDelegate As New MasterDataDelegate
+                                            'Dim myMasterDataDelegate As New MasterDataDelegate
 
-                                            resultData = myMasterDataDelegate.GetSampleTypes(dbConnection)
+                                            resultData = MasterDataDelegate.GetSampleTypes(dbConnection)
                                             If Not resultData.HasError Then
                                                 SampleTypes = resultData.SetDatos.ToString.Split(CChar(","))
                                             End If

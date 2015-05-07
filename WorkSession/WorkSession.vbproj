@@ -120,6 +120,9 @@
     <Reference Include="System.Data.DataSetExtensions">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="Telerik.JustMock">
+      <HintPath>..\packages\JustMock.2015.1.224.3\lib\Net35\Telerik.JustMock.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Import Include="Microsoft.VisualBasic" />
@@ -136,14 +139,10 @@
     <Compile Include="AutoReportsDelegate.vb" />
     <Compile Include="BarcodeWSDelegate.vb" />
     <Compile Include="BarcodePositionsWithNoRequestsDelegate.vb" />
+    <Compile Include="Contaminations Handling\AnalysisMode.vb" />
     <Compile Include="ExportDelegate.vb" />
     <Compile Include="ImportErrorsLogDelegate.vb" />
     <Compile Include="OperateCalculatedTestDelegate.vb" />
-    <Compile Include="OptimizationAPolicyApplier.vb" />
-    <Compile Include="OptimizationBPolicyApplier.vb" />
-    <Compile Include="OptimizationCPolicyApplier.vb" />
-    <Compile Include="OptimizationDPolicyApplier.vb" />
-    <Compile Include="OptimizationPolicyApplier.vb" />
     <Compile Include="OrderTestsLISInfoDelegate.vb" />
     <Compile Include="PreparationTestDataDelegate.vb" />
     <Compile Include="ReactionsRotorDelegate.vb" />
@@ -190,6 +189,11 @@
     <Compile Include="WSRequiredElementsTubesDelegate.vb" />
     <Compile Include="WSRotorContentByPositionDelegate.vb" />
     <Compile Include="WSRotorPositionsInProcessDelegate.vb" />
+    <Compile Include="WSStatusRecalculatorForBlanks.vb" />
+    <Compile Include="WSStatusRecalculatorForCalibs.vb" />
+    <Compile Include="WSStatusRecalculatorForCtrlPatientsSTD.vb" />
+    <Compile Include="WSStatusRecalculatorForCtrlPatientsWithISE.vb" />
+    <Compile Include="WSStatusRecalculatorForNotDeletedExecutions.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">
@@ -210,8 +214,13 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Ax00.CrossCutting\Ax00.CrossCutting.vbproj">
+      <Project>{b23d6aff-a359-4d3e-87bf-820167228fe5}</Project>
+      <Name>Ax00.CrossCutting</Name>
+    </ProjectReference>
     <ProjectReference Include="..\AX00Types\AX00Types.vbproj">
       <Project>{3B617EBF-0488-46BD-AB56-094F81D0E4C3}</Project>
       <Name>AX00Types</Name>
@@ -244,6 +253,7 @@
   <ItemGroup>
     <Service Include="{3259AA49-8AA1-44D3-9025-A0B520596A8C}" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

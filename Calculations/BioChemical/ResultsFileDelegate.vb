@@ -1,7 +1,6 @@
 ﻿Option Strict On
 Option Explicit On
 
-Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 'Imports Biosystems.Ax00.DAL.DAO To remove
@@ -14,6 +13,7 @@ Imports System.Reflection
 'Imports System.Xml ' to remove
 Imports System.IO
 Imports System.ComponentModel
+Imports System.Linq
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 
 
@@ -305,7 +305,7 @@ Namespace Biosystems.Ax00.BL
                 If Not allOK Then
                     Dim noAbsorbances As New AbsorbanceDS
                     resultData.SetDatos = noAbsorbances
-                    resultData.HasError = True
+                    'resultData.HasError = True
                 End If
 
             Catch ex As Exception
@@ -2630,7 +2630,7 @@ Namespace Biosystems.Ax00.BL
         ''' Created by: RH 27/02/2012 Based on previous code by DL
         ''' AG 19/11/2014 BA-2067 add parameter for base line type
         ''' </remarks>
-        Public Function GetDataForAbsCurve(ByVal pDBConnection As SqlClient.SqlConnection, _
+        Public Function GetDataForAbsCurve(ByVal pDBConnection As SqlConnection, _
                                            ByVal pOrderTestID As Integer, _
                                            ByVal pRerunNumber As Integer, _
                                            ByVal pMultiItemNumber As Integer, _
@@ -2638,14 +2638,14 @@ Namespace Biosystems.Ax00.BL
                                            ByVal pAllowDecimals As Integer, ByVal pBLType As String) As GlobalDataTO
 
             Dim resultData As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim dbConnection As SqlConnection = Nothing
             Dim ReplicateDS = New GraphDS
 
             Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                resultData = GetOpenDBConnection(pDBConnection)
 
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then
 
@@ -2658,7 +2658,6 @@ Namespace Biosystems.Ax00.BL
                             Dim myWavelengthPos As String = String.Empty
                             Dim myAnalyzerLedPositions As New AnalyzerLedPositionsDelegate
                             Dim myAnalyzerLedPositionsDS As AnalyzerLedPositionsDS
-                            'Dim myAnalyzerLedPositionsRow As AnalyzerLedPositionsDS.tcfgAnalyzerLedPositionsRow
                             Dim myAnalyzerLedPositionsList As List(Of AnalyzerLedPositionsDS.tcfgAnalyzerLedPositionsRow)
 
                             resultData = myTestsData.GetList(dbConnection)
@@ -2696,27 +2695,15 @@ Namespace Biosystems.Ax00.BL
                                         If String.Compare(pExecutions(aux_i).ReadingMode, "BIC", False) = 0 Then
                                             myWavelengthPos = String.Empty
 
-                                            'resultData = myTestsData.Read(dbConnection, pExecutions(i).TestID)
-
-                                            'If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-                                            'myTestsDS = CType(resultData.SetDatos, TestsDS)
-
                                             myTestsRow = (From row As TestsDS.tparTestsRow In myTestsDS.tparTests _
                                                           Where row.TestID = pExecutions(aux_i).TestID _
                                                           Select row).ToList().First()
-
-                                            'resultData = GetWaveLength(dbConnection, _
-                                            '                           myAbsorbancesDS.twksAbsorbances(x).AnalyzerID, _
-                                            '                           myAbsorbancesDS.twksAbsorbances(x).WavelengthPos, _
-                                            '                           myTestsDS.tparTests.Item(0).MainWavelength, _
-                                            '                           myTestsDS.tparTests.Item(0).ReferenceWavelength)
 
                                             myAnalyzerLedPositionsList = _
                                                     (From row As AnalyzerLedPositionsDS.tcfgAnalyzerLedPositionsRow In myAnalyzerLedPositionsDS.tcfgAnalyzerLedPositions _
                                                      Where row.LedPosition = myAbsorbancesDS.twksAbsorbances(auxX).WavelengthPos _
                                                      Select row).ToList()
 
-                                            'If Not resultData.HasError Then
                                             If myAnalyzerLedPositionsList.Count > 0 Then
                                                 If myTestsRow.MainWavelength = myAnalyzerLedPositionsList.First().WaveLength Then
                                                     myWavelengthPos = "M"
@@ -2724,14 +2711,10 @@ Namespace Biosystems.Ax00.BL
                                                     myWavelengthPos = "R"
                                                 End If
 
-                                                'myWavelengthPos = CStr(resultData.SetDatos)
-
                                                 Select Case myWavelengthPos
                                                     Case "M"
                                                         With myAbsorbancesDS
                                                             If .twksAbsorbances(auxX).Absorbance = -1 Then
-                                                                'AG 15/10/2012
-                                                                'myCycleRow.Abs1 = "Error"
                                                                 myCycleRow.Abs1 = GlobalConstants.ABSORBANCE_INVALID_VALUE.ToString 'Error
                                                             Else
                                                                 myCycleRow.Abs1 = .twksAbsorbances(auxX).Absorbance.ToStringWithDecimals(pAllowDecimals)
@@ -2740,7 +2723,6 @@ Namespace Biosystems.Ax00.BL
                                                             If auxX > 0 AndAlso .twksAbsorbances(auxX - 1).WaveLength <> .twksAbsorbances(auxX).WaveLength Then
                                                                 If .twksAbsorbances(auxX).Absorbance <> -1 AndAlso .twksAbsorbances(auxX - 1).Absorbance <> -1 Then
                                                                     'ToDo: Check how to show this value, in Abs value or the original signed value
-                                                                    'myCycleRow.Diff = Math.Abs(.twksAbsorbances(x).Absorbance - .twksAbsorbances(x - 1).Absorbance).ToStringWithDecimals(pAllowDecimals)
 
                                                                     myCycleRow.Diff = (.twksAbsorbances(auxX).Absorbance - .twksAbsorbances(auxX - 1).Absorbance).ToStringWithDecimals(pAllowDecimals)
                                                                 End If
@@ -2749,8 +2731,6 @@ Namespace Biosystems.Ax00.BL
 
                                                     Case "R"
                                                         If myAbsorbancesDS.twksAbsorbances(auxX).Absorbance = -1 Then
-                                                            'AG 15/10/2012
-                                                            'myCycleRow.Abs2 = "Error"
                                                             myCycleRow.Abs2 = GlobalConstants.ABSORBANCE_INVALID_VALUE.ToString 'Error
                                                         Else
                                                             myCycleRow.Abs2 = myAbsorbancesDS.twksAbsorbances(auxX).Absorbance.ToStringWithDecimals(pAllowDecimals)
@@ -2764,8 +2744,6 @@ Namespace Biosystems.Ax00.BL
                                         ElseIf String.Compare(pExecutions(aux_i).ReadingMode, "MONO", False) = 0 Then
 
                                             If myAbsorbancesDS.twksAbsorbances(auxX).Absorbance = -1 Then
-                                                'AG 15/10/2012
-                                                'myCycleRow.Abs1 = "Error"
                                                 myCycleRow.Abs1 = GlobalConstants.ABSORBANCE_INVALID_VALUE.ToString 'Error
                                             Else
                                                 myCycleRow.Abs1 = myAbsorbancesDS.twksAbsorbances(auxX).Absorbance.ToStringWithDecimals(pAllowDecimals)
@@ -2783,7 +2761,7 @@ Namespace Biosystems.Ax00.BL
                                     Next x
 
                                     'AG 15/10/2012 - keep error message until presentation layer
-                                ElseIf resultData.HasError AndAlso resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString Then
+                                ElseIf resultData.HasError AndAlso resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString Then
                                     Exit For
                                 End If
                             Next i
@@ -2794,10 +2772,9 @@ Namespace Biosystems.Ax00.BL
             Catch ex As Exception
                 resultData = New GlobalDataTO()
                 resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ResultsFileDelegate.GetDataForAbsCurve", EventLogEntryType.Error, False)
 
             Finally
@@ -2805,7 +2782,6 @@ Namespace Biosystems.Ax00.BL
 
             End Try
 
-            'resultData.HasError = False 'AG 15/10/2012 - WHY THE ERROR FLAG IS REMOVED???
             resultData.SetDatos = ReplicateDS
 
             Return resultData

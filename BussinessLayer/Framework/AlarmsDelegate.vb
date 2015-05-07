@@ -106,7 +106,7 @@ Namespace Biosystems.Ax00.BL
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
             Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                resultData = GetOpenDBConnection(pDBConnection)
 
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)

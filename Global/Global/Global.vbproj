@@ -132,11 +132,16 @@
     <Import Include="System.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AlarmEnumerates.vb" />
+    <Compile Include="AnalyzerManager\StatusParameters.vb" />
     <Compile Include="ApplicationLogManager\ApplicationLog.vb" />
     <Compile Include="DAOBase.vb" />
     <Compile Include="ApplicationLogManager\tfmwApplicationLogDAO.vb" />
+    <Compile Include="DebugLogManager\DebugLogger.vb" />
+    <Compile Include="DelegatesToCoreBusinesGlue.vb" />
     <Compile Include="Enums\AnalyzerModelEnum.vb" />
     <Compile Include="Enums\BarcodeWorksessionActionsEnum.vb" />
+    <Compile Include="Enums\StringStepStatus.vb" />
     <Compile Include="Extensions.vb" />
     <Compile Include="FwAdjustments\ArmTO.vb" />
     <Compile Include="FwAdjustments\FwAdjustmentsDataTO.vb" />
@@ -237,8 +242,13 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Ax00.CrossCutting\Ax00.CrossCutting.vbproj">
+      <Project>{b23d6aff-a359-4d3e-87bf-820167228fe5}</Project>
+      <Name>Ax00.CrossCutting</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\AX00Types\AX00Types.vbproj">
       <Project>{3B617EBF-0488-46BD-AB56-094F81D0E4C3}</Project>
       <Name>AX00Types</Name>

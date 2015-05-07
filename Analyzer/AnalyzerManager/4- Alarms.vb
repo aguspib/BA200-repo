@@ -3,15 +3,13 @@ Option Strict On
 
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.BL
-Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Calculations
 Imports System.Timers
-Imports System.Data
 Imports System.Data.SqlClient
-Imports System.ComponentModel 'AG 20/04/2011 - added when create instance to an BackGroundWorker
 Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports System.Globalization    ' XBC 29/01/2013 - change IsNumeric function by Double.TryParse method for Temperature values (Bugs tracking #1122)
+Imports Biosystems.Ax00.Global.AlarmEnumerates
+Imports System.Globalization
 Imports Biosystems.Ax00.Core.Interfaces
 
 Namespace Biosystems.Ax00.Core.Entities
@@ -19,1257 +17,46 @@ Namespace Biosystems.Ax00.Core.Entities
     Partial Public Class AnalyzerManager
 
 #Region "Main Manage Alarms treatment"
-
-        ''' <summary>
-        ''' If needed perform the proper business depending the alarm code and status
-        ''' Note that some alarms has already perfomed previous business (alarms in instructions different than AlarmsDetails,
-        ''' for instance ANSBR1, ANSBR2, ANSBM1, STATUS, ...)
-        ''' Finally save alarms into Database and prepare DS for UI refresh
-        ''' </summary>
-        ''' <param name="pdbConnection"></param>
-        ''' <param name="pAlarmIDList">List of alarms to treat</param>
-        ''' <param name="pAlarmStatusList" >For each alarm in pAlarmCode indicates his status: TRUE alarm exists, FALSE alarm solved</param>
-        ''' <param name="pAdditionalInfoList">Additional info for some alams: volume missing, prep clot warnings, prep locked</param>
-        ''' <returns>Global Data To indicating when an error has occurred </returns>
-        ''' <remarks>
-        ''' Created by:  AG 16/03/2011
-        ''' Modified by: SA 29/06/2012 - Removed the OpenDBTransaction; all functions called by this method should open their own DBTransaction
-        '''                              or DBConnection, depending if they update or read data - This is to avoid locks between the different
-        '''                              threads in execution
-        '''              AG 25/072012    pAdditionalInfoList
-        '''              AG 30/11/2012 - Do not inform the attribute endRunAlreadySentFlagAttribute as TRUE when call the ManageAnalyzer with ENDRUN or when you add it to the queue
-        '''                              This flag will be informed once the instruction has been really sent. Current code causes that sometimes the ENDRUN instruction is added to
-        '''                              queue but how the flag is informed before send the instruction it wont never be sent!!
-        '''              AG 22/05/2014 - #1637 Use exclusive lock (multithread protection)
-        '''              AG 05/06/2014 - #1657 Protection (provisional solution)! (do not clear instructions queue when there are only 1 alarm and it is ISE_OFF_ERR)
-        '''                            - PENDING FINAL SOLUTION: AlarmID ISE_OFF_ERR must be generated only 1 time when alarm appears, and only 1 time when alarm is fixed (now this alarm with status FALSE is generated with each ANSINF received)
-        '''              XB 04/11/2014 - Add ISE_TIMEOUT_ERR alarm - BA-1872
-        '''              XB 06/11/2014 - Add COMMS_TIMEOUT_ERR alarm - BA-1872
-        ''' </remarks>
-        Private Function ManageAlarms(ByVal pdbConnection As SqlConnection, _
-                                      ByVal pAlarmIDList As List(Of Alarms), _
-                                      ByVal pAlarmStatusList As List(Of Boolean), _
-                                      Optional ByVal pAdditionalInfoList As List(Of String) = Nothing) As GlobalDataTO
-
-            Dim myGlobal As New GlobalDataTO
-            Dim dbConnection As SqlConnection = Nothing
-
-            Try
-                'myGlobal = DAOBase.GetOpenDBTransaction(pdbConnection)
-                'If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
-                '    dbConnection = DirectCast(myGlobal.SetDatos, SqlClient.SqlConnection)
-                '    If (Not dbConnection Is Nothing) Then
-
-                'AG 25/09/2012 - comment an use the attribute endRunAlreadySentFlagAttribute
-                'Dim endRunInstructionSent As Boolean = endRunAlreadySentFlagAttribute 'False 'Only send one ENDRUN while looping but send none if it has been sent before
-
-                Dim index As Integer = 0
-                Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS 'AG 12/03/2012
-
-                If Not endRunAlreadySentFlagAttribute AndAlso AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.END_RUN_START Then
-                    endRunAlreadySentFlagAttribute = True
-                End If
-
-                Dim methodHasToAddInstructionToQueueFlag As Integer = 0 'AG 14/05/2012 - Once one instruction has been sent. The other instructions managed in this method will be added to queue
-                '                                                              0 -> Instruction can be sent
-                '                                                              1 -> One instruction has already been sent. New instructions to be sent in ManageAlarms will be add to queue
-                '                                                              2 -> None instruction can be sent (RESET FREEZE). New instructions to be sent in ManageAlarms wont be add to queue (except SOUND)
-
-                'AG 06/03/2012 - Freeze mode treatment
-                If analyzerFREEZEFlagAttribute Then
-                    'AG 05/06/2014 - #1657 - 'AG + XB 08/04/2014 - #1118 (except ISE_OFF_ERR that is always generated with status FALSE)
-                    'ClearQueueToSend() 'Clear all instruction in queue to be sent
-                    If ((pAlarmIDList.Count = 1 AndAlso Not pAlarmIDList.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR)) OrElse pAlarmIDList.Count > 1) Then
-                        ClearQueueToSend() 'Clear all instruction in queue to be sent
-                    End If
-                    'AG 05/06/2014 - #1657
-
-                    If String.Equals(analyzerFREEZEModeAttribute, "AUTO") Then
-                        'INSTRUCTIONS: NOTHING
-                        'BUSINESS: NOTHING
-                        'PRESENTATION: Nothing
-
-                    ElseIf String.Equals(analyzerFREEZEModeAttribute, "PARTIAL") Then 'PARTIAL freeze
-                        'INSTRUCTIONS: If Running then send END instruction (if not sent yet)
-                        'TR 22/10/2013 -Bug #1353 Validate if not pause mode to send the end instruction.
-                        'AG 26/03/2014 - #1501 (Physics #48) - END cannot be sent when pause mode is starting (pauseModeIsStarting)
-                        If Not AllowScanInRunningAttribute AndAlso Not pauseModeIsStarting AndAlso AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING AndAlso _
-                            Not endRunAlreadySentFlagAttribute AndAlso AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.END_RUN_START Then 'Alarm Exists
-
-                            myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.ENDRUN, True)
-
-                            If Not myGlobal.HasError AndAlso ConnectedAttribute Then
-                                'endRunAlreadySentFlagAttribute = True 'AG 30/11/2012 - Not inform this flag here. It will be informed once really sent
-                                methodHasToAddInstructionToQueueFlag = 1 'AG 14/05/2012
-                                UpdateSensorValuesAttribute(AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True) 'AG 15/05/2012
-                            End If
-                        End If
-
-                        'BUSINESS: Nothing
-
-                        'PRESENTATION: Show message box informing the user the worksesion has been paused 'IAx00MainMDI.ShowAlarmsOrSensorsWarningMessages +
-                        '              When analyzer leaves RUNNING and becomes STANDBY activate Recover button
-
-
-                    ElseIf String.Equals(analyzerFREEZEModeAttribute, "TOTAL") Then 'TOTAL freeze
-                        'INSTRUCTIONS: If Running then send STANDBY instruction (if not sent yet)
-                        If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then 'Alarm Exists
-                            'AG 25/09/2012 - do not sent STANDBY if recovery results process is INPROCESS
-                            If mySessionFlags(AnalyzerManagerFlags.RESULTSRECOVERProcess.ToString) <> "INPROCESS" Then
-                                myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.STANDBY, True)
-                            End If
-
-                            'WorkSession aborted (not necessary to sent the ABORT instruction because the Fw has stopped automatically!!!)
-                            If Not myGlobal.HasError Then
-                                ''AG 11/12/2012 not integrated in v1.0.0
-                                'If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.RESULTSRECOVERProcess.ToString) <> "INPROCESS" Then
-                                '    AnalyzerIsReadyAttribute = False
-                                'End If
-                                ''AG 11/12/2012
-                                methodHasToAddInstructionToQueueFlag = 1 'AG 14/05/2012
-                                endRunAlreadySentFlagAttribute = True 'AG 14/05/2012 - when StandBy instruction is sent the ENDRUN instruction has no sense!!
-
-                                Dim myWSAnalyzerDelegate As New WSAnalyzersDelegate
-                                myGlobal = myWSAnalyzerDelegate.UpdateWSStatus(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute, "ABORTED")
-                            End If
-
-                            'AG 16/04/2012
-                        Else
-                            'If new freeze total alarm appears during recover washings ... mark recover process as closed
-                            If mySessionFlags(AnalyzerManagerFlags.RECOVERprocess.ToString) = "INPROCESS" _
-                            AndAlso SensorValuesAttribute.ContainsKey(AnalyzerSensors.RECOVER_PROCESS_FINISHED) _
-                            AndAlso SensorValuesAttribute(AnalyzerSensors.RECOVER_PROCESS_FINISHED) = 1 Then
-                                UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.RECOVERprocess, "CLOSED")
-                            End If
-                            'AG 16/04/2012
-                        End If
-
-
-                        'BUSINESS: Nothing
-
-                        'PRESENTATION: Show message box informing the user the worksesion has been aborted + activate Recover button
-                        'IAx00MainMDI.ShowAlarmsOrSensorsWarningMessages
-
-                    ElseIf String.Equals(analyzerFREEZEModeAttribute, "RESET") Then
-                        'INSTRUCTIONS: Stop the sensor information instructions
-                        myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.INFO, True, Nothing, Ax00InfoInstructionModes.STP)
-
-                        'BUSINESS: 
-                        SetAnalyzerNotReady() 'AG 07/03/2012 - analyzer is not ready to perform anything but CONNECT
-
-                        'WorkSession aborted (not necessary to sent the ABORT instruction because the Fw has stopped automatically!!!)
-                        If Not myGlobal.HasError Then
-                            methodHasToAddInstructionToQueueFlag = 2 'AG 14/05/2012
-
-                            If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then 'Only abort work session if analyzer is in Running
-                                Dim myWSAnalyzerDelegate As New WSAnalyzersDelegate
-                                myGlobal = myWSAnalyzerDelegate.UpdateWSStatus(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute, "ABORTED")
-                            End If
-                        End If
-
-                        'PRESENTATION: Show message box informing the user the analyzer must be restarted
-                        'IAx00MainMDI.ShowAlarmsOrSensorsWarningMessages
-
-                    End If
-                End If
-                'AG 06/03/2012
-                Dim alarmsDelg As New WSAnalyzerAlarmsDelegate 'AG 16/01/2014 - Move declaration here!
-
-                Dim myISEOffErrorFixed As Boolean = False  'JV 08/01/2014 BT #1118
-                Dim myISETimeoutErrorFixed As Boolean = False ' XB 04/11/2014 - BA-1872
-                Dim myCOMMSTimeoutErrorFixed As Boolean = False ' XB 06/11/2014 - BA-1872
-                For Each alarmItem As Alarms In pAlarmIDList
-                    'General description
-                    'Apply special Business depending the alarm code
-                    '        1- Launch Sw processes
-                    '        2- Automatically send new instruction to the Analyzer
-                    'To inform the user we generate an AnalyzerManager.ReceptionEvent. We prepare event data with the 
-                    'PrepareUIRefreshEvent method called below the End Select
-                    'Buttons activation code in Ax00MainMDI (methods ActivateActionButtonBar, ActiveButtonWithAlarms)
-
-                    Select Case alarmItem
-                        'No reactions rotor
-                        Case GlobalEnumerates.Alarms.REACT_MISSING_ERR
-                            'AG 12/03/2012
-                            'Alarm detected during WarmUp or during Change Rotor process
-                            'INSTRUCTIONS: Nothing
-
-                            'BUSINESS:
-                            'If detected during WarmUp ... PAUSE the process, inform the user to change reactions rotor and finally continue WarmUp process
-                            'If detected during Change Rotor ... inform the user, reset the change rotor process 
-                            If pAlarmStatusList(index) Then 'Alarm Exists
-                                If String.Equals(mySessionFlags(AnalyzerManagerFlags.WUPprocess.ToString), "INPROCESS") Then
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.WUPprocess, "PAUSED")
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.Washing, "")
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.BaseLine, "")
-
-                                ElseIf String.Equals(mySessionFlags(AnalyzerManagerFlags.NEWROTORprocess.ToString), "INPROCESS") Then
-                                    'Re-start the whole process 
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.NEWROTORprocess, "")
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.NewRotor, "")
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.BaseLine, "")
-                                End If
-                            End If
-
-                            'PRESENTATION: 
-                            'Monitor (Main Tab) (RH): Inform the User using pRefreshDS in Ax00MainMDI.OnManageReceptionEvent
-                            'OK: (MDI (StandBy): Disable buttons START, CONTINUE)
-                            '    Change reactions rotor: start process 
-
-                            'DL 31/07/2012. Begin
-                            'Thermo Alarms (Warnings)
-                        Case GlobalEnumerates.Alarms.REACT_TEMP_WARN, GlobalEnumerates.Alarms.R1_TEMP_WARN, _
-                             GlobalEnumerates.Alarms.R2_TEMP_WARN, GlobalEnumerates.Alarms.FRIDGE_TEMP_WARN, _
-                             GlobalEnumerates.Alarms.WS_TEMP_WARN, GlobalEnumerates.Alarms.WS_TEMP_SYSTEM_ERR, _
-                             GlobalEnumerates.Alarms.R1_TEMP_SYSTEM_ERR, GlobalEnumerates.Alarms.R2_TEMP_SYSTEM_ERR
-
-                            'Thermo Alarms (Warnings)
-                            'Case GlobalEnumerates.Alarms.REACT_TEMP_WARN, GlobalEnumerates.Alarms.R1_TEMP_WARN, GlobalEnumerates.Alarms.R2_TEMP_WARN, _
-                            'GlobalEnumerates.Alarms.FRIDGE_TEMP_WARN, GlobalEnumerates.Alarms.WS_TEMP_WARN, GlobalEnumerates.Alarms.WS_TEMP_SYS1_ERR, _
-                            'GlobalEnumerates.Alarms.WS_TEMP_SYS2_ERR, GlobalEnumerates.Alarms.R1_TEMP_SYS1_ERR, GlobalEnumerates.Alarms.R1_TEMP_SYS2_ERR, _
-                            'GlobalEnumerates.Alarms.R2_TEMP_SYS1_ERR, GlobalEnumerates.Alarms.R2_TEMP_SYS2_ERR
-                            'DL 31/07/2012. End
-                            '[2011-03-17 - Llistat-SensorsActuadors.xls]
-                            'Sw has already determined Temp is out of limits and generate Warning (CheckTemperaturesAlarms method)
-
-                            'INSTRUCTIONS: Nothing
-
-                            'BUSINESS:
-                            'AG 05/01/2012 - Sw implements timers
-                            'Manage is the warning timers (cases REACTIONS TEMPERATURE, FRIDGE TEMPERATURE) for change warning to error
-                            If pAlarmStatusList(index) Then 'Alarm Exists
-                                'Activate thermo reactions rotor timer for pass from Warning to Error if needed
-                                If alarmItem = GlobalEnumerates.Alarms.REACT_TEMP_WARN And Not thermoReactionsRotorWarningTimer.Enabled Then
-                                    thermoReactionsRotorWarningTimer.Enabled = True
-                                End If
-
-                                If alarmItem = GlobalEnumerates.Alarms.FRIDGE_TEMP_WARN And Not thermoFridgeWarningTimer.Enabled Then
-                                    thermoFridgeWarningTimer.Enabled = True
-                                End If
-
-                            Else 'Alarm Solved
-                                If alarmItem = GlobalEnumerates.Alarms.REACT_TEMP_WARN And thermoReactionsRotorWarningTimer.Enabled Then
-                                    thermoReactionsRotorWarningTimer.Enabled = False
-                                End If
-
-                                If alarmItem = GlobalEnumerates.Alarms.FRIDGE_TEMP_WARN And thermoFridgeWarningTimer.Enabled Then
-                                    thermoFridgeWarningTimer.Enabled = False
-                                End If
-
-                            End If
-                            'AG 05/01/2012
-
-                            '(OK) case REACT_TEMP_WARN -> In method ProcessReadingsReceived
-                            '                        If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.REACT_TEMP_WARN) Then
-                            '                            Mark the results with ThermoWarningFlag 
-
-                            'AG 06/03/2012
-                            ''(OK) recover instruction is needed
-                            'If (alarmItem = GlobalEnumerates.Alarms.R1_TEMP_WARN OrElse alarmItem = GlobalEnumerates.Alarms.R2_TEMP_WARN OrElse _
-                            '    alarmItem = GlobalEnumerates.Alarms.R1_TEMP_SYSTEM_ERR OrElse alarmItem = GlobalEnumerates.Alarms.R2_TEMP_SYSTEM_ERR) Then
-                            '    myPendingRecoveryInstructionFlagAttribute = pAlarmStatusList(index)
-                            'End If
-
-
-                            'PRESENTATION: 
-                            'Monitor (Main Tab) (RH): Inform the User using pRefreshDS in Ax00MainMDI.OnManageReceptionEvent
-
-
-                            'Bottle or scales levels
-                        Case GlobalEnumerates.Alarms.HIGH_CONTAMIN_WARN, GlobalEnumerates.Alarms.HIGH_CONTAMIN_ERR, _
-                            GlobalEnumerates.Alarms.WASH_CONTAINER_WARN, GlobalEnumerates.Alarms.WASH_CONTAINER_ERR
-                            '[2011-03-17 - Llistat-SensorsActuadors.xls]
-                            'Sw has already determined Warning or not (CheckContainerAlarms method)
-
-                            'LIMITE_WARNING. LIMITE_CRITICO
-                            'TODO
-                            'Antes de lanzar la sesion (START o CONTINUE) calcular si se puede acabar con volumen actual
-                            '¿Como calculamos el uso de depositos en funcion de los tests que nos quedan pendientes? ¿Que hacemos si la sesión es muy larga
-                            'y necesitamos más de una botella de agua o de residuos?
-                            'Cuando decidamos dejar de enviar Tests, ¿que significa? ¿enviar END o no enviar nada?
-
-                            'Por ahora se puede hacer que cuando haya que dejar de enviar preparaciones se debe activar flag pauseSendingTestPreparationsFlag = TRUE
-                            'If pAlarmStatusList(index) Then pauseSendingTestPreparationsFlag = TRUE
-                            'If Not pAlarmStatusList(index) Then pauseSendingTestPreparationsFlag = FALSE
-
-
-                            'INSTRUCTIONS:
-                            '(OK)Case HIGH_CONTAMIN_ERR, WASH_CONTANIER_ERR stop sending test but Sw inform the user can not remove or refill container until Ax00 indicates
-                            '(only if the ENDRUN has not been sent yet)
-                            If alarmItem = GlobalEnumerates.Alarms.HIGH_CONTAMIN_ERR Or alarmItem = GlobalEnumerates.Alarms.WASH_CONTAINER_ERR Then
-                                'TR 22/10/2013 -Bug #1353 Validate if not pause mode to send the end instruction.
-                                'AG 26/03/2014 - #1501 (Physics #48) - END cannot be sent when pause mode is starting (pauseModeIsStarting)
-                                If Not AllowScanInRunningAttribute AndAlso Not pauseModeIsStarting AndAlso pAlarmStatusList(index) And AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING _
-                                   And Not endRunAlreadySentFlagAttribute And AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.END_RUN_START Then 'Alarm Exists
-                                    'AG 14/05/2012 - if no instruction sent call ManagerAnalyzer. Else add instruction to queue 
-                                    'myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ENDRUN, True)
-                                    'If Not myGlobal.HasError AndAlso ConnectedAttribute Then endRunAlreadySentFlagAttribute = True
-                                    If methodHasToAddInstructionToQueueFlag = 0 Then
-                                        myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.ENDRUN, True)
-                                        If Not myGlobal.HasError AndAlso ConnectedAttribute Then
-                                            'endRunAlreadySentFlagAttribute = True 'AG 30/11/2012 - Not inform this flag here. It will be informed once really sent
-                                            methodHasToAddInstructionToQueueFlag = 1
-                                            UpdateSensorValuesAttribute(AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True) 'AG 15/05/2012
-                                        End If
-
-                                    ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
-                                        ' XBC 21/05/2012 - to avoid send the same instruction more than 1 time
-                                        If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.ENDRUN) Then
-                                            myInstructionsQueue.Add(AnalyzerManagerSwActionList.ENDRUN)
-                                            myParamsQueue.Add("")
-                                            'endRunAlreadySentFlagAttribute = True 'AG 30/11/2012 - Not inform this flag here. It will be informed once really sent
-                                            UpdateSensorValuesAttribute(AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True) 'AG 19/06/2012
-                                        End If
-                                    End If
-                                    'AG 14/05/2012
-                                End If
-                            End If
-
-                            'BUSINESS: Nothing
-
-                            'PRESENTATION:
-                            'Monitor (Main Tab) (RH): Inform the User using pRefreshDS in Ax00MainMDI.OnManageReceptionEvent
-                            'MDI: When ERROR case button activation or deactivation list definition (complete the final list in method Ax00MainMDI.ActivateActionButtonBar)
-                            '(OK) (StandBy: Disable buttons START, CONTINUE,...)
-
-                            '(OK) 2 Case HIGH_CONTAMIN_ERR, WASH_CONTANIER_ERR Show message informing the user
-                            '        (“No sustituya la botella hasta que el analizador le indique que puede hacerlo con seguridad”) (Ax00MainMDI.ShowAlarmWarningMessages)
-
-
-
-                        Case GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR, GlobalEnumerates.Alarms.WATER_SYSTEM_ERR
-                            '[2011-03-17 - Llistat-SensorsActuadors.xls]
-                            'S&S
-                            'When Ax00 stop running do not allow continue, block machine and show message
-                            'TR 22/10/2013 -Bug #1353 Validate if not pause mode to send the end instruction.
-                            'AG 26/03/2014 - #1501 (Physics #48) - END cannot be sent when pause mode is starting (pauseModeIsStarting)
-                            If Not AllowScanInRunningAttribute AndAlso Not pauseModeIsStarting AndAlso pAlarmStatusList(index) And AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING And Not endRunAlreadySentFlagAttribute _
-                            And AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.END_RUN_START Then 'Alarm Exists
-                                'AG 14/05/2012 - if no instruction sent call ManagerAnalyzer. Else add instruction to queue 
-                                'myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ENDRUN, True)
-                                'If Not myGlobal.HasError AndAlso ConnectedAttribute Then endRunAlreadySentFlagAttribute = True
-                                If methodHasToAddInstructionToQueueFlag = 0 Then
-                                    myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.ENDRUN, True)
-                                    If Not myGlobal.HasError AndAlso ConnectedAttribute Then
-                                        UpdateSensorValuesAttribute(AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True) 'AG 15/05/2012
-                                        methodHasToAddInstructionToQueueFlag = 1
-                                        'endRunAlreadySentFlagAttribute = True 'AG 30/11/2012 - Not inform this flag here. It will be informed once really sent
-                                    End If
-
-                                ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
-                                    ' XBC 21/05/2012 - to avoid send the same instruction more than 1 time
-                                    If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.ENDRUN) Then
-                                        myInstructionsQueue.Add(AnalyzerManagerSwActionList.ENDRUN)
-                                        myParamsQueue.Add("")
-                                        'endRunAlreadySentFlagAttribute = True 'AG 30/11/2012 - Not inform this flag here. It will be informed once really sent
-                                        UpdateSensorValuesAttribute(AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True) 'AG 19/06/2012
-                                    End If
-                                End If
-                                'AG 14/05/2012
-                            End If
-
-                            'BUSINESS: Nothing
-
-                            'PRESENTATION:
-                            'Monitor (Main Tab) (RH): Inform the User using pRefreshDS in Ax00MainMDI.OnManageReceptionEvent
-                            'MDI: Button activation or deactivation list definition (complete the final list in method Ax00MainMDI.ActivateActionButtonBar)
-                            '(OK) 2 Show message informing the user ("Revise el depósito de entrada, o la conexión a la red de agua") (Ax00MainMDI.ShowAlarmWarningMessages)
-                            'OK: (StandBy: Disable buttons START, CONTINUE,...)
-
-
-                        Case GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR, GlobalEnumerates.Alarms.WASTE_SYSTEM_ERR
-                            '[2011-03-17 - Llistat-SensorsActuadors.xls]
-                            'Inform the user and S&S
-
-                            'INSTRUCTIONS: (only if the ENDRUN has not been sent yet)
-                            If pAlarmStatusList(index) And AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING And Not endRunAlreadySentFlagAttribute _
-                            And AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.END_RUN_START Then 'Alarm Exists
-                                'AG 14/05/2012 - if no instruction sent call ManagerAnalyzer. Else add instruction to queue 
-                                'myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ENDRUN, True)
-                                'If Not myGlobal.HasError AndAlso ConnectedAttribute Then endRunAlreadySentFlagAttribute = True
-                                If methodHasToAddInstructionToQueueFlag = 0 Then
-                                    myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.ENDRUN, True)
-                                    If Not myGlobal.HasError AndAlso ConnectedAttribute Then
-                                        UpdateSensorValuesAttribute(AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True) 'AG 15/05/2012
-                                        methodHasToAddInstructionToQueueFlag = 1
-                                        'endRunAlreadySentFlagAttribute = True 'AG 30/11/2012 - Not inform this flag here. It will be informed once really sent
-                                    End If
-
-                                ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
-                                    ' XBC 21/05/2012 - to avoid send the same instruction more than 1 time
-                                    If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.ENDRUN) Then
-                                        myInstructionsQueue.Add(AnalyzerManagerSwActionList.ENDRUN)
-                                        myParamsQueue.Add("")
-                                        'endRunAlreadySentFlagAttribute = True 'AG 30/11/2012 - Not inform this flag here. It will be informed once really sent
-                                        UpdateSensorValuesAttribute(AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True) 'AG 19/06/2012
-                                    End If
-                                End If
-                                'AG 14/05/2012
-                            End If
-
-                            'BUSINESS: Nothing
-
-                            'PRESENTATION:
-                            'Monitor (Main Tab) (RH): Inform the User using pRefreshDS in Ax00MainMDI.OnManageReceptionEvent
-                            'MDI: Button activation or deactivation list definition (complete the final list in method Ax00MainMDI.ActivateActionButtonBar)
-                            '(OK) 2) Show message when Ax00 stops ("Revise la salida de residuos") (Ax00MainMDI.ShowAlarmWarningMessages)
-                            'OK: (StandBy: Disable buttons START, CONTINUE,...)
-
-
-                            'Non critical collisions (R1, R2 or S arms)
-                        Case GlobalEnumerates.Alarms.R1_COLLISION_WARN, GlobalEnumerates.Alarms.R2_COLLISION_WARN, _
-                            GlobalEnumerates.Alarms.S_COLLISION_WARN
-                            '[2011-03-17 - Llistat-SensorsActuadors.xls]
-                            'Sw sends Ax00 to S&S
-                            'Sw activates CONTINE or ABORT (Recover will be sent automatically before send the button instruction)
-
-                            'INSTRUCTIONS: S&S (only if the ENDRUN has not been sent yet)
-                            'TR 22/10/2013 -Bug #1353 Validate if not pause mode to send the end instruction.
-                            'AG 26/03/2014 - #1501 (Physics #48) - END cannot be sent when pause mode is starting (pauseModeIsStarting)
-                            If Not AllowScanInRunningAttribute AndAlso Not pauseModeIsStarting AndAlso pAlarmStatusList(index) And AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING And Not endRunAlreadySentFlagAttribute _
-                            And AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.END_RUN_START Then 'Alarm Exists
-                                'AG 14/05/2012 - if no instruction sent call ManagerAnalyzer. Else add instruction to queue 
-                                'myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ENDRUN, True)
-                                'If Not myGlobal.HasError AndAlso ConnectedAttribute Then endRunAlreadySentFlagAttribute = True
-                                If methodHasToAddInstructionToQueueFlag = 0 Then
-                                    myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.ENDRUN, True)
-                                    If Not myGlobal.HasError AndAlso ConnectedAttribute Then
-                                        UpdateSensorValuesAttribute(AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True) 'AG 15/05/2012
-                                        methodHasToAddInstructionToQueueFlag = 1
-                                        'endRunAlreadySentFlagAttribute = True 'AG 30/11/2012 - Not inform this flag here. It will be informed once really sent
-                                    End If
-
-                                ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
-                                    ' XBC 21/05/2012 - to avoid send the same instruction more than 1 time
-                                    If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.ENDRUN) Then
-                                        myInstructionsQueue.Add(AnalyzerManagerSwActionList.ENDRUN)
-                                        myParamsQueue.Add("")
-                                        'endRunAlreadySentFlagAttribute = True 'AG 30/11/2012 - Not inform this flag here. It will be informed once really sent
-                                        UpdateSensorValuesAttribute(AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True) 'AG 19/06/2012
-                                    End If
-                                End If
-                                'AG 14/05/2012
-
-                            End If
-
-                            'BUSINESS:
-                            'NOTE: Previous business is performed in method ProcessArmStatusRecived
-
-                            'PRESENTATION:
-                            'Monitor (Main Tab) (RH): Inform the User using pRefreshDS in Ax00MainMDI.OnManageReceptionEvent
-
-
-                            'Status alarms (Fridge, ISE)
-                            'ISE status alarm is only generated when Instrument has ISE module installed - adjust ISEINS:1
-                        Case GlobalEnumerates.Alarms.FRIDGE_STATUS_WARN, GlobalEnumerates.Alarms.FRIDGE_STATUS_ERR
-                            'GlobalEnumerates.Alarms.ISE_OFF_ERR 'AG 30/05/2012  - comment this line, this alarm has an individual treatment (look for mark 'AG 23/03/2012 - ISE switch off' in this method)
-
-                            '[2011-03-17 - Llistat-SensorsActuadors.xls]
-                            'FRIDGE: No business (only inform user)
-                            'ISE: Send ISE test preparations are not allowed & inform user
-                            'NOTE: All ISE alarms apply only if Ax00 has ISE module
-
-                            'INSTRUCTIONS: Nothing
-
-                            'BUSINESS:
-                            'AG 21/03/2012 - this business rule is taken into account in method SendNextPreparation
-                            ''Case ISE_STATUS_WARN: Send ISETEST instruction is not allowed
-                            'If alarmItem = GlobalEnumerates.Alarms.ISE_STATUS_WARN Then
-                            '    If pAlarmStatusList(index) Then 'Alarm Exists
-                            '        If alarmItem = GlobalEnumerates.Alarms.ISE_STATUS_WARN Then
-                            '            pauseSendingISETestFlag = True
-                            '        End If
-                            '    Else 'Alarm solved
-                            '        If alarmItem = GlobalEnumerates.Alarms.ISE_STATUS_WARN Then
-                            '            pauseSendingISETestFlag = False
-                            '        End If
-                            '    End If
-                            'End If
-
-                            'PRESENTATION:
-                            'Monitor (Main Tab) (RH): Inform the User using pRefreshDS in Ax00MainMDI.OnManageReceptionEvent
-
-
-                            'Level Detection alarms
-                        Case GlobalEnumerates.Alarms.R1_NO_VOLUME_WARN, GlobalEnumerates.Alarms.R2_NO_VOLUME_WARN, _
-                            GlobalEnumerates.Alarms.S_NO_VOLUME_WARN
-                            '[2011-03-17 - Llistat-SensorsActuadors.xls]
-                            'INSTRUCTIONS: Nothing
-
-                            'BUSINESS:
-                            'NOTE: Previous business is performed in method ProcessArmStatusRecived
-
-                            'PRESENTATION: Nothing
-
-
-                            'Clot detection
-                        Case GlobalEnumerates.Alarms.CLOT_DETECTION_WARN, GlobalEnumerates.Alarms.CLOT_DETECTION_ERR
-                            '[2011-03-17 - Llistat-SensorsActuadors.xls]
-                            'INSTRUCTIONS: Nothing
-
-                            'BUSINESS:
-                            'NOTE: Previous business is performed in method ProcessArmStatusRecived (mark preparation results as possible clot)
-                            'Case CLOT_DETECTION_ERR -> Stop sending test preparations
-                            If pAlarmStatusList(index) Then 'Alarm Exists
-                                If alarmItem = GlobalEnumerates.Alarms.CLOT_DETECTION_ERR Then
-
-                                    'AG 16/02/2012 - Do not use the pauseSendingTestPreparationsFlag because Sw leave sending preparations but never
-                                    'sends the ENDRUN instruction ... I comment the old line and implement that when CLOT_DETECTION_ERR exits Sw sends ENDRUN
-                                    ''AG 27/10/2011 - Set to TRUE the flag pause sending test when the clot detection is enabled
-                                    ''pauseSendingTestPreparationsFlag = True
-                                    Dim clotDetectionEnabled As Boolean = True
-                                    Dim adjustValue As String = ""
-                                    adjustValue = ReadAdjustValue(Ax00Adjustsments.CLOT)
-                                    If Not String.Equals(adjustValue, String.Empty) AndAlso IsNumeric(adjustValue) Then
-                                        clotDetectionEnabled = CType(adjustValue, Boolean)
-                                    End If
-
-                                    If clotDetectionEnabled Then
-
-                                        'AG 17/07/2012 - CANCELLED again (JE+RP+ST+EF) !! Bugs Tracking 706
-
-                                        ''AG 19/06/2012 - Re activated!!
-                                        ''AG 15/03/2012 - CANCELLED - reunion seguimiento proyecto 13/03/2012: JE, RP, EF, ST, JM (se refleja en excel Instrucciones Ax00 (rev 40).xls
-                                        ''AG 16/02/2012
-                                        ''pauseSendingTestPreparationsFlag = True
-                                        'If pAlarmStatusList(index) And AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING And Not endRunAlreadySentFlagAttribute _
-                                        '    And AnalyzerCurrentActionAttribute <> GlobalEnumerates.AnalyzerManagerAx00Actions.END_RUN_START Then 'Alarm Exists
-                                        '    'myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ENDRUN, True)
-                                        '    'If Not myGlobal.HasError AndAlso ConnectedAttribute Then endRunAlreadySentFlagAttribute = True
-                                        '    If methodHasToAddInstructionToQueueFlag = 0 Then
-                                        '        myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ENDRUN, True)
-                                        '        If Not myGlobal.HasError AndAlso ConnectedAttribute Then
-                                        '            UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True) 'AG 15/05/2012
-                                        '            methodHasToAddInstructionToQueueFlag = 1
-                                        '            endRunAlreadySentFlagAttribute = True
-                                        '        End If
-
-                                        '    ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
-                                        '        ' XBC 21/05/2012 - to avoid send the same instruction more than 1 time
-                                        '        If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.ENDRUN) Then
-                                        '            myInstructionsQueue.Add(GlobalEnumerates.AnalyzerManagerSwActionList.ENDRUN)
-                                        '            myParamsQueue.Add("")
-                                        '            endRunAlreadySentFlagAttribute = True
-                                        '            UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True) 'AG 19/06/2012
-                                        '        End If
-                                        '    End If
-                                        'End If
-
-                                    End If
-
-                                    'AG 27/10/2011
-                                End If
-
-                            Else 'Alarm solved
-                                If alarmItem = GlobalEnumerates.Alarms.CLOT_DETECTION_ERR Then
-                                    pauseSendingTestPreparationsFlag = False
-                                End If
-                            End If
-
-                            'PRESENTATION:
-                            'Monitor (Main Tab) (RH): Inform the User using pRefreshDS in Ax00MainMDI.OnManageReceptionEvent
-
-
-                        Case GlobalEnumerates.Alarms.BASELINE_INIT_ERR
-                            '[2011-05-12 - !!! Ax00 - Sw Espec Meetings.xls]
-
-                            'INSTRUCTIONS: 
-                            'STANDBY
-                            'If alarm is new: Automatically perform new Alight
-                            'If already exists (2on tentative also fails): If running -> Go to StandBy
-                            If pAlarmStatusList(index) Then 'Alarm Exists
-                                'baselineInitializationFailuresAttribute += 1 'AG 27/11/2014 BA-2144
-                                If AnalyzerStatus = AnalyzerManagerStatus.STANDBY AndAlso baselineInitializationFailuresAttribute < ALIGHT_INIT_FAILURES Then
-                                    'AG 27/11/2014 BA-2144 comment code, business will be implemented in method SendAutomaticALIGHTRerun 
-                                    ''When ALIGHT has been rejected ... increment the variable CurrentWellAttribute to perform the new in other well
-                                    'Dim SwParams As New SwParametersDelegate
-                                    'myGlobal = SwParams.GetParameterByAnalyzer(dbConnection, AnalyzerIDAttribute, GlobalEnumerates.SwParameters.MAX_REACTROTOR_WELLS.ToString, False)
-                                    'If Not myGlobal.HasError Then
-                                    '    Dim SwParamsDS As New ParametersDS
-                                    '    SwParamsDS = CType(myGlobal.SetDatos, ParametersDS)
-                                    '    If SwParamsDS.tfmwSwParameters.Rows.Count > 0 Then
-                                    '        Dim reactionsDelegate As New ReactionsRotorDelegate
-                                    '        CurrentWellAttribute = reactionsDelegate.GetRealWellNumber(CurrentWellAttribute + 1, CInt(SwParamsDS.tfmwSwParameters(0).ValueNumeric))
-                                    '    End If
-                                    'End If
-
-                                    ''AG 14/05/2012 - if no instruction sent call ManagerAnalyzer. Else add instruction to queue 
-                                    ''myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, CurrentWellAttribute)
-                                    'If methodHasToAddInstructionToQueueFlag = 0 Then
-                                    '    myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, CurrentWellAttribute)
-                                    '    methodHasToAddInstructionToQueueFlag = 1
-                                    'ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
-                                    '    ' XBC 21/05/2012 - to avoid send the same instruction more than 1 time
-                                    '    If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.ADJUST_LIGHT) Then
-                                    '        myInstructionsQueue.Add(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT)
-                                    '        myParamsQueue.Add(CurrentWellAttribute.ToString)
-                                    '    End If
-                                    'End If
-                                    ''AG 14/05/2012
-
-                                    ''When a process involve an instruction sending sequence automatic change the AnalyzerIsReady value
-                                    'If Not myGlobal.HasError AndAlso ConnectedAttribute Then SetAnalyzerNotReady()
-
-
-
-                                ElseIf AnalyzerStatus = AnalyzerManagerStatus.RUNNING Then
-                                    'If 3 consecutive well rejection initializations have been refused (baselineCalcs.exitRunningType = 2) -> STANDBY
-                                    'RPM 06/09/2012 - StandBy NO!!!, leave running using END or ABORT (no prep started, so better use END)
-                                    'If 30 consecutive wells have been rejected once the initialization is OK (baselineCalcs.exitRunningType = 1) -> END
-
-                                    Select Case wellBaseLineAutoPausesSession
-                                        Case 0 'Nothing
-
-                                        Case 1, 2 'END 'AG 06/09/2012 - also add case 2
-                                            'TR 22/10/2013 -Bug #1353 Validate if not pause mode to send the end instruction.
-                                            'AG 26/03/2014 - #1501 (Physics #48) - END cannot be sent when pause mode is starting (pauseModeIsStarting)
-                                            If Not AllowScanInRunningAttribute AndAlso Not pauseModeIsStarting AndAlso Not endRunAlreadySentFlagAttribute AndAlso AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.END_RUN_START Then
-                                                If methodHasToAddInstructionToQueueFlag = 0 Then
-                                                    myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.ENDRUN, True)
-                                                    If Not myGlobal.HasError AndAlso ConnectedAttribute Then
-                                                        'endRunAlreadySentFlagAttribute = True 'AG 30/11/2012 - Not inform this flag here. It will be informed once really sent
-                                                        methodHasToAddInstructionToQueueFlag = 1
-                                                        UpdateSensorValuesAttribute(AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True)
-                                                    End If
-
-                                                ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
-                                                    If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.ENDRUN) Then
-                                                        myInstructionsQueue.Add(AnalyzerManagerSwActionList.ENDRUN)
-                                                        myParamsQueue.Add("")
-                                                        'endRunAlreadySentFlagAttribute = True 'AG 30/11/2012 - Not inform this flag here. It will be informed once really sent
-                                                        UpdateSensorValuesAttribute(AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True) 'AG 19/06/2012
-                                                    End If
-                                                End If
-                                            End If
-
-                                            'AG 06/09/2012 - commented, RPM says not to send STANDBY, use END better
-                                            'Case 2 'STANDBY
-                                            '    If methodHasToAddInstructionToQueueFlag = 0 Then
-                                            '        myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STANDBY, True)
-                                            '        If Not myGlobal.HasError AndAlso ConnectedAttribute Then
-                                            '            endRunAlreadySentFlagAttribute = True 'when StandBy instruction is sent, send the ENDRUN instruction has no sense!!
-                                            '            methodHasToAddInstructionToQueueFlag = 1
-                                            '            UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True)
-                                            '        End If
-
-                                            '    ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
-                                            '        If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.STANDBY) Then
-                                            '            myInstructionsQueue.Add(GlobalEnumerates.AnalyzerManagerSwActionList.STANDBY)
-                                            '            myParamsQueue.Add("")
-                                            '            endRunAlreadySentFlagAttribute = True 'when StandBy instruction is sent, send the ENDRUN instruction has no sense!!
-                                            '            UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.AUTO_PAUSE_BY_ALARM, 1, True) 'AG 19/06/2012
-                                            '        End If
-                                            '    End If
-                                    End Select
-                                    'AG 05/06/2012
-
-                                End If
-
-                            Else
-                                ResetBaseLineFailuresCounters() 'AG 27/11/2014 BA-2066
-                            End If
-
-                            'BUSINESS: Nothing
-
-                            'PRESENTATION: 
-                            'If alarm is new: None
-                            'If already exists (2on tentative also fails): Show message "It is highly recommended change the reactions rotor"
-                            '(Ax00MainMDI.OnManageReceptionEvent & ShowAlarmWarningMessages)
-                            'MDI: Button activation or deactivation list definition (complete the final list in method Ax00MainMDI.ActivateActionButtonBar)
-
-
-                        Case GlobalEnumerates.Alarms.BASELINE_WELL_WARN
-                            '[2011-05-04 - Ax00 - Sw Espec Meetings]
-
-                            If pAlarmStatusList(index) Then 'Alarm Exists
-                                'INSTRUCTIONS: 
-                                '(NO, IMPLEMENT THIS BUSINESS, REJECTED!!!!) If no executions IN process -> Send ENDRUN, else do nothing (wait)
-
-                                'BUSINESS: Activate flag
-                                WELLbaselineParametersFailuresAttribute = True
-
-                                'PRESENTATION: Show message "Change methacrylate rotor is high recommend" when user performs Wup, Start or finish work session 
-                                '(Ax00MainMDI.OnManageReceptionEvent & ShowAlarmWarningMessages)
-
-                            Else
-                                WELLbaselineParametersFailuresAttribute = False
-                            End If
-
-                            'Recover instruction error
-                        Case GlobalEnumerates.Alarms.RECOVER_ERR
-
-                            If pAlarmStatusList(index) Then 'Alarm Exists
-                                'The recover instruction has finished with error
-                                If recoverAlreadySentFlagAttribute Then recoverAlreadySentFlagAttribute = False
-                                UpdateSensorValuesAttribute(AnalyzerSensors.RECOVER_PROCESS_FINISHED, 1, True) 'Inform the recover instruction has finished (but with errors)
-                            End If
-
-                            'Arm collision error (error codes)
-                        Case GlobalEnumerates.Alarms.R1_COLLISION_ERR, GlobalEnumerates.Alarms.R2_COLLISION_ERR, _
-                            GlobalEnumerates.Alarms.S_COLLISION_ERR
-
-                            If pAlarmStatusList(index) Then 'Alarm Exists
-                                'Mark all INPROCESS executions as PENDING or LOCKED
-                                'AG 08/03/2012 - This method is called only when Software receives ANSBxx with collision information
-                                'Dim exec_dlg As New ExecutionsDelegate
-                                'myGlobal = exec_dlg.ChangeINPROCESSStatusByCollision(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute)
-                            End If
-
-                            'Instructions aborted or rejected
-                        Case GlobalEnumerates.Alarms.INST_ABORTED_ERR, GlobalEnumerates.Alarms.INST_REJECTED_ERR
-                            If pAlarmStatusList(index) Then
-                                'INSTRUCTIONS: ask for detailed errors
-                                'AG 14/05/2012 - if no instruction sent call ManagerAnalyzer. Else add instruction to queue 
-                                'myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.ALR) 'AG 12/03/2012: (INFO;Q:ALR)
-                                'If Not myGlobal.HasError AndAlso ConnectedAttribute Then SetAnalyzerNotReady()
-                                If methodHasToAddInstructionToQueueFlag = 0 Then
-                                    myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.INFO, True, Nothing, Ax00InfoInstructionModes.ALR)
-                                    methodHasToAddInstructionToQueueFlag = 1
-                                    'AG 04/04/2012 - When a process involve an instruction sending sequence automatic (for instance STANDBY (end) + WASH) change the AnalyzerIsReady value
-                                    If Not myGlobal.HasError AndAlso ConnectedAttribute Then SetAnalyzerNotReady()
-                                ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
-                                    ' XBC 21/05/2012 - to avoid send the same instruction more than 1 time
-                                    If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.INFO) Then
-                                        myInstructionsQueue.Add(AnalyzerManagerSwActionList.INFO)
-                                        'AG 10/12/2012 - Do not use ToString here because Sw will send INFO;Q:ALR; instead of INFO;Q:2;
-                                        'myParamsQueue.Add(GlobalEnumerates.Ax00InfoInstructionModes.ALR.ToString)
-                                        myParamsQueue.Add(CInt(Ax00InfoInstructionModes.ALR))
-                                    End If
-                                End If
-                                'AG 14/05/2012
-
-                                'BUSINESS: NOTHING
-                                'PRESENTATION: NOTHING
-                            End If
-
-                        Case GlobalEnumerates.Alarms.INST_REJECTED_WARN
-
-                            'TR BUG #1339  before sending the next instruction, validate if the last intruction send was pause to star logic
-                            If AppLayer.LastInstructionTypeSent = AppLayerEventList.PAUSE Then
-                                PauseAlreadySentFlagAttribute = False
-                                SetAllowScanInRunningValue(False) 'AG 08/11/2013 #1358  AllowScanInRunningAttribute = False
-                                If String.Compare(mySessionFlags(AnalyzerManagerFlags.PAUSEprocess.ToString), "INPROCESS", False) = 0 Then
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.PAUSEprocess, "")
-                                End If
-                            End If
-                            'TR BUG #1339 -END
-
-                            'Sw has received a Request but has sent instruction out of time.
-                            'Search for next instruction to be sent but using next well (only in Running)
-                            If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
-                                Dim reactRotorDlg As New ReactionsRotorDelegate
-                                futureRequestNextWell = reactRotorDlg.GetRealWellNumber(CurrentWellAttribute + 1, MAX_REACTROTOR_WELLS) 'Estimation of future next well (last well received with Request + 1)
-                                myGlobal = Me.SearchNextPreparation(dbConnection, futureRequestNextWell) 'Search for next instruction to be sent ... and sent it!!
-                                If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then '(1)
-                                    myNextPreparationToSendDS = CType(myGlobal.SetDatos, AnalyzerManagerDS)
-                                End If
-                            End If
-
-
-                            'Debug print to leave developent traces
-                            'Dim myLogAcciones As New ApplicationLogManager()
-                            GlobalBase.CreateLogActivity("Instruction rejected (out of time)", "AnalyzerManager.ManageAlarms", EventLogEntryType.Information, False)
-                            Debug.Print(Now.ToString & " .Instruction rejected (out of time)")
-
-                            ''''''''''''
-                            'ISE ALARMS
-                            ''''''''''''
-                            'AG 23/03/2012 - ISE switch off
-                        Case GlobalEnumerates.Alarms.ISE_OFF_ERR
-                            If pAlarmStatusList(index) Then
-                                ISEAnalyzer.IsISESwitchON = False 'SGM 29/06/2012
-                                MyClass.RefreshISEAlarms() 'SGM 19/06/2012
-
-                                'When this alarm appears in RUNNING: Lock all pending ISE preparations
-                                If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
-                                    Dim exec_delg As New ExecutionsDelegate
-
-                                    '1st: Get all ISE executions pending (required to inform the UI with the locked executions
-                                    myGlobal = exec_delg.GetExecutionsByStatus(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute, "PENDING", False, "PREP_ISE")
-                                    If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
-                                        Dim myExecutionsDS As New ExecutionsDS
-
-                                        '2on: Lock all pending ISE preparation executions
-                                        myGlobal = exec_delg.UpdateStatusByExecutionTypeAndStatus(dbConnection, WorkSessionIDAttribute, AnalyzerIDAttribute, "PREP_ISE", "PENDING", "LOCKED")
-
-                                        '3rd: Prepare data for generate user interface refresh event
-                                        If Not myGlobal.HasError Then
-                                            For Each row As ExecutionsDS.twksWSExecutionsRow In myExecutionsDS.twksWSExecutions.Rows
-                                                myGlobal = PrepareUIRefreshEvent(dbConnection, UI_RefreshEvents.EXECUTION_STATUS, row.ExecutionID, 0, Nothing, False)
-                                                If myGlobal.HasError Then Exit For
-                                            Next
-                                        End If
-
-                                    End If
-
-                                End If
-                                'JV 08/01/2014 BT #1118
-                            Else
-                                'AG 16/01/2014 - Mark IseOffError as FIXED only when exists the alarm ISE_OFF_ERR in database with status TRUE
-                                ' Previous code causes the MONITOR screen refreshs always each 2 seconds because each ANSINF causes new alarm notification ISE_OFF_ERR with status false
-                                'myISEOffsErrorFixed = True
-                                myGlobal = alarmsDelg.GetByAlarmID(dbConnection, GlobalEnumerates.Alarms.ISE_OFF_ERR.ToString, Nothing, Nothing, AnalyzerIDAttribute, "")
-                                If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
-                                    Dim temporalDS As New WSAnalyzerAlarmsDS
-                                    temporalDS = DirectCast(myGlobal.SetDatos, WSAnalyzerAlarmsDS)
-
-                                    'Search if exists alarm ISE_OFF_ERR with status TRUE, in this case set flag myISEOffsErrorFixed = True (FIXED)
-                                    'in order to mark it as fixed
-                                    Dim auxList As List(Of WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow)
-                                    auxList = (From a As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In temporalDS.twksWSAnalyzerAlarms _
-                                               Where a.AlarmID = GlobalEnumerates.Alarms.ISE_OFF_ERR.ToString AndAlso a.AlarmStatus = True Select a).ToList
-                                    If auxList.Count > 0 Then
-                                        myISEOffErrorFixed = True
-                                    End If
-                                    auxList = Nothing
-                                End If
-                                'AG 16/01/2014 - JV 08/01/2014 BT #1118
-
-                            End If
-
-                            'AG 23/03/2012
-
-                            ' XB 04/11/2014 - BA-1872
-                        Case GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR
-
-                            myGlobal = alarmsDelg.GetByAlarmID(dbConnection, GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR.ToString, Nothing, Nothing, AnalyzerIDAttribute, "")
-                            If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
-                                Dim temporalDS As New WSAnalyzerAlarmsDS
-                                temporalDS = DirectCast(myGlobal.SetDatos, WSAnalyzerAlarmsDS)
-
-                                'Search if exists alarm ISE_TIMEOUT_ERR with status TRUE, in this case set flag myISETimeoutErrorFixed = True (FIXED)
-                                'in order to mark it as fixed
-                                Dim auxList As List(Of WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow)
-                                auxList = (From a As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In temporalDS.twksWSAnalyzerAlarms _
-                                           Where a.AlarmID = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR.ToString AndAlso a.AlarmStatus = True Select a).ToList
-                                If auxList.Count > 0 Then
-                                    myISETimeoutErrorFixed = True
-                                End If
-                                auxList = Nothing
-                            End If
-                            ' XB 04/11/2014 - BA-1872
-
-                            ' XB 06/11/2014 - BA-1872
-                        Case GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR
-
-                            myGlobal = alarmsDelg.GetByAlarmID(dbConnection, GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR.ToString, Nothing, Nothing, AnalyzerIDAttribute, "")
-                            If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
-                                Dim temporalDS As New WSAnalyzerAlarmsDS
-                                temporalDS = DirectCast(myGlobal.SetDatos, WSAnalyzerAlarmsDS)
-
-                                'Search if exists alarm COMMS_TIMEOUT_ERR with status TRUE, in this case set flag myCOMMSTimeoutErrorFixed = True (FIXED)
-                                'in order to mark it as fixed
-                                Dim auxList As List(Of WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow)
-                                auxList = (From a As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In temporalDS.twksWSAnalyzerAlarms _
-                                           Where a.AlarmID = GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR.ToString AndAlso a.AlarmStatus = True Select a).ToList
-                                If auxList.Count > 0 Then
-                                    myCOMMSTimeoutErrorFixed = True
-                                End If
-                                auxList = Nothing
-                            End If
-                            ' XB 06/11/2014 - BA-1872
-
-                            'SGM 19/06/2012
-                        Case GlobalEnumerates.Alarms.ISE_CONNECT_PDT_ERR
-                            If pAlarmStatusList(index) Then
-                                MyClass.RefreshISEAlarms()
-                            End If
-                            'SGM 19/06/2012
-
-
-                            'DL 31/07/2012
-                        Case GlobalEnumerates.Alarms.FW_CPU_ERR, GlobalEnumerates.Alarms.FW_DISTRIBUTED_ERR, _
-                             GlobalEnumerates.Alarms.FW_REPOSITORY_ERR, GlobalEnumerates.Alarms.FW_CHECKSUM_ERR, _
-                             GlobalEnumerates.Alarms.FW_MAN_ERR
-
-                            If pAlarmStatusList(index) Then
-                                'INSTRUCTIONS: nothing
-                                'BUSINESS: call stopcomm
-                                ' Cut off communications channel
-                                If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
-                                    myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.INFO, _
-                                                              True, _
-                                                              Nothing, _
-                                                              Ax00InfoInstructionModes.STP)
-                                End If
-
-                                If Not myGlobal.HasError Then StopComm()
-                                'PRESENTATION: disconnect Showmessage from Presntation
-                            End If
-
-                        Case GlobalEnumerates.Alarms.INST_NOALLOW_INS_ERR, GlobalEnumerates.Alarms.INST_REJECTED_WARN
-                            'TR BUG #1339 Validate if the last intruction send was pause to star logic
-                            If AppLayer.LastInstructionTypeSent = AppLayerEventList.PAUSE Then
-                                PauseAlreadySentFlagAttribute = False
-                                SetAllowScanInRunningValue(False) 'AG 08/11/2013   AllowScanInRunningAttribute = False
-                                If String.Compare(mySessionFlags(AnalyzerManagerFlags.PAUSEprocess.ToString), "INPROCESS", False) = 0 Then
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.PAUSEprocess, "")
-                                End If
-                            End If
-                            'TR BUG #1339 -END
-                        Case Else
-                            'Nothing
-                    End Select
-                    index = index + 1
-                Next
-
-                'AG 12/03/2012 - Update analyzer session flags into DataBase
-                If myAnalyzerFlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
-                    Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
-                    myGlobal = myFlagsDelg.Update(dbConnection, myAnalyzerFlagsDS)
-                End If
-                'AG 12/03/2012
-
-                'Save alarms into DataBase and prepare DS for UI refresh
-                'Dim alarmsDelg As New WSAnalyzerAlarmsDelegate 'AG 16/01/2014 - Move definition upper
-                Dim wsAlarmsDS As New WSAnalyzerAlarmsDS
-                Dim newRowFlag As Boolean = False
-                index = 0
-
-                'AG 22/05/2014 #1637 - Use exclusive lock over myUI_RefreshDS variables
-                SyncLock myUI_RefreshDS.ReceivedAlarms
-                    myUI_RefreshDS.ReceivedAlarms.Clear() 'Clear DS used for update presentation layer (only the proper data table)
-                End SyncLock
-
-                'Get the alarms defined with OKType = False (never are marked as solved)
-                Dim alarmsWithOKTypeFalse As List(Of String) = (From a As AlarmsDS.tfmwAlarmsRow In _
-                                                            alarmsDefintionTableDS.tfmwAlarms Where a.OKType = False Select a.AlarmID).ToList
-
-                For Each alarmIDItem As Alarms In pAlarmIDList
-                    newRowFlag = False
-                    If alarmIDItem <> GlobalEnumerates.Alarms.NONE Then
-                        If pAlarmStatusList(index) Then 'Save alarms and also the alarms solved
-                            If Not myAlarmListAttribute.Contains(alarmIDItem) Then
-                                myAlarmListAttribute.Add(alarmIDItem)
-                                newRowFlag = True
-
-                                'AG 24/07/2012 - some alarms are never markt as solved. They can be duplicate in database but not in myAlarmListAttribute
-                            ElseIf alarmsWithOKTypeFalse.Contains(alarmIDItem.ToString) Then
-                                newRowFlag = True
-
-                            End If
-                            'JV 08/01/2014 BT #1118
-                        ElseIf myISEOffErrorFixed AndAlso alarmIDItem = GlobalEnumerates.Alarms.ISE_OFF_ERR Then
-                            newRowFlag = True
-                            'JV 08/01/2014 BT #1118
-                            ' XB 04/11/2014 - BA-1872
-                        ElseIf myISETimeoutErrorFixed AndAlso alarmIDItem = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR Then
-                            newRowFlag = True
-                            ' XB 04/11/2014 - BA-1872
-                            ' XB 06/11/2014 - BA-1872
-                        ElseIf myCOMMSTimeoutErrorFixed AndAlso alarmIDItem = GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR Then
-                            newRowFlag = True
-                            ' XB 06/11/2014 - BA-1872
-                        Else 'Fixed alarms
-                            If myAlarmListAttribute.Contains(alarmIDItem) Then
-                                myAlarmListAttribute.Remove(alarmIDItem)
-                                newRowFlag = True
-                            End If
-
-                        End If
-
-                        'Add rows into WSAnalyzerAlarmsDS with the new or solved alarms and save them
-                        If newRowFlag Then
-                            Dim alarmRow As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow
-                            alarmRow = wsAlarmsDS.twksWSAnalyzerAlarms.NewtwksWSAnalyzerAlarmsRow
-                            With alarmRow
-                                .BeginEdit()
-                                .AlarmID = alarmIDItem.ToString
-                                .AnalyzerID = AnalyzerIDAttribute
-
-                                .AlarmDateTime = Now
-
-                                If WorkSessionIDAttribute <> "" Then
-                                    .WorkSessionID = WorkSessionIDAttribute
-                                Else
-                                    .SetWorkSessionIDNull()
-                                End If
-                                .AlarmStatus = pAlarmStatusList(index)
-
-                                .AlarmItem = 1 'By now (25/03/2011 )always 1
-
-                                'AG 25/07/2012 - v043 code when the parameter pVolumeMissingAdditionalInfo was a single string
-                                'in v050 it is defined as a list of string because a single ansbm1 instruction can generate additional info for sample volume missing and also clot warning alarms
-                                'If String.IsNullOrEmpty(pVolumeMissingAdditionalInfo) Then
-                                '    .SetAdditionalInfoNull() 'By now (25/03/2011 )always NULL
-                                'Else
-                                '    .AdditionalInfo = pVolumeMissingAdditionalInfo
-                                'End If
-                                .SetAdditionalInfoNull() 'MI: Added count > index to condition, and item null, as strings can be null to prevent bug being generated
-                                If pAdditionalInfoList IsNot Nothing AndAlso pAdditionalInfoList.Count > index AndAlso
-                                    pAdditionalInfoList(index) IsNot Nothing AndAlso
-                                    String.Equals(pAdditionalInfoList(index), String.Empty) Then
-                                    .AdditionalInfo = pAdditionalInfoList(index)
-                                End If
-                                'AG 25/07/2012
-
-                                .EndEdit()
-                            End With
-
-                            wsAlarmsDS.twksWSAnalyzerAlarms.AddtwksWSAnalyzerAlarmsRow(alarmRow)
-
-                            'Prepare UIRefresh Dataset (NEW_ALARMS_RECEIVED) for refresh screen when needed
-                            myGlobal = PrepareUIRefreshEvent(dbConnection, UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, alarmIDItem.ToString, pAlarmStatusList(index))
-
-                            'JV 08/01/2014 BT #1118
-                            If myISEOffErrorFixed Then
-                                myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.ISE_OFF_ERR)
-                            End If
-                            'JV 08/01/2014 BT #1118
-
-                        End If
-
-                    End If
-                    index = index + 1
-                Next
-                wsAlarmsDS.AcceptChanges()
-
-                If wsAlarmsDS.twksWSAnalyzerAlarms.Rows.Count > 0 Then
-                    myGlobal = alarmsDelg.Save(dbConnection, wsAlarmsDS, alarmsDefintionTableDS) 'AG 24/07/2012 change Create for Save who inserts alarms with status TRUE and updates alarms with status FALSE
-                    ''TR 26/10/2011 
-                    If Not myGlobal.HasError AndAlso Not AnalyzerIsRingingAttribute Then
-                        myGlobal = SoundActivationByAlarm(dbConnection, methodHasToAddInstructionToQueueFlag)
-                    End If
-                    ''TR 26/10/2011 -END.
-                End If
-
-                'AG 14/03/2012
-                If analyzerFREEZEFlagAttribute Then
-                    'AG 05/06/2014 - #1657 - (except ISE_OFF_ERR that is always generated with status FALSE)
-                    If ((pAlarmIDList.Count = 1 AndAlso Not pAlarmIDList.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR)) OrElse pAlarmIDList.Count > 1) Then
-                        If String.Equals(analyzerFREEZEModeAttribute, "AUTO") Then
-                            'BUSINESS: 
-                            'Special code for FREEZE (AUTO) - once solved the cover alarms error check if there are any other freeze alarm o not
-                            'If not remove the attributes flags (freeze and freeze mode and also update the sensor FREERZE to 0)
-
-                            'NOTE: for call this method here the parameter can not be pAlarmIDList. Instead use the current alarms in analyzer attribute (myAlarmListAttribute)
-
-                            If Not ExistFreezeAlarms(dbConnection, myAlarmListAttribute) Then 'Freeze auto solved
-                                'Analyzer has recovered an operating status automatically by closing covers
-                                analyzerFREEZEFlagAttribute = False
-                                analyzerFREEZEModeAttribute = ""
-                                AnalyzerIsReadyAttribute = True 'Analyzer is ready
-                                UpdateSensorValuesAttribute(AnalyzerSensors.FREEZE, 0, True) 'Inform presentation the analyzer is ready
-
-                                'AG 14/05/2012 - if no instruction sent call ManagerAnalyzer. Else add instruction to queue 
-                                'myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STATE, True) 'Ask for status
-                                If methodHasToAddInstructionToQueueFlag = 0 Then
-                                    myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.STATE, True) 'Ask for status
-                                    methodHasToAddInstructionToQueueFlag = 1
-                                ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
-                                    ' XBC 21/05/2012 - to avoid send the same instruction more than 1 time
-                                    If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.STATE) Then
-                                        myInstructionsQueue.Add(AnalyzerManagerSwActionList.STATE)
-                                        myParamsQueue.Add("")
-                                    End If
-                                End If
-                                'AG 14/05/2012
-
-                            Else 'Exists freeze auto
-                                'Reset all processes flags
-                                Dim flags_dlg As New AnalyzerManagerFlagsDelegate
-                                myGlobal = flags_dlg.ResetFlags(dbConnection, AnalyzerIDAttribute)
-
-                                'Finally read and update our internal structures
-                                If Not myGlobal.HasError Then
-                                    InitializeAnalyzerFlags(dbConnection)
-                                End If
-
-                                'if standby ... activate ansinf (some processes as shutdown, nrotor, ise utilities deactivate it, if freezes
-                                'appears while sensors deactivated there is no other way to auto recover
-                                If Not myGlobal.HasError Then
-                                    If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
-                                        'AG 14/05/2012 - if no instruction sent call ManagerAnalyzer. Else add instruction to queue 
-                                        'myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STR)
-                                        'If Not myGlobal.HasError AndAlso ConnectedAttribute Then SetAnalyzerNotReady()
-                                        If methodHasToAddInstructionToQueueFlag = 0 Then
-                                            myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.INFO, True, Nothing, Ax00InfoInstructionModes.STR)
-                                            methodHasToAddInstructionToQueueFlag = 1
-                                            'AG 04/04/2012 - When a process involve an instruction sending sequence automatic (for instance STANDBY (end) + WASH) change the AnalyzerIsReady value
-                                            If Not myGlobal.HasError AndAlso ConnectedAttribute Then SetAnalyzerNotReady()
-                                        ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
-                                            ' XBC 21/05/2012 - to avoid send the same instruction more than 1 time
-                                            If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.INFO) Then
-                                                myInstructionsQueue.Add(AnalyzerManagerSwActionList.INFO)
-                                                'AG 10/12/2012 - Do not use ToString here because Sw will send INFO;Q:STR; instead of INFO;Q:3;
-                                                'myParamsQueue.Add(GlobalEnumerates.Ax00InfoInstructionModes.STR.ToString)
-                                                myParamsQueue.Add(CInt(Ax00InfoInstructionModes.STR))
-                                            End If
-                                        End If
-                                        'AG 14/05/2012
-                                    End If
-                                End If
-                            End If
-
-                        ElseIf Not String.Equals(analyzerFREEZEModeAttribute, "PARTIAL") Then
-                            'Remove all flags ... recover is required
-                            Dim flags_dlg As New AnalyzerManagerFlagsDelegate
-                            myGlobal = flags_dlg.ResetFlags(dbConnection, AnalyzerIDAttribute)
-                        End If
-
-                    End If
-                End If
-                'AG 14/03/2012
-
-                alarmsWithOKTypeFalse = Nothing
-
-                'If (Not myGlobal.HasError) Then
-                '    'When the Database Connection was opened locally, then the Commit is executed
-                '    If (pdbConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-                'Else
-                '    'When the Database Connection was opened locally, then the Rollback is executed
-                '    If (pdbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-                'End If
-                '    End If
-                'End If
-
-            Catch ex As Exception
-                myGlobal.HasError = True
-                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString()
-                myGlobal.ErrorMessage = ex.Message
-
-                'Dim myLogAcciones As New ApplicationLogManager()
-                'GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ManageAlarms", EventLogEntryType.Error, False)
-                GlobalBase.CreateLogActivity(ex)
-
-                'Finally
-                '    If (pdbConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-
-            Return myGlobal
-        End Function
-
-
-        ''' <summary>
-        ''' Activate the Analyzer Alarm Sound if prosuce alarm require sound.
-        ''' The analyzer alarm sound must be activate on Analyzer configuration.
-        ''' </summary>
-        ''' <param name="pdbConnection"></param>
-        ''' <param name="pSomeInstructionAlreadySent" ></param>
-        ''' <returns></returns>
-        ''' <remarks>CREATED BY: TR 27/10/2011
-        ''' AG 14/05/2012 - add byRef parameter psomeinstructionAlreadySent. When 0 send Sound instruction, else add to queue</remarks>
-        Private Function SoundActivationByAlarm(ByVal pdbConnection As SqlConnection, ByRef pSomeInstructionAlreadySent As Integer) As GlobalDataTO
-            Dim myGlobalDataTO As New GlobalDataTO
-            Dim dbConnection As New SqlConnection
-            Try
-                myGlobalDataTO = DAOBase.GetOpenDBConnection(pdbConnection)
-                If (Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlConnection)
-
-                    If (Not dbConnection Is Nothing) Then
-                        'TR 26/10/2011 
-
-                        'if alarm sound is configured an analyzer is not currently ringing then search inside 
-                        'the new alarms if any requires sound.
-                        If Not AnalyzerIsRingingAttribute Then
-                            'Validate if Analyzer Alarm sound is enable.
-                            myGlobalDataTO = IsAlarmSoundDisable(dbConnection)
-                            If Not myGlobalDataTO.HasError Then
-                                'Alarm sound is enable
-                                If Not DirectCast(myGlobalDataTO.SetDatos, Boolean) Then
-                                    'Validate if Analyzer status is Freeze
-                                    Dim sendSoundInstruction As Boolean = False
-
-                                    Dim myAlarmList As New List(Of AlarmsDS.tfmwAlarmsRow)
-                                    'Get the new active alarm, Linq over RecivedAlarms
-                                    For Each myAlarmRow As UIRefreshDS.ReceivedAlarmsRow In myUI_RefreshDS.ReceivedAlarms.Where(Function(a) a.AlarmStatus)
-                                        myAlarmList = (From a In alarmsDefintionTableDS.tfmwAlarms Where String.Equals(a.AlarmID, myAlarmRow.AlarmID) Select a).ToList()
-                                        If myAlarmList.Count = 1 Then
-                                            If AnalyzerStatus = AnalyzerManagerStatus.RUNNING AndAlso myAlarmList.First().OnRunningSound Then
-                                                sendSoundInstruction = True
-                                                Exit For
-                                            ElseIf myAlarmList.First().Sound Then
-                                                sendSoundInstruction = True
-                                                Exit For
-                                            End If
-                                        End If
-                                    Next
-
-                                    If sendSoundInstruction Then
-                                        'AG 14/05/2012
-                                        'myGlobalDataTO = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.SOUND, True)
-                                        If pSomeInstructionAlreadySent = 0 Then
-                                            ' XBC 21/05/2012 - to avoid send SOUND more than 1 time
-                                            'myGlobalDataTO = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.SOUND, True)
-                                            'pSomeInstructionAlreadySent = 1
-                                            'If myInstructionsQueue.Count > 0 and 
-                                            If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.SOUND) Then
-                                                myGlobalDataTO = ManageAnalyzer(AnalyzerManagerSwActionList.SOUND, True)
-                                                pSomeInstructionAlreadySent = 1
-                                            End If
-                                            ' XBC 21/05/2012
-                                        Else
-                                            myInstructionsQueue.Add(AnalyzerManagerSwActionList.SOUND)
-                                            myParamsQueue.Add("")
-                                        End If
-                                        'AG 14/05/2012
-                                    End If
-                                    myAlarmList = Nothing 'AG 02/08/2012 - free memory
-                                End If
-                            End If
-                        End If
-                        'TR 26/10/2011 -END.
-                    End If
-                End If
-            Catch ex As Exception
-                myGlobalDataTO.HasError = True
-                myGlobalDataTO.ErrorCode = Messages.SYSTEM_ERROR.ToString
-                myGlobalDataTO.ErrorMessage = ex.Message
-
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SoundActivation", EventLogEntryType.Error, False)
-            Finally
-                If (pdbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-
-            Return myGlobalDataTO
-
-        End Function
-
-
         ''' <summary>
         ''' Indicate if the Alarm Sound is enable on the Analyzer configuration.
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>CREATE BY: TR 27/10/2011</remarks>
-        Private Function IsAlarmSoundDisable(ByVal pdbConnection As SqlConnection) As GlobalDataTO
+        Public Function IsAlarmSoundDisable(ByVal pdbConnection As SqlConnection) As GlobalDataTO Implements IAnalyzerManager.IsAlarmSoundDisable
 
-            Dim myGlobalDataTO As New GlobalDataTO
+            Dim myGlobalDataTo As New GlobalDataTO
             Dim dbConnection As New SqlConnection
             Try
-                myGlobalDataTO = DAOBase.GetOpenDBTransaction(pdbConnection)
-                If (Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlConnection)
+                myGlobalDataTo = GetOpenDBTransaction(pdbConnection)
+                If (Not myGlobalDataTo.HasError And Not myGlobalDataTo.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTo.SetDatos, SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then
                         'Search on tcfgAnalyzerSettings where setting id = ALARM_DISABLED
                         Dim myAnalyzerSettingDelegate As New AnalyzerSettingsDelegate
-                        Dim myAnalyzerSettingsDS As New AnalyzerSettingsDS
-                        myGlobalDataTO = myAnalyzerSettingDelegate.GetAnalyzerSetting(pdbConnection, Me.AnalyzerIDAttribute, AnalyzerSettingsEnum.ALARM_DISABLED.ToString())
+                        myGlobalDataTo = myAnalyzerSettingDelegate.GetAnalyzerSetting(pdbConnection, AnalyzerIDAttribute, AnalyzerSettingsEnum.ALARM_DISABLED.ToString())
 
-                        If Not myGlobalDataTO.HasError Then
-                            myAnalyzerSettingsDS = DirectCast(myGlobalDataTO.SetDatos, AnalyzerSettingsDS)
+                        If Not myGlobalDataTo.HasError Then
+                            Dim myAnalyzerSettingsDS As AnalyzerSettingsDS = DirectCast(myGlobalDataTo.SetDatos, AnalyzerSettingsDS)
                             If (myAnalyzerSettingsDS.tcfgAnalyzerSettings.Rows.Count = 1) Then
-                                myGlobalDataTO.SetDatos = CType(myAnalyzerSettingsDS.tcfgAnalyzerSettings.First.CurrentValue, Boolean)
+                                myGlobalDataTo.SetDatos = CType(myAnalyzerSettingsDS.tcfgAnalyzerSettings.First.CurrentValue, Boolean)
                             End If
                         End If
                     End If
                 End If
 
             Catch ex As Exception
-                myGlobalDataTO.HasError = True
-                myGlobalDataTO.ErrorCode = Messages.SYSTEM_ERROR.ToString
-                myGlobalDataTO.ErrorMessage = ex.Message
+                myGlobalDataTo.HasError = True
+                myGlobalDataTo.ErrorCode = Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTo.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.IsAlarmSoundEnable", EventLogEntryType.Error, False)
 
             Finally
                 If (pdbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
 
-            Return myGlobalDataTO
+            Return myGlobalDataTo
 
         End Function
 
@@ -1287,65 +74,30 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Created by XBC 23/05/2011
         ''' Modified by XBC 16/10/2012 - Add pErrorCodeList functionality to manage Firmware Alarms into Service Software
         ''' </remarks>
-        Private Function ManageAlarms_SRV(ByVal pdbConnection As SqlConnection, _
+        Public Function ManageAlarms_SRV(ByVal pdbConnection As SqlConnection, _
                                           ByVal pAlarmIDList As List(Of Alarms), _
                                           ByVal pAlarmStatusList As List(Of Boolean), _
                                           Optional ByVal pErrorCodeList As List(Of String) = Nothing, _
-                                          Optional ByVal pAnswerErrorReception As Boolean = False) As GlobalDataTO
+                                          Optional ByVal pAnswerErrorReception As Boolean = False) As GlobalDataTO _
+                                      Implements IAnalyzerManager.ManageAlarms_SRV
             Dim myGlobal As New GlobalDataTO
             Dim dbConnection As New SqlConnection
 
             Try
 
-
-                ' XBC 16/10/2012 - Is used this code ?
-                'Dim index As Integer = 0
-                'For Each alarmItem As GlobalEnumerates.Alarms In pAlarmIDList
-                '    If alarmItem <> GlobalEnumerates.Alarms.NONE Then
-                '        If Not myAlarmListAttribute.Contains(alarmItem) Then
-                '            myAlarmListAttribute.Add(alarmItem)
-
-                '            'Generate UI_Refresh event ALARMS_RECEIVED
-                '            PrepareUIRefreshEvent(Nothing, GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, alarmItem.ToString, True)
-
-                '            'SGM 19/06/2012
-                '            Select Case alarmItem
-
-                '                'SGM 18/09/2012
-                '                Case GlobalEnumerates.Alarms.ISE_OFF_ERR
-                '                    If pAlarmStatusList(index) Then
-                '                        ISEAnalyzer.IsISESwitchON = False
-                '                        MyClass.RefreshISEAlarms()
-                '                    End If
-
-                '                Case GlobalEnumerates.Alarms.ISE_CONNECT_PDT_ERR
-                '                    If pAlarmStatusList(index) Then
-                '                        MyClass.RefreshISEAlarms()
-                '                    End If
-                '            End Select
-
-                '        End If
-                '    End If
-
-                '    index = index + 1
-                'Next
-                ' XBC 16/10/2012 
-
-                'Dim myLogAcciones2 As New ApplicationLogManager()
                 Dim myManageAlarmType As ManagementAlarmTypes = ManagementAlarmTypes.OMMIT_ERROR
 
                 If Not pErrorCodeList Is Nothing Then
                     If pErrorCodeList.Count > 0 Then
 
-                        ' XBC 07/11/2012
                         SolveErrorCodesToDisplay(pErrorCodeList)
 
                         Dim myAlarmsDelegate As New AlarmsDelegate
                         ' Get Management priotity of each error
                         Dim myManageAlarmTypeTemp As ManagementAlarmTypes
-                        Dim AddErrCode As Boolean = False
-                        Dim InformAlarm As Boolean = False
-                        Dim AlarmID As String = ""
+                        Dim addErrCode As Boolean
+                        Dim informAlarm As Boolean = False
+                        Dim alarmId As String = ""
 
                         For i As Integer = 0 To pErrorCodeList.Count - 1
 
@@ -1356,81 +108,78 @@ Namespace Biosystems.Ax00.Core.Entities
                                 Exit Try
                             End If
 
-                            AlarmID = pAlarmIDList(i).ToString
+                            alarmId = pAlarmIDList(i).ToString
 
                             myGlobal = myAlarmsDelegate.ReadManagementAlarm(Nothing, pErrorCodeList(i))
                             If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
-                                Dim myErrorCodesDS As AlarmErrorCodesDS
-                                myErrorCodesDS = CType(myGlobal.SetDatos, AlarmErrorCodesDS)
-                                If myErrorCodesDS.tfmwAlarmErrorCodes.Count > 0 Then
+                                Dim myErrorCodesDs As AlarmErrorCodesDS
+                                myErrorCodesDs = CType(myGlobal.SetDatos, AlarmErrorCodesDS)
+                                If myErrorCodesDs.tfmwAlarmErrorCodes.Count > 0 Then
 
-                                    ' XBC 07/11/2012
-                                    AddErrorCodesToDisplay(myErrorCodesDS)
+                                    AddErrorCodesToDisplay(myErrorCodesDs)
 
-                                    Select Case myErrorCodesDS.tfmwAlarmErrorCodes(0).ManagementID
+                                    Select Case myErrorCodesDs.tfmwAlarmErrorCodes(0).ManagementID
                                         Case "1_UPDATE_FW"
                                             myManageAlarmTypeTemp = ManagementAlarmTypes.UPDATE_FW
-                                            AddErrCode = True
-                                            InformAlarm = True
+                                            addErrCode = True
+                                            informAlarm = True
 
                                         Case "2_FATAL_ERROR"
                                             myManageAlarmTypeTemp = ManagementAlarmTypes.FATAL_ERROR
-                                            AddErrCode = True
-                                            InformAlarm = True
+                                            addErrCode = True
+                                            informAlarm = True
 
                                         Case "3_RECOVER_ERROR"
-                                            MyClass.ManageAnalyzer(AnalyzerManagerSwActionList.INFO, True, Nothing, Ax00InfoInstructionModes.STP) 'SGM 19/11/2012
-                                            If (AlarmID = GlobalEnumerates.Alarms.INST_ABORTED_ERR.ToString Or AlarmID = GlobalEnumerates.Alarms.RECOVER_ERR.ToString) _
+                                            ManageAnalyzer(AnalyzerManagerSwActionList.INFO, True, Nothing, Ax00InfoInstructionModes.STP) 'SGM 19/11/2012
+                                            If (alarmId = AlarmEnumerates.Alarms.INST_ABORTED_ERR.ToString Or alarmId = AlarmEnumerates.Alarms.RECOVER_ERR.ToString) _
                                                AndAlso Not pAnswerErrorReception Then
                                                 myManageAlarmTypeTemp = ManagementAlarmTypes.REQUEST_INFO
-                                                AddErrCode = False
-                                                InformAlarm = False
-                                                MyClass.IsInstructionAborted = (AlarmID = GlobalEnumerates.Alarms.INST_ABORTED_ERR.ToString)
+                                                addErrCode = False
+                                                informAlarm = False
+                                                IsInstructionAborted = (alarmId = AlarmEnumerates.Alarms.INST_ABORTED_ERR.ToString)
                                                 GlobalBase.CreateLogActivity("Alarm error codes received [" & pErrorCodeList(i) & "] - Priority Management : " & myManageAlarmTypeTemp.ToString, "AnalyzerManager.ManageAlarms_SRV", EventLogEntryType.Information, False)
                                             Else
                                                 myManageAlarmTypeTemp = ManagementAlarmTypes.RECOVER_ERROR
-                                                AddErrCode = True
-                                                InformAlarm = True
+                                                addErrCode = True
+                                                informAlarm = True
                                             End If
 
                                         Case "4_SIMPLE_ERROR"
                                             myManageAlarmTypeTemp = ManagementAlarmTypes.SIMPLE_ERROR
-                                            AddErrCode = True
-                                            If AlarmID = GlobalEnumerates.Alarms.REACT_MISSING_ERR.ToString Then 'SGM 07/11/2012 - reactions rotor
-                                                If Not MyClass.IsServiceRotorMissingInformed Then
-                                                    InformAlarm = True
+                                            addErrCode = True
+                                            If alarmId = AlarmEnumerates.Alarms.REACT_MISSING_ERR.ToString Then 'SGM 07/11/2012 - reactions rotor
+                                                If Not IsServiceRotorMissingInformed Then
+                                                    informAlarm = True
                                                 End If
                                             Else
-                                                InformAlarm = InformAlarm Or (MyClass.IsInstructionRejected Or MyClass.IsRecoverFailed) 'SGM 29/10/2012 - manage only in case of origin of Error 20 - INST_REJECTED_WARN
+                                                informAlarm = informAlarm Or (IsInstructionRejected Or IsRecoverFailed) 'SGM 29/10/2012 - manage only in case of origin of Error 20 - INST_REJECTED_WARN
                                             End If
 
 
                                         Case "5_REQUEST_INFO"
                                             'SGM 29/10/2012 - reset flag that indicates E:20 received (Instruction Rejected)
-                                            MyClass.IsInstructionRejected = (AlarmID = GlobalEnumerates.Alarms.INST_REJECTED_ERR.ToString)
+                                            IsInstructionRejected = (alarmId = AlarmEnumerates.Alarms.INST_REJECTED_ERR.ToString)
 
                                             'SGM 07/11/2012 - reset flag that indicates E:22 received (Recover failed)
-                                            MyClass.IsRecoverFailed = (AlarmID = GlobalEnumerates.Alarms.RECOVER_ERR.ToString)
+                                            IsRecoverFailed = (alarmId = AlarmEnumerates.Alarms.RECOVER_ERR.ToString)
 
                                             myManageAlarmTypeTemp = ManagementAlarmTypes.REQUEST_INFO
-                                            AddErrCode = False
-                                            InformAlarm = False
+                                            addErrCode = False
+                                            informAlarm = False
                                             GlobalBase.CreateLogActivity("Alarm error codes received [" & pErrorCodeList(i) & "] - Priority Management : " & myManageAlarmTypeTemp.ToString, "AnalyzerManager.ManageAlarms_SRV", EventLogEntryType.Information, False)
 
                                         Case "6_OMMIT_ERROR"
                                             myManageAlarmTypeTemp = ManagementAlarmTypes.OMMIT_ERROR
-                                            AddErrCode = False
-                                            'InformAlarm = False
+                                            addErrCode = False
                                             GlobalBase.CreateLogActivity("Alarm error codes received [" & pErrorCodeList(i) & "] - Priority Management : " & myManageAlarmTypeTemp.ToString, "AnalyzerManager.ManageAlarms_SRV", EventLogEntryType.Information, False)
 
                                         Case Else
                                             myManageAlarmTypeTemp = ManagementAlarmTypes.NONE
-                                            AddErrCode = False
-                                            'InformAlarm = False
+                                            addErrCode = False
 
                                     End Select
 
-                                    If AddErrCode Then
+                                    If addErrCode Then
                                         ' Add New Error Codes received
                                         If Not myErrorCodesAttribute.Contains(pErrorCodeList(i)) Then
                                             myErrorCodesAttribute.Add(pErrorCodeList(i))
@@ -1454,9 +203,9 @@ Namespace Biosystems.Ax00.Core.Entities
                             End If
                         Next
 
-                        If Not myGlobal.HasError And InformAlarm Then
+                        If Not myGlobal.HasError And informAlarm Then
                             ' Update Alarm sensors to inform to Presentation layer what kind of management is need to display
-                            PrepareUIRefreshEvent(Nothing, UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, AlarmID, True)
+                            PrepareUIRefreshEvent(Nothing, UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, alarmId, True)
                             UpdateSensorValuesAttribute(AnalyzerSensors.SRV_MANAGEMENT_ALARM_TYPE, myManageAlarmType, True)
                             IsServiceAlarmInformedAttr = True
                         End If
@@ -1468,23 +217,21 @@ Namespace Biosystems.Ax00.Core.Entities
                     If Not IsServiceAlarmInformedAttr Then
                         For Each alarmItem As Alarms In pAlarmIDList
                             Select Case alarmItem
-                                Case GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR, GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR
+                                Case AlarmEnumerates.Alarms.WATER_DEPOSIT_ERR, AlarmEnumerates.Alarms.WASTE_DEPOSIT_ERR
 
-                                    ' XBC 07/11/2012
                                     Dim myErrorCodesDS As New AlarmErrorCodesDS
                                     Dim myErrorCodesRow As AlarmErrorCodesDS.tfmwAlarmErrorCodesRow
                                     myErrorCodesRow = myErrorCodesDS.tfmwAlarmErrorCodes.NewtfmwAlarmErrorCodesRow
                                     myErrorCodesRow.AlarmID = alarmItem.ToString
                                     myErrorCodesRow.ErrorCode = -1
                                     myErrorCodesRow.ManagementID = ManagementAlarmTypes.SIMPLE_ERROR.ToString
-                                    If alarmItem = GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR Then
+                                    If alarmItem = AlarmEnumerates.Alarms.WATER_DEPOSIT_ERR Then
                                         myErrorCodesRow.ResourceID = "ALM_WATER_DEPOSIT_ERR"
                                     Else
                                         myErrorCodesRow.ResourceID = "ALM_WASTE_DEPOSIT_ERR"
                                     End If
                                     myErrorCodesDS.tfmwAlarmErrorCodes.Rows.Add(myErrorCodesRow)
                                     AddErrorCodesToDisplay(myErrorCodesDS)
-                                    ' XBC 07/11/2012
 
                                     ' Update Alarm sensors to inform to Presentation layer what kind of management is need to display
                                     PrepareUIRefreshEvent(Nothing, UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, alarmItem.ToString, True)
@@ -1505,7 +252,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ManageAlarms_SRV", EventLogEntryType.Error, False)
 
             Finally
@@ -1544,11 +290,11 @@ Namespace Biosystems.Ax00.Core.Entities
         '''              XB 06/11/2014 - Add new COMMS Timeour Alarm - BA-1872
         '''              AG 04/12/2014 BA-2236 add new optional parameters ErrorCode and pErrorCodesList
         ''' </remarks>
-        Private Sub PrepareLocalAlarmList(ByVal pAlarmCode As Alarms, ByVal pAlarmStatus As Boolean, _
+        Public Sub PrepareLocalAlarmList(ByVal pAlarmCode As Alarms, ByVal pAlarmStatus As Boolean, _
                                           ByRef pAlarmList As List(Of Alarms), ByRef pAlarmStatusList As List(Of Boolean), _
                                           Optional ByVal pAddInfo As String = "", _
                                           Optional ByRef pAdditionalInfoList As List(Of String) = Nothing, _
-                                          Optional ByVal pAddAlwaysFlag As Boolean = False)
+                                          Optional ByVal pAddAlwaysFlag As Boolean = False) Implements IAnalyzerManager.PrepareLocalAlarmList
             'NOTE: Do not use Try/Catch: the caller method implements it
 
             If (pAlarmStatus) Then
@@ -1556,148 +302,93 @@ Namespace Biosystems.Ax00.Core.Entities
                 '''''''''''''
                 Dim addFlag As Boolean = True 'By default add all new alarms
 
-                'Exception Nr.1: if exists Reactions rotor thermo error/nok do not add reaction rotor thermo warning!!
-                If pAlarmCode = GlobalEnumerates.Alarms.REACT_TEMP_WARN Then
-                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.REACT_TEMP_ERR) Then addFlag = False
+                Select Case pAlarmCode
+                    Case AlarmEnumerates.Alarms.REACT_TEMP_WARN 'Exception Nr.1: if exists Reactions rotor thermo error/nok do not add reaction rotor thermo warning!!
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.REACT_TEMP_ERR) Then addFlag = False
 
-                    'DL 31/07/2012. Begin
-                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.REACT_TEMP_SYS_ERR) Then addFlag = False
-                    'If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.REACT_TEMP_SYS1_ERR) Then addFlag = False
-                    'If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.REACT_TEMP_SYS2_ERR) Then addFlag = False
-                    'DL 31/07/2012. End
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.REACT_TEMP_SYS_ERR) Then addFlag = False
+                    Case AlarmEnumerates.Alarms.REACT_TEMP_ERR
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.REACT_TEMP_SYS_ERR) Then addFlag = False
 
-                ElseIf pAlarmCode = GlobalEnumerates.Alarms.REACT_TEMP_ERR Then
-                    'DL 31/07/2012. Begin
-                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.REACT_TEMP_SYS_ERR) Then addFlag = False
-                    'If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.REACT_TEMP_SYS1_ERR) Then addFlag = False
-                    'If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.REACT_TEMP_SYS2_ERR) Then addFlag = False
-                    'DL 31/07/2012. End
+                    Case AlarmEnumerates.Alarms.FRIDGE_TEMP_WARN 'Exception Nr.2: if exists Fridge thermo error/nok do not add fridge thermo warning!!
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.FRIDGE_TEMP_ERR) Then addFlag = False
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.FRIDGE_TEMP_SYS_ERR) Then addFlag = False
 
-                    'Exception Nr.2: if exists Fridge thermo error/nok do not add fridge thermo warning!!
-                ElseIf pAlarmCode = GlobalEnumerates.Alarms.FRIDGE_TEMP_WARN Then
-                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.FRIDGE_TEMP_ERR) Then addFlag = False
-                    'DL 31/07/2012. Begin
-                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS_ERR) Then addFlag = False
-                    'If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS1_ERR) Then addFlag = False
-                    'If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS2_ERR) Then addFlag = False
-                    'DL 31/07/2012. End
+                    Case AlarmEnumerates.Alarms.FRIDGE_TEMP_ERR
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.FRIDGE_TEMP_SYS_ERR) Then addFlag = False
 
-                ElseIf pAlarmCode = GlobalEnumerates.Alarms.FRIDGE_TEMP_ERR Then
-                    'DL 31/07/2012. Begin
-                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS_ERR) Then addFlag = False
-                    'If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS1_ERR) Then addFlag = False
-                    'If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS2_ERR) Then addFlag = False
-                    'DL 31/07/2012. End
+                    Case AlarmEnumerates.Alarms.HIGH_CONTAMIN_WARN 'Exception Nr.3: if exists High contamination deposit error do not add high contamination deposit warning!!
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.HIGH_CONTAMIN_ERR) Then addFlag = False
 
-                    'Exception Nr.3: if exists High contamination deposit error do not add high contamination deposit warning!!
-                ElseIf pAlarmCode = GlobalEnumerates.Alarms.HIGH_CONTAMIN_WARN Then
-                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.HIGH_CONTAMIN_ERR) Then addFlag = False
+                    Case AlarmEnumerates.Alarms.WASH_CONTAINER_WARN 'Exception Nr.4: if exists Wash solution deposit error do not add Wash solution deposit warning!!
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.WASH_CONTAINER_ERR) Then addFlag = False
 
-                    'Exception Nr.4: if exists Wash solution deposit error do not add Wash solution deposit warning!!
-                ElseIf pAlarmCode = GlobalEnumerates.Alarms.WASH_CONTAINER_WARN Then
-                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_ERR) Then addFlag = False
+                    Case AlarmEnumerates.Alarms.R1_TEMP_WARN 'Exception Nr.5: if exists R1 thermo system error do not add R1 thermo warning!!
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.R1_TEMP_SYSTEM_ERR) Then addFlag = False
 
-                    'Exception Nr.5: if exists R1 thermo system error do not add R1 thermo warning!!
-                ElseIf pAlarmCode = GlobalEnumerates.Alarms.R1_TEMP_WARN Then
-                    'DL 31/07/2012. Begin
-                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.R1_TEMP_SYSTEM_ERR) Then addFlag = False
-                    'If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.R1_TEMP_SYS1_ERR) Then addFlag = False
-                    'If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.R1_TEMP_SYS2_ERR) Then addFlag = False
-                    'DL 31/07/2012. end
+                    Case AlarmEnumerates.Alarms.R2_TEMP_WARN 'Exception Nr.6: if exists R2 thermo system error do not add R2 thermo warning!!
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.R2_TEMP_SYSTEM_ERR) Then addFlag = False
 
-                    'Exception Nr.6: if exists R2 thermo system error do not add R2 thermo warning!!
-                ElseIf pAlarmCode = GlobalEnumerates.Alarms.R2_TEMP_WARN Then
-                    'DL 31/07/2012. Begin
-                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.R2_TEMP_SYSTEM_ERR) Then addFlag = False
-                    'If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.R2_TEMP_SYS1_ERR) Then addFlag = False
-                    'If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.R2_TEMP_SYS2_ERR) Then addFlag = False
-                    'DL 31/07/2012. end
-                    'Exception Nr.7: if exists Washing station system error do not add washing station thermo warning!!
-                ElseIf pAlarmCode = GlobalEnumerates.Alarms.WS_TEMP_WARN Then
-                    'DL 31/07/2012. Begin
-                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WS_TEMP_SYSTEM_ERR) Then addFlag = False
-                    'If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WS_TEMP_SYS1_ERR) Then addFlag = False
-                    'If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WS_TEMP_SYS2_ERR) Then addFlag = False
-                    'DL 31/07/2012. End
+                    Case AlarmEnumerates.Alarms.WS_TEMP_WARN 'Exception Nr.7: if exists Washing station system error do not add washing station thermo warning!!
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.WS_TEMP_SYSTEM_ERR) Then addFlag = False
 
-                    'Exception Nr.8: if exists Water deposit system error do not add water deposit error (calculated by Sw)!!
-                ElseIf pAlarmCode = GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR Then
-                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WATER_SYSTEM_ERR) Then addFlag = False
+                    Case AlarmEnumerates.Alarms.WATER_DEPOSIT_ERR 'Exception Nr.8: if exists Water deposit system error do not add water deposit error (calculated by Sw)!!
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.WATER_SYSTEM_ERR) Then addFlag = False
 
-                    'Exception Nr.8: if exists Waste deposit system error do not add waste deposit error (calculated by Sw)!!
-                ElseIf pAlarmCode = GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR Then
-                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WASTE_SYSTEM_ERR) Then addFlag = False
+                    Case AlarmEnumerates.Alarms.WASTE_DEPOSIT_ERR 'Exception Nr.8: if exists Waste deposit system error do not add waste deposit error (calculated by Sw)!!
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.WASTE_SYSTEM_ERR) Then addFlag = False
 
-                    'Exception Nr.9: if exists ISE system error do not add ise status off !!
-                ElseIf pAlarmCode = GlobalEnumerates.Alarms.ISE_OFF_ERR Then
-                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR) Then addFlag = False
+                    Case AlarmEnumerates.Alarms.ISE_OFF_ERR 'Exception Nr.9: if exists ISE system error do not add ise status off !!
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.ISE_OFF_ERR) Then addFlag = False
 
-                    'Exception Nr.10: if exists main cover error do not add main cover warn!! 'AG 15/03/2012
-                ElseIf pAlarmCode = GlobalEnumerates.Alarms.MAIN_COVER_WARN Then
-                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.MAIN_COVER_ERR) Then addFlag = False
+                    Case AlarmEnumerates.Alarms.MAIN_COVER_WARN 'Exception Nr.10: if exists main cover error do not add main cover warn!! 'AG 15/03/2012
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.MAIN_COVER_ERR) Then addFlag = False
 
-                    'Exception Nr.11: if exists fridge cover error do not add fridge cover warn!! 'AG 15/03/2012
-                ElseIf pAlarmCode = GlobalEnumerates.Alarms.FRIDGE_COVER_WARN Then
-                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.FRIDGE_COVER_ERR) Then addFlag = False
+                    Case AlarmEnumerates.Alarms.FRIDGE_COVER_WARN 'Exception Nr.11: if exists fridge cover error do not add fridge cover warn!! 'AG 15/03/2012
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.FRIDGE_COVER_ERR) Then addFlag = False
 
-                    'Exception Nr.12: if exists samples cover error do not add samples cover warn!! 'AG 15/03/2012
-                ElseIf pAlarmCode = GlobalEnumerates.Alarms.S_COVER_WARN Then
-                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.S_COVER_ERR) Then addFlag = False
+                    Case AlarmEnumerates.Alarms.S_COVER_WARN 'Exception Nr.12: if exists samples cover error do not add samples cover warn!! 'AG 15/03/2012
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.S_COVER_ERR) Then addFlag = False
 
-                    'Exception Nr.13: if exists reactions cover error do not add reactions cover warn!! 'AG 15/03/2012
-                ElseIf pAlarmCode = GlobalEnumerates.Alarms.REACT_COVER_WARN Then
-                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.REACT_COVER_ERR) Then addFlag = False
+                    Case AlarmEnumerates.Alarms.REACT_COVER_WARN 'Exception Nr.13: if exists reactions cover error do not add reactions cover warn!! 'AG 15/03/2012
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.REACT_COVER_ERR) Then addFlag = False
 
-                    'Exception Nr.14: if exists base line error do not add BASE LINE WELL warn (baseline warn)!! 'AG 26/04/2012
-                ElseIf pAlarmCode = GlobalEnumerates.Alarms.BASELINE_WELL_WARN Then
-                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.BASELINE_INIT_ERR) Then addFlag = False
+                    Case AlarmEnumerates.Alarms.BASELINE_WELL_WARN 'Exception Nr.14: if exists base line error do not add BASE LINE WELL warn (baseline warn)!! 'AG 26/04/2012
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.BASELINE_INIT_ERR) Then addFlag = False
 
-                    'AG 07/09/2012 - In running if the Base line init error appears remove the METHACRYL_ROTOR_WARN alarm if exists
-                ElseIf AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING AndAlso pAlarmCode = GlobalEnumerates.Alarms.BASELINE_INIT_ERR Then
-                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.BASELINE_WELL_WARN) Then
-                        myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.BASELINE_WELL_WARN)
-                    End If
-                    'if exists ISE timeout or  ise status off do not add it again !!   ' XB 03/11/2014 - BA-1872
-                ElseIf pAlarmCode = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR Then
-                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR) Or myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR) Then addFlag = False
-                    'if exists COMMS timeout do not add it again !!   ' XB 06/11/2014 - BA-1872
-                ElseIf pAlarmCode = GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR Then
-                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR) Then addFlag = False
-                End If
+                    Case AlarmEnumerates.Alarms.BASELINE_INIT_ERR 'AG 07/09/2012 - In running if the Base line init error appears remove the METHACRYL_ROTOR_WARN alarm if exists
+                        If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING AndAlso myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.BASELINE_WELL_WARN) Then
+                            myAlarmListAttribute.Remove(AlarmEnumerates.Alarms.BASELINE_WELL_WARN)
+                        End If
 
+                    Case AlarmEnumerates.Alarms.ISE_TIMEOUT_ERR 'if exists ISE timeout or  ise status off do not add it again !!   ' XB 03/11/2014 - BA-1872
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.ISE_OFF_ERR) Or myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.ISE_TIMEOUT_ERR) Then addFlag = False
+
+                    Case AlarmEnumerates.Alarms.COMMS_TIMEOUT_ERR 'if exists COMMS timeout do not add it again !!   ' XB 06/11/2014 - BA-1872
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.COMMS_TIMEOUT_ERR) Then addFlag = False
+
+                    Case AlarmEnumerates.Alarms.GLF_BOARD_FBLD_ERR
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.GLF_BOARD_FBLD_ERR) Or Not CanManageRetryAlarm Then
+                            addFlag = CanManageRetryAlarm
+                        End If
+                End Select
                 'AG 10/02/2012 - While start instrument is inprocess only generate the alarms that affect the process
-                Dim warmUpInProcess As Boolean = False
-                If (String.Equals(mySessionFlags(AnalyzerManagerFlags.WUPprocess.ToString), "INPROCESS") OrElse _
-                    String.Equals(mySessionFlags(AnalyzerManagerFlags.WUPprocess.ToString), "PAUSED")) Then
-                    warmUpInProcess = True
-                End If
+                Dim warmUpInProcess = String.Equals(mySessionFlags(AnalyzerManagerFlags.WUPprocess.ToString), "INPROCESS") OrElse _
+                                      String.Equals(mySessionFlags(AnalyzerManagerFlags.WUPprocess.ToString), "PAUSED")
 
                 'AG 13/04/2012 - when warm up is in process check if the alarm must be generated or not
                 If warmUpInProcess AndAlso Not pAddAlwaysFlag Then
                     'If warmUpInProcess Then
-                    'AG 13/04/2012
-
                     addFlag = False 'By default no alarms generation
 
                     'Only those alarms affecting the start instrument process 
-                    'AG 20/02/2012 - we can NOT use the method 'ExistBottleAlarms' because the alarm still has not been created
-                    'AG 24/02/2012 - the baseline error alarm can also appear in wup process
-                    'XBC 27/03/2012 - add ISE Management Alarms
-                    'SGM 27/07/2012 - add ISE independent errors alarma (ERC)
                     If Not IgnoreAlarmWhileWarmUp(pAlarmCode) Then
                         addFlag = True
                     End If
                 End If
-                'AG 10/02/2012
 
                 'AG 18/05/2012 - While shutdown instrument is inprocess only generate the alarms that affect the process
-                Dim sDownInProcess As Boolean = False
-                ' AG+XBC 24/05/2012 - no for status PAUSED for SDown Process
-                'If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess.ToString) = "INPROCESS" OrElse _
-                '    mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess.ToString) = "PAUSED") Then
-                If (mySessionFlags(AnalyzerManagerFlags.SDOWNprocess.ToString) = "INPROCESS") Then
-                    sDownInProcess = True
-                End If
+                Dim sDownInProcess = String.Equals(mySessionFlags(AnalyzerManagerFlags.SDOWNprocess.ToString), "INPROCESS")
 
                 If sDownInProcess AndAlso Not pAddAlwaysFlag Then
                     addFlag = False 'By default no alarms generation
@@ -1710,12 +401,12 @@ Namespace Biosystems.Ax00.Core.Entities
                 'AG 28/02/2012 - rare case: sw shows message no comms but communications exists and sw continues receiving instructions (for example ANSINF)
                 'When no comms Sw clears all alarms 
                 'When Sw receives instructions (for instance ANSINF) the alarms will we generated and insert into database again and again every 2 seconds
-                If addFlag AndAlso myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.COMMS_ERR) Then
+                If addFlag AndAlso myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.COMMS_ERR) Then
                     'Software business alarms
 
                     ' XBC 23/03/2012
-                    'If pAlarmCode <> GlobalEnumerates.Alarms.BASELINE_INIT_ERR AndAlso pAlarmCode <> GlobalEnumerates.Alarms.METHACRYL_ROTOR_WARN _
-                    'AndAlso pAlarmCode <> GlobalEnumerates.Alarms.REPORTSATLOADED_WARN Then
+                    'If pAlarmCode <> AlarmEnumerates.Alarms.BASELINE_INIT_ERR AndAlso pAlarmCode <> AlarmEnumerates.Alarms.METHACRYL_ROTOR_WARN _
+                    'AndAlso pAlarmCode <> AlarmEnumerates.Alarms.REPORTSATLOADED_WARN Then
                     If Not IgnoreAlarmWhileCommError(pAlarmCode) Then
                         addFlag = True
                     End If
@@ -1724,63 +415,64 @@ Namespace Biosystems.Ax00.Core.Entities
                 'AG 28/02/2012
 
                 'Get the alarms defined with OKType = False (never are marked as solved)
-                Dim alarmsWithOKTypeFalse As List(Of String) = (From a As AlarmsDS.tfmwAlarmsRow In alarmsDefintionTableDS.tfmwAlarms _
+                Dim alarmsWithOkTypeFalse As List(Of String) = (From a As AlarmsDS.tfmwAlarmsRow In alarmsDefintionTableDS.tfmwAlarms _
                                                                Where a.OKType = False Select a.AlarmID).ToList
 
                 If (addFlag) Then
-                    'New alarm exists ... add to list with TRUE status only if alarm doesnt exists
-                    If Not myAlarmListAttribute.Contains(pAlarmCode) Then
-                        'AG 04/12/2014 BA-2236
+                    'New alarm exists ... add to the list with TRUE status but only if the AlarmID doesn't exist in it
+                    'BA-2384: call new function AddLocalActiveAlarmToList to add the new Alarm to the Alarms List
+                    If (Not myAlarmListAttribute.Contains(pAlarmCode)) Then
                         AddLocalActiveAlarmToList(pAlarmCode, pAlarmList, pAlarmStatusList, pAddInfo, pAdditionalInfoList)
-
-                        'AG 24/07/2012 - some alarms are never markt as solved. They can be duplicated in pAlarmList
-                    ElseIf alarmsWithOKTypeFalse.Contains(pAlarmCode.ToString) Then
-                        'AG 29/08/2012 - exception BASELINE_WELL_WARN (change reactions rotor recommend). It can appear several times in the same WS but the alarm is generated once
-                        If pAlarmCode <> GlobalEnumerates.Alarms.BASELINE_WELL_WARN Then
-                            'AG 04/12/2014 BA-2236
-                            AddLocalActiveAlarmToList(pAlarmCode, pAlarmList, pAlarmStatusList, pAddInfo, pAdditionalInfoList)
+                    Else
+                        'BA-2384: If the Alarm already exists but one or more FW Error Codes have been received for it, check if field AdditionalInfo needs to be
+                        '         updated (by adding new FW Error Codes) and in this case, execute the UPDATE
+                        If (Not String.IsNullOrEmpty(pAddInfo) AndAlso IsNumeric(pAddInfo.Replace(",", ""))) Then
+                            Dim myGlobal = UpdateAdditionalInfoField(Nothing, pAlarmCode.ToString, pAddInfo)
                         End If
 
-                        'AG 07/09/2012 - base line init can appear several times in Running, for these alarm repetitions a flag defines when stop WS
-                    ElseIf pAlarmCode = GlobalEnumerates.Alarms.BASELINE_INIT_ERR Then
-                        If wellBaseLineAutoPausesSession <> 0 Then
-                            'AG 04/12/2014 BA-2236
-                            AddLocalActiveAlarmToList(pAlarmCode, pAlarmList, pAlarmStatusList, pAddInfo, pAdditionalInfoList)
-                        End If
-                        'AG 07/09/2012
+                        If (alarmsWithOKTypeFalse.Contains(pAlarmCode.ToString)) Then
+                            'Exception: BASELINE_WELL_WARN (Change Reactions Rotor recommended). It can appear several times in the same WS but the alarm is generated just once
+                            If (pAlarmCode <> AlarmEnumerates.Alarms.BASELINE_WELL_WARN) Then
+                                AddLocalActiveAlarmToList(pAlarmCode, pAlarmList, pAlarmStatusList, pAddInfo, pAdditionalInfoList)
+                            End If
 
+                            'Base Line Init Error can appear several times in Running. For these Alarm repetitions, a flag defines when stop WS
+                        ElseIf (pAlarmCode = AlarmEnumerates.Alarms.BASELINE_INIT_ERR) Then
+                            If (wellBaseLineAutoPausesSession <> 0) Then
+                                AddLocalActiveAlarmToList(pAlarmCode, pAlarmList, pAlarmStatusList, pAddInfo, pAdditionalInfoList)
+                            End If
+                        End If
                     End If
                 End If
 
                 'AG 15/03/2012 - Special code for AUTOrecove FREEZE alarms - if error code appears add it, but if the warning level already exists then remove it
-                If pAlarmCode = GlobalEnumerates.Alarms.MAIN_COVER_ERR Then
-                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.MAIN_COVER_WARN) Then
-                        pAlarmList.Add(GlobalEnumerates.Alarms.MAIN_COVER_WARN) 'If cover error is added remove the warning level
-                        pAlarmStatusList.Add(False)
-                    End If
-
-                ElseIf pAlarmCode = GlobalEnumerates.Alarms.FRIDGE_COVER_ERR Then
-                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.FRIDGE_COVER_WARN) Then
-                        pAlarmList.Add(GlobalEnumerates.Alarms.FRIDGE_COVER_WARN) 'If cover error is added remove the warning level
-                        pAlarmStatusList.Add(False)
-                    End If
-
-                ElseIf pAlarmCode = GlobalEnumerates.Alarms.REACT_COVER_ERR Then
-                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.REACT_COVER_WARN) Then
-                        pAlarmList.Add(GlobalEnumerates.Alarms.REACT_COVER_WARN) 'If cover error is added remove the warning level
-                        pAlarmStatusList.Add(False)
-                    End If
-
-                ElseIf pAlarmCode = GlobalEnumerates.Alarms.S_COVER_ERR Then
-                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.S_COVER_WARN) Then
-                        pAlarmList.Add(GlobalEnumerates.Alarms.S_COVER_WARN) 'If cover error is added remove the warning level
-                        pAlarmStatusList.Add(False)
-                    End If
-                End If
-                'AG 15/03/2012
-
-                alarmsWithOKTypeFalse = Nothing
-
+                Select Case pAlarmCode
+                    Case AlarmEnumerates.Alarms.MAIN_COVER_ERR
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.MAIN_COVER_WARN) Then
+                            pAlarmList.Add(AlarmEnumerates.Alarms.MAIN_COVER_WARN) 'If cover error is added remove the warning level
+                            pAlarmStatusList.Add(False)
+                        End If
+                    Case AlarmEnumerates.Alarms.FRIDGE_COVER_ERR
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.FRIDGE_COVER_WARN) Then
+                            pAlarmList.Add(AlarmEnumerates.Alarms.FRIDGE_COVER_WARN) 'If cover error is added remove the warning level
+                            pAlarmStatusList.Add(False)
+                        End If
+                    Case AlarmEnumerates.Alarms.REACT_COVER_ERR
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.REACT_COVER_WARN) Then
+                            pAlarmList.Add(AlarmEnumerates.Alarms.REACT_COVER_WARN) 'If cover error is added remove the warning level
+                            pAlarmStatusList.Add(False)
+                        End If
+                    Case AlarmEnumerates.Alarms.S_COVER_ERR
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.S_COVER_WARN) Then
+                            pAlarmList.Add(AlarmEnumerates.Alarms.S_COVER_WARN) 'If cover error is added remove the warning level
+                            pAlarmStatusList.Add(False)
+                        End If
+                        'Case AlarmEnumerates.Alarms.GLF_BOARD_FBLD_ERR
+                        '    If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.GLF_BOARD_FBLD_ERR) Then
+                        '        pAlarmList.Add(AlarmEnumerates.Alarms.GLF_BOARD_FBLD_ERR)
+                        '        pAlarmStatusList.Add(False)
+                        '    End If
+                End Select
             Else
                 'ALARM SOLVED
                 '''''''''''''
@@ -1797,60 +489,60 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 'AG 05/01/2011
                 'Special code Nr.1: if Reactions rotor thermo warning is solved also mark the error alarm as solved too!!
-                If pAlarmCode = GlobalEnumerates.Alarms.REACT_TEMP_WARN Then
-                    solvedErrAlarmID.Add(GlobalEnumerates.Alarms.REACT_TEMP_ERR)
+                If pAlarmCode = AlarmEnumerates.Alarms.REACT_TEMP_WARN Then
+                    solvedErrAlarmID.Add(AlarmEnumerates.Alarms.REACT_TEMP_ERR)
                     OtherAlarmsSolved = True
 
                     'Special code Nr.2: if Firdge thermo warning is solved also mark the error/nok alarm as solved too!!
-                ElseIf pAlarmCode = GlobalEnumerates.Alarms.FRIDGE_TEMP_WARN Then
-                    solvedErrAlarmID.Add(GlobalEnumerates.Alarms.FRIDGE_TEMP_ERR)
+                ElseIf pAlarmCode = AlarmEnumerates.Alarms.FRIDGE_TEMP_WARN Then
+                    solvedErrAlarmID.Add(AlarmEnumerates.Alarms.FRIDGE_TEMP_ERR)
                     OtherAlarmsSolved = True
 
                     'AG 13/03/2012
                     'Special code Nr.6: if R1 collision err (freeze) is solved also mark the r1 collision warn as solved too!!
-                ElseIf pAlarmCode = GlobalEnumerates.Alarms.R1_COLLISION_ERR Then
-                    solvedErrAlarmID.Add(GlobalEnumerates.Alarms.R1_COLLISION_WARN)
+                ElseIf pAlarmCode = AlarmEnumerates.Alarms.R1_COLLISION_ERR Then
+                    solvedErrAlarmID.Add(AlarmEnumerates.Alarms.R1_COLLISION_WARN)
                     OtherAlarmsSolved = True
 
                     'Special code Nr.7: if R2 collision err (freeze) is solved also mark the r2 collision warn as solved too!!
-                ElseIf pAlarmCode = GlobalEnumerates.Alarms.R2_COLLISION_ERR Then
-                    solvedErrAlarmID.Add(GlobalEnumerates.Alarms.R2_COLLISION_WARN)
+                ElseIf pAlarmCode = AlarmEnumerates.Alarms.R2_COLLISION_ERR Then
+                    solvedErrAlarmID.Add(AlarmEnumerates.Alarms.R2_COLLISION_WARN)
                     OtherAlarmsSolved = True
 
                     'Special code Nr.8: if samples collision err (freeze) is solved also mark the samples collision warn as solved too!!
-                ElseIf pAlarmCode = GlobalEnumerates.Alarms.S_COLLISION_ERR Then
-                    solvedErrAlarmID.Add(GlobalEnumerates.Alarms.S_COLLISION_WARN)
+                ElseIf pAlarmCode = AlarmEnumerates.Alarms.S_COLLISION_ERR Then
+                    solvedErrAlarmID.Add(AlarmEnumerates.Alarms.S_COLLISION_WARN)
                     OtherAlarmsSolved = True
                     'AG 13/03/2012
                     'JV 08/01/2014 BT #1118
-                ElseIf pAlarmCode = GlobalEnumerates.Alarms.ISE_OFF_ERR Then
-                    solvedErrAlarmID.Add(GlobalEnumerates.Alarms.ISE_OFF_ERR)
+                ElseIf pAlarmCode = AlarmEnumerates.Alarms.ISE_OFF_ERR Then
+                    solvedErrAlarmID.Add(AlarmEnumerates.Alarms.ISE_OFF_ERR)
                     OtherAlarmsSolved = True
                     'JV 08/01/2014 BT #1118
-                ElseIf pAlarmCode = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR Then
-                    solvedErrAlarmID.Add(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR)
+                ElseIf pAlarmCode = AlarmEnumerates.Alarms.ISE_TIMEOUT_ERR Then
+                    solvedErrAlarmID.Add(AlarmEnumerates.Alarms.ISE_TIMEOUT_ERR)
                     OtherAlarmsSolved = True
-                ElseIf pAlarmCode = GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR Then
-                    solvedErrAlarmID.Add(GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR)
+                ElseIf pAlarmCode = AlarmEnumerates.Alarms.COMMS_TIMEOUT_ERR Then
+                    solvedErrAlarmID.Add(AlarmEnumerates.Alarms.COMMS_TIMEOUT_ERR)
                     OtherAlarmsSolved = True
                 End If
 
                 'AG 28/03/2012 - Special code Nr.9: for auto recover freeze alarms (when cover warn solved also mark the cover error as solved too!!)
                 If Not analyzerFREEZEFlagAttribute OrElse analyzerFREEZEModeAttribute = "AUTO" Then
-                    If pAlarmCode = GlobalEnumerates.Alarms.MAIN_COVER_WARN Then
-                        solvedErrAlarmID.Add(GlobalEnumerates.Alarms.MAIN_COVER_ERR)
+                    If pAlarmCode = AlarmEnumerates.Alarms.MAIN_COVER_WARN Then
+                        solvedErrAlarmID.Add(AlarmEnumerates.Alarms.MAIN_COVER_ERR)
                         OtherAlarmsSolved = True
 
-                    ElseIf pAlarmCode = GlobalEnumerates.Alarms.FRIDGE_COVER_WARN Then
-                        solvedErrAlarmID.Add(GlobalEnumerates.Alarms.FRIDGE_COVER_ERR)
+                    ElseIf pAlarmCode = AlarmEnumerates.Alarms.FRIDGE_COVER_WARN Then
+                        solvedErrAlarmID.Add(AlarmEnumerates.Alarms.FRIDGE_COVER_ERR)
                         OtherAlarmsSolved = True
 
-                    ElseIf pAlarmCode = GlobalEnumerates.Alarms.S_COVER_WARN Then
-                        solvedErrAlarmID.Add(GlobalEnumerates.Alarms.S_COVER_ERR)
+                    ElseIf pAlarmCode = AlarmEnumerates.Alarms.S_COVER_WARN Then
+                        solvedErrAlarmID.Add(AlarmEnumerates.Alarms.S_COVER_ERR)
                         OtherAlarmsSolved = True
 
-                    ElseIf pAlarmCode = GlobalEnumerates.Alarms.REACT_COVER_WARN Then
-                        solvedErrAlarmID.Add(GlobalEnumerates.Alarms.REACT_COVER_ERR)
+                    ElseIf pAlarmCode = AlarmEnumerates.Alarms.REACT_COVER_WARN Then
+                        solvedErrAlarmID.Add(AlarmEnumerates.Alarms.REACT_COVER_ERR)
                         OtherAlarmsSolved = True
                     End If
                 End If
@@ -1862,18 +554,19 @@ Namespace Biosystems.Ax00.Core.Entities
                             pAlarmList.Add(item)
                             pAlarmStatusList.Add(False)
                             'JV 08/01/2014 BT #1118
-                        ElseIf item = GlobalEnumerates.Alarms.ISE_OFF_ERR Then
+                        ElseIf item = AlarmEnumerates.Alarms.ISE_OFF_ERR Then
                             pAlarmList.Add(item)
                             pAlarmStatusList.Add(False)
                             'JV 08/01/2014 BT #1118
-                        ElseIf item = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR Then
+                        ElseIf item = AlarmEnumerates.Alarms.ISE_TIMEOUT_ERR Then
                             pAlarmList.Add(item)
                             pAlarmStatusList.Add(False)
-                        ElseIf item = GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR Then
+                        ElseIf item = AlarmEnumerates.Alarms.COMMS_TIMEOUT_ERR Then
                             pAlarmList.Add(item)
                             pAlarmStatusList.Add(False)
                         End If
                     Next
+
                 End If
 
             End If
@@ -1887,8 +580,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Created XBC 16/10/2012
         ''' </remarks>
-        Private Sub PrepareLocalAlarmList_SRV(ByVal pErrorCodeList As List(Of Integer), _
-                                              ByRef pErrorCodeFinalList As List(Of String))
+        Public Sub PrepareLocalAlarmList_SRV(ByVal pErrorCodeList As List(Of Integer), ByRef pErrorCodeFinalList As List(Of String)) Implements IAnalyzerManager.PrepareLocalAlarmList_SRV
 
             'NOTE: Do not use Try Catch do the caller method implements it
 
@@ -1904,38 +596,115 @@ Namespace Biosystems.Ax00.Core.Entities
 
         End Sub
 
-
         ''' <summary>
-        ''' Inform in a local alarm list the new active alarms. This list will be use for alarms treatment
+        ''' Add to a local Alarms list the informed Alarm. This list will be used for Alarms treatment
         ''' </summary>
-        ''' <param name="pAlarmCode"></param>
-        ''' <param name="pAlarmList"></param>
-        ''' <param name="pAlarmStatusList"></param>
-        ''' <param name="pAddInfo"></param>
-        ''' <param name="pAdditionalInfoList"></param>
-        ''' <remarks>AG 04/12/2014 BA-2236
-        ''' AG 09/12/2014 BA-2236 remove parameters pErrorCode and pErrorCodeList. We will use the AdditionalInfo field also for store the error codes</remarks>
-        Private Sub AddLocalActiveAlarmToList(ByVal pAlarmCode As Alarms, _
-                                  ByRef pAlarmList As List(Of Alarms), ByRef pAlarmStatusList As List(Of Boolean), _
-                                  Optional ByVal pAddInfo As String = "", _
-                                  Optional ByRef pAdditionalInfoList As List(Of String) = Nothing)
+        ''' <param name="pAlarmCode">Alarm Identifier</param>
+        ''' <param name="pAlarmList">List to return all Alarms</param>
+        ''' <param name="pAlarmStatusList">List containing the Status of all Alarms</param>
+        ''' <param name="pAddInfo">Additional information to save for the Alarm. Optional parameter.</param>
+        ''' <param name="pAdditionalInfoList">List of Strings to store the additional information for the Alarm</param>
+        ''' <remarks>
+        ''' Created by:  SA 31/03/2015 - BA-2384 (Created in BA200 for implementation of BA-2236)
+        ''' </remarks>
+        Private Sub AddLocalActiveAlarmToList(ByVal pAlarmCode As Alarms, ByRef pAlarmList As List(Of Alarms), ByRef pAlarmStatusList As List(Of Boolean), _
+                                              Optional ByVal pAddInfo As String = "", Optional ByRef pAdditionalInfoList As List(Of String) = Nothing)
             Try
                 pAlarmList.Add(pAlarmCode)
                 pAlarmStatusList.Add(True)
 
-                'AG 25/07/2012 - used only for the volume missing, clot warnings, prep locked alarms
-                'AG 09/12/2014 BA-2236 now also for store the error codes
-                If Not pAdditionalInfoList Is Nothing AndAlso pAddInfo <> "" Then
-                    pAdditionalInfoList.Add(pAddInfo)
-                End If
-
+                'Additional Information is used to save information for Alarms related with Volume Missing, Clot Warnings, Blocked Preparations
+                'and also the FW Error Code when an instruction ANSERR is received
+                If (Not pAdditionalInfoList Is Nothing AndAlso pAddInfo <> String.Empty) Then pAdditionalInfoList.Add(pAddInfo)
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.AddLocalActiveAlarmToList", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex)
             End Try
         End Sub
 
+        ''' <summary>
+        ''' For Alarms that already exist for the Analyzer Work Session and having one or more FW Error Codes as additional information, if the Alarm is received again, this 
+        ''' function verifies if the FW Error Codes received are already registered as additional information and for those not registered, add them to the additional information
+        ''' field and update the Alarm in table twksWSAnalyzerAlarms
+        ''' </summary>
+        ''' <param name="pDbConnection">Open DB Connection</param>
+        ''' <param name="pAlarmID">Alarm Identifier</param>
+        ''' <param name="pAdditionalInfo">Additional information to save for the Alarm</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by: SA 13/04/2015 - BA-2384
+        ''' </remarks>
+        Private Function UpdateAdditionalInfoField(ByVal pDbConnection As SqlConnection, ByVal pAlarmId As String, ByVal pAdditionalInfo As String) As GlobalDataTO
+            Dim myGlobal As New GlobalDataTO
+            Dim dbConnection As SqlConnection = Nothing
 
+            Try
+                myGlobal = DAOBase.GetOpenDBTransaction(pDbConnection)
+                If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobal.SetDatos, SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim updateRowFlag = False
+                        Dim alarmsDelg As New WSAnalyzerAlarmsDelegate
+
+                        myGlobal = alarmsDelg.GetByAlarmID(dbConnection, pAlarmID, Nothing, Nothing, AnalyzerIDAttribute, String.Empty)
+                        If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
+                            Dim temporalDs = DirectCast(myGlobal.SetDatos, WSAnalyzerAlarmsDS)
+
+                            If (temporalDS.twksWSAnalyzerAlarms.Rows.Count > 0) Then
+                                If (Not String.IsNullOrEmpty(temporalDS.twksWSAnalyzerAlarms.First.AdditionalInfo)) Then
+                                    Dim existingFwCodes = temporalDs.twksWSAnalyzerAlarms.First.AdditionalInfo.Split(","c)
+
+                                    Dim codeExist = False
+                                    Dim receivedFwCodes = pAdditionalInfo.Split(","c)
+                                    For Each receivedCode As String In receivedFWCodes
+                                        For Each existingCode As String In existingFWCodes
+                                            codeExist = (receivedCode = existingCode)
+                                            If (codeExist) Then Exit For
+                                        Next
+
+                                        If (Not codeExist) Then
+                                            temporalDS.twksWSAnalyzerAlarms.First.BeginEdit()
+                                            temporalDS.twksWSAnalyzerAlarms.First.AdditionalInfo &= "," & receivedCode
+                                            temporalDS.twksWSAnalyzerAlarms.First.EndEdit()
+                                            updateRowFlag = True
+                                        End If
+                                    Next
+                                Else
+                                    temporalDS.twksWSAnalyzerAlarms.First.BeginEdit()
+                                    temporalDS.twksWSAnalyzerAlarms.First.AdditionalInfo = pAdditionalInfo
+                                    temporalDS.twksWSAnalyzerAlarms.First.EndEdit()
+                                    updateRowFlag = True
+                                End If
+
+                                If (updateRowFlag) Then
+                                    myGlobal = alarmsDelg.Update(dbConnection, temporalDS)
+                                End If
+                            End If
+                        End If
+
+                        If (Not myGlobal.HasError) Then
+                            'When the Database Connection was opened locally, then the Commit is executed
+                            If (pDbConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                        Else
+                            'When the Database Connection was opened locally, then the Rollback is executed
+                            If (pDbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                        End If
+                    End If
+                End If
+            Catch ex As Exception
+                'When the Database Connection was opened locally, then the Rollback is executed
+                If (pDbConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+
+                myGlobal = New GlobalDataTO()
+                myGlobal.HasError = True
+                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                myGlobal.ErrorMessage = ex.Message
+
+                GlobalBase.CreateLogActivity(ex)
+            Finally
+                If (pDbConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return myGlobal
+        End Function
 
         ''' <summary>
         ''' Verify if there are Temperature Warning Alarms
@@ -1974,25 +743,24 @@ Namespace Biosystems.Ax00.Core.Entities
             'Dim Utilities As New Utilities
 
             Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                resultData = GetOpenDBConnection(pDBConnection)
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim alarmStatus As Boolean = False
-                        Dim alarmID As Alarms = GlobalEnumerates.Alarms.NONE
-                        Dim limitList As New List(Of FieldLimitsDS.tfmwFieldLimitsRow)
+                        Dim alarmId As Alarms = AlarmEnumerates.Alarms.NONE
 
                         Dim adjustValue As String = String.Empty
                         Dim tempSetPoint As Single = 0 'Temperature "consigna"
 
                         'THERMO REACTIONS ROTOR
                         'Read parameter THERMO_REACTIONS_LIMIT in tfmwFieldLimits to get Min/Max values for it
-                        limitList = (From a In myClassFieldLimitsDS.tfmwFieldLimits _
+                        Dim limitList = (From a In myClassFieldLimitsDS.tfmwFieldLimits _
                                     Where a.LimitID = FieldLimitsEnum.THERMO_REACTIONS_LIMIT.ToString _
                                    Select a).ToList
 
                         If (limitList.Count > 0) Then
-                            alarmID = GlobalEnumerates.Alarms.REACT_TEMP_WARN
+                            alarmId = AlarmEnumerates.Alarms.REACT_TEMP_WARN
                             alarmStatus = False
 
                             'Get the SetPoint Temperature
@@ -2000,7 +768,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             'If (adjustValue <> String.Empty AndAlso IsNumeric(adjustValue)) Then
                             If (adjustValue <> String.Empty AndAlso _
                                 Double.TryParse(adjustValue, NumberStyles.Any, CultureInfo.InvariantCulture, New Double)) Then
-                                tempSetPoint = Utilities.FormatToSingle(adjustValue)
+                                tempSetPoint = FormatToSingle(adjustValue)
                             Else
                                 'Dim myLogAcciones2 As New ApplicationLogManager()
                                 GlobalBase.CreateLogActivity("Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Error, False)
@@ -2023,7 +791,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             Else
                                 alarmStatus = False
                             End If
-                            PrepareLocalAlarmList(alarmID, alarmStatus, pAlarmList, pAlarmStatusList)
+                            PrepareLocalAlarmList(alarmId, alarmStatus, pAlarmList, pAlarmStatusList)
                         End If
 
                         'THERMO FRIDGE (Reagents Rotor)
@@ -2033,7 +801,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                    Select a).ToList
 
                         If (limitList.Count > 0) Then
-                            alarmID = GlobalEnumerates.Alarms.FRIDGE_TEMP_WARN
+                            alarmId = AlarmEnumerates.Alarms.FRIDGE_TEMP_WARN
                             alarmStatus = False
 
                             'Get the SetPoint Temperature
@@ -2041,7 +809,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             'If (adjustValue <> String.Empty AndAlso IsNumeric(adjustValue)) Then
                             If (adjustValue <> String.Empty AndAlso _
                                 Double.TryParse(adjustValue, NumberStyles.Any, CultureInfo.InvariantCulture, New Double)) Then
-                                tempSetPoint = Utilities.FormatToSingle(adjustValue)
+                                tempSetPoint = FormatToSingle(adjustValue)
                             Else
                                 'Dim myLogAcciones2 As New ApplicationLogManager()
                                 GlobalBase.CreateLogActivity("Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Error, False)
@@ -2064,7 +832,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             Else
                                 alarmStatus = False
                             End If
-                            PrepareLocalAlarmList(alarmID, alarmStatus, pAlarmList, pAlarmStatusList)
+                            PrepareLocalAlarmList(alarmId, alarmStatus, pAlarmList, pAlarmStatusList)
                         End If
 
                         'THERMO WASHING STATION
@@ -2074,7 +842,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                    Select a).ToList
 
                         If (limitList.Count > 0) Then
-                            alarmID = GlobalEnumerates.Alarms.WS_TEMP_WARN
+                            alarmId = AlarmEnumerates.Alarms.WS_TEMP_WARN
                             alarmStatus = False
 
                             'Get the SetPoint Temperature
@@ -2082,7 +850,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             'If (adjustValue <> String.Empty AndAlso IsNumeric(adjustValue)) Then
                             If (adjustValue <> String.Empty AndAlso _
                                 Double.TryParse(adjustValue, NumberStyles.Any, CultureInfo.InvariantCulture, New Double)) Then
-                                tempSetPoint = Utilities.FormatToSingle(adjustValue)
+                                tempSetPoint = FormatToSingle(adjustValue)
                             Else
                                 'Dim myLogAcciones2 As New ApplicationLogManager()
                                 GlobalBase.CreateLogActivity("Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Error, False)
@@ -2097,7 +865,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             Else
                                 alarmStatus = False
                             End If
-                            PrepareLocalAlarmList(alarmID, alarmStatus, pAlarmList, pAlarmStatusList)
+                            PrepareLocalAlarmList(alarmId, alarmStatus, pAlarmList, pAlarmStatusList)
                         End If
 
                         'AG 05/01/2012 - Do not treat R1 or R2 temperature in RUNNING mode
@@ -2119,7 +887,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 'If (adjustValue <> String.Empty AndAlso IsNumeric(adjustValue)) Then
                                 If (adjustValue <> String.Empty AndAlso _
                                     Double.TryParse(adjustValue, NumberStyles.Any, CultureInfo.InvariantCulture, New Double)) Then
-                                    tempSetPoint = Utilities.FormatToSingle(adjustValue)
+                                    tempSetPoint = FormatToSingle(adjustValue)
                                 Else
                                     'Dim myLogAcciones2 As New ApplicationLogManager()
                                     GlobalBase.CreateLogActivity("Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Error, False)
@@ -2142,8 +910,8 @@ Namespace Biosystems.Ax00.Core.Entities
                                 End If
 
                                 If (Not alarmStatus) Then
-                                    alarmID = GlobalEnumerates.Alarms.R1_TEMP_WARN
-                                    PrepareLocalAlarmList(alarmID, alarmStatus, pAlarmList, pAlarmStatusList)
+                                    alarmId = AlarmEnumerates.Alarms.R1_TEMP_WARN
+                                    PrepareLocalAlarmList(alarmId, alarmStatus, pAlarmList, pAlarmStatusList)
                                 End If
 
                                 'THERMO R2 ARM
@@ -2154,7 +922,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 'If (adjustValue <> String.Empty AndAlso IsNumeric(adjustValue)) Then
                                 If (adjustValue <> String.Empty AndAlso _
                                     Double.TryParse(adjustValue, NumberStyles.Any, CultureInfo.InvariantCulture, New Double)) Then
-                                    tempSetPoint = Utilities.FormatToSingle(adjustValue)
+                                    tempSetPoint = FormatToSingle(adjustValue)
                                 Else
                                     'Dim myLogAcciones2 As New ApplicationLogManager()
                                     GlobalBase.CreateLogActivity("Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Error, False)
@@ -2177,8 +945,8 @@ Namespace Biosystems.Ax00.Core.Entities
                                 End If
 
                                 If (Not alarmStatus) Then
-                                    alarmID = GlobalEnumerates.Alarms.R2_TEMP_WARN
-                                    PrepareLocalAlarmList(alarmID, alarmStatus, pAlarmList, pAlarmStatusList)
+                                    alarmId = AlarmEnumerates.Alarms.R2_TEMP_WARN
+                                    PrepareLocalAlarmList(alarmId, alarmStatus, pAlarmList, pAlarmStatusList)
                                 End If
                             End If
                         Else
@@ -2234,7 +1002,7 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim dbConnection As New SqlConnection
 
             Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                resultData = GetOpenDBConnection(pDBConnection)
                 If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
 
@@ -2243,7 +1011,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             Dim myPercentage As Single = 0
                             Dim newSensorNumericalValueFlag As Boolean = False 'AG 01/04/2011 - Inform new numerical values for Ax00 sensors to be monitorized
 
-                            Dim alarmID As Alarms = GlobalEnumerates.Alarms.NONE
+                            Dim alarmId As Alarms = AlarmEnumerates.Alarms.NONE
                             Dim alarmStatus As Boolean = False
                             Dim limitList As New List(Of FieldLimitsDS.tfmwFieldLimitsRow)
                             'Dim Utilities As New Utilities
@@ -2260,7 +1028,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 resultData = GetBottlePercentage(CInt(pHighContaminationContainer), False)
                                 If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                                     myPercentage = CSng(CType(resultData.SetDatos, Double))
-                                    myPercentage = Utilities.FormatToSingle(Utilities.ToStringWithFormat(myPercentage, 0)) 'AG 21/12/2011 format 0 decimals BugsTrackings 258 (Elena) ('AG 04/10/2011 - format mypercentage with 1 decimal)
+                                    myPercentage = FormatToSingle(ToStringWithFormat(myPercentage, 0)) 'AG 21/12/2011 format 0 decimals BugsTrackings 258 (Elena) ('AG 04/10/2011 - format mypercentage with 1 decimal)
 
                                     'AG 22/02/2012 Only inform new numerical value when the alarm is not locked to prevent level oscillations
                                     ''AG 01/04/2011 - Inform new numerical values for Ax00 sensors to be monitorized
@@ -2268,7 +1036,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 End If
 
                                 'Vol > Critical limit (error)
-                                alarmID = GlobalEnumerates.Alarms.HIGH_CONTAMIN_ERR
+                                alarmId = AlarmEnumerates.Alarms.HIGH_CONTAMIN_ERR
                                 alarmStatus = False
                                 If myPercentage >= limitList(0).MaxValue Then
                                     'Alarm Warning
@@ -2279,7 +1047,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                     'AG 21/02/2012 - To prevent the ERROR or WARNING alarm level oscillations when near the limit (electronics tolerances),
                                     'when the ERROR level alarm exists it is remove only after user has pressed the "Change Bottle Confirmation" button
-                                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.HIGH_CONTAMIN_ERR) Then
+                                    If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.HIGH_CONTAMIN_ERR) Then
                                         If mySessionFlags(AnalyzerManagerFlags.CHANGE_BOTTLES_Process.ToString) <> "INPROCESS" Then
                                             alarmStatus = True
                                         End If
@@ -2291,12 +1059,12 @@ Namespace Biosystems.Ax00.Core.Entities
                                     'AG 21/02/2012
 
                                 End If
-                                PrepareLocalAlarmList(alarmID, alarmStatus, pAlarmList, pAlarmStatusList)
+                                PrepareLocalAlarmList(alarmId, alarmStatus, pAlarmList, pAlarmStatusList)
 
                                 'If not exist high contamination error ... check if warning
                                 If Not alarmStatus Then
                                     'Vol > Warning limit & Vol < Critical limit (warning)
-                                    alarmID = GlobalEnumerates.Alarms.HIGH_CONTAMIN_WARN
+                                    alarmId = AlarmEnumerates.Alarms.HIGH_CONTAMIN_WARN
                                     alarmStatus = False
                                     If myPercentage >= limitList(0).MinValue And myPercentage < limitList(0).MaxValue Then
                                         'Alarm Warning
@@ -2306,7 +1074,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                         'AG 21/02/2012 - To prevent the WARNING or OK alarm level oscillations when near the limit (electronics tolerances),
                                         'when the WARNING level alarm exists it is remove only after user has pressed the "Change Bottle Confirmation" button or after generate the ERROR alarm level
-                                        If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.HIGH_CONTAMIN_WARN) Then
+                                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.HIGH_CONTAMIN_WARN) Then
                                             If mySessionFlags(AnalyzerManagerFlags.CHANGE_BOTTLES_Process.ToString) <> "INPROCESS" Then
                                                 alarmStatus = True
                                             End If
@@ -2315,10 +1083,10 @@ Namespace Biosystems.Ax00.Core.Entities
                                     End If
 
                                 Else 'If exists error warning can not be active
-                                    alarmID = GlobalEnumerates.Alarms.HIGH_CONTAMIN_WARN
+                                    alarmId = AlarmEnumerates.Alarms.HIGH_CONTAMIN_WARN
                                     alarmStatus = False
                                 End If
-                                PrepareLocalAlarmList(alarmID, alarmStatus, pAlarmList, pAlarmStatusList)
+                                PrepareLocalAlarmList(alarmId, alarmStatus, pAlarmList, pAlarmStatusList)
 
                             End If
 
@@ -2335,7 +1103,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 resultData = GetBottlePercentage(CInt(pWashSolutionContainer), True)
                                 If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                                     myPercentage = CSng(CType(resultData.SetDatos, Double))
-                                    myPercentage = Utilities.FormatToSingle(Utilities.ToStringWithFormat(myPercentage, 0)) 'AG 21/12/2011 format 0 decimals BugsTrackings 258 (Elena)  'AG 04/10/2011 - format mypercentage with 1 decimal
+                                    myPercentage = FormatToSingle(ToStringWithFormat(myPercentage, 0)) 'AG 21/12/2011 format 0 decimals BugsTrackings 258 (Elena)  'AG 04/10/2011 - format mypercentage with 1 decimal
 
                                     'AG 22/02/2012 Only inform new numerical value when the alarm is not locked to prevent level oscillations
                                     ''AG 01/04/2011 - Inform new numerical values for Ax00 sensors to be monitorized
@@ -2343,7 +1111,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 End If
 
                                 'Vol < Critical limit (error)
-                                alarmID = GlobalEnumerates.Alarms.WASH_CONTAINER_ERR
+                                alarmId = AlarmEnumerates.Alarms.WASH_CONTAINER_ERR
                                 alarmStatus = False
                                 If myPercentage <= limitList(0).MinValue Then
                                     'Alarm Warning
@@ -2355,7 +1123,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                     'AG 21/02/2012 - To prevent the ERROR or WARNING alarm level oscillations when near the limit (electronics tolerances),
                                     'when the ERROR level alarm exists it is remove only after user has pressed the "Change Bottle Confirmation" button
-                                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_ERR) Then
+                                    If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.WASH_CONTAINER_ERR) Then
                                         If mySessionFlags(AnalyzerManagerFlags.CHANGE_BOTTLES_Process.ToString) <> "INPROCESS" Then
                                             alarmStatus = True
                                         End If
@@ -2367,12 +1135,12 @@ Namespace Biosystems.Ax00.Core.Entities
                                     'AG 21/02/2012
 
                                 End If
-                                PrepareLocalAlarmList(alarmID, alarmStatus, pAlarmList, pAlarmStatusList)
+                                PrepareLocalAlarmList(alarmId, alarmStatus, pAlarmList, pAlarmStatusList)
 
                                 'If not exist wash solution container error ... check if warning
                                 If Not alarmStatus Then
                                     'Vol < Warning limit & Vol > Critical limit (warning)
-                                    alarmID = GlobalEnumerates.Alarms.WASH_CONTAINER_WARN
+                                    alarmId = AlarmEnumerates.Alarms.WASH_CONTAINER_WARN
                                     alarmStatus = False
                                     If myPercentage > limitList(0).MinValue And myPercentage <= limitList(0).MaxValue Then
                                         'Alarm Warning
@@ -2382,7 +1150,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                         'AG 21/02/2012 - To prevent the WARNING or OK alarm level oscillations when near the limit (electronics tolerances),
                                         'when the WARNING level alarm exists it is remove only after user has pressed the "Change Bottle Confirmation" button or after generate the ERROR alarm level
-                                        If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_WARN) Then
+                                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.WASH_CONTAINER_WARN) Then
                                             If mySessionFlags(AnalyzerManagerFlags.CHANGE_BOTTLES_Process.ToString) <> "INPROCESS" Then
                                                 alarmStatus = True
                                             End If
@@ -2392,10 +1160,10 @@ Namespace Biosystems.Ax00.Core.Entities
                                     End If
 
                                 Else 'If exists error warning can not be active
-                                    alarmID = GlobalEnumerates.Alarms.WASH_CONTAINER_WARN
+                                    alarmId = AlarmEnumerates.Alarms.WASH_CONTAINER_WARN
                                     alarmStatus = False
                                 End If
-                                PrepareLocalAlarmList(alarmID, alarmStatus, pAlarmList, pAlarmStatusList)
+                                PrepareLocalAlarmList(alarmId, alarmStatus, pAlarmList, pAlarmStatusList)
 
                             End If
                             limitList = Nothing 'AG 02/08/2012 - free memory
@@ -2437,7 +1205,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 Dim myAlarmList As New List(Of Alarms)
                 Dim myAlarmStatusList As New List(Of Boolean)
-                Dim alarmID As Alarms = GlobalEnumerates.Alarms.NONE
+                Dim alarmID As Alarms = AlarmEnumerates.Alarms.NONE
                 Dim alarmStatus As Boolean = False
                 'Dim myLogAcciones As New ApplicationLogManager() 'AG 29/05/2014 - #1630 add traces informing when deposit sensors activate/deactivate timers
 
@@ -2445,7 +1213,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 Dim myIntValue As Integer = 0
                 If pSensors.ContainsKey(AnalyzerSensors.COVER_GENERAL) Then
                     myIntValue = CInt(pSensors(AnalyzerSensors.COVER_GENERAL))
-                    alarmID = GlobalEnumerates.Alarms.MAIN_COVER_WARN
+                    alarmID = AlarmEnumerates.Alarms.MAIN_COVER_WARN
 
                     If myIntValue = 1 Then 'Open
                         alarmStatus = True
@@ -2462,7 +1230,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 'Get Photometrics (Reaccions) cover (parameter index 4)
                 If pSensors.ContainsKey(AnalyzerSensors.COVER_REACTIONS) Then
                     myIntValue = CInt(pSensors(AnalyzerSensors.COVER_REACTIONS))
-                    alarmID = GlobalEnumerates.Alarms.REACT_COVER_WARN
+                    alarmID = AlarmEnumerates.Alarms.REACT_COVER_WARN
 
                     If myIntValue = 1 Then 'Open
                         alarmStatus = True
@@ -2479,7 +1247,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 'Get Reagents (Fridge) cover (parameter index 5)
                 If pSensors.ContainsKey(AnalyzerSensors.COVER_FRIDGE) Then
                     myIntValue = CInt(pSensors(AnalyzerSensors.COVER_FRIDGE))
-                    alarmID = GlobalEnumerates.Alarms.FRIDGE_COVER_WARN
+                    alarmID = AlarmEnumerates.Alarms.FRIDGE_COVER_WARN
 
                     If myIntValue = 1 Then 'Open
                         alarmStatus = True
@@ -2496,7 +1264,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 'Get Samples cover (parameter index 6)
                 If pSensors.ContainsKey(AnalyzerSensors.COVER_SAMPLES) Then
                     myIntValue = CInt(pSensors(AnalyzerSensors.COVER_SAMPLES))
-                    alarmID = GlobalEnumerates.Alarms.S_COVER_WARN
+                    alarmID = AlarmEnumerates.Alarms.S_COVER_WARN
 
                     If myIntValue = 1 Then 'Open
                         alarmStatus = True
@@ -2513,7 +1281,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 'Get System liquid sensor (parameter index 7)
                 If pSensors.ContainsKey(AnalyzerSensors.WATER_DEPOSIT) Then
                     'AG 01/12/2011 - Sw do not generates the alarm WATER_DEPOSIT_ERR now, it activates a timer it is who generates the alarm if the time expires
-                    alarmID = GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR
+                    alarmID = AlarmEnumerates.Alarms.WATER_DEPOSIT_ERR
                     myIntValue = CInt(pSensors(AnalyzerSensors.WATER_DEPOSIT))
 
                     If myIntValue = 0 Or myIntValue = 2 Then 'Empty or impossible status
@@ -2522,7 +1290,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         alarmStatus = False
 
                         'AG 29/05/2014 - BT #1630 - Alarm fixed automatically in running but in standby requires user action (click ChangeBottleButton)
-                        If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR) AndAlso _
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.WATER_DEPOSIT_ERR) AndAlso _
                            (AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY AndAlso mySessionFlags(AnalyzerManagerFlags.CHANGE_BOTTLES_Process.ToString) <> "INPROCESS") Then
                             alarmStatus = True ' Keep alarm until user clicks confirmation
                         End If
@@ -2534,7 +1302,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                     'AG 29/05/2014 - #1630 - Do not activate timer is alarm is already active!!
                     'If alarmStatus AndAlso Not waterDepositTimer.Enabled Then
-                    If alarmStatus AndAlso Not waterDepositTimer.Enabled AndAlso Not myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR) Then
+                    If alarmStatus AndAlso Not waterDepositTimer.Enabled AndAlso Not myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.WATER_DEPOSIT_ERR) Then
                         GlobalBase.CreateLogActivity("Water deposit empty!! Enable timer waterDepositTimer. Sensor value: " & myIntValue, "AnalyzerManager.UserSwANSINFTreatment", EventLogEntryType.Information, False)
                         waterDepositTimer.Enabled = True 'Activate timer (but NOT ACTIVATE ALARM!!!)
 
@@ -2554,7 +1322,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 'Get Waste sensor (parameter index 8)
                 If pSensors.ContainsKey(AnalyzerSensors.WASTE_DEPOSIT) Then
                     'AG 01/12/2011 - Sw do not generates the alarm WASTE_DEPOSIT_ERR now, it activates a timer it is who generates the alarm if the time expires
-                    alarmID = GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR
+                    alarmID = AlarmEnumerates.Alarms.WASTE_DEPOSIT_ERR
 
                     myIntValue = CInt(pSensors(AnalyzerSensors.WASTE_DEPOSIT))
 
@@ -2564,7 +1332,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         alarmStatus = False
 
                         'AG 29/05/2014 - BT #1630 - Alarm fixed automatically in running but in standby requires user action (click ChangeBottleButton)
-                        If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR) AndAlso _
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.WASTE_DEPOSIT_ERR) AndAlso _
                            (AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY AndAlso mySessionFlags(AnalyzerManagerFlags.CHANGE_BOTTLES_Process.ToString) <> "INPROCESS") Then
                             alarmStatus = True ' Keep alarm until user clicks confirmation
                         End If
@@ -2577,7 +1345,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                     'AG 29/05/2014 - #1630 - Do not activate timer is alarm is already active!!
                     'If alarmStatus AndAlso Not wasteDepositTimer.Enabled Then
-                    If alarmStatus AndAlso Not wasteDepositTimer.Enabled AndAlso Not myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR) Then
+                    If alarmStatus AndAlso Not wasteDepositTimer.Enabled AndAlso Not myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.WASTE_DEPOSIT_ERR) Then
                         GlobalBase.CreateLogActivity("Waste deposit full!! Enable timer wasteDepositTimer. Sensor value: " & myIntValue, "AnalyzerManager.UserSwANSINFTreatment", EventLogEntryType.Information, False)
                         wasteDepositTimer.Enabled = True 'Activate timer (but NOT ACTIVATE ALARM!!!)
 
@@ -2609,7 +1377,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 'Get Fridge status (parameter index 12)
                 If pSensors.ContainsKey(AnalyzerSensors.FRIDGE_STATUS) Then
                     myIntValue = CInt(pSensors(AnalyzerSensors.FRIDGE_STATUS))
-                    alarmID = GlobalEnumerates.Alarms.FRIDGE_STATUS_WARN
+                    alarmID = AlarmEnumerates.Alarms.FRIDGE_STATUS_WARN
 
                     If myIntValue = 0 Then 'OFF
                         alarmStatus = True
@@ -2644,7 +1412,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 '(this alarm is only generated when Instrument has ISE module installed - adjust ISEINS = 1)
                 If pSensors.ContainsKey(AnalyzerSensors.ISE_STATUS) Then
                     myIntValue = CInt(pSensors(AnalyzerSensors.ISE_STATUS))
-                    alarmID = GlobalEnumerates.Alarms.ISE_OFF_ERR
+                    alarmID = AlarmEnumerates.Alarms.ISE_OFF_ERR
 
                     If myIntValue = 0 Then 'OFF
                         'AG 23/11/2011 - this alarm is only generated when Instrument has ISE module installed - adjust ISEINS = 1
@@ -2673,7 +1441,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 Dim instrAddedToLogFlag As Boolean = False 'Indicates if the instruction has been added to log file
                 If myAlarmList.Count > 0 Then
                     'NOTE: Here do not place different code for service or user because this method is called only for the user Software
-                    myGlobal = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                    Dim currentAlarms = New AnalyzerAlarms(Me)
+                    myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
 
                     'AG 18/06/2012 - The ANSINF instruction is saved to log only when new alarms are generated or solved
                     '                Previous code only saved it when new alarms were generated
@@ -2681,7 +1450,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     'newNoProbeTemperatureAlarms = (From a As Boolean In myAlarmStatusList Where a = True Select a).ToList
                     'If newNoProbeTemperatureAlarms.Count > 0 Then
 
-                    If ((myAlarmList.Count = 1 AndAlso Not myAlarmList.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR)) OrElse myAlarmList.Count > 1) Then 'AG + XB 08/04/2014 - #1118 (do not save always ANSINF in log due to ISE_OFF_ERR)
+                    If ((myAlarmList.Count = 1 AndAlso Not myAlarmList.Contains(AlarmEnumerates.Alarms.ISE_OFF_ERR)) OrElse myAlarmList.Count > 1) Then 'AG + XB 08/04/2014 - #1118 (do not save always ANSINF in log due to ISE_OFF_ERR)
                         ''Dim myLogAcciones As New ApplicationLogManager() 'AG 29/05/2014 - #1630 declare at the beginning
                         GlobalBase.CreateLogActivity("Received Instruction [" & AppLayer.InstructionReceived & "]", "AnalyzerManager.UserSwANSINFTreatment", EventLogEntryType.Information, False)
                         instrAddedToLogFlag = True
@@ -2696,16 +1465,6 @@ Namespace Biosystems.Ax00.Core.Entities
                     'AG 16/03/2012 - Check if process can continue only when (ise intalled and isemanager initiated) or ise not installed 
                     '((Ise Instaled and (initiated or not swtiched on)) or not ise instaled)
                     If ISEAnalyzer IsNot Nothing AndAlso ISEAnalyzer.ConnectionTasksCanContinue Then
-
-                        'SGM 27/03/2012 proposal
-                        'If ISEAnalyzer.IsISEModuleInstalled And _
-                        '((ISEAnalyzer.IsISESwitchedON And ISEAnalyzer.IsInitiatedOK) Or _
-                        ' (Not ISEAnalyzer.IsISESwitchedON)) Then
-
-                        ValidateWarmUpProcess(myAnalyzerFlagsDS, GlobalEnumerates.WarmUpProcessFlag.Wash) 'BA-2075
-                        ValidateWarmUpProcess(myAnalyzerFlagsDS, GlobalEnumerates.WarmUpProcessFlag.ProcessStaticBaseLine) 'BA-2075
-                        ValidateWarmUpProcess(myAnalyzerFlagsDS, GlobalEnumerates.WarmUpProcessFlag.ProcessDynamicBaseLine) 'BA-2075
-
 
                         If Not CheckIfProcessCanContinue() Then
                             UpdateSensorValuesAttribute(AnalyzerSensors.ABORTED_DUE_BOTTLE_ALARMS, 1, True)
@@ -2732,7 +1491,6 @@ Namespace Biosystems.Ax00.Core.Entities
                                 UpdateSensorValuesAttribute(AnalyzerSensors.ABORTED_DUE_BOTTLE_ALARMS, 0, True)
                             End If
                         End If
-                        'AG 24/05/2012
                     End If
 
                     'AG 19/04/2012 - Abort (with out wash) is allowed while Partial Freeze
@@ -2749,9 +1507,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         Else
                             myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.STATE, True)
                         End If
-                        'AG 04/09/2012
                     End If
-                    'AG 19/04/2012
                 End If
 
                 'Update analyzer session flags into DataBase
@@ -2768,7 +1524,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.UserSwANSINFTreatment", EventLogEntryType.Error, False)
             End Try
 
@@ -2790,14 +1545,11 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim myGlobal As New GlobalDataTO
 
             Try
-                'Dim Utilities As New Utilities
                 Dim myCalc As New CalculationsDelegate()
 
                 Dim isLogActivity As Boolean = False 'SGM 11/10/2011
 
                 Dim alarmStatus As Boolean = False ' XBC 18/10/2012
-
-                'If Not MyClass.IsDisplayingServiceData Then Exit Try 'only while not displaying data
 
                 'Get General cover (parameter index 3)
                 Dim myIntValue As Integer = 0
@@ -2917,7 +1669,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'mySetpointTemp = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        myEmptyLevel = Utilities.FormatToSingle(myValue)
+                        myEmptyLevel = FormatToSingle(myValue)
                     End If
 
                     myGlobal = myAdjustmentDelegate.ReadAdjustmentValueByGroupAndAxis(ADJUSTMENT_GROUPS.WASHING_SOLUTION.ToString, _
@@ -2925,7 +1677,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'myTargetTemp = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        myFullLevel = Utilities.FormatToSingle(myValue)
+                        myFullLevel = FormatToSingle(myValue)
                     End If
 
                     If myGlobal.SetDatos Is Nothing OrElse myGlobal.HasError Then
@@ -2938,12 +1690,12 @@ Namespace Biosystems.Ax00.Core.Entities
                         myLastLevel = SensorValuesAttribute(AnalyzerSensors.BOTTLE_WASHSOLUTION)
                         myNewLevel = pSensors(AnalyzerSensors.BOTTLE_WASHSOLUTION)
 
-                        myGlobal = Utilities.CalculatePercent(myLastLevel, myEmptyLevel, myFullLevel)
+                        myGlobal = CalculatePercent(myLastLevel, myEmptyLevel, myFullLevel)
                         If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                             myLastPercent = CType(myGlobal.SetDatos, Single)
                         End If
 
-                        myGlobal = Utilities.CalculatePercent(myNewLevel, myEmptyLevel, myFullLevel)
+                        myGlobal = CalculatePercent(myNewLevel, myEmptyLevel, myFullLevel)
                         If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                             myNewPercent = CType(myGlobal.SetDatos, Single)
                         End If
@@ -2987,7 +1739,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'mySetpointTemp = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        myEmptyLevel = Utilities.FormatToSingle(myValue)
+                        myEmptyLevel = FormatToSingle(myValue)
                     End If
 
                     myGlobal = myAdjustmentDelegate.ReadAdjustmentValueByGroupAndAxis(ADJUSTMENT_GROUPS.HIGH_CONTAMINATION.ToString, _
@@ -2995,7 +1747,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'myTargetTemp = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        myFullLevel = Utilities.FormatToSingle(myValue)
+                        myFullLevel = FormatToSingle(myValue)
                     End If
 
                     If myGlobal.SetDatos Is Nothing OrElse myGlobal.HasError Then
@@ -3008,12 +1760,12 @@ Namespace Biosystems.Ax00.Core.Entities
                         myLastLevel = SensorValuesAttribute(AnalyzerSensors.BOTTLE_HIGHCONTAMINATION_WASTE)
                         myNewLevel = pSensors(AnalyzerSensors.BOTTLE_HIGHCONTAMINATION_WASTE)
 
-                        myGlobal = Utilities.CalculatePercent(myLastLevel, myEmptyLevel, myFullLevel)
+                        myGlobal = CalculatePercent(myLastLevel, myEmptyLevel, myFullLevel)
                         If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                             myLastPercent = CType(myGlobal.SetDatos, Single)
                         End If
 
-                        myGlobal = Utilities.CalculatePercent(myNewLevel, myEmptyLevel, myFullLevel)
+                        myGlobal = CalculatePercent(myNewLevel, myEmptyLevel, myFullLevel)
                         If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                             myNewPercent = CType(myGlobal.SetDatos, Single)
                         End If
@@ -3062,7 +1814,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'mySetpointTemp = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        mySetpointTemp = Utilities.FormatToSingle(myValue)
+                        mySetpointTemp = FormatToSingle(myValue)
                     Else
                         myGlobal.HasError = True
                         Exit Try
@@ -3073,7 +1825,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'myTargetTemp = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        myTargetTemp = Utilities.FormatToSingle(myValue)
+                        myTargetTemp = FormatToSingle(myValue)
                     Else
                         myGlobal.HasError = True
                         Exit Try
@@ -3085,7 +1837,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'sensorValueToMonitor = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        sensorValueToMonitor = Utilities.FormatToSingle(myValue)
+                        sensorValueToMonitor = FormatToSingle(myValue)
 
                         'Update the class attribute SensorValuesAttribute
                         'UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_FRIDGE, pSensors(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_FRIDGE), True)
@@ -3111,7 +1863,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'mySetpointTemp = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        mySetpointTemp = Utilities.FormatToSingle(myValue)
+                        mySetpointTemp = FormatToSingle(myValue)
                     Else
                         myGlobal.HasError = True
                         Exit Try
@@ -3122,7 +1874,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'myTargetTemp = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        myTargetTemp = Utilities.FormatToSingle(myValue)
+                        myTargetTemp = FormatToSingle(myValue)
                     Else
                         myGlobal.HasError = True
                         Exit Try
@@ -3134,7 +1886,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'sensorValueToMonitor = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        sensorValueToMonitor = Utilities.FormatToSingle(myValue)
+                        sensorValueToMonitor = FormatToSingle(myValue)
 
                         'Update the class attribute SensorValuesAttribute
                         'UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_REACTIONS, pSensors(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_REACTIONS), True)
@@ -3159,7 +1911,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'mySetpointTemp = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        mySetpointTemp = Utilities.FormatToSingle(myValue)
+                        mySetpointTemp = FormatToSingle(myValue)
                     Else
                         myGlobal.HasError = True
                         Exit Try
@@ -3170,7 +1922,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'myTargetTemp = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        myTargetTemp = Utilities.FormatToSingle(myValue)
+                        myTargetTemp = FormatToSingle(myValue)
                     Else
                         myGlobal.HasError = True
                         Exit Try
@@ -3182,7 +1934,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'sensorValueToMonitor = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        sensorValueToMonitor = Utilities.FormatToSingle(myValue)
+                        sensorValueToMonitor = FormatToSingle(myValue)
 
                         'Update the class attribute SensorValuesAttribute
                         'UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_WASHINGSTATION, pSensors(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_WASHINGSTATION), True)
@@ -3207,7 +1959,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'mySetpointTemp = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        mySetpointTemp = Utilities.FormatToSingle(myValue)
+                        mySetpointTemp = FormatToSingle(myValue)
                     Else
                         myGlobal.HasError = True
                         Exit Try
@@ -3218,7 +1970,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'myTargetTemp = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        myTargetTemp = Utilities.FormatToSingle(myValue)
+                        myTargetTemp = FormatToSingle(myValue)
                     Else
                         myGlobal.HasError = True
                         Exit Try
@@ -3230,7 +1982,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'sensorValueToMonitor = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        sensorValueToMonitor = Utilities.FormatToSingle(myValue)
+                        sensorValueToMonitor = FormatToSingle(myValue)
 
                         'Update the class attribute SensorValuesAttribute
                         'UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_R1, pSensors(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_R1), True)
@@ -3255,7 +2007,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'mySetpointTemp = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        mySetpointTemp = Utilities.FormatToSingle(myValue)
+                        mySetpointTemp = FormatToSingle(myValue)
                     Else
                         myGlobal.HasError = True
                         Exit Try
@@ -3266,7 +2018,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'myTargetTemp = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        myTargetTemp = Utilities.FormatToSingle(myValue)
+                        myTargetTemp = FormatToSingle(myValue)
                     Else
                         myGlobal.HasError = True
                         Exit Try
@@ -3278,7 +2030,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'sensorValueToMonitor = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        sensorValueToMonitor = Utilities.FormatToSingle(myValue)
+                        sensorValueToMonitor = FormatToSingle(myValue)
 
                         'Update the class attribute SensorValuesAttribute
                         'UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_R2, pSensors(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_R2), True)
@@ -3308,7 +2060,6 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
                 If isLogActivity Then
-                    'Dim myLogAcciones As New ApplicationLogManager()
                     GlobalBase.CreateLogActivity("Received Instruction [" & AppLayer.InstructionReceived & "]", "ApplicationLayer.ActivateProtocol (case RECEIVE)", EventLogEntryType.Information, False)
                 End If
 
@@ -3317,15 +2068,11 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ServiceSwAnsInfTreatment", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
         End Function
-
-
-
 
         ''' <summary>
         ''' SW has received FW data
@@ -3386,317 +2133,6 @@ Namespace Biosystems.Ax00.Core.Entities
             Return myGlobal
         End Function
 
-        ' TO DELETE !!!
-        '''' <summary>
-        '''' SW has received MANIFOLD data
-        '''' Service Sw has his own threatment different form User SW
-        '''' </summary>
-        '''' <param name="pElements "></param>
-        '''' <returns></returns>
-        '''' <remarks>SGM 23/05/2011 - creation </remarks>
-        'Private Function ServiceSwManifoldInfoTreatment(ByVal pElements As Dictionary(Of GlobalEnumerates.MANIFOLD_ELEMENTS, String)) As GlobalDataTO
-
-        '    Dim myGlobal As New GlobalDataTO
-
-        '    Try
-        '        'They must be in order
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_TEMP) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_TEMP, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_TEMP), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MR1) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MR1, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MR1H), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MR1H) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MR1H, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MR1H), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MR1A) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MR1A, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MR1A), True)
-        '        End If
-
-
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MR2) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MR2, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MR2H), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MR2H) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MR2H, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MR2H), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MR2A) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MR2A, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MR2A), True)
-        '        End If
-
-
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MS) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MS, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MS), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MSH) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MSH, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MSH), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MSA) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MSA, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MSA), True)
-        '        End If
-
-
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_B1) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_B1, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_B1), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_B1D) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_B1D, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_B1D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_B2) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_B2, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_B2), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_B2D) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_B2D, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_B2D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_B3) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_B3, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_B3), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_B3D) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_B3D, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_B3D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV1) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV1, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV1), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV1D) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV1D, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV1D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV2) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV2, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV2), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV2D) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV2D, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV2D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV3) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV3, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV3), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV3D) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV3D, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV3D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV4) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV4, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV4), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV4D) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV4D, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV4D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV5) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV5, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV5), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV5D) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV5D, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV5D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV6) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV6, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV6), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV6D) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV6D, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV6D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_GE1) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_GE1, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_GE1), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_GE1D) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_GE1D, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_GE1D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_GE2) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_GE2, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_GE2), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_GE2D) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_GE2D, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_GE2D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_GE3) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_GE3, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_GE3), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_GE3D) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_GE3D, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_GE3D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_CLT) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_CLT, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_CLT), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_CLTD) Then
-        '            UpdateManifoldValuesAttribute(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_CLTD, pElements(GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_CLTD), True)
-        '        End If
-
-        '    Catch ex As Exception
-        '        myGlobal.HasError = True
-        '        myGlobal.ErrorCode = "SYSTEM_ERROR"
-        '        myGlobal.ErrorMessage = ex.Message
-
-        '        'Dim myLogAcciones As New ApplicationLogManager()
-        '        GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ServiceSwManifoldInfoTreatment", EventLogEntryType.Error, False)
-        '    End Try
-
-        '    Return myGlobal
-        'End Function
-
-        '''' <summary>
-        '''' SW has received FLUIDIC data
-        '''' Service Sw has his own threatment different form User SW
-        '''' </summary>
-        '''' <param name="pElements "></param>
-        '''' <returns></returns>
-        '''' <remarks>SGM 23/05/2011 - creation </remarks>
-        'Private Function ServiceSwFluidicsInfoTreatment(ByVal pElements As Dictionary(Of GlobalEnumerates.FLUIDICS_ELEMENTS, String)) As GlobalDataTO
-
-        '    Dim myGlobal As New GlobalDataTO
-
-        '    Try
-
-
-        '        'They must be in order
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_TEMP) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_TEMP, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_TEMP), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_MS) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_MS, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_MS), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_MSH) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_MSH, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_MSH), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_MSA) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_MSA, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_MSA), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B1) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B1, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B1), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B1D) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B1D, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B1D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B2) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B2, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B2), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B2D) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B2D, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B2D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B3) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B3, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B3), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B3D) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B3D, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B3D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B4) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B4, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B4), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B4D) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B4D, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B4D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B5) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B5, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B5), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B5D) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B5D, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B5D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B6) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B6, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B6), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B6D) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B6D, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B6D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B7) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B7, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B7), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B7D) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B7D, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B7D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B8) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B8, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B8), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B8D) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B8D, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B8D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B9) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B9, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B9), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B9D) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B9D, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B9D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B10) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B10, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B10), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B10D) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B10D, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B10D), True)
-        '        End If
-
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_EV1) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_EV1, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_EV1), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_EV2) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_EV2, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_EV2), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_MS) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_MS, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_MS), True)
-        '        End If
-        '        If pElements.ContainsKey(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_GE1) Then
-        '            UpdateFluidicsValuesAttribute(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_GE1, pElements(GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_GE1), True)
-        '        End If
-        '    Catch ex As Exception
-        '        myGlobal.HasError = True
-        '        myGlobal.ErrorCode = "SYSTEM_ERROR"
-        '        myGlobal.ErrorMessage = ex.Message
-
-        '        'Dim myLogAcciones As New ApplicationLogManager()
-        '        GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ServiceSwManifoldInfoTreatment", EventLogEntryType.Error, False)
-        '    End Try
-
-        '    Return myGlobal
-        'End Function
-
-        '''' <summary>
-        '''' SW has received PHOTOMETRICS data
-        '''' Service Sw has his own threatment different form User SW
-        '''' </summary>
-        '''' <param name="pElements "></param>
-        '''' <returns></returns>
-        '''' <remarks>SGM 23/05/2011 - creation </remarks>
-        'Private Function ServiceSwPhotometricsInfoTreatment(ByVal pElements As Dictionary(Of GlobalEnumerates.PHOTOMETRICS_ELEMENTS, String)) As GlobalDataTO
-
-        '    Dim myGlobal As New GlobalDataTO
-
-        '    Try
-        '        'They must be in order
-        '        If pElements.ContainsKey(GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_TEMP) Then
-        '            UpdatePhotometricsValuesAttribute(GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_TEMP, pElements(GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_TEMP), True)
-        '        End If
-
-
-
-        '        'PDT
-
-        '    Catch ex As Exception
-        '        myGlobal.HasError = True
-        '        myGlobal.ErrorCode = "SYSTEM_ERROR"
-        '        myGlobal.ErrorMessage = ex.Message
-
-        '        'Dim myLogAcciones As New ApplicationLogManager()
-        '        GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ServiceSwPhotometricsInfoTreatment", EventLogEntryType.Error, False)
-        '    End Try
-
-        '    Return myGlobal
-        'End Function
-        ' TO DELETE !!!
-
         ''' <summary>
         ''' SW has received ARMS data
         ''' Service Sw has his own threatment different form User SW
@@ -3743,7 +2179,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ServiceSwArmsInfoTreatment", EventLogEntryType.Error, False)
             End Try
 
@@ -3786,7 +2221,6 @@ Namespace Biosystems.Ax00.Core.Entities
                     myUI_RefreshDS.ProbeValueChanged.AddProbeValueChangedRow(myNewprobesValuesRow)
                     myUI_RefreshDS.ProbeValueChanged.AcceptChanges() 'AG 22/05/2014 #1637 AcceptChanges in datatable layer instead of dataset layer
                 End SyncLock
-                'myUI_RefreshDS.AcceptChanges() 'AG 22/05/2014 #1637 AcceptChanges in datatable layer instead of dataset layer
 
                 'Generate UI_Refresh event PROBESSVALUE_CHANGED
                 If Not myUI_RefreshEvent.Contains(UI_RefreshEvents.PROBESVALUE_CHANGED) Then myUI_RefreshEvent.Add(UI_RefreshEvents.PROBESVALUE_CHANGED)
@@ -3796,7 +2230,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ServiceSwProbesInfoTreatment", EventLogEntryType.Error, False)
             End Try
 
@@ -3851,8 +2284,6 @@ Namespace Biosystems.Ax00.Core.Entities
                     myUI_RefreshDS.RotorValueChanged.AcceptChanges() 'AG 22/05/2014 #1637 AcceptChanges in datatable layer instead of dataset layer
                 End SyncLock
 
-                'myUI_RefreshDS.AcceptChanges() 'AG 22/05/2014 #1637 AcceptChanges in datatable layer instead of dataset layer
-
                 'Generate UI_Refresh event ROTORSSVALUE_CHANGED
                 If Not myUI_RefreshEvent.Contains(UI_RefreshEvents.ROTORSVALUE_CHANGED) Then myUI_RefreshEvent.Add(UI_RefreshEvents.ROTORSVALUE_CHANGED)
 
@@ -3861,14 +2292,11 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ServiceSwRotorsInfoTreatment", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
         End Function
-
-
 
         ''' <summary>
         ''' Update the internal attribte SensorValuesAttribute
@@ -3885,10 +2313,6 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim flagChanges As Boolean = False
 
             Try
-
-                'SGM 29/09/2011
-                'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                 If GlobalBase.IsServiceAssembly Then
                     If InfoRefreshFirstTime Then
                         InfoRefreshFirstTime = False
@@ -3933,38 +2357,31 @@ Namespace Biosystems.Ax00.Core.Entities
                     If pSensor = AnalyzerSensors.CONNECTED Then
 
                         'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                        'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                        If GlobalBase.IsServiceAssembly Then
-                            'Nothing
-
-                        Else
+                        If Not GlobalBase.IsServiceAssembly Then
                             'Add into alarms table
                             Dim myAlarmList As New List(Of Alarms)
                             Dim myAlarmStatusList As New List(Of Boolean)
-                            Dim alarmID As Alarms = GlobalEnumerates.Alarms.COMMS_ERR
-                            Dim alarmStatus As Boolean = False
-                            If pNewValue <> 1 Then alarmStatus = True
-                            PrepareLocalAlarmList(alarmID, alarmStatus, myAlarmList, myAlarmStatusList)
+                            Const alarmId As Alarms = AlarmEnumerates.Alarms.COMMS_ERR
+                            Dim alarmStatus = pNewValue <> 1
+                            PrepareLocalAlarmList(alarmId, alarmStatus, myAlarmList, myAlarmStatusList)
                             If myAlarmList.Count > 0 Then
                                 Dim myGlobal As New GlobalDataTO
-                                myGlobal = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                                Dim currentAlarms = New AnalyzerAlarms(Me)
+                                myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
                             End If
                         End If
 
                     End If
-                    'AG 17/10/2011
 
                     Return True
                 End If
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.UpdateSensorValuesAttribute", EventLogEntryType.Error, False)
             End Try
 
             Return False
 
         End Function
-
 
         ''' <summary>
         ''' Update the internal attribte CpuValuesAttribute
@@ -3994,36 +2411,6 @@ Namespace Biosystems.Ax00.Core.Entities
             'Generate UI_Refresh event CPUVALUE_CHANGED
             PrepareUIRefreshEventCpu(Nothing, UI_RefreshEvents.CPUVALUE_CHANGED, pElement, pNewValue)
             'End If
-
-        End Sub
-
-        ''' <summary>
-        ''' Update the internal attribte CyclesValuesAttribute
-        ''' </summary>
-        ''' <param name="pElement"></param>
-        ''' <param name="pNewValue"></param>
-        ''' <param name="pUIEventForChangesFlag"></param>
-        ''' <remarks></remarks>
-        Private Sub UpdateHwCyclesValuesAttribute(ByVal pElement As CYCLE_ELEMENTS, _
-                                                  ByVal pSubsystem As SUBSYSTEMS, _
-                                                  ByVal pUnits As CYCLE_UNITS, _
-                                                  ByVal pNewValue As String, _
-                                                  ByVal pUIEventForChangesFlag As Boolean)
-            'NOTE: Do not implement Try .. Catch due the methods who call it implements it
-
-            Dim flagChanges As Boolean = False
-
-            'If Not CyclesValuesAttribute.ContainsKey(pElement) Then
-            '    CyclesValuesAttribute.Add(pElement, pNewValue)
-            '    flagChanges = True
-
-            'ElseIf CyclesValuesAttribute(pElement) <> pNewValue Then
-            '    CyclesValuesAttribute(pElement) = pNewValue
-            '    flagChanges = True
-            'End If
-
-            'Generate UI_Refresh event MANIFOLDVALUE_CHANGED
-            PrepareUIRefreshEventCycles(Nothing, UI_RefreshEvents.HWCYCLES_CHANGED, pElement, pSubsystem, pUnits, pNewValue)
 
         End Sub
 
@@ -4163,7 +2550,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 If MinAdj <> -1 AndAlso MaxAdj <> -1 AndAlso MinAdj <> MaxAdj Then
                     ''Dim myUtil As New Utilities.
-                    myGlobal = Utilities.CalculatePercent(pCounts, MinAdj, MaxAdj, True)
+                    myGlobal = CalculatePercent(pCounts, MinAdj, MaxAdj, True)
                 Else
                     myGlobal.SetDatos = Nothing
                 End If
@@ -4179,34 +2566,6 @@ Namespace Biosystems.Ax00.Core.Entities
             Return myGlobal
 
         End Function
-
-
-
-        ''' <summary>
-        ''' The fridge status damaged is when fw sends any of these error codes: 301, 302 or 303 (belongs to FRIDGE_TEMP_SYS_ERR and FRIDGE_FAN_WARN)
-        ''' </summary>
-        ''' <param name="pAlarmList"></param>
-        ''' <param name="pAlarmStatusList"></param>
-        ''' <returns>Boolean</returns>
-        ''' <remarks></remarks>
-        Private Function IsFridgeStatusDamaged(ByVal pAlarmList As List(Of Alarms), ByVal pAlarmStatusList As List(Of Boolean)) As Boolean
-            Dim myReturn As Boolean = False
-            Try
-                'DL 31/07/2012. Begin
-                If pAlarmList.Contains(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS_ERR) OrElse pAlarmList.Contains(GlobalEnumerates.Alarms.FRIDGE_FAN_WARN) Then
-                    'If pAlarmList.Contains(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS1_ERR) OrElse _
-                    '  pAlarmList.Contains(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS2_ERR) OrElse _
-                    ' pAlarmList.Contains(GlobalEnumerates.Alarms.FRIDGE_FAN_WARN) Then
-                    myReturn = True
-                End If
-                'DL 31/07/2012. End
-            Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.IsFridgeStatusDamaged", EventLogEntryType.Error, False)
-            End Try
-            Return myReturn
-        End Function
-
 
         ''' <summary>
         ''' Error codes not detected yet are marked as solved
@@ -4269,7 +2628,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SolveErrorCodesToDisplay", EventLogEntryType.Error, False)
             End Try
         End Sub
@@ -4311,7 +2669,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.AddErrorCodesToDisplay", EventLogEntryType.Error, False)
             End Try
         End Sub
@@ -4331,7 +2688,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.RemoveErrorCodesToDisplay", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
@@ -4356,38 +2712,34 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim readyToSentInstruction As Boolean = True ' True next instruction can be sent / False can not be sent due a bottle alarms
             Try
                 Dim bottleErrAlarm As Boolean = False
-                Dim reactRotorMissingAlarm As Boolean = myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.REACT_MISSING_ERR) 'AG 12/03/2012
+                Dim reactRotorMissingAlarm As Boolean = myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.REACT_MISSING_ERR) 'AG 12/03/2012
                 Dim myGlobal As New GlobalDataTO
                 Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
 
                 'AG 20/02/2012 - The following condition is added into a public method
-                'If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_ERR) OrElse myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.HIGH_CONTAMIN_ERR) _
-                '  OrElse myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_WARN) OrElse myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.HIGH_CONTAMIN_WARN) _
-                '  OrElse myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WASTE_SYSTEM_ERR) OrElse myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WATER_SYSTEM_ERR) _
-                '  OrElse myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR) OrElse myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR) Then
                 If ExistBottleAlarms() Then
                     bottleErrAlarm = True
                 End If
 
                 'AG 22/02/2012 - Change bottle confirmation process
-                If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.CHANGE_BOTTLES_Process.ToString) = "INPROCESS" Then
+                If mySessionFlags(AnalyzerManagerFlags.CHANGE_BOTTLES_Process.ToString) = "INPROCESS" Then
                     Dim askForStateFlag As Boolean = True
-                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.CHANGE_BOTTLES_Process, "CLOSED")
+                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.CHANGE_BOTTLES_Process, "CLOSED")
 
                     If bottleErrAlarm OrElse reactRotorMissingAlarm Then
                         readyToSentInstruction = False
 
                     Else
                         'If change bottles confirmation success and there was an ABORT ws wash pending ... send it automatically
-                        If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess.ToString) = "PAUSED" Then
-                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess, "INPROCESS")
-                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.Washing, "")
+                        If mySessionFlags(AnalyzerManagerFlags.ABORTprocess.ToString) = "PAUSED" Then
+                            UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.ABORTprocess, "INPROCESS")
+                            UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.Washing, "")
                             askForStateFlag = False 'In this case is not necessary to ask for status, we sent the Wash instruction
 
                             'If change bottles confirmation success and there was an RECOVER ws wash pending ... send it automatically
-                        ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.RECOVERprocess.ToString) = "PAUSED" Then
-                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.RECOVERprocess, "INPROCESS")
-                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.Washing, "")
+                        ElseIf mySessionFlags(AnalyzerManagerFlags.RECOVERprocess.ToString) = "PAUSED" Then
+                            UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.RECOVERprocess, "INPROCESS")
+                            UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.Washing, "")
                             askForStateFlag = False 'In this case is not necessary to ask for status, we sent the Wash instruction
 
                         Else 'for other processes activate action button but not send next instruction automatically
@@ -4398,11 +2750,10 @@ Namespace Biosystems.Ax00.Core.Entities
                     'Finally Sw also ask for status
                     'Send a STATE instruction
                     If askForStateFlag Then
-                        myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STATE, True)
+                        myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.STATE, True)
                     End If
 
                 End If
-                'AG 22/02/2012
 
                 If readyToSentInstruction Then
 
@@ -4411,43 +2762,43 @@ Namespace Biosystems.Ax00.Core.Entities
                     End If
 
                     'Some action button process required Wash instruction is bottle level OK before Sw sends it
-                    If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.Washing.ToString) = "" Then
+                    If mySessionFlags(AnalyzerManagerFlags.Washing.ToString) = "" Then
 
                         'AG 20/02/2012 - abort process
                         'ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess.ToString) = "INPROCESS" Then
-                        If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess.ToString) = "INPROCESS" Then
+                        If mySessionFlags(AnalyzerManagerFlags.ABORTprocess.ToString) = "INPROCESS" Then
                             If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
                                 If bottleErrAlarm OrElse reactRotorMissingAlarm Then
                                     readyToSentInstruction = False
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess, "PAUSED")
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.Washing, "CANCELED")
+                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.ABORTprocess, "PAUSED")
+                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.Washing, "CANCELED")
 
                                     'Else 'AG 28/02/2012 - when ABORT send the WASH instrucion
                                 Else
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess, "INPROCESS") 'AG 05/03/2012
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.Washing, "INI")
+                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.ABORTprocess, "INPROCESS") 'AG 05/03/2012
+                                    UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.Washing, "INI")
 
                                     'Send a WASH instruction (Conditioning complete)
-                                    myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.WASH, True)
+                                    myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.WASH, True)
                                 End If
                             End If
                             'AG 20/02/2012
 
                             'AG 08/03/2012 - recover process
-                        ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.RECOVERprocess.ToString) = "INPROCESS" Then
+                        ElseIf mySessionFlags(AnalyzerManagerFlags.RECOVERprocess.ToString) = "INPROCESS" Then
 
                             If bottleErrAlarm OrElse reactRotorMissingAlarm Then
                                 readyToSentInstruction = False
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.RECOVERprocess, "PAUSED")
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.Washing, "CANCELED")
+                                UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.RECOVERprocess, "PAUSED")
+                                UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.Washing, "CANCELED")
 
                                 'Else 'AG 28/02/2012 - when RECOVER finishes send the WASH instrucion only in standby
                             ElseIf AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.RECOVERprocess, "INPROCESS") 'AG 05/03/2012
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.Washing, "INI")
+                                UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.RECOVERprocess, "INPROCESS") 'AG 05/03/2012
+                                UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.Washing, "INI")
 
                                 'Send a WASH instruction (Conditioning complete)
-                                myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.WASH, True)
+                                myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.WASH, True)
                             End If
 
                         End If
@@ -4463,35 +2814,9 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.CheckIfProcessCanContinue", EventLogEntryType.Error, False)
             End Try
             Return readyToSentInstruction
-        End Function
-
-        ''' <summary>
-        ''' 
-        ''' </summary>
-        ''' <returns></returns>
-        ''' <remarks>
-        ''' Modified by: IT 19/12/2014 - BA-2143 (Accessibility Level)
-        ''' </remarks>
-        Public Function CheckIfWashingIsPossible() As Boolean Implements IAnalyzerManager.CheckIfWashingIsPossible
-
-            Dim readyToSentInstruction As Boolean = True ' True next instruction can be sent / False can not be sent due a bottle alarms
-            Dim bottleErrAlarm As Boolean = False
-            Dim reactRotorMissingAlarm As Boolean = myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.REACT_MISSING_ERR) 'AG 12/03/2012
-
-            If ExistBottleAlarms() Then
-                bottleErrAlarm = True
-            End If
-
-            If bottleErrAlarm OrElse reactRotorMissingAlarm Then
-                readyToSentInstruction = False
-            End If
-
-            Return readyToSentInstruction
-
         End Function
 
 #End Region
@@ -4502,7 +2827,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Transalte the Fw error code to an internal Sw alarm ID enumerate
         ''' Depending the error code the internal flag AnalyzerIsFREEZEMode is activated
         ''' </summary>
-        ''' <param name="pDBConnection"></param>
+        ''' <param name="pDbConnection"></param>
         ''' <param name="pErrorCodeList"></param>
         ''' <remarks>
         ''' AG 25/03/2011 - creation ... but not implemented due the error codes are not still defined
@@ -4514,42 +2839,39 @@ Namespace Biosystems.Ax00.Core.Entities
         '''               When method finishes, the list of alarms returned must be equivalent to the pErrorCodeList
         '''               So: define byRef the parameter pErrorCodeList (error codes that not generate alarm will be removed from list), error codes that generates N alarms will be added N-1 times to list           
         ''' </remarks>
-        Private Function TranslateErrorCodeToAlarmID(ByVal pDBConnection As SqlConnection, ByRef pErrorCodeList As List(Of Integer)) As List(Of Alarms)
-            Dim resultData As GlobalDataTO = Nothing
+        Public Function TranslateErrorCodeToAlarmID(ByVal pDbConnection As SqlConnection, ByRef pErrorCodeList As List(Of Integer)) As List(Of Alarms) _
+            Implements IAnalyzerManager.TranslateErrorCodeToAlarmID
+
+            Dim resultData As GlobalDataTO
             Dim dbConnection As SqlConnection = Nothing
             Dim toReturnAlarmList As New List(Of Alarms)
 
             Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                resultData = GetOpenDBConnection(pDBConnection)
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
                     If (Not dbConnection Is Nothing) Then
 
                         Dim stringAlarmList As New List(Of String)
                         Dim myLinq As List(Of AlarmsDS.tfmwAlarmsRow)
-                        Dim fwStartsFreezeFlag As Boolean = False 'AG 28/03/2012
+                        Dim fwStartsFreezeFlag As Boolean = False
 
-                        'AG 02/02/2015 BA-2222 - use a local list in loop because the list in parameter can be modified
-                        'For Each row As Integer In pErrorCodeList
+                        'use a local list in loop because the list in parameter can be modified
                         Dim alarmItemCounter As Integer = 0 'Count the alarms generated by 1 error code!!
                         Dim myLocalErrorCodeList As New List(Of Integer)
                         myLocalErrorCodeList.AddRange(pErrorCodeList)
 
                         'For each ErrorCode in pErrorCodeList search the related AlarmID and evaluate if Freeze
                         For Each row As Integer In myLocalErrorCodeList
-                            'AG 02/02/2015 BA-2222
                             myLinq = (From a As AlarmsDS.tfmwAlarmsRow In alarmsDefintionTableDS.tfmwAlarms _
                                       Where Not a.IsErrorCodeNull AndAlso a.ErrorCode = row Select a).ToList
 
                             If myLinq.Count > 0 Then
-                                alarmItemCounter = 0 'AG 02/02/2015 BA-2222
+                                alarmItemCounter = 0
                                 For Each item As AlarmsDS.tfmwAlarmsRow In myLinq
                                     'Get the related AlarmID
-
-                                    'AG 05/03/2012
-                                    'This line causes system error, vb .net can not convert a String (item.AlarmID) into a internal enumerate (GlobalEnumerates.Alarms)
-                                    'Solution: Create a list of alarm string and the call a method who implements the select case to asign to proper GlobalEnumerates.Alarms ID
-                                    'toReturnAlarmList.Add(CType(item.AlarmID, GlobalEnumerates.Alarms))
+                                    'This line causes system error, vb .net can not convert a String (item.AlarmID) into a internal enumerate (AlarmEnumerates.Alarms)
+                                    'Solution: Create a list of alarm string and the call a method who implements the select case to asign to proper AlarmEnumerates.Alarms ID
 
                                     If Not stringAlarmList.Contains(item.AlarmID) Then
                                         stringAlarmList.Add(item.AlarmID)
@@ -4559,14 +2881,9 @@ Namespace Biosystems.Ax00.Core.Entities
                                         If alarmItemCounter > 1 Then
                                             pErrorCodeList.Insert(pErrorCodeList.IndexOf(row), row)
                                         End If
-                                        'AG 02/02/2015 BA-2222
 
                                         ' XBC 16/10/2012 - Alarms treatment for Service
-                                        'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                                        'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                                        If GlobalBase.IsServiceAssembly Then
-                                            ' Not Apply
-                                        Else
+                                        If Not GlobalBase.IsServiceAssembly Then
                                             'Evaluate if Freeze and FreezeMode
                                             If Not item.IsFreezeNull Then
                                                 If Not analyzerFREEZEFlagAttribute Then
@@ -4577,14 +2894,8 @@ Namespace Biosystems.Ax00.Core.Entities
                                                     'AG 07/03/2012 - RPM spec the cover errors are treated as "Total" freeze in running
                                                     '                in other status are a special freeze mode autosolved "auto"
                                                     If item.Freeze = "AUTO" And AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
-                                                        'analyzerFREEZEModeAttribute = "PARTIAL" 'AG - New spec RPM 08/03/2012 - Not partial, Total!!
                                                         analyzerFREEZEModeAttribute = "TOTAL"
                                                     End If
-                                                    'AG 07/03/2012
-
-                                                    'AG 28/03/2012
-                                                    'UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.FREEZE, 1, True) 'AG 06/03/2012 - Inform presentation analyzer is FREEZE
-
                                                 Else
                                                     'Inform when user try to connect after freeze on connection
                                                     If SensorValuesAttribute(AnalyzerSensors.FREEZE) <> 1 Then
@@ -4608,31 +2919,22 @@ Namespace Biosystems.Ax00.Core.Entities
                                         End If
                                     End If
                                 Next
-                                'AG 02/02/2015 BA-2222 - Error code that without related alarm!! Remove it from list
                             Else
                                 pErrorCodeList.Remove(row)
-                                'AG 02/02/2015 BA-2222
-
                             End If
                         Next
-                        myLinq = Nothing
-
                         'Translate the stringAlarmList into toReturnAlarmList
                         If stringAlarmList.Count > 0 Then
                             toReturnAlarmList = ConvertToAlarmIDEnumerate(stringAlarmList)
 
                             ' XBC 16/10/2012 - Alarms treatment for Service
-                            'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                            'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                            If GlobalBase.IsServiceAssembly Then
-                                ' Not Apply
-                            Else
+                            If Not GlobalBase.IsServiceAssembly Then
                                 'AG 28/03/2012 - The only AUTO freeze code error in standby is INSTRUCTION REJECTED ERROR (not covers)
                                 'FREEZE is when Fw informs instruction rejected error because some enabled cover is opened
                                 'not when informs only enabled cover opened
                                 If fwStartsFreezeFlag AndAlso analyzerFREEZEModeAttribute = "AUTO" Then
                                     'Remove false Freeze
-                                    If Not toReturnAlarmList.Contains(GlobalEnumerates.Alarms.INST_REJECTED_ERR) Then
+                                    If Not toReturnAlarmList.Contains(AlarmEnumerates.Alarms.INST_REJECTED_ERR) Then
                                         analyzerFREEZEFlagAttribute = False
                                         analyzerFREEZEModeAttribute = ""
                                     End If
@@ -4642,7 +2944,6 @@ Namespace Biosystems.Ax00.Core.Entities
                                 If fwStartsFreezeFlag AndAlso analyzerFREEZEFlagAttribute Then
                                     UpdateSensorValuesAttribute(AnalyzerSensors.FREEZE, 1, True)
                                 End If
-                                'AG 28/03/2012
                             End If
                         End If
 
@@ -4652,13 +2953,23 @@ Namespace Biosystems.Ax00.Core.Entities
             Catch ex As Exception
                 toReturnAlarmList.Clear() 'Clear the alarm list to return
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.TranslateErrorCodeToAlarmID", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return (toReturnAlarmList)
+        End Function
+
+        Public Function SimpleTranslateErrorCodeToAlarmId(ByVal pDbConnection As SqlConnection, ByVal errorCode As Integer) As Alarms Implements IAnalyzerManager.SimpleTranslateErrorCodeToAlarmId
+            Dim dbConnection = GetSafeOpenDBConnection(pDbConnection)
+            If (Not dbConnection.HasError AndAlso Not dbConnection.SetDatos Is Nothing) Then
+                Dim c = (From a As AlarmsDS.tfmwAlarmsRow In alarmsDefintionTableDS.tfmwAlarms Where a.ErrorCode = errorCode Select a.AlarmID).ToList
+                If c.Count = 1 Then
+                    Return DirectCast([Enum].Parse(GetType(Alarms), c.FirstOrDefault()), Alarms)
+                End If
+            End If
+            Return AlarmEnumerates.Alarms.NONE
         End Function
 
         ''' <summary>
@@ -4672,229 +2983,12 @@ Namespace Biosystems.Ax00.Core.Entities
         '''              XB 20/01/2015 - Add new ISE Alarms - BA-1873
         ''' </remarks>
         Private Function ConvertToAlarmIDEnumerate(ByVal pAlarmStringCodes As List(Of String)) As List(Of Alarms)
-            'Do not implement Try/Catch: the caller method does it
-
-            Dim alarmIDEnumList As New List(Of Alarms)
+            Dim alarmIdEnumList As New List(Of Alarms)
             For Each row As String In pAlarmStringCodes
-                'AG 04/12/2014 BA-2236 code improvement
-                alarmIDEnumList.Add(DirectCast([Enum].Parse(GetType(Alarms), row), Alarms))
-
-                'This select must be updated with every alarmID added into enumerate GlobalEnumerates.Alarms
-                'Select Case row
-                '    Case "MAIN_COVER_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.MAIN_COVER_ERR)
-                '    Case "MAIN_COVER_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.MAIN_COVER_WARN)
-
-                '    Case "WASH_CONTAINER_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WASH_CONTAINER_ERR)
-                '    Case "WASH_CONTAINER_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WASH_CONTAINER_WARN)
-
-                '    Case "HIGH_CONTAMIN_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.HIGH_CONTAMIN_ERR)
-                '    Case "HIGH_CONTAMIN_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.HIGH_CONTAMIN_WARN)
-
-                '    Case "R1_TEMP_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_TEMP_WARN)
-                '        'DL 31/07/2012. Begin. Remove R1_TEMP_SYSTEM_ERR
-                '    Case "R1_TEMP_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_TEMP_SYSTEM_ERR)
-                '        'Case "R1_TEMP_SYS1_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_TEMP_SYS1_ERR)
-                '        'Case "R1_TEMP_SYS2_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_TEMP_SYS2_ERR)
-                '        'DL 31/07/2012. End
-                '    Case "R1_DETECT_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_DETECT_SYSTEM_ERR)
-                '    Case "R1_NO_VOLUME_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_NO_VOLUME_WARN)
-                '    Case "BOTTLE_LOCKED_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.BOTTLE_LOCKED_WARN) 'TR 01/10/2012 -Botlle locked alarm.
-                '    Case "R1_COLLISION_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_COLLISION_ERR)
-                '    Case "R1_COLLISION_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_COLLISION_WARN)
-                '    Case "FRIDGE_COVER_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_COVER_ERR)
-                '    Case "FRIDGE_COVER_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_COVER_WARN)
-                '    Case "FRIDGE_TEMP_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_TEMP_WARN)
-                '    Case "FRIDGE_TEMP_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_TEMP_ERR)
-                '        'DL 31/07/2012. Begin Remove FRIDGE_TEMP_SYS_ERR
-                '    Case "FRIDGE_TEMP_SYS_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS_ERR)
-                '        'Case "FRIDGE_TEMP_SYS1_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS1_ERR)
-                '        'Case "FRIDGE_TEMP_SYS2_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS2_ERR)
-                '        'DL 31/07/2012. End
-                '    Case "FRIDGE_STATUS_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_STATUS_WARN)
-                '    Case "FRIDGE_STATUS_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_STATUS_ERR)
-
-                '    Case "R2_TEMP_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_TEMP_WARN)
-                '        'DL 31/07/2012. Begin. Remove R2_TEMP_SYSTEM_ERR
-                '    Case "R2_TEMP_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_TEMP_SYSTEM_ERR)
-                '        'Case "R2_TEMP_SYS1_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_TEMP_SYS1_ERR)
-                '        'Case "R2_TEMP_SYS2_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_TEMP_SYS2_ERR)
-                '        'DL 31/07/2012. End
-                '    Case "R2_DETECT_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_DETECT_SYSTEM_ERR)
-                '    Case "R2_NO_VOLUME_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_NO_VOLUME_WARN)
-                '    Case "R2_COLLISION_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_COLLISION_ERR)
-                '    Case "R2_COLLISION_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_COLLISION_WARN)
-                '    Case "WATER_DEPOSIT_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR)
-                '    Case "WATER_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WATER_SYSTEM_ERR)
-                '    Case "WASTE_DEPOSIT_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR)
-                '    Case "WASTE_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WASTE_SYSTEM_ERR)
-                '    Case "REACT_ROTOR_FAN_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_ROTOR_FAN_WARN)
-                '    Case "FRIDGE_FAN_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_FAN_WARN)
-                '    Case "REACT_COVER_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_COVER_ERR)
-                '    Case "REACT_COVER_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_COVER_WARN)
-                '    Case "REACT_MISSING_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_MISSING_ERR)
-                '    Case "REACT_ENCODER_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_ENCODER_ERR)
-                '    Case "REACT_TEMP_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_TEMP_WARN)
-                '    Case "REACT_TEMP_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_TEMP_ERR)
-                '        'DL 31/07/2012. Begin. Remove REACT_TEMP_SYS_ERR
-                '    Case "REACT_TEMP_SYS_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_TEMP_SYS_ERR)
-                '        'Case "REACT_TEMP_SYS1_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_TEMP_SYS1_ERR)
-                '        'Case "REACT_TEMP_SYS2_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_TEMP_SYS2_ERR)
-                '        'DL 31/07/2012. End
-                '    Case "REACT_SAFESTOP_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_SAFESTOP_ERR)
-                '    Case "WS_TEMP_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_TEMP_WARN)
-                '        'DL 31/07/2012. Begin. Remove WS_TEMP_SYSTEM_ERR
-                '    Case "WS_TEMP_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_TEMP_SYSTEM_ERR)
-                '        'Case "WS_TEMP_SYS1_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_TEMP_SYS1_ERR)
-                '        'Case "WS_TEMP_SYS2_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_TEMP_SYS2_ERR)
-                '        'DL 31/07/2012. End
-
-                '    Case "WS_COLLISION_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_COLLISION_ERR)
-                '    Case "CLOT_DETECTION_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.CLOT_DETECTION_ERR)
-                '    Case "CLOT_DETECTION_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.CLOT_DETECTION_WARN)
-                '    Case "CLOT_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.CLOT_SYSTEM_ERR)   'DL 13/06/2012
-
-                '    Case "S_DETECT_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_DETECT_SYSTEM_ERR)
-                '    Case "S_NO_VOLUME_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_NO_VOLUME_WARN)
-                '    Case "DS_NO_VOLUME_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.DS_NO_VOLUME_WARN)
-                '    Case "S_COLLISION_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_COLLISION_ERR)
-                '    Case "S_COLLISION_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_COLLISION_WARN)
-                '    Case "S_OBSTRUCTED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_OBSTRUCTED_ERR)
-
-                '    Case "S_COVER_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_COVER_ERR)
-                '    Case "S_COVER_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_COVER_WARN)
-
-                '    Case "R1_H_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_H_HOME_ERR)
-                '    Case "R1_V_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_V_HOME_ERR)
-                '    Case "R2_H_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_H_HOME_ERR)
-                '    Case "R2_V_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_V_HOME_ERR)
-                '    Case "S_H_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_H_HOME_ERR)
-                '    Case "S_V_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_V_HOME_ERR)
-                '    Case "STIRRER1_H_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER1_H_HOME_ERR)
-                '    Case "STIRRER1_V_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER1_V_HOME_ERR)
-                '    Case "STIRRER2_H_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER2_H_HOME_ERR)
-                '    Case "STIRRER2_V_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER2_V_HOME_ERR)
-                '    Case "FRIDGE_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_HOME_ERR)
-                '    Case "SAMPLES_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.SAMPLES_HOME_ERR)
-                '    Case "REACTIONS_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACTIONS_HOME_ERR)
-                '    Case "WS_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_HOME_ERR)
-                '    Case "WS_PUMP_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_PUMP_HOME_ERR)
-                '    Case "R1_PUMP_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_PUMP_HOME_ERR)
-                '    Case "R2_PUMP_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_PUMP_HOME_ERR)
-                '    Case "S_PUMP_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_PUMP_HOME_ERR)
-
-                '    Case "INST_REJECTED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_REJECTED_ERR)
-                '    Case "INST_ABORTED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_ABORTED_ERR)
-                '    Case "RECOVER_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.RECOVER_ERR)
-                '    Case "INST_REJECTED_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_REJECTED_WARN)
-                '    Case "PH_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.PH_BOARD_ERR)
-                '    Case "GLF_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.GLF_RESET_ERR)
-                '    Case "SFX_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.SFX_RESET_ERR)
-                '    Case "JEX_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.JEX_RESET_ERR)
-
-                '        'DL 13/06/2012. Begin
-                '    Case "R1_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_BOARD_ERR)
-                '    Case "R1_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_RESET_ERR)
-                '    Case "R2_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_BOARD_ERR)
-                '    Case "R2_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_RESET_ERR)
-                '    Case "S_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_BOARD_ERR)
-                '    Case "S_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_RESET_ERR)
-                '    Case "STIRRER1_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER1_BOARD_ERR)
-                '    Case "STIRRER1_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER1_RESET_ERR)
-                '    Case "STIRRER2_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER2_BOARD_ERR)
-                '    Case "STIRRER2_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER2_RESET_ERR)
-                '    Case "R1_DETECT_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_DETECT_BOARD_ERR)
-                '    Case "R1_DETECT_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_DETECT_RESET_ERR)
-                '    Case "R2_DETECT_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_DETECT_BOARD_ERR)
-                '    Case "R2_DETECT_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_DETECT_RESET_ERR)
-                '    Case "S_DETECT_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_DETECT_BOARD_ERR)
-                '    Case "S_DETECT_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_DETECT_RESET_ERR)
-                '    Case "FRIDGE_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_BOARD_ERR)
-                '    Case "FRIDGE_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_RESET_ERR)
-                '    Case "S_ROTOR_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_ROTOR_BOARD_ERR)
-                '    Case "S_ROTOR_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_ROTOR_RESET_ERR)
-                '    Case "GLF_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.GLF_BOARD_ERR)
-                '    Case "SFX_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.SFX_BOARD_ERR)
-                '    Case "JEX_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.JEX_BOARD_ERR)
-                '        'DL 13/06/2012. End
-
-                '    Case "ISE_OFF_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_OFF_ERR)
-                '    Case "ISE_FAILED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_FAILED_ERR)
-                '    Case "ISE_TIMEOUT_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR)
-
-                ' XBC 21/03/2012
-                '    Case "ISE_RP_INVALID_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_RP_INVALID_ERR)
-                '    Case "ISE_RP_NOT_INSTALL" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_RP_NO_INST_ERR)
-                '    Case "ISE_RP_DEPLETED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_RP_DEPLETED_ERR)
-                '    Case "ISE_ELEC_WRONG_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_ELEC_WRONG_ERR)
-                '    Case "ISE_CP_INSTALL_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_CP_INSTALL_WARN)
-                '    Case "ISE_CP_WRONG" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_CP_WRONG_ERR)
-                '    Case "ISE_LONG_DEACT_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_LONG_DEACT_ERR)
-                '    Case "ISE_RP_EXPIRED_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_RP_EXPIRED_WARN)
-                '    Case "ISE_ELEC_CONS_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_ELEC_CONS_WARN)
-                '    Case "ISE_ELEC_DATE_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_ELEC_DATE_WARN)
-                '    Case "ISE_ACTIVATED" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_ACTIVATED)
-                '    Case "ISE_CONNECT_PDT_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_CONNECT_PDT_ERR) 'SGM 26/03/2012
-
-                ' XB 20/01/2015 - BA-1873
-                '    Case "ISE_CALB_PDT_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_CALB_PDT_WARN)
-                '    Case "ISE_PUMP_PDT_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_PUMP_PDT_WARN)
-                '    Case "ISE_CLEAN_PDT_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_CLEAN_PDT_WARN)
-                '
-                '    Case "BASELINE_INIT_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.BASELINE_INIT_ERR)
-                '    Case "BASELINE_WELL_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.BASELINE_WELL_WARN)
-                '    Case "PREP_LOCKED_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.PREP_LOCKED_WARN)
-                '    Case "COMMS_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.COMMS_ERR)
-                '    Case "REPORTSATLOADED_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REPORTSATLOADED_WARN)
-                '    Case "ADJUST_NO_EXIST" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ADJUST_NO_EXIST)
-
-                '        'BT #1355 - Added Case for new Alarm WS_PAUSE_MODE_WARN
-                '    Case "WS_PAUSE_MODE_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_PAUSE_MODE_WARN)
-
-                '    Case "INST_NOALLOW_INS_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_NOALLOW_INS_ERR) 'TR 21/10/2013 Bug #1339 add this alamr on User app.
-                '
-                'Case "FW_CPU_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_CPU_ERR)                     'DL 27/07/2012 
-                'Case "FW_DISTRIBUTED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_DISTRIBUTED_ERR)     'DL 27/07/2012 
-                'Case "FW_REPOSITORY_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_REPOSITORY_ERR)       'DL 27/07/2012 
-                'Case "FW_CHECKSUM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_CHECKSUM_ERR)           'DL 27/07/2012 
-                'Case "FW_INTERNAL_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_INTERNAL_ERR)           'DL 27/07/2012 
-                'Case "FW_MAN_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_MAN_ERR)                     'DL 27/07/2012 
-                'Case "FW_CAN_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_CAN_ERR)                     'DL 27/07/2012 
-                'Case "INST_UNKOWN_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_UNKOWN_ERR)           'DL 27/07/2012 
-                'Case "INST_NOALLOW_STA_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_NOALLOW_STA_ERR) 'DL 27/07/2012 
-                'Case "INST_NOALLOW_INS_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_NOALLOW_INS_ERR) 'DL 27/07/2012 
-                'Case "INST_COMMAND_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_COMMAND_WARN)       'DL 27/07/2012 
-                'Case "INST_LOADADJ_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_LOADADJ_WARN)       'DL 27/07/2012 
-
-                'End Select
-
-                '' XBC 18/10/2012 - Alarms treatment for Service
-                ''SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                ''If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                'If GlobalBase.IsServiceAssembly Then
-                '    Select Case row
-                '        Case "FW_CPU_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_CPU_ERR)
-                '        Case "FW_DISTRIBUTED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_DISTRIBUTED_ERR)
-                '        Case "FW_REPOSITORY_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_REPOSITORY_ERR)
-                '        Case "FW_CHECKSUM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_CHECKSUM_ERR)
-                '        Case "FW_INTERNAL_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_INTERNAL_ERR)
-                '        Case "FW_MAN_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_MAN_ERR)
-                '        Case "FW_CAN_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_CAN_ERR)
-                '        Case "INST_UNKOWN_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_UNKOWN_ERR)
-                '        Case "INST_NOALLOW_STA_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_NOALLOW_STA_ERR)
-                '        Case "INST_NOALLOW_INS_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_NOALLOW_INS_ERR)
-                '        Case "INST_COMMAND_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_COMMAND_WARN)
-                '        Case "INST_LOADADJ_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_LOADADJ_WARN)
-                '        Case "INST_REJECTED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_REJECTED_ERR)
-                '        Case "INST_ABORTED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_ABORTED_ERR)
-                '    End Select
-                'End If
-                '' XBC 18/10/2012 
-                'AG 04/12/2014 BA-2236
-
+                alarmIdEnumList.Add(DirectCast([Enum].Parse(GetType(Alarms), row), Alarms))
             Next
-            Return alarmIDEnumList
+            Return alarmIdEnumList
         End Function
-
 
         ''' <summary>
         ''' All alarms involving error code must be removed after receive a status instruction with E:0
@@ -4905,12 +2999,12 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <returns></returns>
         ''' <remarks>AG 06/03/2012
         ''' AG 27/03/2012</remarks>
-        Private Function RemoveErrorCodeAlarms(ByVal pDBConnection As SqlConnection, ByVal pAction As AnalyzerManagerAx00Actions) As GlobalDataTO
+        Public Function RemoveErrorCodeAlarms(ByVal pDBConnection As SqlConnection, ByVal pAction As AnalyzerManagerAx00Actions) As GlobalDataTO Implements IAnalyzerManager.RemoveErrorCodeAlarms
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlConnection = Nothing
 
             Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                resultData = GetOpenDBConnection(pDBConnection)
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = CType(resultData.SetDatos, SqlConnection)
                     If (Not dbConnection Is Nothing) Then
@@ -4974,12 +3068,9 @@ Namespace Biosystems.Ax00.Core.Entities
                             '3- Finally call manage all alarms detected (new or fixed)
                             'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                             'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                            If GlobalBase.IsServiceAssembly Then
-                                ' XBC 16/10/2012 - Alarms treatment for Service
-                                ' Not Apply
-                                'resultData = ManageAlarms_SRV(dbConnection, okAlarmList, okAlarmStatusList)
-                            Else
-                                resultData = ManageAlarms(dbConnection, okAlarmList, okAlarmStatusList)
+                            If Not GlobalBase.IsServiceAssembly Then
+                                Dim currentAlarms = New AnalyzerAlarms(Me)
+                                resultData = currentAlarms.Manage(okAlarmList, okAlarmStatusList)
                             End If
                         End If
 
@@ -4997,65 +3088,11 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.RemoveErrorCodeAlarms", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return resultData
-        End Function
-
-
-        ''' <summary>
-        ''' If some of the alarms in pAlarmList means analyzer FREEZE then return TRUE
-        ''' If none of the alarms in pAlarmList means analyzer FREEZE then return FALSE
-        ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pAlarmList"></param>
-        ''' <returns></returns>
-        ''' <remarks>AG 07/03/2012</remarks>
-        Private Function ExistFreezeAlarms(ByVal pDBConnection As SqlConnection, ByVal pAlarmList As List(Of Alarms)) As Boolean
-            Dim resultData As GlobalDataTO = Nothing
-            Dim dbConnection As SqlConnection = Nothing
-            Dim returnData As Boolean = False
-
-            Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-
-                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-
-                        Dim myLinq As List(Of AlarmsDS.tfmwAlarmsRow)
-
-                        For Each item As Alarms In pAlarmList
-                            myLinq = (From a As AlarmsDS.tfmwAlarmsRow In alarmsDefintionTableDS.tfmwAlarms _
-                                      Where String.Equals(a.AlarmID, item.ToString) AndAlso Not a.IsFreezeNull Select a).ToList
-
-                            If myLinq.Count > 0 Then
-                                returnData = True 'Currently exist some alarm that means analyzer in FREEZE mode
-                                Exit For
-                            End If
-                        Next
-                        myLinq = Nothing
-
-                    End If
-                End If
-
-            Catch ex As Exception
-                resultData = New GlobalDataTO()
-                resultData.HasError = True
-                resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
-                resultData.ErrorMessage = ex.Message
-
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ExistFreezeAlarms", EventLogEntryType.Error, False)
-
-            Finally
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-
-            End Try
-            Return returnData
         End Function
 
 #End Region
@@ -5075,35 +3112,34 @@ Namespace Biosystems.Ax00.Core.Entities
         '''             AG 25/09/2012 - Add the POLLRD instruction
         '''             XB 30/09/2014 - Deactivate old timeout management - Remove too restrictive limitations because timeouts - BA-1872
         ''' </remarks>
-        Private Function IgnoreErrorCodes(ByVal pLastInstructionTypeSent As AppLayerEventList, ByVal pInstructionSent As String, ByVal pErrorValue As Integer) As Boolean
+        Public Function IgnoreErrorCodes(ByVal pLastInstructionTypeSent As AppLayerEventList, ByVal pInstructionSent As String, ByVal pErrorValue As Integer) As Boolean _
+            Implements IAnalyzerManager.IgnoreErrorCodes
             Dim ignoreFlag As Boolean = False 'Default value FALSE
             Try
                 ' XBC 18/10/2012 - Alarms treatment for Service
-                'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                 If GlobalBase.IsServiceAssembly Then
                     ' Service Software no ignore errors
                     If IsServiceAlarmInformed Then
                         ignoreFlag = True
-                    ElseIf MyClass.IsFwUpdateInProcess Then
+                    ElseIf IsFwUpdateInProcess Then
                         'in case that FW update is currently being performed, ignore alarms.
                         ignoreFlag = True
-                    ElseIf MyClass.IsConfigGeneralProcess Then
+                    ElseIf IsConfigGeneralProcess Then
                         'in case user is processing general configurations, ignore corresponding alarms.
                         Dim myAlarms As New List(Of Alarms)
                         Dim myErrorCode As New List(Of Integer)
                         myErrorCode.Add(pErrorValue)
                         myAlarms = TranslateErrorCodeToAlarmID(Nothing, myErrorCode)
                         For Each alarmID As Alarms In myAlarms
-                            If alarmID = GlobalEnumerates.Alarms.MAIN_COVER_ERR Or _
-                               alarmID = GlobalEnumerates.Alarms.MAIN_COVER_WARN Or _
-                               alarmID = GlobalEnumerates.Alarms.FRIDGE_COVER_ERR Or _
-                               alarmID = GlobalEnumerates.Alarms.FRIDGE_COVER_WARN Or _
-                               alarmID = GlobalEnumerates.Alarms.S_COVER_ERR Or _
-                               alarmID = GlobalEnumerates.Alarms.S_COVER_WARN Or _
-                               alarmID = GlobalEnumerates.Alarms.REACT_COVER_ERR Or _
-                               alarmID = GlobalEnumerates.Alarms.REACT_COVER_WARN Or _
-                               alarmID = GlobalEnumerates.Alarms.CLOT_SYSTEM_ERR Then
+                            If alarmID = AlarmEnumerates.Alarms.MAIN_COVER_ERR Or _
+                               alarmID = AlarmEnumerates.Alarms.MAIN_COVER_WARN Or _
+                               alarmID = AlarmEnumerates.Alarms.FRIDGE_COVER_ERR Or _
+                               alarmID = AlarmEnumerates.Alarms.FRIDGE_COVER_WARN Or _
+                               alarmID = AlarmEnumerates.Alarms.S_COVER_ERR Or _
+                               alarmID = AlarmEnumerates.Alarms.S_COVER_WARN Or _
+                               alarmID = AlarmEnumerates.Alarms.REACT_COVER_ERR Or _
+                               alarmID = AlarmEnumerates.Alarms.REACT_COVER_WARN Or _
+                               alarmID = AlarmEnumerates.Alarms.CLOT_SYSTEM_ERR Then
                                 ignoreFlag = True
                             End If
                         Next
@@ -5119,10 +3155,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
                 Select Case pLastInstructionTypeSent
-
                     Case AppLayerEventList.CONNECT, AppLayerEventList.CONFIG, AppLayerEventList.READADJ, AppLayerEventList.INFO, AppLayerEventList.SOUND, _
                         AppLayerEventList.POLLFW, AppLayerEventList.POLLHW, AppLayerEventList.LOADADJ, AppLayerEventList.STATE, AppLayerEventList.POLLSN, AppLayerEventList.POLLRD
-
                         'AG-XB 17/09/2012 - Ignore STATEs in connection process.
                         If pLastInstructionTypeSent = AppLayerEventList.STATE Then
                             If mySessionFlags(AnalyzerManagerFlags.CONNECTprocess.ToString) = "INPROCESS" Then
@@ -5132,8 +3166,6 @@ Namespace Biosystems.Ax00.Core.Entities
                             'Always ignore error code
                             ignoreFlag = True
                         End If
-
-
 
                     Case AppLayerEventList.BARCODE_REQUEST
                         'Ignore error code only when barcode request in configuration mode
@@ -5145,68 +3177,45 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
                     Case AppLayerEventList.ISE_CMD
-                        'AG 30/03/2012
                         'Ignore error code only when ISE cmd request in low level control mode
                         If Not pInstructionSent Is Nothing Then
                             'The following code requires new Fw not available in 30/03/2012
-
-                            ' XBC 03/09/2012 - Correction : add new ISE instructions M:4 and M:5
-                            'If InStr(pInstructionSent, "M:1;") > 0 Then
                             If InStr(pInstructionSent, "M:1;") > 0 Or _
                                InStr(pInstructionSent, "M:4;") > 0 Or _
                                InStr(pInstructionSent, "M:5;") > 0 Then
-                                ' XBC 03/09/2012 
 
                                 ignoreFlag = True
 
-                                ' XB 04/05/2012
                                 Dim myAlarms As New List(Of Alarms)
                                 Dim myErrorCode As New List(Of Integer)
                                 myErrorCode.Add(pErrorValue)
                                 myAlarms = TranslateErrorCodeToAlarmID(Nothing, myErrorCode)
                                 For Each alarmID As Alarms In myAlarms
-                                    If alarmID = GlobalEnumerates.Alarms.ISE_FAILED_ERR Or _
-                                       alarmID = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR Then
+                                    If alarmID = AlarmEnumerates.Alarms.ISE_FAILED_ERR Or _
+                                       alarmID = AlarmEnumerates.Alarms.ISE_TIMEOUT_ERR Then
                                         ignoreFlag = False
                                     End If
                                 Next
-                                ' XB 04/05/2012
 
                             End If
-
-                            ''Temporally code: never ignore error codes with ISECMD
-                            'ignoreFlag = False
-
-                            'Abort current ise procedure in ise_manager class
                             If Not ignoreFlag Then
 
-                                ' XB 30/09/2014 - BA-1872
-                                ''SGM 25/10/2012 - Abort ISE Operation only if E:61, E:20, E:21
-                                'If pErrorValue = 61 Or pErrorValue = 20 Or pErrorValue = 21 Then
-                                '    If ISEAnalyzer IsNot Nothing Then ISEAnalyzer.AbortCurrentProcedureDueToException()
-                                'End If
-                                ''If ISEAnalyzer IsNot Nothing Then ISEAnalyzer.AbortCurrentProcedureDueToException() SGM 25/10/2012
                                 If pErrorValue = 61 Then
                                     If ISEAnalyzer IsNot Nothing Then ISEAnalyzer.AbortCurrentProcedureDueToException(True)
                                 End If
                                 If pErrorValue = 20 Or pErrorValue = 21 Then
                                     If ISEAnalyzer IsNot Nothing Then ISEAnalyzer.AbortCurrentProcedureDueToException()
                                 End If
-                                ' XB 30/09/2014 - BA-1872
                             End If
                         End If
-                        'AG 30/03/2012
-
                 End Select
 
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.IgnoreErrorCodes", EventLogEntryType.Error, False)
             End Try
             Return ignoreFlag
         End Function
-
 
         ''' <summary>
         ''' Most of alarms must be ignored while the start instrument process is in process
@@ -5222,30 +3231,29 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim ignoreFlag As Boolean = True 'Default value TRUE
             Try
                 'AG 22/05/2012 - Note the ise alarms will be asked for when the Terminate button is activated
-                If pAlarmID = GlobalEnumerates.Alarms.WASH_CONTAINER_ERR OrElse pAlarmID = GlobalEnumerates.Alarms.WASH_CONTAINER_WARN OrElse _
-                  pAlarmID = GlobalEnumerates.Alarms.HIGH_CONTAMIN_ERR OrElse pAlarmID = GlobalEnumerates.Alarms.HIGH_CONTAMIN_WARN OrElse _
-                  pAlarmID = GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR OrElse pAlarmID = GlobalEnumerates.Alarms.WATER_SYSTEM_ERR OrElse _
-                  pAlarmID = GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR OrElse pAlarmID = GlobalEnumerates.Alarms.WASTE_SYSTEM_ERR OrElse _
-                  pAlarmID = GlobalEnumerates.Alarms.BASELINE_INIT_ERR OrElse pAlarmID = GlobalEnumerates.Alarms.REACT_MISSING_ERR OrElse _
-                  pAlarmID = GlobalEnumerates.Alarms.FRIDGE_COVER_ERR OrElse pAlarmID = GlobalEnumerates.Alarms.S_COVER_ERR OrElse _
-                  pAlarmID = GlobalEnumerates.Alarms.MAIN_COVER_ERR OrElse pAlarmID = GlobalEnumerates.Alarms.REACT_COVER_ERR OrElse _
-                  pAlarmID = GlobalEnumerates.Alarms.ISE_CP_INSTALL_WARN OrElse pAlarmID = GlobalEnumerates.Alarms.ISE_CP_WRONG_ERR OrElse _
-                  pAlarmID = GlobalEnumerates.Alarms.ISE_LONG_DEACT_ERR OrElse pAlarmID = GlobalEnumerates.Alarms.ISE_ELEC_CONS_WARN OrElse _
-                  pAlarmID = GlobalEnumerates.Alarms.ISE_ELEC_DATE_WARN OrElse pAlarmID = GlobalEnumerates.Alarms.ISE_RP_INVALID_ERR OrElse _
-                  pAlarmID = GlobalEnumerates.Alarms.ISE_RP_EXPIRED_WARN OrElse pAlarmID = GlobalEnumerates.Alarms.ISE_RP_NO_INST_ERR OrElse _
-                  pAlarmID = GlobalEnumerates.Alarms.ISE_ELEC_WRONG_ERR OrElse pAlarmID = GlobalEnumerates.Alarms.ISE_OFF_ERR OrElse _
-                  pAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_A OrElse pAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_B OrElse _
-                  pAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_C OrElse pAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_D OrElse _
-                  pAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_F OrElse pAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_M OrElse _
-                  pAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_N OrElse pAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_P OrElse _
-                  pAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_R OrElse pAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_S OrElse _
-                  pAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_T OrElse pAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_W OrElse _
-                  pAlarmID = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR Then
+                If pAlarmID = AlarmEnumerates.Alarms.WASH_CONTAINER_ERR OrElse pAlarmID = AlarmEnumerates.Alarms.WASH_CONTAINER_WARN OrElse _
+                  pAlarmID = AlarmEnumerates.Alarms.HIGH_CONTAMIN_ERR OrElse pAlarmID = AlarmEnumerates.Alarms.HIGH_CONTAMIN_WARN OrElse _
+                  pAlarmID = AlarmEnumerates.Alarms.WATER_DEPOSIT_ERR OrElse pAlarmID = AlarmEnumerates.Alarms.WATER_SYSTEM_ERR OrElse _
+                  pAlarmID = AlarmEnumerates.Alarms.WASTE_DEPOSIT_ERR OrElse pAlarmID = AlarmEnumerates.Alarms.WASTE_SYSTEM_ERR OrElse _
+                  pAlarmID = AlarmEnumerates.Alarms.BASELINE_INIT_ERR OrElse pAlarmID = AlarmEnumerates.Alarms.REACT_MISSING_ERR OrElse _
+                  pAlarmID = AlarmEnumerates.Alarms.FRIDGE_COVER_ERR OrElse pAlarmID = AlarmEnumerates.Alarms.S_COVER_ERR OrElse _
+                  pAlarmID = AlarmEnumerates.Alarms.MAIN_COVER_ERR OrElse pAlarmID = AlarmEnumerates.Alarms.REACT_COVER_ERR OrElse _
+                  pAlarmID = AlarmEnumerates.Alarms.ISE_CP_INSTALL_WARN OrElse pAlarmID = AlarmEnumerates.Alarms.ISE_CP_WRONG_ERR OrElse _
+                  pAlarmID = AlarmEnumerates.Alarms.ISE_LONG_DEACT_ERR OrElse pAlarmID = AlarmEnumerates.Alarms.ISE_ELEC_CONS_WARN OrElse _
+                  pAlarmID = AlarmEnumerates.Alarms.ISE_ELEC_DATE_WARN OrElse pAlarmID = AlarmEnumerates.Alarms.ISE_RP_INVALID_ERR OrElse _
+                  pAlarmID = AlarmEnumerates.Alarms.ISE_RP_EXPIRED_WARN OrElse pAlarmID = AlarmEnumerates.Alarms.ISE_RP_NO_INST_ERR OrElse _
+                  pAlarmID = AlarmEnumerates.Alarms.ISE_ELEC_WRONG_ERR OrElse pAlarmID = AlarmEnumerates.Alarms.ISE_OFF_ERR OrElse _
+                  pAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_A OrElse pAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_B OrElse _
+                  pAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_C OrElse pAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_D OrElse _
+                  pAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_F OrElse pAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_M OrElse _
+                  pAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_N OrElse pAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_P OrElse _
+                  pAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_R OrElse pAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_S OrElse _
+                  pAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_T OrElse pAlarmID = AlarmEnumerates.Alarms.ISE_ERROR_W OrElse _
+                  pAlarmID = AlarmEnumerates.Alarms.ISE_TIMEOUT_ERR Then
                     ignoreFlag = False
                 End If
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.IgnoreAlarmWhileWarmUp", EventLogEntryType.Error, False)
             End Try
             Return ignoreFlag
@@ -5261,28 +3269,11 @@ Namespace Biosystems.Ax00.Core.Entities
         Private Function IgnoreAlarmWhileCommError(ByVal pAlarmID As Alarms) As Boolean
             Dim ignoreFlag As Boolean = True 'Default value TRUE
             Try
-                'AG 16/05/2012 - When no connection only treat the informative alarm reportsat loaded
-                'If pAlarmID = GlobalEnumerates.Alarms.BASELINE_INIT_ERR OrElse _
-                '   pAlarmID = GlobalEnumerates.Alarms.METHACRYL_ROTOR_WARN OrElse _
-                '   pAlarmID = GlobalEnumerates.Alarms.REPORTSATLOADED_WARN OrElse _
-                '   pAlarmID = GlobalEnumerates.Alarms.ISE_CP_INSTALL_WARN OrElse _
-                '   pAlarmID = GlobalEnumerates.Alarms.ISE_CP_WRONG_ERR OrElse _
-                '   pAlarmID = GlobalEnumerates.Alarms.ISE_LONG_DEACT_ERR OrElse _
-                '   pAlarmID = GlobalEnumerates.Alarms.ISE_ELEC_CONS_WARN OrElse _
-                '   pAlarmID = GlobalEnumerates.Alarms.ISE_ELEC_DATE_WARN OrElse _
-                '   pAlarmID = GlobalEnumerates.Alarms.ISE_RP_INVALID_ERR OrElse _
-                '   pAlarmID = GlobalEnumerates.Alarms.ISE_RP_EXPIRED_WARN OrElse _
-                '   pAlarmID = GlobalEnumerates.Alarms.ISE_RP_NO_INST_ERR OrElse _
-                '   pAlarmID = GlobalEnumerates.Alarms.ISE_ELEC_WRONG_ERR Then
-                '    ignoreFlag = False
-                'End If
-                If pAlarmID = GlobalEnumerates.Alarms.REPORTSATLOADED_WARN Then
+                If pAlarmID = AlarmEnumerates.Alarms.REPORTSATLOADED_WARN Then
                     ignoreFlag = False
                 End If
-                'AG 16/05/2012
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.IgnoreAlarmWhileCommError", EventLogEntryType.Error, False)
             End Try
             Return ignoreFlag
@@ -5298,13 +3289,13 @@ Namespace Biosystems.Ax00.Core.Entities
         Private Function IgnoreAlarmWhileShutDown(ByVal pAlarmID As Alarms) As Boolean
             Dim ignoreFlag As Boolean = True 'Default value TRUE
             Try
-                If pAlarmID = GlobalEnumerates.Alarms.WASH_CONTAINER_ERR OrElse pAlarmID = GlobalEnumerates.Alarms.WASH_CONTAINER_WARN OrElse _
-                  pAlarmID = GlobalEnumerates.Alarms.HIGH_CONTAMIN_ERR OrElse pAlarmID = GlobalEnumerates.Alarms.HIGH_CONTAMIN_WARN OrElse _
-                  pAlarmID = GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR OrElse pAlarmID = GlobalEnumerates.Alarms.WATER_SYSTEM_ERR OrElse _
-                  pAlarmID = GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR OrElse pAlarmID = GlobalEnumerates.Alarms.WASTE_SYSTEM_ERR OrElse _
-                  pAlarmID = GlobalEnumerates.Alarms.REACT_MISSING_ERR OrElse _
-                  pAlarmID = GlobalEnumerates.Alarms.FRIDGE_COVER_ERR OrElse pAlarmID = GlobalEnumerates.Alarms.S_COVER_ERR OrElse _
-                  pAlarmID = GlobalEnumerates.Alarms.MAIN_COVER_ERR OrElse pAlarmID = GlobalEnumerates.Alarms.REACT_COVER_ERR Then
+                If pAlarmID = AlarmEnumerates.Alarms.WASH_CONTAINER_ERR OrElse pAlarmID = AlarmEnumerates.Alarms.WASH_CONTAINER_WARN OrElse _
+                  pAlarmID = AlarmEnumerates.Alarms.HIGH_CONTAMIN_ERR OrElse pAlarmID = AlarmEnumerates.Alarms.HIGH_CONTAMIN_WARN OrElse _
+                  pAlarmID = AlarmEnumerates.Alarms.WATER_DEPOSIT_ERR OrElse pAlarmID = AlarmEnumerates.Alarms.WATER_SYSTEM_ERR OrElse _
+                  pAlarmID = AlarmEnumerates.Alarms.WASTE_DEPOSIT_ERR OrElse pAlarmID = AlarmEnumerates.Alarms.WASTE_SYSTEM_ERR OrElse _
+                  pAlarmID = AlarmEnumerates.Alarms.REACT_MISSING_ERR OrElse _
+                  pAlarmID = AlarmEnumerates.Alarms.FRIDGE_COVER_ERR OrElse pAlarmID = AlarmEnumerates.Alarms.S_COVER_ERR OrElse _
+                  pAlarmID = AlarmEnumerates.Alarms.MAIN_COVER_ERR OrElse pAlarmID = AlarmEnumerates.Alarms.REACT_COVER_ERR Then
                     ignoreFlag = False
                 End If
 
@@ -5314,7 +3305,6 @@ Namespace Biosystems.Ax00.Core.Entities
             End Try
             Return ignoreFlag
         End Function
-
 
 #End Region
 
@@ -5340,27 +3330,19 @@ Namespace Biosystems.Ax00.Core.Entities
                 Dim myAlarmStatusList As New List(Of Boolean)
 
                 'Change warning to error
-                PrepareLocalAlarmList(GlobalEnumerates.Alarms.REACT_TEMP_WARN, False, myAlarmList, myAlarmStatusList)
-                PrepareLocalAlarmList(GlobalEnumerates.Alarms.REACT_TEMP_ERR, True, myAlarmList, myAlarmStatusList)
+                PrepareLocalAlarmList(AlarmEnumerates.Alarms.REACT_TEMP_WARN, False, myAlarmList, myAlarmStatusList)
+                PrepareLocalAlarmList(AlarmEnumerates.Alarms.REACT_TEMP_ERR, True, myAlarmList, myAlarmStatusList)
                 If myAlarmList.Count > 0 Then
-                    'resultData = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
-                    'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                    'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                    If GlobalBase.IsServiceAssembly Then
-                        ' XBC 16/10/2012 - Alarms treatment for Service
-                        ' Not Apply
-                        'resultData = ManageAlarms_SRV(Nothing, myAlarmList, myAlarmStatusList)
-                    Else
-                        resultData = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                    If Not GlobalBase.IsServiceAssembly Then
+                        Dim currentAlarms = New AnalyzerAlarms(Me)
+                        resultData = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
                     End If
                 End If
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ThermoReactionsRotorError_Timer", EventLogEntryType.Error, False)
             End Try
         End Sub
-
 
         ''' <summary>
         ''' If the fridge thermo warning persists too much time change warning to error
@@ -5382,27 +3364,19 @@ Namespace Biosystems.Ax00.Core.Entities
                 Dim myAlarmStatusList As New List(Of Boolean)
 
                 'Change warning for error
-                PrepareLocalAlarmList(GlobalEnumerates.Alarms.FRIDGE_TEMP_WARN, False, myAlarmList, myAlarmStatusList)
-                PrepareLocalAlarmList(GlobalEnumerates.Alarms.FRIDGE_TEMP_ERR, True, myAlarmList, myAlarmStatusList)
+                PrepareLocalAlarmList(AlarmEnumerates.Alarms.FRIDGE_TEMP_WARN, False, myAlarmList, myAlarmStatusList)
+                PrepareLocalAlarmList(AlarmEnumerates.Alarms.FRIDGE_TEMP_ERR, True, myAlarmList, myAlarmStatusList)
                 If myAlarmList.Count > 0 Then
-                    'resultData = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
-                    'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                    'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                    If GlobalBase.IsServiceAssembly Then
-                        ' XBC 16/10/2012 - Alarms treatment for Service
-                        ' Not Apply
-                        'resultData = ManageAlarms_SRV(Nothing, myAlarmList, myAlarmStatusList)
-                    Else
-                        resultData = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                    If Not GlobalBase.IsServiceAssembly Then
+                        Dim currentAlarms = New AnalyzerAlarms(Me)
+                        resultData = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
                     End If
                 End If
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ThermoFridgeError_Timer", EventLogEntryType.Error, False)
             End Try
         End Sub
-
 
         ''' <summary>
         ''' If the waste deposit warning persists too much time change warning to error
@@ -5423,30 +3397,25 @@ Namespace Biosystems.Ax00.Core.Entities
                 Dim myAlarmStatusList As New List(Of Boolean)
 
                 'Prepare internal alarm structures and variables
-                PrepareLocalAlarmList(GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR, True, myAlarmList, myAlarmStatusList)
+                PrepareLocalAlarmList(AlarmEnumerates.Alarms.WASTE_DEPOSIT_ERR, True, myAlarmList, myAlarmStatusList)
 
                 'Manage the new alarm
                 If myAlarmList.Count > 0 Then
                     'AG 29/05/2014 - #1630
-                    'Dim myLogAcciones As New ApplicationLogManager()
                     GlobalBase.CreateLogActivity("Waste deposit full too much time!! Generate alarm WASTE_DEPOSIT_ERR", "AnalyzerManager.WaterDepositError_Timer", EventLogEntryType.Information, False)
 
-                    'resultData = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
-                    'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                    'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                     If GlobalBase.IsServiceAssembly Then
                         resultData = ManageAlarms_SRV(Nothing, myAlarmList, myAlarmStatusList)
                     Else
-                        resultData = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                        Dim currentAlarms = New AnalyzerAlarms(Me)
+                        resultData = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
                     End If
                 End If
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.WasteDepositError_Timer", EventLogEntryType.Error, False)
             End Try
         End Sub
-
 
         ''' <summary>
         ''' If the water deposit warning persists too much time change warning to error
@@ -5467,12 +3436,10 @@ Namespace Biosystems.Ax00.Core.Entities
                 Dim myAlarmStatusList As New List(Of Boolean)
 
                 'Prepare internal alarm structures and variables
-                PrepareLocalAlarmList(GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR, True, myAlarmList, myAlarmStatusList)
+                PrepareLocalAlarmList(AlarmEnumerates.Alarms.WATER_DEPOSIT_ERR, True, myAlarmList, myAlarmStatusList)
 
                 'Manage the new alarm
                 If myAlarmList.Count > 0 Then
-                    'AG 29/05/2014 - #1630
-                    'Dim myLogAcciones As New ApplicationLogManager()
                     GlobalBase.CreateLogActivity("Water deposit empty too much time!! Generate alarm WATER_DEPOSIT_ERR", "AnalyzerManager.WaterDepositError_Timer", EventLogEntryType.Information, False)
 
                     'resultData = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
@@ -5481,12 +3448,12 @@ Namespace Biosystems.Ax00.Core.Entities
                     If GlobalBase.IsServiceAssembly Then
                         resultData = ManageAlarms_SRV(Nothing, myAlarmList, myAlarmStatusList)
                     Else
-                        resultData = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                        Dim currentAlarms = New AnalyzerAlarms(Me)
+                        resultData = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
                     End If
                 End If
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.WaterDepositError_Timer", EventLogEntryType.Error, False)
             End Try
         End Sub
@@ -5510,22 +3477,15 @@ Namespace Biosystems.Ax00.Core.Entities
                 Dim myAlarmList As New List(Of Alarms)
                 Dim myAlarmStatusList As New List(Of Boolean)
 
-                PrepareLocalAlarmList(GlobalEnumerates.Alarms.R1_TEMP_WARN, True, myAlarmList, myAlarmStatusList)
+                PrepareLocalAlarmList(AlarmEnumerates.Alarms.R1_TEMP_WARN, True, myAlarmList, myAlarmStatusList)
                 If myAlarmList.Count > 0 Then
-                    'resultData = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
-                    'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                    'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                    If GlobalBase.IsServiceAssembly Then
-                        ' XBC 16/10/2012 - Alarms treatment for Service
-                        ' Not Apply
-                        'resultData = ManageAlarms_SRV(Nothing, myAlarmList, myAlarmStatusList)
-                    Else
-                        resultData = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                    If Not GlobalBase.IsServiceAssembly Then
+                        Dim currentAlarms = New AnalyzerAlarms(Me)
+                        resultData = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
                     End If
                 End If
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.thermoR1ArmWarningTimer_Timer", EventLogEntryType.Error, False)
             End Try
         End Sub
@@ -5549,29 +3509,20 @@ Namespace Biosystems.Ax00.Core.Entities
                 Dim myAlarmList As New List(Of Alarms)
                 Dim myAlarmStatusList As New List(Of Boolean)
 
-                PrepareLocalAlarmList(GlobalEnumerates.Alarms.R2_TEMP_WARN, True, myAlarmList, myAlarmStatusList)
+                PrepareLocalAlarmList(AlarmEnumerates.Alarms.R2_TEMP_WARN, True, myAlarmList, myAlarmStatusList)
                 If myAlarmList.Count > 0 Then
-                    'resultData = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
-                    'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                    'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                    If GlobalBase.IsServiceAssembly Then
-                        ' XBC 16/10/2012 - Alarms treatment for Service
-                        ' Not Apply
-                        'resultData = ManageAlarms_SRV(Nothing, myAlarmList, myAlarmStatusList)
-                    Else
-                        resultData = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                    If Not GlobalBase.IsServiceAssembly Then
+                        Dim currentAlarms = New AnalyzerAlarms(Me)
+                        resultData = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
                     End If
                 End If
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.thermoR2ArmWarningTimer_Timer", EventLogEntryType.Error, False)
             End Try
         End Sub
 
 #End Region
-
-
     End Class
 
 End Namespace

@@ -1,9 +1,12 @@
 ﻿Option Strict Off
 
+Imports System.Text
 Imports System.Timers
 Imports System.Windows.Forms
 Imports Biosystems.Ax00.Global
 Imports CommunicationsAx00
+#Const TRACECOM = True
+
 Namespace Biosystems.Ax00.CommunicationsSwFw
     'Adapted from Enlace.vb (iPRO User Sw)
 
@@ -58,6 +61,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private CurrentChannel As String 'SGM 06/07/2012
         Private CurrentSettings As String 'SGM 06/07/2012
 
+        ReadOnly _debugLogger As DebugLogger = New DebugLogger()
 #End Region
 
 #Region "Methods"
@@ -170,6 +174,17 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Public Function SendSynchronousByte(ByRef in_datosByte() As Byte) As Boolean
 
             'Try
+
+#If TRACECOM Then
+            Dim SB As New StringBuilder(in_datosByte.Length)
+            For Each B As Byte In in_datosByte
+                SB.Append(ChrW(B))
+            Next
+            Debug.WriteLine("   PC>>> : " & SB.ToString)
+            _debugLogger.AddLog("   PC>>> : " & SB.ToString)
+#End If
+
+
             SendSynchronousByte = cls_serialPort.SendSynchronousDataByte(in_datosByte)
 
             'RH 14/10/2010 It is a bad practice to catch an exception, do nothing with it and throw it again.
@@ -322,6 +337,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             '    Throw 'ex
             'End Try
 
+
+#If TRACECOM Then
+            _debugLogger.AddLog("   PC<<< : " & dataReceived)
+            Debug.WriteLine("   PC<<< : " & dataReceived)
+#End If
+
             'AG 10/07/2012
             If Not cls_serialPort Is Nothing Then
                 RaiseEvent ActivateProtocol(GlobalEnumerates.AppLayerEventList.RECEIVE, dataReceived)
@@ -329,6 +350,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 ActivateReception()
                 Application.DoEvents()
             End If
+
+
             'AG 10/07/2012
         End Sub
 

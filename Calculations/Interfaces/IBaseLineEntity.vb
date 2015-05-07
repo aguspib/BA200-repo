@@ -12,6 +12,7 @@ Namespace Biosystems.Ax00.Core.Interfaces
         WriteOnly Property SwParameters() As ParametersDS
         WriteOnly Property Adjustments() As SRVAdjustmentsDS
         Property validALight() As Boolean
+        Property validFLight() As Boolean
         ReadOnly Property exitRunningType() As Integer 'AG 04/06/2012
         ReadOnly Property existsAlightResults() As Boolean
         Property BaseLineTypeForWellReject As BaseLineType 'AG 11/11/2014 BA-2065

@@ -2270,7 +2270,7 @@ Namespace Biosystems.Ax00.BL
         ''' Modified by: SA 26/04/2010 - Parameter pWorkSessionID changed from optional to fixed
         '''              SA 28/08/2012 - Added new optional parameter for the Analyzer Identifier
         ''' </remarks>
-        Public Function GetOrderTestsForWS(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, _
+        Public Shared Function GetOrderTestsForWS(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, _
                                            Optional ByVal pAnalyzerID As String = "", Optional ByVal pReturnOpenAsSelected As Boolean = True) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -3278,9 +3278,8 @@ Namespace Biosystems.Ax00.BL
 
                             'Get value of the SW Parameter for the allowed maximum number of non cumulated QC Results for the Control/Lot and the Test/SampleType
                             Dim myMaxQCResults As Integer = 0
-                            Dim mySWParametersDelegate As New SwParametersDelegate
 
-                            resultData = mySWParametersDelegate.ReadNumValueByParameterName(dbConnection, GlobalEnumerates.SwParameters.MAX_QCRESULTS_TO_ACCUMULATE.ToString, Nothing)
+                            resultData = SwParametersDelegate.ReadNumValueByParameterName(dbConnection, GlobalEnumerates.SwParameters.MAX_QCRESULTS_TO_ACCUMULATE.ToString, Nothing)
                             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                                 myMaxQCResults = Convert.ToInt32(DirectCast(resultData.SetDatos, Single))
 

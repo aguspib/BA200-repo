@@ -7,6 +7,8 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.App
+Imports Biosystems.Ax00.App.PresentationLayerListener
+Imports Biosystems.Ax00.Core.Services
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 
 Public Class UiChangeRotor
@@ -270,33 +272,39 @@ Public Class UiChangeRotor
             dxProgressBar.Visible = False
             dxProgressBar.Properties.Minimum = 0
             dxProgressBar.Properties.Maximum = DefaultLightAdjustTime
+
+            AnalyzerController.Instance.PauseWarmUpService() 'IT 26/03/2015 - BA-2406
+
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", ".InitializeScreen " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".InitializeScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
-    ''' <summary>
-    ''' Not allow move form and mantain the center location in center parent
-    ''' </summary>
-    ''' <remarks>
-    ''' Created by: DL 27/07/2011
-    ''' </remarks>
-    Protected Overrides Sub WndProc(ByRef m As Message)
-        If (m.Msg = WM_WINDOWPOSCHANGING) Then
-            Dim mySize As Size = Me.Parent.Size
-            Dim myLocation As Point = Me.Parent.Location
-            Dim pos As WINDOWPOS = DirectCast(Runtime.InteropServices.Marshal.PtrToStructure(m.LParam, GetType(WINDOWPOS)), WINDOWPOS)
+    ' ''' <summary>
+    ' ''' Not allow move form and mantain the center location in center parent
+    ' ''' </summary>
+    ' ''' <remarks>
+    ' ''' Created by: DL 27/07/2011
+    ' ''' </remarks>
+    'Protected Overrides Sub WndProc(ByRef m As Message)
+    '    If (m.Msg = WM_WINDOWPOSCHANGING) Then
+    '        Dim mySize As Size = Me.Parent.Size
+    '        Dim myLocation As Point = Me.Parent.Location
+    '        Dim pos As WINDOWPOS = DirectCast(Runtime.InteropServices.Marshal.PtrToStructure(m.LParam, GetType(WINDOWPOS)), WINDOWPOS)
 
-            pos.x = myLocation.X + CInt((mySize.Width - Me.Width) / 2)
-            pos.y = myLocation.Y + CInt((mySize.Height - Me.Height) / 2) - 70
-            Runtime.InteropServices.Marshal.StructureToPtr(pos, m.LParam, True)
-        End If
-        MyBase.WndProc(m)
-    End Sub
+    '        pos.x = myLocation.X + CInt((mySize.Width - Me.Width) / 2)
+    '        pos.y = myLocation.Y + CInt((mySize.Height - Me.Height) / 2) - 70
+    '        Runtime.InteropServices.Marshal.StructureToPtr(pos, m.LParam, True)
+    '    End If
+    '    MyBase.WndProc(m)
+    'End Sub
 
     Private Sub ExitScreen()
         Try
+
+            AnalyzerController.Instance.ChangeRotorCloseProcess() 'BA-2143
+
             If (bsCancelButton.Enabled) Then
                 If (statusMDIChangedFlag) Then
                     UiAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.STANDBY)
@@ -305,15 +313,18 @@ Public Class UiChangeRotor
                 End If
 
                 'Open the WS Monitor form and close this one
-                If (Not Me.Tag Is Nothing) Then
-                    'A PerformClick() method was executed
-                    Me.Close()
-                Else
-                    'Normal button click
-                    'Open the WS Monitor form and close this one
-                    UiAx00MainMDI.OpenMonitorForm(Me)
-                End If
+                'If (Not Me.Tag Is Nothing) Then
+                'A PerformClick() method was executed
+                'Me.Close()
+                'Else
+                'Normal button click
+                'Open the WS Monitor form and close this one
+                UiAx00MainMDI.OpenMonitorForm(Me)
+                'End If
             End If
+
+            AnalyzerController.Instance.ReStartWarmUpService() 'IT 26/03/2015 - BA-2406
+
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", ".ExitScreen " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ExitScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -361,15 +372,15 @@ Public Class UiChangeRotor
         _processIsPaused = IsProcessPaused()
 
         secondsInPause = dxProgressBar.Position
-        dxProgressBar.Visible = True
-        dxProgressBar.Show()
+        If dxProgressBar.Visible = False Then dxProgressBar.Visible = True
+        'dxProgressBar.Show()
 
         Dim Dt1 As DateTime = DateTime.Now
         Dim Dt2 As DateTime
         Dim Span As TimeSpan
 
         bsContinueButton.Enabled = False
-
+        Dim elapsed = Now.AddSeconds(0.1)
         While ScreenWorkingProcess AndAlso (Not _processIsPaused)
             Dt2 = DateTime.Now
             Span = Dt2.Subtract(Dt1)
@@ -380,15 +391,18 @@ Public Class UiChangeRotor
                 dxProgressBar.Position = CInt(Span.TotalSeconds + secondsInPause)
             End If
 
-            dxProgressBar.Show()
-            Application.DoEvents()
+            If dxProgressBar.Visible = False Then dxProgressBar.Show()
+            If elapsed < Now Then
+                elapsed = Now.AddSeconds(0.1)
+                Application.DoEvents()
+            End If
 
             If Not AnalyzerController.Instance.Analyzer.Connected Then ScreenWorkingProcess = False 'DL 26/09/2012
         End While
 
         If (Not _processIsPaused) AndAlso (Not ScreenWorkingProcess) Then
             dxProgressBar.Position = dxProgressBar.Properties.Maximum
-            dxProgressBar.Show()
+            If dxProgressBar.Visible = False Then dxProgressBar.Show()
             Application.DoEvents()
 
             'dl 26/09/2012
@@ -451,9 +465,12 @@ Public Class UiChangeRotor
             End If
 
             Try
-                processStarted = AnalyzerController.Instance.ChangeRotorStartProcess(_recoverProcess)
 
-                If (processStarted) Then
+                If (Not _recoverProcess) Then
+                    processStarted = AnalyzerController.Instance.ChangeRotorStartProcess()
+                End If
+
+                If (processStarted Or _recoverProcess) Then
                     'Disable buttons
                     'DL 28/02/2012
                     dxProgressBar.Visible = False
@@ -606,8 +623,8 @@ Public Class UiChangeRotor
         myGlobal = myReactionsRotorDelegate.ChangeRotor(Nothing, UiAx00MainMDI.ActiveAnalyzer, UiAx00MainMDI.AnalyzerModel)
 
         'DL 29/02/2012 - evaluate if the adjust ligth has been successfully or not
-        Dim myAlarms As List(Of GlobalEnumerates.Alarms) = AnalyzerController.Instance.Analyzer.Alarms
-        If (Not myAlarms.Contains(GlobalEnumerates.Alarms.BASELINE_INIT_ERR)) Then
+        Dim myAlarms As List(Of AlarmEnumerates.Alarms) = AnalyzerController.Instance.Analyzer.Alarms
+        If (Not myAlarms.Contains(AlarmEnumerates.Alarms.BASELINE_INIT_ERR)) Then
             ScreenWorkingProcess = False 'Process finished
             ExistBaseLineInitError = False
         Else
@@ -731,11 +748,10 @@ Public Class UiChangeRotor
 
             'AG 12/03/2012 - Reactions rotor missing alarm
             If (Not pRefreshEventType Is Nothing AndAlso pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED)) Then
-                Dim linQAlarm As List(Of Biosystems.Ax00.Types.UIRefreshDS.ReceivedAlarmsRow)
-                linQAlarm = (From a As Biosystems.Ax00.Types.UIRefreshDS.ReceivedAlarmsRow In pRefreshDS.ReceivedAlarms _
-                            Where a.AlarmID = GlobalEnumerates.Alarms.REACT_MISSING_ERR.ToString _
+                Dim linQAlarm = (From a As Biosystems.Ax00.Types.UIRefreshDS.ReceivedAlarmsRow In pRefreshDS.ReceivedAlarms _
+                            Where a.AlarmID = AlarmEnumerates.Alarms.REACT_MISSING_ERR.ToString _
                           AndAlso a.AlarmStatus = True _
-                           Select a).ToList
+                           Select a)
 
                 If (linQAlarm.Count > 0) Then
                     ScreenWorkingProcess = False 'Process finished
@@ -745,7 +761,6 @@ Public Class UiChangeRotor
                     bsCancelButton.Enabled = True
                     RefreshDoneField = True 'RH 28/03/2012
                 End If
-                linQAlarm = Nothing
 
                 'AG 02/04/2012 - Raise WashStation is active once the ISE initialization finished
                 If (bsChangeRotortButton.Enabled AndAlso Not UiAx00MainMDI Is Nothing) Then
@@ -809,7 +824,6 @@ Public Class UiChangeRotor
 #Region "Events"
 
     Private Sub bsCancelButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsCancelButton.Click
-        AnalyzerController.Instance.ChangeRotorCloseProcess() 'BA-2143
         ExitScreen()
     End Sub
 

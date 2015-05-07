@@ -2,7 +2,7 @@
 Option Strict On
 
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.DAL
+Imports Biosystems.Ax00.Global.AlarmEnumerates
 Imports Biosystems.Ax00.DAL.DAO
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
@@ -1177,7 +1177,7 @@ Namespace Biosystems.Ax00.BL
                                                 qcResultRow.VisibleResultValue > openQCResultsROW.MaxRange) Then
                                                 'Insert Alarm QC_OUT_OF_RANGE in tqcResult Alarms for the result
                                                 InsertNewQcResultAlarmNEW(myQCResultAlarmsDS, qcResultRow.QCControlLotID, qcResultRow.QCTestSampleID, _
-                                                                          pAnalyzerID, qcResultRow.RunsGroupNumber, qcResultRow.RunNumber, GlobalEnumerates.Alarms.QC_OUT_OF_RANGE.ToString)
+                                                                          pAnalyzerID, qcResultRow.RunsGroupNumber, qcResultRow.RunNumber, Alarms.QC_OUT_OF_RANGE.ToString)
                                             End If
                                         End If
 

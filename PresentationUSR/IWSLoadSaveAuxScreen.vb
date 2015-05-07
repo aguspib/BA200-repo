@@ -487,9 +487,8 @@ Public Class UiWSLoadSaveAuxScreen
                         Me.Close()
                     End If
                 Else
-                    Dim myWSDelegate As New WorkSessionsDelegate
 
-                    myGlobalDataTO = myWSDelegate.GetOrderTestsForWS(Nothing, ActiveWSAttribute, ActiveAnalyzerAttribute)
+                    myGlobalDataTO = WorkSessionsDelegate.GetOrderTestsForWS(Nothing, ActiveWSAttribute, ActiveAnalyzerAttribute)
                     If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                         Dim myWorkSessionResultDS As WorkSessionResultDS = DirectCast(myGlobalDataTO.SetDatos, WorkSessionResultDS)
 

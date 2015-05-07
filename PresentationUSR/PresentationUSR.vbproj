@@ -977,6 +977,7 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\02.-Application Layer\Ax00.Application\Ax00.Application.vbproj">
@@ -990,6 +991,10 @@
     <ProjectReference Include="..\Analyzer\Analyzer.vbproj">
       <Project>{BD816D19-6903-4603-8A75-A14C099D4EB2}</Project>
       <Name>Analyzer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Ax00.CrossCutting\Ax00.CrossCutting.vbproj">
+      <Project>{b23d6aff-a359-4d3e-87bf-820167228fe5}</Project>
+      <Name>Ax00.CrossCutting</Name>
     </ProjectReference>
     <ProjectReference Include="..\AX00Types\AX00Types.vbproj">
       <Project>{3B617EBF-0488-46BD-AB56-094F81D0E4C3}</Project>
@@ -1172,6 +1177,10 @@
     <Folder Include="Import\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

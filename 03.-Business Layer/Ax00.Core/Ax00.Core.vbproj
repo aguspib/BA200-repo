@@ -35,6 +35,7 @@
     <NoWarn>
     </NoWarn>
     <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup>
     <OptionExplicit>On</OptionExplicit>
@@ -81,6 +82,9 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Telerik.JustMock">
+      <HintPath>..\..\packages\JustMock.2015.1.224.3\lib\Net35\Telerik.JustMock.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Import Include="Microsoft.VisualBasic" />
@@ -94,13 +98,43 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="04.-Services\AsyncService.vb" />
-    <Compile Include="04.-Services\DynamicBaseLineService.vb" />
-    <Compile Include="04.-Services\ServicesInterfaces\IServiceStatusCallback.vb" />
-    <Compile Include="04.-Services\RotorChangeServices.vb" />
-    <Compile Include="04.-Services\ServiceStatusCallback.vb" />
-    <Compile Include="04.-Services\ServiceStatusEnum.vb" />
-    <Compile Include="04.-Services\ServicesInterfaces\IAsyncService.vb" />
+    <Compile Include="Entities\Enums\AnalyzerModelEnum.vb" />
+    <Compile Include="Entities\BA200AnalyzerEntity.vb" />
+    <Compile Include="Entities\BA400AnalyzerEntity.vb" />
+    <Compile Include="Entities\WorkSession\BA400ContaminationsSpecification.vb" />
+    <Compile Include="Entities\WorkSession\BA200ContaminationsSpecification.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\ContaminationManager.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\LAx00Frame.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\ContaminationsContext.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\ContextStep.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\DispensingContaminationDescription.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\EmptyWashing.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\RegularWaterWashing.vb" />
+    <Compile Include="Entities\WorkSession\Optimizations\OptimizationAPolicyApplier.vb" />
+    <Compile Include="Entities\WorkSession\Optimizations\OptimizationBacktrackingApplier.vb" />
+    <Compile Include="Entities\WorkSession\Optimizations\OptimizationBPolicyApplier.vb" />
+    <Compile Include="Entities\WorkSession\Optimizations\OptimizationCPolicyApplier.vb" />
+    <Compile Include="Entities\WorkSession\Optimizations\OptimizationDPolicyApplier.vb" />
+    <Compile Include="Entities\WorkSession\Optimizations\OptimizationPolicyApplier.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\WashingDescription.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\ReagentDispensing.vb" />
+    <Compile Include="Entities\WorkSession\WSExecutionCreator.vb" />
+    <Compile Include="Entities\WorkSession\WSExecutionsSorter.vb" />
+    <Compile Include="Services\AsyncService.vb" />
+    <Compile Include="Services\Enums\BaseLineStepsEnum.vb" />
+    <Compile Include="Services\Interfaces\IBaseLineService.vb" />
+    <Compile Include="Services\Interfaces\IRotorChangeService.vb" />
+    <Compile Include="Services\Interfaces\IWarmUpService.vb" />
+    <Compile Include="Services\Enums\RotorChangeStepsEnum.vb" />
+    <Compile Include="Services\WarmUpService.vb" />
+    <Compile Include="Services\BaseLineService.vb" />
+    <Compile Include="Services\Enums\StringStepStatus.vb" />
+    <Compile Include="Services\Interfaces\IServiceStatusCallback.vb" />
+    <Compile Include="Services\RotorChangeService.vb" />
+    <Compile Include="Services\ServiceStatusCallback.vb" />
+    <Compile Include="Services\Enums\ServiceStatusEnum.vb" />
+    <Compile Include="Services\Interfaces\IAsyncService.vb" />
+    <Compile Include="Services\Enums\WarmUpStepsEnum.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -135,11 +169,16 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Analyzer\Analyzer.vbproj">
       <Project>{bd816d19-6903-4603-8a75-a14c099d4eb2}</Project>
       <Name>Analyzer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Ax00.CrossCutting\Ax00.CrossCutting.vbproj">
+      <Project>{b23d6aff-a359-4d3e-87bf-820167228fe5}</Project>
+      <Name>Ax00.CrossCutting</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\AX00Types\AX00Types.vbproj">
       <Project>{3b617ebf-0488-46bd-ab56-094f81d0e4c3}</Project>
@@ -179,8 +218,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="01.-Interfaces\" />
-    <Folder Include="02.-Entities\" />
+    <Folder Include="Entities\WorkSession\Contaminations\Interfaces\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

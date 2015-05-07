@@ -31,6 +31,7 @@
     <OutputPath>bin\Release\</OutputPath>
     <DocumentationFile>Biosystems.Ax00.App.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup>
     <OptionExplicit>On</OptionExplicit>
@@ -59,6 +60,9 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Telerik.JustMock">
+      <HintPath>..\..\packages\JustMock.2015.1.224.3\lib\Net35\Telerik.JustMock.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Import Include="Microsoft.VisualBasic" />
@@ -78,6 +82,7 @@
     <Compile Include="AnalyzerFactory.vb" />
     <Compile Include="IAnalyzerController.vb" />
     <Compile Include="IAnalyzerFactory.vb" />
+    <Compile Include="PersentationLayerListener\IPresentationLayerListener.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -93,6 +98,10 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="PersentationLayerListener\Requests\Notify.vb" />
+    <Compile Include="PersentationLayerListener\Requests\PresentationRequest.vb" />
+    <Compile Include="PersentationLayerListener\Requests\YesNoCancelQuestion.vb" />
+    <Compile Include="PersentationLayerListener\Requests\YesNoQuestion.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">
@@ -112,6 +121,7 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\03.-Business Layer\Ax00.Core\Ax00.Core.vbproj">

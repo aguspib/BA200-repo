@@ -81,7 +81,7 @@ Namespace Biosystems.Ax00.DAL.DAO
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
             Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                resultData = GetOpenDBConnection(pDBConnection)
 
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
@@ -91,15 +91,17 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                         'cmdText &= "SELECT * " & vbCrLf
                         'cmdText &= "FROM tfmwAlarms " & vbCrLf
-                        cmdText = " SELECT a.*, aec.ErrorCode " & vbCrLf
+
+                        'AJG AÑADIDO EL ISNULL OJO!!!!!
+                        cmdText = " SELECT a.*, ISNULL(aec.ErrorCode,0) AS ERRORCODE " & vbCrLf
                         cmdText &= " FROM tfmwAlarms a LEFT OUTER JOIN tfmwAlarmErrorCodes aec " & vbCrLf
                         cmdText &= " ON a.AlarmID = aec.AlarmID "
 
                         Dim myDS As New AlarmsDS
 
                         'Fill the DataSet to return
-                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
-                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                        Using dbCmd As New SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlDataAdapter(dbCmd)
                                 dbDataAdapter.Fill(myDS.tfmwAlarms)
                             End Using
                         End Using

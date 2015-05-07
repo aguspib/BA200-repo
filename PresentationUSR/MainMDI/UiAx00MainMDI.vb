@@ -7,6 +7,7 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalConstants
 Imports Biosystems.Ax00.Global.GlobalEnumerates
+Imports Biosystems.Ax00.Global.AlarmEnumerates
 Imports Biosystems.Ax00.PresentationCOM
 Imports Biosystems.Ax00.BL.UpdateVersion
 Imports Biosystems.Ax00.CommunicationsSwFw
@@ -20,6 +21,8 @@ Imports System.IO
 Imports Biosystems.Ax00.App
 Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Core.Entities
+Imports Biosystems.Ax00.Core.Services
+Imports Biosystems.Ax00.App.PresentationLayerListener.Requests
 
 Partial Public Class UiAx00MainMDI
 
@@ -65,7 +68,7 @@ Partial Public Class UiAx00MainMDI
     Public SamplesRotorAlert As bsAlert
 
     Public AlertList As New List(Of bsAlert)
-    Public AlertText As New Dictionary(Of GlobalEnumerates.Alarms, String)
+    Public AlertText As New Dictionary(Of Alarms, String)
     'RH 01/07/2011 END
 
     Private myAnalyzerSettingsDelegate As New AnalyzerSettingsDelegate
@@ -556,6 +559,8 @@ Partial Public Class UiAx00MainMDI
         End Set
     End Property
 
+
+
 #End Region
 
 #Region "Common Forms" 'SG 03/12/10
@@ -623,6 +628,7 @@ Partial Public Class UiAx00MainMDI
         If e.KeyData = Keys.F1 Then
             SetHelpProvider()
         End If
+
     End Sub
 
     ''' <summary>
@@ -1459,7 +1465,7 @@ Partial Public Class UiAx00MainMDI
                                 Dim myLogMaxDays As Integer = 30
                                 Dim myParams As New SwParametersDelegate
 
-                                resultData = myParams.ReadNumValueByParameterName(Nothing, GlobalEnumerates.SwParameters.MAX_DAYS_IN_PREVIOUSLOG.ToString(), Nothing)
+                                resultData = SwParametersDelegate.ReadNumValueByParameterName(Nothing, GlobalEnumerates.SwParameters.MAX_DAYS_IN_PREVIOUSLOG.ToString(), Nothing)
                                 If (Not resultData.HasError) Then myLogMaxDays = CInt(resultData.SetDatos)
 
                                 resultData = ApplicationLogManager.ExportLogToXml(WorkSessionIDAttribute, myLogMaxDays)
@@ -3055,19 +3061,6 @@ Partial Public Class UiAx00MainMDI
             ElseIf showPAUSEWSiconFlag Then
                 GlobalBase.CreateLogActivity("Btn Pause WS", Me.Name & ".bsTSMultiFunctionSessionButton_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
 
-                'AG 20/01/2014 - Move this code inside PauseSessionActions method
-                ''JV + AG #1391 26/11/2013
-                'Dim resultData As New GlobalDataTO
-                'Dim myExDlg As New ExecutionsDelegate
-                'resultData = myExDlg.ExistCriticalPauseTests(Nothing, AnalyzerIDAttribute, AnalyzerModelAttribute, WorkSessionIDAttribute)
-                'If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-                '    If CType(resultData.SetDatos, Boolean) AndAlso _
-                '        BSCustomMessageBox.Show(Me, infoCritical, My.Application.Info.Title, MessageBoxButtons.YesNo, MessageBoxIcon.Warning, BSCustomMessageBox.BSMessageBoxDefaultButton.LeftButton, _
-                '                                "", waitButton, tooltipPause) = DialogResult.Yes Then Return
-                'End If
-                ''JV + AG #1391 26/11/2013
-                'AG 20/01/2014 
-
                 PauseSessionActions()
             End If
         Catch ex As Exception
@@ -3088,7 +3081,7 @@ Partial Public Class UiAx00MainMDI
             'JV + AG revision 18/10/2013 task # 1341
             SetHQProcessByUserFlag(False) 'AG 30/07/2013 - on press START WS button reset the flag for host query from MDI
             'Normal business
-            MyClass.InitiateStartSession()
+            InitiateStartSession()
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PlaySessionActions ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".PlaySessionActions ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -3289,6 +3282,7 @@ Partial Public Class UiAx00MainMDI
     ''' Created by:  AG 01/06/2010 - Tested: ok
     ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
     '''              IT 01/12/2014 - BA-2075
+    '''              IT 26/03/2015 - BA-2406
     ''' </remarks>
     Private Sub bsTSStartInstrumentButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsTSStartInstrumentButton.Click
         Try
@@ -3300,23 +3294,6 @@ Partial Public Class UiAx00MainMDI
             ' XBC 06/07/2012
             isStartInstrumentActivating = True
 
-            'AG 12/09/2011 - move the DL 09/09/2011 code into InitializeStartInstrument method, and also move the code situation
-
-            'Show message (one time) recommend change reactions rotor if needed
-            '
-            'AG 23/05/2012 - Do not inform "Change reactions rotor recommend" because user can not use the change reactions rotor utility"
-            'Dim AnalReactionsRotor As New AnalyzerReactionsRotorDelegate
-            'myGlobal = AnalReactionsRotor.ChangeReactionsRotorRecommended(Nothing, AnalyzerIDAttribute, AnalyzerModelAttribute)
-            'If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-            '    Dim messageID As String = ""
-            '    messageID = CType(myGlobal.SetDatos, String)
-            '    If messageID <> "" And ChangeReactionsRotorRecommendedWarning = 0 Then
-            '        ChangeReactionsRotorRecommendedWarning = 1
-            '        ShowMessage("Warning", messageID)
-            '    Else
-            '        ChangeReactionsRotorRecommendedWarning = 0
-            '    End If
-            'End If
             ChangeReactionsRotorRecommendedWarning = 0
             'AG 23/05/2012
 
@@ -3338,37 +3315,41 @@ Partial Public Class UiAx00MainMDI
                     'NOTE: This button is disable while the REACT_ROTOR_MISSING alarm exist. In other way we have to implement a new elseIf case
                     'Continue the process on the aborted task (Washing)
                 Else
-                    myGlobal = AnalyzerController.Instance.StartWarmUpProcess() 'BA-2075
-
-                    If Not myGlobal.HasError Then
-                        If AnalyzerController.Instance.Analyzer.Connected Then
+                    'IT 26/03/2015 - BA-2406 - INI
+                    Try
+                        If (AnalyzerController.Instance.StartWarmUpProcess(False, AddressOf AskToUseRotorContentsForFLIGHT)) Then
                             ShowStatus(Messages.STARTING_INSTRUMENT) 'RH 21/03/2012
-
                             'Activate only if current screen is monitor
                             WarmUpFinishedAttribute = False
                             BsTimerWUp.Enabled = True
                             If Not ActiveMdiChild Is Nothing Then
                                 If (TypeOf ActiveMdiChild Is UiMonitor) Then
                                     Dim CurrentMdiChild As UiMonitor = CType(ActiveMdiChild, UiMonitor)
-                                    'CurrentMdiChild.bsWamUpGroupBox.Enabled = True
                                     CurrentMdiChild.bsWamUpGroupBox.Visible = True
                                 End If
+                                'IT 26/03/2015 - BA-2406 (INI)
+                                If (TypeOf ActiveMdiChild Is UiChangeRotor) Then
+                                    CloseActiveMdiChild()
+                                End If
+                                'IT 26/03/2015 - BA-2406 (END)
                             End If
                             'END DL 09/09/2011
                         Else
                             activateButtonsFlag = True
                         End If
-                    Else
+
+                    Catch ex As Exception
                         ShowMessage("Error", myGlobal.ErrorMessage)
                         activateButtonsFlag = True
-                    End If
+                    End Try
+                    'IT 26/03/2015 - BA-2406 - END
 
                     If activateButtonsFlag Then
                         SetActionButtonsEnableProperty(True) 'AG 14/10/2011 - update vertical button bar
                         SetEnableMainTab(True) 'DL 26/03/2012 test
                     End If
-                End If
 
+                End If
             End If
 
         Catch ex As Exception
@@ -3379,6 +3360,22 @@ Partial Public Class UiAx00MainMDI
             isStartInstrumentActivating = False
         End Try
     End Sub
+
+    ''' <summary>
+    ''' If the reactions rotor is full of clean viable water, this function will ask the user to use this water for the whole FLIGHT process instead of empting the rotor and do it from scratch
+    ''' </summary>
+    ''' <remarks>This function will store the results into a field inside the passed obj.
+    ''' This is done this way to allow cross-thread calls.</remarks>
+    Public Sub AskToUseRotorContentsForFLIGHT(obj As BaseLineService.ReuseRotorResponse)
+
+        Dim question As New YesNoQuestion
+        question.Text = MultilanguageResourcesDelegate.GetResourceText("MSG_REUSE_FLIGHT_ROTOR")
+
+        AnalyzerController.PresentationLayerInterface.InvokeSynchronizedRequest(question)
+        obj.Reuse = (question.Result = MsgBoxResult.Yes)
+
+    End Sub
+
 
     ''' <summary>
     ''' Shut down the instrument
@@ -3425,7 +3422,7 @@ Partial Public Class UiAx00MainMDI
 
                     'AG 29/09/2011 - If bootle alarms show message and not start the shutdown process
                     Dim activateButtonsFlag As Boolean = False
-                    Dim myCurrentAlarms As List(Of GlobalEnumerates.Alarms)
+                    Dim myCurrentAlarms As List(Of Alarms)
                     myCurrentAlarms = AnalyzerController.Instance.Analyzer.Alarms
 
                     'DL 10/10/2012. Begin !!!
@@ -3712,7 +3709,7 @@ Partial Public Class UiAx00MainMDI
             Application.DoEvents()
             ' XB 07/11/2013
 
-            MyClass.StartSession(pFromHostQueryMDIButton) 'AG 14/01/2014 - BT #1435
+            StartSession(pFromHostQueryMDIButton) 'AG 14/01/2014 - BT #1435
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitiateStartSession ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".InitiateStartSession ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -3860,25 +3857,6 @@ Partial Public Class UiAx00MainMDI
                 If (ChangeReactionsRotorRecommendedWarning = 0) Then
                     Dim userAnswer As DialogResult = DialogResult.Yes
 
-                    ''Verify if the WorkSession can be fully executed with the current level of Washing Solutions and High Contamination Waste bottles
-                    'Dim ex_delg As New ExecutionsDelegate
-                    'myGlobal = ex_delg.CalculateIfBottleLevelsAreSufficientForWS(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, _
-                    '                                                             AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.BOTTLE_WASHSOLUTION), _
-                    '                                                             AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.BOTTLE_HIGHCONTAMINATION_WASTE))
-
-                    'If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
-                    '    If (CType(myGlobal.SetDatos, Boolean)) Then
-                    '        Volume is not OK; a warning Message is shown, but the User can choose between stop the WS Start/Continue process to solve the problem
-                    '        or to continue with the execution despite of the problem
-                    '        userAnswer = ShowMessage(Me.Name & ".bsTSContinueSessionButton_Click", GlobalEnumerates.Messages.CHANGE_BOTTLE_RECOMMEND.ToString)
-                    '    End If
-                    'Else
-                    '    Error verifying the current level of Washing Solutions and High Contamination Waste bottles; shown it
-                    '    ShowMessage(Me.Name & ".bsTSContinueSessionButton_Click", myGlobal.ErrorCode, myGlobal.ErrorMessage, Me)
-                    'End If
-
-                    'If there is at least a requested ISE Test pending to execute in the WorkSession, verify if ISE Module is 
-                    'installed and ready to be used
                     Dim wsReadyToBeSent As Boolean = True 'This flag only can be false if user do not want to regenerate the executions in method CreateExecutionsProcess
                     If (Not myGlobal.HasError AndAlso userAnswer = DialogResult.Yes) Then
 
@@ -3971,286 +3949,14 @@ Partial Public Class UiAx00MainMDI
                                 End If
                             End If
 
-                            ''Verify if there are ISE Tests requested in the WorkSession and pending of execution
-                            'Dim updateExecutions As Boolean = False
-                            'Dim myOrderTestsDelegate As New OrderTestsDelegate
-
-                            'myGlobal = myOrderTestsDelegate.IsThereAnyTestByType(Nothing, WorkSessionIDAttribute, "ISE")
-                            'If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
-                            '    If (CType(myGlobal.SetDatos, Boolean)) Then
-                            '        If (AnalyzerController.Instance.Analyzer.ISEAnalyzer Is Nothing) OrElse (Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEModuleReady) Then
-                            '            'ISE Module is not available, verify is there is at least an STANDARD Test pending of execution
-                            '            'to shown the proper Message 
-                            '            myGlobal = myOrderTestsDelegate.IsThereAnyTestByType(Nothing, WorkSessionIDAttribute, "STD")
-                            '            If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
-                            '                If (CType(myGlobal.SetDatos, Boolean)) Then
-                            '                    'ISE Module is not ready to be used but there are STD Tests pending of execution; a question Message is shown, and the User 
-                            '                    'can choose between stop the WS Start/Continue process to solve the problem or to continue with the execution despite of the problem
-                            '                    userAnswer = ShowMessage(Me.Name & ".bsTSStartSessionButton_Click", GlobalEnumerates.Messages.ISE_MODULE_NOT_AVAILABLE.ToString)
-
-                            '                    If (userAnswer = DialogResult.Yes) Then
-                            '                        'User has selected continue WS without ISE Tests; all pending ISE Tests will be blocked
-                            '                        updateExecutions = True
-
-                            '                    End If
-                            '                Else
-                            '                    'ISE Module is not ready and there are not STD Tests pending of execution; an error Message is shown due to 
-                            '                    'the WS can not be started
-                            '                    userAnswer = DialogResult.No
-                            '                    ShowMessage(Me.Name & ".bsTSStartSessionButton_Click", GlobalEnumerates.Messages.ONLY_ISE_WS_NOT_STARTED.ToString)
-
-                            '                    'All ISE Pending Tests will be blocked
-                            '                    updateExecutions = True
-                            '                End If
-
-                            '                If (updateExecutions) Then
-                            '                    If (Me.ActiveMdiChild Is Nothing) OrElse (Not TypeOf ActiveMdiChild Is IWSRotorPositions) Then
-                            '                        Dim myExecutionsDelegate As New ExecutionsDelegate
-                            '                        myGlobal = myExecutionsDelegate.UpdateStatusByExecutionTypeAndStatus(Nothing, WorkSessionIDAttribute, AnalyzerIDAttribute, "PREP_ISE", "PENDING", "LOCKED")
-                            '                    End If
-
-                            '                    If (Not Me.ActiveMdiChild Is Nothing) AndAlso (TypeOf ActiveMdiChild Is IMonitor) Then
-                            '                        'Refresh the status of ISE Preparations in Monitor Screen if it is the active screen
-                            '                        Dim myDummyUIRefresh As New UIRefreshDS
-                            '                        IMonitor.UpdateWSState(myDummyUIRefresh)
-                            '                    End If
-                            '                End If
-                            '            End If
-
-                            '            ' XBC 26/06/2012 - ISE self-maintenance
-                            '        Else
-                            '            AnalyzerController.Instance.Analyzer.ISEAnalyzer.WorkSessionID = WorkSessionIDAttribute
-                            '            myGlobal = myOrderTestsDelegate.IsThereAnyTestByType(Nothing, WorkSessionIDAttribute, "STD")
-                            '            If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
-                            '                If (CType(myGlobal.SetDatos, Boolean)) Then
-                            '                    AnalyzerController.Instance.Analyzer.ISEAnalyzer.WorkSessionTestsByType = "ALL"
-                            '                Else
-                            '                    AnalyzerController.Instance.Analyzer.ISEAnalyzer.WorkSessionTestsByType = "ISE"
-                            '                End If
-                            '            End If
-
-                            '            If executeSTD Then
-                            '                executeSTD = False
-                            '                ' Do nothing. leaving to continue with the work session execution
-                            '                ' Previously existing ISE preparations have been locked
-                            '            Else
-                            '                ' Check ISE calibrations required
-                            '                If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer Is Nothing Then
-                            '                    If AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEModuleReady Then
-                            '                        ' Check if initial Purges are required. This is required when any calibration is required
-                            '                        Dim ElectrodesCalibrationRequired As Boolean = False
-                            '                        Dim PumpsCalibrationRequired As Boolean = False
-                            '                        Dim BubblesCalibrationRequired As Boolean = False
-                            '                        ' Check if ISE Electrodes calibration is required
-                            '                        myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.CheckElectrodesCalibrationIsNeeded
-                            '                        If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
-                            '                            ElectrodesCalibrationRequired = CType(myGlobal.SetDatos, Boolean)
-                            '                        End If
-                            '                        ' Check if ISE Pumps calibration is required
-                            '                        myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.CheckPumpsCalibrationIsNeeded
-                            '                        If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
-                            '                            PumpsCalibrationRequired = CType(myGlobal.SetDatos, Boolean)
-                            '                        End If
-                            '                        ' Check if ISE Bubbles calibration is required 
-                            '                        myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.CheckBubbleCalibrationIsNeeded
-                            '                        If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
-                            '                            BubblesCalibrationRequired = CType(myGlobal.SetDatos, Boolean)
-                            '                        End If
-
-
-                            '                        If ElectrodesCalibrationRequired Or PumpsCalibrationRequired Or BubblesCalibrationRequired Then
-                            '                            If Not StartSessionisInitialPUGsent Then
-                            '                                ' Execute initial Purge A and Purge B
-                            '                                Me.StartSessionisInitialPUGsent = True
-                            '                                myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.DoMaintenanceExit() ' this function throws Purge A and Purge B 
-                            '                                If Not myGlobal.HasError Then
-                            '                                    AnalyzerController.Instance.Analyzer.ISEAnalyzer.PurgeAbyFirmware += 1
-                            '                                    AnalyzerController.Instance.Analyzer.ISEAnalyzer.PurgeBbyFirmware += 1
-                            '                                    ShowStatus(Messages.STARTING_SESSION)
-                            '                                    Me.StartSessionisPending = True
-                            '                                    EnableButtonAndMenus(False)
-                            '                                    Cursor = Cursors.WaitCursor
-                            '                                    SetEnableMainTab(False)
-                            '                                    ' XBC 29/08/2012 - Disable Monitor Panel
-                            '                                    'If Not Me.ActiveMdiChild Is Nothing Then
-                            '                                    '    Me.ActiveMdiChild.Enabled = False
-                            '                                    'End If
-                            '                                    InitializeMarqueeProgreesBar()
-                            '                                End If
-                            '                                ' waiting until CALIBRATION operation is performed
-                            '                                ' then will be back to continue Work Session
-                            '                                Exit Sub
-
-                            '                            Else
-                            '                                ' Execute required Calibrations
-
-                            '                                If ElectrodesCalibrationRequired And Not Me.SkipCALB Then
-                            '                                    Me.StartSessionisCALBsent = True
-                            '                                    myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.DoElectrodesCalibration()
-                            '                                    If myGlobal.HasError Then
-                            '                                        ShowMessage("Error", GlobalEnumerates.Messages.ISE_CALB_WRONG.ToString)
-                            '                                    Else
-                            '                                        ShowStatus(Messages.STARTING_SESSION)
-                            '                                        Me.StartSessionisPending = True
-                            '                                        EnableButtonAndMenus(False)
-                            '                                        Cursor = Cursors.WaitCursor
-                            '                                        SetEnableMainTab(False)
-                            '                                        ' XBC 29/08/2012 - Disable Monitor Panel
-                            '                                        'If Not Me.ActiveMdiChild Is Nothing Then
-                            '                                        '    Me.ActiveMdiChild.Enabled = False
-                            '                                        'End If
-                            '                                        InitializeMarqueeProgreesBar()
-                            '                                    End If
-                            '                                    ' waiting until CALIBRATION operation is performed
-                            '                                    ' then will be back to continue Work Session
-                            '                                    Exit Sub
-                            '                                End If
-
-
-                            '                                If PumpsCalibrationRequired And Not Me.SkipPMCL Then
-                            '                                    Me.StartSessionisPMCLsent = True
-                            '                                    myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.DoPumpsCalibration()
-                            '                                    If myGlobal.HasError Then
-                            '                                        ShowMessage("Error", GlobalEnumerates.Messages.ISE_PMCL_WRONG.ToString)
-                            '                                    Else
-                            '                                        ShowStatus(Messages.STARTING_SESSION)
-                            '                                        Me.StartSessionisPending = True
-                            '                                        EnableButtonAndMenus(False)
-                            '                                        Cursor = Cursors.WaitCursor
-                            '                                        SetEnableMainTab(False)
-                            '                                        ' XBC 29/08/2012 - Disable Monitor Panel
-                            '                                        'If Not Me.ActiveMdiChild Is Nothing Then
-                            '                                        '    Me.ActiveMdiChild.Enabled = False
-                            '                                        'End If
-                            '                                        InitializeMarqueeProgreesBar()
-                            '                                    End If
-                            '                                    ' waiting until CALIBRATION operation is performed
-                            '                                    ' then will be back to continue Work Session
-                            '                                    Exit Sub
-                            '                                End If
-
-
-                            '                                If BubblesCalibrationRequired And Not Me.SkipBMCL Then
-                            '                                    Me.StartSessionisBMCLsent = True
-                            '                                    myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.DoBubblesCalibration()
-                            '                                    If myGlobal.HasError Then
-                            '                                        ShowMessage("Error", GlobalEnumerates.Messages.ISE_BMCL_WRONG.ToString)
-                            '                                    Else
-                            '                                        ShowStatus(Messages.STARTING_SESSION)
-                            '                                        Me.StartSessionisPending = True
-                            '                                        EnableButtonAndMenus(False)
-                            '                                        Cursor = Cursors.WaitCursor
-                            '                                        SetEnableMainTab(False)
-                            '                                        ' XBC 29/08/2012 - Disable Monitor Panel
-                            '                                        'If Not Me.ActiveMdiChild Is Nothing Then
-                            '                                        '    Me.ActiveMdiChild.Enabled = False
-                            '                                        'End If
-                            '                                        InitializeMarqueeProgreesBar()
-                            '                                    End If
-                            '                                    ' waiting until CALIBRATION operation is performed
-                            '                                    ' then will be back to continue Work Session
-                            '                                    Exit Sub
-                            '                                End If
-
-                            '                            End If
-
-                            '                        End If
-
-                            '                    End If
-
-                            '                End If
-                            '            End If
-                            '        End If
-
-                            '    Else
-                            '        If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer Is Nothing Then
-                            '            AnalyzerController.Instance.Analyzer.ISEAnalyzer.WorkSessionTestsByType = "STD"
-                            '        End If
-                            '        ' XBC 26/06/2012
-
-                            '    End If
-                            'Else
-                            '    'Error verifying if there are requested ISE Tests pending of execution in the active Work Session; shown it
-                            '    ShowMessage(Me.Name & ".bsTSStartSessionButton_Click", myGlobal.ErrorCode, myGlobal.ErrorMessage, Me)
-                            'End If
-                            'AG 15/07/2013 - End block of code moved into function VerifyISEConditioningBeforeRunning
 
                         End If 'AG 12/07/2013 - UserAnswer: NO
                     End If
 
-                    'AG 15/07/2013 - The following code is commented but moved into function VerifyISEConditioningBeforeRunning
-                    '                in order to be reused also for the process of automatic WS creation with LIS only by START WS click
-
-                    ' XBC 23/07/2012
-                    'Me.StartSessionisPending = False
-                    'If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer Is Nothing Then
-                    '    If Not ActiveMdiChild Is Nothing Then
-                    '        If (TypeOf ActiveMdiChild Is IMonitor) Then
-                    '            Dim CurrentMdiChild As IMonitor = CType(ActiveMdiChild, IMonitor)
-                    '            AnalyzerController.Instance.Analyzer.ISEAnalyzer.WorkSessionOverallTime = CurrentMdiChild.remainingTime
-                    '        End If
-                    '    End If
-                    'End If
-                    'AG 15/07/2013 - End block of code moved into function VerifyISEConditioningBeforeRunning
 
                     'The WS START/CONTINUE process can continue...
                     If (Not myGlobal.HasError AndAlso userAnswer = DialogResult.Yes) Then
 
-                        'AG 15/07/2013 - The following code is commented but moved into function VerifyISEConditioningBeforeRunning
-                        '                in order to be reused also for the process of automatic WS creation with LIS only by START WS click
-
-                        ' XBC 17/07/2012 - Estimated ISE Consumption by Firmware
-                        'If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer Is Nothing Then
-
-                        '    'SGM 01/10/2012 - If no calibration is needed set ISE preparations as PENDING
-                        '    Dim myOrderTestsDelegate As New OrderTestsDelegate
-                        '    myGlobal = myOrderTestsDelegate.IsThereAnyTestByType(Nothing, WorkSessionIDAttribute, "ISE")
-                        '    If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
-                        '        If CBool(myGlobal.SetDatos) Then
-
-                        '            ' XBC 12/04/2013 - Create Executions is a long time process so is need to be called on threading mode
-                        '            'Dim isReady As Boolean = False
-                        '            'Dim myAffectedElectrodes As List(Of String)
-                        '            'myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.CheckAnyCalibrationIsNeeded(myAffectedElectrodes)
-                        '            'If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
-                        '            '    isReady = Not (CBool(myGlobal.SetDatos) And myAffectedElectrodes Is Nothing)
-                        '            'End If
-
-                        '            'Dim myExecutionDelegate As New ExecutionsDelegate
-                        '            'Dim createWSInRunning As Boolean = (AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING)
-                        '            'myGlobal = myExecutionDelegate.CreateWSExecutions(Nothing, AnalyzerController.Instance.Analyzer.ActiveAnalyzer, AnalyzerController.Instance.Analyzer.ActiveWorkSession, _
-                        '            '                                              createWSInRunning, -1, String.Empty, isReady, myAffectedElectrodes)
-
-                        '            ''refresh WS grid
-                        '            'If (Not Me.ActiveMdiChild Is Nothing) AndAlso (TypeOf ActiveMdiChild Is IMonitor) Then
-                        '            '    'Refresh the status of ISE Preparations in Monitor Screen if it is the active screen
-                        '            '    Dim myDummyUIRefresh As New UIRefreshDS
-                        '            '    IMonitor.UpdateWSState(myDummyUIRefresh)
-                        '            'End If
-
-                        '            Me.StartSessionisPending = True
-                        '            myGlobal = CreateExecutionsProcessByISEChanges()
-                        '            If Not myGlobal.HasError Then
-                        '                WSExecutionsAlreadyCreated = True
-                        '                Me.StartSessionisPending = False
-                        '            End If
-                        '            ' XBC 12/04/2013
-
-                        '        End If
-                        '    End If
-
-                        '    AnalyzerController.Instance.Analyzer.ISEAnalyzer.WorkSessionIsRunning = True
-
-                        '    ''Dim myLogAcciones As New ApplicationLogManager()    ' TO COMMENT !!!
-                        '    'GlobalBase.CreateLogActivity("Update Consumptions - Update Last Date WS ISE Operation [ " & DateTime.Now.ToString & "]", "Ax00MainMDI.StartSession", EventLogEntryType.Information, False)   ' TO COMMENT !!!
-                        '    ' Update date for the ISE test executed while running
-                        '    AnalyzerController.Instance.Analyzer.ISEAnalyzer.UpdateISEInfoSetting(ISEModuleSettings.LAST_OPERATION_WS_DATE, DateTime.Now.ToString, True)
-                        '    'end SGM 01/10/2012
-                        'End If
-                        ' XBC 17/07/2012
-                        'AG 15/07/2013 - End block of code moved into function VerifyISEConditioningBeforeRunning
-
-                        'Disable all buttons and menu options until Analyzer accepts the new instruction
                         SetActionButtonsEnableProperty(False)
                         EnableButtonAndMenus(False)
 
@@ -4318,51 +4024,6 @@ Partial Public Class UiAx00MainMDI
                         If Not myGlobal.HasError And wsReadyToBeSent Then 'AG 10/05/2012
                             readBarcodeIfConfigured = True 'AG 08/03/2013 - Enter running but ,if configured, read barcode before
                             StartEnterInRunningMode() 'AG 08/03/2013 - previous code has been move to this method because it is called from several parts
-
-                            '¡¡¡DO NOT DELETE THIS CODE!!! --> SA 21/03/2012
-                            'If (processingBeforeRunning = "2") Then
-                            '    If (AnalyzerController.Instance.Analyzer.GetSensorValue(AnalyzerSensors.ISE_WARNINGS) = 1) Then
-                            '        'ISE conditioning failed. Do you want to continue locking all ISE Tests preparations?
-                            '        If (ShowMessage("Question", GlobalEnumerates.Messages.ISE_CONDITION_FAILED.ToString) = Windows.Forms.DialogResult.Yes) Then
-                            '            '1) Lock all pending ISE Tests preparations
-                            '            myGlobal = ex_delg.UpdateStatusByExecutionTypeAndStatus(Nothing, WorkSessionIDAttribute, AnalyzerIDAttribute, "PREP_ISE", "PENDING", "LOCKED")
-
-                            '            '2) Enter Running
-                            '            If (Not myGlobal.HasError) Then
-                            '                myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.RUNNING, True)
-                            '                If (myGlobal.HasError) Then
-                            '                    ShowMessage("Error", myGlobal.ErrorCode, myGlobal.ErrorMessage)
-                            '                End If
-
-                            '                If (Not AnalyzerController.Instance.Analyzer.Connected Or myGlobal.HasError) Then
-                            '                    SetActionButtonsEnableProperty(True)
-                            '                Else
-                            '                    SetWorkSessionUserCommandFlags(WorkSessionUserActions.START_WS)
-
-                            '                    'Set WorkSession Status to INPROCESS
-                            '                    Dim myWSAnalyzerDelegate As New WSAnalyzersDelegate
-                            '                    myGlobal = myWSAnalyzerDelegate.UpdateWSStatus(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, "INPROCESS")
-                            '                    If (Not myGlobal.HasError) Then
-                            '                        WSStatusAttribute = "INPROCESS"
-                            '                    Else
-                            '                        'Error updating the WS Status to INPROCESS
-                            '                        If (Not myGlobal.ErrorCode Is Nothing) Then ShowMessage("Error", myGlobal.ErrorCode, myGlobal.ErrorMessage)
-                            '                    End If
-                            '                End If
-                            '            End If
-
-                            '            'Else
-                            '            '1) Abort Enter Running: Do nothing
-                            '        End If
-                            '        AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_WARNINGS) = 0 'clear sensor
-                            '    Else
-                            '        ShowMessage("Error", myGlobal.ErrorCode, myGlobal.ErrorMessage)
-                            '    End If
-                            '    'AG 24/01/2012
-                            'Else
-                            '    SetActionButtonsEnableProperty(True)
-                            '    Me.ElapsedTimeTimer.Start()
-                            'End If
 
                         Else
                             'AG 10/05/2012
@@ -5106,11 +4767,13 @@ Partial Public Class UiAx00MainMDI
                 ''AG 31/03/2014 - #1565
 
                 GlobalBase.CreateLogActivity("Update ISE executions after conditioning !", Name & ".CreateWSExecutionsWithISEChanges ", EventLogEntryType.Information, False)
-                Dim myExecutionDelegate As New ExecutionsDelegate
-                Dim createWSInRunning As Boolean = (AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING)
+                'Dim myExecutionDelegate As New ExecutionsDelegate
+                Dim createWSInRunning As Boolean = (AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.RUNNING)
 
                 'AG 30/05/2014 #1644 - Redesing correction #1584 for avoid DeadLocks (add parameter AllowScanInRunning)
-                myGlobal = myExecutionDelegate.CreateWSExecutions(Nothing, AnalyzerController.Instance.Analyzer.ActiveAnalyzer, AnalyzerController.Instance.Analyzer.ActiveWorkSession, _
+                'myGlobal = myExecutionDelegate.CreateWSExecutions(Nothing, AnalyzerController.Instance.Analyzer.ActiveAnalyzer, AnalyzerController.Instance.Analyzer.ActiveWorkSession, _
+                '                                                  createWSInRunning, -1, String.Empty, isReady, myAffectedElectrodes, AnalyzerController.Instance.Analyzer.AllowScanInRunning)
+                myGlobal = DelegatesToCoreBusinesGlue.CreateWS(Nothing, AnalyzerController.Instance.Analyzer.ActiveAnalyzer, AnalyzerController.Instance.Analyzer.ActiveWorkSession, _
                                                                   createWSInRunning, -1, String.Empty, isReady, myAffectedElectrodes, AnalyzerController.Instance.Analyzer.AllowScanInRunning)
                 ' XB 16/04/2014 - #1599
 
@@ -6583,55 +6246,52 @@ Partial Public Class UiAx00MainMDI
             AlertText.Clear()
 
             'CoverAlert
-            Dim myAlarms As New List(Of GlobalEnumerates.Alarms)
-            myAlarms.Add(GlobalEnumerates.Alarms.MAIN_COVER_WARN)
-            myAlarms.Add(GlobalEnumerates.Alarms.MAIN_COVER_ERR) 'AG 14/03/2012
+            Dim myAlarms As New List(Of Alarms)
+            myAlarms.Add(Alarms.MAIN_COVER_WARN)
+            myAlarms.Add(Alarms.MAIN_COVER_ERR) 'AG 14/03/2012
 
             CoverAlert = New bsAlert(Me, 220, 45 + ParentMDITopHeight, 85, 0, "Analyzer", True)
             CoverAlert.Tag = myAlarms
             AlertList.Add(CoverAlert)
 
             'ISEModuleAlert
-            myAlarms = New List(Of GlobalEnumerates.Alarms)
-            myAlarms.Add(GlobalEnumerates.Alarms.ISE_OFF_ERR)
-            myAlarms.Add(GlobalEnumerates.Alarms.ISE_FAILED_ERR) 'ag 09/01/2012 - this alarm excludes the ISE_STATUS_WARN so it is not necessary change the bsAlert size
+            myAlarms = New List(Of Alarms)
+            myAlarms.Add(Alarms.ISE_OFF_ERR)
+            myAlarms.Add(Alarms.ISE_FAILED_ERR) 'ag 09/01/2012 - this alarm excludes the ISE_STATUS_WARN so it is not necessary change the bsAlert size
 
-            myAlarms.Add(GlobalEnumerates.Alarms.ISE_CONNECT_PDT_ERR) 'SGM 26/03/2012
-            myAlarms.Add(GlobalEnumerates.Alarms.ISE_RP_INVALID_ERR)
-            myAlarms.Add(GlobalEnumerates.Alarms.ISE_RP_DEPLETED_ERR)
-            myAlarms.Add(GlobalEnumerates.Alarms.ISE_ELEC_WRONG_ERR)
-            myAlarms.Add(GlobalEnumerates.Alarms.ISE_CP_INSTALL_WARN)
-            myAlarms.Add(GlobalEnumerates.Alarms.ISE_CP_WRONG_ERR)
-            myAlarms.Add(GlobalEnumerates.Alarms.ISE_LONG_DEACT_ERR)
-            'myAlarms.Add(GlobalEnumerates.Alarms.ISE_RP_EXPIRED)
-            'myAlarms.Add(GlobalEnumerates.Alarms.ISE_ELEC_EXP_CONS)
-            'myAlarms.Add(GlobalEnumerates.Alarms.ISE_ELEC_EXP_DATE)
-            myAlarms.Add(GlobalEnumerates.Alarms.ISE_ACTIVATED)
-            myAlarms.Add(GlobalEnumerates.Alarms.ISE_RP_NO_INST_ERR)
-            myAlarms.Add(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR) ' XB 03/11/2014 - BA-1872
+            myAlarms.Add(Alarms.ISE_CONNECT_PDT_ERR) 'SGM 26/03/2012
+            myAlarms.Add(Alarms.ISE_RP_INVALID_ERR)
+            myAlarms.Add(Alarms.ISE_RP_DEPLETED_ERR)
+            myAlarms.Add(Alarms.ISE_ELEC_WRONG_ERR)
+            myAlarms.Add(Alarms.ISE_CP_INSTALL_WARN)
+            myAlarms.Add(Alarms.ISE_CP_WRONG_ERR)
+            myAlarms.Add(Alarms.ISE_LONG_DEACT_ERR)
+            myAlarms.Add(Alarms.ISE_ACTIVATED)
+            myAlarms.Add(Alarms.ISE_RP_NO_INST_ERR)
+            myAlarms.Add(Alarms.ISE_TIMEOUT_ERR) ' XB 03/11/2014 - BA-1872
 
             ' XB 20/01/2015 - BA-1873
-            myAlarms.Add(GlobalEnumerates.Alarms.ISE_CALB_PDT_WARN)
-            myAlarms.Add(GlobalEnumerates.Alarms.ISE_PUMP_PDT_WARN)
-            myAlarms.Add(GlobalEnumerates.Alarms.ISE_CLEAN_PDT_WARN)
+            myAlarms.Add(Alarms.ISE_CALB_PDT_WARN)
+            myAlarms.Add(Alarms.ISE_PUMP_PDT_WARN)
+            myAlarms.Add(Alarms.ISE_CLEAN_PDT_WARN)
 
             ISEModuleAlert = New bsAlert(Me, 220, 115 + ParentMDITopHeight, 170, 40, "ISE Module", True)
             ISEModuleAlert.Tag = myAlarms
             AlertList.Add(ISEModuleAlert)
 
             'WashingSolutionAlert
-            myAlarms = New List(Of GlobalEnumerates.Alarms)
-            myAlarms.Add(GlobalEnumerates.Alarms.WASH_CONTAINER_ERR)
-            myAlarms.Add(GlobalEnumerates.Alarms.WASH_CONTAINER_WARN)
+            myAlarms = New List(Of Alarms)
+            myAlarms.Add(Alarms.WASH_CONTAINER_ERR)
+            myAlarms.Add(Alarms.WASH_CONTAINER_WARN)
 
             WashingSolutionAlert = New bsAlert(Me, 220, 300 + ParentMDITopHeight, 150, 0, "Washing Solution bottle", True)
             WashingSolutionAlert.Tag = myAlarms
             AlertList.Add(WashingSolutionAlert)
 
             'ResiduesBalanceAlert
-            myAlarms = New List(Of GlobalEnumerates.Alarms)
-            myAlarms.Add(GlobalEnumerates.Alarms.HIGH_CONTAMIN_ERR)
-            myAlarms.Add(GlobalEnumerates.Alarms.HIGH_CONTAMIN_WARN)
+            myAlarms = New List(Of Alarms)
+            myAlarms.Add(Alarms.HIGH_CONTAMIN_ERR)
+            myAlarms.Add(Alarms.HIGH_CONTAMIN_WARN)
 
             'ResiduesBalanceAlert = New bsAlert(Me, 220, 295 + ParentMDITopHeight, 210, 0, "High Contamination bottle", True)
             ResiduesBalanceAlert = New bsAlert(Me, 645, 280 + ParentMDITopHeight, 135, 0, "High Contamination bottle", False)
@@ -6639,99 +6299,94 @@ Partial Public Class UiAx00MainMDI
             AlertList.Add(ResiduesBalanceAlert)
 
             'Reagents1ArmAlert
-            myAlarms = New List(Of GlobalEnumerates.Alarms)
-            myAlarms.Add(GlobalEnumerates.Alarms.R1_TEMP_WARN)
-            myAlarms.Add(GlobalEnumerates.Alarms.R1_TEMP_SYSTEM_ERR) 'AG 05/01/2011 - this alarm excludes the R1_Temp_Warm so it is not necessary change the bsAlert size
-            myAlarms.Add(GlobalEnumerates.Alarms.R1_DETECT_SYSTEM_ERR)
-            'myAlarms.Add(GlobalEnumerates.Alarms.R1_NO_VOLUME_WARN) 'DL 03/05/2012. Bugs Tracking (Nr: 518)
-            myAlarms.Add(GlobalEnumerates.Alarms.R1_COLLISION_ERR) 'AG 21/05/2012 - R1_COLLISION_WARN
+            myAlarms = New List(Of Alarms)
+            myAlarms.Add(Alarms.R1_TEMP_WARN)
+            myAlarms.Add(Alarms.R1_TEMP_SYSTEM_ERR) 'AG 05/01/2011 - this alarm excludes the R1_Temp_Warm so it is not necessary change the bsAlert size
+            myAlarms.Add(Alarms.R1_DETECT_SYSTEM_ERR)
+            myAlarms.Add(Alarms.R1_COLLISION_ERR) 'AG 21/05/2012 - R1_COLLISION_WARN
 
             Reagents1ArmAlert = New bsAlert(Me, 220, 390 + ParentMDITopHeight, 100, 70, "Reagent1 Arm", True)
             Reagents1ArmAlert.Tag = myAlarms
             AlertList.Add(Reagents1ArmAlert)
 
             'ReagentsRotorAlert
-            myAlarms = New List(Of GlobalEnumerates.Alarms)
-            myAlarms.Add(GlobalEnumerates.Alarms.FRIDGE_COVER_WARN)
-            myAlarms.Add(GlobalEnumerates.Alarms.FRIDGE_COVER_ERR) 'AG 14/03/2012
-            myAlarms.Add(GlobalEnumerates.Alarms.FRIDGE_TEMP_ERR)
-            myAlarms.Add(GlobalEnumerates.Alarms.FRIDGE_TEMP_WARN)
-            myAlarms.Add(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS_ERR) 'AG 21/05/2012
-            myAlarms.Add(GlobalEnumerates.Alarms.FRIDGE_STATUS_ERR)
-            myAlarms.Add(GlobalEnumerates.Alarms.FRIDGE_STATUS_WARN)
+            myAlarms = New List(Of Alarms)
+            myAlarms.Add(Alarms.FRIDGE_COVER_WARN)
+            myAlarms.Add(Alarms.FRIDGE_COVER_ERR) 'AG 14/03/2012
+            myAlarms.Add(Alarms.FRIDGE_TEMP_ERR)
+            myAlarms.Add(Alarms.FRIDGE_TEMP_WARN)
+            myAlarms.Add(Alarms.FRIDGE_TEMP_SYS_ERR) 'AG 21/05/2012
+            myAlarms.Add(Alarms.FRIDGE_STATUS_ERR)
+            myAlarms.Add(Alarms.FRIDGE_STATUS_WARN)
 
             ReagentsRotorAlert = New bsAlert(Me, 220, 482 + ParentMDITopHeight, 70, 40, "Reagents Rotor", True)
             ReagentsRotorAlert.Tag = myAlarms
             AlertList.Add(ReagentsRotorAlert)
 
             'Reagents2ArmAlert
-            myAlarms = New List(Of GlobalEnumerates.Alarms)
-            myAlarms.Add(GlobalEnumerates.Alarms.R2_TEMP_WARN)
-            myAlarms.Add(GlobalEnumerates.Alarms.R2_TEMP_SYSTEM_ERR) 'AG 05/01/2011 - this alarm excludes the R2_Temp_Warm so it is not necessary change the bsAlert size
-            myAlarms.Add(GlobalEnumerates.Alarms.R2_DETECT_SYSTEM_ERR)
-            'myAlarms.Add(GlobalEnumerates.Alarms.R2_NO_VOLUME_WARN) 'DL 03/05/2012. Bugs Tracking (Nr: 518)
-            myAlarms.Add(GlobalEnumerates.Alarms.R2_COLLISION_ERR) 'AG 21/05/2012 - R2_COLLISION_WARN
+            myAlarms = New List(Of Alarms)
+            myAlarms.Add(Alarms.R2_TEMP_WARN)
+            myAlarms.Add(Alarms.R2_TEMP_SYSTEM_ERR) 'AG 05/01/2011 - this alarm excludes the R2_Temp_Warm so it is not necessary change the bsAlert size
+            myAlarms.Add(Alarms.R2_DETECT_SYSTEM_ERR)
+            myAlarms.Add(Alarms.R2_COLLISION_ERR) 'AG 21/05/2012 - R2_COLLISION_WARN
 
             Reagents2ArmAlert = New bsAlert(Me, 220, 570 + ParentMDITopHeight, 179, -35, "Reagent2 Arm", True)
             Reagents2ArmAlert.Tag = myAlarms
             AlertList.Add(Reagents2ArmAlert)
 
             'OthersAlert       
-            myAlarms = New List(Of GlobalEnumerates.Alarms)
-            myAlarms.Add(GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR)
-            myAlarms.Add(GlobalEnumerates.Alarms.WATER_SYSTEM_ERR) 'AG 09/01/2012 - this alarm excludes the WATER_DEPOSIT_ERR so it is not necessary change the bsAlert size
-            myAlarms.Add(GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR)
-            myAlarms.Add(GlobalEnumerates.Alarms.WASTE_SYSTEM_ERR) 'AG 09/01/2012 - this alarm excludes the WASTE_DEPOSIT_ERR so it is not necessary change the bsAlert size
-            myAlarms.Add(GlobalEnumerates.Alarms.REACT_ROTOR_FAN_WARN)
-            myAlarms.Add(GlobalEnumerates.Alarms.FRIDGE_FAN_WARN)
+            myAlarms = New List(Of Alarms)
+            myAlarms.Add(Alarms.WATER_DEPOSIT_ERR)
+            myAlarms.Add(Alarms.WATER_SYSTEM_ERR) 'AG 09/01/2012 - this alarm excludes the WATER_DEPOSIT_ERR so it is not necessary change the bsAlert size
+            myAlarms.Add(Alarms.WASTE_DEPOSIT_ERR)
+            myAlarms.Add(Alarms.WASTE_SYSTEM_ERR) 'AG 09/01/2012 - this alarm excludes the WASTE_DEPOSIT_ERR so it is not necessary change the bsAlert size
+            myAlarms.Add(Alarms.REACT_ROTOR_FAN_WARN)
+            myAlarms.Add(Alarms.FRIDGE_FAN_WARN)
 
             OthersAlert = New bsAlert(Me, 780, 60 + ParentMDITopHeight, 0, 0, "Others", False)
             OthersAlert.Tag = myAlarms
             AlertList.Add(OthersAlert)
 
             'ReactionsRotorAlert
-            myAlarms = New List(Of GlobalEnumerates.Alarms)
-            myAlarms.Add(GlobalEnumerates.Alarms.REACT_COVER_WARN)
-            myAlarms.Add(GlobalEnumerates.Alarms.REACT_COVER_ERR) 'AG 14/03/2012
-            myAlarms.Add(GlobalEnumerates.Alarms.REACT_MISSING_ERR)
-            myAlarms.Add(GlobalEnumerates.Alarms.BASELINE_WELL_WARN)
-            myAlarms.Add(GlobalEnumerates.Alarms.BASELINE_INIT_ERR) 'AG 31/01/2012 - this alarm excludes the METHACRYL_ROTOR_WARN so it is not necessary change the bsAlert size
-            myAlarms.Add(GlobalEnumerates.Alarms.REACT_ENCODER_ERR)
-            myAlarms.Add(GlobalEnumerates.Alarms.REACT_TEMP_ERR)
-            myAlarms.Add(GlobalEnumerates.Alarms.REACT_TEMP_WARN)
-            myAlarms.Add(GlobalEnumerates.Alarms.REACT_TEMP_SYS_ERR) 'AG 21/05/2012
+            myAlarms = New List(Of Alarms)
+            myAlarms.Add(Alarms.REACT_COVER_WARN)
+            myAlarms.Add(Alarms.REACT_COVER_ERR) 'AG 14/03/2012
+            myAlarms.Add(Alarms.REACT_MISSING_ERR)
+            myAlarms.Add(Alarms.BASELINE_WELL_WARN)
+            myAlarms.Add(Alarms.BASELINE_INIT_ERR) 'AG 31/01/2012 - this alarm excludes the METHACRYL_ROTOR_WARN so it is not necessary change the bsAlert size
+            myAlarms.Add(Alarms.REACT_ENCODER_ERR)
+            myAlarms.Add(Alarms.REACT_TEMP_ERR)
+            myAlarms.Add(Alarms.REACT_TEMP_WARN)
+            myAlarms.Add(Alarms.REACT_TEMP_SYS_ERR) 'AG 21/05/2012
 
             ReactionsRotorAlert = New bsAlert(Me, 605, 335 + ParentMDITopHeight, 175, 110, "Reactions Rotor", False)
             ReactionsRotorAlert.Tag = myAlarms
             AlertList.Add(ReactionsRotorAlert)
 
             'WashingStationHeaterTempAlert
-            myAlarms = New List(Of GlobalEnumerates.Alarms)
-            myAlarms.Add(GlobalEnumerates.Alarms.WS_TEMP_WARN)
-            myAlarms.Add(GlobalEnumerates.Alarms.WS_TEMP_SYSTEM_ERR) 'AG 09/01/2012 - this alarm excludes WS_Temp_Warn so it is not necessary change the bsAlert size
-            myAlarms.Add(GlobalEnumerates.Alarms.WS_COLLISION_ERR)
+            myAlarms = New List(Of Alarms)
+            myAlarms.Add(Alarms.WS_TEMP_WARN)
+            myAlarms.Add(Alarms.WS_TEMP_SYSTEM_ERR) 'AG 09/01/2012 - this alarm excludes WS_Temp_Warn so it is not necessary change the bsAlert size
+            myAlarms.Add(Alarms.WS_COLLISION_ERR)
 
             WashingStationAlert = New bsAlert(Me, 635, 430 + ParentMDITopHeight, 145, 30, "Washing Station", False)
             WashingStationAlert.Tag = myAlarms
             AlertList.Add(WashingStationAlert)
 
             'SampleArmAlert
-            myAlarms = New List(Of GlobalEnumerates.Alarms)
-            'myAlarms.Add(GlobalEnumerates.Alarms.CLOT_DETECTION_ERR) 'AG 25/07/2012 - Alarm related with a preparation, not in globe in the same way as S_NO_VOLUME_WARN
-            'myAlarms.Add(GlobalEnumerates.Alarms.CLOT_DETECTION_WARN) 'AG 25/07/2012 - Alarm related with a preparation, not in globe in the same way as S_NO_VOLUME_WARN
-            myAlarms.Add(GlobalEnumerates.Alarms.S_OBSTRUCTED_ERR) 'AG 12/03/2012
-            myAlarms.Add(GlobalEnumerates.Alarms.S_DETECT_SYSTEM_ERR)
-            'myAlarms.Add(GlobalEnumerates.Alarms.S_NO_VOLUME_WARN) 'DL 03/05/2012. Bugs Tracking (Nr: 518)
-            myAlarms.Add(GlobalEnumerates.Alarms.S_COLLISION_ERR) 'AG 21/05/2012- S_COLLISION_WARN
+            myAlarms = New List(Of Alarms)
+            myAlarms.Add(Alarms.S_OBSTRUCTED_ERR) 'AG 12/03/2012
+            myAlarms.Add(Alarms.S_DETECT_SYSTEM_ERR)
+            myAlarms.Add(Alarms.S_COLLISION_ERR) 'AG 21/05/2012- S_COLLISION_WARN
 
             SampleArmAlert = New bsAlert(Me, 620, 503 + ParentMDITopHeight, 160, 45, "Samples Arm", False)
             SampleArmAlert.Tag = myAlarms
             AlertList.Add(SampleArmAlert)
 
             'SamplesRotorCoverAlert
-            myAlarms = New List(Of GlobalEnumerates.Alarms)
-            myAlarms.Add(GlobalEnumerates.Alarms.S_COVER_WARN)
-            myAlarms.Add(GlobalEnumerates.Alarms.S_COVER_ERR) 'AG 14/03/2012
+            myAlarms = New List(Of Alarms)
+            myAlarms.Add(Alarms.S_COVER_WARN)
+            myAlarms.Add(Alarms.S_COVER_ERR) 'AG 14/03/2012
 
             SamplesRotorAlert = New bsAlert(Me, 710, 607 + ParentMDITopHeight, 70, -55, "Samples Rotor", False)
             SamplesRotorAlert.Tag = myAlarms
@@ -6742,7 +6397,7 @@ Partial Public Class UiAx00MainMDI
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeAlertGlobes ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
+            ShowMessage("Error", Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
 
         End Try
     End Sub
@@ -6766,7 +6421,7 @@ Partial Public Class UiAx00MainMDI
                 Dim linqRes As List(Of AlarmsDS.tfmwAlarmsRow)
                 Dim myText As String
 
-                For Each alarm As GlobalEnumerates.Alarms In [Enum].GetValues(GetType(GlobalEnumerates.Alarms))
+                For Each alarm As Alarms In [Enum].GetValues(GetType(Alarms))
                     linqRes = (From a As AlarmsDS.tfmwAlarmsRow In myAlarmsDS.tfmwAlarms _
                                Where String.Equals(a.AlarmID, alarm.ToString()) _
                                Select a).ToList()
@@ -7756,30 +7411,59 @@ Partial Public Class UiAx00MainMDI
     ''' <remarks>
     ''' Modified by:  IT 30/01/2015 - BA-2216
     '''               IT 13/02/2015 - BA-2266
+    '''               IT 26/03/2015 - BA-2406
     ''' </remarks>
     Private Sub RecoverInterruptedProcesses()
 
         If (AnalyzerController.Instance.Analyzer.Connected) Then
-            If (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "INPROCESS") OrElse _
-                AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "PAUSED" Then
+            RecoverInterruptedNewRotorProcess()
+            RecoverInterruptedWarmUpProcess() 'BA-2406
+        End If
 
-                'AG 04/02/2015 BA-2246 ERROR2
-                If Not ActiveMdiChild Is Nothing Then
+    End Sub
 
-                    If (Not TypeOf ActiveMdiChild Is UiChangeRotor) Then
-                        CloseActiveMdiChild()
-                        OpenMDIChildForm(UiChangeRotor)
-                    End If
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by: IT 26/03/2014 - BA-2406
+    ''' </remarks>
+    Private Sub RecoverInterruptedNewRotorProcess()
 
-                    If (TypeOf ActiveMdiChild Is UiChangeRotor) Then
-                        Dim CurrentMdiChild As UiChangeRotor = CType(ActiveMdiChild, UiChangeRotor)
-                        CurrentMdiChild.RecoverProcess()
-                    End If
+        If (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "INPROCESS") OrElse _
+            AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "PAUSED" Then
 
+            'AG 04/02/2015 BA-2246 ERROR2
+            If Not ActiveMdiChild Is Nothing Then
+
+                If (Not TypeOf ActiveMdiChild Is UiChangeRotor) Then
+                    CloseActiveMdiChild()
+                    OpenMDIChildForm(UiChangeRotor)
                 End If
-                'AG 04/02/2015 BA-2246 ERROR2
+
+                If (TypeOf ActiveMdiChild Is UiChangeRotor) Then
+                    Dim CurrentMdiChild As UiChangeRotor = CType(ActiveMdiChild, UiChangeRotor)
+                    CurrentMdiChild.RecoverProcess()
+                End If
 
             End If
+            'AG 04/02/2015 BA-2246 ERROR2
+
+        End If
+
+    End Sub
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by: IT 26/03/2014 - BA-2406
+    ''' </remarks>
+    Private Sub RecoverInterruptedWarmUpProcess()
+
+        If (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "INPROCESS") OrElse _
+            AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "PAUSED" Then
+            AnalyzerController.Instance.StartWarmUpProcess(True, AddressOf AskToUseRotorContentsForFLIGHT)
         End If
 
     End Sub
@@ -8202,6 +7886,9 @@ Partial Public Class UiAx00MainMDI
 
             BsLoadDefaultReportTemplates.RunWorkerAsync() 'RH 17/02/2012
 
+            'Inyección de dependencias en triple mortal... (MI. Esto es un WIP!!)
+            AnalyzerController.PresentationLayerInterface = New AppComLayer(Me)
+
             Application.DoEvents()
 
         Catch ex As Exception
@@ -8264,13 +7951,13 @@ Partial Public Class UiAx00MainMDI
                         WorkSessionIDAttribute = myWorkSessionsDS.twksWorkSessions(0).WorkSessionID
                         WSStatusAttribute = myWorkSessionsDS.twksWorkSessions(0).WorkSessionStatus
 
-                            'If there was an existing WS and the adding of a new Empty one was stopped, write the Warning in the Application LOG
-                            If (myWorkSessionsDS.twksWorkSessions(0).CreateEmptyWSStopped) Then
-                                'Dim myLogAcciones As New ApplicationLogManager()
-                                GlobalBase.CreateLogActivity("WARNING: Source of call to add EMPTY WS when the previous one still exists", "IAx00MainMDI.OpenRotorPositionsForm", EventLogEntryType.Error, False)
-                            End If
+                        'If there was an existing WS and the adding of a new Empty one was stopped, write the Warning in the Application LOG
+                        If (myWorkSessionsDS.twksWorkSessions(0).CreateEmptyWSStopped) Then
+                            'Dim myLogAcciones As New ApplicationLogManager()
+                            GlobalBase.CreateLogActivity("WARNING: Source of call to add EMPTY WS when the previous one still exists", "IAx00MainMDI.OpenRotorPositionsForm", EventLogEntryType.Error, False)
                         End If
                     End If
+                End If
 
                 SetWSActiveDataFromDB()
             End If
@@ -8278,26 +7965,26 @@ Partial Public Class UiAx00MainMDI
             ' XB 22/11/2013 - Task #1394
             DisplayISELockedPreparationsWarningAttribute = False
 
-                UiWSRotorPositions.ActiveAnalyzer = AnalyzerIDAttribute
-                UiWSRotorPositions.AnalyzerModel = AnalyzerModelAttribute
-                UiWSRotorPositions.ActiveWorkSession = WorkSessionIDAttribute
-                UiWSRotorPositions.WorkSessionStatus(AnalyzerController.Instance.Analyzer.AnalyzerStatus.ToString) = WSStatusAttribute
-                UiWSRotorPositions.ShowHostQueryScreen = pShowHQScreen 'AG 03/04/2013
+            UiWSRotorPositions.ActiveAnalyzer = AnalyzerIDAttribute
+            UiWSRotorPositions.AnalyzerModel = AnalyzerModelAttribute
+            UiWSRotorPositions.ActiveWorkSession = WorkSessionIDAttribute
+            UiWSRotorPositions.WorkSessionStatus(AnalyzerController.Instance.Analyzer.AnalyzerStatus.ToString) = WSStatusAttribute
+            UiWSRotorPositions.ShowHostQueryScreen = pShowHQScreen 'AG 03/04/2013
 
-                ' XB 17/07/2013 - Auto WS process
-                'XB 23/07/2013 - auto HQ
-                'IWSRotorPositions.AutoWSCreationWithLISMode = autoWSCreationWithLISModeAttribute
-                UiWSRotorPositions.AutoWSCreationWithLISMode = autoWSCreationWithLISModeAttribute OrElse HQProcessByUserFlag
+            ' XB 17/07/2013 - Auto WS process
+            'XB 23/07/2013 - auto HQ
+            'IWSRotorPositions.AutoWSCreationWithLISMode = autoWSCreationWithLISModeAttribute
+            UiWSRotorPositions.AutoWSCreationWithLISMode = autoWSCreationWithLISModeAttribute OrElse HQProcessByUserFlag
+            'XB 23/07/2013
+
+            'AG 09/07/2013
+            UiWSRotorPositions.OpenByAutomaticProcess = pAutomateProcessWithLIS
+            'XB 23/07/2013 - auto HQ
+            ' If autoWSCreationWithLISModeAttribute AndAlso pAutomateProcessWithLIS Then
+            If (autoWSCreationWithLISModeAttribute OrElse HQProcessByUserFlag) AndAlso pAutomateProcessWithLIS Then
                 'XB 23/07/2013
-
-                'AG 09/07/2013
-                UiWSRotorPositions.OpenByAutomaticProcess = pAutomateProcessWithLIS
-                'XB 23/07/2013 - auto HQ
-                ' If autoWSCreationWithLISModeAttribute AndAlso pAutomateProcessWithLIS Then
-                If (autoWSCreationWithLISModeAttribute OrElse HQProcessByUserFlag) AndAlso pAutomateProcessWithLIS Then
-                    'XB 23/07/2013
-                    SetAutomateProcessStatusValue(LISautomateProcessSteps.subProcessCreateExecutions)
-                End If
+                SetAutomateProcessStatusValue(LISautomateProcessSteps.subProcessCreateExecutions)
+            End If
 
             'AG 09/07/2013
 
@@ -8663,9 +8350,9 @@ Partial Public Class UiAx00MainMDI
                 'AG 06/09/2012 - Analyzer manager initialization requires WorkSessionID to be informed before AnalyzerID
 
                 'AG 10/11/2014 BA-2082 use the AnalyzerModel read from database instead of the enumerate AnalyzerModelEnum (inform the analyzer model before createAnalyzer)
-                MyClass.AnalyzerModel = AnalyzerModelAttribute
+                AnalyzerModel = AnalyzerModelAttribute
                 '#REFACTORING
-                MDIAnalyzerManager = AnalyzerController.Instance.CreateAnalyzer(My.Application.Info.AssemblyName, MyClass.AnalyzerModel, pStartingApplication, WorkSessionIDAttribute, AnalyzerIDAttribute, FwVersionAttribute)
+                MDIAnalyzerManager = AnalyzerController.Instance.CreateAnalyzer(My.Application.Info.AssemblyName, AnalyzerModel, pStartingApplication, WorkSessionIDAttribute, AnalyzerIDAttribute, FwVersionAttribute)
 
                 Application.DoEvents()
 
@@ -8893,8 +8580,6 @@ Partial Public Class UiAx00MainMDI
             Dim myAnalyzerSettingsDS As New AnalyzerSettingsDS
             Dim myAnalyzerSettingsRow As AnalyzerSettingsDS.tcfgAnalyzerSettingsRow
 
-
-
             If Not isAlarm Then
                 ShowStatus(Messages.STANDBY) 'RH 21/03/2012
                 AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsAnalyzerWarmUp = False 'AG 16/05/2012 '#REFACTORING
@@ -8940,6 +8625,8 @@ Partial Public Class UiAx00MainMDI
 
                 End If
 
+                AnalyzerController.Instance.WarmUpCloseProcess() 'IT 26/03/2014 - BA-2406
+
             Else
                 ''WUPCOMPLETEFLAG
                 'myAnalyzerSettingsRow = myAnalyzerSettingsDS.tcfgAnalyzerSettings.NewtcfgAnalyzerSettingsRow
@@ -8982,6 +8669,7 @@ Partial Public Class UiAx00MainMDI
 
                 End If
             End If
+
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FinishWarmUp ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -9813,7 +9501,7 @@ Partial Public Class UiAx00MainMDI
             End If
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitiateLISWrapper ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".InitiateLISWrapper ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+            ShowMessage(Name & ".InitiateLISWrapper ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
 

@@ -1,5 +1,4 @@
-﻿Imports System
-Imports System.Reflection
+﻿Imports System.Reflection
 Imports System.Runtime.InteropServices
 
 ' La información general sobre un ensamblado se controla mediante el siguiente 
@@ -31,5 +30,5 @@ Imports System.Runtime.InteropServices
 ' mediante el asterisco ('*'), como se muestra a continuación:
 ' <Assembly: AssemblyVersion("1.0.*")> 
 
-<Assembly: AssemblyVersion("3.0.6.0")> 
-<Assembly: AssemblyFileVersion("3.0.6.0")> 
+<Assembly: AssemblyVersion("3.0.7.0")> 
+<Assembly: AssemblyFileVersion("3.0.7.0")> 

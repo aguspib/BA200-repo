@@ -236,6 +236,52 @@ Partial Public Class tparContaminationsDAO
         End Try
         Return resultData
     End Function
+
+
+    Public Shared Function GetAllContaminationsForAReagent(ReagentID As Integer) As TypedGlobalDataTo(Of ContaminationsDS.tparContaminationsDataTable)
+        'Dim resultData As GlobalDataTO = Nothing
+        Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+        Try
+            Dim connection = GetSafeOpenDBConnection(Nothing)
+            dbConnection = connection.SetDatos
+            If dbConnection Is Nothing Then
+
+                Return New TypedGlobalDataTo(Of ContaminationsDS.tparContaminationsDataTable) _
+                    With {.SetDatos = Nothing, .HasError = True, .ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString}
+
+            Else
+                Dim cmdText As String = "SELECT * FROM [Ax00].[dbo].[tparContaminations] Where ReagentContaminatorID=" & ReagentID & ";"
+
+                Dim contaminationsDataDS As New ContaminationsDS
+                Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                    Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                        dbDataAdapter.Fill(contaminationsDataDS.tparContaminations)
+                    End Using
+                End Using
+                Dim resultData As New TypedGlobalDataTo(Of ContaminationsDS.tparContaminationsDataTable)
+                resultData.SetDatos = contaminationsDataDS.tparContaminations
+
+                resultData.HasError = False
+                Return resultData
+            End If
+
+        Catch ex As Exception
+            Dim resultData = New TypedGlobalDataTo(Of ContaminationsDS.tparContaminationsDataTable)
+            resultData.HasError = True
+            resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+            resultData.ErrorMessage = ex.Message
+
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex)
+            Return resultData
+        Finally
+            If dbConnection IsNot Nothing Then dbConnection.Close()
+        End Try
+
+    End Function
+
+
 #End Region
 
 #Region "Other Methods"

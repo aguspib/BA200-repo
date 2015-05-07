@@ -567,6 +567,13 @@ Namespace Biosystems.Ax00.Global
             End Get
         End Property
 
+        ' XBC 05/05/2011
+        Shared ReadOnly Property MaxRepetitionsRetry() As Integer
+            Get
+                Return My.Settings.MaxRepetitionsRetry
+            End Get
+        End Property
+
 #End Region
 
 #Region "Public methods"
@@ -641,6 +648,9 @@ Namespace Biosystems.Ax00.Global
                     Dim exceptionCompleteMessage = exceptionDesc.ToString
 
                     GlobalBase.CreateLogActivity(exceptionCompleteMessage, sourceOfException, EventLogEntryType.Error, False)
+#If config = "Debug" Then
+                    Debug.WriteLine("EXCEPTION LOGGED: " & exceptionCompleteMessage)
+#End If
 
                 Else
                     GlobalBase.CreateLogActivity(

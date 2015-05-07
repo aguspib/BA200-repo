@@ -1,15 +1,15 @@
 ﻿Imports Biosystems.Ax00.Core.Interfaces
-Imports Biosystems.Ax00.Core.Entities
-Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Calculations
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports System.Data
+Imports Biosystems.Ax00.Core.Entities.Worksession.Interfaces
 
 Namespace Biosystems.Ax00.Core.Entities
 
     Partial Public MustInherit Class AnalyzerManager
         Implements IAnalyzerManager
+
+
 
         Private WithEvents _baseLine As IBaseLineEntity
         Private WithEvents _iseAnalyzer As IISEManager

@@ -1,14 +1,17 @@
 ﻿Option Explicit On
 Option Strict On
 Option Infer On
+
 Imports System.Windows.Forms
+Imports Biosystems.Ax00.App
 
 Imports Biosystems.Ax00.BL
+Imports Biosystems.Ax00.CC
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.Controls.UserControls
-
+Imports Biosystems.Ax00.Core.Services
 
 Public Class Ax00MainForm
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
@@ -337,21 +340,17 @@ Public Class Ax00MainForm
 #End Region
 
     Private Sub MITestButtonClick(sender As Object, e As EventArgs) Handles MITestProcess.Click
-        Debug.WriteLine("Trying to launch FLIGHT as a service")
-        Dim FLS As New Biosystems.Ax00.Core.Services.DynamicBaseLineService(Biosystems.Ax00.App.AnalyzerController.Instance.Analyzer)
-        FLS.OnServiceStatusChange =
-            Sub(status As Biosystems.Ax00.Core.Services.IServiceStatusCallback)
-                Try
-                    Debug.WriteLine(status.NewServiceStatus.ToString & " " & Now.ToString)
-                    status.Sender.Dispose()
-                Catch ex As Exception
-                    MsgBox(ex.Message)
-                End Try
-            End Sub
-        If FLS.StartService() = False Then
-            Debug.WriteLine("Service could not be started.")
-        Else
-            Debug.WriteLine("Service launched...")
-        End If
+        Dim RL As New RangedCollection(Of String)(1, 10)
+        RL.AllowOutOfRange = True
+        For i = RL.Range.minimum To RL.Range.maximum + 100
+            RL.Add("Hola " & i)
+        Next
+        RL(1) = "New value"
+        Debug.WriteLine(RL.Count)
+        RL.RemoveOutOfRangeItems()
+        Debug.WriteLine(RL.Count)
+        For Each S In RL
+            Debug.WriteLine(S)
+        Next
     End Sub
 End Class

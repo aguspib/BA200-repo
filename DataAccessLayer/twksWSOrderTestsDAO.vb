@@ -1042,7 +1042,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                                " (CASE WHEN T.FirstReadingCycle < T.SecondReadingCycle THEN T.SecondReadingCycle " & vbCrLf & _
                                                                      " ELSE T.FirstReadingCycle END) AS ReadingCycle, " & vbCrLf & _
                                                                " (CASE WSOT.SampleClass WHEN 'CALIB' THEN C.CalibratorID " & vbCrLf & _
-                                                                                      " WHEN 'CTRL'  THEN WSOT.ControlID ELSE 0 END) AS ElementID " & vbCrLf & _
+                                                                                      " WHEN 'CTRL'  THEN WSOT.ControlID " & vbCrLf & _
+                                                                                      " WHEN 'PATIENT' THEN WSOT.CreationOrder ELSE 0 END) AS ElementID " & vbCrLf & _
                                                 " FROM vwksWSOrderTests WSOT INNER JOIN tparTests T ON WSOT.TestID = T.TestID " & vbCrLf & _
                                                                            " INNER JOIN tparTestReagents TR ON WSOT.TestID = TR.TestID " & vbCrLf & _
                                                                            " LEFT OUTER JOIN tparTestCalibrators C ON WSOT.TestID = C.TestID AND WSOT.SampleType = C.SampleType " & vbCrLf & _
@@ -1056,7 +1057,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                 " SELECT DISTINCT WSOT.TestType, WSOT.TestID, WSOT.SampleType, WSOT.SampleClass, WSOT.OrderID, " & vbCrLf & _
                                                                 " WSOT.StatFlag, WSOT.OrderTestID, WSOT.AlternativeOrderTestID, WSOT.CreationOrder, 0 AS ReagentID, " & vbCrLf & _
                                                                 " 0 AS ReadingCycle, " & vbCrLf & _
-                                                                " (CASE WSOT.SampleClass WHEN 'CTRL' THEN WSOT.ControlID ELSE 0 END) AS ElementID " & vbCrLf & _
+                                                                " (CASE WSOT.SampleClass WHEN 'CTRL' THEN WSOT.ControlID " & vbCrLf & _
+                                                                                       " WHEN 'PATIENT' THEN WSOT.CreationOrder ELSE 0 END) AS ElementID " & vbCrLf & _
                                                 " FROM   vwksWSOrderTests WSOT INNER JOIN tparISETests IT ON WSOT.TestID = IT.ISETestID " & vbCrLf & _
                                                 " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
                                                 " AND    WSOT.AnalyzerID = '" & pAnalyzerID & "' " & vbCrLf & _

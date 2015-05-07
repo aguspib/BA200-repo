@@ -2,7 +2,7 @@
 Option Explicit On
 
 Imports Biosystems.Ax00.BL
-Imports Biosystems.Ax00.DAL
+Imports Biosystems.Ax00.Global.AlarmEnumerates
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 
@@ -471,9 +471,9 @@ Namespace Biosystems.Ax00.Calculations
                         'If a Normality Range was found for the ISE Test/Sample Type, validate the Concentration value
                         If (lowerLimit <> -1 AndAlso upperLimit <> -1) Then
                             If (pCONC_Value < lowerLimit) Then
-                                validationResult = GlobalEnumerates.Alarms.CONC_REMARK7.ToString
+                                validationResult = Alarms.CONC_REMARK7.ToString
                             ElseIf (pCONC_Value > upperLimit) Then
-                                validationResult = GlobalEnumerates.Alarms.CONC_REMARK8.ToString
+                                validationResult = Alarms.CONC_REMARK8.ToString
                             End If
                         End If
                     End If
