@@ -13,8 +13,8 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
         Sub New()
 
-            'This is BA200 dependant:
-            AdditionalPredilutionSteps = SwParametersDelegate.ReadIntValue(Nothing, GlobalEnumerates.SwParameters.PREDILUTION_CYCLES, "A400").SetDatos
+            'This is B4200 dependant:
+            AdditionalPredilutionSteps = SwParametersDelegate.ReadIntValue(Nothing, GlobalEnumerates.SwParameters.PREDILUTION_CYCLES, AnalyzerModel).SetDatos
 
             Dim contaminationPersitence = SwParametersDelegate.ReadIntValue(Nothing, GlobalEnumerates.SwParameters.CONTAMIN_REAGENT_PERSIS, Nothing).SetDatos
 
@@ -44,7 +44,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             Return AnalysisMode.MonoReactive
         End Function
 
-        Public ReadOnly Property AnalyzerID As String Implements IAnalyzerContaminationsSpecification.AnalyzerID
+        Public ReadOnly Property AnalyzerModel As String Implements IAnalyzerContaminationsSpecification.AnalyzerModel
             Get
                 Return Enums.AnalyzerModelEnum.A400.ToString
             End Get

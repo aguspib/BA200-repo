@@ -142,7 +142,7 @@ Namespace Biosystems.Ax00.BL
                         'Use NOTHING as ISEElectrodes, False as pauseMode (do not affect for reruns and  pManualRerun parameter)
                         'myGlobal = myExecutionDelegate.CreateWSExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pRunningMode, pOrderTestID, myAutoRepCriterion, pIsISEModuleReady, Nothing, False, pManualRepetitionFlag)
 
-                        myGlobal = DelegatesToCoreBusinesGlue.CreateWS(dbConnection, pWorkSessionID, pRunningMode, pOrderTestID, myAutoRepCriterion, pIsISEModuleReady, Nothing, False, pManualRepetitionFlag)
+                        myGlobal = DelegatesToCoreBusinesGlue.CreateWS(dbConnection, pAnalyzerID, pWorkSessionID, pRunningMode, pOrderTestID, myAutoRepCriterion, pIsISEModuleReady, Nothing, False, pManualRepetitionFlag)
                         'AG 31/03/2014 - #1565
 
                         'If the Required Element needed for the OrderTestID is marked as FINISHED, unmark it

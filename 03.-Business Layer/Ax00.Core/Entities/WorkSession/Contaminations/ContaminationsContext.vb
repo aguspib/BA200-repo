@@ -107,7 +107,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
                     If rows IsNot Nothing And rows.Any() Then
                         Dim row = rows.First()
                         dispensing.R1ReagentID = row.ReagentID
-                        FillDispenseContaminations(dispensing)
+                        'FillDispenseContaminations(dispensing)
 
                     End If
                 Next
@@ -138,7 +138,6 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
                 If curIndex <= maxIndex Then
                     Dim row = table(curIndex)
                     dispense.R1ReagentID = row.ReagentID
-                    FillDispenseContaminations(dispense)
                 End If
             Next
         End Sub
@@ -168,25 +167,6 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             Next
         End Sub
 
-        Private Sub FillDispenseContaminations(dispensing As IReagentDispensing)
-            If dispensing.Contamines IsNot Nothing Then Return
-            dispensing.Contamines = New Dictionary(Of Integer, IDispensingContaminationDescription)()
-            Dim contaminations = tparContaminationsDAO.GetAllContaminationsForAReagent(dispensing.R1ReagentID)
-            For Each contamination In contaminations.SetDatos
-                If contamination.ContaminationType <> "R1" Then Continue For
-
-                Dim description = New DispensingContaminationDescription()
-                description.ContaminedReagent = contamination.ReagentContaminatedID
-                If contamination.IsWashingSolutionR1Null Then
-                    description.RequiredWashing = New RegularWaterWashing
-                Else
-                    description.RequiredWashing = New WashingDescription(Math.Abs(AnalyzerContaminationsDescriptor.ContaminationsContextRange.Minimum), contamination.WashingSolutionR1)
-                End If
-
-                dispensing.Contamines.Add(contamination.ReagentContaminatedID, description)
-            Next
-
-        End Sub
 #End Region
 
     End Class

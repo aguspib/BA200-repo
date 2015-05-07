@@ -11,7 +11,7 @@ Namespace Tests
 
 
             Assert.AreNotSame(DelegatesToCoreBusinesGlue.BsCoreAssembly(), Nothing)
-            Dim result = DelegatesToCoreBusinesGlue.CreateWS(Nothing, "BA200", "A1234", True)
+            Dim result = DelegatesToCoreBusinesGlue.CreateWS(Nothing, "A345", "A1234", True)
             Assert.AreNotSame(result, Nothing)
         End Sub
 

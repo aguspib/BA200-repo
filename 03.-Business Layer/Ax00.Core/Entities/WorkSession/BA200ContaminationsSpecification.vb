@@ -17,8 +17,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
         Sub New()
 
-            'This is BA200 dependant:
-            AdditionalPredilutionSteps = SwParametersDelegate.ReadIntValue(Nothing, GlobalEnumerates.SwParameters.PREDILUTION_CYCLES, "A200").SetDatos
+            AdditionalPredilutionSteps = SwParametersDelegate.ReadIntValue(Nothing, GlobalEnumerates.SwParameters.PREDILUTION_CYCLES, AnalyzerModel).SetDatos
 
             Dim contaminationPersitance = SwParametersDelegate.ReadIntValue(Nothing, GlobalEnumerates.SwParameters.CONTAMIN_REAGENT_PERSIS, Nothing).SetDatos
 
@@ -66,24 +65,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
         End Function
 
-        Private Function GetAllReagents() As TestReagentsDS
-
-            Dim TestReagentsDAO As New tparTestReagentsDAO()
-            Static testReagentsDataDS As TestReagentsDS
-            Dim resultData As TypedGlobalDataTo(Of TestReagentsDS)
-
-            If testReagentsDataDS Is Nothing Then
-                resultData = TestReagentsDAO.GetAllReagents(Nothing)
-
-                If Not resultData.HasError Then
-                    testReagentsDataDS = resultData.SetDatos
-                End If
-            End If
-
-            Return testReagentsDataDS
-        End Function
-
-        Public Function AnalysisModesAreCompatible(current As AnalysisMode, expected As AnalysisMode) As Boolean Implements IAnalyzerContaminationsSpecification.AreAnalysisModesCompatible
+        Public Function AreAnalysisModesCompatible(current As AnalysisMode, expected As AnalysisMode) As Boolean Implements IAnalyzerContaminationsSpecification.AreAnalysisModesCompatible
             If (expected = current OrElse expected = AnalysisMode.MonoReactive) Then
                 Return True
             Else
@@ -100,10 +82,30 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             End If
         End Function
 
-        Public ReadOnly Property AnalyzerID As String Implements IAnalyzerContaminationsSpecification.AnalyzerID
+        Public ReadOnly Property AnalyzerModel As String Implements IAnalyzerContaminationsSpecification.AnalyzerModel
             Get
                 Return Enums.AnalyzerModelEnum.A200.ToString
             End Get
         End Property
+
+#Region "Private members"
+        Private Function GetAllReagents() As TestReagentsDS
+
+            Dim TestReagentsDAO As New tparTestReagentsDAO()
+            Static testReagentsDataDS As TestReagentsDS
+            Dim resultData As TypedGlobalDataTo(Of TestReagentsDS)
+
+            If testReagentsDataDS Is Nothing Then
+                resultData = TestReagentsDAO.GetAllReagents(Nothing)
+
+                If Not resultData.HasError Then
+                    testReagentsDataDS = resultData.SetDatos
+                End If
+            End If
+
+            Return testReagentsDataDS
+        End Function
+#End Region
+
     End Class
 End Namespace

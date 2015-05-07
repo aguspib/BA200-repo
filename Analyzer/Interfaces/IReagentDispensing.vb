@@ -12,9 +12,9 @@ Namespace Biosystems.Ax00.Core.Entities.Worksession.Contaminations.Interfaces
 
         Property ExecutionID As Integer
 
-        Property AnalysisMode As Integer 'OptimizationPolicyApplier.AnalysisMode
+        ReadOnly Property AnalysisMode As Integer 'OptimizationPolicyApplier.AnalysisMode
 
-        Property Contamines As Dictionary(Of Integer, IDispensingContaminationDescription)
+        ReadOnly Property Contamines As Dictionary(Of Integer, IDispensingContaminationDescription)
 
         Function RequiredWashingSolution(Reagent As IReagentDispensing, scope As Integer) As IWashingDescription
 
