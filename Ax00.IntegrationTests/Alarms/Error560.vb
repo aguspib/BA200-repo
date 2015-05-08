@@ -67,7 +67,7 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
             analyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STATUS_RECEIVED, False, instruction)
 
             'result and precondition for reset
-            Assert.IsFalse(analyzerManager.CanManageRetryAlarm)
+            Assert.IsTrue(analyzerManager.CanManageRetryAlarm)
             Assert.IsTrue(analyzerManager.CanSendingRepetitions)
             Assert.AreEqual(analyzerManager.NumSendingRepetitionsTimeout, 1)
 
@@ -77,7 +77,7 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
             'result
             Assert.IsFalse(analyzerManager.AnalyzerIsReady)
             Assert.IsFalse(analyzerManager.IsAlarmInfoRequested)
-            Assert.AreEqual(analyzerManager.NumSendingRepetitionsTimeout, 2)
+            Assert.AreEqual(analyzerManager.NumSendingRepetitionsTimeout, 0)
 
         End Sub
 
@@ -110,7 +110,7 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
             analyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STATUS_RECEIVED, False, instruction)
 
             'result
-            Assert.IsFalse(analyzerManager.CanManageRetryAlarm)
+            Assert.IsTrue(analyzerManager.CanManageRetryAlarm)
             Assert.IsTrue(analyzerManager.CanSendingRepetitions)
             Assert.AreEqual(analyzerManager.NumSendingRepetitionsTimeout, 1)
 

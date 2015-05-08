@@ -368,8 +368,8 @@ Namespace Biosystems.Ax00.Core.Entities
                         If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.COMMS_TIMEOUT_ERR) Then addFlag = False
 
                     Case AlarmEnumerates.Alarms.GLF_BOARD_FBLD_ERR
-                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.GLF_BOARD_FBLD_ERR) Or Not CanManageRetryAlarm Then
-                            addFlag = CanManageRetryAlarm
+                        If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.GLF_BOARD_FBLD_ERR) Or (CanManageRetryAlarm AndAlso NumSendingRepetitionsTimeout < 2) Then
+                            addFlag = False                        
                         End If
                 End Select
                 'AG 10/02/2012 - While start instrument is inprocess only generate the alarms that affect the process
