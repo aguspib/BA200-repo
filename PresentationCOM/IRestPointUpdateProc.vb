@@ -6,7 +6,6 @@ Imports System.IO
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.BL.Framework
 Imports Biosystems.Ax00.BL
-Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.BL.UpdateVersion
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.Global.TO

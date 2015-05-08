@@ -11,48 +11,62 @@
       </DataSource>
     </xs:appinfo>
   </xs:annotation>
-  <xs:element name="VersionsDS" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_DataSetName="VersionsDS" msprop:Generator_UserDSName="VersionsDS" msprop:EnableTableAdapterManager="true">
+  <xs:element name="VersionsDS" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="true" msprop:Generator_DataSetName="VersionsDS" msprop:Generator_UserDSName="VersionsDS">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
-        <xs:element name="tfmwVersions" msprop:Generator_UserTableName="tfmwVersions" msprop:Generator_RowDeletedName="tfmwVersionsRowDeleted" msprop:Generator_TableClassName="tfmwVersionsDataTable" msprop:Generator_RowChangedName="tfmwVersionsRowChanged" msprop:Generator_RowClassName="tfmwVersionsRow" msprop:Generator_RowChangingName="tfmwVersionsRowChanging" msprop:Generator_RowEvArgName="tfmwVersionsRowChangeEvent" msprop:Generator_RowEvHandlerName="tfmwVersionsRowChangeEventHandler" msprop:Generator_TablePropName="tfmwVersions" msprop:Generator_TableVarName="tabletfmwVersions" msprop:Generator_RowDeletingName="tfmwVersionsRowDeleting">
+        <xs:element name="tfmwVersions" msprop:Generator_TableClassName="tfmwVersionsDataTable" msprop:Generator_RowEvArgName="tfmwVersionsRowChangeEvent" msprop:Generator_TablePropName="tfmwVersions" msprop:Generator_TableVarName="tabletfmwVersions" msprop:Generator_RowEvHandlerName="tfmwVersionsRowChangeEventHandler" msprop:Generator_RowDeletingName="tfmwVersionsRowDeleting" msprop:Generator_RowChangingName="tfmwVersionsRowChanging" msprop:Generator_RowDeletedName="tfmwVersionsRowDeleted" msprop:Generator_UserTableName="tfmwVersions" msprop:Generator_RowChangedName="tfmwVersionsRowChanged" msprop:Generator_RowClassName="tfmwVersionsRow">
           <xs:complexType>
             <xs:sequence>
-              <xs:element name="PackageID" msprop:Generator_UserColumnName="PackageID" msprop:Generator_ColumnPropNameInRow="PackageID" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnPackageID" msprop:Generator_ColumnPropNameInTable="PackageIDColumn" minOccurs="0">
+              <xs:element name="PackageID" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="PackageID" msprop:Generator_ColumnVarNameInTable="columnPackageID" msprop:Generator_ColumnPropNameInTable="PackageIDColumn" msprop:Generator_UserColumnName="PackageID" minOccurs="0">
                 <xs:simpleType>
                   <xs:restriction base="xs:string">
                     <xs:maxLength value="50" />
                   </xs:restriction>
                 </xs:simpleType>
               </xs:element>
-              <xs:element name="UserSoftware" msprop:Generator_UserColumnName="UserSoftware" msprop:Generator_ColumnPropNameInRow="UserSoftware" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnUserSoftware" msprop:Generator_ColumnPropNameInTable="UserSoftwareColumn" minOccurs="0">
+              <xs:element name="UserSoftware" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="UserSoftware" msprop:Generator_ColumnVarNameInTable="columnUserSoftware" msprop:Generator_ColumnPropNameInTable="UserSoftwareColumn" msprop:Generator_UserColumnName="UserSoftware" minOccurs="0">
                 <xs:simpleType>
                   <xs:restriction base="xs:string">
                     <xs:maxLength value="10" />
                   </xs:restriction>
                 </xs:simpleType>
               </xs:element>
-              <xs:element name="ServiceSoftware" msprop:Generator_UserColumnName="ServiceSoftware" msprop:Generator_ColumnPropNameInRow="ServiceSoftware" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnServiceSoftware" msprop:Generator_ColumnPropNameInTable="ServiceSoftwareColumn" minOccurs="0">
+              <xs:element name="ServiceSoftware" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="ServiceSoftware" msprop:Generator_ColumnVarNameInTable="columnServiceSoftware" msprop:Generator_ColumnPropNameInTable="ServiceSoftwareColumn" msprop:Generator_UserColumnName="ServiceSoftware" minOccurs="0">
                 <xs:simpleType>
                   <xs:restriction base="xs:string">
                     <xs:maxLength value="10" />
                   </xs:restriction>
                 </xs:simpleType>
               </xs:element>
-              <xs:element name="DBSoftware" msprop:Generator_UserColumnName="DBSoftware" msprop:Generator_ColumnPropNameInRow="DBSoftware" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnDBSoftware" msprop:Generator_ColumnPropNameInTable="DBSoftwareColumn" minOccurs="0">
+              <xs:element name="DBSoftware" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="DBSoftware" msprop:Generator_ColumnVarNameInTable="columnDBSoftware" msprop:Generator_ColumnPropNameInTable="DBSoftwareColumn" msprop:Generator_UserColumnName="DBSoftware" minOccurs="0">
                 <xs:simpleType>
                   <xs:restriction base="xs:string">
                     <xs:maxLength value="10" />
                   </xs:restriction>
                 </xs:simpleType>
               </xs:element>
-              <xs:element name="FirmwareScripts" msprop:Generator_UserColumnName="FirmwareScripts" msprop:Generator_ColumnPropNameInRow="FirmwareScripts" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnFirmwareScripts" msprop:Generator_ColumnPropNameInTable="FirmwareScriptsColumn" minOccurs="0">
+              <xs:element name="FirmwareScripts" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="FirmwareScripts" msprop:Generator_ColumnVarNameInTable="columnFirmwareScripts" msprop:Generator_ColumnPropNameInTable="FirmwareScriptsColumn" msprop:Generator_UserColumnName="FirmwareScripts" minOccurs="0">
                 <xs:simpleType>
                   <xs:restriction base="xs:string">
                     <xs:maxLength value="10" />
                   </xs:restriction>
                 </xs:simpleType>
               </xs:element>
-              <xs:element name="Firmware" msprop:Generator_UserColumnName="Firmware" msprop:Generator_ColumnPropNameInRow="Firmware" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnFirmware" msprop:Generator_ColumnPropNameInTable="FirmwareColumn" minOccurs="0">
+              <xs:element name="Firmware" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="Firmware" msprop:Generator_ColumnVarNameInTable="columnFirmware" msprop:Generator_ColumnPropNameInTable="FirmwareColumn" msprop:Generator_UserColumnName="Firmware" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="10" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="DBCommonRevisionNumber" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="DBCommonRevisionNumber" msprop:Generator_ColumnVarNameInTable="columnDBCommonRevisionNumber" msprop:Generator_ColumnPropNameInTable="DBCommonRevisionNumberColumn" msprop:Generator_UserColumnName="DBCommonRevisionNumber" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="10" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="DBDataRevisionNumber" msprop:Generator_ColumnVarNameInTable="columnDBDataRevisionNumber" msprop:Generator_ColumnPropNameInRow="DBDataRevisionNumber" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInTable="DBDataRevisionNumberColumn" msprop:Generator_UserColumnName="DBDataRevisionNumber" minOccurs="0">
                 <xs:simpleType>
                   <xs:restriction base="xs:string">
                     <xs:maxLength value="10" />

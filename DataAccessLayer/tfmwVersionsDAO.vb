@@ -164,10 +164,11 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pDBSoftware"></param>
         ''' <returns></returns>
         ''' <remarks>
-        ''' CREATED BY: TR 17/01/2013 v1.0.1
+        ''' Created by:  TR 17/01/2013 v1.0.1
+        ''' Modified by: IT 08/05/2015: BA-2471
         ''' </remarks>
         Public Function UpdateDBSoftware(ByVal pDBConnection As SqlClient.SqlConnection,
-                                         ByVal pPackageID As String, ByVal pDBSoftware As Double) As GlobalDataTO
+                                         ByVal pPackageID As String, ByVal pDBSoftware As String, ByVal pDBCommonRevisionNumber As String, ByVal pDBDataRevisionNumber As String) As GlobalDataTO
             Dim resultData As New GlobalDataTO
 
             Try
@@ -178,8 +179,20 @@ Namespace Biosystems.Ax00.DAL.DAO
                     Dim cmdText As String = ""
                     cmdText &= " UPDATE tfmwVersions " & vbCrLf
                     cmdText &= " SET "
-                    'make sure the version is saved with the . instead another decimal separator.
-                    cmdText &= " DBSoftware = N'" & pDBSoftware.ToString("##0.00").Replace(",", ".") & "'" & vbCrLf
+
+                    If Not String.IsNullOrEmpty(pDBSoftware) Then
+                        cmdText &= " DBSoftware = N'" & pDBSoftware & "'" & vbCrLf
+                    End If
+
+                    'cmdText &= " DBRevisionDate = N'" & pDBRevisionDate & "'" & vbCrLf 'yyyy-MM-dd'
+
+                    If Not String.IsNullOrEmpty(pDBCommonRevisionNumber) Then
+                        cmdText &= " DBCommonRevisionNumber = N'" & pDBCommonRevisionNumber & "'" & vbCrLf
+                    End If
+
+                    If Not String.IsNullOrEmpty(pDBDataRevisionNumber) Then
+                        cmdText &= " DBDataRevisionNumber = N'" & pDBDataRevisionNumber & "'" & vbCrLf
+                    End If
 
                     cmdText &= " WHERE PackageID = '" & pPackageID & "'" & vbCrLf
 
@@ -189,7 +202,7 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                     resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
                     resultData.HasError = (resultData.AffectedRecords = 0)
-                End If
+                    End If
 
             Catch ex As Exception
                 resultData.HasError = True

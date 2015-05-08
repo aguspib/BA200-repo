@@ -5,7 +5,6 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.BL.Framework
 Imports System.IO
-Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.BL.UpdateVersion
 Imports System.Drawing 'SG 03/12/10
 Imports System.Windows.Forms 'SG 03/12/10

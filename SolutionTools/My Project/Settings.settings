@@ -1,7 +1,18 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" UseMySettingsClassName="true">
-  <Profiles>
-    <Profile Name="(Default)" />
-  </Profiles>
-  <Settings />
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="My" GeneratedClassName="MySettings" UseMySettingsClassName="true">
+  <Profiles />
+  <Settings>
+    <Setting Name="TaskListCommon" Type="System.String" Scope="User">
+      <Value Profile="(Default)">bax00framework\04.-Data Access Layer\Ax00.Framework.Data\UpdateVersion\Task\TaskList_BAx00.xml</Value>
+    </Setting>
+    <Setting Name="TaskListData" Type="System.String" Scope="User">
+      <Value Profile="(Default)">04.-Data Access Layer\Ax00.Data\UpdateVersion\Task\TaskList_BA200.xml</Value>
+    </Setting>
+    <Setting Name="TaskListEncrypted" Type="System.String" Scope="User">
+      <Value Profile="(Default)">PresentationCOM\Update\Task\TaskList.xml</Value>
+    </Setting>
+    <Setting Name="TaskListDecrypted" Type="System.String" Scope="User">
+      <Value Profile="(Default)">PresentationCOM\Update\Task\TaskListDecrypted.xml</Value>
+    </Setting>
+  </Settings>
 </SettingsFile>
