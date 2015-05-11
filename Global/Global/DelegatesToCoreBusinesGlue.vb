@@ -40,9 +40,7 @@ Public Class DelegatesToCoreBusinesGlue
         End Try
 
     End Function
-
-
-
+    
     Class ContaminationManagerWrapper
         Private ReadOnly _contaminationManagerInstance As Object
         Private ReadOnly _contaminationManagerClass As Type
@@ -116,8 +114,7 @@ Public Class DelegatesToCoreBusinesGlue
             Return coreAssembly
         End SyncLock
     End Function
-
-
+    
     Private Shared ReadOnly Property AssemblyDirectory() As String
         Get
             <ThreadStatic> Static location As String

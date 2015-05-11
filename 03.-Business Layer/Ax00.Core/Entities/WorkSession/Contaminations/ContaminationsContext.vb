@@ -20,7 +20,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
             Steps.AllowOutOfRange = False
             For i = range.Minimum To range.Maximum
-                Steps.Add(New ContextStep(analyzerContaminationsDescriptor.DispensesPerStep)) 'Cantidad máxima de reactivos que se pueden dispensar por ciclo
+                Steps.Append(New ContextStep(analyzerContaminationsDescriptor.DispensesPerStep)) 'Cantidad máxima de reactivos que se pueden dispensar por ciclo
             Next
 
         End Sub
@@ -138,6 +138,22 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
                 If curIndex <= maxIndex Then
                     Dim row = table(curIndex)
                     dispense.R1ReagentID = row.ReagentID
+                    'row.PostDilutionType
+                    'row.SampleClass
+                    'row.SampleType
+
+                    If row.IsExecutionTypeNull = False Then
+                        Select Case row.ExecutionType
+                            Case "PREP_STD", "", Nothing
+                                dispense.IsISE = False
+                            Case "PREP_ISE"
+                                dispense.IsISE = True
+                            Case Else
+#If config = "debug" Then
+                            Throw New Exception("Found preparation with unknown execution type: """ & row.executiontype & """. Happy debugging!")
+#End If
+                        End Select
+                    End If
                 End If
             Next
         End Sub

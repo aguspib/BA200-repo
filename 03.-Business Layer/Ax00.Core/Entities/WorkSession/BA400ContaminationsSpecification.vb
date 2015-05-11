@@ -10,7 +10,6 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
     Public Class BA400ContaminationsSpecification
         Implements IAnalyzerContaminationsSpecification
 
-
         Sub New()
 
             'This is B4200 dependant:

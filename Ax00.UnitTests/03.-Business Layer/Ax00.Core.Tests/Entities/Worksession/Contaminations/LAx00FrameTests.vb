@@ -2,7 +2,7 @@
 Imports NUnit.Framework
 
 
-Namespace Tests
+Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Tests
 
     <TestFixture()> Public Class InstrumentFrameParserTests
 

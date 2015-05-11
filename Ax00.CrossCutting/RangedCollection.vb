@@ -66,7 +66,7 @@
         ''' <param name="item">The item to be added</param>
         ''' <returns>Returns TRUE if the item was added successfully. Otherwise returns false.</returns>
         ''' <remarks></remarks>
-        Public Function Add(item As T) As Boolean
+        Public Function Append(item As T) As Boolean
             If (Not AllowOutOfRange) AndAlso (GetZeroBasedMaxIndex() < _internalList.Count) Then
                 Return False
             Else
@@ -132,11 +132,11 @@
         ReadOnly _internalList As New List(Of T)
 
         Private Function ConvertToZeroBasedIndex(index As Integer) As Integer
-            Return index - Range.minimum
+            Return index - Range.Minimum
         End Function
 
         Private Function GetZeroBasedMaxIndex() As Integer
-            Return ConvertToZeroBasedIndex(Range.maximum) '(Range.maximum - Range.minimum)
+            Return ConvertToZeroBasedIndex(Range.Maximum) '(Range.maximum - Range.minimum)
         End Function
 #End Region
 
