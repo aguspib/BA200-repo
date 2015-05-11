@@ -1056,7 +1056,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''                              OrderID and ControlID from twksOrderTests
         '''              XB 08/10/2014 - BA-1970 ==> Changed the query to get also field KineticsLinear to initialize preparation structure
         ''' </remarks>
-        Public Function GetExecution(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pExecutionID As Integer, _
+        Public Shared Function GetExecution(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pExecutionID As Integer, _
                                      Optional ByVal pAnalyzerID As String = "", Optional ByVal pWorkSessionID As String = "") As GlobalDataTO
 
             Dim resultData As GlobalDataTO = Nothing

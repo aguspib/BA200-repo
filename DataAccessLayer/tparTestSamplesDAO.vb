@@ -984,6 +984,47 @@ Namespace Biosystems.Ax00.DAL.DAO
             Return resultData
         End Function
 
+
+        Public Shared Function GetPredilutionModeForTest(pTestID As Integer, pSampleType As String) As String
+            If pSampleType = String.Empty Then Return ""
+            Dim Query = String.Format("SELECT TOP 1 [PredilutionMode] FROM [Ax00].[dbo].[tparTestSamples] Where TestID = {0} And SampleType='{1}';", pTestID, pSampleType)
+
+            Dim resultData As New GlobalDataTO
+            Dim connection = GetSafeOpenDBConnection(Nothing)
+            Try
+                If (connection.SetDatos Is Nothing) Then
+                    resultData.HasError = True
+                    resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
+                Else
+                    'Dim cmdText As String = Query
+
+                    Dim dbCmd As New SqlClient.SqlCommand
+                    dbCmd.Connection = connection.SetDatos
+                    dbCmd.CommandText = Query
+                    Dim da As New SqlDataAdapter(dbCmd)
+                    Dim DT As New DataTable
+                    da.Fill(DT)
+                    If DT IsNot Nothing AndAlso DT.Rows.Count > 0 Then
+                        Dim result = TryCast(DT.Rows(0).Item(0), String)
+                        Return result
+                    Else
+                        Return ""
+                    End If
+                End If
+
+            Catch ex As Exception
+                'resultData.HasError = True
+                'resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                'resultData.ErrorMessage = ex.Message
+
+                'Dim myLogAcciones As New ApplicationLogManager()
+                'GlobalBase.CreateLogActivity(ex.Message, "tparTestSamplesDAO.UpdateNumOfControls", EventLogEntryType.Error, False)
+            End Try
+
+            Return ""
+
+
+        End Function
 #End Region
 
 #Region "Other Methods"

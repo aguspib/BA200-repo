@@ -7,5 +7,7 @@
         Property WashingStrength As Integer
 
         Property WashingSolutionID As String
+
     End Interface
+
 End Namespace

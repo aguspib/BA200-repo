@@ -3,6 +3,7 @@ Option Strict On
 
 Imports System.Data.SqlClient
 Imports Biosystems.Ax00.BL
+Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 Imports Biosystems.Ax00.Types
 
 Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
@@ -126,6 +127,18 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
             ' - the last reagent and the newly inserted
             ' - the last pHighContaminationPersistence reagents and the newly inserted
             ' - if the newly is bi-reactive, check if there's contamination between it and the previous bi-reactive
+
+            'MIC Testing
+
+            Dim cont = New ContaminationsContext(ContaminationsSpecification)
+            cont.FillContextInStatic(pExecutions)
+            Dim washingsList = cont.GetWashingRequiredForAGivenDispensing(cont.Steps(0)(1))
+            If washingsList.Count > 0 Then
+                For Each W In washingsList
+                    Debug.WriteLine("Not empty! We need a washing of kind: " & W.WashingSolutionID & " and there's a persistance clash of " & W.WashingStrength)
+                Next
+            End If
+            '/MIC
 
             Dim contamNumber As Integer = 0
             Dim previousReagent = pExecutions.Count - 2
