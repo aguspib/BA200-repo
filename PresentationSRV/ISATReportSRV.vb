@@ -9,6 +9,7 @@ Imports Biosystems.Ax00.BL.UpdateVersion
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.Controls.UserControls
 Imports Biosystems.Ax00.App
+Imports Biosystems.Ax00.Framework.CrossCutting
 
 Public Class UiSATReportSRV
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
@@ -420,7 +421,8 @@ Public Class UiSATReportSRV
     ''' New function for CreateRSAT with process for encrypt/decrypt Patient names optimized
     ''' </summary>
     ''' <remarks>
-    ''' Created by: SA 11/02/2014 - BT #1506
+    ''' Created by:  SA 11/02/2014 - BT #1506
+    ''' Modified by: IT 08/05/2015 - BA-2471
     ''' </remarks>
     Private Sub CreateReportSAT_NEW()
         Dim myGlobal As New GlobalDataTO
@@ -456,8 +458,8 @@ Public Class UiSATReportSRV
             SATFileName = FileNameTextBox.Text
             SATFilePath = FolderPathTextBox.Text
 
-            Dim mySATUtil As New SATReportUtilities
-            myGlobal = mySATUtil.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_REPORT, False, String.Empty, AnalyzerController.Instance.Analyzer.AdjustmentsFilePath, SATFilePath, SATFileName) '#REFACTORING
+            'Dim mySATUtil As New SATReportUtilities
+            myGlobal = SATReportUtilities.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_REPORT, False, String.Empty, AnalyzerController.Instance.Analyzer.AdjustmentsFilePath, SATFilePath, SATFileName) 'BA-2471: IT 08/05/2015
 
             If (Not myGlobal.HasError) Then
                 'Restore original values of First and Last Names in tparPatients

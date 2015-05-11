@@ -9,7 +9,6 @@ Imports Biosystems.Ax00.Global.GlobalConstants
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Global.AlarmEnumerates
 Imports Biosystems.Ax00.PresentationCOM
-Imports Biosystems.Ax00.BL.UpdateVersion
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.Controls.UserControls
 Imports System.Globalization
@@ -23,6 +22,8 @@ Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Core.Entities
 Imports Biosystems.Ax00.Core.Services
 Imports Biosystems.Ax00.App.PresentationLayerListener.Requests
+Imports Biosystems.Ax00.Framework.App
+Imports Biosystems.Ax00.Framework.CrossCutting
 
 Partial Public Class UiAx00MainMDI
 
@@ -1838,6 +1839,7 @@ Partial Public Class UiAx00MainMDI
     '''                                           implementation of a new way of manage the thread used for release the LIS Manager Object is added (although commented,
     '''                                           due to more testing is required)
     '''              IT 23/10/2014 - REFACTORING (BA-2016)
+    '''              IT 08/05/2015 - BA-2471
     ''' </remarks>
     Private Sub ApplicationClosing(ByVal sender As System.Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles MyBase.FormClosing
         'Dim writeInLog As Boolean = True
@@ -1947,8 +1949,7 @@ Partial Public Class UiAx00MainMDI
                     GlobalBase.CreateLogActivity(My.Application.Info.ProductName & " - Application END", "IAx00MainMDI_FormClosing", EventLogEntryType.Information, False)
 
                     'TR 10/07/2013 - Shrink the Database before close the application
-                    Dim myDataBaseUpdateManagerDelegate As New DataBaseUpdateManagerDelegate
-                    myDataBaseUpdateManagerDelegate.ShrinkDatabase(Biosystems.Ax00.Global.DAOBase.CurrentDB, Nothing)
+                    DataBaseManagerDelegate.ShrinkDatabase(Biosystems.Ax00.Global.DAOBase.CurrentDB, Nothing) 'BA-2471: IT 08/05/2015
 
                     'BT #1588 - SQL Services are not stopped
                     '#If (Not Debug) Then
@@ -5428,6 +5429,7 @@ Partial Public Class UiAx00MainMDI
     '''              XB 23/04/2013 - Add ShowMultipleMessage method to can display the multiples errors can be occurred
     '''              AG 28/11/2013 - BT #1397
     '''              IT 23/10/2014 - REFACTORING (BA-2016)
+    '''              IT 08/05/2015 - BA-2471
     ''' </remarks>
     Private Sub ResetSession()
         Try
@@ -5482,8 +5484,8 @@ Partial Public Class UiAx00MainMDI
                     'End If
                     '' DL 14/06/2011
 
-                    Dim mySATUtil As New SATReportUtilities
-                    myGlobal = mySATUtil.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_REPORT, True, ExcelPath, myAdjustmentsFilePath)
+                    'Dim mySATUtil As New SATReportUtilities
+                    myGlobal = SATReportUtilities.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_REPORT, True, ExcelPath, myAdjustmentsFilePath) 'BA-2471: IT 08/05/2015
 
                     'TR 21/11/2011 -Reset the time variable.
                     LocalElapsedTimeAttribute = New DateTime

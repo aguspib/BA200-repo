@@ -153,7 +153,7 @@ Namespace Biosystems.Ax00.BL
         ''' <returns></returns>
         ''' <remarks>
         ''' Create by:   TR 17/01/2013
-        ''' Modified by: IT 08/05/2015: BA-2471
+        ''' Modified by: IT 08/05/2015 - BA-2471
         ''' </remarks>
         Public Function SaveDBSoftwareVersion(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pPackageID As String, ByVal pDBSoftware As String, ByVal pDBCommonRevisionNumber As String, ByVal pDBDataRevisionNumber As String) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
@@ -167,7 +167,7 @@ Namespace Biosystems.Ax00.BL
 
                         Dim myVersionsDAO As New tfmwVersionsDAO
 
-                        myGlobalDataTO = myVersionsDAO.UpdateDBSoftware(dbConnection, pPackageID, pDBSoftware, pDBCommonRevisionNumber, pDBDataRevisionNumber) 'IT 08/05/2015: BA-2471
+                        myGlobalDataTO = myVersionsDAO.UpdateDBSoftware(dbConnection, pPackageID, pDBSoftware, pDBCommonRevisionNumber, pDBDataRevisionNumber) 'IT 08/05/2015 - BA-2471
 
                         If (Not myGlobalDataTO.HasError) Then
                             'When the Database Connection was opened locally, then the Commit is executed

@@ -9,11 +9,12 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Global.AlarmEnumerates
-Imports Biosystems.Ax00.BL.UpdateVersion
 Imports Biosystems.Ax00.PresentationCOM
 Imports Biosystems.Ax00.Global.TO
 Imports LIS.Biosystems.Ax00.LISCommunications   ' XB 07/05/2013
 Imports Biosystems.Ax00.App
+Imports Biosystems.Ax00.Framework.App
+Imports Biosystems.Ax00.Framework.CrossCutting
 
 Public Class UiSATReportLoad
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
@@ -156,12 +157,13 @@ Public Class UiSATReportLoad
     ''' Created by: SG 08/10/2010
     ''' Modified by: SA 16/05/2014 - BT #1631 ==> When pVersionComparison indicates that SAT Report Version is higher than Application Version,
     '''                                           return REPORT_SAT_VERSION_IS_HIGHER as ErrorCode instead of as ErrorMessage
+    '''              IT 08/05/2015 - BA-2471
     ''' </remarks>
     Private Function ManageVersionComparison(ByVal pVersionComparison As GlobalEnumerates.SATReportVersionComparison) As GlobalDataTO
         Dim myGlobal As New GlobalDataTO
         'Dim myUtil As New Utilities.
         Dim tempFolder As String = ""
-        Dim mySATUtil As New SATReportUtilities
+        'Dim mySATUtil As New SATReportUtilities
 
         Try
             'Dim myLangDelegate As New MultilanguageResourcesDelegate
@@ -242,7 +244,7 @@ Public Class UiSATReportLoad
                     'RH 12/11/2010 tempFolder can not be so long. RestoreDB will throw an exception.
                     'So, we need a tempFolder like "C:\tempFolder"
                     'tempFolder = Directory.GetParent(RestorePointPath).FullName & "\temp"
-                    myGlobal = mySATUtil.GetTempFolder() 'New function
+                    myGlobal = SATReportUtilities.GetTempFolder() 'BA-2471: IT 08/05/2015
 
                     If Not myGlobal.HasError AndAlso Not myGlobal Is Nothing Then
                         tempFolder = CStr(myGlobal.SetDatos)
@@ -371,16 +373,16 @@ Public Class UiSATReportLoad
     ''' Restores the Database with the data contained in a SAT Report or a Restore Point.
     ''' </summary>
     ''' <remarks>
-    ''' Created by:  SG    08/10/2010
-    ''' Modified by: RH    12/11/2010
-    '''              TR    29/01/2013 -Call the updatedatabase process.
+    ''' Created by:  SG 08/10/2010
+    ''' Modified by: RH 12/11/2010
+    '''              TR 29/01/2013 -Call the updatedatabase process.
+    '''              IT 08/05/2015 - BA-2471
     ''' </remarks>
     Private Sub RestoreDataBase()
         Try
             'Restore
-            Dim myDBManager As New DataBaseManagerDelegate
             'Me.DBRestored = myDBManager.RestoreDatabaseNEW(DAOBase.CurrentDB, Me.RestoreDBFilePath)new mode with System.Data library (discarded)
-            Me.DBRestored = myDBManager.RestoreDatabase(DAOBase.DBServer, DAOBase.CurrentDB, DAOBase.DBLogin, DAOBase.DBPassword, Me.RestoreDBFilePath)
+            Me.DBRestored = DataBaseManagerDelegate.RestoreDatabase(DAOBase.DBServer, DAOBase.CurrentDB, DAOBase.DBLogin, DAOBase.DBPassword, Me.RestoreDBFilePath) 'BA-2471: IT 08/05/2015
 
             'TR 29/01/2013 -Call the update process
             UpdateDataBase()
@@ -413,6 +415,7 @@ Public Class UiSATReportLoad
     ''' Created by: SG 08/10/2010
     ''' Modified by: RH 12/11/2010
     '''              TR 29/01/2013 -Implement the update database update process.
+    '''              IT 08/05/2015 - BA-2471
     ''' </remarks>
     Private Sub UpdateDataBase()
         Try
@@ -426,8 +429,7 @@ Public Class UiSATReportLoad
 
             'TR 29/01/2013 -Implementation Update process.
             Dim myGlobalDataTO As New GlobalDataTO
-            Dim myDatabaseMngDelegate As New DataBaseManagerDelegate
-            myGlobalDataTO = myDatabaseMngDelegate.InstallUpdateProcess(DAOBase.DBServer, DAOBase.CurrentDB, DAOBase.DBLogin, DAOBase.DBPassword, True)
+            myGlobalDataTO = UpdaterController.Instance.InstallUpdateProcess(DAOBase.DBServer, DAOBase.CurrentDB, DAOBase.DBLogin, DAOBase.DBPassword, True) 'BA-2471: IT 08/05/2015
             If myGlobalDataTO.HasError Then
                 Me.DBUpdated = False
                 Dim myMessage As String = "Updating process has been cancelled because some errors have been found. No changes were made on database." & _
@@ -476,7 +478,8 @@ Public Class UiSATReportLoad
     ''' <remarks>
     ''' Created by: SG 08/10/2010
     ''' Modified by: RH 12/11/2010
-    ''' Modified by AG 25/10/2011 - before create a restore point disable ANSINF, once finished enable it
+    '''              AG 25/10/2011 - before create a restore point disable ANSINF, once finished enable it
+    '''              IT 08/05/2015 - BA-2471
     ''' </remarks>
     Private Sub CreateRestorePoint()
         'Cursor.Current = Cursors.WaitCursor
@@ -484,8 +487,8 @@ Public Class UiSATReportLoad
 
         Try
 
-            Dim mySATUtil As New SATReportUtilities
-            myGlobal = mySATUtil.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_RESTORE, False, "", AnalyzerController.Instance.Analyzer.AdjustmentsFilePath) '#REFACTORING
+            'Dim mySATUtil As New SATReportUtilities
+            myGlobal = SATReportUtilities.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_RESTORE, False, "", AnalyzerController.Instance.Analyzer.AdjustmentsFilePath) 'BA-2471: IT 08/05/2015
             If Not myGlobal.HasError AndAlso Not myGlobal Is Nothing Then
                 SATReportCreated = CBool(myGlobal.SetDatos)
             End If
@@ -507,13 +510,14 @@ Public Class UiSATReportLoad
     ''' <returns></returns>
     ''' <remarks>Created by: SG 08/10/2010
     ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    '''              IT 08/05/2015 - BA-2471
     ''' </remarks>
     Private Function LoadSATReport(ByVal pFilePath As String) As GlobalDataTO
         Dim myGlobal As New GlobalDataTO
 
         Try
             'Dim myUtil As New Utilities.
-            Dim mySATUtil As New SATReportUtilities
+            'Dim mySATUtil As New SATReportUtilities
 
             'obtain the APP version
             Dim myAppVersion As String
@@ -524,12 +528,12 @@ Public Class UiSATReportLoad
                 'obtain the SAT version
                 Dim mySATVersion As String
 
-                myGlobal = mySATUtil.GetSATReportVersion(pFilePath)
+                myGlobal = SATReportUtilities.GetSATReportVersion(pFilePath) 'BA-2471: IT 08/05/2015
                 If Not myGlobal.HasError And Not myGlobal Is Nothing Then
                     mySATVersion = CStr(myGlobal.SetDatos)
 
                     Dim myComparisonResult As New GlobalEnumerates.SATReportVersionComparison
-                    myGlobal = mySATUtil.CompareSATandAPPversions(myAppVersion, mySATVersion)
+                    myGlobal = SATReportUtilities.CompareSATandAPPversions(myAppVersion, mySATVersion) 'BA-2471: IT 08/05/2015
                     If Not myGlobal.HasError And Not myGlobal Is Nothing Then
                         myComparisonResult = CType(myGlobal.SetDatos, GlobalEnumerates.SATReportVersionComparison)
                         Me.RestorePointPath = pFilePath
