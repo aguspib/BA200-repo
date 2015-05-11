@@ -13,7 +13,7 @@ Namespace Biosystems.Ax00.BL.Framework
 
     'Class to handler all the Application Session Funtionality
     Public Class ApplicationSessionManager
-        Inherits GlobalBase
+        'Inherits GlobalBase
 
 #Region "Public Methods"
         ''' <summary>
