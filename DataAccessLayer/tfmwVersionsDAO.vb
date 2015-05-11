@@ -165,7 +165,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <returns></returns>
         ''' <remarks>
         ''' Created by:  TR 17/01/2013 v1.0.1
-        ''' Modified by: IT 08/05/2015: BA-2471
+        ''' Modified by: IT 08/05/2015 - BA-2471
         ''' </remarks>
         Public Function UpdateDBSoftware(ByVal pDBConnection As SqlClient.SqlConnection,
                                          ByVal pPackageID As String, ByVal pDBSoftware As String, ByVal pDBCommonRevisionNumber As String, ByVal pDBDataRevisionNumber As String) As GlobalDataTO

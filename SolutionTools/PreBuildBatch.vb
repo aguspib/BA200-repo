@@ -2,7 +2,7 @@
 Imports System.Text
 Imports System.Security
 Imports System.Windows.Forms
-Imports Biosystems.Ax00.Data.UpdateVersion.DatabaseUpdater
+Imports Biosystems.Ax00.Framework.Core.UpdateVersion.DatabaseUpdater
 
 Module PreBuildBatch
 

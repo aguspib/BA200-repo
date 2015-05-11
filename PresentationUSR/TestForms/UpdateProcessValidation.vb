@@ -5,6 +5,7 @@ Option Infer On
 Imports System.IO
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.DAL
+Imports Biosystems.Ax00.Framework.App
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 
@@ -23,9 +24,9 @@ Public Class UpdateProcessValidation
             dbConnection = DirectCast(myGlobal.SetDatos, SqlClient.SqlConnection)
             If (Not dbConnection Is Nothing) Then
                 Dim myUpdateVersionChangesList As New UpdateVersionChangesDS
-                Dim myUpdateProcessDelegate As New UpdateVersion.UpdatePreloadedFactoryTestDelegate
+                'Dim myUpdateProcessDelegate As New UpdateVersion.UpdatePreloadedFactoryTestDelegate
 
-                myGlobal = myUpdateProcessDelegate.SetFactoryISETestsProgramming(dbConnection, myUpdateVersionChangesList)
+                myGlobal = UpdaterController.Instance.SetFactoryISETestsProgramming(dbConnection, myUpdateVersionChangesList) 'BA-2471: IT 08/05/2015
                 If (Not myGlobal.HasError) Then
                     'When the Database Connection was opened locally, then the Commit is executed
                     DAOBase.CommitTransaction(dbConnection)
@@ -65,9 +66,9 @@ Public Class UpdateProcessValidation
             dbConnection = DirectCast(myGlobal.SetDatos, SqlClient.SqlConnection)
             If (Not dbConnection Is Nothing) Then
                 Dim myUpdateVersionChangesList As New UpdateVersionChangesDS
-                Dim myUpdateProcessDelegate As New UpdateVersion.UpdatePreloadedFactoryTestDelegate
+                'Dim myUpdateProcessDelegate As New UpdateVersion.UpdatePreloadedFactoryTestDelegate
 
-                myGlobal = myUpdateProcessDelegate.SetFactorySTDTestsProgramming(dbConnection, myUpdateVersionChangesList)
+                myGlobal = UpdaterController.Instance.SetFactorySTDTestsProgramming(dbConnection, myUpdateVersionChangesList) 'BA-2471: IT 08/05/2015
                 If (Not myGlobal.HasError) Then
                     'When the Database Connection was opened locally, then the Commit is executed
                     DAOBase.CommitTransaction(dbConnection)
@@ -122,9 +123,9 @@ Public Class UpdateProcessValidation
 
                 If (Not myGlobal.HasError) Then
                     Dim myUpdateVersionChangesList As New UpdateVersionChangesDS
-                    Dim myUpdateProcessDelegate As New UpdateVersion.UpdatePreloadedFactoryTestDelegate
+                    'Dim myUpdateProcessDelegate As New UpdateVersion.UpdatePreloadedFactoryTestDelegate
 
-                    myGlobal = myUpdateProcessDelegate.SetFactoryOFFSTestsProgramming(dbConnection, mySwVersion, myUpdateVersionChangesList)
+                    myGlobal = UpdaterController.Instance.SetFactoryOFFSTestsProgramming(dbConnection, mySwVersion, myUpdateVersionChangesList) 'BA-2471: IT 08/05/2015
                     If (Not myGlobal.HasError) Then
                         'When the Database Connection was opened locally, then the Commit is executed
                         DAOBase.CommitTransaction(dbConnection)
@@ -165,9 +166,9 @@ Public Class UpdateProcessValidation
             dbConnection = DirectCast(myGlobal.SetDatos, SqlClient.SqlConnection)
             If (Not dbConnection Is Nothing) Then
                 Dim myUpdateVersionChangesList As New UpdateVersionChangesDS
-                Dim myUpdateProcessDelegate As New UpdateVersion.UpdatePreloadedFactoryTestDelegate
+                'Dim myUpdateProcessDelegate As New UpdateVersion.UpdatePreloadedFactoryTestDelegate
 
-                myGlobal = myUpdateProcessDelegate.SetFactoryCALCTestsProgramming(dbConnection, myUpdateVersionChangesList)
+                myGlobal = UpdaterController.Instance.SetFactoryCALCTestsProgramming(dbConnection, myUpdateVersionChangesList) 'BA-2471: IT 08/05/2015
                 If (Not myGlobal.HasError) Then
                     'When the Database Connection was opened locally, then the Commit is executed
                     DAOBase.CommitTransaction(dbConnection)
@@ -186,7 +187,7 @@ Public Class UpdateProcessValidation
                 Else
                     'When the Database Connection was opened locally, then the Rollback is executed
                     DAOBase.RollbackTransaction(dbConnection)
-                    
+
                     MsgBox("ERROR UPDATING CALC TESTS: " & myGlobal.ErrorMessage, vbOKOnly)
                 End If
             End If

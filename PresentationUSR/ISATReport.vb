@@ -11,6 +11,7 @@ Imports Biosystems.Ax00.BL.UpdateVersion
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.Controls.UserControls
 Imports Biosystems.Ax00.App
+Imports Biosystems.Ax00.Framework.CrossCutting
 
 
 Public Class UiSATReport
@@ -538,8 +539,8 @@ Public Class UiSATReport
             SATFileName = FileNameTextBox.Text
             SATFilePath = FolderPathTextBox.Text
 
-            Dim mySATUtil As New SATReportUtilities
-            myGlobal = mySATUtil.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_REPORT, False, String.Empty, AnalyzerController.Instance.Analyzer.AdjustmentsFilePath, SATFilePath, SATFileName)
+            'Dim mySATUtil As New SATReportUtilities
+            myGlobal = SATReportUtilities.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_REPORT, False, String.Empty, AnalyzerController.Instance.Analyzer.AdjustmentsFilePath, SATFilePath, SATFileName) 'BA-2471: IT 08/05/2015
 
             If (Not myGlobal.HasError) Then
                 'Restore original values of First and Last Names in tparPatients

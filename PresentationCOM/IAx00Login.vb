@@ -5,9 +5,10 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.BL.Framework
 Imports System.IO
-Imports Biosystems.Ax00.BL.UpdateVersion
 Imports System.Drawing 'SG 03/12/10
 Imports System.Windows.Forms 'SG 03/12/10
+Imports Biosystems.Ax00.Framework.App
+Imports Biosystems.Ax00.Framework.CrossCutting
 Imports Biosystems.Ax00.Types
 
 Public Class UiAx00Login
@@ -119,15 +120,15 @@ Public Class UiAx00Login
 
     ''' <remarks>
     ''' Validate SQL Server engine and DB availability
-    ''' AG 22/11/2010 - create by copy the code in constructor into this new method
+    ''' Created by:  AG 22/11/2010 - create by copy the code in constructor into this new method
+    ''' Modified by: IT 08/05/2015 - BA-2471 
     ''' </remarks>
     Private Sub CheckDataBaseAvailability()
         'Move the RH code into this new method a new worker
         Try
-            Dim MyDabaseManagerDelegate As New DataBaseManagerDelegate()
 
             DBServerError = False
-            If Not MyDabaseManagerDelegate.StartSQLService(DAOBase.DBServer) Then
+            If Not DataBaseManagerDelegate.StartSqlService(DAOBase.DBServer) Then 'BA-2471: IT 08/05/2015
                 'wfPreload.Close()
 
                 'RH 27/05/2011 Make this method run in the Main Thread
@@ -189,7 +190,7 @@ Public Class UiAx00Login
                         dbConnection.Close()
 
                         'RH 15/07/2011 Now set DB to MultiUser
-                        If Not MyDabaseManagerDelegate.SetDataBaseMultiUser(DAOBase.DBServer, DAOBase.CurrentDB, DAOBase.DBLogin, DAOBase.DBPassword) Then
+                        If Not DataBaseManagerDelegate.SetDataBaseMultiUser(DAOBase.DBServer, DAOBase.CurrentDB, DAOBase.DBLogin, DAOBase.DBPassword) Then 'BA-2471: IT 08/05/2015
                             'RH 27/05/2011 Make this method run in the Main Thread
                             Ax00StartUp.UIThread(New Action(AddressOf Ax00StartUp.Close))
                             Ax00StartUp = Nothing
@@ -1161,17 +1162,17 @@ Public Class UiAx00Login
     ''' <summary>
     ''' Update and installation process.
     ''' Modified by: RH 17/11/2010
-    ''' Modified by AG 16/01/2013 Define as a Function and return a GlobalDataTo
+    '''              AG 16/01/2013 Define as a Function and return a GlobalDataTo
+    '''              IT 08/05/2015 - BA-2471
     ''' </summary>
     Private Shared Function InstallUpdateProcess() As GlobalDataTO
         'Private Shared Sub InstallUpdateProcess()
         ''Dim myLogAcciones As New ApplicationLogManager()
         Dim myGlobalDataTO As New GlobalDataTO
         Try
-            Dim mydbmngDelegate As New DataBaseManagerDelegate()
 
             'GlobalBase.CreateLogActivity(Me.Name & ".Updateprocess -Validating if Data Base exists ", "Installation validation", EventLogEntryType.Information, False)
-            myGlobalDataTO = mydbmngDelegate.InstallUpdateProcess(DAOBase.DBServer, DAOBase.CurrentDB, DAOBase.DBLogin, DAOBase.DBPassword)
+            myGlobalDataTO = UpdaterController.Instance.InstallUpdateProcess(DAOBase.DBServer, DAOBase.CurrentDB, DAOBase.DBLogin, DAOBase.DBPassword) 'BA-2471: IT 08/05/2015
 
         Catch ex As Exception
             MessageBox.Show(ex.Message + " ((" + ex.HResult.ToString + "))")

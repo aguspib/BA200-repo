@@ -54,6 +54,10 @@
     <OutputPath>bin\x86\Release\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.SqlServer.Smo, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\bax00framework\Third Party\Required Libraries\SqlServer2008R2\Microsoft.SqlServer.Smo.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -132,6 +136,10 @@
     <ProjectReference Include="..\..\AX00Types\AX00Types.vbproj">
       <Project>{3b617ebf-0488-46bd-ab56-094f81d0e4c3}</Project>
       <Name>AX00Types</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\bax00framework\03.-Business Layer\Ax00.Framework.Core\Ax00.Framework.Core.vbproj">
+      <Project>{dc90b322-5a1d-4e45-943f-a76447ad0016}</Project>
+      <Name>Ax00.Framework.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\bax00framework\Global\Global.vbproj">
       <Project>{5d65020c-c2d7-4ac3-b557-223fc290e526}</Project>

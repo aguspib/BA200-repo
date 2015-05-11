@@ -9,6 +9,7 @@ Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.BL.UpdateVersion
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.App
+Imports Biosystems.Ax00.Framework.CrossCutting
 
 Public Class UiCreateRestorePoint
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
@@ -130,7 +131,7 @@ Public Class UiCreateRestorePoint
         Dim myGlobal As New GlobalDataTO
         ''Dim myUtil As New Utilities.
         Dim tempFolder As String = ""
-        Dim mySATUtil As New SATReportUtilities
+        'Dim mySATUtil As New SATReportUtilities
 
         Try
 
@@ -218,7 +219,8 @@ Public Class UiCreateRestorePoint
     ''' <remarks>
     ''' Created by: SG 08/10/2010
     ''' Modified by: RH 12/11/2010
-    ''' Modified by AG 25/10/2011 - before create a restore point disable ANSINF, once finished enable it
+    '''              AG 25/10/2011 - before create a restore point disable ANSINF, once finished enable it
+    '''              IT 08/05/2015 - BA-2471
     ''' </remarks>
     Private Sub CreateRestorePointStart()
         'Cursor.Current = Cursors.WaitCursor
@@ -226,8 +228,8 @@ Public Class UiCreateRestorePoint
 
         Try
 
-            Dim mySATUtil As New SATReportUtilities
-            myGlobal = mySATUtil.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_RESTORE, False, "", AnalyzerController.Instance.Analyzer.AdjustmentsFilePath) '#REFACTORING
+            'Dim mySATUtil As New SATReportUtilities
+            myGlobal = SATReportUtilities.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_RESTORE, False, "", AnalyzerController.Instance.Analyzer.AdjustmentsFilePath) 'BA-2471: IT 08/05/2015
             If Not myGlobal.HasError AndAlso Not myGlobal Is Nothing Then
                 RestorePointCreated = CBool(myGlobal.SetDatos)
             End If
