@@ -1718,10 +1718,6 @@
       <Project>{BD816D19-6903-4603-8A75-A14C099D4EB2}</Project>
       <Name>Analyzer</Name>
     </ProjectReference>
-    <ProjectReference Include="..\AX00Types\AX00Types.vbproj">
-      <Project>{3B617EBF-0488-46BD-AB56-094F81D0E4C3}</Project>
-      <Name>AX00Types</Name>
-    </ProjectReference>
     <ProjectReference Include="..\bax00framework\02.-Application Layer\Ax00.Framework.Application\Ax00.Framework.Application.vbproj">
       <Project>{0fbb1ec8-80ea-4cf2-a0cb-b8802c7f7d37}</Project>
       <Name>Ax00.Framework.Application</Name>
@@ -1729,6 +1725,10 @@
     <ProjectReference Include="..\bax00framework\05.-Cross Cutting Layer\Ax00.Framework.CrossCutting\Ax00.Framework.CrossCutting.vbproj">
       <Project>{d880e48a-3a14-4916-a60b-45b8251fe010}</Project>
       <Name>Ax00.Framework.CrossCutting</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\bax00framework\AX00Types\AX00Types.vbproj">
+      <Project>{19114cc5-ba39-4d35-89fa-41d9efb7a931}</Project>
+      <Name>AX00Types</Name>
     </ProjectReference>
     <ProjectReference Include="..\bax00framework\Global\Global.vbproj">
       <Project>{5d65020c-c2d7-4ac3-b557-223fc290e526}</Project>

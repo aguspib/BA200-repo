@@ -186,8 +186,8 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\AX00Types\AX00Types.vbproj">
-      <Project>{3B617EBF-0488-46BD-AB56-094F81D0E4C3}</Project>
+    <ProjectReference Include="..\..\bax00framework\AX00Types\AX00Types.vbproj">
+      <Project>{19114CC5-BA39-4D35-89FA-41D9EFB7A931}</Project>
       <Name>AX00Types</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\bax00framework\Global\Global.vbproj">
