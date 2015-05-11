@@ -1371,9 +1371,13 @@ Namespace Biosystems.Ax00.Core.Entities
                                 'CHANGE RULE: When a new TEST is sent remove all previous Wash sent (reagents or cuvettes)
                                 'The old was wrong and also the index used where wrong!!! - (Now, I think it has no sense)
 
+                                'AJG. Leave ReagentWashFlag as part of the persistance.
                                 '2on NEW RULE: When send a new PREP_STD clear all previous wash
+                                'resLinq = (From a As AnalyzerManagerDS.sentPreparationsRow In mySentPreparationsDS.sentPreparations _
+                                '           Where a.ReagentWashFlag = True Or a.CuvetteWashFlag = True _
+                                '           Select a).ToList
                                 resLinq = (From a As AnalyzerManagerDS.sentPreparationsRow In mySentPreparationsDS.sentPreparations _
-                                           Where a.ReagentWashFlag = True Or a.CuvetteWashFlag = True _
+                                           Where a.CuvetteWashFlag = True _
                                            Select a).ToList
                                 If resLinq.Count > 0 Then '(6.2) 
                                     For i As Integer = resLinq.Count - 1 To 0 Step -1
