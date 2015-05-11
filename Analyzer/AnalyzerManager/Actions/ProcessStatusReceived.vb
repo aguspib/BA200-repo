@@ -729,16 +729,21 @@ Namespace Biosystems.Ax00.Core.Entities
         End Function
 
         Private Sub ManageErrorFieldAndStates(ByRef myGlobal As GlobalDataTO, ByVal errorValue As Integer, ByRef myActionValue As AnalyzerManagerAx00Actions, ByVal myExpectedTimeRaw As Integer)
+            If errorValue = 0 AndAlso _analyzerManager.CanManageRetryAlarm Then
+                _analyzerManager.CanSendingRepetitions() = False
+                _analyzerManager.NumSendingRepetitionsTimeout() = 0
+                _analyzerManager.CanManageRetryAlarm = False
+            End If
             If errorValue = 560 Then
                 _analyzerManager.CanSendingRepetitions() = True
                 _analyzerManager.NumSendingRepetitionsTimeout() += 1
+                ' Activates Alarm begin
+                _analyzerManager.CanManageRetryAlarm = True
 
                 If _analyzerManager.NumSendingRepetitionsTimeout() > GlobalBase.MaxRepetitionsRetry Then
                     GlobalBase.CreateLogActivity("FLIGHT Error: GLF_BOARD_FBLD_ERR", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
                     _analyzerManager.CanSendingRepetitions() = False
-
-                    ' Activates Alarm begin
-                    _analyzerManager.CanManageRetryAlarm = True
+                    _analyzerManager.NumSendingRepetitionsTimeout() = 0
 
                     Dim myAlarmList As New List(Of Alarms)
                     Dim myAlarmStatusList As New List(Of Boolean)

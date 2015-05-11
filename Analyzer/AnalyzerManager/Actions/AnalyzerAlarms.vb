@@ -237,9 +237,6 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <summary>
         ''' 
         ''' </summary>
-        ''' <remarks>
-        ''' Search if exists alarm ISE_TIMEOUT_ERR with status TRUE, in this case set flag myISETimeoutErrorFixed = True (FIXED) in order to mark it as fixed
-        ''' </remarks>
         Private Sub GlfBoardErrorDuringFBLD()
             If _analyzerManager.CanManageRetryAlarm Then
                 _analyzerManager.CanManageRetryAlarm = False
