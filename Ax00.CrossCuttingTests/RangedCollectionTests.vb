@@ -33,16 +33,16 @@ Namespace Biosystems.Ax00.CC.Tests
 
         <Test()> Public Sub AddTest()
             Dim RangedCol As New RangedCollection(Of String)(New Range(Of Integer)(min, max))
-            RangedCol.Add("Hola")
+            RangedCol.Append("Hola")
             Assert.AreEqual(RangedCol.Count, 1)
 
         End Sub
 
         <Test()> Public Sub RemoveLastTest()
             Dim RangedCol As New RangedCollection(Of String)(New Range(Of Integer)(min, max))
-            RangedCol.Add("Hola")
+            RangedCol.Append("Hola")
             Dim string2 = "Adiós"
-            RangedCol.Add(string2)
+            RangedCol.Append(string2)
             Dim last = RangedCol.RemoveLast
             Assert.AreSame(last, string2)
             Assert.AreEqual(RangedCol.Count, 1)
@@ -59,7 +59,7 @@ Namespace Biosystems.Ax00.CC.Tests
             '2.- Test Allow OutOfRange
             RangedCol.AllowOutOfRange = True
             For i = 1 To 1000
-                RangedCol.Add("test " & 1)
+                RangedCol.Append("test " & 1)
             Next
             Assert.Equals(RangedCol.Count, 1000)
 
@@ -72,7 +72,7 @@ Namespace Biosystems.Ax00.CC.Tests
         <Test()> Public Sub RemoveFirstTest()
             Dim RangedCol As New RangedCollection(Of String)(min, max)
             For i = 1 To 20
-                RangedCol.Add("Sample " & 1)
+                RangedCol.Append("Sample " & 1)
             Next
 
             Dim first = RangedCol(min), second = RangedCol(min + 1)
@@ -87,7 +87,7 @@ Namespace Biosystems.Ax00.CC.Tests
             Dim RangedCol As New RangedCollection(Of String)(min, max)
             Const items = 20
             For i = 1 To items
-                RangedCol.Add("Sample " & 1)
+                RangedCol.Append("Sample " & 1)
             Next
             Dim counter = 0
             'forEach uses GetTypedEnumerator internally, so it's the way to test it
@@ -99,13 +99,13 @@ Namespace Biosystems.Ax00.CC.Tests
 
         <Test()> Public Sub AllowOutOfRange()
             Dim RangedCol As New RangedCollection(Of String)(min, max)
-            For i = 1 To 1000
-                RangedCol.Add("Sample " & 1)
+            For i = 1 To max - min + 10
+                RangedCol.Append("Sample " & 1)
             Next
 
             RangedCol.AllowOutOfRange = False
-            RangedCol.Add("placeholder")
-            Assert.AreEqual(RangedCol.Add("Can't fit, there's no more room!"), False)
+            RangedCol.Append("placeholder")
+            Assert.AreEqual(RangedCol.Append("Can't fit, there's no more room!"), False)
 
         End Sub
 

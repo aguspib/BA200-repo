@@ -12,6 +12,8 @@ Namespace Biosystems.Ax00.Core.Entities.Worksession.Contaminations.Interfaces
 
         Property ExecutionID As Integer
 
+        Property IsISE As Boolean
+
         ReadOnly Property AnalysisMode As Integer 'OptimizationPolicyApplier.AnalysisMode
 
         ReadOnly Property Contamines As Dictionary(Of Integer, IDispensingContaminationDescription)

@@ -6,7 +6,6 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
     Public Class ReagentDispensing
         Implements IReagentDispensing
 
-
         Public Function RequiredWashingSolution(dispensing As IReagentDispensing, scope As Integer) As IWashingDescription Implements IReagentDispensing.RequiredWashingSolution
             If scope = 0 Then   'A reagent can't contamine itself
                 Return New EmptyWashing
@@ -88,6 +87,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             Next
         End Sub
 
+        Public Property IsISE As Boolean Implements IReagentDispensing.IsISE
     End Class
 
 End Namespace

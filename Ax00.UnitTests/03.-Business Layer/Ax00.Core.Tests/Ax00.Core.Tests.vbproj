@@ -82,8 +82,8 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Entities\Worksession\Contamination handling\ContaminationsContextTests.vb" />
-    <Compile Include="Entities\Worksession\Contamination handling\InstrumentFrameParserTests.vb" />
+    <Compile Include="Entities\Worksession\Contaminations\ContaminationsContextTests.vb" />
+    <Compile Include="Entities\Worksession\Contaminations\LAx00FrameTests.vb" />
     <Compile Include="Services\BaseLineServiceTests.vb" />
     <Compile Include="Services\RotorChangeServicesTests.vb" />
     <Compile Include="Services\WarmUpServiceTests.vb" />
