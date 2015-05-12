@@ -1,6 +1,7 @@
 ﻿Option Explicit On
 Option Strict On
 
+Imports Biosystems.Ax00.Framework.CrossCutting
 Imports Biosystems.Ax00.Global
 
 
@@ -13,15 +14,16 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' </summary>
         ''' <returns>true if restore is OK, or false if Fail</returns>
         ''' <remarks>
-        ''' Modified by: RH    18/11/2010 - Assume SQL Server and Browser services are running. This speeds up the process.
+        ''' Modified by: RH 18/11/2010 - Assume SQL Server and Browser services are running. This speeds up the process.
         '''                               - Assume Database does not exist. This speeds up the process.
-        '''              TR    24/01/2011 - Get the backup file form the AppConfig.
-        '''              TR    22/01/2013 -Implement the use of globaldata TO   
+        '''              TR 24/01/2011 - Get the backup file form the AppConfig.
+        '''              TR 22/01/2013 - Implement the use of globaldata TO 
+        '''              IT 08/05/2015 - BA-2471  
         ''' </remarks>
         Public Function InstallApplicationDataBase(ByVal pServerName As String, ByVal pDataBaseName As String, _
                                                    ByVal DBLogin As String, ByVal DBPassword As String) As GlobalDataTO
             Dim myGlobalDataTO = New GlobalDataTO
-            Dim MyDabaseManagerDelegate As New DataBaseManagerDelegate()
+            'Dim MyDabaseManagerDelegate As New DataBaseManagerDelegate()
             'Dim myLogAcciones As New ApplicationLogManager()
 
             Try
@@ -32,7 +34,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO = CopyBackupToTempDirectory(BackUpfile)
                 If Not myGlobalDataTO.HasError Then
                     BackUpfile = myGlobalDataTO.SetDatos.ToString()
-                    MyDabaseManagerDelegate.RestoreDatabase(pServerName, pDataBaseName, DBLogin, DBPassword, BackUpfile)
+                    DataBaseManagerDelegate.RestoreDatabase(pServerName, pDataBaseName, DBLogin, DBPassword, BackUpfile) 'BA-2471: IT 08/05/2015
                     myGlobalDataTO.SetDatos = True
                 Else
                     myGlobalDataTO.SetDatos = False

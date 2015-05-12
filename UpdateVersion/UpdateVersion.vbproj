@@ -85,7 +85,6 @@
     <Compile Include="CalibratorUpdateData.vb" />
     <Compile Include="ContaminationsUpdateData.vb" />
     <Compile Include="DatabaseManagerDelegate\DataBaseInstallerManagerDelegate.vb" />
-    <Compile Include="DatabaseManagerDelegate\DataBaseManagerDelegate.vb" />
     <Compile Include="DatabaseManagerDelegate\DataBaseUpdateManagerDelegate.vb" />
     <Compile Include="ISEInformationUpdateData.vb" />
     <Compile Include="ISETestUpdateData.vb" />

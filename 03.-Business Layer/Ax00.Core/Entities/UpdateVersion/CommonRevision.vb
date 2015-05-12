@@ -52,23 +52,41 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
 
 #Region "Private members"
 
-        Private Sub RunStructure(result As ExecutionResults, ByRef server As Server, ByVal dataBaseName As String)
+        Private Sub RunStructure(results As ExecutionResults, ByRef server As Server, ByVal dataBaseName As String)
 
             If StructureScript Is Nothing OrElse StructureScript.Trim = String.Empty Then Return
             Debug.WriteLine("Running StructureScript script")
-            result.Success = DBManager.ExecuteScripts(server, dataBaseName, StructureScript)
-            If result.Success = False Then result.LastErrorStep = ExecutionResults.ErrorStep.StructureScript
+            results.Success = DBManager.ExecuteScripts(server, dataBaseName, StructureScript)
+            If results.Success = False Then results.LastErrorStep = ExecutionResults.ErrorStep.StructureScript
 
         End Sub
 
-        Private Sub RunData(result As ExecutionResults, ByRef server As Server, ByVal dataBaseName As String)
+        Private Sub RunData(results As ExecutionResults, ByRef server As Server, ByVal dataBaseName As String)
 
             If DataScript Is Nothing OrElse DataScript.Trim = String.Empty Then Return
             Debug.WriteLine("Running data script")
-            result.Success = DBManager.ExecuteScripts(server, dataBaseName, DataScript)
-            If result.Success = False Then result.LastErrorStep = ExecutionResults.ErrorStep.DataScript
+            results.Success = DBManager.ExecuteScripts(server, dataBaseName, DataScript)
+            If results.Success = False Then results.LastErrorStep = ExecutionResults.ErrorStep.DataScript
+
+            WriteLog(results)
 
         End Sub
+
+        Private Sub WriteLog(results As ExecutionResults)
+
+            DebugLogger.AddLog(String.Format("Common Revision  Number: {0} JiraId:", RevisionNumber, JiraId), "UpdateVersion")
+            DebugLogger.AddLog(String.Format("      StructureScript:{0}", StructureScript), "UpdateVersion")
+            DebugLogger.AddLog(String.Format("      DataScript:{0}", DataScript), "UpdateVersion")
+            DebugLogger.AddLog(String.Format("      Errors:{0}", results.Success), "UpdateVersion")
+
+        End Sub
+
+        Private Overloads Function ToString() As String
+
+            Dim contend As New System.Text.StringBuilder()
+            Return contend.AppendLine().ToString()
+
+        End Function
 
 #End Region
 

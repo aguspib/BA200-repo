@@ -47,7 +47,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
             Dim myGlobalDataTO As New GlobalDataTO
             Dim update As Boolean = False
-            Dim myDBDatabaseManager As New DataBaseManagerDelegate 'BA-2471: IT 08/05/2015
+            'Dim myDBDatabaseManager As New DataBaseManagerDelegate 'BA-2471: IT 08/05/2015
 
             GlobalBase.CreateLogActivity("On UpdateDatabase method ", "DataBaseUpdateManager.UpdateDatabase", EventLogEntryType.Information, False)
 
@@ -76,7 +76,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
                     myGlobal = SATReportUtilities.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_UPDATE, False, "", "", "", "", usSwVersion) 'BA-2471: IT 08/05/2015
                     If (Not myGlobal.HasError) Then
-                        Dim myDatabaseAdmin As New DataBaseManagerDelegate()
+                        'Dim myDatabaseAdmin As New DataBaseManagerDelegate()
 
                         'TR 16/01/2013 v1.0.1 - Search new database backup file to restore on temporal db
                         Dim myBackUpFile As String = AppDomain.CurrentDomain.BaseDirectory & GlobalBase.BakDirectoryPath & GlobalBase.TempDBBakupFileName
@@ -85,7 +85,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                             myBackUpFile = CopyBackupToTempDirectory(myBackUpFile)
 
                             'Restore the temporary DB (Ax00TEM)
-                            If (myDatabaseAdmin.RestoreDatabase(pServerName, GlobalBase.TemporalDBName, pDBLogin, pDBPassword, myBackUpFile)) Then
+                            If (DataBaseManagerDelegate.RestoreDatabase(pServerName, GlobalBase.TemporalDBName, pDBLogin, pDBPassword, myBackUpFile)) Then 'BA-2471: IT 08/05/2015
                                 GlobalBase.CreateLogActivity("Temporal Database restore Success ", "DataBaseUpdateManager.UpdateDatabase", _
                                                                 EventLogEntryType.Information, False)
 
@@ -150,7 +150,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                                     End If
 
                                     'TR 08/07/2013 - After Update Process execute the SHRINK Command (outside the DB Transaction)
-                                    myGlobalDataTO = myDBDatabaseManager.ShrinkDatabase(pDataBaseName, myServer) 'BA-2471: IT 08/05/2015
+                                    myGlobalDataTO = DataBaseManagerDelegate.ShrinkDatabase(pDataBaseName, myServer) 'BA-2471: IT 08/05/2015
                                 End If
                             End If
                         End If
@@ -217,7 +217,9 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' <param name="ServerName">Server name</param>
         ''' <param name="TempDatabaseName">Temporal Database Name.</param>
         ''' <returns></returns>
-        ''' <remarks></remarks>
+        ''' <remarks>
+        ''' Modified by: IT 08/05/2015 - BA-2471
+        ''' </remarks>
         Public Function RemoveBackupFileAndTempDatabase(ByVal TempBackupFile As String, ByVal ServerName As String, _
                                                         ByVal DBLogin As String, ByVal DBPassword As String, _
                                                         ByVal TempDatabaseName As String) As Boolean
@@ -227,8 +229,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 If IO.File.Exists(TempBackupFile) Then
                     IO.File.Delete(TempBackupFile) 'remove temp. backup file.
                 End If
-                Dim myDatabaseAdmin As New DataBaseManagerDelegate()
-                result = myDatabaseAdmin.DeleteDatabase(ServerName, TempDatabaseName, DBLogin, DBPassword) 'remover Temp. Database
+                'Dim myDatabaseAdmin As New DataBaseManagerDelegate()
+                result = DataBaseManagerDelegate.DeleteDatabase(ServerName, TempDatabaseName, DBLogin, DBPassword) 'BA-2471: IT 08/05/2015 
             Catch ex As Exception
                 'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message & " --- " & ex.InnerException.ToString(), _
@@ -245,19 +247,20 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' Modified by: AG 16/01/2013 v1.0.1 - Evaluate if successfully or not and continue business (see update version process design)
         '''              TR 29/01/2013 v1.0.1 - Add the new parameter pLoadingRSAT to indicate if user is loading a RSAT
         '''              SA 16/05/2014 - BT #1632 ==> Before start the update process, execute the temporary script used to change the structure 
-        '''                                           of ApplicationLog table (tfmwApplicationLog)    
+        '''                                           of ApplicationLog table (tfmwApplicationLog) 
+        '''              IT 08/05/2015 - BA-2471   
         ''' </remarks>
         Public Function InstallUpdateProcess(ByVal pServerName As String, ByVal pDataBaseName As String, ByVal DBLogin As String, _
                                              ByVal DBPassword As String, Optional pLoadingRSAT As Boolean = False) As GlobalDataTO
 
             Dim myGlobalDataTO As New GlobalDataTO
-            Dim myDBDatabaseManager As New DataBaseManagerDelegate
+            'Dim myDBDatabaseManager As New DataBaseManagerDelegate
             Dim initialTimeUpdate As New DateTime 'TR Variable used to validate the time 
 
             Try
                 'GlobalBase.CreateLogActivity("InstallUpdateProcess" & ".Updateprocess -Validating if Data Base exists ", "Installation validation", EventLogEntryType.Information, False)
 
-                If myDBDatabaseManager.DataBaseExist(pServerName, pDataBaseName, DBLogin, DBPassword) Then
+                If DataBaseManagerDelegate.DataBaseExist(pServerName, pDataBaseName, DBLogin, DBPassword) Then 'BA-2471: IT 08/05/2015
                     'BT #1632 - Before start the update process, execute temporary scripts used to change the structure of tables that have to 
                     '           be already updated when the UpdateVersion process starts (f.i. ApplicationLog Table --> tfmwApplicationLog)
                     ExecuteScriptsBeforeUpdate()
