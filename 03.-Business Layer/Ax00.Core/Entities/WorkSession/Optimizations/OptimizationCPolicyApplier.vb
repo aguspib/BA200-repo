@@ -97,7 +97,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
                     'Simplication: In this point do not take care about High contamination persistance
                     Dim newContaminatorID As Integer
                     If indexI > 1 Then
-                        newContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+                        newContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions
                                                 Where a.OrderTestID = sortedOTList(indexI - 2) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
 
                         contaminations = GetContaminationBetweenReagents(newContaminatorID, MainContaminatedID, ContaminDS)

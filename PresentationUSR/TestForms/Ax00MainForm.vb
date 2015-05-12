@@ -340,17 +340,6 @@ Public Class Ax00MainForm
 #End Region
 
     Private Sub MITestButtonClick(sender As Object, e As EventArgs) Handles MITestProcess.Click
-        Dim RL As New RangedCollection(Of String)(1, 10)
-        RL.AllowOutOfRange = True
-        For i = RL.Range.minimum To RL.Range.maximum + 100
-            RL.Append("Hola " & i)
-        Next
-        RL(1) = "New value"
-        Debug.WriteLine(RL.Count)
-        RL.RemoveOutOfRangeItems()
-        Debug.WriteLine(RL.Count)
-        For Each S In RL
-            Debug.WriteLine(S)
-        Next
+        LinkLayer.SimulateDataReception("STATUS;R2B2:15;R2B1:11;")
     End Sub
 End Class

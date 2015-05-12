@@ -444,6 +444,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
         End Function
 
+        Public Shared Sub SimulateDataReception(data As String)
+            RaiseEvent ActivateProtocol(GlobalEnumerates.AppLayerEventList.RECEIVE, data)
+        End Sub
+
 #End Region
 
     End Class

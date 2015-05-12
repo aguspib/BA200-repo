@@ -3,6 +3,7 @@ Imports System.Data.SqlClient
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Core.Entities.Worksession.Contaminations
 Imports Biosystems.Ax00.CC
+Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Core.Entities.Worksession.Contaminations.Interfaces
@@ -14,7 +15,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
     Public Class BA200ContaminationsSpecification
         Implements IAnalyzerContaminationsSpecification
 
-
+        Private creationThread As Threading.Thread
         Sub New()
 
             AdditionalPredilutionSteps = SwParametersDelegate.ReadIntValue(Nothing, GlobalEnumerates.SwParameters.PREDILUTION_CYCLES, AnalyzerModel).SetDatos
@@ -24,6 +25,21 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             ContaminationsContextRange = New Range(Of Integer)(-contaminationPersitance, AdditionalPredilutionSteps + contaminationPersitance - 1)
 
             DispensesPerStep = 2    'The analyzer has R1 and R2
+
+            AddHandler LinkLayer.ActivateProtocol, AddressOf Me.RetrieveInstructions
+
+            creationThread = Threading.Thread.CurrentThread
+
+        End Sub
+
+        Private Sub RetrieveInstructions(eventKind As GlobalEnumerates.AppLayerEventList, ByRef data As String)
+            'We want to prevent this event listener from modifing data parameter that is passed ByRef, so we're adding a delegate passed ByValue.
+            ProcessInstructionReceived(eventKind, data)
+        End Sub
+        Private Sub ProcessInstructionReceived(eventKind As GlobalEnumerates.AppLayerEventList, ByVal data As String)
+            If Threading.Thread.CurrentThread IsNot creationThread Then
+                MsgBox("Threading and message received: " & data)
+            End If
         End Sub
 
         Public Property ContaminationsContextRange As Range(Of Integer) Implements IAnalyzerContaminationsSpecification.ContaminationsContextRange
