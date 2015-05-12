@@ -1614,7 +1614,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     contaminationFound = True 'LOW or HIGH contamination found
 
                     'Check if the required wash has been already sent or not
-                    Dim requiredWash As String = "DISTILLED"
+                    Dim requiredWash As String = "EMPTY"
                     If Not auxList(auxList.Count - 1).IsWashSolution1Null Then requiredWash = auxList(auxList.Count - 1).WashSolution1
 
 #If DEBUG Then
@@ -1658,7 +1658,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 contaminationFound = True 'HIGH contamination found
 
                                 'Check if the required wash has been already sent or not
-                                Dim requiredWash As String = "DISTILLED"
+                                Dim requiredWash As String = "EMPTY"
                                 If Not auxList(highIndex).IsWashSolution1Null Then requiredWash = auxList(highIndex).WashSolution1
 
                                 'AG 28/03/2014 - #1563 it is not necessary modify the next line , ExecutionID can not be NULL because the list has been get using Linq where executionType = PREP_STD
