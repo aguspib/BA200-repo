@@ -1004,8 +1004,9 @@ Namespace Biosystems.Ax00.DAL.DAO
                     Dim da As New SqlDataAdapter(dbCmd)
                     Dim DT As New DataTable
                     da.Fill(DT)
+                    'connection.SetDatos.Close()
                     If DT IsNot Nothing AndAlso DT.Rows.Count > 0 Then
-                        Dim result = TryCast(DT.Rows(0).Item(0), String)
+                        Dim result = TryCast(DT.Rows(0).Item(0), String) & ""
                         Return result
                     Else
                         Return ""
@@ -1019,6 +1020,12 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                 'Dim myLogAcciones As New ApplicationLogManager()
                 'GlobalBase.CreateLogActivity(ex.Message, "tparTestSamplesDAO.UpdateNumOfControls", EventLogEntryType.Error, False)
+            Finally
+                If connection.SetDatos IsNot Nothing Then
+                    Try
+                        connection.SetDatos.Close()
+                    Catch : End Try
+                End If
             End Try
 
             Return ""

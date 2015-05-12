@@ -27,7 +27,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
         Protected Property ReagentContaminatedID As Integer
         Protected Property contaminatedOrderTest As Integer
         Protected Property MainContaminatorID As Integer
-        Protected Property contaminations As List(Of ContaminationsDS.tparContaminationsRow)
+        Protected Property contaminations As EnumerableRowCollection(Of ContaminationsDS.tparContaminationsRow)
         Protected Property ContaminDS As ContaminationsDS
         Protected Property HighContaminationPersistence As Integer
         Protected Property contaminatorOrderTest As Integer
@@ -50,7 +50,10 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
             ReagentContaminatedID = -1
             contaminatedOrderTest = -1
             MainContaminatorID = -1
-            contaminations = New List(Of ContaminationsDS.tparContaminationsRow)
+
+            'we create an empty contaminations enumerable:
+            contaminations = (From wse In (New ContaminationsDS).tparContaminations Select wse)
+
             contaminatorOrderTest = -1
             MainContaminatedID = -1
             typeExpectedResult = AnalysisMode.MonoReactive
@@ -271,15 +274,23 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
         ''' <remarks>
         ''' Created by AJG in 17/03/2015
         ''' </remarks>
-        Protected Function GetContaminationBetweenReagents(ByVal Contaminator As Integer, ByVal Contaminated As Integer, ByVal pContaminationsDS As ContaminationsDS) As List(Of ContaminationsDS.tparContaminationsRow)
+        Private Function InternalGetContaminationBetweenReagents(ByVal Contaminator As Integer, ByVal Contaminated As Integer, ByVal pContaminationsDS As ContaminationsDS) As EnumerableRowCollection(Of ContaminationsDS.tparContaminationsRow)
             Dim result = (From wse In pContaminationsDS.tparContaminations _
                                              Where wse.ReagentContaminatorID = Contaminator _
                                              AndAlso wse.ReagentContaminatedID = Contaminated _
-                                             Select wse).ToList()
+                                             Select wse)
 
             Return result
         End Function
 
+        Protected Function AreThereContaminationBetweenReagents(ByVal Contaminator As Integer, ByVal Contaminated As Integer, ByVal pContaminationsDS As ContaminationsDS) As Boolean
+            Return InternalGetContaminationBetweenReagents(Contaminator, Contaminated, pContaminationsDS).Any
+        End Function
+
+        Protected Function GetContaminationBetweenReagents(ByVal Contaminator As Integer, ByVal Contaminated As Integer, ByVal pContaminationsDS As ContaminationsDS) As EnumerableRowCollection(Of ContaminationsDS.tparContaminationsRow)
+            Dim result = InternalGetContaminationBetweenReagents(Contaminator, Contaminated, pContaminationsDS)
+            Return result
+        End Function
         ''' <summary>
         ''' Get the hard contaminations that exist between contaminator and contaminated reagents.
         ''' Hard contaminations are those that requires a washing solution to applied.
@@ -291,12 +302,12 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
         ''' <remarks>
         ''' Created by AJG in 17/03/2015
         ''' </remarks>
-        Protected Function GetHardContaminationBetweenReagents(ByVal Contaminator As Integer, ByVal Contaminated As Integer, ByVal pContaminationsDS As ContaminationsDS) As List(Of ContaminationsDS.tparContaminationsRow)
+        Protected Function GetHardContaminationBetweenReagents(ByVal Contaminator As Integer, ByVal Contaminated As Integer, ByVal pContaminationsDS As ContaminationsDS) As EnumerableRowCollection(Of ContaminationsDS.tparContaminationsRow)
             Dim result = (From wse In pContaminationsDS.tparContaminations _
                                              Where wse.ReagentContaminatorID = Contaminator _
                                              AndAlso wse.ReagentContaminatedID = Contaminated _
                                              AndAlso Not wse.IsWashingSolutionR1Null _
-                                             Select wse).ToList()
+                                             Select wse)
 
             Return result
         End Function
@@ -327,7 +338,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
                 Dim ReagentContaminatorID = pPreviousReagentID(pPreviousReagentID.Count - 1) 'Last Reagent in previous element group (reverse order)
                 Dim ReagentContaminatedID As Integer = -1
                 Dim myExecLinqByOT As List(Of ExecutionsDS.twksWSExecutionsRow)
-                Dim contaminations As List(Of ContaminationsDS.tparContaminationsRow) = Nothing
+                Dim contaminations As EnumerableRowCollection(Of ContaminationsDS.tparContaminationsRow) = Nothing
 
                 If myOTListLinq.Count > 1 Then
                     Dim itera As Integer = 0

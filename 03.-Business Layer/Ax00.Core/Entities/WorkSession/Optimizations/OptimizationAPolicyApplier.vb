@@ -43,7 +43,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
 
                 'If no contamination between the consecutive tests look for high contamin: [If (i-2) contaminates (i)]
                 'Only if ordertest(i-1) maxreplicates < hihgcontamination persistance
-                If contaminations.Count = 0 Then
+                If Not contaminations.Any Then
                     Dim maxReplicates As Integer = 1
                     maxReplicates = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
                                      Where a.OrderTestID = sortedOTList(auxIndex - 1) Select a.ReplicateNumber).Max
@@ -62,7 +62,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
                 SetExpectedTypeReagent()
 
                 'OrderTest(i-1) (the MainContaminatorID) contaminates OrderTest(i) ... so try move OrderTes(i) down until becomes no contaminated
-                If contaminations.Count > 0 Then
+                If contaminations.Any Then
 
                     'Move the contaminated reagent where not contaminated is (taking care about HIGH contaminations persistance inside the Element group OrderTests)
                     'Evaluate if it is a LOW contamination ... next process starts in index: i + 1
@@ -112,7 +112,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
                 'Move the contaminated where it is not contaminated (taking care about HIGH contaminations persistance inside the Element group OrderTests)
                 Execute_jj_loop(pExecutions, aux_j, aux_j, (aux_j - limit))
 
-                If contaminations.Count = 0 AndAlso ReagentAnalysisModesAreCompatible() Then
+                If Not contaminations.Any AndAlso ReagentAnalysisModesAreCompatible() Then
                     'Move orderTest(i) (the contaminated one) after orderTest(j) (where orderTest(i) is not contaminated)
 
                     'New BAx00 (Ax5 do not implement this business
@@ -129,7 +129,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
 
                     'Before move OrderTest(i) (the Contaminated one, and future OrderTest(j+1)) also be carefull does not contaminates the current OrderTest(j+1) (the future OrderTest(j+2)
                     'Simplication: In this point do not take care about High contamination persistance
-                    If contaminations.Count = 0 AndAlso ReagentAnalysisModesAreCompatible() Then
+                    If Not contaminations.Any AndAlso ReagentAnalysisModesAreCompatible() Then
                         If aux_j < sortedOTList.Count - 1 Then
                             newContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
                                                                Where a.OrderTestID = sortedOTList(aux_j + 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
@@ -138,7 +138,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
                     End If
 
 
-                    If contaminations.Count = 0 AndAlso ReagentAnalysisModesAreCompatible() Then
+                    If Not contaminations.Any AndAlso ReagentAnalysisModesAreCompatible() Then
                         '(i < j)
                         If sortedOTList.Count - 1 > aux_j Then
                             sortedOTList.Insert(aux_j + 1, contaminatedOrderTest)
@@ -174,7 +174,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
                         contaminations = GetHardContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, ContaminDS)
                     End If
 
-                    If contaminations.Count > 0 Then Exit For
+                    If contaminations.Any Then Exit For
 
                     If Not ReagentAnalysisModesAreCompatible() Then Exit For
 

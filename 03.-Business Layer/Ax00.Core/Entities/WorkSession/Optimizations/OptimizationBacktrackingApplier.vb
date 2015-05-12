@@ -128,85 +128,41 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
             ' - the last pHighContaminationPersistence reagents and the newly inserted
             ' - if the newly is bi-reactive, check if there's contamination between it and the previous bi-reactive
 
-            'MIC Testing
+            Dim context = New ContaminationsContext(ContaminationsSpecification)
+            context.FillContextInStatic(pExecutions)
+            Dim washingsList = context.GetWashingRequiredForAGivenDispensing(context.Steps(0).Dispensing(1))    'Steps(0) is current step (not before, neither after)
 
-            Dim cont = New ContaminationsContext(ContaminationsSpecification)
-            cont.FillContextInStatic(pExecutions)
-            Dim washingsList = cont.GetWashingRequiredForAGivenDispensing(cont.Steps(0)(1))
-            If washingsList.Count > 0 Then
-                For Each W In washingsList
-                    Debug.WriteLine("Not empty! We need a washing of kind: " & W.WashingSolutionID & " and there's a persistance clash of " & W.WashingStrength)
-                Next
-            End If
-            '/MIC
+            Dim contam = washingsList.Count
 
-            Dim contamNumber As Integer = 0
-            Dim previousReagent = pExecutions.Count - 2
             Dim currentReagent = pExecutions.Count - 1
             Dim contaminatorType As AnalysisMode
 
-            If previousReagent >= 0 AndAlso currentReagent >= 0 Then
-                Dim contam = (From wse In ContaminDS.tparContaminations _
-                                          Where wse.ReagentContaminatorID = pExecutions(previousReagent).ReagentID _
-                                            AndAlso wse.ReagentContaminatedID = pExecutions(currentReagent).ReagentID _
-                                            AndAlso pExecutions(currentReagent).ExecutionStatus = "PENDING" _
-                                            AndAlso pExecutions(currentReagent).ExecutionType = "PREP_STD" _
-                                            AndAlso pExecutions(previousReagent).ExecutionStatus = "PENDING" _
-                                            AndAlso pExecutions(previousReagent).ExecutionType = "PREP_STD" _
-                                          Select wse).ToList()
+            If contam = 0 Then
 
-                If contam.Count = 0 Then
-                    contaminatorType = ContaminationsSpecification.GetAnalysisModeForReagent(pExecutions(currentReagent).ReagentID)  'GetAnalysisModeInTest(dbConnection, pExecutions(currentReagent).ReagentID)
-                    If contaminatorType = AnalysisMode.BiReactive Then
-                        If lastBireactiveID.Count > 0 Then
-                            contam = GetContaminationBetweenReagents(lastBireactiveID.Item(lastBireactiveID.Count - 1), pExecutions(currentReagent).ReagentID, ContaminDS)
-                        End If
-                        If contam.Count = 0 Then
-                            lastBireactiveID.Add(pExecutions(currentReagent).ReagentID)
-                        End If
-                    End If
-                End If
-
-                If contam.Count > 0 Then
-                    contamNumber += 1
-                ElseIf pHighContaminationPersistance > 0 Then
-                    For j = previousReagent To previousReagent - pHighContaminationPersistance Step -1
-                        Dim auxj = j
-                        If (j >= 0) Then
-                            contam = (From wse In ContaminDS.tparContaminations _
-                                                  Where wse.ReagentContaminatorID = pExecutions(auxj).ReagentID _
-                                                  AndAlso wse.ReagentContaminatedID = pExecutions(currentReagent).ReagentID _
-                                                  AndAlso Not wse.IsWashingSolutionR1Null _
-                                                  AndAlso pExecutions(auxj).ExecutionStatus = "PENDING" _
-                                                  AndAlso pExecutions(auxj).ExecutionType = "PREP_STD" _
-                                                  AndAlso pExecutions(currentReagent).ExecutionStatus = "PENDING" _
-                                                  AndAlso pExecutions(currentReagent).ExecutionType = "PREP_STD" _
-                                                  Select wse).ToList()
-
-                            If contam.Count > 0 Then
-                                contamNumber += 1
-                            End If
-                        End If
-                    Next
-                    If contam.Count = 0 AndAlso contaminatorType = AnalysisMode.BiReactive Then
-                        For j = lastBireactiveID.Count - 1 To lastBireactiveID.Count - (1 + pHighContaminationPersistance) Step -1
-                            If (j >= 0) Then
-                                contam = GetHardContaminationBetweenReagents(lastBireactiveID.Item(j), pExecutions(currentReagent).ReagentID, ContaminDS)
-                                If contam.Count > 0 Then
-                                    contamNumber += 1
-                                End If
-                            End If
-                        Next
-                    End If
-                End If
-            Else
-                contaminatorType = ContaminationsSpecification.GetAnalysisModeForReagent(pExecutions(currentReagent).ReagentID) 'GetAnalysisModeInTest(dbConnection, pExecutions(currentReagent).ReagentID)
+                contaminatorType = ContaminationsSpecification.GetAnalysisModeForReagent(pExecutions(currentReagent).ReagentID)  'GetAnalysisModeInTest(dbConnection, pExecutions(currentReagent).ReagentID)
                 If contaminatorType = AnalysisMode.BiReactive Then
-                    lastBireactiveID.Add(pExecutions(currentReagent).ReagentID)
+                    If lastBireactiveID.Count > 0 Then
+                        contam = GetContaminationBetweenReagents(lastBireactiveID.Item(lastBireactiveID.Count - 1), pExecutions(currentReagent).ReagentID, ContaminDS).Count
+                    End If
+                    If contam = 0 Then
+                        lastBireactiveID.Add(pExecutions(currentReagent).ReagentID)
+                    End If
                 End If
             End If
+            If contam = 0 AndAlso contaminatorType = AnalysisMode.BiReactive Then
+                For j = lastBireactiveID.Count - 1 To lastBireactiveID.Count - (1 + pHighContaminationPersistance) Step -1
+                    If (j >= 0) Then
+                        contam = GetHardContaminationBetweenReagents(lastBireactiveID.Item(j), pExecutions(currentReagent).ReagentID, ContaminDS).Count
+                        If contam > 0 Then
+                            contam += 1
+                        End If
+                    End If
+                Next
+            End If
 
-            Return contamNumber
+            Return contam
+
+            
         End Function
     End Class
 End Namespace

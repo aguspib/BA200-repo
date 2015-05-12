@@ -135,6 +135,8 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
         Sub FillContextInStatic(executionsList As List(Of ExecutionsDS.twksWSExecutionsRow))
             'We fill all Steps and ContexttStep collections with data:
+            Dim maxIndex = executionsList.Count - 1
+
             For j As Integer = Me.Steps.Range.Minimum To Me.Steps.Range.Maximum ' Each S In Steps
                 If Steps(j) Is Nothing Then Steps(j) = New ContextStep(ContaminationsSpecifications.DispensesPerStep)
                 For i As Integer = 1 To ContaminationsSpecifications.DispensesPerStep
@@ -146,8 +148,8 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
                 Const curDispense = 1 'We only fill R1 in static mode!
                 Dim dispense = Steps(curStep)(curDispense)
                 If dispense Is Nothing Then Continue For
-                'Dim table = expectedExecutions.twksWSExecutions
-                Dim maxIndex = executionsList.Count - 1
+
+                'All "before" curStep indexes are negative, so it simplifies calculation. Add them to maxiumum and get proper "before" index.
                 Dim curIndex = maxIndex + curStep
                 If curIndex >= 0 AndAlso curIndex <= maxIndex Then
                     Dim row = executionsList(curIndex)
@@ -156,6 +158,10 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             Next
 
         End Sub
+
+
+
+
 
 #Region "Private elements"
         Dim AnalyzerFrame As LAx00Frame
