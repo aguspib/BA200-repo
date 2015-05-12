@@ -112,7 +112,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
                 'Move the contaminated where it is not contaminated (taking care about HIGH contaminations persistance inside the Element group OrderTests)
                 Execute_jj_loop(pExecutions, aux_j, aux_j, (aux_j - limit))
 
-                If Not contaminations.Any AndAlso ReagentAnalysisModesAreCompatible() Then
+                If (Not contaminations.Any) AndAlso ReagentAnalysisModesAreCompatible() Then
                     'Move orderTest(i) (the contaminated one) after orderTest(j) (where orderTest(i) is not contaminated)
 
                     'New BAx00 (Ax5 do not implement this business
@@ -129,7 +129,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
 
                     'Before move OrderTest(i) (the Contaminated one, and future OrderTest(j+1)) also be carefull does not contaminates the current OrderTest(j+1) (the future OrderTest(j+2)
                     'Simplication: In this point do not take care about High contamination persistance
-                    If Not contaminations.Any AndAlso ReagentAnalysisModesAreCompatible() Then
+                    If (Not contaminations.Any) AndAlso ReagentAnalysisModesAreCompatible() Then
                         If aux_j < sortedOTList.Count - 1 Then
                             newContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
                                                                Where a.OrderTestID = sortedOTList(aux_j + 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
@@ -138,7 +138,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
                     End If
 
 
-                    If Not contaminations.Any AndAlso ReagentAnalysisModesAreCompatible() Then
+                    If (Not contaminations.Any) AndAlso ReagentAnalysisModesAreCompatible() Then
                         '(i < j)
                         If sortedOTList.Count - 1 > aux_j Then
                             sortedOTList.Insert(aux_j + 1, contaminatedOrderTest)

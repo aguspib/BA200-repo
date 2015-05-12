@@ -64,7 +64,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
                 ' SetExpectedTypeReagent()
 
                 'OrderTest(i-1) contaminates OrderTest(i) ... so try move OrderTes(i-1) down until it does not contaminates
-                If Not contaminations.Any Then
+                If contaminations.Any Then
                     Execute_j_loop(pExecutions, aux_i, (aux_i + 1), sortedOTList.Count - 1)
 
                 Else
