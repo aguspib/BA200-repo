@@ -7,7 +7,7 @@ Imports Biosystems.Ax00.BL.Framework
 Imports System.IO
 Imports System.Drawing 'SG 03/12/10
 Imports System.Windows.Forms 'SG 03/12/10
-Imports Biosystems.Ax00.Framework.App
+Imports Biosystems.Ax00.App
 Imports Biosystems.Ax00.Framework.CrossCutting
 Imports Biosystems.Ax00.Types
 

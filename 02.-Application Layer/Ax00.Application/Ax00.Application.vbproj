@@ -103,6 +103,7 @@
     <Compile Include="PersentationLayerListener\Requests\PresentationRequest.vb" />
     <Compile Include="PersentationLayerListener\Requests\YesNoCancelQuestion.vb" />
     <Compile Include="PersentationLayerListener\Requests\YesNoQuestion.vb" />
+    <Compile Include="UpdaterController.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">
@@ -156,6 +157,10 @@
     <ProjectReference Include="..\..\Calculations\Calculations.vbproj">
       <Project>{053cffd3-17b1-4a95-af8c-ff4b6de08809}</Project>
       <Name>Calculations</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\UpdateVersion\UpdateVersion.vbproj">
+      <Project>{fbbae46c-213f-4ca1-ad81-b088480494ea}</Project>
+      <Name>UpdateVersion</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />

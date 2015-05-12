@@ -164,9 +164,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\bax00framework\03.-Business Layer\Ax00.Framework.Core\Ax00.Framework.Core.vbproj">
-      <Project>{dc90b322-5a1d-4e45-943f-a76447ad0016}</Project>
-      <Name>Ax00.Framework.Core</Name>
+    <ProjectReference Include="..\03.-Business Layer\Ax00.Core\Ax00.Core.vbproj">
+      <Project>{bd38761f-269a-428a-a15e-9d40b387f992}</Project>
+      <Name>Ax00.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />

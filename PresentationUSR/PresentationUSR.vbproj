@@ -1004,14 +1004,6 @@
       <Project>{19114cc5-ba39-4d35-89fa-41d9efb7a931}</Project>
       <Name>AX00Types</Name>
     </ProjectReference>
-    <ProjectReference Include="..\bax00framework\BussinessLayer\Framework\Framework.vbproj">
-      <Project>{1ac4dd1b-6f3c-471b-bc6b-85bd572298e5}</Project>
-      <Name>Framework %28Common BAx00.Framework\Framework%29</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\bax00framework\DataAccessLayer\DataAccessLayer.vbproj">
-      <Project>{8e6095bf-d5cf-4840-81d6-1a700dcdb43d}</Project>
-      <Name>DataAccessLayer %28Common BAx00.Framework\DataAccessLayer%29</Name>
-    </ProjectReference>
     <ProjectReference Include="..\bax00framework\Global\Global.vbproj">
       <Project>{5d65020c-c2d7-4ac3-b557-223fc290e526}</Project>
       <Name>Global</Name>

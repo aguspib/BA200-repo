@@ -184,6 +184,7 @@
     <Compile Include="History\thisCalibISEDAO.vb" />
     <Compile Include="History\thisISETestSamplesDAO.vb" />
     <Compile Include="History\thisPatientsDAO.vb" />
+    <Compile Include="tfmwVersionsDAO.vb" />
     <Compile Include="tfmwXmlMessagesDAO.vb" />
     <Compile Include="tinfoISEDAO.vb" />
     <Compile Include="twksOrderTestsLISInfoDAO.vb" />

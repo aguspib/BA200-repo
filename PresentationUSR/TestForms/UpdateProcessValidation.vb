@@ -3,9 +3,8 @@ Option Explicit On
 Option Infer On
 
 Imports System.IO
+Imports Biosystems.Ax00.App
 Imports Biosystems.Ax00.BL
-Imports Biosystems.Ax00.DAL
-Imports Biosystems.Ax00.Framework.App
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 

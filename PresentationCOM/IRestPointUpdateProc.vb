@@ -7,10 +7,8 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.BL.Framework
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Global.TO
-Imports System.Drawing
 Imports System.Windows.Forms
 Imports Biosystems.Ax00.App
-Imports Biosystems.Ax00.Framework.App
 Imports Biosystems.Ax00.Framework.CrossCutting
 
 

@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{BD38761F-269A-428A-A15E-9D40B387F992}</ProjectGuid>
+    <ProjectGuid>{FBBAE46C-213F-4CA1-AD81-B088480494EA}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>
     </RootNamespace>
-    <AssemblyName>Biosystems.Ax00.Core</AssemblyName>
+    <AssemblyName>UpdateVersion</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>Windows</MyType>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
@@ -19,11 +19,11 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\Debug\</OutputPath>
-    <DocumentationFile>Biosystems.Ax00.Core.xml</DocumentationFile>
+    <DocumentationFile>UpdateVersion.xml</DocumentationFile>
     <NoWarn>
     </NoWarn>
-    <PlatformTarget>x86</PlatformTarget>
     <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -31,11 +31,10 @@
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DocumentationFile>Biosystems.Ax00.Core.xml</DocumentationFile>
+    <DocumentationFile>UpdateVersion.xml</DocumentationFile>
     <NoWarn>
     </NoWarn>
     <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
-    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup>
     <OptionExplicit>On</OptionExplicit>
@@ -49,39 +48,18 @@
   <PropertyGroup>
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
-    <DebugSymbols>true</DebugSymbols>
-    <DefineDebug>true</DefineDebug>
-    <DefineTrace>true</DefineTrace>
-    <OutputPath>bin\x86\Debug\</OutputPath>
-    <DocumentationFile>Biosystems.Ax00.Core.xml</DocumentationFile>
-    <NoWarn>
-    </NoWarn>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <DefineTrace>true</DefineTrace>
-    <OutputPath>bin\x86\Release\</OutputPath>
-    <DocumentationFile>Biosystems.Ax00.Core.xml</DocumentationFile>
-    <Optimize>true</Optimize>
-    <NoWarn>
-    </NoWarn>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.SqlServer.ConnectionInfo, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\bax00framework\Third Party\Required Libraries\SqlServer2008R2\Microsoft.SqlServer.ConnectionInfo.dll</HintPath>
+      <HintPath>..\bax00framework\Third Party\Required Libraries\SqlServer2008R2\Microsoft.SqlServer.ConnectionInfo.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.SqlServer.Smo, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\bax00framework\Third Party\Required Libraries\SqlServer2008R2\Microsoft.SqlServer.Smo.dll</HintPath>
+      <HintPath>..\bax00framework\Third Party\Required Libraries\SqlServer2008R2\Microsoft.SqlServer.Smo.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.SqlServer.SmoExtended, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bax00framework\Third Party\Required Libraries\SqlServer2008R2\Microsoft.SqlServer.SmoExtended.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -103,21 +81,14 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Services\AsyncService.vb" />
-    <Compile Include="Services\Enums\BaseLineStepsEnum.vb" />
-    <Compile Include="Services\Interfaces\IBaseLineService.vb" />
-    <Compile Include="Services\Interfaces\IRotorChangeService.vb" />
-    <Compile Include="Services\Interfaces\IWarmUpService.vb" />
-    <Compile Include="Services\Enums\RotorChangeStepsEnum.vb" />
-    <Compile Include="Services\WarmUpService.vb" />
-    <Compile Include="Services\BaseLineService.vb" />
-    <Compile Include="Services\Enums\StringStepStatus.vb" />
-    <Compile Include="Services\Interfaces\IServiceStatusCallback.vb" />
-    <Compile Include="Services\RotorChangeService.vb" />
-    <Compile Include="Services\ServiceStatusCallback.vb" />
-    <Compile Include="Services\Enums\ServiceStatusEnum.vb" />
-    <Compile Include="Services\Interfaces\IAsyncService.vb" />
-    <Compile Include="Services\Enums\WarmUpStepsEnum.vb" />
+    <Compile Include="CalculatedTestUpdateData.vb" />
+    <Compile Include="CalibratorUpdateData.vb" />
+    <Compile Include="ContaminationsUpdateData.vb" />
+    <Compile Include="DatabaseManagerDelegate\DataBaseInstallerManagerDelegate.vb" />
+    <Compile Include="DatabaseManagerDelegate\DataBaseManagerDelegate.vb" />
+    <Compile Include="DatabaseManagerDelegate\DataBaseUpdateManagerDelegate.vb" />
+    <Compile Include="ISEInformationUpdateData.vb" />
+    <Compile Include="ISETestUpdateData.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -133,12 +104,10 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Entities\UpdateVersion\CommonRevision.vb" />
-    <Compile Include="Entities\UpdateVersion\DatabaseUpdatesManager.vb" />
-    <Compile Include="Entities\UpdateVersion\DataRevision.vb" />
-    <Compile Include="Entities\UpdateVersion\ExecutionResults.vb" />
-    <Compile Include="Entities\UpdateVersion\Release.vb" />
-    <Compile Include="Entities\UpdateVersion\Revision.vb" />
+    <Compile Include="OffSystemTestUpdateData.vb" />
+    <Compile Include="TestParametersUpdateData.vb" />
+    <Compile Include="UpdateElementParent.vb" />
+    <Compile Include="UpdatePreloadedFactoryTestDelegate.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">
@@ -158,47 +127,45 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Analyzer\Analyzer.vbproj">
-      <Project>{bd816d19-6903-4603-8a75-a14c099d4eb2}</Project>
-      <Name>Analyzer</Name>
+    <ProjectReference Include="..\03.-Business Layer\Ax00.Core\Ax00.Core.vbproj">
+      <Project>{bd38761f-269a-428a-a15e-9d40b387f992}</Project>
+      <Name>Ax00.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\bax00framework\AX00Types\AX00Types.vbproj">
+    <ProjectReference Include="..\bax00framework\05.-Cross Cutting Layer\Ax00.Framework.CrossCutting\Ax00.Framework.CrossCutting.vbproj">
+      <Project>{d880e48a-3a14-4916-a60b-45b8251fe010}</Project>
+      <Name>Ax00.Framework.CrossCutting</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\bax00framework\AX00Types\AX00Types.vbproj">
       <Project>{19114cc5-ba39-4d35-89fa-41d9efb7a931}</Project>
       <Name>AX00Types</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\bax00framework\Global\Global.vbproj">
+    <ProjectReference Include="..\bax00framework\Global\Global.vbproj">
       <Project>{5d65020c-c2d7-4ac3-b557-223fc290e526}</Project>
       <Name>Global</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\BussinessLayer\ConfigurationSetup\ConfigurationSetup.vbproj">
+    <ProjectReference Include="..\bax00framework\ParameterPrograming\ParametersPrograming.vbproj">
+      <Project>{3aaf43d5-55d8-4a0b-9fd3-e8841008e13e}</Project>
+      <Name>ParametersPrograming</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BussinessLayer\ConfigurationSetup\ConfigurationSetup.vbproj">
       <Project>{bc01c1bd-2a93-4002-b74f-7bcf9793309d}</Project>
       <Name>ConfigurationSetup</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\BussinessLayer\Framework\Framework.vbproj">
+    <ProjectReference Include="..\BussinessLayer\Framework\Framework.vbproj">
       <Project>{806a1f2f-07c1-43d2-af67-59accf4b5754}</Project>
-      <Name>Framework</Name>
+      <Name>Framework %28Ax00\Framework%29</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Calculations\Calculations.vbproj">
-      <Project>{053cffd3-17b1-4a95-af8c-ff4b6de08809}</Project>
-      <Name>Calculations</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\DataAccessLayer\DataAccessLayer.vbproj">
+    <ProjectReference Include="..\DataAccessLayer\DataAccessLayer.vbproj">
       <Project>{51863cf3-a3e9-4e41-8924-c69704796fb9}</Project>
-      <Name>DataAccessLayer</Name>
+      <Name>DataAccessLayer %28Ax00\DataAccessLayer%29</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\InfoAnalyzer\InfoAnalyzer.vbproj">
-      <Project>{6471ee6c-c00c-4db6-881c-bfca99aba928}</Project>
-      <Name>InfoAnalyzer</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\WorkSession\WorkSession.vbproj">
+    <ProjectReference Include="..\WorkSession\WorkSession.vbproj">
       <Project>{a883608a-3d41-4339-9c2f-feea18befb68}</Project>
       <Name>WorkSession</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

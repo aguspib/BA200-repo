@@ -162,6 +162,7 @@
     <Compile Include="SwFlagsDelegate.vb" />
     <Compile Include="SwParametersDelegate.vb" />
     <Compile Include="UsersLevelDelegate.vb" />
+    <Compile Include="VersionsDelegate.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">

@@ -13,7 +13,6 @@ Imports Biosystems.Ax00.PresentationCOM
 Imports Biosystems.Ax00.Global.TO
 Imports LIS.Biosystems.Ax00.LISCommunications   ' XB 07/05/2013
 Imports Biosystems.Ax00.App
-Imports Biosystems.Ax00.Framework.App
 Imports Biosystems.Ax00.Framework.CrossCutting
 
 Public Class UiSATReportLoad
