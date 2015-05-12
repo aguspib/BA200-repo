@@ -1371,9 +1371,13 @@ Namespace Biosystems.Ax00.Core.Entities
                                 'CHANGE RULE: When a new TEST is sent remove all previous Wash sent (reagents or cuvettes)
                                 'The old was wrong and also the index used where wrong!!! - (Now, I think it has no sense)
 
+                                'AJG. Leave ReagentWashFlag as part of the persistance.
                                 '2on NEW RULE: When send a new PREP_STD clear all previous wash
+                                'resLinq = (From a As AnalyzerManagerDS.sentPreparationsRow In mySentPreparationsDS.sentPreparations _
+                                '           Where a.ReagentWashFlag = True Or a.CuvetteWashFlag = True _
+                                '           Select a).ToList
                                 resLinq = (From a As AnalyzerManagerDS.sentPreparationsRow In mySentPreparationsDS.sentPreparations _
-                                           Where a.ReagentWashFlag = True Or a.CuvetteWashFlag = True _
+                                           Where a.CuvetteWashFlag = True _
                                            Select a).ToList
                                 If resLinq.Count > 0 Then '(6.2) 
                                     For i As Integer = resLinq.Count - 1 To 0 Step -1
@@ -1602,12 +1606,20 @@ Namespace Biosystems.Ax00.Core.Entities
                                         AndAlso wse.ReagentContaminatedID = ReagentID _
                                         Select wse).ToList()
 
+#If DEBUG Then
+                Debug.Print(String.Format("SearchContaminationBetweenPreviousAndFirstToSend: Previous = {0}; Current = {1} \n", auxList(auxList.Count - 1).ReagentID, ReagentID))
+#End If
+
                 If contaminations.Any() Then '(4)
                     contaminationFound = True 'LOW or HIGH contamination found
 
                     'Check if the required wash has been already sent or not
-                    Dim requiredWash As String = ""
+                    Dim requiredWash As String = "EMPTY"
                     If Not auxList(auxList.Count - 1).IsWashSolution1Null Then requiredWash = auxList(auxList.Count - 1).WashSolution1
+
+#If DEBUG Then
+                    Debug.Print(String.Format("ContaminationsFound, and requiredWash = {0} \n", requiredWash))
+#End If
 
                     Dim previousExecutionsIDSent As Integer = auxList(auxList.Count - 1).ExecutionID
 
@@ -1621,6 +1633,15 @@ Namespace Biosystems.Ax00.Core.Entities
                             Exit For
                         End If
                     Next
+
+#If DEBUG Then
+                    If contaminationFound Then
+                        Debug.Print(String.Format("Low contamination found. \n", requiredWash))
+                    Else
+                        Debug.Print(String.Format("Low contamination removed. \n", requiredWash))
+                    End If
+#End If
+
 
                 ElseIf pHighContaminationPersitance > 0 Then '(4)
                     '1.2) If no LOW contamination exists between the last reagent used and next take care about the previous due the high contamination
@@ -1637,7 +1658,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 contaminationFound = True 'HIGH contamination found
 
                                 'Check if the required wash has been already sent or not
-                                Dim requiredWash As String = ""
+                                Dim requiredWash As String = "EMPTY"
                                 If Not auxList(highIndex).IsWashSolution1Null Then requiredWash = auxList(highIndex).WashSolution1
 
                                 'AG 28/03/2014 - #1563 it is not necessary modify the next line , ExecutionID can not be NULL because the list has been get using Linq where executionType = PREP_STD
