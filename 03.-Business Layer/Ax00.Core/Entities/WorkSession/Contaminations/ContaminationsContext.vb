@@ -1,7 +1,9 @@
-﻿Imports Biosystems.Ax00.CC
+﻿Imports System.Data.Common
+Imports Biosystems.Ax00.CC
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Interfaces
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Interfaces
 Imports Biosystems.Ax00.Core.Interfaces
+Imports Biosystems.Ax00.DAL.DAO
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Types.ExecutionsDS
 
@@ -9,40 +11,44 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
     Public Class ContaminationsContext
 
         Public ReadOnly Steps As RangedCollection(Of ContextStep)
-        Public ReadOnly AnalyzerContaminationsDescriptor As IAnalyzerContaminationsSpecification
+        Public ReadOnly ContaminationsSpecifications As IAnalyzerContaminationsSpecification
 
-        Sub New(analyzerContaminationsDescriptor As IAnalyzerContaminationsSpecification)
+        Sub New(contaminationsSpecifications As IAnalyzerContaminationsSpecification)
 
-            Me.AnalyzerContaminationsDescriptor = analyzerContaminationsDescriptor
-            Dim range = analyzerContaminationsDescriptor.ContaminationsContextRange
+            Me.ContaminationsSpecifications = contaminationsSpecifications
+            Dim range = contaminationsSpecifications.ContaminationsContextRange
 
             Steps = New RangedCollection(Of ContextStep)(range)
 
             Steps.AllowOutOfRange = False
             For i = range.Minimum To range.Maximum
-                Steps.Append(New ContextStep(analyzerContaminationsDescriptor.DispensesPerStep)) 'Cantidad máxima de reactivos que se pueden dispensar por ciclo
+                Steps.Append(New ContextStep(contaminationsSpecifications.DispensesPerStep)) 'Cantidad máxima de reactivos que se pueden dispensar por ciclo
             Next
 
         End Sub
 
-        Function GetWashingRequiredForAGivenDispensing(dispensing As IReagentDispensing) As WashingDescription
+        Function GetWashingRequiredForAGivenDispensing(dispensing As IReagentDispensing) As List(Of IWashingDescription)
 
-            Dim result As IWashingDescription = New EmptyWashing, requiredWashingPower = 0
+            Dim lookUpFilter As New HashSet(Of String)
+            Dim results As New List(Of IWashingDescription)
 
             For curStep = Steps.Range.Minimum To Steps.Range.Maximum
                 If Steps(curStep) Is Nothing Then Continue For
-                For curDispensing = 1 To AnalyzerContaminationsDescriptor.DispensesPerStep
+                For curDispensing = 1 To ContaminationsSpecifications.DispensesPerStep
 
+                    If curDispensing > 1 Then Exit For
                     If Steps(curStep)(curDispensing) Is Nothing Then Continue For
                     Dim dispensingToAsk = Steps(curStep)(curDispensing)
                     Dim requiredWashing = dispensingToAsk.RequiredWashingSolution(dispensing, curStep)
-                    requiredWashingPower += requiredWashing.WashingStrength
-                    If result.WashingStrength < requiredWashing.WashingStrength Then result = requiredWashing
+                    If requiredWashing.WashingStrength > 0 AndAlso lookUpFilter.Contains(requiredWashing.WashingSolutionID) = False Then
+                        lookUpFilter.Add(requiredWashing.WashingSolutionID)
+                        results.Add(requiredWashing)
+                    End If
 
                 Next
             Next
 
-            If requiredWashingPower = 0 Then Return New EmptyWashing Else Return New WashingDescription(requiredWashingPower, result.WashingSolutionID)
+            Return results
 
         End Function
 
@@ -99,7 +105,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
         Sub FillContextInRunning(executions As ExecutionsDS)
             For curStep = Steps.Range.Minimum To Steps.Range.Maximum
-                For curDispense = 1 To AnalyzerContaminationsDescriptor.DispensesPerStep
+                For curDispense = 1 To ContaminationsSpecifications.DispensesPerStep
 
                     Dim dispensing = Steps(curStep)(curDispense)
                     Dim rows = executions.twksWSExecutions.Where(Function(element As twksWSExecutionsRow) element.ExecutionID = dispensing.ExecutionID)
@@ -120,11 +126,21 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
         ''' <param name="expectedExecutions"></param>
         ''' <remarks></remarks>
         Sub FillContextInStatic(expectedExecutions As ExecutionsDS)
+            Dim Lista As New List(Of ExecutionsDS.twksWSExecutionsRow)
+            For Each item In expectedExecutions.twksWSExecutions
+                Lista.Add(item)
+            Next
+            FillContextInStatic(Lista)
+        End Sub
+
+        Sub FillContextInStatic(executionsList As List(Of ExecutionsDS.twksWSExecutionsRow))
             'We fill all Steps and ContexttStep collections with data:
+            Dim maxIndex = executionsList.Count - 1
+
             For j As Integer = Me.Steps.Range.Minimum To Me.Steps.Range.Maximum ' Each S In Steps
-                If Steps(j) Is Nothing Then Steps(j) = New ContextStep(AnalyzerContaminationsDescriptor.DispensesPerStep)
-                For i As Integer = 1 To AnalyzerContaminationsDescriptor.DispensesPerStep
-                    If Steps(j)(i) Is Nothing Then Steps(j)(i) = (AnalyzerContaminationsDescriptor.CreateDispensing())
+                If Steps(j) Is Nothing Then Steps(j) = New ContextStep(ContaminationsSpecifications.DispensesPerStep)
+                For i As Integer = 1 To ContaminationsSpecifications.DispensesPerStep
+                    If Steps(j)(i) Is Nothing Then Steps(j)(i) = (ContaminationsSpecifications.CreateDispensing())
                 Next
             Next
             'We update the already filled data:
@@ -132,31 +148,20 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
                 Const curDispense = 1 'We only fill R1 in static mode!
                 Dim dispense = Steps(curStep)(curDispense)
                 If dispense Is Nothing Then Continue For
-                Dim table = expectedExecutions.twksWSExecutions
-                Dim maxIndex = table.Count - 1
-                Dim curIndex = maxIndex + curStep
-                If curIndex <= maxIndex Then
-                    Dim row = table(curIndex)
-                    dispense.R1ReagentID = row.ReagentID
-                    'row.PostDilutionType
-                    'row.SampleClass
-                    'row.SampleType
 
-                    If row.IsExecutionTypeNull = False Then
-                        Select Case row.ExecutionType
-                            Case "PREP_STD", "", Nothing
-                                dispense.IsISE = False
-                            Case "PREP_ISE"
-                                dispense.IsISE = True
-                            Case Else
-#If config = "debug" Then
-                            Throw New Exception("Found preparation with unknown execution type: """ & row.executiontype & """. Happy debugging!")
-#End If
-                        End Select
-                    End If
+                'All "before" curStep indexes are negative, so it simplifies calculation. Add them to maxiumum and get proper "before" index.
+                Dim curIndex = maxIndex + curStep
+                If curIndex >= 0 AndAlso curIndex <= maxIndex Then
+                    Dim row = executionsList(curIndex)
+                    dispense.FillDispense(ContaminationsSpecifications, row)
                 End If
             Next
+
         End Sub
+
+
+
+
 
 #Region "Private elements"
         Dim AnalyzerFrame As LAx00Frame
@@ -164,17 +169,17 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
         Private Sub FillSteps()
 
             For curStep = Steps.Range.Minimum To Steps.Range.Maximum
-                For curDispense = 1 To AnalyzerContaminationsDescriptor.DispensesPerStep
+                For curDispense = 1 To ContaminationsSpecifications.DispensesPerStep
 
                     If curStep < 0 Then   'Before step(s).
-                        Steps(curStep)(curDispense) = AnalyzerContaminationsDescriptor.CreateDispensing()
+                        Steps(curStep)(curDispense) = ContaminationsSpecifications.CreateDispensing()
                         Dim parameterName = String.Format("R{0}B{1}", curDispense, Math.Abs(curStep))
                         Steps(curStep)(curDispense).ExecutionID = CInt(AnalyzerFrame(parameterName))
 
                     ElseIf curStep = 0 Then   'Current step
 
                     ElseIf curStep > 0 Then   'After step(s)
-                        Steps(curStep)(curDispense) = AnalyzerContaminationsDescriptor.CreateDispensing()
+                        Steps(curStep)(curDispense) = ContaminationsSpecifications.CreateDispensing()
                         Dim parameterName = String.Format("R{0}A{1}", curDispense, curStep)
                         Steps(curStep)(curDispense).ExecutionID = CInt(AnalyzerFrame(parameterName))
 

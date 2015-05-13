@@ -362,8 +362,7 @@ Namespace Biosystems.Ax00.BL
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim mytwksWSExecutionsDAO As New twksWSExecutionsDAO
-                        resultData = mytwksWSExecutionsDAO.GetExecution(dbConnection, pExecutionID, pAnalyzerID, pWorkSessionID)
+                        resultData = twksWSExecutionsDAO.GetExecution(dbConnection, pExecutionID, pAnalyzerID, pWorkSessionID)
                     End If
                 End If
             Catch ex As Exception
@@ -2243,7 +2242,7 @@ Namespace Biosystems.Ax00.BL
 
                         If (pSampleClass = String.Empty) Then
                             'If the parameter is not informed, search the SampleClass of the informed Execution
-                            resultData = myDAO.GetExecution(dbConnection, pExecutionID, pAnalyzerID, pWorkSessionID)
+                            resultData = twksWSExecutionsDAO.GetExecution(dbConnection, pExecutionID, pAnalyzerID, pWorkSessionID)
                             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                                 pSampleClass = DirectCast(resultData.SetDatos, ExecutionsDS).twksWSExecutions.First.SampleClass
                             End If
@@ -3177,7 +3176,7 @@ Namespace Biosystems.Ax00.BL
                         'AG 24/04/2012 - check if is a special test (calib HbTotal)
                         'resultData = myDAO.GetElementInfoByExecutionID(dbConnection, pAnalyzerID, pWorkSessionID, pExecutionID, pAlsoReagentElementInfo)
                         Dim myRealMultiItemNumber As Integer = -1 'Only used for special test calibrators (HbTotal)
-                        resultData = myDAO.GetExecution(dbConnection, pExecutionID)
+                        resultData = twksWSExecutionsDAO.GetExecution(dbConnection, pExecutionID)
                         If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                             Dim wsExecDS As New ExecutionsDS
                             wsExecDS = CType(resultData.SetDatos, ExecutionsDS)

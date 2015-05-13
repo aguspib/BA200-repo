@@ -1,6 +1,8 @@
 ﻿Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Interfaces
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Interfaces
 Imports Biosystems.Ax00.Core.Interfaces
+Imports Biosystems.Ax00.DAL.DAO
+Imports Biosystems.Ax00.Types.ExecutionsDS
 
 Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
     Public Class ReagentDispensing
@@ -10,22 +12,22 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             If scope = 0 Then   'A reagent can't contamine itself
                 Return New EmptyWashing
 
-            ElseIf scope > 0 Then   'A reagent can't contamine somethig that was already sent
-                'Throw New Exception("A later dispensing can't contamine us")
+            ElseIf scope > 0 Then
                 Return dispensing.RequiredWashingSolution(Me, -scope)
 
-            ElseIf Me.Contamines Is Nothing OrElse Me.Contamines.ContainsKey(dispensing.R1ReagentID) = False Then
+            ElseIf Contamines Is Nothing OrElse Contamines.ContainsKey(dispensing.R1ReagentID) = False Then
                 Return New EmptyWashing
-            Else
 
-                Dim washing = Me.Contamines(dispensing.R1ReagentID)
+            Else
+                Dim washing = Contamines(dispensing.R1ReagentID)
+
                 If washing.RequiredWashing.WashingStrength < Math.Abs(scope) Then
                     Return New EmptyWashing
-                Else
-                    'Dim newCleaning = New WashingDescription(washing.RequiredWashing.WashingStrength + scope, washing.RequiredWashing.WashingSolutionID)
 
+                Else
                     Dim newCleaning = New WashingDescription(washing.RequiredWashing.WashingStrength, washing.RequiredWashing.WashingSolutionID)
                     Return newCleaning
+
                 End If
             End If
 
@@ -44,7 +46,6 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
         End Property
 
         Dim _r1ReagentID As Integer, _analysisMode As Integer, _contamines As Dictionary(Of Integer, IDispensingContaminationDescription)
-
 
         Public Property R1ReagentID As Integer Implements IReagentDispensing.R1ReagentID
             Get
@@ -88,6 +89,43 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
         End Sub
 
         Public Property IsISE As Boolean Implements IReagentDispensing.IsISE
+
+        Public Property DelayCyclesForDispensing As Integer Implements IReagentDispensing.DelayCyclesForDispensing
+
+        Public Property OrderTestID As Integer Implements IReagentDispensing.OrderTestID
+
+        Public Property SampleClass As String Implements IReagentDispensing.SampleClass
+
+        Public Property TestID As Integer Implements IReagentDispensing.TestID
+
+        Public Sub FillDispense(analyzerContaminationsSpecification As IAnalyzerContaminationsSpecification, ByVal row As twksWSExecutionsRow) Implements IReagentDispensing.FillDispense
+
+            R1ReagentID = row.ReagentID
+            SampleClass = row.SampleClass
+            OrderTestID = row.OrderTestID
+            TestID = row.TestID
+
+            Dim pTestMode = tparTestSamplesDAO.GetPredilutionModeForTest(row.TestID, row.SampleType)
+            If String.CompareOrdinal(pTestMode, "INST") = 0 AndAlso String.CompareOrdinal(SampleClass, "PATIENT") = 0 Then
+                DelayCyclesForDispensing = analyzerContaminationsSpecification.AdditionalPredilutionSteps - 1
+                Debug.WriteLine("ExecutionID:" & ExecutionID & " SampleClass:" & SampleClass & " OrderTestID:" & OrderTestID & " R1Reagent:" & R1ReagentID & " is a predilution.")
+
+            End If
+
+            If row.IsExecutionTypeNull = False Then
+                Select Case row.ExecutionType
+                    Case "PREP_STD", "", Nothing
+                        IsISE = False
+                    Case "PREP_ISE"
+                        IsISE = True
+                    Case Else
+#If config = "Debug" Then
+                        Throw New Exception("Found preparation with unknown execution type: """ & row.ExecutionType & """. Happy debugging!")
+#End If
+                End Select
+            End If
+        End Sub
+
     End Class
 
 End Namespace

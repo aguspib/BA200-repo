@@ -46,7 +46,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
                 contaminations = GetContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, pContaminationsDS)
                 'If no contamination between the consecutive tests look for high contamin [If (i-2) contaminates (i)]
                 'Only if ordertest(i-1) maxreplicates < hihgcontamination persistance
-                If contaminations.Count = 0 Then
+                If Not contaminations.Any Then
                     Dim maxReplicates As Integer = 1
                     maxReplicates = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
                                      Where a.OrderTestID = sortedOTList(aux_i - 1) Select a.ReplicateNumber).Max
@@ -64,7 +64,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
                 ' SetExpectedTypeReagent()
 
                 'OrderTest(i-1) contaminates OrderTest(i) ... so try move OrderTes(i-1) down until it does not contaminates
-                If contaminations.Count > 0 Then
+                If contaminations.Any Then
                     Execute_j_loop(pExecutions, aux_i, (aux_i + 1), sortedOTList.Count - 1)
 
                 Else
@@ -89,7 +89,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
                 Execute_jj_loop(pExecutions, auxJ, auxJ, (auxJ + HighContaminationPersistence - 1))
                 'AG 25/11/2011
 
-                If contaminations.Count = 0 Then
+                If Not contaminations.Any Then
                     'Move orderTest(i-1) (the contaminator one) before orderTest(j) (where orderTest(i-1) does not contaminates)
 
                     'New BAx00 (Ax5 do not implement this business
@@ -97,7 +97,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
                     'Simplication: In this point do not take care about High contamination persistance
                     Dim newContaminatorID As Integer
                     If indexI > 1 Then
-                        newContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
+                        newContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions
                                                 Where a.OrderTestID = sortedOTList(indexI - 2) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
 
                         contaminations = GetContaminationBetweenReagents(newContaminatorID, MainContaminatedID, ContaminDS)
@@ -106,7 +106,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
 
                     'Before move OrderTest(i-1) (the contaminator one, and future OrderTest(j)) be carefull is not contaminated by current OrderTest(j-1)
                     'Simplication: In this point do not take care about High contamination persistance
-                    If contaminations.Count = 0 Then
+                    If Not contaminations.Any Then
                         If auxJ > 0 Then
                             newContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
                                                                Where a.OrderTestID = sortedOTList(auxJ - 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
@@ -114,7 +114,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
                         End If
                     End If
 
-                    If contaminations.Count = 0 Then
+                    If Not contaminations.Any Then
                         '(i < j)
                         If sortedOTList.Count - 1 > auxJ - 1 Then
                             sortedOTList.Insert(auxJ, contaminatorOrderTest)
@@ -154,7 +154,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
                         contaminations = GetHardContaminationBetweenReagents(ReagentContaminatorID, ReagentContaminatedID, ContaminDS)
                     End If
 
-                    If contaminations.Count > 0 Then Exit For
+                    If contaminations.Any Then Exit For
 
                     'If ReagentsAreCompatibleType() Then Exit For
 

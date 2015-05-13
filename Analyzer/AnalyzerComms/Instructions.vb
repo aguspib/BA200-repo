@@ -493,7 +493,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Dim myExecutionDelegate As New ExecutionsDelegate
                 Dim myPreparationTestDataDS As New PreparationsTestDataDS
                 Dim myPreparationPositionDS As New PreparationsPositionDataDS
-                Dim myPreparationTestDataDAO As New vwksPreparationsTestDataDAO
                 Dim myPreparationPositionDataDAO As New vwksPreparationsPositionDataDAO
 
                 Dim myPreparationParameterList As New List(Of InstructionParameterTO)
@@ -507,7 +506,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         Dim myOrderTestID As Integer = myWSExecutionDS.twksWSExecutions(0).OrderTestID
 
                         'Get the preparation test data.
-                        myGlobalDataTO = myPreparationTestDataDAO.ReadByOrderTestID(Nothing, myOrderTestID)
+                        myGlobalDataTO = vwksPreparationsTestDataDAO.ReadByOrderTestID(Nothing, myOrderTestID)
                         If Not myGlobalDataTO.HasError Then
                             'TODO: currently this function only works for STANDARD Tests (data in the view is filtered
                             '      by TestType = 'STD')

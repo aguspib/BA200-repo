@@ -66,7 +66,7 @@ Public Class DebugLogger
     Private Sub ProcessQueue()
         While _message.IsEmpty = False
             Dim item As DebugMessage = Nothing
-            If _message.TryDequeue(item) AndAlso Not item Is Nothing Then
+            If _message.TryDequeue(item) AndAlso item IsNot Nothing Then
                 WriteLog(item)
             End If
         End While

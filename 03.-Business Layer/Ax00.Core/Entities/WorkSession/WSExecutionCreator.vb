@@ -806,7 +806,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
                 Dim sorter = New WSExecutionsSorter(executionDataDS, activeAnalyzer)
 
                 Dim success = sorter.SortByContamination(pDBConnection)
-                If success Then success = sorter.SortByElementGroupTime()
+                'If success Then success = sorter.SortByElementGroupTime()
                 If success Then success = sorter.SortByGroupContamination(pDBConnection)
 
                 executionDataDS = sorter.Executions

@@ -47,8 +47,7 @@ Namespace Biosystems.Ax00.BL
                                 Dim myOrderTestID As Integer = myWSExecutionDS.twksWSExecutions(0).OrderTestID
 
                                 'Get the preparation test data.
-                                Dim myPreparationTestDataDAO As New vwksPreparationsTestDataDAO
-                                resultData = myPreparationTestDataDAO.ReadByOrderTestID(dbConnection, myOrderTestID)
+                                resultData = vwksPreparationsTestDataDAO.ReadByOrderTestID(dbConnection, myOrderTestID)
 
                             End If
                         End If
@@ -132,7 +131,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "PreparationTestDataDelegate.isPTESTinstruction", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
