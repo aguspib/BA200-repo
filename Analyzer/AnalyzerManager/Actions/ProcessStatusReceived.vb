@@ -96,6 +96,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         myGlobal = _analyzerManager.RemoveErrorCodeAlarms(Nothing, _analyzerManager.AnalyzerCurrentAction())
                     End If
                 End If
+                _analyzerManager.ContaminationsSpecification.FillContextFromAnayzerData(_instructionReceived)
 
                 'Do business depending the requestvalue, action value, status value, alarms value,....
                 DoActionsDependingFieldValues(myStatusValue, myGlobal, myActionValue, myExpectedTime, myWellValue, myRequestValue, errorValue, startTime)

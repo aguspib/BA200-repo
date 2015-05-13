@@ -10,6 +10,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
     Public Class BA400ContaminationsSpecification
         Implements IAnalyzerContaminationsSpecification
 
+
         Sub New()
 
             'This is B4200 dependant:
@@ -46,6 +47,26 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
         Public ReadOnly Property AnalyzerModel As String Implements IAnalyzerContaminationsSpecification.AnalyzerModel
             Get
                 Return Enums.AnalyzerModelEnum.A400.ToString
+            End Get
+        End Property
+
+        Dim _currentContext As ContaminationsContext
+
+        Public Sub FillContextFromAnayzerData(instruction As IEnumerable(Of InstructionParameterTO)) Implements IAnalyzerContaminationsSpecification.FillContextFromAnayzerData
+
+            Dim analyzerFrame = New LAx00Frame(instruction)
+            If analyzerFrame("R") = "1" Then
+                Dim context = New ContaminationsContext(Me)
+                context.FillContentsFromAnalyzer(analyzerFrame)
+                _currentContext = context
+                Debug.WriteLine("Context filled in running! ")
+            End If
+
+        End Sub
+
+        Public ReadOnly Property CurrentRunningContext As IContaminationsContext Implements IAnalyzerContaminationsSpecification.CurrentRunningContext
+            Get
+                Return _currentContext
             End Get
         End Property
     End Class

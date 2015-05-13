@@ -286,6 +286,9 @@ Namespace Biosystems.Ax00.Core.Interfaces
                                           Optional ByVal pServiceParams As List(Of String) = Nothing) As GlobalDataTO
 
         Function SimpleTranslateErrorCodeToAlarmId(ByVal pDbConnection As SqlConnection, ByVal errorCode As Integer) As Alarms
+
+        Function ContaminationsSpecification() As IAnalyzerContaminationsSpecification
+
         Sub ResetFLIGHT()
 
 #End Region

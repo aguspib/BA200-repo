@@ -130,6 +130,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
 
             Dim context = New ContaminationsContext(ContaminationsSpecification)
             context.FillContextInStatic(pExecutions)
+
             Dim washingsList = context.GetWashingRequiredForAGivenDispensing(context.Steps(0).Dispensing(1))    'Steps(0) is current step (not before, neither after)
 
             Dim contam = washingsList.Count

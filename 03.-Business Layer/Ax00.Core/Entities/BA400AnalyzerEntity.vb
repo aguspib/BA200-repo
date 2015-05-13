@@ -37,6 +37,10 @@ Namespace Biosystems.Ax00.Core.Entities
             Return MyBase.GetCurrentBaseLineIDByType(pdbConnection, pAnalyzerID, pWorkSessionID, pWell, pBaseLineWithAdjust, BaseLineTypeForCalculations.ToString())
         End Function
 
+        Public Overrides Function ContaminationsSpecification() As IAnalyzerContaminationsSpecification
+            Return WSExecutionCreator.Instance.ContaminationsSpecification
+        End Function
+
 #End Region
 
  

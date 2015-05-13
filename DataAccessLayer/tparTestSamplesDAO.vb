@@ -996,7 +996,6 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
-                    'Dim cmdText As String = Query
 
                     Dim dbCmd As New SqlClient.SqlCommand
                     dbCmd.Connection = connection.SetDatos
@@ -1004,7 +1003,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     Dim da As New SqlDataAdapter(dbCmd)
                     Dim DT As New DataTable
                     da.Fill(DT)
-                    'connection.SetDatos.Close()
+
                     If DT IsNot Nothing AndAlso DT.Rows.Count > 0 Then
                         Dim result = TryCast(DT.Rows(0).Item(0), String) & ""
                         Return result
