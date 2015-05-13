@@ -1,4 +1,5 @@
-﻿Imports System.Xml.Serialization
+﻿Imports System.Text
+Imports System.Xml.Serialization
 Imports Microsoft.SqlServer.Management.Smo
 Imports Biosystems.Ax00.BL
 
@@ -66,7 +67,7 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
             release.Version = Version
 
             For Each revision In CommonRevisions
-                If revision.RevisionNumber < fromCommonRevisionNumber Then
+                If revision.RevisionNumber <= fromCommonRevisionNumber Then
                     Continue For
                 Else
                     release.CommonRevisions.Add(revision)
@@ -74,7 +75,7 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
             Next
 
             For Each revision In DataRevisions
-                If revision.RevisionNumber < fromDataRevisionNumber Then
+                If revision.RevisionNumber <= fromDataRevisionNumber Then
                     Continue For
                 Else
                     release.DataRevisions.Add(revision)
@@ -116,7 +117,7 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
                 results.LastErrorRelease = Me
             End If
 
-            Debug.WriteLine("Execution result:" & results.Success)
+            'WriteLog()
 
         End Sub
 
@@ -157,6 +158,32 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
 
             ' update the new Database version. pass the server connection contex because we are inside a transaction that can affect the table.
             myVersionsDelegate.SaveDBSoftwareVersion(pServer.ConnectionContext.SqlConnectionObject(), packageId, Version, String.Empty, String.Empty)
+
+        End Sub
+
+        Public Sub WriteLog()
+
+            DebugLogger.AddLog(" --------------------------------------------", "UpdateVersion")
+            DebugLogger.AddLog(String.Format(" Release: {0}", Version), "UpdateVersion")
+            DebugLogger.AddLog(" 1.- Results for Common scripts", "UpdateVersion")
+
+            For Each revision As CommonRevision In CommonRevisions
+                revision.WriteLog()
+                If Not revision.Results.Success Then
+                    Exit For
+                End If
+            Next
+
+            DebugLogger.AddLog(" 2.- Results for Data scripts", "UpdateVersion")
+
+            For Each revision As DataRevision In DataRevisions
+                revision.WriteLog()
+                If Not revision.Results.Success Then
+                    Exit For
+                End If
+            Next
+
+            DebugLogger.AddLog(" --------------------------------------------", "UpdateVersion")
 
         End Sub
 

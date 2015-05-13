@@ -6,6 +6,7 @@
         Public Property LastErrorCommonRevision As CommonRevision
         Public Property LastErrorDataRevision As DataRevision
         Public Property LastErrorStep As ErrorStep = ErrorStep.NoErrors
+        Public Property Exception() As Exception
         Public Enum ErrorStep
             NoErrors
             PrerequisiteScript

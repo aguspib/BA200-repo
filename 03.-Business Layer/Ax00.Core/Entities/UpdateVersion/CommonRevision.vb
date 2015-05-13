@@ -1,4 +1,6 @@
-﻿Imports Biosystems.Ax00.BL
+﻿Imports System.ComponentModel
+Imports System.Text
+Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.DAL
 Imports Microsoft.SqlServer.Management.Smo
 
@@ -19,32 +21,39 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
 
 #Region "Public members"
 
-        Public Overrides Function Run(results As ExecutionResults, ByRef server As Server, ByVal dataBaseName As String, ByVal packageId As String) As Boolean
-            Debug.WriteLine("Executting Common Revision JiraId:" & JiraId & " RevisionNumber:" & RevisionNumber)
+        Public Overrides Function Run(executionResults As ExecutionResults, ByRef server As Server, ByVal dataBaseName As String, ByVal packageId As String) As Boolean
 
-            If results.Success Then RunPrerequisites(results, server, dataBaseName)
-            If results.Success Then RunStructure(results, server, dataBaseName)
-            If results.Success Then RunData(results, server, dataBaseName)
-            If results.Success Then RunIntegrity(results, server, dataBaseName)
+            Me.Results = executionResults
 
-            If results.Success Then
-                UpdateDatabaseVersion(results, dataBaseName, server, packageId)
+            If executionResults.Success Then RunPrerequisites(server, dataBaseName)
+            If executionResults.Success Then RunStructure(server, dataBaseName)
+            If executionResults.Success Then RunData(server, dataBaseName)
+            If executionResults.Success Then RunIntegrity(server, dataBaseName)
+
+            If executionResults.Success Then
+                UpdateDatabaseVersion(dataBaseName, server, packageId)
             Else
-                results.LastErrorCommonRevision = Me
+                executionResults.LastErrorCommonRevision = Me
             End If
 
-            Debug.WriteLine("Execution result:" & results.Success)
+            'WriteLog(Me.ToString())
 
-            Return results.Success
+            Return executionResults.Success
         End Function
 
+        Public Sub WriteLog()
 
-        Private Sub UpdateDatabaseVersion(results As ExecutionResults, ByVal dataBaseName As String, ByRef server As Server, ByVal packageId As String)
+            Dim content As New StringBuilder()
 
-            Dim myVersionsDelegate As New VersionsDelegate
+            content.AppendLine(String.Format(" Common Revision JiraId: {0} RevisionNumber: {1}", JiraId, RevisionNumber))
+            content.AppendLine(String.Format("      StructureScript: {0}", StructureScript))
+            content.AppendLine(String.Format("      DataScript: {0}", DataScript))
+            content.AppendLine(String.Format("      Success: {0}", Results.Success))
+            If Not Results.Success Then
+                content.AppendLine(String.Format("      Exception: {0}", Results.Exception.Message & " " & Results.Exception.InnerException.ToString()))
+            End If
 
-            ' update the new Database version. pass the server connection contex because we are inside a transaction that can affect the table.
-            myVersionsDelegate.SaveDBSoftwareVersion(server.ConnectionContext.SqlConnectionObject(), packageId, String.Empty, RevisionNumber, String.Empty)
+            DebugLogger.AddLog(content.ToString(), "UpdateVersion")
 
         End Sub
 
@@ -52,41 +61,32 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
 
 #Region "Private members"
 
-        Private Sub RunStructure(results As ExecutionResults, ByRef server As Server, ByVal dataBaseName As String)
+        Private Sub RunStructure(ByRef server As Server, ByVal dataBaseName As String)
 
             If StructureScript Is Nothing OrElse StructureScript.Trim = String.Empty Then Return
             Debug.WriteLine("Running StructureScript script")
-            results.Success = DBManager.ExecuteScripts(server, dataBaseName, StructureScript)
-            If results.Success = False Then results.LastErrorStep = ExecutionResults.ErrorStep.StructureScript
+            Results.Success = DBManager.ExecuteScripts(server, dataBaseName, StructureScript, Results.Exception)
+            If Results.Success = False Then Results.LastErrorStep = ExecutionResults.ErrorStep.StructureScript
 
         End Sub
 
-        Private Sub RunData(results As ExecutionResults, ByRef server As Server, ByVal dataBaseName As String)
+        Private Sub RunData(ByRef server As Server, ByVal dataBaseName As String)
 
             If DataScript Is Nothing OrElse DataScript.Trim = String.Empty Then Return
             Debug.WriteLine("Running data script")
-            results.Success = DBManager.ExecuteScripts(server, dataBaseName, DataScript)
-            If results.Success = False Then results.LastErrorStep = ExecutionResults.ErrorStep.DataScript
-
-            WriteLog(results)
+            Results.Success = DBManager.ExecuteScripts(server, dataBaseName, DataScript, Results.Exception)
+            If Results.Success = False Then Results.LastErrorStep = ExecutionResults.ErrorStep.DataScript
 
         End Sub
 
-        Private Sub WriteLog(results As ExecutionResults)
+        Private Sub UpdateDatabaseVersion(ByVal dataBaseName As String, ByRef server As Server, ByVal packageId As String)
 
-            DebugLogger.AddLog(String.Format("Common Revision  Number: {0} JiraId:", RevisionNumber, JiraId), "UpdateVersion")
-            DebugLogger.AddLog(String.Format("      StructureScript:{0}", StructureScript), "UpdateVersion")
-            DebugLogger.AddLog(String.Format("      DataScript:{0}", DataScript), "UpdateVersion")
-            DebugLogger.AddLog(String.Format("      Errors:{0}", results.Success), "UpdateVersion")
+            Dim myVersionsDelegate As New VersionsDelegate
+
+            ' update the new Database version. pass the server connection contex because we are inside a transaction that can affect the table.
+            myVersionsDelegate.SaveDBSoftwareVersion(server.ConnectionContext.SqlConnectionObject(), packageId, String.Empty, RevisionNumber, String.Empty)
 
         End Sub
-
-        Private Overloads Function ToString() As String
-
-            Dim contend As New System.Text.StringBuilder()
-            Return contend.AppendLine().ToString()
-
-        End Function
 
 #End Region
 

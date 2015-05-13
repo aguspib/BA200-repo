@@ -25,6 +25,8 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
 
 #End Region
 
+        <XmlIgnoreAttribute()>
+        Public Property Results As ExecutionResults
 
 #Region "Public members"
 
@@ -66,11 +68,11 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
 #Region "Private members"
 
 
-        Public Sub RunPrerequisites(result As ExecutionResults, ByRef server As Server, ByVal dataBaseName As String)
+        Public Sub RunPrerequisites(ByRef server As Server, ByVal dataBaseName As String)
             If PrerequisiteScript Is Nothing OrElse PrerequisiteScript.Trim = String.Empty Then Return
             Debug.WriteLine("Running prerequisite script")
 
-            If result.Success = False Then result.LastErrorStep = ExecutionResults.ErrorStep.PrerequisiteScript
+            If Results.Success = False Then Results.LastErrorStep = ExecutionResults.ErrorStep.PrerequisiteScript
         End Sub
 
         'Private Sub RunStructure(result As ExecutionResults)
@@ -89,12 +91,11 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
         '    If result.Success = False Then result.LastErrorStep = ExecutionResults.ErrorStep.DataScript
         'End Sub
 
-        Public Sub RunIntegrity(result As ExecutionResults, ByRef server As Server, ByVal dataBaseName As String)
+        Public Sub RunIntegrity(ByRef server As Server, ByVal dataBaseName As String)
             If IntegrityScript Is Nothing OrElse IntegrityScript.Trim = String.Empty Then Return
             Debug.WriteLine("Running integrity script")
 
-
-            If result.Success = False Then result.LastErrorStep = ExecutionResults.ErrorStep.IntegrityCheckScript
+            If Results.Success = False Then Results.LastErrorStep = ExecutionResults.ErrorStep.IntegrityCheckScript
 
         End Sub
 

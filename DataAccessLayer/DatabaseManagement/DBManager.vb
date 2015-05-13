@@ -343,6 +343,25 @@ Namespace Biosystems.Ax00.DAL
         Public Shared Function ExecuteScripts(ByVal pServer As Server, ByVal DataBaseName As String, _
                                               ByVal SQLScripts As String, _
                                               Optional ByVal pTransactionCommand As String = "") As Boolean
+            Return ExecuteScripts(pServer, DataBaseName, SQLScripts, Nothing, pTransactionCommand)
+        End Function
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="pServer"></param>
+        ''' <param name="DataBaseName"></param>
+        ''' <param name="SQLScripts"></param>
+        ''' <param name="returnedError"></param>
+        ''' <param name="pTransactionCommand"></param>
+        ''' <returns></returns>
+        ''' <remarks>
+        ''' Created by: IT 13/05/2015 - BA-2471
+        ''' </remarks>
+        Public Shared Function ExecuteScripts(ByVal pServer As Server, ByVal DataBaseName As String, _
+                                              ByVal SQLScripts As String, _
+                                              ByRef returnedError As Exception, _
+                                              Optional ByVal pTransactionCommand As String = "") As Boolean
             Dim result As Boolean = False
 
             Try
@@ -358,9 +377,8 @@ Namespace Biosystems.Ax00.DAL
                 result = True
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
+                returnedError = ex 'IT 13/05/2015 - BA-2471
                 GlobalBase.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.ExecuteScripts", EventLogEntryType.Error, False)
-
             End Try
 
             Return result

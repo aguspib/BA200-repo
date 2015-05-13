@@ -10,6 +10,17 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
 
         Public Property Releases As New List(Of Release)
 
+        <XmlIgnoreAttribute()>
+        Public Property FromVersion As String
+        <XmlIgnoreAttribute()>
+        Public Property FromCommonRevisionNumber As String
+        <XmlIgnoreAttribute()>
+        Public Property FromDataRevisionNumber As String
+
+        <XmlIgnoreAttribute()>
+        Public Property Results As ExecutionResults
+
+
         Public Sub SortContents()
             Releases.Sort()
             For Each release In Releases
@@ -60,7 +71,6 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
             Return auxVariable
         End Function
 
-
         Shared Function Deserialize(stream As StreamReader) As DatabaseUpdatesManager
             'Deserialize text file to a new object.
 
@@ -74,21 +84,25 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
         End Function
 
 
-        Function GenerateUpdatePack(fromVersion As String, fromCommonRevisionNumber As String, fromDataRevisionNumber As String) As DatabaseUpdatesManager
+        Function GenerateUpdatePack(ByVal version As String, commonRevisionNumber As String, dataRevisionNumber As String) As DatabaseUpdatesManager
 
             Dim updatesManager As New DatabaseUpdatesManager
+            updatesManager.FromVersion = version
+            updatesManager.FromCommonRevisionNumber = commonRevisionNumber
+            updatesManager.FromDataRevisionNumber = dataRevisionNumber
 
             For Each release In Releases
-                If release.Version < fromVersion Then
+                If release.Version < version Then
                     'Ignore previous versions
                     Continue For
-                ElseIf release.Version = fromVersion Then
-                    'Ignore previous subversions, but get required subversions
-                    updatesManager.Releases.Add(release.GenerateRevisionPack(fromCommonRevisionNumber, fromDataRevisionNumber))
+                ElseIf release.Version = version Then
+                    'Ignore previous subversions, but get required subversion
+                    updatesManager.Releases.Add(release.GenerateRevisionPack(commonRevisionNumber, dataRevisionNumber))
                 Else
                     'Add newer versions
                     updatesManager.Releases.Add(release)
                 End If
+
             Next
 
             updatesManager.SortContents()
@@ -98,13 +112,16 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
         End Function
 
         Public Function RunScripts(ByVal dataBaseName As String, ByRef server As Server, ByVal packageId As String) As ExecutionResults
-            Dim results As New ExecutionResults
 
+            Results = New ExecutionResults
             For Each release In Releases
                 release.RunScripts(results, dataBaseName, server, packageId)
                 If results.Success = False Then Exit For
             Next
+
+            WriteLog()
             Return results
+
         End Function
 
         Public Sub Merge(databaseUpdatesManager As DatabaseUpdatesManager)
@@ -133,6 +150,31 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
 
         End Function
 
+        Private Sub WriteLog()
+
+            DebugLogger.AddLog(" --------------------------------------------", "UpdateVersion")
+            DebugLogger.AddLog(" Update Version: Generated Update Pack (INI)", "UpdateVersion")
+            DebugLogger.AddLog(String.Format(" From Version: {0} Common Revision: {1} Data Revision: {2}", FromVersion, FromCommonRevisionNumber, FromDataRevisionNumber), "UpdateVersion")
+            For Each release In Releases
+                DebugLogger.AddLog(String.Format(" Added Release Version: {0}", release.Version), "UpdateVersion")
+                DebugLogger.AddLog(String.Format(" - Total Common Revisions: {0}", release.CommonRevisions.Count), "UpdateVersion")
+                DebugLogger.AddLog(String.Format(" - Total Data Revisions: {0}", release.DataRevisions.Count), "UpdateVersion")
+            Next
+            DebugLogger.AddLog(String.Format(" Total Releases: {0}", Releases.Count), "UpdateVersion")
+            DebugLogger.AddLog(" Update Version: Generating Update Pack (END)", "UpdateVersion")
+            DebugLogger.AddLog(" --------------------------------------------", "UpdateVersion")
+
+
+            DebugLogger.AddLog(" --------------------------------------------", "UpdateVersion")
+            DebugLogger.AddLog(" Update Version: Run Scripts (INI)", "UpdateVersion")
+            For Each release In Releases
+                release.WriteLog()
+            Next
+            DebugLogger.AddLog(String.Format(" - Process finished successfully: {0}", Results.Success), "UpdateVersion")
+            DebugLogger.AddLog(" Update Version: Run Scripts (END)", "UpdateVersion")
+            DebugLogger.AddLog(" --------------------------------------------", "UpdateVersion")
+
+        End Sub
 
     End Class
 
