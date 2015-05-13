@@ -1654,7 +1654,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                               AndAlso wse.ReagentContaminatedID = ReagentID _
                                               AndAlso Not wse.IsWashingSolutionR1Null _
                                               Select wse).ToList()
-                            If contaminations.Count > 0 Then
+                            If contaminations.Any() Then
                                 contaminationFound = True 'HIGH contamination found
 
                                 'Check if the required wash has been already sent or not
@@ -2089,32 +2089,32 @@ Namespace Biosystems.Ax00.Core.Entities
             '2.1) Calculate contaminations number with current executions sort
             contaminNumber = 1 + ExecutionsDelegate.GetContaminationNumber(pContaminationsDS, toSendList, pHighContaminationPersitance)
 
-            If contaminNumber > 0 Then '(5)
-                Dim myReagentsIDList As New List(Of Integer) 'List of previous reagents sent before the current previousElementLastReagentID, 
-                '                                                   remember this information in order to check the high contamination persistance (One Item for each different OrderTest)
-                Dim myMaxReplicatesList As New List(Of Integer) 'Same item number as previous list, indicates the replicate number for each item in previous list
-                GetMaxReplicatesList(myReagentsIDList, myMaxReplicatesList, previousReagentIDSentList)
+            'If contaminNumber > 0 Then '(5)
+            Dim myReagentsIDList As New List(Of Integer) 'List of previous reagents sent before the current previousElementLastReagentID, 
+            '                                                   remember this information in order to check the high contamination persistance (One Item for each different OrderTest)
+            Dim myMaxReplicatesList As New List(Of Integer) 'Same item number as previous list, indicates the replicate number for each item in previous list
+            GetMaxReplicatesList(myReagentsIDList, myMaxReplicatesList, previousReagentIDSentList)
 
 #If DEBUG Then
-                Debug.Print(String.Format("After GetMaxReplicatesList: myReagentsIDList = {0}; myMaxReplicatesList = {1}; previousReagentIDSentList = {2} \n",
-                                          myReagentsIDList.Count, myMaxReplicatesList.Count, previousReagentIDSentList.Count))
+            Debug.Print(String.Format("After GetMaxReplicatesList: myReagentsIDList = {0}; myMaxReplicatesList = {1}; previousReagentIDSentList = {2} \n",
+                                      myReagentsIDList.Count, myMaxReplicatesList.Count, previousReagentIDSentList.Count))
 #End If
 
-                '2.2) If contaminations: apply Backtracking algorithm for handling contaminations, and choose the best solution
-                Dim currentResultList As List(Of ExecutionsDS.twksWSExecutionsRow)
-                currentResultList = toSendList.ToList() 'Initial order                                    
-                toSendList = ExecutionsDelegate.ManageContaminationsForRunningAndStatic(ActiveAnalyzer, dbConnection, pContaminationsDS, currentResultList, pHighContaminationPersitance, contaminNumber, myReagentsIDList, myMaxReplicatesList)
+            '2.2) If contaminations: apply Backtracking algorithm for handling contaminations, and choose the best solution
+            Dim currentResultList As List(Of ExecutionsDS.twksWSExecutionsRow)
+            currentResultList = toSendList.ToList() 'Initial order                                    
+            toSendList = ExecutionsDelegate.ManageContaminationsForRunningAndStatic(ActiveAnalyzer, dbConnection, pContaminationsDS, currentResultList, pHighContaminationPersitance, contaminNumber, myReagentsIDList, myMaxReplicatesList)
 
 #If DEBUG Then
-                Debug.Print(String.Format("Executed backtraking algorithm. toSendList = {0} \n", toSendList.Count().ToString()))
+            Debug.Print(String.Format("Executed backtraking algorithm. toSendList = {0} \n", toSendList.Count().ToString()))
 #End If
 
-                '2.3) Finally check if exists contamination between last reagents used and next reagent that will be used (High or Low contamination)
-                CheckIfContaminationStillExist(previousReagentIDSentList, pHighContaminationPersitance, myContaminationID, myWashSolutionType, indexNextToSend, nextExecutionFound, pContaminationsDS, toSendList)
-            Else '(5) (If contaminNumber = 0 Then)
-                nextExecutionFound = True
-                indexNextToSend = 0
-            End If
+            '2.3) Finally check if exists contamination between last reagents used and next reagent that will be used (High or Low contamination)
+            CheckIfContaminationStillExist(previousReagentIDSentList, pHighContaminationPersitance, myContaminationID, myWashSolutionType, indexNextToSend, nextExecutionFound, pContaminationsDS, toSendList)
+            'Else '(5) (If contaminNumber = 0 Then)
+            'nextExecutionFound = True
+            'indexNextToSend = 0
+            'End If
         End Sub
 
         Private Sub GetMaxReplicatesList(ByRef myReagentsIDList As List(Of Integer), ByRef myMaxReplicatesList As List(Of Integer), previousReagentIDSentList As List(Of AnalyzerManagerDS.sentPreparationsRow))
@@ -2271,31 +2271,29 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim myRow As AnalyzerManagerDS.searchNextRow
 
             pFound = True ' Inform something is found to be sent: execution or wash
+
+            myRow = myReturn.searchNext.NewsearchNextRow
+            myRow.ExecutionID = toSendList(indexNextToSend).ExecutionID
+
             If nextExecutionFound Then '(4)
                 'Prepare output DS with the proper information (execution to be sent)
-                myRow = myReturn.searchNext.NewsearchNextRow
-                myRow.ExecutionID = toSendList(indexNextToSend).ExecutionID
                 myRow.SampleClass = toSendList(indexNextToSend).SampleClass
                 myRow.SetContaminationIDNull()
                 myRow.SetWashingSolution1Null()
-                myReturn.searchNext.AddsearchNextRow(myRow)
 #If DEBUG Then
                 Debug.Print(String.Format("Next execution sent: {0}, sample class {1}", myRow.ExecutionID.ToString(), myRow.SampleClass))
 #End If
             Else
                 'Contamination (wash has to be sent)
-                myRow = myReturn.searchNext.NewsearchNextRow
-                myRow.ExecutionID = toSendList(indexNextToSend).ExecutionID 'AG + DL 06/07/2012 'GlobalConstants.NO_PENDING_PREPARATION_FOUND
                 myRow.SetSampleClassNull()
                 myRow.ContaminationID = myContaminationID
                 myRow.WashingSolution1 = myWashSolutionType
-                myReturn.searchNext.AddsearchNextRow(myRow)
-
 #If DEBUG Then
                 Debug.Print(String.Format("Next Wash sent: {0}, sample class {1}, contamination {2}", myRow.ExecutionID.ToString(), myRow.SampleClass, myRow.ContaminationID.ToString()))
 #End If
 
             End If '(4)
+            myReturn.searchNext.AddsearchNextRow(myRow)
             Return myReturn
         End Function
 
