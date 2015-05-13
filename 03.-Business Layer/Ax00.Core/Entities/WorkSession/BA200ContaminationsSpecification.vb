@@ -15,7 +15,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
     Public Class BA200ContaminationsSpecification
         Implements IAnalyzerContaminationsSpecification
 
-        Private creationThread As Threading.Thread
+        Private myThread As Threading.Thread
         Sub New()
 
             AdditionalPredilutionSteps = SwParametersDelegate.ReadIntValue(Nothing, GlobalEnumerates.SwParameters.PREDILUTION_CYCLES, AnalyzerModel).SetDatos
@@ -28,7 +28,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
             AddHandler LinkLayer.ActivateProtocol, AddressOf Me.RetrieveInstructions
 
-            creationThread = Threading.Thread.CurrentThread
+            myThread = Threading.Thread.CurrentThread
 
         End Sub
 
@@ -37,8 +37,8 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             ProcessInstructionReceived(eventKind, data)
         End Sub
         Private Sub ProcessInstructionReceived(eventKind As GlobalEnumerates.AppLayerEventList, ByVal data As String)
-            If Threading.Thread.CurrentThread IsNot creationThread Then
-                MsgBox("Threading and message received: " & data)
+            If Threading.Thread.CurrentThread IsNot myThread Then
+                'MsgBox("Threading and message received: " & data)
             End If
         End Sub
 
