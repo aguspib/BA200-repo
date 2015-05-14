@@ -403,15 +403,22 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
             Dim myGlobalDataTo As New GlobalDataTO
             Dim results As New ExecutionResults
 
-            Dim updates = databaseUpdatesManager.GenerateUpdatePack(fromVersion, fromCommonRevisionNumber, fromDataRevisionNumber)
+            If InitializeDatabase(pDataBaseName, pServer) Then
 
-            If updates.Releases.Count > 0 Then
-                results = updates.RunScripts(pDataBaseName, pServer, packageId)
+                Dim updates = databaseUpdatesManager.GenerateUpdatePack(fromVersion, fromCommonRevisionNumber, fromDataRevisionNumber)
 
-                If (Not results.Success) Then
-                    myGlobalDataTo.ErrorCode = GlobalEnumerates.Messages.INVALID_DATABASE_UPDATE.ToString()
-                    myGlobalDataTo.HasError = True
+                If updates.Releases.Count > 0 Then
+                    results = updates.RunScripts(pDataBaseName, pServer, packageId)
+
+                    If (Not results.Success) Then
+                        myGlobalDataTo.ErrorCode = GlobalEnumerates.Messages.INVALID_DATABASE_UPDATE.ToString()
+                        myGlobalDataTo.HasError = True
+                    End If
                 End If
+
+            Else
+                myGlobalDataTo.ErrorCode = GlobalEnumerates.Messages.INVALID_DATABASE_UPDATE.ToString()
+                myGlobalDataTo.HasError = True
             End If
 
             Return myGlobalDataTo
@@ -680,6 +687,31 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
             End Try
             Return myGlobalDataTO
         End Function
+
+
+        Private Function InitializeDatabase(ByVal dataBaseName As String, ByRef server As Server) As Boolean
+            Try
+                Const script As String = " EXECUTE [dbo].[InitializeAx00Database] "
+
+                If server Is Nothing Then
+                    'Create a new server control
+                    server = New Server(DAOBase.DBServer)
+                    server.ConnectionContext.LoginSecure = False
+                    server.ConnectionContext.Login = DAOBase.DBLogin
+                    server.ConnectionContext.Password = DAOBase.DBPassword
+                End If
+
+                Dim connBuilder As New System.Data.SqlClient.SqlConnectionStringBuilder(GlobalBase.UpdateDatabaseConnectionString)
+                Dim tempDataBaseName = connBuilder.InitialCatalog
+
+                Return DataBaseManagerDelegate.RunDatabaseScript(server, tempDataBaseName, script)
+
+            Catch ex As Exception
+                GlobalBase.CreateLogActivity(ex)
+                Throw
+            End Try
+        End Function
+
 
 #Region "TEMPORARY FUNCTIONS TO UPDATE STRUCTURE FOR v3.0.1"
         ''' <summary>

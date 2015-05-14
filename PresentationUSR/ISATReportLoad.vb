@@ -546,6 +546,8 @@ Public Class UiSATReportLoad
                         'AG 25/10/2011
 
                         If Not myGlobal.HasError Then
+                            DebugLogger.AddLog(" LOADING SATREPORT.", "UpdateVersion")
+                            DebugLogger.AddLog(String.Format(" SAT Report Version: {0} Software Version: {0}", mySATVersion, myAppVersion), "UpdateVersion")
                             myGlobal = Me.ManageVersionComparison(myComparisonResult)
                         End If
 
