@@ -47,9 +47,13 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
 
             content.AppendLine(String.Format(" Data Revision JiraId: {0} RevisionNumber: {1}", JiraId, RevisionNumber))
             content.AppendLine(String.Format("      DataScript: {0}", DataScript))
-            content.AppendLine(String.Format("      Success: {0}", Results.Success))
-            If Not Results.Success Then
-                content.AppendLine(String.Format("      Exception: {0}", Results.Exception.Message & " " & Results.Exception.InnerException.ToString()))
+
+            If (Not Results Is Nothing) Then
+                content.AppendLine(String.Format("      Success: {0}", Results.Success))
+
+                If (Not Results.Exception Is Nothing) Then
+                    content.AppendLine(String.Format("      Exception: {0}", Results.Exception.Message & " " & Results.Exception.InnerException.ToString()))
+                End If
             End If
 
             DebugLogger.AddLog(content.ToString(), "UpdateVersion")
@@ -63,7 +67,6 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
         Private Sub RunData(ByRef server As Server, ByVal dataBaseName As String)
 
             If DataScript Is Nothing OrElse DataScript.Trim = String.Empty Then Return
-            Debug.WriteLine("Running data script")
             Results.Success = DBManager.ExecuteScripts(server, dataBaseName, DataScript, Results.Exception)
             If Results.Success = False Then Results.LastErrorStep = ExecutionResults.ErrorStep.DataScript
 

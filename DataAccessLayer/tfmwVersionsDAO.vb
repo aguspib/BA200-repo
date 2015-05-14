@@ -1,6 +1,7 @@
 ﻿Option Strict On
 Option Explicit On
 
+Imports System.Runtime.InteropServices
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 
@@ -176,6 +177,13 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
+
+                    If (String.IsNullOrEmpty(pDBSoftware)) _
+                        And ((String.IsNullOrEmpty(pDBCommonRevisionNumber)) OrElse (pDBCommonRevisionNumber = "0")) _
+                        And ((String.IsNullOrEmpty(pDBDataRevisionNumber)) OrElse (pDBDataRevisionNumber = "0")) Then
+                        Return resultData
+                    End If
+
                     Dim cmdText As String = ""
                     cmdText &= " UPDATE tfmwVersions " & vbCrLf
                     cmdText &= " SET "
@@ -186,11 +194,11 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                     'cmdText &= " DBRevisionDate = N'" & pDBRevisionDate & "'" & vbCrLf 'yyyy-MM-dd'
 
-                    If Not String.IsNullOrEmpty(pDBCommonRevisionNumber) Then
+                    If ((Not String.IsNullOrEmpty(pDBCommonRevisionNumber)) AndAlso (pDBCommonRevisionNumber <> "0")) Then
                         cmdText &= " DBCommonRevisionNumber = N'" & pDBCommonRevisionNumber & "'" & vbCrLf
                     End If
 
-                    If Not String.IsNullOrEmpty(pDBDataRevisionNumber) Then
+                    If ((Not String.IsNullOrEmpty(pDBDataRevisionNumber)) AndAlso (pDBDataRevisionNumber <> "0")) Then
                         cmdText &= " DBDataRevisionNumber = N'" & pDBDataRevisionNumber & "'" & vbCrLf
                     End If
 

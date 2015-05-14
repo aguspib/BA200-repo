@@ -169,18 +169,12 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
 
             For Each revision As CommonRevision In CommonRevisions
                 revision.WriteLog()
-                If Not revision.Results.Success Then
-                    Exit For
-                End If
             Next
 
             DebugLogger.AddLog(" 2.- Results for Data scripts", "UpdateVersion")
 
             For Each revision As DataRevision In DataRevisions
                 revision.WriteLog()
-                If Not revision.Results.Success Then
-                    Exit For
-                End If
             Next
 
             DebugLogger.AddLog(" --------------------------------------------", "UpdateVersion")

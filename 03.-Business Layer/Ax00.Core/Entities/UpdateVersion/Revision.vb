@@ -1,6 +1,7 @@
 ﻿Imports System.Globalization
 Imports System.Xml.Serialization
 Imports Biosystems.Ax00.BL
+Imports Biosystems.Ax00.DAL
 Imports Microsoft.SqlServer.Management.Smo
 
 ' ReSharper disable once CheckNamespace
@@ -69,32 +70,17 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
 
 
         Public Sub RunPrerequisites(ByRef server As Server, ByVal dataBaseName As String)
-            If PrerequisiteScript Is Nothing OrElse PrerequisiteScript.Trim = String.Empty Then Return
-            Debug.WriteLine("Running prerequisite script")
 
+            If PrerequisiteScript Is Nothing OrElse PrerequisiteScript.Trim = String.Empty Then Return
+            Results.Success = DBManager.ExecuteBooleanScript(server, dataBaseName, PrerequisiteScript, Results.Exception)
             If Results.Success = False Then Results.LastErrorStep = ExecutionResults.ErrorStep.PrerequisiteScript
+
         End Sub
 
-        'Private Sub RunStructure(result As ExecutionResults)
-        '    If StructureScript Is Nothing OrElse StructureScript.Trim = String.Empty Then Return
-        '    Debug.WriteLine("Running structure script")
-
-
-        '    If result.Success = False Then result.LastErrorStep = ExecutionResults.ErrorStep.StructureScript
-
-        'End Sub
-
-        'Private Sub RunData(result As ExecutionResults)
-        '    If DataScript Is Nothing OrElse DataScript.Trim = String.Empty Then Return
-        '    Debug.WriteLine("Running data script")
-
-        '    If result.Success = False Then result.LastErrorStep = ExecutionResults.ErrorStep.DataScript
-        'End Sub
-
         Public Sub RunIntegrity(ByRef server As Server, ByVal dataBaseName As String)
-            If IntegrityScript Is Nothing OrElse IntegrityScript.Trim = String.Empty Then Return
-            Debug.WriteLine("Running integrity script")
 
+            If IntegrityScript Is Nothing OrElse IntegrityScript.Trim = String.Empty Then Return
+            Results.Success = DBManager.ExecuteBooleanScript(server, dataBaseName, IntegrityScript, Results.Exception)
             If Results.Success = False Then Results.LastErrorStep = ExecutionResults.ErrorStep.IntegrityCheckScript
 
         End Sub

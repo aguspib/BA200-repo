@@ -384,6 +384,30 @@ Namespace Biosystems.Ax00.DAL
             Return result
         End Function
 
+        Public Shared Function ExecuteBooleanScript(ByVal server As Server, ByVal dataBaseName As String, _
+                                              ByVal sqlScripts As String, _
+                                              ByRef returnedError As Exception, _
+                                              Optional ByVal pTransactionCommand As String = "") As Boolean
+
+            Dim result As Boolean = False
+
+            Try
+
+                Dim dbCmd As New SqlClient.SqlCommand
+                dbCmd.Connection = server.ConnectionContext.SqlConnectionObject
+                dbCmd.CommandText = sqlScripts
+
+                result = CType(dbCmd.ExecuteScalar, Boolean)
+
+            Catch ex As Exception
+                returnedError = ex
+                GlobalBase.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.ExecuteScripts", EventLogEntryType.Error, False)
+            End Try
+
+            Return result
+
+        End Function
+
         ''' <summary>
         ''' Validate if a database exist on the server.
         ''' </summary>
