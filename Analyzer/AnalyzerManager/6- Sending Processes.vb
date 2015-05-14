@@ -1128,8 +1128,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 Dim lastSampleType As String = ""
                                 Dim lastSampleClass As String = ""
 
-                                Dim sentLinqList As New List(Of AnalyzerManagerDS.sentPreparationsRow)
-                                sentLinqList = (From a As AnalyzerManagerDS.sentPreparationsRow In mySentPreparationsDS.sentPreparations _
+                                Dim sentLinqList = (From a As AnalyzerManagerDS.sentPreparationsRow In mySentPreparationsDS.sentPreparations _
                                                 Where String.Equals(a.ExecutionType, "PREP_STD") _
                                                 Select a).ToList
 
