@@ -13,6 +13,8 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
     Public Class ContaminationsContext
         Implements IContaminationsContext
 
+
+
         Public ReadOnly Steps As RangedCollection(Of ContextStep)
         Public ReadOnly ContaminationsSpecifications As IAnalyzerContaminationsSpecification
 
@@ -30,7 +32,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
         End Sub
 
-        Public Function ActionRequiredForDispensing(dispensing As IReagentDispensing) As ActionRequiredForDispensing Implements IContaminationsContext.GetActionRequiredForAGivenDispensing
+        Public Function ActionRequiredForDispensing(dispensing As IReagentDispensing) As ActionRequiredForDispensing Implements IContaminationsContext.ActionRequiredForDispensing
 
             Dim lookUpFilter As New HashSet(Of String)
             Dim results As New ActionRequiredForDispensing 'New List(Of IWashingDescription)
@@ -198,6 +200,14 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
         End Sub
 
 #End Region
+
+        Public Function ActionRequiredForAGivenDispensing(ReagentID As ExecutionsDS.twksWSExecutionsRow) As ActionRequiredForDispensing Implements IContaminationsContext.ActionRequiredForDispensing
+            Dim D As New ReagentDispensing()
+            D.FillDispense(ContaminationsSpecifications, ReagentID)
+            Return ActionRequiredForDispensing(D)
+
+        End Function
+
 
     End Class
 

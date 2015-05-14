@@ -4,7 +4,9 @@ Imports Biosystems.Ax00.Types
 
 Namespace Biosystems.Ax00.Core.Entities.Worksession.Interfaces
     Public Interface IContaminationsContext
-        Function GetActionRequiredForAGivenDispensing(dispensing As IReagentDispensing) As ActionRequiredForDispensing
+        Function ActionRequiredForDispensing(dispensing As IReagentDispensing) As ActionRequiredForDispensing
+        Function ActionRequiredForDispensing(Execution As ExecutionsDS.twksWSExecutionsRow) As ActionRequiredForDispensing
+
 
         ''' <summary>
         ''' fills context from minimum index to 0, using the ExecutionsDS.<Para>This method ONLY fills the first dispensing (R1). </Para>
