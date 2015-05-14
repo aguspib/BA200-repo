@@ -1519,7 +1519,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorMessage = ex.Message 'AG 19/06/2012
 
                 'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.GetNextExecution", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex) '.Message, "AnalyzerManager.GetNextExecution", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -1595,13 +1595,22 @@ Namespace Biosystems.Ax00.Core.Entities
 
             previousReagentIDSentList = (From a As AnalyzerManagerDS.sentPreparationsRow In mySentPreparationsDS.sentPreparations _
                                      Where a.ExecutionType = "PREP_STD" Select a).ToList
-
+            Debug.Print("SeachContaminationBetweenPreviousAndFirsToSend: " & previousReagentIDSentList.Count)
             Dim context = ContaminationsSpecification.CurrentRunningContext
 
+            Dim executionB2 = 0
+            Dim executionB1 = 0
+            If previousReagentIDSentList.Count >= 1 Then ExecutionB2 = previousReagentIDSentList(0).ExecutionID
+            If previousReagentIDSentList.Count >= 2 Then ExecutionB1 = previousReagentIDSentList(1).ExecutionID
+            context.FillContentsFromAnalyzer(String.Format("STATUS;R1B2:{0};R1B1:{1};", executionB2, executionB1))
+
+            Debug.Print("CourrentContext read")
             Dim result = context.ActionRequiredForDispensing(ReagentID)
             If result.Action <> IContaminationsAction.RequiredAction.NoAction Then
+                Debug.Print("Contaminations found")
                 Return True
             Else
+                Debug.Print("Contaminations not found")
                 Return False
             End If
 

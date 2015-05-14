@@ -2,6 +2,7 @@
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Interfaces
 Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.DAL.DAO
+Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Types.ExecutionsDS
 
 Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
@@ -86,7 +87,17 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
         Public Property ReagentNumber As Integer Implements IReagentDispensing.ReagentNumber
 
+        Dim _executionID As Integer
         Public Property ExecutionID As Integer Implements IReagentDispensing.ExecutionID
+            Get
+                Return _executionID
+            End Get
+            Set(value As Integer)
+                _executionID = value
+                Dim dt As vwksWSExecutionsMonitorDataTable
+
+            End Set
+        End Property
 
         Private Sub FillContaminations()
             _contamines = New Dictionary(Of Integer, IDispensingContaminationDescription)()
@@ -118,12 +129,12 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
         Public Sub FillDispense(analyzerContaminationsSpecification As IAnalyzerContaminationsSpecification, ByVal row As twksWSExecutionsRow) Implements IReagentDispensing.FillDispense
 
-            R1ReagentID = row.ReagentID
-            SampleClass = row.SampleClass
-            OrderTestID = row.OrderTestID
-            TestID = row.TestID
+            If Not row.IsReagentIDNull Then R1ReagentID = row.ReagentID
+            If Not row.IsSampleClassNull Then SampleClass = row.SampleClass
+            If Not row.IsOrderTestIDNull Then OrderTestID = row.OrderTestID
+            If Not row.IsTestIDNull Then TestID = row.TestID
 
-            Dim pTestMode = tparTestSamplesDAO.GetPredilutionModeForTest(row.TestID, row.SampleType)
+            Dim pTestMode = tparTestSamplesDAO.GetPredilutionModeForTest(R1ReagentID, row.SampleType)
 
             If String.CompareOrdinal(pTestMode, "INST") = 0 AndAlso String.CompareOrdinal(SampleClass, "PATIENT") = 0 Then
                 DelayCyclesForDispensing = analyzerContaminationsSpecification.AdditionalPredilutionSteps - 1
