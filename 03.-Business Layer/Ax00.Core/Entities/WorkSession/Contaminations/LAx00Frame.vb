@@ -59,9 +59,10 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             Return Parameters.ElementAt(index).Key
         End Function
 
-        Default Public Property Item(key As String) As String
+        Default Public Property Item(key As String, Optional defaultValue As String = "") As String
             Get
-                Return Parameters(key)
+                If Parameters.ContainsKey(key) Then Return Parameters(key) Else Return defaultValue
+
             End Get
             Set(value As String)
                 Parameters(key) = value

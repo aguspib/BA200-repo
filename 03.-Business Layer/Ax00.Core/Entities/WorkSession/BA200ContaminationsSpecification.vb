@@ -15,6 +15,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
     Public Class BA200ContaminationsSpecification
         Implements IAnalyzerContaminationsSpecification
 
+
         Private myThread As Threading.Thread
         Sub New()
 
@@ -37,9 +38,11 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             ProcessInstructionReceived(eventKind, data)
         End Sub
         Private Sub ProcessInstructionReceived(eventKind As GlobalEnumerates.AppLayerEventList, ByVal data As String)
-            If Threading.Thread.CurrentThread IsNot myThread Then
-                'MsgBox("Threading and message received: " & data)
-            End If
+            'If Threading.Thread.CurrentThread IsNot myThread Then
+            '    Debug.WriteLine("Analyzer message from foreign thread: " & data)
+            'Else
+            '    Debug.WriteLine("Analyzer message from main thread: " & data)
+            'End If
         End Sub
 
         Public Property ContaminationsContextRange As Range(Of Integer) Implements IAnalyzerContaminationsSpecification.ContaminationsContextRange
@@ -121,7 +124,24 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
             Return testReagentsDataDS
         End Function
+
+        Dim _currentContext As ContaminationsContext
 #End Region
 
+        Public Sub FillContextFromAnayzerData(instruction As IEnumerable(Of InstructionParameterTO)) Implements IAnalyzerContaminationsSpecification.FillContextFromAnayzerData
+            Dim analyzerFrame = New LAx00Frame(instruction)
+            If analyzerFrame("R") = "1" Then
+                Dim context = New ContaminationsContext(Me)
+                context.FillContentsFromAnalyzer(analyzerFrame)
+                _currentContext = context
+                Debug.WriteLine("Context filled in running! ")
+            End If
+        End Sub
+
+        Public ReadOnly Property CurrentRunningContext As IContaminationsContext Implements IAnalyzerContaminationsSpecification.CurrentRunningContext
+            Get
+                Return _currentContext
+            End Get
+        End Property
     End Class
 End Namespace

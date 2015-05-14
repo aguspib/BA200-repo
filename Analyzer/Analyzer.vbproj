@@ -157,6 +157,7 @@
     <Compile Include="AnalyzerManager\ToIntegrate.vb" />
     <Compile Include="Interfaces\IAnalyzerContaminationSpecification.vb" />
     <Compile Include="Interfaces\IAnalyzerManager.vb" />
+    <Compile Include="Interfaces\IContaminationsContext.vb" />
     <Compile Include="Interfaces\IDispensingContaminationDescription.vb" />
     <Compile Include="Interfaces\IISEManager.vb" />
     <Compile Include="Interfaces\IReagentDispensing.vb" />

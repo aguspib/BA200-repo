@@ -8,7 +8,10 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Types.ExecutionsDS
 
 Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
+
+
     Public Class ContaminationsContext
+        Implements IContaminationsContext
 
         Public ReadOnly Steps As RangedCollection(Of ContextStep)
         Public ReadOnly ContaminationsSpecifications As IAnalyzerContaminationsSpecification
@@ -27,7 +30,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
         End Sub
 
-        Function GetWashingRequiredForAGivenDispensing(dispensing As IReagentDispensing) As List(Of IWashingDescription)
+        Public Function GetWashingRequiredForAGivenDispensing(dispensing As IReagentDispensing) As List(Of IWashingDescription) Implements IContaminationsContext.GetWashingRequiredForAGivenDispensing
 
             Dim lookUpFilter As New HashSet(Of String)
             Dim results As New List(Of IWashingDescription)
@@ -52,8 +55,8 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
         End Function
 
-        Public Sub FillContentsFromAnalyzer(instructionParameters As IEnumerable(Of InstructionParameterTO))
-            AnalyzerFrame = New LAx00Frame(instructionParameters)
+        Public Sub FillContentsFromAnalyzer(instructionParameters As LAx00Frame)
+            AnalyzerFrame = instructionParameters
             FillSteps()
         End Sub
 
@@ -103,7 +106,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             Debug.WriteLine("DONE!")
         End Sub
 
-        Sub FillContextInRunning(executions As ExecutionsDS)
+        Public Sub FillContextInRunning(executions As ExecutionsDS)
             For curStep = Steps.Range.Minimum To Steps.Range.Maximum
                 For curDispense = 1 To ContaminationsSpecifications.DispensesPerStep
 
@@ -125,7 +128,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
         ''' </summary>
         ''' <param name="expectedExecutions"></param>
         ''' <remarks></remarks>
-        Sub FillContextInStatic(expectedExecutions As ExecutionsDS)
+        Public Sub FillContextInStatic(expectedExecutions As ExecutionsDS) Implements IContaminationsContext.FillContextInStatic
             Dim Lista As New List(Of ExecutionsDS.twksWSExecutionsRow)
             For Each item In expectedExecutions.twksWSExecutions
                 Lista.Add(item)
@@ -133,7 +136,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             FillContextInStatic(Lista)
         End Sub
 
-        Sub FillContextInStatic(executionsList As List(Of ExecutionsDS.twksWSExecutionsRow))
+        Public Sub FillContextInStatic(executionsList As List(Of ExecutionsDS.twksWSExecutionsRow)) Implements IContaminationsContext.FillContextInStatic
             'We fill all Steps and ContexttStep collections with data:
             Dim maxIndex = executionsList.Count - 1
 
@@ -174,15 +177,17 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
                     If curStep < 0 Then   'Before step(s).
                         Steps(curStep)(curDispense) = ContaminationsSpecifications.CreateDispensing()
                         Dim parameterName = String.Format("R{0}B{1}", curDispense, Math.Abs(curStep))
-                        Steps(curStep)(curDispense).ExecutionID = CInt(AnalyzerFrame(parameterName))
-
+                        If AnalyzerFrame.KeysCollection.Contains(parameterName) Then
+                            Steps(curStep)(curDispense).ExecutionID = CInt(AnalyzerFrame(parameterName))
+                        End If
                     ElseIf curStep = 0 Then   'Current step
 
                     ElseIf curStep > 0 Then   'After step(s)
                         Steps(curStep)(curDispense) = ContaminationsSpecifications.CreateDispensing()
                         Dim parameterName = String.Format("R{0}A{1}", curDispense, curStep)
-                        Steps(curStep)(curDispense).ExecutionID = CInt(AnalyzerFrame(parameterName))
-
+                        If AnalyzerFrame.KeysCollection.Contains(parameterName) Then
+                            Steps(curStep)(curDispense).ExecutionID = CInt(AnalyzerFrame(parameterName))
+                        End If
                     End If
                 Next
             Next

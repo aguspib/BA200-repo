@@ -11504,10 +11504,10 @@ Partial Public Class UiAx00MainMDI
 #End Region
 
 #Region "Help Area"
-    ''' <summary>
-    ''' Get the help file name on the current application language.
-    ''' </summary>
-    ''' <remarks>CREATED BY: TR 03/11/2011</remarks>
+        ''' <summary>
+        ''' Get the help file name on the current application language.
+        ''' </summary>
+        ''' <remarks>CREATED BY: TR 03/11/2011</remarks>
     Public Sub SetHelpProvider()
         Try
 

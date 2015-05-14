@@ -8,6 +8,7 @@ Imports Biosystems.Ax00.Core.Entities.WorkSession.Interfaces
 Namespace Biosystems.Ax00.Core.Entities
 
     Public Class BA200AnalyzerEntity
+
         Inherits AnalyzerManager
 
 
@@ -34,6 +35,10 @@ Namespace Biosystems.Ax00.Core.Entities
                      ByVal pWorkSessionID As String, ByVal pWell As Integer, ByVal pBaseLineWithAdjust As Boolean) As GlobalDataTO
 
             Return GetCurrentBaseLineIDByType(pdbConnection, pAnalyzerID, pWorkSessionID, pWell, pBaseLineWithAdjust, BaseLineTypeForCalculations.ToString())
+        End Function
+
+        Public Overrides Function ContaminationsSpecification() As IAnalyzerContaminationsSpecification
+            Return WSExecutionCreator.Instance.ContaminationsSpecification
         End Function
 
 #End Region
