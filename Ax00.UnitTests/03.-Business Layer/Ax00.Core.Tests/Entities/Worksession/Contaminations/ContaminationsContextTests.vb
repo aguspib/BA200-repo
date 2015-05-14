@@ -29,7 +29,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Tests
             Assert.AreEqual(cont.Steps(-2)(2).ExecutionID, 9)
 
             'Obtener la washing solution necesaria si le doy la técnica 12
-            cont.Steps(-2)(2).RequiredWashingSolution(New ReagentDispensing With {.R1ReagentID = 12}, -2)
+            cont.Steps(-2)(2).RequiredWashingOrSkip(New ReagentDispensing With {.R1ReagentID = 12}, -2)
 
         End Sub
 

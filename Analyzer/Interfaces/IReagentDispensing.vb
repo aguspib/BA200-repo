@@ -27,7 +27,7 @@ Namespace Biosystems.Ax00.Core.Entities.Worksession.Contaminations.Interfaces
 
         ReadOnly Property Contamines As Dictionary(Of Integer, IDispensingContaminationDescription)
 
-        Function RequiredWashingSolution(Reagent As IReagentDispensing, scope As Integer) As IWashingDescription
+        Function RequiredWashingOrSkip(Reagent As IReagentDispensing, scope As Integer) As IContaminationsAction
 
         ''' <summary>
         ''' This indicates the number of cycles that will take between the dispense is programmed and the analyzer actually makes the dispensing. 

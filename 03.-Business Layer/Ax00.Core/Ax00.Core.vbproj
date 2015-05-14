@@ -104,6 +104,7 @@
     <Compile Include="Entities\WorkSession\BA400ContaminationsSpecification.vb" />
     <Compile Include="Entities\WorkSession\BA200ContaminationsSpecification.vb" />
     <Compile Include="Entities\WorkSession\Contaminations\ContaminationManager.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\ContaminationsAction.vb" />
     <Compile Include="Entities\WorkSession\Contaminations\LAx00Frame.vb" />
     <Compile Include="Entities\WorkSession\Contaminations\ContaminationsContext.vb" />
     <Compile Include="Entities\WorkSession\Contaminations\ContextStep.vb" />

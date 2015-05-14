@@ -30,10 +30,10 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
         End Sub
 
-        Public Function GetWashingRequiredForAGivenDispensing(dispensing As IReagentDispensing) As List(Of IWashingDescription) Implements IContaminationsContext.GetWashingRequiredForAGivenDispensing
+        Public Function ActionRequiredForDispensing(dispensing As IReagentDispensing) As ActionRequiredForDispensing Implements IContaminationsContext.GetActionRequiredForAGivenDispensing
 
             Dim lookUpFilter As New HashSet(Of String)
-            Dim results As New List(Of IWashingDescription)
+            Dim results As New ActionRequiredForDispensing 'New List(Of IWashingDescription)
 
             For curStep = Steps.Range.Minimum To Steps.Range.Maximum
                 If Steps(curStep) Is Nothing Then Continue For
@@ -42,12 +42,16 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
                     If curDispensing > 1 Then Exit For
                     If Steps(curStep)(curDispensing) Is Nothing Then Continue For
                     Dim dispensingToAsk = Steps(curStep)(curDispensing)
-                    Dim requiredWashing = dispensingToAsk.RequiredWashingSolution(dispensing, curStep)
-                    If requiredWashing.WashingStrength > 0 AndAlso lookUpFilter.Contains(requiredWashing.WashingSolutionID) = False Then
-                        lookUpFilter.Add(requiredWashing.WashingSolutionID)
-                        results.Add(requiredWashing)
+                    Dim requiredWashing = dispensingToAsk.RequiredWashingOrSkip(dispensing, curStep)
+                    If requiredWashing.Action = IContaminationsAction.RequiredAction.Wash Then
+                        If requiredWashing.InvolvedWash.WashingStrength > 0 AndAlso lookUpFilter.Contains(requiredWashing.InvolvedWash.WashingSolutionID) = False Then
+                            lookUpFilter.Add(requiredWashing.InvolvedWash.WashingSolutionID)
+                            results.InvolvedWashes.Add(requiredWashing.InvolvedWash)
+                        End If
+                    ElseIf requiredWashing.Action = IContaminationsAction.RequiredAction.Skip Then
+                        results.Action = IContaminationsAction.RequiredAction.Skip
+                        Exit For
                     End If
-
                 Next
             Next
 
