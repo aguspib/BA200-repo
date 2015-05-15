@@ -2233,7 +2233,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             Try
                                 Debug.Print(String.Format("Inside the For. Loop variable i = {0}; SentPreparations(i).ReagentWashFlag = {1}; SentPreparations(i).WashSolution1 = {2}; SentPreparations(i).ExecutionID = {3} ",
                                                           i.ToString(), mySentPreparationsDS.sentPreparations(i).ReagentWashFlag.ToString(), mySentPreparationsDS.sentPreparations(i).WashSolution1.ToString(), mySentPreparationsDS.sentPreparations(i).ExecutionID.ToString()))
-                            Catch ex As Exception
+                            Catch
 
                             End Try
 #End If
@@ -2246,7 +2246,7 @@ Namespace Biosystems.Ax00.Core.Entities
 #If DEBUG Then
                                 Try
                                     Debug.Print(String.Format("CheckIfContaminationStillExist: Found proper wash already sent in step {0} \n", i.ToString()))
-                                Catch ex As Exception
+                                Catch
                                 End Try
 #End If
                                 Exit For
