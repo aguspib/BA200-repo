@@ -2961,15 +2961,26 @@ Namespace Biosystems.Ax00.Core.Entities
             Return (toReturnAlarmList)
         End Function
 
-        Public Function SimpleTranslateErrorCodeToAlarmId(ByVal pDbConnection As SqlConnection, ByVal errorCode As Integer) As Alarms Implements IAnalyzerManager.SimpleTranslateErrorCodeToAlarmId
-            Dim dbConnection = GetSafeOpenDBConnection(pDbConnection)
-            If (Not dbConnection.HasError AndAlso Not dbConnection.SetDatos Is Nothing) Then
-                Dim c = (From a As AlarmsDS.tfmwAlarmsRow In alarmsDefintionTableDS.tfmwAlarms Where a.ErrorCode = errorCode Select a.AlarmID).ToList
-                If c.Count = 1 Then
+        Public Function SimpleTranslateErrorCodeToAlarmId(pDbConnection As SqlConnection, errorCode As Integer) As Alarms Implements IAnalyzerManager.SimpleTranslateErrorCodeToAlarmId
+            'Dim dbConnection As TypedGlobalDataTo(Of SqlConnection) = Nothing
+            Try
+                'dbConnection = GetSafeOpenDBConnection(pDbConnection)
+                'If (Not dbConnection.HasError AndAlso Not dbConnection.SetDatos Is Nothing) Then
+                Dim c = (From a As AlarmsDS.tfmwAlarmsRow In alarmsDefintionTableDS.tfmwAlarms Where a.ErrorCode = errorCode Select a.AlarmID)
+                If c.Any Then
                     Return DirectCast([Enum].Parse(GetType(Alarms), c.FirstOrDefault()), Alarms)
                 End If
-            End If
-            Return AlarmEnumerates.Alarms.NONE
+                'End If
+                Return AlarmEnumerates.Alarms.NONE
+            Catch
+                Throw
+            Finally
+                'If pDbConnection Is Nothing AndAlso dbConnection IsNot Nothing AndAlso dbConnection.SetDatos IsNot Nothing Then
+                'Try : dbConnection.SetDatos.Close()
+                'Catch : End Try
+                'End If
+            End Try
+
         End Function
 
         ''' <summary>

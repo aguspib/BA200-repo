@@ -138,6 +138,8 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             End If
         End Sub
 
+
+
         Public ReadOnly Property CurrentRunningContext As IContaminationsContext Implements IAnalyzerContaminationsSpecification.CurrentRunningContext
             Get
                 Return _currentContext

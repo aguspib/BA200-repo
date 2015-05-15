@@ -987,7 +987,9 @@ Namespace Biosystems.Ax00.DAL.DAO
 
         Public Shared Function GetPredilutionModeForTest(pTestID As Integer, pSampleType As String) As String
             If pSampleType = String.Empty Then Return ""
-            Dim Query = String.Format("SELECT TOP 1 [PredilutionMode] FROM [Ax00].[dbo].[tparTestSamples] Where TestID = {0} And SampleType='{1}';", pTestID, pSampleType)
+            Dim Query = String.Format("SELECT top (1) b.predilutionmode " &
+  "FROM [Ax00].[dbo].[tparTestReagents] a, [Ax00].[dbo].[tpartestsamples] b " &
+  "where a.TestID = b.TestID and a.ReagentID = {0} and b.SampleType = '{1}'", pTestID, pSampleType)
 
             Dim resultData As New GlobalDataTO
             Dim connection = GetSafeOpenDBConnection(Nothing)
@@ -1013,6 +1015,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 End If
 
             Catch ex As Exception
+                Throw
                 'resultData.HasError = True
                 'resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 'resultData.ErrorMessage = ex.Message

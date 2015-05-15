@@ -15,7 +15,8 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
 
 
-        Public ReadOnly Steps As RangedCollection(Of ContextStep)
+
+        'Public Property Steps As RangedCollection(Of ContextStep) Implements IContaminationsContext.Steps
         Public ReadOnly ContaminationsSpecifications As IAnalyzerContaminationsSpecification
 
         Sub New(contaminationsSpecifications As IAnalyzerContaminationsSpecification)
@@ -23,7 +24,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             Me.ContaminationsSpecifications = contaminationsSpecifications
             Dim range = contaminationsSpecifications.ContaminationsContextRange
 
-            Steps = New RangedCollection(Of ContextStep)(range)
+            Steps = New RangedCollection(Of IContextStep)(range)
 
             Steps.AllowOutOfRange = False
             For i = range.Minimum To range.Maximum
@@ -66,7 +67,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             FillSteps()
         End Sub
 
-        Public Sub FillContentsFromAnalyzer(rawAnalyzerFrame As String)
+        Public Sub FillContentsFromAnalyzer(rawAnalyzerFrame As String) Implements IContaminationsContext.FillContentsFromAnalyzer
             AnalyzerFrame = New LAx00Frame()
             AnalyzerFrame.ParseRawData(rawAnalyzerFrame)
             FillSteps()
@@ -181,7 +182,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
                 For curDispense = 1 To ContaminationsSpecifications.DispensesPerStep
 
                     If curStep < 0 Then   'Before step(s).
-                        Steps(curStep)(curDispense) = ContaminationsSpecifications.CreateDispensing()
+                        If Steps(curStep)(curDispense) Is Nothing Then Steps(curStep)(curDispense) = ContaminationsSpecifications.CreateDispensing()
                         Dim parameterName = String.Format("R{0}B{1}", curDispense, Math.Abs(curStep))
                         If AnalyzerFrame.KeysCollection.Contains(parameterName) Then
                             Steps(curStep)(curDispense).ExecutionID = CInt(AnalyzerFrame(parameterName))
@@ -189,7 +190,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
                     ElseIf curStep = 0 Then   'Current step
 
                     ElseIf curStep > 0 Then   'After step(s)
-                        Steps(curStep)(curDispense) = ContaminationsSpecifications.CreateDispensing()
+                        If Steps(curStep)(curDispense) Is Nothing Then Steps(curStep)(curDispense) = ContaminationsSpecifications.CreateDispensing()
                         Dim parameterName = String.Format("R{0}A{1}", curDispense, curStep)
                         If AnalyzerFrame.KeysCollection.Contains(parameterName) Then
                             Steps(curStep)(curDispense).ExecutionID = CInt(AnalyzerFrame(parameterName))
@@ -209,6 +210,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
         End Function
 
 
+        Public Property Steps As RangedCollection(Of IContextStep) Implements IContaminationsContext.Steps
     End Class
 
 End Namespace

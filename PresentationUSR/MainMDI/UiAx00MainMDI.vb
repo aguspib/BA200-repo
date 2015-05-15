@@ -1484,7 +1484,7 @@ Partial Public Class UiAx00MainMDI
                                 'TR 04/10/2011 - Implemented new method
                                 EnableButtonAndMenus(False)   'AG 08/11/2012 - Moved after 'If (myResult = DialogResult.OK) Then'
 
-                                MDILISManager.ClearQueueOfSpecimenNotResponded()   'AG 23/07/2013 - Patients are removed from rotor during Reset, so it has no sense keep this queue
+                                If MDILISManager IsNot Nothing Then MDILISManager.ClearQueueOfSpecimenNotResponded() 'AG 23/07/2013 - Patients are removed from rotor during Reset, so it has no sense keep this queue
                                 Dim workingThread As New Threading.Thread(AddressOf ResetSession)
                                 ScreenWorkingProcess = True
                                 processingReset = True

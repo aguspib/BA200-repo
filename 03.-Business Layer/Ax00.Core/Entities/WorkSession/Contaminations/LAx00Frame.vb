@@ -33,6 +33,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
             _frame = Frame
 
+            If buffer Is Nothing Then buffer = New StringBuilder
             buffer.Clear()
 
             Parameters = ParseParameters()

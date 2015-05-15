@@ -158,6 +158,7 @@
     <Compile Include="Interfaces\IAnalyzerContaminationSpecification.vb" />
     <Compile Include="Interfaces\IAnalyzerManager.vb" />
     <Compile Include="Interfaces\IContaminationsContext.vb" />
+    <Compile Include="Interfaces\IContextStep.vb" />
     <Compile Include="Interfaces\IDispensingContaminationDescription.vb" />
     <Compile Include="Interfaces\IDispensingRequiredContaminationsAction.vb" />
     <Compile Include="Interfaces\IISEManager.vb" />
