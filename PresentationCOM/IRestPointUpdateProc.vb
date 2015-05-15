@@ -400,7 +400,12 @@ Public Class UiRestPointUpdateProc
 
             'TR 29/01/2013 -Implementation Update process.
             Dim myGlobalDataTO As New GlobalDataTO
+            DebugLogger.AddLog(" --------------------------------------------", "UpdateVersion")
+            DebugLogger.AddLog(" UPDATE VERSION - RESTORE POINT PROCESS (INI)", "UpdateVersion")
             myGlobalDataTO = UpdaterController.Instance.InstallUpdateProcess(DAOBase.DBServer, DAOBase.CurrentDB, DAOBase.DBLogin, DAOBase.DBPassword, True) 'BA-2471: IT 08/05/2015
+            DebugLogger.AddLog(" UPDATE VERSION - RESTORE POINT PROCESS (END)", "UpdateVersion")
+            DebugLogger.AddLog(" --------------------------------------------", "UpdateVersion")
+
             If myGlobalDataTO.HasError Then
                 Me.DBUpdated = False
                 Dim myMessage As String = "Updating process has been cancelled because some errors have been found. No changes were made on database." & _

@@ -1171,8 +1171,12 @@ Public Class UiAx00Login
         Dim myGlobalDataTO As New GlobalDataTO
         Try
 
+            DebugLogger.AddLog(" --------------------------------------------", "UpdateVersion")
+            DebugLogger.AddLog(" UPDATE VERSION - LOGIN PROCESS (INI)", "UpdateVersion")
             'GlobalBase.CreateLogActivity(Me.Name & ".Updateprocess -Validating if Data Base exists ", "Installation validation", EventLogEntryType.Information, False)
             myGlobalDataTO = UpdaterController.Instance.InstallUpdateProcess(DAOBase.DBServer, DAOBase.CurrentDB, DAOBase.DBLogin, DAOBase.DBPassword) 'BA-2471: IT 08/05/2015
+            DebugLogger.AddLog(" UPDATE VERSION - LOGIN PROCESS (END)", "UpdateVersion")
+            DebugLogger.AddLog(" --------------------------------------------", "UpdateVersion")
 
         Catch ex As Exception
             MessageBox.Show(ex.Message + " ((" + ex.HResult.ToString + "))")

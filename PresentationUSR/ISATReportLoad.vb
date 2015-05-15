@@ -428,7 +428,11 @@ Public Class UiSATReportLoad
 
             'TR 29/01/2013 -Implementation Update process.
             Dim myGlobalDataTO As New GlobalDataTO
+            DebugLogger.AddLog(" --------------------------------------------", "UpdateVersion")
+            DebugLogger.AddLog(" UPDATE VERSION - SATREPORT PROCESS (INI)", "UpdateVersion")
             myGlobalDataTO = UpdaterController.Instance.InstallUpdateProcess(DAOBase.DBServer, DAOBase.CurrentDB, DAOBase.DBLogin, DAOBase.DBPassword, True) 'BA-2471: IT 08/05/2015
+            DebugLogger.AddLog(" UPDATE VERSION - SATREPORT PROCESS (END)", "UpdateVersion")
+            DebugLogger.AddLog(" --------------------------------------------", "UpdateVersion")
             If myGlobalDataTO.HasError Then
                 Me.DBUpdated = False
                 Dim myMessage As String = "Updating process has been cancelled because some errors have been found. No changes were made on database." & _
@@ -546,8 +550,6 @@ Public Class UiSATReportLoad
                         'AG 25/10/2011
 
                         If Not myGlobal.HasError Then
-                            DebugLogger.AddLog(" LOADING SATREPORT.", "UpdateVersion")
-                            DebugLogger.AddLog(String.Format(" SAT Report Version: {0} Software Version: {0}", mySATVersion, myAppVersion), "UpdateVersion")
                             myGlobal = Me.ManageVersionComparison(myComparisonResult)
                         End If
 

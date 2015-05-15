@@ -1,2 +1,18 @@
 ﻿<DatabaseUpdatesManager xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Releases>
+    <!-- 
+	  <Release Version="00.00.00">
+    <DataRevisions>
+      <DataRevision JiraID="" SequenceNumber="">
+        <PrerequisiteScript>
+        </PrerequisiteScript>
+        <DataScript>
+        </DataScript>
+        <IntegrityScript>
+        </IntegrityScript> 
+      </DataRevision>
+    </DataRevisions>
+    </Release>
+	  -->
+  </Releases>
 </DatabaseUpdatesManager>
