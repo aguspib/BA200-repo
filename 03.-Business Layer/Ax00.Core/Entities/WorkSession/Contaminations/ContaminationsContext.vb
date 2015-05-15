@@ -222,17 +222,17 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             Next
         End Sub
 
-        Private Sub SetStepValues(parameterName As String, targetStep As IDispensing, curDispense As Integer)
+        Private Sub SetStepValues(parameterName As String, targetDispensing As IDispensing, curDispense As Integer)
 
             Dim value = AnalyzerFrame(parameterName)
             If String.Equals(value, "D", StringComparison.OrdinalIgnoreCase) Then
-                targetStep.KindOfLiquid = IDispensing.KindOfDispensedLiquid.Dummy
+                targetDispensing.KindOfLiquid = IDispensing.KindOfDispensedLiquid.Dummy
             ElseIf value.StartsWith("W", StringComparison.OrdinalIgnoreCase) Then
-                targetStep.WashingID = CInt(Mid(value, 2))
+                targetDispensing.WashingID = CInt(Mid(value, 2))
             Else
-                targetStep.ExecutionID = CInt(value)
+                targetDispensing.ExecutionID = CInt(value)
             End If
-            targetStep.ReagentNumber = curDispense
+            targetDispensing.ReagentNumber = curDispense
         End Sub
 
 #End Region

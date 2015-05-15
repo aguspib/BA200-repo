@@ -125,8 +125,18 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             Set(value As Integer)
                 _executionID = value
                 'TODO: Get all data from ExecutionID
-                Dim dt As vwksWSExecutionsMonitorDataTable
-
+                Dim aux = New Biosystems.Ax00.DataAccess.vWSExecutionsDAO()
+                If aux IsNot Nothing Then
+                    Dim resultDS = aux.GetInfoExecutionByExecutionID(_executionID)
+                    If resultDS IsNot Nothing AndAlso resultDS.vWSExecutionsSELECT.Any Then
+                        Dim result = resultDS.vWSExecutionsSELECT(0)
+                        R1ReagentID = result.ReagentID
+                        OrderTestID = result.OrderTestID
+                        SampleClass = result.SampleClass
+                        Dim predilutionMode = If(result.IsPredilutionModeNull, "", result.PredilutionMode)
+                        DelayCyclesForDispensing = If(predilutionMode = "INST", WSExecutionCreator.Instance.ContaminationsSpecification.AdditionalPredilutionSteps - 1, 0)
+                    End If
+                End If
             End Set
         End Property
 

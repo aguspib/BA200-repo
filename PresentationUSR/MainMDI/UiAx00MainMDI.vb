@@ -11546,4 +11546,31 @@ Partial Public Class UiAx00MainMDI
     Private Sub AuxBA200ToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AuxBA200ToolStripMenuItem.Click
         BA200TestForm.Show()
     End Sub
+
+    Private Sub UiAx00MainMDI_MdiChildActivate(sender As Object, e As EventArgs) Handles Me.MdiChildActivate
+
+
+        Dim differentWidth = Me.ActiveMdiChild.Width - Me.GetMdiClientWindow.ClientSize.Width
+        If differentWidth > 0 Then
+            Me.Width += differentWidth
+            Me.Left -= CInt(differentWidth / 2)
+        End If
+
+        Dim differentHeight = Me.ActiveMdiChild.Height - Me.GetMdiClientWindow.ClientSize.Height
+        If differentHeight > 0 Then
+            Me.Height += differentHeight
+            Me.Top -= CInt(differentHeight / 2)
+        End If
+
+    End Sub
+
+    Private Function GetMdiClientWindow() As MdiClient
+        For Each ctl As Control In Me.Controls
+            If TypeOf ctl Is MdiClient Then
+                Return TryCast(ctl, MdiClient)
+            End If
+        Next
+        Return Nothing
+    End Function
+
 End Class
