@@ -1591,7 +1591,7 @@ Namespace Biosystems.Ax00.Core.Entities
             Return toSendList
         End Function
 
-        Private Function SeachContaminationBetweenPreviousAndFirsToSend(ByRef previousReagentIDSentList As List(Of AnalyzerManagerDS.sentPreparationsRow), pContaminationsDS As ContaminationsDS, ReagentID As ExecutionsDS.twksWSExecutionsRow, pHighContaminationPersitance As Integer) As Boolean
+        Private Function SeachContaminationBetweenPreviousAndFirsToSend(ByRef previousReagentIDSentList As List(Of AnalyzerManagerDS.sentPreparationsRow), pContaminationsDS As ContaminationsDS, ReagentRow As ExecutionsDS.twksWSExecutionsRow, pHighContaminationPersitance As Integer) As Boolean
 
             previousReagentIDSentList = (From a As AnalyzerManagerDS.sentPreparationsRow In mySentPreparationsDS.sentPreparations _
                                      Where a.ExecutionType = "PREP_STD" Select a).ToList
@@ -1605,7 +1605,7 @@ Namespace Biosystems.Ax00.Core.Entities
             context.FillContentsFromAnalyzer(String.Format("STATUS;R1B2:{0};R1B1:{1};", executionB2, executionB1))
 
             Debug.Print("CourrentContext read")
-            Dim result = context.ActionRequiredForDispensing(ReagentID)
+            Dim result = context.ActionRequiredForDispensing(ReagentRow)
             If result.Action <> IContaminationsAction.RequiredAction.NoAction Then
                 Debug.Print("Contaminations found")
                 Return True

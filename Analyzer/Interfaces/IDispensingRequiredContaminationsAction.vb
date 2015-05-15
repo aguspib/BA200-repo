@@ -9,6 +9,7 @@ Namespace Biosystems.Ax00.Core.Entities.Worksession.Contaminations.Interfaces
             NoAction
             Wash
             Skip
+            RemoveRequiredWashing
         End Enum
 
     End Interface

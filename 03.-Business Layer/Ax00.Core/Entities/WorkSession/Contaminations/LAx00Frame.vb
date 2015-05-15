@@ -11,7 +11,16 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
         Const ParserbufferSize = 1024
         Const SentenceSeparator = ";"c
         Const ValueOperator = ":"c
-        <ThreadStatic> Shared buffer As New StringBuilder(ParserbufferSize)
+        <ThreadStatic> Shared _buffer As StringBuilder
+        Private Property buffer As StringBuilder
+            Get
+                If _buffer Is Nothing Then _buffer = New StringBuilder(ParserbufferSize)
+                Return _buffer
+            End Get
+            Set(value As StringBuilder)
+                _buffer = value
+            End Set
+        End Property
         Protected Parameters As New Dictionary(Of String, String)
 #End Region
 

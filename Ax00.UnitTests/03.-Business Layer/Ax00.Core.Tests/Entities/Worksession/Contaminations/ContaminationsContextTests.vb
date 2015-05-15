@@ -29,12 +29,12 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Tests
             Assert.AreEqual(cont.Steps(-2)(2).ExecutionID, 9)
 
             'Obtener la washing solution necesaria si le doy la técnica 12
-            cont.Steps(-2)(2).RequiredWashingOrSkip(New ReagentDispensing With {.R1ReagentID = 12}, -2)
+            cont.Steps(-2)(2).RequiredActionForDispensing(New Dispensing With {.R1ReagentID = 12}, -2)
 
         End Sub
 
-        Private Function DispensingMockFactory() As IReagentDispensing
-            Dim dispensing = Mock.Create(Of IReagentDispensing)()
+        Private Function DispensingMockFactory() As IDispensing
+            Dim dispensing = Mock.Create(Of IDispensing)()
             Return dispensing
         End Function
 

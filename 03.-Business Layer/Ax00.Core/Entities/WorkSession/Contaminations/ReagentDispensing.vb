@@ -6,22 +6,50 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Types.ExecutionsDS
 
 Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
-    Public Class ReagentDispensing
-        Implements IReagentDispensing
+    Public Class Dispensing
+        Implements IDispensing
 
-        Public Function RequiredWashingSolution(dispensing As IReagentDispensing, scope As Integer) As IContaminationsAction Implements IReagentDispensing.RequiredWashingOrSkip
+
+        Public Function RequiredWashingOrSkip(dispensing As IDispensing, scope As Integer) As IContaminationsAction Implements IDispensing.RequiredActionForDispensing
+
+            Select Case KindOfLiquid
+                Case IDispensing.KindOfDispensedLiquid.Dummy
+
+                    Return New ContaminationsAction With {.Action = IContaminationsAction.RequiredAction.NoAction}
+                Case IDispensing.KindOfDispensedLiquid.Ise, IDispensing.KindOfDispensedLiquid.Reagent
+                    Return ReagentRequiresWashingOrSkip(scope, dispensing)
+
+                Case IDispensing.KindOfDispensedLiquid.Washing
+                    Dim contaAction = New ContaminationsAction
+                    contaAction.Action = IContaminationsAction.RequiredAction.RemoveRequiredWashing
+                    Dim WashingSolutionID As String = "" 'TODO: Get washing solution String ID from WashingID
+                    contaAction.InvolvedWash = New WashingDescription(-1, WashingSolutionID)
+                    Return contaAction
+
+                Case Else
+                    Return Nothing
+
+            End Select
+
+        End Function
+
+        Private Function ReagentRequiresWashingOrSkip(scope As Integer, dispensing As IDispensing) As IContaminationsAction
+
+            'Scope indicates the distance in cycles with the reagent that is asking us if we contaminate it.
+            'A negative Scope value indicates we're BEFORE the dispensing we're checking. (contamiantions can be solved with washing)
+            'A possitive Scope value indicates we're AFTER the dispensing we're checking. (contaminations can be prevented with Skip)
 
             If scope = 0 Then   'A reagent can't contamine itself
                 Return New ContaminationsAction() With {.Action = IContaminationsAction.RequiredAction.NoAction}
 
-
+                'Miramos si el dispensing nos contaminará.
             ElseIf scope > 0 Then
-                Dim result = dispensing.RequiredWashingOrSkip(Me, -scope)
+                Dim result = dispensing.RequiredActionForDispensing(Me, -scope)
                 If result.Action = IContaminationsAction.RequiredAction.Wash Then
                     Return New ContaminationsAction() With {.Action = IContaminationsAction.RequiredAction.Skip}
                 ElseIf result.Action = IContaminationsAction.RequiredAction.Skip Then
                     'Back to future?? --> this is impossible
-#If Configuration = "Debug" Then
+#If Config = "Debug" Then
                     Throw New Exception("Skip can't be required to solve a contamination of a BEFORE reagent. Happy debugging!")
 #Else
                     Return New ContaminationsAction() With {.Action = IContaminationsAction.RequiredAction.Skip}
@@ -30,6 +58,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
                     Return New ContaminationsAction() With {.Action = IContaminationsAction.RequiredAction.NoAction}
                 End If
 
+                'Miramos si contaminamos al dispensing:
             ElseIf Contamines Is Nothing OrElse Contamines.ContainsKey(dispensing.R1ReagentID) = False Then
                 Return New ContaminationsAction() With {.Action = IContaminationsAction.RequiredAction.NoAction}
 
@@ -49,32 +78,33 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
                 End If
             End If
-
         End Function
 
-        Public ReadOnly Property AnalysisMode As Integer Implements IReagentDispensing.AnalysisMode
+        Public ReadOnly Property AnalysisMode As Integer Implements IDispensing.AnalysisMode
             Get
                 Return _analysisMode
             End Get
         End Property
 
-        Public ReadOnly Property Contamines As Dictionary(Of Integer, IDispensingContaminationDescription) Implements IReagentDispensing.Contamines
+        Public ReadOnly Property Contamines As Dictionary(Of Integer, IDispensingContaminationDescription) Implements IDispensing.Contamines
             Get
                 Return _contamines
             End Get
         End Property
 
-        Dim _r1ReagentID As Integer, _analysisMode As Integer, _contamines As Dictionary(Of Integer, IDispensingContaminationDescription)
+        Dim _r1ReagentId As Integer, _analysisMode As Integer, _contamines As Dictionary(Of Integer, IDispensingContaminationDescription)
 
-        Public Property R1ReagentID As Integer Implements IReagentDispensing.R1ReagentID
+        Public Property R1ReagentID As Integer Implements IDispensing.R1ReagentID
             Get
-                Return _r1ReagentID
+                Return _r1ReagentId
             End Get
             Set(value As Integer)
-                If _r1ReagentID <> value Then
-                    _r1ReagentID = value
-                    _analysisMode = ContaminationsSpecification.GetAnalysisModeForReagent(_r1ReagentID)
+                If _r1ReagentId <> value Then
+                    _r1ReagentId = value
+                    _analysisMode = ContaminationsSpecification.GetAnalysisModeForReagent(_r1ReagentId)
                     FillContaminations()
+                    'GET IF IT ISE
+                    'GET IF IT IS PTEST
                 End If
             End Set
         End Property
@@ -85,15 +115,16 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             End Get
         End Property
 
-        Public Property ReagentNumber As Integer Implements IReagentDispensing.ReagentNumber
+        Public Property ReagentNumber As Integer Implements IDispensing.ReagentNumber
 
         Dim _executionID As Integer
-        Public Property ExecutionID As Integer Implements IReagentDispensing.ExecutionID
+        Public Property ExecutionID As Integer Implements IDispensing.ExecutionID
             Get
                 Return _executionID
             End Get
             Set(value As Integer)
                 _executionID = value
+                'TODO: Get all data from ExecutionID
                 Dim dt As vwksWSExecutionsMonitorDataTable
 
             End Set
@@ -117,17 +148,17 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             Next
         End Sub
 
-        Public Property IsISE As Boolean Implements IReagentDispensing.IsISE
+        Public Property KindOfLiquid As IDispensing.KindOfDispensedLiquid Implements IDispensing.KindOfLiquid
 
-        Public Property DelayCyclesForDispensing As Integer Implements IReagentDispensing.DelayCyclesForDispensing
+        Public Property DelayCyclesForDispensing As Integer Implements IDispensing.DelayCyclesForDispensing
 
-        Public Property OrderTestID As Integer Implements IReagentDispensing.OrderTestID
+        Public Property OrderTestID As Integer Implements IDispensing.OrderTestID
 
-        Public Property SampleClass As String Implements IReagentDispensing.SampleClass
+        Public Property SampleClass As String Implements IDispensing.SampleClass
 
-        Public Property TestID As Integer Implements IReagentDispensing.TestID
+        Public Property TestID As Integer Implements IDispensing.TestID
 
-        Public Sub FillDispense(analyzerContaminationsSpecification As IAnalyzerContaminationsSpecification, ByVal row As twksWSExecutionsRow) Implements IReagentDispensing.FillDispense
+        Public Sub FillDispense(analyzerContaminationsSpecification As IAnalyzerContaminationsSpecification, ByVal row As twksWSExecutionsRow) Implements IDispensing.FillDispense
 
             If Not row.IsReagentIDNull Then R1ReagentID = row.ReagentID
             If Not row.IsSampleClassNull Then SampleClass = row.SampleClass
@@ -145,9 +176,9 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             If row.IsExecutionTypeNull = False Then
                 Select Case row.ExecutionType
                     Case "PREP_STD", "", Nothing
-                        IsISE = False
+                        KindOfLiquid = IDispensing.KindOfDispensedLiquid.Reagent
                     Case "PREP_ISE"
-                        IsISE = True
+                        KindOfLiquid = IDispensing.KindOfDispensedLiquid.Ise
                     Case Else
 #If config = "Debug" Then
                         Throw New Exception("Found preparation with unknown execution type: """ & row.ExecutionType & """. Happy debugging!")
@@ -156,6 +187,17 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             End If
         End Sub
 
+        Dim _washingID As Integer = -1
+        Public Property WashingID As Integer Implements IDispensing.WashingID
+            Get
+                Return _washingID
+            End Get
+            Set(value As Integer)
+                _washingID = value
+                'TODO: GET WASHING DATA FROM ID
+                KindOfLiquid = IDispensing.KindOfDispensedLiquid.Washing
+            End Set
+        End Property
     End Class
 
 End Namespace

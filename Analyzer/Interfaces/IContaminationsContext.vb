@@ -5,7 +5,7 @@ Imports Biosystems.Ax00.CC
 
 Namespace Biosystems.Ax00.Core.Entities.Worksession.Interfaces
     Public Interface IContaminationsContext
-        Function ActionRequiredForDispensing(dispensing As IReagentDispensing) As ActionRequiredForDispensing
+        Function ActionRequiredForDispensing(dispensing As IDispensing) As ActionRequiredForDispensing
         Function ActionRequiredForDispensing(Execution As ExecutionsDS.twksWSExecutionsRow) As ActionRequiredForDispensing
         Sub FillContentsFromAnalyzer(rawAnalyzerFrame As String)
 

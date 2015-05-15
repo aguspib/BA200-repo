@@ -9,7 +9,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
         Sub New(dispensingPerStep As Integer)
             'ReDim _dispensings(dispensingPerStep - 1)
-            _dispensings = New RangedCollection(Of IReagentDispensing)(1, dispensingPerStep)
+            _dispensings = New RangedCollection(Of IDispensing)(1, dispensingPerStep)
             _dispensings.Preallocate()
         End Sub
 
@@ -19,19 +19,19 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             End Get
         End Property
 
-        Default Public Property Dispensing(index As Integer) As IReagentDispensing Implements IContextStep.Dispensing
+        Default Public Property Dispensing(index As Integer) As IDispensing Implements IContextStep.Dispensing
             Get
                 Return _dispensings(index)
             End Get
-            Set(value As IReagentDispensing)
+            Set(value As IDispensing)
                 _dispensings(index) = value
             End Set
         End Property
 
 
-        Private ReadOnly _dispensings As RangedCollection(Of IReagentDispensing)  'R1 are dispenses(0), R2 are dispenses(1), etc.
+        Private ReadOnly _dispensings As RangedCollection(Of IDispensing)  'R1 are dispenses(0), R2 are dispenses(1), etc.
 
-        Public Function GetEnumerator() As IEnumerator(Of IReagentDispensing) Implements IEnumerable(Of IReagentDispensing).GetEnumerator
+        Public Function GetEnumerator() As IEnumerator(Of IDispensing) Implements IEnumerable(Of IDispensing).GetEnumerator
             Return _dispensings.GetTypedEnumerator()
         End Function
 
