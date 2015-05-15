@@ -17,6 +17,8 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
         Public Property FromCommonRevisionNumber As String
         <XmlIgnoreAttribute()>
         Public Property FromDataRevisionNumber As String
+        <XmlIgnoreAttribute()>
+        Public Property ToVersion As String
 
         <XmlIgnoreAttribute()>
         Public Property Results As ExecutionResults
@@ -85,22 +87,25 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
         End Function
 
 
-        Function GenerateUpdatePack(ByVal version As String, commonRevisionNumber As String, dataRevisionNumber As String) As DatabaseUpdatesManager
+        Function GenerateUpdatePack(pFromVersion As String, pFromCommonRevisionNumberFrom As String, pFromDataRevisionNumber As String, pToVersion As String) As DatabaseUpdatesManager
 
             Dim updatesManager As New DatabaseUpdatesManager
-            updatesManager.FromVersion = version
-            updatesManager.FromCommonRevisionNumber = commonRevisionNumber
-            updatesManager.FromDataRevisionNumber = dataRevisionNumber
+            updatesManager.FromVersion = pFromVersion
+            updatesManager.FromCommonRevisionNumber = pFromCommonRevisionNumberFrom
+            updatesManager.FromDataRevisionNumber = pFromDataRevisionNumber
+            updatesManager.ToVersion = pToVersion
 
             For Each release In Releases
-                If release.Version < version Then
+                If release.Version < pFromVersion Then
                     'Ignore previous versions
                     Continue For
-                ElseIf release.Version = version Then
-                    'Ignore previous subversions, but get required subversion
-                    updatesManager.Releases.Add(release.GenerateRevisionPack(commonRevisionNumber, dataRevisionNumber))
-                Else
-                    'Add newer versions
+                    'ElseIf release.Version = pFromVersion Then
+                    '    'Ignore previous subversions, but get required subversion
+                    '    updatesManager.Releases.Add(release.GenerateRevisionPack(pFromCommonRevisionNumberFrom, pFromDataRevisionNumber))
+                    'Else
+                    '    'Add newer versions
+                    '    updatesManager.Releases.Add(release)
+                ElseIf ((release.Version >= pFromVersion) And (release.Version <= pToVersion)) Then
                     updatesManager.Releases.Add(release)
                 End If
 
@@ -155,7 +160,7 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
 
             DebugLogger.AddLog(" --------------------------------------------", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
             DebugLogger.AddLog(" Update Version: Generated Update Pack (INI)", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
-            DebugLogger.AddLog(String.Format(" From Version: {0} Common Revision: {1} Data Revision: {2}", FromVersion, FromCommonRevisionNumber, FromDataRevisionNumber), GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+            DebugLogger.AddLog(String.Format(" From Version: {0}  Common Revision: {1} Data Revision: {2} To Version: {3}", FromVersion, FromCommonRevisionNumber, FromDataRevisionNumber, ToVersion), GlobalBase.UpdateVersionDatabaseProcessLogFileName)
             For Each release In Releases
                 DebugLogger.AddLog(String.Format(" Added Release Version: {0}", release.Version), GlobalBase.UpdateVersionDatabaseProcessLogFileName)
                 DebugLogger.AddLog(String.Format(" - Total Common Revisions: {0}", release.CommonRevisions.Count), GlobalBase.UpdateVersionDatabaseProcessLogFileName)
