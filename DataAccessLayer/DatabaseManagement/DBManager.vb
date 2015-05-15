@@ -395,6 +395,7 @@ Namespace Biosystems.Ax00.DAL
 
                 Dim dbCmd As New SqlClient.SqlCommand
                 dbCmd.Connection = server.ConnectionContext.SqlConnectionObject
+                dbCmd.Connection.ChangeDatabase(dataBaseName)
                 dbCmd.CommandText = sqlScripts
 
                 result = CType(dbCmd.ExecuteScalar, Boolean)

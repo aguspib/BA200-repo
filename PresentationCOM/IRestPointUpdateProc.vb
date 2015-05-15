@@ -400,11 +400,11 @@ Public Class UiRestPointUpdateProc
 
             'TR 29/01/2013 -Implementation Update process.
             Dim myGlobalDataTO As New GlobalDataTO
-            DebugLogger.AddLog(" --------------------------------------------", "UpdateVersion")
-            DebugLogger.AddLog(" UPDATE VERSION - RESTORE POINT PROCESS (INI)", "UpdateVersion")
+            DebugLogger.AddLog(" --------------------------------------------", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+            DebugLogger.AddLog(" UPDATE VERSION - RESTORE POINT PROCESS (INI)", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
             myGlobalDataTO = UpdaterController.Instance.InstallUpdateProcess(DAOBase.DBServer, DAOBase.CurrentDB, DAOBase.DBLogin, DAOBase.DBPassword, True) 'BA-2471: IT 08/05/2015
-            DebugLogger.AddLog(" UPDATE VERSION - RESTORE POINT PROCESS (END)", "UpdateVersion")
-            DebugLogger.AddLog(" --------------------------------------------", "UpdateVersion")
+            DebugLogger.AddLog(" UPDATE VERSION - RESTORE POINT PROCESS (END)", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+            DebugLogger.AddLog(" --------------------------------------------", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
 
             If myGlobalDataTO.HasError Then
                 Me.DBUpdated = False

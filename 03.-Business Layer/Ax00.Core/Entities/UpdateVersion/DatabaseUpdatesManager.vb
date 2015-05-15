@@ -1,6 +1,7 @@
 ﻿Imports System.IO
 Imports System.Xml
 Imports System.Xml.Serialization
+Imports Biosystems.Ax00.Global
 Imports Microsoft.SqlServer.Management.Smo
 
 Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
@@ -152,27 +153,27 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
 
         Private Sub WriteLog()
 
-            DebugLogger.AddLog(" --------------------------------------------", "UpdateVersion")
-            DebugLogger.AddLog(" Update Version: Generated Update Pack (INI)", "UpdateVersion")
-            DebugLogger.AddLog(String.Format(" From Version: {0} Common Revision: {1} Data Revision: {2}", FromVersion, FromCommonRevisionNumber, FromDataRevisionNumber), "UpdateVersion")
+            DebugLogger.AddLog(" --------------------------------------------", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+            DebugLogger.AddLog(" Update Version: Generated Update Pack (INI)", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+            DebugLogger.AddLog(String.Format(" From Version: {0} Common Revision: {1} Data Revision: {2}", FromVersion, FromCommonRevisionNumber, FromDataRevisionNumber), GlobalBase.UpdateVersionDatabaseProcessLogFileName)
             For Each release In Releases
-                DebugLogger.AddLog(String.Format(" Added Release Version: {0}", release.Version), "UpdateVersion")
-                DebugLogger.AddLog(String.Format(" - Total Common Revisions: {0}", release.CommonRevisions.Count), "UpdateVersion")
-                DebugLogger.AddLog(String.Format(" - Total Data Revisions: {0}", release.DataRevisions.Count), "UpdateVersion")
+                DebugLogger.AddLog(String.Format(" Added Release Version: {0}", release.Version), GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+                DebugLogger.AddLog(String.Format(" - Total Common Revisions: {0}", release.CommonRevisions.Count), GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+                DebugLogger.AddLog(String.Format(" - Total Data Revisions: {0}", release.DataRevisions.Count), GlobalBase.UpdateVersionDatabaseProcessLogFileName)
             Next
-            DebugLogger.AddLog(String.Format(" Total Releases: {0}", Releases.Count), "UpdateVersion")
-            DebugLogger.AddLog(" Update Version: Generating Update Pack (END)", "UpdateVersion")
-            DebugLogger.AddLog(" --------------------------------------------", "UpdateVersion")
+            DebugLogger.AddLog(String.Format(" Total Releases: {0}", Releases.Count), GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+            DebugLogger.AddLog(" Update Version: Generating Update Pack (END)", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+            DebugLogger.AddLog(" --------------------------------------------", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
 
 
-            DebugLogger.AddLog(" --------------------------------------------", "UpdateVersion")
-            DebugLogger.AddLog(" Update Version: Run Scripts (INI)", "UpdateVersion")
+            DebugLogger.AddLog(" --------------------------------------------", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+            DebugLogger.AddLog(" Update Version: Run Scripts (INI)", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
             For Each release In Releases
                 release.WriteLog()
             Next
-            DebugLogger.AddLog(String.Format(" - Process finished successfully: {0}", Results.Success), "UpdateVersion")
-            DebugLogger.AddLog(" Update Version: Run Scripts (END)", "UpdateVersion")
-            DebugLogger.AddLog(" --------------------------------------------", "UpdateVersion")
+            DebugLogger.AddLog(String.Format(" - Process finished successfully: {0}", Results.Success), GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+            DebugLogger.AddLog(" Update Version: Run Scripts (END)", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+            DebugLogger.AddLog(" --------------------------------------------", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
 
         End Sub
 
