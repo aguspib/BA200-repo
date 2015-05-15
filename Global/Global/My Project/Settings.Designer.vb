@@ -730,18 +730,6 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("Ax00.bak")>  _
-        Public Property DBBackUpFileName() As String
-            Get
-                Return CType(Me("DBBackUpFileName"),String)
-            End Get
-            Set
-                Me("DBBackUpFileName") = value
-            End Set
-        End Property
-        
-        <Global.System.Configuration.UserScopedSettingAttribute(),  _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
         Public Property IsServiceAssembly() As Boolean
             Get
@@ -857,6 +845,18 @@ Namespace My
             End Get
             Set
                 Me("TempDBBakupFileName") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("Ax00TEM.bak")>  _
+        Public Property DBBackUpFileName() As String
+            Get
+                Return CType(Me("DBBackUpFileName"),String)
+            End Get
+            Set
+                Me("DBBackUpFileName") = value
             End Set
         End Property
     End Class
