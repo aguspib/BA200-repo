@@ -104,7 +104,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                                     'If an error has been raised during execution of Update Version Process, inform the ErrorCode in the GlobalDataTO to return
                                     If (myGlobalDataTO.HasError) Then myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.INVALID_DATABASE_UPDATE.ToString
                                 End If
-                                
+
                                 'Validate if there was an Error during the Update Version Process
                                 If (myGlobalDataTO.HasError) Then
                                     'ERROR CASE
