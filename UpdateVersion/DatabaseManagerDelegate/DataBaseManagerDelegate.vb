@@ -99,8 +99,14 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                    Not String.IsNullOrEmpty(DataBaseName) AndAlso _
                    Not String.IsNullOrEmpty(BackUpFileName) Then 'validate do not send empty values.
                     If System.IO.File.Exists(BackUpFileName) Then 'validate backupfile exist.
+                        'If DataBaseName.Equals(GlobalBase.TemporalDBName) Then
+                        'result = DBManager.RestoreTEMDataBase(ServerName, DataBaseName, DBLogin, DBPassword, _
+                        'BackUpFileName)
+                        'Else
                         result = DBManager.RestoreDataBase(ServerName, DataBaseName, DBLogin, DBPassword, _
-                                                           BackUpFileName)
+                                                                                   BackUpFileName)
+                        'End If
+
                     Else
                         GlobalBase.CreateLogActivity(BackUpFileName & " file not found.", _
                                                         "DataBaseManagerDelegate.RestoreDatabase", EventLogEntryType.Error, False)

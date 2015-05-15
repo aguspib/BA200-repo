@@ -170,12 +170,6 @@
     <Setting Name="TemporalDirectory" Type="System.String" Scope="User">
       <Value Profile="(Default)">C:\TEMP\</Value>
     </Setting>
-    <Setting Name="TempDBBakupFileName" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Ax00TEM.bak</Value>
-    </Setting>
-    <Setting Name="DBBackUpFileName" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Ax00.bak</Value>
-    </Setting>
     <Setting Name="IsServiceAssembly" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
@@ -202,6 +196,12 @@
     </Setting>
     <Setting Name="MaxRepetitionsRetry" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">1</Value>
+    </Setting>
+    <Setting Name="TempDBBakupFileName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Ax00.bak</Value>
+    </Setting>
+    <Setting Name="DBBackUpFileName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Ax00TEM.bak</Value>
     </Setting>
   </Settings>
 </SettingsFile>

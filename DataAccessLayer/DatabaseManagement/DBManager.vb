@@ -334,6 +334,81 @@ Namespace Biosystems.Ax00.DAL
         End Function
 
         ''' <summary>
+        ''' Restore a database from an specific backup file.
+        ''' </summary>
+        ''' <param name="ServerName">Server name to connect</param>
+        ''' <param name="DataBaseName">DataBase Name to restore</param>
+        ''' <param name="BackUpFileName">contains the file name and the file path.</param>
+        ''' <returns>True if OK (OR) False if Fail</returns>
+        ''' <remarks>
+        ''' Created by: MR 14/05/2015 - BA - 2477 ==> Function created for when we need restore our original bakcup in a  diferent database. 
+        '''                                           Ex: we use Ax00.bak to create Ax00TEM.
+        ''' </remarks>
+        Public Shared Function RestoreTEMDataBase(ByVal ServerName As String, ByVal DataBaseName As String, _
+                                               ByVal DBLogin As String, ByVal DBPassword As String, _
+                                               ByVal BackUpFileName As String) As Boolean
+
+            Dim result As Boolean = False ' keep the operation result.
+            'Dim myLogAcciones As New ApplicationLogManager()
+            Try
+                Dim LocalServer As New Server(ServerName)
+
+                LocalServer.ConnectionContext.LoginSecure = False
+                LocalServer.ConnectionContext.Login = DBLogin
+                LocalServer.ConnectionContext.Password = DBPassword
+                LocalServer.ConnectionContext.DatabaseName = "master"
+
+                Dim dbRestore As New Restore()
+                dbRestore.Database = DataBaseName
+                dbRestore.Action = RestoreActionType.Database
+                dbRestore.ReplaceDatabase = True
+
+                Dim device As New BackupDeviceItem(BackUpFileName, DeviceType.File)
+                dbRestore.Devices.Add(device)
+                Dim dtFiles As DataTable = dbRestore.ReadFileList(LocalServer)
+                'Dim backupDbLogicalName As String = dtFiles.Rows(0)("LogicalName").ToString()
+                Dim LogicalFile As String = dtFiles.Rows(0)("LogicalName").ToString()
+                'Move the file in case the backup was made with a diferent operating system's "Programs files" directory.
+                dbRestore.RelocateFiles.Add(New RelocateFile(LogicalFile, String.Format("{0}\{1}.mdf", LocalServer.MasterDBPath, DataBaseName)))
+                dbRestore.RelocateFiles.Add(New RelocateFile(String.Format("{0}_log", LogicalFile), String.Format("{0}\{1}_Log.ldf", LocalServer.MasterDBPath, DataBaseName)))
+
+                dbRestore.SqlRestore(LocalServer)
+
+                'Remove the backup device from the Backup object.
+                dbRestore.Devices.Remove(device)
+
+                'Close connection
+                LocalServer.ConnectionContext.Disconnect()
+
+                result = True
+
+            Catch ex As Exception
+                Dim Message As String
+                If ex.InnerException IsNot Nothing AndAlso ex.InnerException.InnerException IsNot Nothing Then
+                    Message = ex.InnerException.InnerException.Message
+                Else
+                    Message = ex.Message
+                End If
+
+                GlobalBase.CreateLogActivity(Message, "RestoreTEMDataBase", EventLogEntryType.Error, False)
+
+                'Throw ex  'Commented line RH 10/11/2010
+                'Do prefer using an empty throw when catching and re-throwing an exception.
+                'This is the best way to preserve the exception call stack.
+                'http://msdn.microsoft.com/en-us/library/ms229005(v=VS.90).aspx
+                'http://exceptionalcode.wordpress.com/2010/04/13/net-exceptions-throw-ex-is-evil-but-throw-is-not-that-innocent/
+                Throw
+
+            Finally
+                'SetDataBaseMultiUser(ServerName, DataBaseName, DBLogin, DBPassword) 'SG 18/10/10
+
+            End Try
+
+            Return result
+        End Function
+
+
+        ''' <summary>
         ''' Executes scripts in a selected server.
         ''' </summary>
         ''' <param name="pServer">Server Name.</param>
