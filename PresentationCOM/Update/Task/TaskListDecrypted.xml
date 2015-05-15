@@ -1216,6 +1216,56 @@
     <Version>3.07</Version>
     <StructureScript>
       ALTER TABLE [tcfgAnalyzers] ALTER COLUMN [FirmwareVersion] varchar(10)
+     
+      GO
+
+      IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[vWSExecutionsSELECT]') AND type in (N'P', N'PC'))
+      DROP PROCEDURE [dbo].[vWSExecutionsSELECT]
+      GO
+
+      GO
+
+      CREATE PROCEDURE [dbo].[vWSExecutionsSELECT]
+      AS
+	      SET NOCOUNT ON;
+      SELECT a.ExecutionID, a.AnalyzerID, a.WorkSessionID, a.SampleClass, a.OrderTestID, a.ReplicateNumber, a.ExecutionStatus, a.ExecutionType, 
+	      a.PreparationID, b.OrderID, b.TestType, b.SampleType, d.TestID, e.ReagentID, f.PredilutionMode  
+      FROM twksWSExecutions a, twksOrderTests b, twksOrders c, tparTests d, tparTestReagents e, tparTestSamples f
+      where A.OrderTestID = B.OrderTestID 
+      AND B.OrderID = C.OrderID 
+      AND B.TestID = D.TestID 
+      AND D.TestID = E.TestID 
+      AND D.TestID = F.TestID 
+      AND a.ExecutionID > 0  
+      AND E.ReagentNumber = 1
+      AND B.SampleType = F.SampleType 
+
+      GO
+
+      IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[vWSExecutionsSELECT_BY_EXECUTION_ID]') AND type in (N'P', N'PC'))
+      DROP PROCEDURE [dbo].[vWSExecutionsSELECT_BY_EXECUTION_ID]
+      GO
+
+      CREATE PROCEDURE [dbo].[vWSExecutionsSELECT_BY_EXECUTION_ID]
+      (
+	      @pEXECUTIONID int
+      )
+      AS
+	      SET NOCOUNT ON;
+      SELECT a.ExecutionID, a.AnalyzerID, a.WorkSessionID, a.SampleClass, a.OrderTestID, a.ReplicateNumber, a.ExecutionStatus, a.ExecutionType, 
+	      a.PreparationID, b.OrderID, b.TestType, b.SampleType, d.TestID, e.ReagentID, f.PredilutionMode  
+      FROM twksWSExecutions a, twksOrderTests b, twksOrders c, tparTests d, tparTestReagents e, tparTestSamples f
+      where A.OrderTestID = B.OrderTestID 
+      AND B.OrderID = C.OrderID 
+      AND B.TestID = D.TestID 
+      AND D.TestID = E.TestID 
+      AND D.TestID = F.TestID 
+      AND a.ExecutionID = @pEXECUTIONID
+      AND E.ReagentNumber = 1
+      AND B.SampleType = F.SampleType 
+
+      GO
+    
     </StructureScript>
 
     <UpdateScript>
