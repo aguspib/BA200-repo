@@ -33,7 +33,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
         End Sub
 
-        Public Function ActionRequiredForDispensing(dispensing As IReagentDispensing) As ActionRequiredForDispensing Implements IContaminationsContext.ActionRequiredForDispensing
+        Public Function ActionRequiredForDispensing(dispensing As IDispensing) As ActionRequiredForDispensing Implements IContaminationsContext.ActionRequiredForDispensing
 
             Dim lookUpFilter As New HashSet(Of String)
             Dim results As New ActionRequiredForDispensing 'New List(Of IWashingDescription)
@@ -42,25 +42,47 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
                 If Steps(curStep) Is Nothing Then Continue For
                 For curDispensing = 1 To ContaminationsSpecifications.DispensesPerStep
 
-                    If curDispensing > 1 Then Exit For
                     If Steps(curStep)(curDispensing) Is Nothing Then Continue For
                     Dim dispensingToAsk = Steps(curStep)(curDispensing)
-                    Dim requiredWashing = dispensingToAsk.RequiredWashingOrSkip(dispensing, curStep)
-                    If requiredWashing.Action = IContaminationsAction.RequiredAction.Wash Then
-                        If requiredWashing.InvolvedWash.WashingStrength > 0 AndAlso lookUpFilter.Contains(requiredWashing.InvolvedWash.WashingSolutionID) = False Then
-                            lookUpFilter.Add(requiredWashing.InvolvedWash.WashingSolutionID)
-                            results.InvolvedWashes.Add(requiredWashing.InvolvedWash)
-                        End If
-                    ElseIf requiredWashing.Action = IContaminationsAction.RequiredAction.Skip Then
-                        results.Action = IContaminationsAction.RequiredAction.Skip
-                        Exit For
-                    End If
+                    Dim responseFromDispense = dispensingToAsk.RequiredActionForDispensing(dispensing, curStep)
+
+                    Select Case responseFromDispense.Action
+
+                        Case IContaminationsAction.RequiredAction.Wash
+                            If responseFromDispense.InvolvedWash.WashingStrength > 0 AndAlso lookUpFilter.Contains(responseFromDispense.InvolvedWash.WashingSolutionID) = False Then
+                                lookUpFilter.Add(responseFromDispense.InvolvedWash.WashingSolutionID)
+                                results.InvolvedWashes.Add(responseFromDispense.InvolvedWash)
+                                results.Action = IContaminationsAction.RequiredAction.Wash
+                            End If
+
+                        Case IContaminationsAction.RequiredAction.Skip
+                            results.Action = IContaminationsAction.RequiredAction.Skip
+                            Exit For
+
+                        Case IContaminationsAction.RequiredAction.RemoveRequiredWashing
+                            RemoveWashingFromResult(responseFromDispense, lookUpFilter, results)
+                    End Select
+
                 Next
             Next
 
             Return results
 
         End Function
+
+        Private Sub RemoveWashingFromResult(responseFromDispensing As IContaminationsAction, lookUpFilter As HashSet(Of String), results As ActionRequiredForDispensing)
+            If responseFromDispensing.Action <> IContaminationsAction.RequiredAction.RemoveRequiredWashing Then Return
+
+            ' ReSharper disable once InconsistentNaming
+            Dim washingID = responseFromDispensing.InvolvedWash.WashingSolutionID
+            If lookUpFilter.Contains(washingID) Then
+                lookUpFilter.Remove(responseFromDispensing.InvolvedWash.WashingSolutionID)
+                Dim washingToRemove = results.InvolvedWashes.FirstOrDefault(Function(wash) wash.WashingSolutionID = washingID)
+                If washingToRemove IsNot Nothing AndAlso washingToRemove.WashingSolutionID <> String.Empty Then
+                    results.InvolvedWashes.Remove(washingToRemove)
+                End If
+            End If
+        End Sub
 
         Public Sub FillContentsFromAnalyzer(instructionParameters As LAx00Frame)
             AnalyzerFrame = instructionParameters
@@ -113,22 +135,22 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             Debug.WriteLine("DONE!")
         End Sub
 
-        Public Sub FillContextInRunning(executions As ExecutionsDS)
-            For curStep = Steps.Range.Minimum To Steps.Range.Maximum
-                For curDispense = 1 To ContaminationsSpecifications.DispensesPerStep
+        'Public Sub FillContextInRunning(executions As ExecutionsDS)
+        '    For curStep = Steps.Range.Minimum To Steps.Range.Maximum
+        '        For curDispense = 1 To ContaminationsSpecifications.DispensesPerStep
 
-                    Dim dispensing = Steps(curStep)(curDispense)
-                    Dim rows = executions.twksWSExecutions.Where(Function(element As twksWSExecutionsRow) element.ExecutionID = dispensing.ExecutionID)
+        '            Dim dispensing = Steps(curStep)(curDispense)
+        '            Dim rows = executions.twksWSExecutions.Where(Function(element As twksWSExecutionsRow) element.ExecutionID = dispensing.ExecutionID)
 
-                    If rows IsNot Nothing And rows.Any() Then
-                        Dim row = rows.First()
-                        dispensing.R1ReagentID = row.ReagentID
-                        'FillDispenseContaminations(dispensing)
+        '            If rows IsNot Nothing And rows.Any() Then
+        '                Dim row = rows.First()
+        '                dispensing.R1ReagentID = row.ReagentID
+        '                'FillDispenseContaminations(dispensing)
 
-                    End If
-                Next
-            Next
-        End Sub
+        '            End If
+        '        Next
+        '    Next
+        'End Sub
 
         ''' <summary>
         ''' fills context from minimum index to 0, using the ExecutionsDS.<Para>This method ONLY fills the first dispensing (R1). </Para>
@@ -136,10 +158,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
         ''' <param name="expectedExecutions"></param>
         ''' <remarks></remarks>
         Public Sub FillContextInStatic(expectedExecutions As ExecutionsDS) Implements IContaminationsContext.FillContextInStatic
-            Dim Lista As New List(Of ExecutionsDS.twksWSExecutionsRow)
-            For Each item In expectedExecutions.twksWSExecutions
-                Lista.Add(item)
-            Next
+            Dim Lista As List(Of twksWSExecutionsRow) = expectedExecutions.twksWSExecutions.ToList()
             FillContextInStatic(Lista)
         End Sub
 
@@ -185,7 +204,9 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
                         If Steps(curStep)(curDispense) Is Nothing Then Steps(curStep)(curDispense) = ContaminationsSpecifications.CreateDispensing()
                         Dim parameterName = String.Format("R{0}B{1}", curDispense, Math.Abs(curStep))
                         If AnalyzerFrame.KeysCollection.Contains(parameterName) Then
-                            Steps(curStep)(curDispense).ExecutionID = CInt(AnalyzerFrame(parameterName))
+                            Dim targetStep = Steps(curStep)(curDispense)
+                            SetStepValues(parameterName, targetStep, curDispense)
+
                         End If
                     ElseIf curStep = 0 Then   'Current step
 
@@ -193,17 +214,31 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
                         If Steps(curStep)(curDispense) Is Nothing Then Steps(curStep)(curDispense) = ContaminationsSpecifications.CreateDispensing()
                         Dim parameterName = String.Format("R{0}A{1}", curDispense, curStep)
                         If AnalyzerFrame.KeysCollection.Contains(parameterName) Then
-                            Steps(curStep)(curDispense).ExecutionID = CInt(AnalyzerFrame(parameterName))
+                            Dim targetStep = Steps(curStep)(curDispense)
+                            SetStepValues(parameterName, targetStep, curDispense)
                         End If
                     End If
                 Next
             Next
         End Sub
 
+        Private Sub SetStepValues(parameterName As String, targetStep As IDispensing, curDispense As Integer)
+
+            Dim value = AnalyzerFrame(parameterName)
+            If String.Equals(value, "D", StringComparison.OrdinalIgnoreCase) Then
+                targetStep.KindOfLiquid = IDispensing.KindOfDispensedLiquid.Dummy
+            ElseIf value.StartsWith("W", StringComparison.OrdinalIgnoreCase) Then
+                targetStep.WashingID = CInt(Mid(value, 2))
+            Else
+                targetStep.ExecutionID = CInt(value)
+            End If
+            targetStep.ReagentNumber = curDispense
+        End Sub
+
 #End Region
 
         Public Function ActionRequiredForAGivenDispensing(ReagentID As ExecutionsDS.twksWSExecutionsRow) As ActionRequiredForDispensing Implements IContaminationsContext.ActionRequiredForDispensing
-            Dim D As New ReagentDispensing()
+            Dim D As New Dispensing()
             D.FillDispense(ContaminationsSpecifications, ReagentID)
             Return ActionRequiredForDispensing(D)
 

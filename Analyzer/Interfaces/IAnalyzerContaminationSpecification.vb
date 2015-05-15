@@ -26,7 +26,7 @@ Namespace Biosystems.Ax00.Core.Entities.Worksession.Interfaces
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Function CreateDispensing() As IReagentDispensing
+        Function CreateDispensing() As IDispensing
 
         Property AdditionalPredilutionSteps As Integer
 
