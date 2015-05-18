@@ -248,6 +248,10 @@ Namespace Biosystems.Ax00.Core.Entities
                                 AnalyzerManagerAx00Actions.ISE_TEST_END, _
                                 AnalyzerManagerAx00Actions.SKIP_END, _
                                 AnalyzerManagerAx00Actions.WASHING_RUN_END
+                            'AJG. Washings are stored
+                            If pAx00ActionCode = AnalyzerManagerAx00Actions.WASHING_RUN_END Then
+                                InsertNextPreparation(Nothing)
+                            End If
                             myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.NEXT_PREPARATION, True, Nothing, pNextWell)
 
                         Case AnalyzerManagerAx00Actions.WASHING_RUN_START, AnalyzerManagerAx00Actions.SKIP_START
