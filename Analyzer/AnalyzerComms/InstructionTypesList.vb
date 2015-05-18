@@ -1957,38 +1957,45 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 myInstructionTO = New InstructionParameterTO
                 myInstructionTO.InstructionType = "WRUN"
-                myInstructionTO.Parameter = "BP1"
+                myInstructionTO.Parameter = "ID"
                 myInstructionTO.ParameterIndex = 5
                 Instructions.Add(myInstructionTO)
 
+
                 myInstructionTO = New InstructionParameterTO
                 myInstructionTO.InstructionType = "WRUN"
-                myInstructionTO.Parameter = "BT1"
+                myInstructionTO.Parameter = "BP1"
                 myInstructionTO.ParameterIndex = 6
                 Instructions.Add(myInstructionTO)
 
                 myInstructionTO = New InstructionParameterTO
                 myInstructionTO.InstructionType = "WRUN"
-                myInstructionTO.Parameter = "BRT1"
+                myInstructionTO.Parameter = "BT1"
                 myInstructionTO.ParameterIndex = 7
                 Instructions.Add(myInstructionTO)
 
                 myInstructionTO = New InstructionParameterTO
                 myInstructionTO.InstructionType = "WRUN"
-                myInstructionTO.Parameter = "BP2"
+                myInstructionTO.Parameter = "BRT1"
                 myInstructionTO.ParameterIndex = 8
                 Instructions.Add(myInstructionTO)
 
                 myInstructionTO = New InstructionParameterTO
                 myInstructionTO.InstructionType = "WRUN"
-                myInstructionTO.Parameter = "BT2"
+                myInstructionTO.Parameter = "BP2"
                 myInstructionTO.ParameterIndex = 9
                 Instructions.Add(myInstructionTO)
 
                 myInstructionTO = New InstructionParameterTO
                 myInstructionTO.InstructionType = "WRUN"
-                myInstructionTO.Parameter = "BRT2"
+                myInstructionTO.Parameter = "BT2"
                 myInstructionTO.ParameterIndex = 10
+                Instructions.Add(myInstructionTO)
+
+                myInstructionTO = New InstructionParameterTO
+                myInstructionTO.InstructionType = "WRUN"
+                myInstructionTO.Parameter = "BRT2"
+                myInstructionTO.ParameterIndex = 11
                 Instructions.Add(myInstructionTO)
 
                 myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496

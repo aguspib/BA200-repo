@@ -9,6 +9,7 @@ Namespace Biosystems.Ax00.Core.Entities
     Partial Public MustInherit Class AnalyzerManager
         Implements IAnalyzerManager
 
+
         Private WithEvents _baseLine As IBaseLineEntity
         Private WithEvents _iseAnalyzer As IISEManager
 
