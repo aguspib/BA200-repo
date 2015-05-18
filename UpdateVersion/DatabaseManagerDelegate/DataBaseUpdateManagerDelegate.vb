@@ -405,7 +405,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
             If InitializeDatabase(pDataBaseName, pServer) Then
 
-                Dim updates = databaseUpdatesManager.GenerateUpdatePack(fromVersion, fromCommonRevisionNumber, fromDataRevisionNumber)
+                Dim appDataBaseVersion As String = Utilities.FormatToCorrectVersion(GlobalBase.DataBaseVersion)
+                Dim updates = databaseUpdatesManager.GenerateUpdatePack(fromVersion, fromCommonRevisionNumber, fromDataRevisionNumber, appDataBaseVersion)
 
                 If updates.Releases.Count > 0 Then
                     results = updates.RunScripts(pDataBaseName, pServer, packageId)

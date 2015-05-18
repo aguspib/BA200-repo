@@ -2,6 +2,7 @@
 Imports System.Xml.Serialization
 Imports Microsoft.SqlServer.Management.Smo
 Imports Biosystems.Ax00.BL
+Imports Biosystems.Ax00.Global
 
 ' ReSharper disable once CheckNamespace
 Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
@@ -163,21 +164,21 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
 
         Public Sub WriteLog()
 
-            DebugLogger.AddLog(" --------------------------------------------", "UpdateVersion")
-            DebugLogger.AddLog(String.Format(" Release: {0}", Version), "UpdateVersion")
-            DebugLogger.AddLog(" 1.- Results for Common scripts", "UpdateVersion")
+            DebugLogger.AddLog(" --------------------------------------------", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+            DebugLogger.AddLog(String.Format(" Release: {0}", Version), GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+            DebugLogger.AddLog(" 1.- Results for Common scripts", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
 
             For Each revision As CommonRevision In CommonRevisions
                 revision.WriteLog()
             Next
 
-            DebugLogger.AddLog(" 2.- Results for Data scripts", "UpdateVersion")
+            DebugLogger.AddLog(" 2.- Results for Data scripts", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
 
             For Each revision As DataRevision In DataRevisions
                 revision.WriteLog()
             Next
 
-            DebugLogger.AddLog(" --------------------------------------------", "UpdateVersion")
+            DebugLogger.AddLog(" --------------------------------------------", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
 
         End Sub
 

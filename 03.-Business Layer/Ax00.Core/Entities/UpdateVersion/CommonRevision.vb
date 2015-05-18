@@ -2,6 +2,7 @@
 Imports System.Text
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.DAL
+Imports Biosystems.Ax00.Global
 Imports Microsoft.SqlServer.Management.Smo
 
 ' ReSharper disable once CheckNamespace
@@ -25,10 +26,19 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
 
             Me.Results = executionResults
 
-            If executionResults.Success Then RunPrerequisites(server, dataBaseName)
-            If executionResults.Success Then RunStructure(server, dataBaseName)
-            If executionResults.Success Then RunData(server, dataBaseName)
-            If executionResults.Success Then RunIntegrity(server, dataBaseName)
+            RunPrerequisites(server, dataBaseName)
+
+            If (executionResults.Success) Then
+                RunStructure(server, dataBaseName)
+                If executionResults.Success Then
+                    RunData(server, dataBaseName)
+                    If executionResults.Success Then
+                        RunIntegrity(server, dataBaseName)
+                    End If
+                End If
+            Else
+                RunIntegrity(server, dataBaseName)
+            End If
 
             If executionResults.Success Then
                 UpdateDatabaseVersion(dataBaseName, server, packageId)
@@ -50,13 +60,15 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
             content.AppendLine(String.Format("      DataScript: {0}", DataScript))
             If (Not Results Is Nothing) Then
                 content.AppendLine(String.Format("      Success: {0}", Results.Success))
-
+                If Not Results.Success Then
+                    content.AppendLine(String.Format("      Step Error: {0}", Results.LastErrorStep.ToString()))
+                End If
                 If (Not Results.Exception Is Nothing) Then
                     content.AppendLine(String.Format("      Exception: {0}", Results.Exception.Message & " " & Results.Exception.InnerException.ToString()))
                 End If
             End If
 
-            DebugLogger.AddLog(content.ToString(), "UpdateVersion")
+            DebugLogger.AddLog(content.ToString(), GlobalBase.UpdateVersionDatabaseProcessLogFileName)
 
         End Sub
 

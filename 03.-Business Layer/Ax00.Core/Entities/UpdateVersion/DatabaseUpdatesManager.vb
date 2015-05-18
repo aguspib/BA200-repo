@@ -1,6 +1,7 @@
 ﻿Imports System.IO
 Imports System.Xml
 Imports System.Xml.Serialization
+Imports Biosystems.Ax00.Global
 Imports Microsoft.SqlServer.Management.Smo
 
 Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
@@ -16,6 +17,8 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
         Public Property FromCommonRevisionNumber As String
         <XmlIgnoreAttribute()>
         Public Property FromDataRevisionNumber As String
+        <XmlIgnoreAttribute()>
+        Public Property ToVersion As String
 
         <XmlIgnoreAttribute()>
         Public Property Results As ExecutionResults
@@ -84,22 +87,25 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
         End Function
 
 
-        Function GenerateUpdatePack(ByVal version As String, commonRevisionNumber As String, dataRevisionNumber As String) As DatabaseUpdatesManager
+        Function GenerateUpdatePack(pFromVersion As String, pFromCommonRevisionNumberFrom As String, pFromDataRevisionNumber As String, pToVersion As String) As DatabaseUpdatesManager
 
             Dim updatesManager As New DatabaseUpdatesManager
-            updatesManager.FromVersion = version
-            updatesManager.FromCommonRevisionNumber = commonRevisionNumber
-            updatesManager.FromDataRevisionNumber = dataRevisionNumber
+            updatesManager.FromVersion = pFromVersion
+            updatesManager.FromCommonRevisionNumber = pFromCommonRevisionNumberFrom
+            updatesManager.FromDataRevisionNumber = pFromDataRevisionNumber
+            updatesManager.ToVersion = pToVersion
 
             For Each release In Releases
-                If release.Version < version Then
+                If release.Version < pFromVersion Then
                     'Ignore previous versions
                     Continue For
-                ElseIf release.Version = version Then
-                    'Ignore previous subversions, but get required subversion
-                    updatesManager.Releases.Add(release.GenerateRevisionPack(commonRevisionNumber, dataRevisionNumber))
-                Else
-                    'Add newer versions
+                    'ElseIf release.Version = pFromVersion Then
+                    '    'Ignore previous subversions, but get required subversion
+                    '    updatesManager.Releases.Add(release.GenerateRevisionPack(pFromCommonRevisionNumberFrom, pFromDataRevisionNumber))
+                    'Else
+                    '    'Add newer versions
+                    '    updatesManager.Releases.Add(release)
+                ElseIf ((release.Version >= pFromVersion) And (release.Version <= pToVersion)) Then
                     updatesManager.Releases.Add(release)
                 End If
 
@@ -152,27 +158,27 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
 
         Private Sub WriteLog()
 
-            DebugLogger.AddLog(" --------------------------------------------", "UpdateVersion")
-            DebugLogger.AddLog(" Update Version: Generated Update Pack (INI)", "UpdateVersion")
-            DebugLogger.AddLog(String.Format(" From Version: {0} Common Revision: {1} Data Revision: {2}", FromVersion, FromCommonRevisionNumber, FromDataRevisionNumber), "UpdateVersion")
+            DebugLogger.AddLog(" --------------------------------------------", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+            DebugLogger.AddLog(" Update Version: Generated Update Pack (INI)", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+            DebugLogger.AddLog(String.Format(" From Version: {0}  Common Revision: {1} Data Revision: {2} To Version: {3}", FromVersion, FromCommonRevisionNumber, FromDataRevisionNumber, ToVersion), GlobalBase.UpdateVersionDatabaseProcessLogFileName)
             For Each release In Releases
-                DebugLogger.AddLog(String.Format(" Added Release Version: {0}", release.Version), "UpdateVersion")
-                DebugLogger.AddLog(String.Format(" - Total Common Revisions: {0}", release.CommonRevisions.Count), "UpdateVersion")
-                DebugLogger.AddLog(String.Format(" - Total Data Revisions: {0}", release.DataRevisions.Count), "UpdateVersion")
+                DebugLogger.AddLog(String.Format(" Added Release Version: {0}", release.Version), GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+                DebugLogger.AddLog(String.Format(" - Total Common Revisions: {0}", release.CommonRevisions.Count), GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+                DebugLogger.AddLog(String.Format(" - Total Data Revisions: {0}", release.DataRevisions.Count), GlobalBase.UpdateVersionDatabaseProcessLogFileName)
             Next
-            DebugLogger.AddLog(String.Format(" Total Releases: {0}", Releases.Count), "UpdateVersion")
-            DebugLogger.AddLog(" Update Version: Generating Update Pack (END)", "UpdateVersion")
-            DebugLogger.AddLog(" --------------------------------------------", "UpdateVersion")
+            DebugLogger.AddLog(String.Format(" Total Releases: {0}", Releases.Count), GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+            DebugLogger.AddLog(" Update Version: Generating Update Pack (END)", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+            DebugLogger.AddLog(" --------------------------------------------", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
 
 
-            DebugLogger.AddLog(" --------------------------------------------", "UpdateVersion")
-            DebugLogger.AddLog(" Update Version: Run Scripts (INI)", "UpdateVersion")
+            DebugLogger.AddLog(" --------------------------------------------", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+            DebugLogger.AddLog(" Update Version: Run Scripts (INI)", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
             For Each release In Releases
                 release.WriteLog()
             Next
-            DebugLogger.AddLog(String.Format(" - Process finished successfully: {0}", Results.Success), "UpdateVersion")
-            DebugLogger.AddLog(" Update Version: Run Scripts (END)", "UpdateVersion")
-            DebugLogger.AddLog(" --------------------------------------------", "UpdateVersion")
+            DebugLogger.AddLog(String.Format(" - Process finished successfully: {0}", Results.Success), GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+            DebugLogger.AddLog(" Update Version: Run Scripts (END)", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+            DebugLogger.AddLog(" --------------------------------------------", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
 
         End Sub
 
