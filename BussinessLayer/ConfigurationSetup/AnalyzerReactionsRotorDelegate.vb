@@ -11,6 +11,7 @@ Namespace Biosystems.Ax00.BL
 
     Public Class AnalyzerReactionsRotorDelegate
 
+
 #Region "C R U D"
 
         ''' <summary>
@@ -39,8 +40,8 @@ Namespace Biosystems.Ax00.BL
                             End If
                         End If
 
-                        End If
                     End If
+                End If
             Catch ex As Exception
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
@@ -342,8 +343,9 @@ Namespace Biosystems.Ax00.BL
                                     createDS.AcceptChanges()
                                     resultData = myDAO.Create(dbConnection, createDS)
 
-                                    'Dim logExecution As New StatisticsUpkeepDelegate
-                                    'logExecution.LogRotorChangeConsum(pAnalyzerID)
+                                    Dim logExecution As New StatisticsUpKeepManager()
+                                    logExecution.LogRotorChangeConsum(pAnalyzerID)
+
                                 End If
                             End If
                         End If
@@ -377,6 +379,6 @@ Namespace Biosystems.Ax00.BL
 
 #End Region
 
-    End Class
 
+    End Class
 End Namespace

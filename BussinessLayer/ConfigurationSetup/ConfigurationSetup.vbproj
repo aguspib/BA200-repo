@@ -133,6 +133,7 @@
     <Compile Include="BarCodeSampleTypesMappingDelegate.vb" />
     <Compile Include="CustomDemographicsDelegate.vb" />
     <Compile Include="GridColsConfigurationDelegate.vb" />
+    <Compile Include="IStatisticsUpkeepDelegate.vb" />
     <Compile Include="LISMappingsDelegate.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
@@ -177,6 +178,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\bax00framework\05.-Cross Cutting Layer\Ax00.Framework.CrossCutting\Ax00.Framework.CrossCutting.vbproj">
+      <Project>{d880e48a-3a14-4916-a60b-45b8251fe010}</Project>
+      <Name>Ax00.Framework.CrossCutting</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\bax00framework\AX00Types\AX00Types.vbproj">
       <Project>{19114cc5-ba39-4d35-89fa-41d9efb7a931}</Project>
       <Name>AX00Types</Name>
