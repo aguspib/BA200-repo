@@ -341,6 +341,9 @@ Namespace Biosystems.Ax00.BL
                                     createDS.tcfgAnalyzerReactionsRotor.AddtcfgAnalyzerReactionsRotorRow(row)
                                     createDS.AcceptChanges()
                                     resultData = myDAO.Create(dbConnection, createDS)
+
+                                    'Dim logExecution As New StatisticsUpkeepDelegate
+                                    'logExecution.LogRotorChangeConsum(pAnalyzerID)
                                 End If
                             End If
                         End If
@@ -373,9 +376,6 @@ Namespace Biosystems.Ax00.BL
 
 
 #End Region
-
-
-
 
     End Class
 

@@ -481,6 +481,8 @@ Namespace Biosystems.Ax00.Core.Entities
                                         actionAlreadySent = True
                                         If Not myGlobal.HasError Then
                                             AddNewSentPreparationsList(Nothing, myAnManagerDS, pNextWell) 'Update sent instructions DS
+                                            Dim logExecution As New StatisticsUpkeepDelegate
+                                            logExecution.LogExecutionReagenConsum(myAnManagerDS.nextPreparation(0).ExecutionID, ActiveAnalyzer)
                                         Else
                                             'AG 27/09/2012 - the instruction could not be sent because empty fields. Executions has been LOCKED in GeneratePreparation (test o ptest)
                                             ' method in Instructions class. Now we have to remove the error flag and code
@@ -520,6 +522,8 @@ Namespace Biosystems.Ax00.Core.Entities
                                                 actionAlreadySent = True
                                                 If Not myGlobal.HasError Then
                                                     AddNewSentPreparationsList(Nothing, myAnManagerDS, nextPTESTWell) 'Update sent instructions DS
+                                                    Dim logExecution As New StatisticsUpkeepDelegate
+                                                    logExecution.LogExecutionReagenConsum(myAnManagerDS.nextPreparation(0).ExecutionID, ActiveAnalyzer)
                                                 Else
                                                     'AG 27/09/2012 - the instruction could not be sent because empty fields. Affected executions has been LOCKED in GeneratePreparation (test o ptest)
                                                     ' method in Instructions class. Now we have to remove the error flag and code

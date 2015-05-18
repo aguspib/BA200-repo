@@ -84,6 +84,7 @@
     <Import Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Logger\MessageLoggerTests.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -121,6 +122,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\bax00framework\05.-Cross Cutting Layer\Ax00.Framework.CrossCutting\Ax00.Framework.CrossCutting.vbproj">
+      <Project>{d880e48a-3a14-4916-a60b-45b8251fe010}</Project>
+      <Name>Ax00.Framework.CrossCutting</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\bax00framework\Global\Global.vbproj">
       <Project>{5d65020c-c2d7-4ac3-b557-223fc290e526}</Project>
       <Name>Global</Name>
