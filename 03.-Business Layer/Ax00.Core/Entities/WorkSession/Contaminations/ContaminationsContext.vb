@@ -166,12 +166,8 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             'We fill all Steps and ContexttStep collections with data:
             Dim maxIndex = executionsList.Count - 1
 
-            For j As Integer = Me.Steps.Range.Minimum To Me.Steps.Range.Maximum ' Each S In Steps
-                If Steps(j) Is Nothing Then Steps(j) = New ContextStep(ContaminationsSpecifications.DispensesPerStep)
-                For i As Integer = 1 To ContaminationsSpecifications.DispensesPerStep
-                    If Steps(j)(i) Is Nothing Then Steps(j)(i) = (ContaminationsSpecifications.CreateDispensing())
-                Next
-            Next
+            FillEmptyContext()
+
             'We update the already filled data:
             For curStep = Steps.Range.Minimum To Steps.Range.Maximum
                 Const curDispense = 1 'We only fill R1 in static mode!
@@ -186,6 +182,15 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
                 End If
             Next
 
+        End Sub
+
+        Public Sub FillEmptyContext()
+            For j As Integer = Me.Steps.Range.Minimum To Me.Steps.Range.Maximum ' Each S In Steps
+                If Steps(j) Is Nothing Then Steps(j) = New ContextStep(ContaminationsSpecifications.DispensesPerStep)
+                For i As Integer = 1 To ContaminationsSpecifications.DispensesPerStep
+                    If Steps(j)(i) Is Nothing Then Steps(j)(i) = (ContaminationsSpecifications.CreateDispensing())
+                Next
+            Next
         End Sub
 
 

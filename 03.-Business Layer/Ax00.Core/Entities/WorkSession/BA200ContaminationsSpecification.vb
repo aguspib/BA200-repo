@@ -1,4 +1,5 @@
 ﻿Imports System.Collections.Concurrent
+Imports System.Data.Common
 Imports System.Data.SqlClient
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Core.Entities.Worksession.Contaminations
@@ -14,6 +15,7 @@ Imports Biosystems.Ax00.Types
 Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
     Public Class BA200ContaminationsSpecification
         Implements IAnalyzerContaminationsSpecification
+
 
 
         Private myThread As Threading.Thread
@@ -143,6 +145,13 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
         Public ReadOnly Property CurrentRunningContext As IContaminationsContext Implements IAnalyzerContaminationsSpecification.CurrentRunningContext
             Get
                 Return _currentContext
+            End Get
+        End Property
+
+        Public ReadOnly Property HighContaminationPersistence As Integer Implements IAnalyzerContaminationsSpecification.HighContaminationPersistence
+            Get
+                <ThreadStatic> Static highContaminationPersitance As Integer = SwParametersDelegate.ReadIntValue(Nothing, GlobalEnumerates.SwParameters.CONTAMIN_REAGENT_PERSIS, Nothing).SetDatos
+                Return highContaminationPersitance
             End Get
         End Property
     End Class

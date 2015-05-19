@@ -11,6 +11,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
         Implements IAnalyzerContaminationsSpecification
 
 
+
         Sub New()
 
             'This is B4200 dependant:
@@ -67,6 +68,13 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
         Public ReadOnly Property CurrentRunningContext As IContaminationsContext Implements IAnalyzerContaminationsSpecification.CurrentRunningContext
             Get
                 Return _currentContext
+            End Get
+        End Property
+
+        Public ReadOnly Property HighContaminationPersistence As Integer Implements IAnalyzerContaminationsSpecification.HighContaminationPersistence
+            Get
+                <ThreadStatic> Static highContaminationPersitance As Integer = SwParametersDelegate.ReadIntValue(Nothing, GlobalEnumerates.SwParameters.CONTAMIN_REAGENT_PERSIS, Nothing).SetDatos
+                Return highContaminationPersitance
             End Get
         End Property
     End Class

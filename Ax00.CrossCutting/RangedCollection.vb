@@ -136,7 +136,7 @@
         End Function
 
         Private Function GetZeroBasedMaxIndex() As Integer
-            Return ConvertToZeroBasedIndex(Range.Maximum) '(Range.maximum - Range.minimum)
+            Return ConvertToZeroBasedIndex(Range.Maximum)
         End Function
 #End Region
 

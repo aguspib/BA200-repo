@@ -100,6 +100,13 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
             Dim originalOrderChanged As Boolean = False
             Dim addContaminationBetweenGroups As Integer = 0
             If Not pPreviousReagentID Is Nothing Then
+
+                'MIC
+                Dim C = New ContaminationBetweenElementsSorter(pContaminationsDS, pPreviousReagentID, pPreviousReagentIDMaxReplicates, pExecutions)
+                C.MoveToAvoidContaminationBetweenElements()
+                '/MIC
+
+
                 MoveToAvoidContaminationBetweenElements(pContaminationsDS, pPreviousReagentID, pPreviousReagentIDMaxReplicates, pHighContaminationPersistance, pExecutions, originalOrderChanged, addContaminationBetweenGroups)
             End If
 
@@ -327,6 +334,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
         ''' <param name="originalorderchanged"></param>
         ''' <param name="addContaminationBetweenGroups"></param>
         ''' <remarks>AG 08/11/2011</remarks>
+        ''' 
         Private Sub MoveToAvoidContaminationBetweenElements(ByVal pContaminationsDS As ContaminationsDS, ByVal pPreviousReagentID As List(Of Integer), ByVal pPreviousReplicatesNumber As List(Of Integer), _
                                                             ByVal pHighContaminationPersistance As Integer, ByRef pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), ByRef originalorderchanged As Boolean, ByRef addContaminationBetweenGroups As Integer)
 
