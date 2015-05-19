@@ -343,9 +343,6 @@ Namespace Biosystems.Ax00.BL
                                     createDS.AcceptChanges()
                                     resultData = myDAO.Create(dbConnection, createDS)
 
-                                    Dim logExecution As New StatisticsUpKeepManager()
-                                    logExecution.LogRotorChangeConsum(pAnalyzerID)
-
                                 End If
                             End If
                         End If

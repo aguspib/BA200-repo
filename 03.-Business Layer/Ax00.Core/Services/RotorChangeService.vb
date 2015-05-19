@@ -5,6 +5,9 @@ Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Global.AlarmEnumerates
 Imports Biosystems.Ax00.Core.Services.Enums
 Imports Biosystems.Ax00.Core.Services.Interfaces
+Imports Biosystems.Ax00.BL
+Imports Biosystems.Ax00.Framework.Core
+
 
 Namespace Biosystems.Ax00.Core.Services
     ''' <summary>
@@ -220,13 +223,22 @@ Namespace Biosystems.Ax00.Core.Services
 #Region "Private Methods"
 
         Private Sub BaseLineStatusChanged(callback As IServiceStatusCallback)
+
+            Static NeedToLog As Boolean = True
+
             Select Case callback.Sender.Status
                 Case ServiceStatusEnum.Paused
+                    NeedToLog = False
                     PauseProcess()
+
                 Case ServiceStatusEnum.Running
+                    'We register the start of rotor change process by log.
+                    If NeedToLog Then StatisticsUpkeepDelegate.LogRotorChangeConsum(Me._analyzer.ActiveAnalyzer)
                     RestartProcess()
+
                 Case ServiceStatusEnum.EndError, ServiceStatusEnum.EndSuccess
                     FinalizeProcess()
+                    NeedToLog = True
             End Select
         End Sub
 
@@ -288,6 +300,7 @@ Namespace Biosystems.Ax00.Core.Services
         End Sub
 
         Private Sub ExecuteBaseLineStep()
+
             _baseLineService.StartService()
         End Sub
 

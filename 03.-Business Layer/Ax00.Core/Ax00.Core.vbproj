@@ -165,6 +165,10 @@
       <Project>{bd816d19-6903-4603-8a75-a14c099d4eb2}</Project>
       <Name>Analyzer</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\bax00framework\03.-Business Layer\Ax00.Framework.Core\Ax00.Framework.Core.vbproj">
+      <Project>{dc90b322-5a1d-4e45-943f-a76447ad0016}</Project>
+      <Name>Ax00.Framework.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\bax00framework\AX00Types\AX00Types.vbproj">
       <Project>{19114cc5-ba39-4d35-89fa-41d9efb7a931}</Project>
       <Name>AX00Types</Name>
