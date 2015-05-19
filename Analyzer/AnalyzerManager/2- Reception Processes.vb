@@ -1441,36 +1441,37 @@ Namespace Biosystems.Ax00.Core.Entities
                     If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                         dbConnection = DirectCast(myGlobal.SetDatos, SqlConnection)
                         If (Not dbConnection Is Nothing) Then
-                            Dim myNextPreparationID As Integer
-                            Dim myPreparationDS As New WSPreparationsDS
-                            Dim myPrepDelegate As New WSPreparationsDelegate
-                            Dim prepRow As WSPreparationsDS.twksWSPreparationsRow
+                            Dim myNextPreparationID = InsertNextPreparation(dbConnection)
 
-                            'Generate the next PreparationID and insert the new Preparation
-                            myGlobal = myPrepDelegate.GeneratePreparationID(dbConnection)
-                            If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
-                                myNextPreparationID = CType(myGlobal.SetDatos, Integer)
+                            'Dim myPreparationDS As New WSPreparationsDS
+                            'Dim myPrepDelegate As New WSPreparationsDelegate
+                            'Dim prepRow As WSPreparationsDS.twksWSPreparationsRow
 
-                                'Prepare data to insert the new Preparation
-                                prepRow = myPreparationDS.twksWSPreparations.NewtwksWSPreparationsRow
-                                prepRow.AnalyzerID = AnalyzerIDAttribute
-                                prepRow.WorkSessionID = WorkSessionIDAttribute
-                                prepRow.PreparationID = myNextPreparationID
-                                prepRow.LAX00Data = AppLayer.LastPreparationInstructionSent
-                                prepRow.PreparationStatus = "INPROCESS"
+                            ''Generate the next PreparationID and insert the new Preparation
+                            'myGlobal = myPrepDelegate.GeneratePreparationID(dbConnection)
+                            'If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
+                            '    myNextPreparationID = CType(myGlobal.SetDatos, Integer)
 
-                                'AG 20/09/2012 v052 - inform the well where the reactions is dispensed on (when PTEST apply the correct offset factor)
-                                prepRow.WellUsed = CurrentWellAttribute
-                                If InStr(prepRow.LAX00Data, "PTEST") > 0 Then
-                                    Dim reactRotorDlg As New ReactionsRotorDelegate
-                                    prepRow.WellUsed = reactRotorDlg.GetRealWellNumber(CurrentWellAttribute + WELL_OFFSET_FOR_PREDILUTION, MAX_REACTROTOR_WELLS)
-                                End If
+                            '    'Prepare data to insert the new Preparation
+                            '    prepRow = myPreparationDS.twksWSPreparations.NewtwksWSPreparationsRow
+                            '    prepRow.AnalyzerID = AnalyzerIDAttribute
+                            '    prepRow.WorkSessionID = WorkSessionIDAttribute
+                            '    prepRow.PreparationID = myNextPreparationID
+                            '    prepRow.LAX00Data = AppLayer.LastPreparationInstructionSent
+                            '    prepRow.PreparationStatus = "INPROCESS"
 
-                                myPreparationDS.twksWSPreparations.AddtwksWSPreparationsRow(prepRow)
+                            '    'AG 20/09/2012 v052 - inform the well where the reactions is dispensed on (when PTEST apply the correct offset factor)
+                            '    prepRow.WellUsed = CurrentWellAttribute
+                            '    If InStr(prepRow.LAX00Data, "PTEST") > 0 Then
+                            '        Dim reactRotorDlg As New ReactionsRotorDelegate
+                            '        prepRow.WellUsed = reactRotorDlg.GetRealWellNumber(CurrentWellAttribute + WELL_OFFSET_FOR_PREDILUTION, MAX_REACTROTOR_WELLS)
+                            '    End If
 
-                                'Insert the new Preparation
-                                myGlobal = myPrepDelegate.AddWSPreparation(dbConnection, myPreparationDS)
-                            End If
+                            '    myPreparationDS.twksWSPreparations.AddtwksWSPreparationsRow(prepRow)
+
+                            '    'Insert the new Preparation
+                            '    myGlobal = myPrepDelegate.AddWSPreparation(dbConnection, myPreparationDS)
+                            'End If
 
                             If (Not myGlobal.HasError) Then
                                 If (AppLayer.LastInstructionTypeSent = AppLayerEventList.SEND_ISE_PREPARATION) Then
@@ -1559,148 +1560,6 @@ Namespace Biosystems.Ax00.Core.Entities
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
-
-            'Try
-
-            '    myGlobal = DAOBase.GetOpenDBTransaction(pDBConnection)
-            '    If (Not myGlobal.HasError) And (Not myGlobal.SetDatos Is Nothing) Then
-            '        dbConnection = CType(myGlobal.SetDatos, SqlClient.SqlConnection)
-            '        If (Not dbConnection Is Nothing) Then
-            '            '<Function Logic>
-
-            '            '1ST: Insert record into preparations table
-            '            '''''''''''''''''''''''''''''''''''''''''''
-            '            Dim myPreparationDS As New WSPreparationsDS
-            '            Dim myPrepDelegate As New WSPreparationsDelegate
-
-            '            Dim prepRow As WSPreparationsDS.twksWSPreparationsRow
-            '            prepRow = myPreparationDS.twksWSPreparations.NewtwksWSPreparationsRow
-
-            '            'Fill the differents fields:
-            '            'Get the next PreparationID
-            '            myGlobal = myPrepDelegate.GeneratePreparationID(dbConnection)
-            '            If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-            '                prepRow.PreparationID = CType(myGlobal.SetDatos, Integer)
-            '            Else
-            '                Exit Try
-            '            End If
-
-            '            'Other fields
-            '            prepRow.AnalyzerID = AnalyzerIDAttribute
-            '            prepRow.WorkSessionID = WorkSessionIDAttribute
-            '            'prepRow.LAX00Data = "AppLayer.LastPreparationInstructionSent" '(for testings)
-            '            prepRow.LAX00Data = AppLayer.LastPreparationInstructionSent 'Get the Application layer attribute
-
-            '            prepRow.PreparationStatus = "INPROCESS"
-            '            myPreparationDS.twksWSPreparations.AddtwksWSPreparationsRow(prepRow)
-
-            '            'Insert record
-            '            myGlobal = myPrepDelegate.AddWSPreparation(dbConnection, myPreparationDS)
-            '            If myGlobal.HasError Then Exit Try
-
-
-            '            '2ON: Update Execution Status (INPROCESS)
-            '            '''''''''''''''''''''''''''''''''''''''''
-            '            Dim myExecutionsDS As New ExecutionsDS
-            '            Dim exeRow As ExecutionsDS.twksWSExecutionsRow
-
-            '            exeRow = myExecutionsDS.twksWSExecutions.NewtwksWSExecutionsRow
-
-            '            'exeRow.ExecutionID = IdBuilder.NextId() (for testings)
-            '            'exeRow.ExecutionID = 34
-            '            exeRow.ExecutionID = AppLayer.LastExecutionIDSent  'Get the Application layer attribute
-
-            '            exeRow.ExecutionStatus = prepRow.PreparationStatus
-            '            exeRow.PreparationID = prepRow.PreparationID
-            '            'AG 17/05/2010 - We cannt inform the baselineid in this point because the well used isnt known!!!
-
-            '            myExecutionsDS.twksWSExecutions.AddtwksWSExecutionsRow(exeRow)
-
-            '            Dim exeDelegate As New ExecutionsDelegate
-
-            '            'AG 03/02/2011 - If an ISE TEST instruction is sent maybe several executions (same OrderTestId - RerunNumber - ReplicateNumber)
-            '            'becomes to INPROCESS (Tested pending)
-            '            If AppLayer.LastInstructionTypeSent = GlobalEnumerates.AppLayerEventList.SEND_ISE_PREPARATION Then
-            '                myGlobal = exeDelegate.GetAffectedISEExecutions(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute, AppLayer.LastExecutionIDSent)
-            '                If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-            '                    Dim affectedExecutions As New ExecutionsDS
-            '                    affectedExecutions = CType(myGlobal.SetDatos, ExecutionsDS)
-
-            '                    Dim pending As List(Of ExecutionsDS.twksWSExecutionsRow) = _
-            '                        (From a In affectedExecutions.twksWSExecutions _
-            '                         Where a.ExecutionStatus = "PENDING" Select a).ToList
-
-            '                    If pending.Count > 0 Then
-            '                        For Each item In pending
-            '                            exeRow = myExecutionsDS.twksWSExecutions.NewtwksWSExecutionsRow
-            '                            exeRow.ExecutionID = item.ExecutionID
-            '                            exeRow.PreparationID = prepRow.PreparationID 'AG 30/11/2011 - several ise executions are performed using the same preparationid
-            '                            exeRow.ExecutionStatus = prepRow.PreparationStatus '"INPROCESS"
-            '                            myExecutionsDS.twksWSExecutions.AddtwksWSExecutionsRow(exeRow)
-            '                        Next
-            '                    End If
-            '                End If
-            '            End If
-            '            'AG 03/02/2011
-
-            '            myGlobal = exeDelegate.UpdateStatus(dbConnection, myExecutionsDS)
-
-            '            'AG 26/11/2010 - Prepare data for generate communications UI event
-            '            If Not myGlobal.HasError Then
-            '                'AG 08/02/2011 - Using ISE several executions can become INPROCESS at the same time
-            '                'myUI_RefreshDS.ExecutionStatusChanged.Clear() 'AG 27/02/2012 (comment line) Clear current DS table contents 
-            '                For Each row As ExecutionsDS.twksWSExecutionsRow In myExecutionsDS.twksWSExecutions.Rows
-            '                    myGlobal = PrepareUIRefreshEvent(dbConnection, GlobalEnumerates.UI_RefreshEvents.EXECUTION_STATUS, row.ExecutionID, 0, Nothing, False)
-            '                    If myGlobal.HasError Then Exit For
-            '                Next
-            '                'END AG 08/02/2011
-            '            End If
-            '            'END AG 26/11/2010
-
-            '            'Update rotor position status (SAMPLES: PENDING, INPROCESS, FINISHED)
-            '            If Not myGlobal.HasError Then
-            '                Dim rcp_del As New WSRotorContentByPositionDelegate
-            '                myGlobal = rcp_del.UpdateSamplePositionStatus(dbConnection, exeRow.ExecutionID, WorkSessionIDAttribute, AnalyzerIDAttribute)
-            '                If Not myGlobal.HasError Then
-            '                    Dim rotorPosDS As New WSRotorContentByPositionDS
-            '                    rotorPosDS = CType(myGlobal.SetDatos, WSRotorContentByPositionDS)
-            '                    For Each row As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In rotorPosDS.twksWSRotorContentByPosition.Rows
-            '                        myGlobal = PrepareUIRefreshEventNum2(dbConnection, GlobalEnumerates.UI_RefreshEvents.ROTORPOSITION_CHANGED, "SAMPLES", row.CellNumber, _
-            '                                                             row.Status, "", -1, -1, "", "", Nothing, Nothing, Nothing, -1, -1, "", "")
-            '                        'AG 09/03/2012 - do not inform about ElementStatus (old code: '... row.Status, "POS", -1, -1, "", "", Nothing, Nothing, Nothing, -1, -1, "", "")'
-
-            '                        If myGlobal.HasError Then Exit For
-            '                    Next
-            '                End If
-            '            End If
-
-            '            If (Not myGlobal.HasError) Then
-            '                'When the Database Connection was opened locally, then the Commit is executed
-            '                If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-
-            '            Else
-            '                'When the Database Connection was opened locally, then the Rollback is executed
-            '                If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-            '            End If
-
-            '        End If
-            '    End If
-
-            'Catch ex As Exception
-            '    myGlobal.HasError = True
-            '    myGlobal.ErrorCode = "SYSTEM_ERROR"
-            '    myGlobal.ErrorMessage = ex.Message
-
-            '    'Dim myLogAcciones As New ApplicationLogManager()
-            '    GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.MarkPreparationAccepted", EventLogEntryType.Error, False)
-            'End Try
-
-            ''We have used Exit Try so we have to sure the connection becomes properly closed here
-            'If myGlobal.HasError Then
-            '    If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-            '    If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-            'End If
-
 
             Return myGlobal
 
@@ -3932,6 +3791,40 @@ Namespace Biosystems.Ax00.Core.Entities
 
 #End Region
 
+        Private Function InsertNextPreparation(dbConnection As SqlConnection) As Integer
+            Dim myPreparationDS As New WSPreparationsDS
+            Dim myPrepDelegate As New WSPreparationsDelegate
+            Dim prepRow As WSPreparationsDS.twksWSPreparationsRow
+
+            'Generate the next PreparationID and insert the new Preparation
+            Dim myGlobal = myPrepDelegate.GeneratePreparationID(dbConnection)
+            If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
+                Dim myNextPreparationID = CType(myGlobal.SetDatos, Integer)
+
+                'Prepare data to insert the new Preparation
+                prepRow = myPreparationDS.twksWSPreparations.NewtwksWSPreparationsRow
+                prepRow.AnalyzerID = AnalyzerIDAttribute
+                prepRow.WorkSessionID = WorkSessionIDAttribute
+                prepRow.PreparationID = myNextPreparationID
+                prepRow.LAX00Data = AppLayer.LastPreparationInstructionSent
+                prepRow.PreparationStatus = "INPROCESS"
+
+                'AG 20/09/2012 v052 - inform the well where the reactions is dispensed on (when PTEST apply the correct offset factor)
+                prepRow.WellUsed = CurrentWellAttribute
+                If InStr(prepRow.LAX00Data, "PTEST") > 0 Then
+                    Dim reactRotorDlg As New ReactionsRotorDelegate
+                    prepRow.WellUsed = reactRotorDlg.GetRealWellNumber(CurrentWellAttribute + WELL_OFFSET_FOR_PREDILUTION, MAX_REACTROTOR_WELLS)
+                End If
+
+                myPreparationDS.twksWSPreparations.AddtwksWSPreparationsRow(prepRow)
+
+                'Insert the new Preparation
+                myPrepDelegate.AddWSPreparation(dbConnection, myPreparationDS)
+
+                Return myNextPreparationID
+            End If
+
+        End Function
 
     End Class
 

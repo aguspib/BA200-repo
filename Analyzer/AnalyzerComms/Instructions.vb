@@ -2,6 +2,7 @@
 Option Explicit On
 
 Imports Biosystems.Ax00.BL
+Imports Biosystems.Ax00.Core.Entities
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.DAL.DAO
@@ -614,7 +615,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     If myPreparationParameterList.Count > 0 Then
                         For Each myInstructionTO As InstructionParameterTO In myPreparationParameterList
                             Select Case myInstructionTO.ParameterIndex
-                                Case 1 'Axxx -Analyzer Description
+                                Case 1  'Axxx -Analyzer Description
                                     'myInstructionTO.Parameter = "A400"
                                     myInstructionTO.ParameterValue = "A400" '1st & 2on characters: model, 3th & 4th characters: analyzer number
                                     Exit Select
@@ -633,10 +634,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                         Exit For   'DL 26/06/2012
                                     End If
 
-                                    ''AG 28/09/2012 - auxiliary code for test incomplete instruction
-                                    'myGlobalDataTO.HasError = True
-                                    'Exit For
-                                    ''AG 28/09/2012
                                     Exit Select
 
                                 Case 4 ' S -Source.
@@ -666,7 +663,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                     End If
                                     Exit Select
 
-                                Case 5 ' BP1 -Bottle Position R1.
+                                Case 5
+                                    myInstructionTO.ParameterValue = GetValueExecutionID(pWashingDataDS)
+
+                                Case 6 ' BP1 -Bottle Position R1.
                                     myInstructionTO.ParameterValue = "0" 'AG 09/02/2012
                                     If Not pWashingDataDS.nextPreparation(0).IsWashSolution1Null Then
 
@@ -693,7 +693,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                     End If
                                     Exit Select
 
-                                Case 6 ' BT1 -Bottle Type.
+                                Case 7 ' BT1 -Bottle Type.
                                     'With the previous values on the qRCPList get the BOTTLE Type.
                                     If qRCPList.Count > 0 Then
                                         myInstructionTO.ParameterValue = GetBottleCode(qRCPList.First().TubeType)
@@ -702,11 +702,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                     End If
                                     Exit Select
 
-                                Case 7 'BRT1 -Bottle Rack Type.
+                                Case 8 'BRT1 -Bottle Rack Type.
                                     myInstructionTO.ParameterValue = "1" 'Type 1 (Original)
                                     Exit Select
 
-                                Case 8 ' BP2 -Bottle Position R2.
+                                Case 9 ' BP2 -Bottle Position R2.
                                     myInstructionTO.ParameterValue = "0" 'AG 09/02/2012
                                     If Not pWashingDataDS.nextPreparation(0).IsWashSolution2Null Then
                                         'Get the solution 1 information by solution code.
@@ -733,7 +733,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                     End If
                                     Exit Select
 
-                                Case 9 'BT2 -Bottle Type.
+                                Case 10 'BT2 -Bottle Type.
                                     'With the previous values on the qRCPList get the BOTTLE Type.
                                     If qRCPList.Count > 0 Then
                                         myInstructionTO.ParameterValue = GetBottleCode(qRCPList.First().TubeType)
@@ -742,7 +742,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                     End If
                                     Exit Select
 
-                                Case 10 'BRT2 -Bottle Rack Type.
+                                Case 11 'BRT2 -Bottle Rack Type.
                                     myInstructionTO.ParameterValue = "1" 'Type 1 Original.
                                     Exit Select
 
@@ -5014,6 +5014,13 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 #Region "OLD methods ... for old instrucion definition"
 
 #End Region
+
+        Private Function GetValueExecutionID(pWashingDataDS As AnalyzerManagerDS) As String
+            If (pWashingDataDS.nextPreparation.Any() AndAlso Not pWashingDataDS.nextPreparation(0).IsExecutionIDNull) Then
+                Return pWashingDataDS.nextPreparation(0).ExecutionID.ToString()
+            End If
+            Return "0"
+        End Function
 
     End Class
 
