@@ -1,10 +1,12 @@
-﻿Namespace Biosystems.Ax00.CC
+﻿
+Namespace Biosystems.Ax00.CC
 
     ''' <summary>
-    ''' This structure represents a minimum and maximum pair of comparable elements. Notice it's imutable.
+    '''  This strucure represents a range of comparable values. That is, an inmutable minimum and maximum pair of comparable elements. 
     ''' </summary>
     ''' <typeparam name="TComparable">The comparable parameter type</typeparam>
     ''' <remarks></remarks>
+    <Serializable()>
     Public Structure Range(Of TComparable As {IComparable})
         Public ReadOnly Minimum As TComparable
         Public ReadOnly Maximum As TComparable
@@ -25,7 +27,7 @@
         End Sub
 
         ''' <summary>
-        ''' Tell if a given value is between minimum and maximum range.Integer This is an inclusive check.
+        ''' Tell if a given value is between minimum and maximum range. This is an inclusive check.
         ''' </summary>
         ''' <param name="value"></param>
         ''' <returns></returns>

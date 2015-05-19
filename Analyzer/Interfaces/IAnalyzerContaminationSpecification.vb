@@ -42,5 +42,7 @@ Namespace Biosystems.Ax00.Core.Entities.Worksession.Interfaces
 
         ReadOnly Property CurrentRunningContext As IContaminationsContext
 
+        ReadOnly Property HighContaminationPersistence As Integer
+
     End Interface
 End Namespace
