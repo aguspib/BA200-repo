@@ -11549,19 +11549,20 @@ Partial Public Class UiAx00MainMDI
 
     Private Sub UiAx00MainMDI_MdiChildActivate(sender As Object, e As EventArgs) Handles Me.MdiChildActivate
 
+        Try
+            Dim differentWidth = Me.ActiveMdiChild.Width - Me.GetMdiClientWindow.ClientSize.Width
+            If differentWidth > 0 Then
+                Me.Width += differentWidth
+                Me.Left -= CInt(differentWidth / 2)
+            End If
 
-        Dim differentWidth = Me.ActiveMdiChild.Width - Me.GetMdiClientWindow.ClientSize.Width
-        If differentWidth > 0 Then
-            Me.Width += differentWidth
-            Me.Left -= CInt(differentWidth / 2)
-        End If
-
-        Dim differentHeight = Me.ActiveMdiChild.Height - Me.GetMdiClientWindow.ClientSize.Height
-        If differentHeight > 0 Then
-            Me.Height += differentHeight
-            Me.Top -= CInt(differentHeight / 2)
-        End If
-
+            Dim differentHeight = Me.ActiveMdiChild.Height - Me.GetMdiClientWindow.ClientSize.Height
+            If differentHeight > 0 Then
+                Me.Height += differentHeight
+                Me.Top -= CInt(differentHeight / 2)
+            End If
+        Catch
+        End Try
     End Sub
 
     Private Function GetMdiClientWindow() As MdiClient

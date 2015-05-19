@@ -136,6 +136,7 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Property wellContaminatedWithWashSent As Integer
         Property CanManageRetryAlarm As Boolean
         Property StartingRunningFirstTime As Boolean
+        ReadOnly Property WashingIDRequired As Boolean
 
 #End Region
 
@@ -290,6 +291,8 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Function ContaminationsSpecification() As IAnalyzerContaminationsSpecification
 
         Sub ResetFLIGHT()
+
+
 
 #End Region
 

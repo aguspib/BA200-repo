@@ -10,6 +10,7 @@ Namespace Biosystems.Ax00.Core.Entities
         Implements IAnalyzerManager
 
 
+
         Private WithEvents _baseLine As IBaseLineEntity
         Private WithEvents _iseAnalyzer As IISEManager
 
@@ -74,5 +75,6 @@ Namespace Biosystems.Ax00.Core.Entities
 
         Public MustOverride Function ContaminationsSpecification() As IAnalyzerContaminationsSpecification Implements IAnalyzerManager.ContaminationsSpecification
 
+        Public MustOverride ReadOnly Property WashingIDRequired As Boolean Implements IAnalyzerManager.WashingIDRequired
     End Class
 End Namespace

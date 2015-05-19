@@ -402,6 +402,13 @@ Namespace Biosystems.Ax00.Core.Entities
 
         End Property
 
+        Protected Shared _currentAnalyzer As IAnalyzerManager
+        Public Shared ReadOnly Property GetCurrentAnalyzerManager As IAnalyzerManager
+            Get
+                Return _currentAnalyzer
+            End Get
+        End Property
+
         Public Property ActiveFwVersion() As String Implements IAnalyzerManager.ActiveFwVersion  'SGM 28/11/2011
             Get
                 Return FwVersionAttribute
@@ -4272,5 +4279,7 @@ Namespace Biosystems.Ax00.Core.Entities
 #End Region
 
     End Class
+
+
 
 End Namespace
