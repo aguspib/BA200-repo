@@ -2203,7 +2203,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                       Where a.ParameterName = SwParameters.PREDILUTION_CYCLES.ToString Select a).ToList
 
                             If myQRes.Count > 0 Then
-                                WELL_OFFSET_FOR_PREDILUTION = CInt(myQRes(0).ValueNumeric) - 1 'Well offset for predilution = (predilution cycles used for time estimation - 1)
+                                WELL_OFFSET_FOR_PREDILUTION = AnalyzerManager.GetCurrentAnalyzerManager().ContaminationsSpecification.AdditionalPredilutionSteps - 1  ' CInt(myQRes(0).ValueNumeric) - 1 'Well offset for predilution = (predilution cycles used for time estimation - 1)
                             End If
 
                             myQRes = (From a As ParametersDS.tfmwSwParametersRow In myParamDs.tfmwSwParameters _
