@@ -19,12 +19,12 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
             MyBase.New(pConn) ', ActiveAnalyzer)
         End Sub
 
-        Protected Overrides Sub Execute_i_loop(ByVal pContaminationsDS As ContaminationsDS, _
+        Protected Overrides Sub ExecuteOptimizationAlgorithm(ByVal pContaminationsDS As ContaminationsDS, _
                                                   ByRef pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), _
                                                   ByVal pHighContaminationPersistance As Integer, _
                                                   Optional ByVal pPreviousReagentID As List(Of Integer) = Nothing, _
                                                   Optional ByVal pPreviousReagentIDMaxReplicates As List(Of Integer) = Nothing)
-            MyBase.Execute_i_loop(pContaminationsDS, pExecutions, pHighContaminationPersistance, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
+            MyBase.ExecuteOptimizationAlgorithm(pContaminationsDS, pExecutions, pHighContaminationPersistance, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
             'Sort the different ordertest inside pExecutions to minimize contaminations (move up the contaminated until becomes not contaminated)
             For i As Integer = 1 To sortedOTList.Count - 1
                 ' ReSharper disable once InconsistentNaming

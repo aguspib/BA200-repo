@@ -37,6 +37,8 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
         Protected Property TypeContaminated As AnalysisMode
         Protected Property typeExpectedResult As AnalysisMode
         Protected Property typeResult As AnalysisMode
+
+        Public Property calculateInRunning As Boolean
 #End Region
 
 #Region "Enums"
@@ -105,15 +107,13 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
                 Dim C = New ContaminationBetweenElementsSorter(pContaminationsDS, pPreviousReagentID, pPreviousReagentIDMaxReplicates, pExecutions)
                 C.MoveToAvoidContaminationBetweenElements()
                 addContaminationBetweenGroups = C.AddContaminationBetweenGroups
-                '/MIC
 
+                '/MIC
 
                 'MoveToAvoidContaminationBetweenElements(pContaminationsDS, pPreviousReagentID, pPreviousReagentIDMaxReplicates, pHighContaminationPersistance, pExecutions, originalOrderChanged, addContaminationBetweenGroups)
             End If
 
-            Dim myExecutionDelegate As New ExecutionsDelegate()
-
-            If pPreviousReagentID Is Nothing OrElse originalOrderChanged Then
+            If pPreviousReagentID Is Nothing OrElse originalOrderChanged OrElse addContaminationBetweenGroups <> 0 Then
 
                 'Get all different ordertests in pExecutions list with executions pending
                 myOTListLinq = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
@@ -124,11 +124,12 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
                     sortedOTList = myOTListLinq.ToList
 
 
-                    Execute_i_loop(pContaminationsDS, pExecutions, pHighContaminationPersistance, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
+                    ExecuteOptimizationAlgorithm(pContaminationsDS, pExecutions, pHighContaminationPersistance, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
 
                     'Now the sortedOTList contains the new orderTest order (but only these with executions pending), now we have to add the locked
                     AddLockedExecutions(pExecutions, sortedOTList)
-                    ContaminationNumber = ExecutionsDelegate.GetContaminationNumber(pContaminationsDS, pExecutions, pHighContaminationPersistance) + addContaminationBetweenGroups
+                    ContaminationNumber = GetContaminationNumber(pContaminationsDS, pExecutions)
+                    'ExecutionsDelegate.GetContaminationNumber(pContaminationsDS, pExecutions, pHighContaminationPersistance) + addContaminationBetweenGroups
 
                 ElseIf myOTListLinq.Count = 1 Then 'No movement is possible
                     ContaminationNumber = addContaminationBetweenGroups
@@ -136,7 +137,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
                 myOTListLinq = Nothing
 
             Else 'If pPreviousElementLastReagentID = -1 OrElse originalOrderChanged Then
-                ContaminationNumber = ExecutionsDelegate.GetContaminationNumber(pContaminationsDS, pExecutions, pHighContaminationPersistance) + addContaminationBetweenGroups
+                ContaminationNumber = GetContaminationNumber(pContaminationsDS, pExecutions) 'ExecutionsDelegate.GetContaminationNumber(pContaminationsDS, pExecutions, pHighContaminationPersistance) + addContaminationBetweenGroups
             End If
 
             Return ContaminationNumber
@@ -147,6 +148,10 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
                 Return WSExecutionCreator.Instance.ContaminationsSpecification
             End Get
         End Property
+
+        Protected Overridable Function GetContaminationNumber(ByVal pContaminationsDS As ContaminationsDS, pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow)) As Integer
+            Return ExecutionsDelegate.GetContaminationNumber(pContaminationsDS, pExecutions, ContaminationsSpecification.HighContaminationPersistence)
+        End Function
 
 #End Region
 
@@ -162,7 +167,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
         ''' <remarks>
         ''' Created on 18/03/2015 by AJG
         ''' </remarks>
-        Protected Overridable Sub Execute_i_loop(ByVal pContaminationsDS As ContaminationsDS, _
+        Protected Overridable Sub ExecuteOptimizationAlgorithm(ByVal pContaminationsDS As ContaminationsDS, _
                                                   ByRef pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), _
                                                   ByVal pHighContaminationPersistance As Integer, _
                                                   Optional ByVal pPreviousReagentID As List(Of Integer) = Nothing, _

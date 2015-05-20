@@ -324,12 +324,11 @@ Namespace Biosystems.Ax00.Core.Entities
                 'AG 07/06/2012
 
                 If Not myGlobal.HasError Then '(1)
-                    Dim myAnManagerDS As New AnalyzerManagerDS
-                    'AG 07/06/2012
-                    'myAnManagerDS = CType(myGlobal.SetDatos, AnalyzerManagerDS)
+                    Dim myAnManagerDS As AnalyzerManagerDS
 
                     myAnManagerDS = CType(myNextPreparationToSendDS, AnalyzerManagerDS)
 
+                    '
                     If myAnManagerDS.nextPreparation.Rows.Count > 0 Then '(2)
                         'Analyze the row0 found
                         '1st: Check if next cuvette is optically rejected ... send nothing (DUMMY)
@@ -2123,7 +2122,7 @@ Namespace Biosystems.Ax00.Core.Entities
             '2.2) If contaminations: apply Backtracking algorithm for handling contaminations, and choose the best solution
             Dim currentResultList As List(Of ExecutionsDS.twksWSExecutionsRow)
             currentResultList = toSendList.ToList() 'Initial order                                    
-            toSendList = ExecutionsDelegate.ManageContaminationsForRunningAndStatic(ActiveAnalyzer, dbConnection, pContaminationsDS, currentResultList, pHighContaminationPersitance, contaminNumber, myReagentsIDList, myMaxReplicatesList)
+            toSendList = ExecutionsDelegate.ManageContaminationsForRunningAndStatic(True, ActiveAnalyzer, dbConnection, pContaminationsDS, currentResultList, pHighContaminationPersitance, contaminNumber, myReagentsIDList, myMaxReplicatesList)
 
 #If DEBUG Then
             Debug.Print(String.Format("Executed backtraking algorithm. toSendList = {0} \n", toSendList.Count().ToString()))

@@ -23,8 +23,10 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
         Protected Property ContDS As ContaminationsDS
         Protected Property previousReagentID As List(Of Integer)
         Protected Property previousReagentIDMaxReplicates As List(Of Integer)
+        Protected Property MakeCalculationsInRunning As Boolean
 
-        Public Sub New(ByVal pCon As SqlConnection,
+        Public Sub New(ByVal makeCalculationsInRunning As Boolean,
+                       ByVal pCon As SqlConnection,
                        ByVal Analyzer As String,
                        ByVal currentCont As Integer,
                        ByVal pHighCont As Integer,
@@ -32,6 +34,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
                        ByVal OrderTests As List(Of ExecutionsDS.twksWSExecutionsRow),
                        Optional ByVal pPreviousReagentID As List(Of Integer) = Nothing,
                        Optional ByVal pPreviousReagentIDMaxReplicates As List(Of Integer) = Nothing)
+            Me.MakeCalculationsInRunning = makeCalculationsInRunning
             Conn = pCon
             ActiveAnalyzer = Analyzer
             currentContaminationNumber = currentCont
@@ -44,6 +47,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
         End Sub
 
         Public Sub ApplyOptimizations(ByVal myOptimizer As OptimizationPolicyApplier, ByVal OrderTests As List(Of ExecutionsDS.twksWSExecutionsRow))
+            myOptimizer.calculateInRunning = MakeCalculationsInRunning
             If currentContaminationNumber > 0 Then
                 currentResult = OrderTests.ToList()
                 currentContaminationNumber = myOptimizer.ExecuteOptimization(ContDS, currentResult, highContaminationPersistance, previousReagentID, previousReagentIDMaxReplicates)

@@ -39,10 +39,11 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             Dim results As New ActionRequiredForDispensing 'New List(Of IWashingDescription)
 
             For curStep = Steps.Range.Minimum To Steps.Range.Maximum
-                If Steps(curStep) Is Nothing Then Continue For
+                If Steps.IsIndexValid(curStep) = False OrElse Steps(curStep) Is Nothing Then Continue For
+
                 For curDispensing = 1 To ContaminationsSpecifications.DispensesPerStep
 
-                    If Steps(curStep)(curDispensing) Is Nothing Then Continue For
+                    If Steps(curStep) Is Nothing OrElse Steps(curStep)(curDispensing) Is Nothing Then Continue For
                     Dim dispensingToAsk = Steps(curStep)(curDispensing)
                     Dim responseFromDispense = dispensingToAsk.RequiredActionForDispensing(dispensing, curStep)
 
@@ -193,7 +194,24 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             Next
         End Sub
 
+        Public Sub FillContentsFromReagentsIDInStatic(reagentsIDList As List(Of Integer), timeOffset As Integer)
+            FillEmptyContext()
+            If reagentsIDList Is Nothing Then Return
+            'Dim maxIndex = reagentsIDList.Count - 1
+            For i2 As Integer = Me.Steps.Range.Minimum To -1
+                Dim auxIndex As Integer = i2
+                Dim reagentsIndex = reagentsIDList.Count + auxIndex
+                auxIndex -= timeOffset
 
+                If auxIndex < Steps.Range.Minimum Then Continue For
+
+                If reagentsIDList.Count > reagentsIndex Then
+                    If Steps(auxIndex)(1) Is Nothing Then Steps(auxIndex)(1) = Me.ContaminationsSpecifications.CreateDispensing
+                    Steps(auxIndex)(1).R1ReagentID = reagentsIDList(reagentsIndex)
+                End If
+            Next
+
+        End Sub
 
 
 

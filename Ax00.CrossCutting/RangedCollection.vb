@@ -31,6 +31,11 @@
             End While
         End Sub
 
+        Function IsIndexValid(index As Integer) As Boolean
+            Dim realIndex = ConvertToZeroBasedIndex(index)
+            Return realIndex < _internalList.Count And realIndex > 0
+        End Function
+
         ''' <summary>
         ''' This allows any item into the collection to be accessed by its index. <para>Notice that the index starts in Range.Minimum </para>
         ''' </summary>
@@ -126,6 +131,11 @@
         Public Sub Sort()
             _internalList.Sort()
         End Sub
+
+        Public Sub Clear()
+            _internalList.Clear()
+        End Sub
+
 
 #Region "Internal zero-based indexes conversion helpers"
 

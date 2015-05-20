@@ -45,7 +45,8 @@ Public Class DelegatesToCoreBusinesGlue
         Private ReadOnly _contaminationManagerInstance As Object
         Private ReadOnly _contaminationManagerClass As Type
 
-        Public Sub New(ByVal pCon As SqlConnection,
+        Public Sub New(ByVal makeCalculatinosInRunning As Boolean,
+                       ByVal pCon As SqlConnection,
                    ByVal Analyzer As String,
                    ByVal currentCont As Integer,
                    ByVal pHighCont As Integer,
@@ -59,7 +60,7 @@ Public Class DelegatesToCoreBusinesGlue
 
             Try
                 _contaminationManagerInstance = Activator.CreateInstance(contaminationManagerClass, {
-                                    pCon, Analyzer, currentCont, pHighCont, contaminsDS,
+                                    makeCalculatinosInRunning, pCon, Analyzer, currentCont, pHighCont, contaminsDS,
                                     OrderTests, pPreviousReagentID, pPreviousReagentIDMaxReplicates
                                 })
                 _contaminationManagerClass = contaminationManagerClass

@@ -1028,6 +1028,7 @@ Namespace Biosystems.Ax00.BL
         ''' AG 25/11/2011 - add the high contamination persistance functionality
         ''' AG 15/12/2011 - define as public to use it in SearchNextPreparation process
         ''' </remarks>
+        <Obsolete()>
         Public Shared Function GetContaminationNumber(ByVal pContaminationsDS As ContaminationsDS, _
                                                 ByVal pExecutions As IEnumerable(Of ExecutionsDS.twksWSExecutionsRow), _
                                                 Optional ByVal pHighContaminationPersistance As Integer = 0) As Integer
@@ -8073,7 +8074,7 @@ Namespace Biosystems.Ax00.BL
 
                 currentContaminationNumber = OrderContaminationNumber
                 currentResult = OrderTests.ToList()
-                bestResult = ManageContaminationsForRunningAndStatic(activeAnalyzer, pConn, contaminationsDataDS, currentResult, highContaminationPersitance, currentContaminationNumber, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
+                bestResult = ManageContaminationsForRunningAndStatic(False, activeAnalyzer, pConn, contaminationsDataDS, currentResult, highContaminationPersitance, currentContaminationNumber, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
 
                 ''A last try, if the order tests only have 2 tests that are contaminating between them, why not to interchange them?
                 'If currentContaminationNumber > 0 Then
@@ -8127,7 +8128,7 @@ Namespace Biosystems.Ax00.BL
         ''' <remarks>
         ''' Created on 19/03/2015 by AJG
         ''' </remarks>
-        Public Shared Function ManageContaminationsForRunningAndStatic(ByVal ActiveAnalyzer As String,
+        Public Shared Function ManageContaminationsForRunningAndStatic(ByVal calculateInRunning As Boolean, ByVal ActiveAnalyzer As String,
                                                                 ByVal pConn As SqlConnection,
                                                                 ByVal contaminationsDataDS As ContaminationsDS,
                                                                 ByRef OrderTests As List(Of ExecutionsDS.twksWSExecutionsRow),
@@ -8137,21 +8138,10 @@ Namespace Biosystems.Ax00.BL
                                                                 Optional ByVal pPreviousReagentIDMaxReplicates As List(Of Integer) = Nothing) As List(Of ExecutionsDS.twksWSExecutionsRow)
 
 
-            'Dim myContaminationManager As New ContaminationManager(pConn, ActiveAnalyzer, currentContaminationNumber, highContaminationPersistance, contaminationsDataDS, OrderTests, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
-            Dim myContaminationManager = New DelegatesToCoreBusinesGlue.ContaminationManagerWrapper(pConn, ActiveAnalyzer, currentContaminationNumber, highContaminationPersistance, contaminationsDataDS, OrderTests, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
-            ''Apply Optimization Policy A. (move contaminated OrderTest down until it becomes no contaminated)
-            'myContaminationManager.ApplyOptimizations(New OptimizationAPolicyApplier(pConn, ActiveAnalyzer), OrderTests)
-
-            ''Apply Optimization Policy B. (move contaminated OrderTest up until it becomes no contaminated)
-            'myContaminationManager.ApplyOptimizations(New OptimizationBPolicyApplier(pConn, ActiveAnalyzer), OrderTests)
-
-            ''Apply Optimization Policy C. (move contaminator OrderTest down until it no contaminates)
-            'myContaminationManager.ApplyOptimizations(New OptimizationCPolicyApplier(pConn, ActiveAnalyzer), OrderTests)
-
-            ''Apply Optimization Policy D. (move contaminator OrderTest up until it no contaminates)
-            'myContaminationManager.ApplyOptimizations(New OptimizationDPolicyApplier(pConn, ActiveAnalyzer), OrderTests)
-
-            'Apply Optimization using Backtracking algorithm. If exists it'll return an optimal solution with no contaminations
+            Dim myContaminationManager = New DelegatesToCoreBusinesGlue.ContaminationManagerWrapper(
+                                         calculateInRunning, pConn, ActiveAnalyzer, currentContaminationNumber,
+                                         highContaminationPersistance, contaminationsDataDS, OrderTests, pPreviousReagentID,
+                                         pPreviousReagentIDMaxReplicates)
 
             'MANEL
             myContaminationManager.ApplyOptimizations(pConn, ActiveAnalyzer, OrderTests)

@@ -576,7 +576,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
 
                 currentContaminationNumber = OrderContaminationNumber
                 currentResult = StandardOrderTests.ToList()
-                bestResult = ExecutionsDelegate.ManageContaminationsForRunningAndStatic(activeAnalyzer, pDbConnection, contaminationsDataDS,
+                bestResult = ExecutionsDelegate.ManageContaminationsForRunningAndStatic(False, activeAnalyzer, pDbConnection, contaminationsDataDS,
                                                                                         currentResult, highContaminationPersitance, currentContaminationNumber,
                                                                                         pPreviousReagentID, pPreviousReagentIDMaxReplicates)
 
