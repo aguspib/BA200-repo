@@ -104,10 +104,11 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
                 'MIC
                 Dim C = New ContaminationBetweenElementsSorter(pContaminationsDS, pPreviousReagentID, pPreviousReagentIDMaxReplicates, pExecutions)
                 C.MoveToAvoidContaminationBetweenElements()
+                addContaminationBetweenGroups = C.AddContaminationBetweenGroups
                 '/MIC
 
 
-                MoveToAvoidContaminationBetweenElements(pContaminationsDS, pPreviousReagentID, pPreviousReagentIDMaxReplicates, pHighContaminationPersistance, pExecutions, originalOrderChanged, addContaminationBetweenGroups)
+                'MoveToAvoidContaminationBetweenElements(pContaminationsDS, pPreviousReagentID, pPreviousReagentIDMaxReplicates, pHighContaminationPersistance, pExecutions, originalOrderChanged, addContaminationBetweenGroups)
             End If
 
             Dim myExecutionDelegate As New ExecutionsDelegate()

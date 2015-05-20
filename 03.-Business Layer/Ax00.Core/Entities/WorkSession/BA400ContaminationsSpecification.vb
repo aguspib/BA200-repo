@@ -73,7 +73,9 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
         Public ReadOnly Property HighContaminationPersistence As Integer Implements IAnalyzerContaminationsSpecification.HighContaminationPersistence
             Get
-                <ThreadStatic> Static highContaminationPersitance As Integer = SwParametersDelegate.ReadIntValue(Nothing, GlobalEnumerates.SwParameters.CONTAMIN_REAGENT_PERSIS, Nothing).SetDatos
+                <ThreadStatic>
+                Static highContaminationPersitance As Integer = SwParametersDelegate.ReadIntValue(Nothing, GlobalEnumerates.SwParameters.CONTAMIN_REAGENT_PERSIS, Nothing).SetDatos
+
                 Return highContaminationPersitance
             End Get
         End Property

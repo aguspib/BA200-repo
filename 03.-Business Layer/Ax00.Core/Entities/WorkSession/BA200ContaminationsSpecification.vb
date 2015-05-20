@@ -41,7 +41,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
         End Sub
         Private Sub ProcessInstructionReceived(eventKind As GlobalEnumerates.AppLayerEventList, ByVal data As String)
             'If Threading.Thread.CurrentThread IsNot myThread Then
-            '    Debug.WriteLine("Analyzer message from foreign thread: " & data)
+            '    Debug.WriteLine("Analyzer message fr om foreign thread: " & data)
             'Else
             '    Debug.WriteLine("Analyzer message from main thread: " & data)
             'End If
