@@ -58,10 +58,14 @@ Public Class ContaminationBetweenElementsSorter
 
         Dim result = context.ActionRequiredForAGivenDispensing(pExecutions(0))
 
-        If context.ActionRequiredForAGivenDispensing(pExecutions(0)).Action = IContaminationsAction.RequiredAction.NoAction Then
+        If result.Action = IContaminationsAction.RequiredAction.NoAction Then
+            AddContaminationBetweenGroups = 0
             Return
-        Else
-            'Backtracking to the rescue!!
+        ElseIf result.Action = IContaminationsAction.RequiredAction.Wash Then
+            AddContaminationBetweenGroups += result.InvolvedWashes.Count
+            'Baacktracking to the rescue!!
+        ElseIf result.Action = IContaminationsAction.RequiredAction.Skip Then
+            AddContaminationBetweenGroups = 1 '??
             Return 'result.InvolvedWashes.Any
         End If
 
