@@ -66,8 +66,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 End Try
                 'BA-2471: IT 08/05/2015 (END)
 
-                'If (update) Then 'BA-2471: IT 08/05/2015
-                If (False) Then 'BA-2471: IT 08/05/2015
+                If (update) Then 'BA-2471: IT 08/05/2015
+                    'If (False) Then 'BA-2471: IT 08/05/2015
 
                     'DL 18/01/2013 - Create an automatic restore point (subfolders RestorePoints and Previous only for User Sw)
                     Dim myGlobal As New GlobalDataTO
