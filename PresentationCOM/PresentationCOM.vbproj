@@ -540,9 +540,6 @@
     <Content Include="Images\OrderTests.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Update\bak\Ax00TEM.bak">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="IRestPointUpdateProc.resx">

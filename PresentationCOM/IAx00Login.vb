@@ -212,6 +212,8 @@ Public Class UiAx00Login
                     DBServerError = True
 
                     Dim appVersion As String = ""
+                    Dim dbVersion As String = ""
+
                     'TR 21/02/2013 -Get the application Version for the installed Database.
                     Dim myVersionDelegate As New VersionsDelegate
                     Dim myGlobalDataTO As New GlobalDataTO
@@ -219,6 +221,7 @@ Public Class UiAx00Login
                     If Not myGlobalDataTO.HasError Then
                         If DirectCast(myGlobalDataTO.SetDatos, VersionsDS).tfmwVersions.Count > 0 Then
                             appVersion = DirectCast(myGlobalDataTO.SetDatos, VersionsDS).tfmwVersions(0).UserSoftware
+                            dbVersion = DirectCast(myGlobalDataTO.SetDatos, VersionsDS).tfmwVersions(0).DBSoftware
                         End If
                     End If
                     'TR 21/02/2013 -END.
@@ -229,14 +232,14 @@ Public Class UiAx00Login
                         'ShowMessage function because there is no connection to the DB.
 
                         MessageBoxResult = MessageBox.Show( _
-                            String.Format("BA400 software version {0} cannot work with a higher Database version {1} " & _
+                            String.Format("BA400 software version {0} cannot work with a higher Database version {3} " & _
                                           "(This situation appears only after installation a previous software version " & _
                                           "without uninstalling database, because automatic downgrade is not possible). {2}" & _
                                           "If you want to load a Restore Point of database version {0}, press the 'Accept' button " & _
                                           "and choose restore point file and restart application and continue working. {2} " & _
                                           "If you want to maintain your database information, press the 'Cancel' button. " & _
                                           "After this you must install BA400 software version {1} (using related distribution package).", _
-                                          Application.ProductVersion, appVersion, vbCrLf), "BA400 Software", MessageBoxButtons.OKCancel, MessageBoxIcon.Error)
+                                          Application.ProductVersion, appVersion, vbCrLf, dbVersion), "BA400 Software", MessageBoxButtons.OKCancel, MessageBoxIcon.Error)
 
 
                         'MessageBoxResult = MessageBox.Show( _

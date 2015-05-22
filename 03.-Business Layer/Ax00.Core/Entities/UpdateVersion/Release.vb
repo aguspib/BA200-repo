@@ -93,7 +93,6 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
                 revision.Run(results, server, dataBaseName, packageId)
 
                 If Not results.Success Then
-                    results.LastErrorCommonRevision = revision
                     Exit For
                 End If
             Next
@@ -102,23 +101,15 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
                 revision.Run(results, server, dataBaseName, packageId)
 
                 If Not results.Success Then
-                    results.LastErrorDataRevision = revision
                     Exit For
                 End If
             Next
-
-            If Not results.Success Then
-                results.LastErrorRelease = Me
-
-            End If
 
             If results.Success Then
                 UpdateDatabaseVersion(results, dataBaseName, server, packageId)
             Else
                 results.LastErrorRelease = Me
             End If
-
-            'WriteLog()
 
         End Sub
 
@@ -166,13 +157,13 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
 
             DebugLogger.AddLog(" --------------------------------------------", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
             DebugLogger.AddLog(String.Format(" Release: {0}", Version), GlobalBase.UpdateVersionDatabaseProcessLogFileName)
-            DebugLogger.AddLog(" 1.- Results for Common scripts", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+            DebugLogger.AddLog(" 1.- Common scripts", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
 
             For Each revision As CommonRevision In CommonRevisions
                 revision.WriteLog()
             Next
 
-            DebugLogger.AddLog(" 2.- Results for Data scripts", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+            DebugLogger.AddLog(" 2.- Data scripts", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
 
             For Each revision As DataRevision In DataRevisions
                 revision.WriteLog()

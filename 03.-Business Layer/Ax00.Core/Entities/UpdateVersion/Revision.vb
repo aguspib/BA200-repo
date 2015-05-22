@@ -26,9 +26,6 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
 
 #End Region
 
-        <XmlIgnoreAttribute()>
-        Public Property Results As ExecutionResults
-
 #Region "Public members"
 
         Public Function CompareTo(obj As Object) As Integer Implements IComparable.CompareTo
@@ -69,19 +66,19 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
 #Region "Private members"
 
 
-        Public Sub RunPrerequisites(ByRef server As Server, ByVal dataBaseName As String)
+        Public Sub RunPrerequisites(result As ExecutionResults, ByRef server As Server, ByVal dataBaseName As String)
 
             If PrerequisiteScript Is Nothing OrElse PrerequisiteScript.Trim = String.Empty Then Return
-            Results.Success = DBManager.ExecuteBooleanScript(server, dataBaseName, PrerequisiteScript, Results.Exception)
-            If Results.Success = False Then Results.LastErrorStep = ExecutionResults.ErrorStep.PrerequisiteScript
+            result.Success = DBManager.ExecuteBooleanScript(server, dataBaseName, PrerequisiteScript, result.Exception)
+            If result.Success = False Then result.LastErrorStep = ExecutionResults.ErrorStep.PrerequisiteScript
 
         End Sub
 
-        Public Sub RunIntegrity(ByRef server As Server, ByVal dataBaseName As String)
+        Public Sub RunIntegrity(result As ExecutionResults, ByRef server As Server, ByVal dataBaseName As String)
 
             If IntegrityScript Is Nothing OrElse IntegrityScript.Trim = String.Empty Then Return
-            Results.Success = DBManager.ExecuteBooleanScript(server, dataBaseName, IntegrityScript, Results.Exception)
-            If Results.Success = False Then Results.LastErrorStep = ExecutionResults.ErrorStep.IntegrityCheckScript
+            result.Success = DBManager.ExecuteBooleanScript(server, dataBaseName, IntegrityScript, result.Exception)
+            If result.Success = False Then result.LastErrorStep = ExecutionResults.ErrorStep.IntegrityCheckScript
 
         End Sub
 

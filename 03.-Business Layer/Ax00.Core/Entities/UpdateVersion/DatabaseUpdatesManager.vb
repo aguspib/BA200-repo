@@ -176,7 +176,9 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
             For Each release In Releases
                 release.WriteLog()
             Next
-            DebugLogger.AddLog(String.Format(" - Process finished successfully: {0}", Results.Success), GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+
+            Results.WriteLog()
+
             DebugLogger.AddLog(" Update Version: Run Scripts (END)", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
             DebugLogger.AddLog(" --------------------------------------------", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
 

@@ -22,33 +22,29 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
 
 #Region "Public members"
 
-        Public Overrides Function Run(executionResults As ExecutionResults, ByRef server As Server, ByVal dataBaseName As String, ByVal packageId As String) As Boolean
+        Public Overrides Function Run(result As ExecutionResults, ByRef server As Server, ByVal dataBaseName As String, ByVal packageId As String) As Boolean
 
-            Me.Results = executionResults
+            RunPrerequisites(result, server, dataBaseName)
 
-            RunPrerequisites(server, dataBaseName)
-
-            If (executionResults.Success) Then
-                RunStructure(server, dataBaseName)
-                If executionResults.Success Then
-                    RunData(server, dataBaseName)
-                    If executionResults.Success Then
-                        RunIntegrity(server, dataBaseName)
+            If (result.Success) Then
+                RunStructure(result, server, dataBaseName)
+                If result.Success Then
+                    RunData(result, server, dataBaseName)
+                    If result.Success Then
+                        RunIntegrity(result, server, dataBaseName)
                     End If
                 End If
             Else
-                RunIntegrity(server, dataBaseName)
+                RunIntegrity(result, server, dataBaseName)
             End If
 
-            If executionResults.Success Then
+            If result.Success Then
                 UpdateDatabaseVersion(dataBaseName, server, packageId)
             Else
-                executionResults.LastErrorCommonRevision = Me
+                result.LastErrorCommonRevision = Me
             End If
 
-            'WriteLog(Me.ToString())
-
-            Return executionResults.Success
+            Return result.Success
         End Function
 
         Public Sub WriteLog()
@@ -58,15 +54,6 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
             content.AppendLine(String.Format(" Common Revision JiraId: {0} RevisionNumber: {1}", JiraId, RevisionNumber))
             content.AppendLine(String.Format("      StructureScript: {0}", StructureScript))
             content.AppendLine(String.Format("      DataScript: {0}", DataScript))
-            If (Not Results Is Nothing) Then
-                content.AppendLine(String.Format("      Success: {0}", Results.Success))
-                If Not Results.Success Then
-                    content.AppendLine(String.Format("      Step Error: {0}", Results.LastErrorStep.ToString()))
-                End If
-                If (Not Results.Exception Is Nothing) Then
-                    content.AppendLine(String.Format("      Exception: {0}", Results.Exception.Message & " " & Results.Exception.InnerException.ToString()))
-                End If
-            End If
 
             DebugLogger.AddLog(content.ToString(), GlobalBase.UpdateVersionDatabaseProcessLogFileName)
 
@@ -76,19 +63,19 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
 
 #Region "Private members"
 
-        Private Sub RunStructure(ByRef server As Server, ByVal dataBaseName As String)
+        Private Sub RunStructure(result As ExecutionResults, ByRef server As Server, ByVal dataBaseName As String)
 
             If StructureScript Is Nothing OrElse StructureScript.Trim = String.Empty Then Return
-            Results.Success = DBManager.ExecuteScripts(server, dataBaseName, StructureScript, Results.Exception)
-            If Results.Success = False Then Results.LastErrorStep = ExecutionResults.ErrorStep.StructureScript
+            result.Success = DBManager.ExecuteScripts(server, dataBaseName, StructureScript, result.Exception)
+            If result.Success = False Then result.LastErrorStep = ExecutionResults.ErrorStep.StructureScript
 
         End Sub
 
-        Private Sub RunData(ByRef server As Server, ByVal dataBaseName As String)
+        Private Sub RunData(result As ExecutionResults, ByRef server As Server, ByVal dataBaseName As String)
 
             If DataScript Is Nothing OrElse DataScript.Trim = String.Empty Then Return
-            Results.Success = DBManager.ExecuteScripts(server, dataBaseName, DataScript, Results.Exception)
-            If Results.Success = False Then Results.LastErrorStep = ExecutionResults.ErrorStep.DataScript
+            result.Success = DBManager.ExecuteScripts(server, dataBaseName, DataScript, result.Exception)
+            If result.Success = False Then result.LastErrorStep = ExecutionResults.ErrorStep.DataScript
 
         End Sub
 
