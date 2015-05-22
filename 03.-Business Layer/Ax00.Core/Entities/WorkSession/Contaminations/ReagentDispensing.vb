@@ -10,7 +10,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
         Implements IDispensing
 
 
-        Public Function RequiredActionForDispensing(dispensing As IDispensing, scope As Integer) As IContaminationsAction Implements IDispensing.RequiredActionForDispensing
+        Public Function RequiredActionForDispensing(dispensing As IDispensing, scope As Integer, reagentNumber As Integer) As IContaminationsAction Implements IDispensing.RequiredActionForDispensing
 
             Select Case KindOfLiquid
                 Case IDispensing.KindOfDispensedLiquid.Dummy
@@ -18,10 +18,10 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
                     Return New ContaminationsAction With {.Action = IContaminationsAction.RequiredAction.NoAction}
 
                 Case IDispensing.KindOfDispensedLiquid.Ise, IDispensing.KindOfDispensedLiquid.Reagent
-                    Return ReagentRequiresWashingOrSkip(scope, dispensing)
+                    Return ReagentRequiresWashingOrSkip(scope, dispensing, reagentNumber)
 
                 Case IDispensing.KindOfDispensedLiquid.Washing
-                    If ReagentNumber = 1 Then
+                    If reagentNumber = 1 Then
                         Dim contaAction = New ContaminationsAction
                         contaAction.Action = IContaminationsAction.RequiredAction.RemoveRequiredWashing
                         Dim WashingSolutionID As String = "" 'TODO: Get washing solution String ID from WashingID
@@ -38,7 +38,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
         End Function
 
-        Private Function ReagentRequiresWashingOrSkip(scope As Integer, dispensing As IDispensing) As IContaminationsAction
+        Private Function ReagentRequiresWashingOrSkip(scope As Integer, dispensing As IDispensing, reagentNumber As Integer) As IContaminationsAction
 
             'Scope indicates the distance in cycles with the reagent that is asking us if we contaminate it.
             'A negative Scope value indicates we're BEFORE the dispensing we're checking. (contamiantions can be solved with washing)
@@ -49,7 +49,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
                 'Miramos si el dispensing nos contaminará.
             ElseIf scope > 0 Then
-                Dim result = dispensing.RequiredActionForDispensing(Me, -scope)
+                Dim result = dispensing.RequiredActionForDispensing(Me, -scope, reagentNumber)
                 If result.Action = IContaminationsAction.RequiredAction.Wash Then
                     Return New ContaminationsAction() With {.Action = IContaminationsAction.RequiredAction.Skip}
                 ElseIf result.Action = IContaminationsAction.RequiredAction.Skip Then
@@ -120,7 +120,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             End Get
         End Property
 
-        Public Property ReagentNumber As Integer Implements IDispensing.ReagentNumber
+        'Public Property ReagentNumber As Integer Implements IDispensing.ReagentNumber
 
         Dim _executionID As Integer
         Public Property ExecutionID As Integer Implements IDispensing.ExecutionID
@@ -129,8 +129,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             End Get
             Set(value As Integer)
                 _executionID = value
-                'TODO: Get all data from ExecutionID
-                Dim aux = New Biosystems.Ax00.DataAccess.vWSExecutionsDAO()
+                Dim aux = New DataAccess.vWSExecutionsDAO()
                 If aux IsNot Nothing Then
                     Dim resultDS = aux.GetInfoExecutionByExecutionID(_executionID)
                     If resultDS IsNot Nothing AndAlso resultDS.vWSExecutionsSELECT.Any Then

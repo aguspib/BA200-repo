@@ -1034,50 +1034,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Return myGlobalDataTo
         End Function
 
-        ''' <summary>
-        ''' In the Resgistred port indentificate the USB and the COM Port
-        ''' this method is incomplete need to implement more functionality.
-        ''' </summary>
-        ''' <param name="strPuertos"></param>
-        ''' <param name="pUSBKey"></param>
-        ''' <remarks></remarks>
-        Private Sub DiferenciarEntreCOMyUSB(ByRef strPuertos() As String, ByVal pUSBKey As String)
-            Dim myGlobalDataTO As New GlobalDataTO
-            Try
-                'Dim i As Integer
-                'Dim intPort As Integer
-                'Dim idRegKey As Integer
-                'Dim blnUSB As Boolean
-                'Dim strTmp As String
-
-                'If IsNothing(pUSBKey) Then Exit Sub '// Si no hay claves parametrizadas considerarlo todo COM
-
-                ''// Diferenciar entre COM's y USB's
-                'For i = 0 To UBound(strPuertos)
-                '    blnUSB = False
-                '    strTmp = strPuertos(i)
-                '    intPort = ObtenerPuerto(strTmp)
-
-                '    For idRegKey = 0 To pUSBKey.Length - 1
-                '        If pUSBKey(intPort, idRegKey) Then blnUSB = True
-                '        If blnUSB = True Then Exit For
-                '    Next idRegKey
-
-                '    If blnUSB Then strPuertos(i) = "USB" & intPort
-                'Next i
-                'TODO: IMPLEMENT FUNCTION 
-                ' ComprobarSiPuertosUSB.
-                ' BuscarEnClave.
-                ' ObtenerPuerto.
-
-            Catch ex As Exception
-                myGlobalDataTO.HasError = True
-                myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
-                myGlobalDataTO.ErrorMessage = ex.Message
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.Open", EventLogEntryType.Error, False)
-            End Try
-        End Sub
 
         Private Function GetPortNumbert(ByVal pPort As String) As Integer
             Dim myPortNumber As Integer = 0
@@ -1105,143 +1061,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 #Region "iPRO adaptation (GestorEstados.vb - Commented functions in Ax00"
 
-        'AG 22/04/2010 - commented
-        '''' <summary>
-        '''' 
-        '''' </summary>
-        '''' <param name="pPort"></param>
-        '''' <param name="pSpeed"></param>
-        '''' <returns></returns>
-        '''' <remarks>
-        '''' CREATE BY: TR 21/04/2010
-        '''' AG 22/04/2010 define as Privte function
-        '''' </remarks>
-        'Private Function Connect(Optional ByVal pPort As String = "", Optional ByVal pSpeed As String = "") As GlobalDataTO
-        '    Dim myGlobalDataTO As New GlobalDataTO
-        '    Try
-        '        'Dim myWaytTime As New DateTime
-        '        'WaitRequestState = True
-        '        'myWaytTime = DateAdd(DateInterval.Second, 1, Date.Now())
 
-        '        'Start the ports connections
-        '        myGlobalDataTO = ManageConnection(pPort, pSpeed)
-        '        If myGlobalDataTO.HasError Then
-        '            myGlobalDataTO.SetDatos = False
-        '        Else                    
-        '        End If
-
-        '    Catch ex As Exception
-        '        myGlobalDataTO.HasError = True
-        '        myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
-        '        myGlobalDataTO.ErrorMessage = ex.Message
-        '        'Dim myLogAcciones As New ApplicationLogManager()
-        '        GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.Connect", EventLogEntryType.Error, False)
-        '    End Try
-        '    Return myGlobalDataTO
-        'End Function
-
-
-        'AG 22/04/2010 - commented
-        '''' <summary>
-        '''' Manage the correct instrument conection initialization 
-        '''' </summary>
-        '''' <param name="pPort"></param>
-        '''' <param name="pSpeed"></param>
-        '''' <returns></returns>
-        '''' <remarks>CREATE BY: TR 21/04/2010</remarks>
-        'Private Function ManageConnection(Optional ByVal pPort As String = "", Optional ByVal pSpeed As String = "") As GlobalDataTO
-        '    Dim myGlobalDataTO As New GlobalDataTO
-        '    Try
-
-        '        'validate if it's conectec to the instrument.
-        '        If GlobalConstants.REAL_DEVELOPMENT_MODE > 0 Then
-        '            myGlobalDataTO.SetDatos = True
-        '        Else
-        '            'Try to open the Port
-        '            myGlobalDataTO = Open(pPort, pSpeed)
-        '            If Not myGlobalDataTO.HasError Then
-        '                'validate the operation result.
-        '                If Not DirectCast(myGlobalDataTO.SetDatos, Boolean) Then
-        '                    myGlobalDataTO.HasError = True
-        '                    myGlobalDataTO.ErrorCode = "OPEN_PORT_ERROR"
-        '                    Exit Try
-        '                End If
-        '                'Do the first conection to the instrument.
-        '                myGlobalDataTO = ActivateProtocol(ClassEventList.CONNECT)
-
-        '                If myGlobalDataTO.HasError Then
-        '                    myGlobalDataTO = New GlobalDataTO
-        '                    myGlobalDataTO.HasError = True
-        '                    myGlobalDataTO.ErrorCode = "CONECTION_FAIL"
-        '                    Exit Try
-        '                End If
-
-        '            End If
-        '        End If
-
-        '        'TODO: RaiseEvent MonitorEstados() -See IPRO GestorEstados.GestionarConexion
-
-        '    Catch ex As Exception
-        '        myGlobalDataTO.HasError = True
-        '        myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
-        '        myGlobalDataTO.ErrorMessage = ex.Message
-        '        'Dim myLogAcciones As New ApplicationLogManager()
-        '        GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.ManageConnection", EventLogEntryType.Error, False)
-        '    End Try
-        '    Return myGlobalDataTO
-        'End Function
 
 #End Region
 
 
-        '#Region "ISE Command Structure"
 
-        '        ''' <summary>
-        '        ''' ISE command structure
-        '        ''' </summary>
-        '        ''' <remarks>Created by SGM 12/12/2011</remarks>
-        '        Public Structure ISECommandStruct
-
-        '            Public ISEMode As GlobalEnumerates.ISEModes
-        '            Public ISECommand As GlobalEnumerates.ISECommands
-        '            Public P1 As Integer
-        '            Public P2 As Integer
-        '            Public P3 As Integer
-        '            Public SampleTubePos As Integer
-        '            Public SampleTubeType As GlobalEnumerates.ISESampleTubeTypes
-        '            Public SampleRotorType As Integer
-        '            Public SampleVolume As Integer 'microlitres
-
-
-        '            'Public Function ToStringCommand() As GlobalDataTO
-
-        '            '    Dim myGlobal As New GlobalDataTO
-        '            '    Dim myString As String = ""
-
-        '            '    Try
-        '            '        myString &= "M:" & CInt(ISEMode).ToString & ";"
-        '            '        myString &= "CMD:" & CInt(ISECommand).ToString & ";"
-        '            '        myString &= "P1:" & P1.ToString & ";"
-        '            '        myString &= "P2:" & P2.ToString & ";"
-        '            '        myString &= "P3:" & P3.ToString & ";"
-        '            '        myString &= "M1:" & SampleTubePos.ToString & ";"
-        '            '        myString &= "TM1:" & CInt(SampleTubeType).ToString & ";"
-        '            '        myString &= "RM1:" & SampleRotorType.ToString & ";"
-        '            '        myString &= "VM1:" & SampleVolume.ToString & ";"
-
-        '            '        myGlobal.SetDatos = myString
-
-        '            '    Catch ex As Exception
-        '            '        myGlobal.HasError = True
-        '            '        myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-        '            '        myGlobal.ErrorMessage = ex.Message
-        '            '    End Try
-
-        '            '    Return myGlobal
-        '            'End Function
-        '        End Structure
-
-        '#End Region
 
 
 #Region "Public methods"
@@ -2652,7 +2477,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     If sentInstruction Then
                         lastInstructionTypeSentAttribute = pInstType
 
-                        'TODO: Business associated (if needed)
+
                     End If
                 End If
 
@@ -2719,65 +2544,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Return CType(myGlobal.SetDatos, Byte())
         End Function
 
-        '''' <summary>
-        '''' Generate the BLIGHT or DLIGHT instructions
-        '''' </summary>
-        '''' <param name="pInstType"></param>
-        '''' <returns>GlobalDataTo indicating if an error has occurred or not. If success, returns the instruction sent (STRING)</returns>
-        '''' <remarks>
-        '''' Creation RH 05/31/2010
-        '''' Removed XBC 20/04/2011 - Is no used
-        '''' </remarks>
-        'Private Function SendBaseLineWithoutAdjustmentInstruction(ByVal pInstType As GlobalEnumerates.AppLayerEventList, ByVal pWell As Integer) As GlobalDataTO
-        '    Dim myGlobal As New GlobalDataTO
-        '    Try
-        '        'FIRST: Generate short instruction
-        '        Dim myInstruction As New Instructions
-        '        Dim paramInstructionList As New List(Of InstructionParameterTO)
 
-        '        myGlobal = myInstruction.GenerateShortInstruction(pInstType)  'Generate the short instruction
-        '        If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-        '            paramInstructionList = CType(myGlobal.SetDatos, List(Of InstructionParameterTO))
-        '        Else
-        '            Exit Try
-        '        End If
-
-        '        'SECOND: Convert InstructionParameterTO into LAX00 string to send
-        '        Dim myInstructionToSend As String = ""
-        '        myGlobal = Me.TransformToStringInstruction(paramInstructionList)
-        '        If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-        '            myInstructionToSend = CType(myGlobal.SetDatos, String)
-        '        Else
-        '            Exit Try
-        '        End If
-
-        '        myInstructionToSend = myInstructionToSend.Replace("W;", String.Format("W:{0};", pWell))
-
-        '        'THIRD: Send generical instruction!!
-        '        myGlobal = Me.SendGenericalInstructions(myInstructionToSend)
-
-        '        'FINALLY: Check if instruction properly sent
-        '        Dim sentInstruction As Boolean = False
-        '        If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-        '            sentInstruction = DirectCast(myGlobal.SetDatos, Boolean)
-        '            If sentInstruction Then
-        '                lastInstructionTypeSentAttribute = pInstType
-        '                myGlobal.SetDatos = myInstructionToSend
-        '                'TODO: Business associated (if needed)
-        '            End If
-        '        End If
-
-        '    Catch ex As Exception
-        '        myGlobal.HasError = True
-        '        myGlobal.ErrorCode = "SYSTEM_ERROR"
-        '        myGlobal.ErrorMessage = ex.Message
-
-        '        'Dim myLogAcciones As New ApplicationLogManager()
-        '        GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SendBaseLineWithoutAdjustmentInstruction", EventLogEntryType.Error, False)
-
-        '    End Try
-        '    Return myGlobal
-        'End Function
 
         ''' <summary>
         ''' Generate a script micro-instrucions list and send it to the analyzer
