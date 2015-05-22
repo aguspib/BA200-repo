@@ -8,7 +8,7 @@ Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Interfaces
 Imports Biosystems.Ax00.Types
 
 Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
-    Public Class OptimizationBacktrackingApplier : Inherits OptimizationPolicyApplier
+    Friend Class OptimizationBacktrackingApplier : Inherits OptimizationPolicyApplier
 
         Private bestResult As List(Of ExecutionsDS.twksWSExecutionsRow)
         Private lastBireactiveID As New List(Of Integer)
@@ -40,24 +40,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
 
         End Sub
 
-        Protected Overrides Sub Execute_j_loop(ByRef pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), _
-                                                  ByVal indexI As Integer, _
-                                                  ByVal lowerLimit As Integer, _
-                                                  ByVal upperLimit As Integer)
-
-            MyBase.Execute_j_loop(pExecutions, indexI, lowerLimit, upperLimit)
-        End Sub
-
-        Protected Overrides Sub Execute_jj_loop(ByRef pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), _
-                                             ByVal indexJ As Integer, _
-                                             ByVal leftLimit As Integer, _
-                                             ByVal rightLimit As Integer, _
-                                             Optional ByVal upperTotalLimit As Integer = 0)
-
-            MyBase.Execute_jj_loop(pExecutions, indexJ, leftLimit, rightLimit)
-
-
-        End Sub
+ 
         Private Const InitialCallStackDepth As Integer = -1
         Dim _callStackNestingLevel As Integer = InitialCallStackDepth
 
@@ -85,12 +68,12 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
             End If
         End Sub
 
-        Protected Overrides Function GetContaminationNumber(ByVal pContaminationsDS As ContaminationsDS, ByVal orderTests As List(Of ExecutionsDS.twksWSExecutionsRow)) As Integer
+        Public Overrides Function GetContaminationNumber(ByVal pContaminationsDS As ContaminationsDS, ByVal orderTests As List(Of ExecutionsDS.twksWSExecutionsRow)) As Integer
             Dim contaminaNumber As Integer = 0
             Dim auxContext = New ContaminationsContext(ContaminationsSpecification)
             auxContext.Steps.Clear()
-            If Not calculateInRunning AndAlso  Me.PreviousReagentID IsNot Nothing AndAlso PreviousReagentID.Any Then
-                    'Iterate throug last "persistence" elements of PreviousreagentID:
+            If Not calculateInRunning AndAlso Me.PreviousReagentID IsNot Nothing AndAlso PreviousReagentID.Any Then
+                'Iterate throug last "persistence" elements of PreviousreagentID:
                 For i As Integer = Me.PreviousReagentID.Count - ContaminationsSpecification.HighContaminationPersistence To Me.PreviousReagentID.Count - 1
                     Dim curStep = New ContextStep(ContaminationsSpecification.DispensesPerStep)
                     curStep(1) = ContaminationsSpecification.CreateDispensing()
@@ -173,7 +156,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
             Dim aux = solutionSet.ToList()
             aux.Add(elem)
 
-            Return (GetCurrentContaminationNumberInBacktracking(aux, HighContaminationPersistence) <= ContaminLimit)
+            Return (GetCurrentContaminationNumberInBacktracking(aux, ContaminationsSpecification.HighContaminationPersistence) <= ContaminLimit)
         End Function
 
         Private Function IsSolution(ByVal solutionSet As List(Of ExecutionsDS.twksWSExecutionsRow)) As Boolean
@@ -200,10 +183,13 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
 
                     If runningContext.Steps(stepIndex) IsNot Nothing Then
                         For dispenseNum = 1 To ContaminationsSpecification.DispensesPerStep
-                            If context.Steps(newIndex)(dispenseNum) Is Nothing AndAlso
+                            If context.Steps(newIndex)(dispenseNum) IsNot Nothing AndAlso
                                 runningContext.Steps(stepIndex)(dispenseNum) IsNot Nothing Then
+                                'MERGE:
                                 context.Steps(newIndex)(dispenseNum) = runningContext.Steps(stepIndex)(dispenseNum)
                             End If
+
+
                         Next
                     End If
 

@@ -18,27 +18,15 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
     ''' <remarks>
     ''' Created on 17/03/2015 by AJG
     ''' </remarks>
-    Public Class OptimizationPolicyApplier
+    Public MustInherit Class OptimizationPolicyApplier
 #Region "Properties"
+        Public Property calculateInRunning As Boolean
         Protected Property ContaminationNumber As Integer
         Protected Property sortedOTList As List(Of Integer)
         Protected Property myOTListLinq As List(Of Integer)
-        Protected Property ReagentContaminatorID As Integer
-        Protected Property ReagentContaminatedID As Integer
-        Protected Property contaminatedOrderTest As Integer
-        Protected Property MainContaminatorID As Integer
-        Protected Property contaminations As EnumerableRowCollection(Of ContaminationsDS.tparContaminationsRow)
         Protected Property ContaminDS As ContaminationsDS
-        Protected Property HighContaminationPersistence As Integer
-        Protected Property contaminatorOrderTest As Integer
-        Protected Property MainContaminatedID As Integer
-        Protected Property dbConnection As SqlConnection
-        Protected Property TypeContaminator As AnalysisMode
-        Protected Property TypeContaminated As AnalysisMode
         Protected Property typeExpectedResult As AnalysisMode
         Protected Property typeResult As AnalysisMode
-
-        Public Property calculateInRunning As Boolean
 #End Region
 
 #Region "Enums"
@@ -48,32 +36,14 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
 
 #Region "Constructor"
         Public Sub New()
-            ReagentContaminatorID = -1
-            ReagentContaminatedID = -1
-            contaminatedOrderTest = -1
-            MainContaminatorID = -1
-
-            'we create an empty contaminations enumerable:
-            contaminations = (From wse In (New ContaminationsDS).tparContaminations Select wse)
-
-            contaminatorOrderTest = -1
-            MainContaminatedID = -1
             typeExpectedResult = AnalysisMode.MonoReactive
             typeResult = AnalysisMode.MonoReactive
         End Sub
 
         Public Sub New(ByVal pConn As SqlConnection) ', ByVal ActiveAnalyzer As String)
             Me.New()
-            dbConnection = pConn
-
         End Sub
 
-#End Region
-
-#Region "Destructor"
-        Protected Overrides Sub Finalize()
-            dbConnection = Nothing
-        End Sub
 #End Region
 
 #Region "Public Methods"
@@ -100,20 +70,20 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
             'Search a ReagentID (inside pExecutions) an OrderTest which ReagentID is not contamianted by pPreviousReagentID
             'and place his executions first
             Dim originalOrderChanged As Boolean = False
-            Dim addContaminationBetweenGroups As Integer = 0
+            Dim ContaminationBetweenGroups As Integer = 0
             If Not pPreviousReagentID Is Nothing Then
 
                 'MIC
                 Dim C = New ContaminationBetweenElementsSorter(pContaminationsDS, pPreviousReagentID, pPreviousReagentIDMaxReplicates, pExecutions)
                 C.MoveToAvoidContaminationBetweenElements()
-                addContaminationBetweenGroups = C.AddContaminationBetweenGroups
+                ContaminationBetweenGroups = C.AddContaminationBetweenGroups
 
                 '/MIC
 
                 'MoveToAvoidContaminationBetweenElements(pContaminationsDS, pPreviousReagentID, pPreviousReagentIDMaxReplicates, pHighContaminationPersistance, pExecutions, originalOrderChanged, addContaminationBetweenGroups)
             End If
 
-            If pPreviousReagentID Is Nothing OrElse originalOrderChanged OrElse addContaminationBetweenGroups <> 0 Then
+            If pPreviousReagentID Is Nothing OrElse originalOrderChanged OrElse ContaminationBetweenGroups <> 0 Then
 
                 'Get all different ordertests in pExecutions list with executions pending
                 myOTListLinq = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
@@ -132,7 +102,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
                     'ExecutionsDelegate.GetContaminationNumber(pContaminationsDS, pExecutions, pHighContaminationPersistance) + addContaminationBetweenGroups
 
                 ElseIf myOTListLinq.Count = 1 Then 'No movement is possible
-                    ContaminationNumber = addContaminationBetweenGroups
+                    ContaminationNumber = ContaminationBetweenGroups
                 End If
                 myOTListLinq = Nothing
 
@@ -149,9 +119,8 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
             End Get
         End Property
 
-        Protected Overridable Function GetContaminationNumber(ByVal pContaminationsDS As ContaminationsDS, pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow)) As Integer
-            Return ExecutionsDelegate.GetContaminationNumber(pContaminationsDS, pExecutions, ContaminationsSpecification.HighContaminationPersistence)
-        End Function
+        Public MustOverride Function GetContaminationNumber(ByVal pContaminationsDS As ContaminationsDS, pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow)) As Integer
+
 
 #End Region
 
@@ -174,63 +143,29 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
                                                   Optional ByVal pPreviousReagentIDMaxReplicates As List(Of Integer) = Nothing)
             'this function must be overriden by children classes
             ContaminDS = pContaminationsDS
-            HighContaminationPersistence = pHighContaminationPersistance
+            'HighContaminationPersistence = pHighContaminationPersistance
         End Sub
 
-        ''' <summary>
-        ''' Virtual method that needs to be overriden on children classes
-        ''' </summary>
-        ''' <param name="pExecutions"></param>
-        ''' <param name="indexI"></param>
-        ''' <param name="lowerLimit"></param>
-        ''' <param name="upperLimit"></param>
-        ''' <remarks>
-        ''' Created on 18/03/2015 by AJG
-        ''' </remarks>
-        Protected Overridable Sub Execute_j_loop(ByRef pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), _
-                                                  ByVal indexI As Integer, _
-                                                  ByVal lowerLimit As Integer, _
-                                                  ByVal upperLimit As Integer)
-            'this function must be overriden by children classes
-        End Sub
 
-        ''' <summary>
-        ''' Virtual method that needs to be overriden on children classes
-        ''' </summary>
-        ''' <param name="pExecutions"></param>
-        ''' <param name="indexJ"></param>
-        ''' <param name="leftLimit"></param>
-        ''' <param name="rightLimit"></param>
-        ''' <param name="upperTotalLimit"></param>
-        ''' <remarks>
-        ''' Created on 18/03/2015 by AJG
-        ''' </remarks>
-        Protected Overridable Sub Execute_jj_loop(ByRef pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), _
-                                                  ByVal indexJ As Integer, _
-                                                  ByVal leftLimit As Integer, _
-                                                  ByVal rightLimit As Integer, _
-                                                  Optional ByVal upperTotalLimit As Integer = 0)
-            'this function must be overriden by children classes
-        End Sub
 #End Region
 
 #Region "Private methods"
 
-        ''' <summary>
-        ''' Sets the type of the reagent to be found, in order to eliminate the current contamination between contaminador and contaminated
-        ''' </summary>
-        ''' <remarks>
-        ''' Created on 19/03/2015
-        ''' </remarks>
-        Protected Sub SetExpectedTypeReagent()
-            TypeContaminator = ContaminationsSpecification.GetAnalysisModeForReagent(ReagentContaminatorID)
-            TypeContaminated = ContaminationsSpecification.GetAnalysisModeForReagent(ReagentContaminatedID)
+        ' ''' <summary>
+        ' ''' Sets the type of the reagent to be found, in order to eliminate the current contamination between contaminador and contaminated
+        ' ''' </summary>
+        ' ''' <remarks>
+        ' ''' Created on 19/03/2015
+        ' ''' </remarks>
+        'Protected Sub SetExpectedTypeReagent()
+        '    TypeContaminator = ContaminationsSpecification.GetAnalysisModeForReagent(ReagentContaminatorID)
+        '    TypeContaminated = ContaminationsSpecification.GetAnalysisModeForReagent(ReagentContaminatedID)
 
-            typeExpectedResult = ContaminationsSpecification.RequiredAnalysisModeBetweenReactions(TypeContaminator, TypeContaminated)
+        '    typeExpectedResult = ContaminationsSpecification.RequiredAnalysisModeBetweenReactions(TypeContaminator, TypeContaminated)
 
-            typeResult = AnalysisMode.MonoReactive
+        '    typeResult = AnalysisMode.MonoReactive
 
-        End Sub
+        'End Sub
 
         ''' <summary>
         ''' Regarding contaminations, this method determines if the current candidate analysis mode (bi or monoreactive) is compatible with the expected reactive analysis mdoe (bi or monoreactive). 

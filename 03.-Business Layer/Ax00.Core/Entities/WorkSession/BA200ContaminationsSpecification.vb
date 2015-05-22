@@ -154,5 +154,6 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
                 Return highContaminationPersitance
             End Get
         End Property
+
     End Class
 End Namespace
