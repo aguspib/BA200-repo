@@ -50,7 +50,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
         Public Overrides ReadOnly Property WashingIDRequired As Boolean
             Get
-                Return False
+                Return True
             End Get
         End Property
     End Class

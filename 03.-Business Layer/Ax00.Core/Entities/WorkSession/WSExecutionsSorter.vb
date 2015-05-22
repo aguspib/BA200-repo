@@ -279,6 +279,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
 
                                                             If existContamination.Count > 0 Then
                                                                 'Calculate the contaminations inside the current Element + 1 (contamination between last and next elementID)
+                                                                'TODO: See contaminations calculation
                                                                 OrderContaminationNumber = 1 + ExecutionsDelegate.GetContaminationNumber(contaminationsDataDS, StandardOrderTests, highContaminationPersitance)
 
                                                             ElseIf highContaminationPersitance > 0 Then
@@ -325,6 +326,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
 
                                                                     If existContamination.Count > 0 Then
                                                                         'Calculate the contaminations inside the current Element + 1 (contamination between last and next elementID)
+                                                                        'TODO: Remove this call
                                                                         OrderContaminationNumber = 1 + ExecutionsDelegate.GetContaminationNumber(contaminationsDataDS, StandardOrderTests, highContaminationPersitance)
                                                                     End If
 

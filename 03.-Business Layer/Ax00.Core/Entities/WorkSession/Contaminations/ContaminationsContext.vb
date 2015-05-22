@@ -213,8 +213,6 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
         End Sub
 
-
-
 #Region "Private elements"
         Dim AnalyzerFrame As LAx00Frame
 
@@ -261,7 +259,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 #End Region
 
         Public Function ActionRequiredForAGivenDispensing(ReagentID As ExecutionsDS.twksWSExecutionsRow) As ActionRequiredForDispensing Implements IContaminationsContext.ActionRequiredForDispensing
-            Dim D As New Dispensing()
+            Dim D As New Ax00Dispensing()
             D.FillDispense(ContaminationsSpecifications, ReagentID)
             Return ActionRequiredForDispensing(D)
 

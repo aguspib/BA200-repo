@@ -6,26 +6,31 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Types.ExecutionsDS
 
 Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
-    Public Class Dispensing
+    Public Class Ax00Dispensing
         Implements IDispensing
 
 
-        Public Function RequiredWashingOrSkip(dispensing As IDispensing, scope As Integer) As IContaminationsAction Implements IDispensing.RequiredActionForDispensing
+        Public Function RequiredActionForDispensing(dispensing As IDispensing, scope As Integer) As IContaminationsAction Implements IDispensing.RequiredActionForDispensing
 
             Select Case KindOfLiquid
                 Case IDispensing.KindOfDispensedLiquid.Dummy
 
                     Return New ContaminationsAction With {.Action = IContaminationsAction.RequiredAction.NoAction}
+
                 Case IDispensing.KindOfDispensedLiquid.Ise, IDispensing.KindOfDispensedLiquid.Reagent
                     Return ReagentRequiresWashingOrSkip(scope, dispensing)
 
                 Case IDispensing.KindOfDispensedLiquid.Washing
-                    Dim contaAction = New ContaminationsAction
-                    contaAction.Action = IContaminationsAction.RequiredAction.RemoveRequiredWashing
-                    Dim WashingSolutionID As String = "" 'TODO: Get washing solution String ID from WashingID
-                    contaAction.InvolvedWash = New WashingDescription(-1, WashingSolutionID)
-                    Return contaAction
+                    If ReagentNumber = 1 Then
+                        Dim contaAction = New ContaminationsAction
+                        contaAction.Action = IContaminationsAction.RequiredAction.RemoveRequiredWashing
+                        Dim WashingSolutionID As String = "" 'TODO: Get washing solution String ID from WashingID
+                        contaAction.InvolvedWash = New WashingDescription(-1, WashingSolutionID)
+                        Return contaAction
+                    Else
+                        Return New ContaminationsAction With {.Action = IContaminationsAction.RequiredAction.NoAction}
 
+                    End If
                 Case Else
                     Return Nothing
 
@@ -67,7 +72,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
                 'Contaminamos al dispnesing, así que miramos si es necesario o no lavar:
                 Dim washing = Contamines(dispensing.R1ReagentID)
 
-                'Si no es PTEST miramos persistencia para decidir si el washing es necesario
+                'Si es TEST miramos persistencia para decidir si el washing es necesario
                 If dispensing.DelayCyclesForDispensing = 0 AndAlso washing.RequiredWashing.WashingStrength < Math.Abs(scope) Then
                     Return New ContaminationsAction() With {.Action = IContaminationsAction.RequiredAction.NoAction}
 

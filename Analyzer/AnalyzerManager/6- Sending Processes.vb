@@ -1933,8 +1933,13 @@ Namespace Biosystems.Ax00.Core.Entities
                         For i = aux To mySentPreparationsDS.sentPreparations.Rows.Count - 1
 #If DEBUG Then
                             Try
+                                Dim execcID As String = "<null>"
+                                If Not mySentPreparationsDS.sentPreparations(i).IsExecutionIDNull() Then
+                                    execcID = mySentPreparationsDS.sentPreparations(i).ExecutionID.ToString
+
+                                End If
                                 Debug.Print(String.Format("Inside the For. Loop variable i = {0}; SentPreparations(i).ReagentWashFlag = {1}; SentPreparations(i).WashSolution1 = {2}; SentPreparations(i).ExecutionID = {3} ",
-                                                          i.ToString(), mySentPreparationsDS.sentPreparations(i).ReagentWashFlag.ToString(), mySentPreparationsDS.sentPreparations(i).WashSolution1.ToString(), mySentPreparationsDS.sentPreparations(i).ExecutionID.ToString()))
+                                                          i.ToString(), mySentPreparationsDS.sentPreparations(i).ReagentWashFlag.ToString(), mySentPreparationsDS.sentPreparations(i).WashSolution1.ToString(), execcID))
                             Catch
 
                             End Try
