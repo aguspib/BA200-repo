@@ -1266,6 +1266,27 @@
 
       GO
     
+      USE [Ax00]
+      GO
+
+      IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[GET_WASHINGSOLUTION]') AND type in (N'P', N'PC'))
+      DROP PROCEDURE [dbo].[GET_WASHINGSOLUTION]
+      GO
+
+
+      CREATE PROCEDURE [dbo].[GET_WASHINGSOLUTION]
+      (
+	      @CELLNUMBER tinyint
+      )
+      AS
+	      SET NOCOUNT ON;
+      SELECT B.ELEMENTID, B.TUBECONTENT, B.SOLUTIONCODE
+      FROM TWKSWSROTORCONTENTBYPOSITION A, TWKSWSREQUIREDELEMENTS B
+      WHERE A.ELEMENTID = B.ELEMENTID AND A.ROTORTYPE = 'REAGENTS'
+      AND A.CELLNUMBER = @CELLNUMBER
+      GO
+
+
     </StructureScript>
 
     <UpdateScript>
