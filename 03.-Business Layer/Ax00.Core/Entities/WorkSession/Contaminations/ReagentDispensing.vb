@@ -218,7 +218,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
                 Else
                     Me.WashingDescription = New WashingDescription(2, WashingDS.WashingSolutionSELECT(0).SOLUTIONCODE)
                 End If
-
+                Debug.WriteLine("Found washing of kind <<" & WashingDescription.WashingSolutionCode & ">> ID= " & WashingID)
 
             End Set
         End Property

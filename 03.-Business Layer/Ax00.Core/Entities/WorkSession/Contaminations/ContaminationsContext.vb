@@ -75,13 +75,16 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             If responseFromDispensing.Action <> IContaminationsAction.RequiredAction.RemoveRequiredWashing Then Return
 
             ' ReSharper disable once InconsistentNaming
-            Dim washingID = responseFromDispensing.InvolvedWash.WashingSolutionCode
-            If lookUpFilter.Contains(washingID) Then
+            Dim washingSolutionCode = responseFromDispensing.InvolvedWash.WashingSolutionCode
+            If lookUpFilter.Contains(washingSolutionCode) Then
+                Debug.WriteLine("Found and removed washing: <<" & washingSolutionCode & ">>")
                 lookUpFilter.Remove(responseFromDispensing.InvolvedWash.WashingSolutionCode)
-                Dim washingToRemove = results.InvolvedWashes.FirstOrDefault(Function(wash) wash.WashingSolutionCode = washingID)
+                Dim washingToRemove = results.InvolvedWashes.FirstOrDefault(Function(wash) wash.WashingSolutionCode = washingSolutionCode)
                 If washingToRemove IsNot Nothing AndAlso washingToRemove.WashingSolutionCode <> String.Empty Then
                     results.InvolvedWashes.Remove(washingToRemove)
                 End If
+            Else
+                Debug.WriteLine("ERROR washing not found: <<" & washingSolutionCode & ">>")
             End If
         End Sub
 
