@@ -24,6 +24,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
                     If ReagentNumber = 1 Then
                         Dim contaAction = New ContaminationsAction
                         contaAction.Action = IContaminationsAction.RequiredAction.RemoveRequiredWashing
+                        Dim a = Me.WashingID
                         Dim WashingSolutionID As String = "" 'TODO: Get washing solution String ID from WashingID
                         contaAction.InvolvedWash = New WashingDescription(-1, WashingSolutionID)
                         Return contaAction
@@ -211,6 +212,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
                 _washingID = value
                 'TODO: GET WASHING DATA FROM ID
                 KindOfLiquid = IDispensing.KindOfDispensedLiquid.Washing
+
             End Set
         End Property
     End Class
