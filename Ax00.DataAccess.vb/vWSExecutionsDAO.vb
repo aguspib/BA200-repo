@@ -26,12 +26,12 @@ Public Class vWSExecutionsDAO
         Return result
     End Function
 
-    Public Function GetWashingSolution(wellID As Integer) As vWSExecutionsDS
+    Public Function GetWashingSolution(ExecutionID As Integer, AnalyzerID As String, WorkSessionID As String) As vWSExecutionsDS
         Dim result As New vWSExecutionsDS()
         Dim aux As New vWSExecutionsDSTableAdapters.WashingSolutionSELECTTableAdapter()
 
         'AJG. If this command throws and exception, it needs to be catched up by the upper layer
-        aux.Fill(result.WashingSolutionSELECT, wellID)
+        aux.Fill(result.WashingSolutionSELECT, ExecutionID.ToString(), AnalyzerID, WorkSessionID)
 
         Return result
     End Function
