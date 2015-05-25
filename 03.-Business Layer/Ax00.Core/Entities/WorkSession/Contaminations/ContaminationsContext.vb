@@ -230,7 +230,8 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
                         If AnalyzerFrame.KeysCollection.Contains(parameterName) Then
                             Dim targetStep = Steps(curStep)(curDispense)
                             SetStepValues(parameterName, targetStep, curDispense)
-
+                        Else
+                            Debug.WriteLine("Parameter " & parameterName & " not found in frame!")
                         End If
                     ElseIf curStep = 0 Then   'Current step
 
@@ -240,6 +241,9 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
                         If AnalyzerFrame.KeysCollection.Contains(parameterName) Then
                             Dim targetStep = Steps(curStep)(curDispense)
                             SetStepValues(parameterName, targetStep, curDispense)
+                        Else
+                            ' Debug.WriteLine("Parameter " & parameterName & " not found in frame!")
+
                         End If
                     End If
                 Next

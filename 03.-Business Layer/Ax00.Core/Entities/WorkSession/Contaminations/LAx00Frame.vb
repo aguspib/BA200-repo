@@ -86,7 +86,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             While _index < _frame.Length
                 'Dim sentence = ParseSentence()
                 Dim KV = TokenizeSentence()
-                dic.Add(KV.Key, KV.Value)
+                If dic.Keys.Contains(KV.Key) = False Then dic.Add(KV.Key, KV.Value)
             End While
             Return dic
 

@@ -37,6 +37,7 @@ Namespace Biosystems.Ax00.Core.Entities.Worksession.Interfaces
         Function RequiredAnalysisModeBetweenReactions(contaminator As AnalysisMode, contamined As AnalysisMode) As AnalysisMode
 
         Sub FillContextFromAnayzerData(instruction As IEnumerable(Of InstructionParameterTO))
+        Sub FillContextFromAnayzerData(instruction As String)
 
         ReadOnly Property AnalyzerModel As String
 

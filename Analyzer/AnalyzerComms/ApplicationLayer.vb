@@ -10,6 +10,7 @@ Imports Biosystems.Ax00.Global.TO
 'Imports System.Configuration
 Imports Biosystems.Ax00.Types 'AG 17/01/2011
 Imports Biosystems.Ax00.BL
+Imports Biosystems.Ax00.Core.Entities
 Imports Timer = System.Timers.Timer 'SGM 08/03/11
 'Imports Biosystems.Ax00.DAL.DAO 'SGM 21/09/2011
 
@@ -1307,6 +1308,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         'Analyzer new instruction response RECEIVED
                     Case GlobalEnumerates.AppLayerEventList.RECEIVE
                         If String.Compare(pFwEntry, "", False) <> 0 Then
+
+                            'ContaminationsSpecification.FillContextFromAnayzerData(_instructionReceived)
+                            AnalyzerManager.GetCurrentAnalyzerManager.ContaminationsSpecification.FillContextFromAnayzerData(pFwEntry)
                             lastInstructionReceivedAttribute = pFwEntry 'AG 20/10/2010
 
                             Dim myLax00 As New LAX00Interpreter

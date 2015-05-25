@@ -18,6 +18,8 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
 
 
+
+
         Private myThread As Threading.Thread
         Sub New()
 
@@ -155,5 +157,21 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             End Get
         End Property
 
+        Public Sub FillContextFromAnayzerData1(instruction As String) Implements IAnalyzerContaminationsSpecification.FillContextFromAnayzerData
+            Dim analyzerFrame = New LAx00Frame()
+            Try
+                analyzerFrame.ParseRawData(instruction)
+                If analyzerFrame.KeysCollection.Contains("STATUS") AndAlso analyzerFrame("R") = "1" Then
+                    Dim context = New ContaminationsContext(Me)
+                    context.FillContentsFromAnalyzer(analyzerFrame)
+                    _currentContext = context
+                    Debug.WriteLine("Context filled in running! ")
+                End If
+            Catch ex As Exception
+                Debug.WriteLine("EXCEPTION FILLING CONTEXT " & ex.Message)
+                GlobalBase.CreateLogActivity(ex)
+            End Try
+
+        End Sub
     End Class
 End Namespace

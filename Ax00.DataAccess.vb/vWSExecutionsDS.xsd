@@ -161,7 +161,7 @@
           <xs:complexType>
             <xs:sequence>
               <xs:element name="ELEMENTID" msprop:Generator_ColumnVarNameInTable="columnELEMENTID" msprop:Generator_ColumnPropNameInRow="ELEMENTID" msprop:Generator_ColumnPropNameInTable="ELEMENTIDColumn" msprop:Generator_UserColumnName="ELEMENTID" type="xs:int" />
-              <xs:element name="TUBECONTENT" msprop:Generator_ColumnVarNameInTable="columnTUBECONTENT" msprop:Generator_ColumnPropNameInRow="TUBECONTENT" msprop:Generator_ColumnPropNameInTable="TUBECONTENTColumn" msprop:Generator_UserColumnName="TUBECONTENT">
+              <xs:element name="TUBECONTENT" msprop:nullValue="_null" msprop:Generator_ColumnPropNameInRow="TUBECONTENT" msprop:Generator_ColumnVarNameInTable="columnTUBECONTENT" msprop:Generator_ColumnPropNameInTable="TUBECONTENTColumn" msprop:Generator_UserColumnName="TUBECONTENT" minOccurs="0">
                 <xs:simpleType>
                   <xs:restriction base="xs:string">
                     <xs:maxLength value="15" />
@@ -180,9 +180,5 @@
         </xs:element>
       </xs:choice>
     </xs:complexType>
-    <xs:unique name="Constraint1" msdata:PrimaryKey="true">
-      <xs:selector xpath=".//mstns:WashingSolutionSELECT" />
-      <xs:field xpath="mstns:ELEMENTID" />
-    </xs:unique>
   </xs:element>
 </xs:schema>

@@ -79,5 +79,21 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
                 Return highContaminationPersitance
             End Get
         End Property
+
+
+        Public Sub FillContextFromAnayzerData1(instruction As String) Implements IAnalyzerContaminationsSpecification.FillContextFromAnayzerData
+            Dim analyzerFrame = New LAx00Frame()
+            Try
+                analyzerFrame.ParseRawData(instruction)
+                If analyzerFrame("R") = "1" Then
+                    Dim context = New ContaminationsContext(Me)
+                    context.FillContentsFromAnalyzer(analyzerFrame)
+                    _currentContext = context
+                    Debug.WriteLine("Context filled in running! ")
+                End If
+            Catch
+            End Try
+
+        End Sub
     End Class
 End Namespace

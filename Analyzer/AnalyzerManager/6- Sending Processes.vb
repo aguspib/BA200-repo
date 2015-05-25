@@ -1299,11 +1299,11 @@ Namespace Biosystems.Ax00.Core.Entities
             Debug.Print("SeachContaminationBetweenPreviousAndFirsToSend: " & previousReagentIDSentList.Count)
             Dim context = ContaminationsSpecification.CurrentRunningContext
 
-            Dim executionB2 = 0
-            Dim executionB1 = 0
-            If previousReagentIDSentList.Count >= 1 Then ExecutionB2 = previousReagentIDSentList(0).ExecutionID
-            If previousReagentIDSentList.Count >= 2 Then ExecutionB1 = previousReagentIDSentList(1).ExecutionID
-            context.FillContentsFromAnalyzer(String.Format("STATUS;R1B2:{0};R1B1:{1};", executionB2, executionB1))
+            'Dim executionB2 = 0
+            'Dim executionB1 = 0
+            'If previousReagentIDSentList.Count >= 1 Then ExecutionB2 = previousReagentIDSentList(0).ExecutionID
+            'If previousReagentIDSentList.Count >= 2 Then ExecutionB1 = previousReagentIDSentList(1).ExecutionID
+            'context.FillContentsFromAnalyzer(String.Format("STATUS;R1B2:{0};R1B1:{1};", executionB2, executionB1))
 
             Debug.Print("CourrentContext read")
             Dim result = context.ActionRequiredForDispensing(ReagentRow)
