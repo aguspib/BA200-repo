@@ -9,7 +9,7 @@ Namespace Biosystems.Ax00.Core.Entities.Worksession.Contaminations.Interfaces
     Public Interface IDispensing
 
 
-        Property ReagentNumber As Integer   '1 for R1, 2 for R2, etc. If any non-cycle based R3 or whatever is added, it should be informed here!
+        'Property ReagentNumber As Integer   '1 for R1, 2 for R2, etc. If any non-cycle based R3 or whatever is added, it should be informed here!
 
         Property R1ReagentID As Integer
 
@@ -29,7 +29,7 @@ Namespace Biosystems.Ax00.Core.Entities.Worksession.Contaminations.Interfaces
 
         ReadOnly Property Contamines As Dictionary(Of Integer, IDispensingContaminationDescription)
 
-        Function RequiredActionForDispensing(Reagent As IDispensing, scope As Integer) As IContaminationsAction
+        Function RequiredActionForDispensing(Reagent As IDispensing, scope As Integer, ReagentNumber As Integer) As IContaminationsAction
 
         ''' <summary>
         ''' This indicates the number of cycles that will take between the dispense is programmed and the analyzer actually makes the dispensing. 

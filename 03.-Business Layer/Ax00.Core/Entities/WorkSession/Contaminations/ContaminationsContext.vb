@@ -45,7 +45,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
                     If Steps(curStep) Is Nothing OrElse Steps(curStep)(curDispensing) Is Nothing Then Continue For
                     Dim dispensingToAsk = Steps(curStep)(curDispensing)
-                    Dim responseFromDispense = dispensingToAsk.RequiredActionForDispensing(dispensing, curStep)
+                    Dim responseFromDispense = dispensingToAsk.RequiredActionForDispensing(dispensing, curStep, curDispensing)
 
                     Select Case responseFromDispense.Action
 
@@ -253,7 +253,6 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             Else
                 targetDispensing.ExecutionID = CInt(value)
             End If
-            targetDispensing.ReagentNumber = curDispense
         End Sub
 
 #End Region

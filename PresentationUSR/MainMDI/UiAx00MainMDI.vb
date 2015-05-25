@@ -11548,7 +11548,7 @@ Partial Public Class UiAx00MainMDI
     End Sub
 
     Private Sub UiAx00MainMDI_MdiChildActivate(sender As Object, e As EventArgs) Handles Me.MdiChildActivate
-
+        If ActiveMdiChild Is Nothing Then Return
         Try
             Dim differentWidth = Me.ActiveMdiChild.Width - Me.GetMdiClientWindow.ClientSize.Width
             If differentWidth > 0 Then
