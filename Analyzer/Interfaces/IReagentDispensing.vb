@@ -15,6 +15,8 @@ Namespace Biosystems.Ax00.Core.Entities.Worksession.Contaminations.Interfaces
 
         Property WashingID As Integer
 
+        Property WashingDescription As IWashingDescription
+
         Property ExecutionID As Integer
 
         Property KindOfLiquid As KindOfDispensedLiquid

@@ -6,7 +6,7 @@
         ''' </summary>
         Property WashingStrength As Integer
 
-        Property WashingSolutionID As String
+        Property WashingSolutionCode As String
 
     End Interface
 

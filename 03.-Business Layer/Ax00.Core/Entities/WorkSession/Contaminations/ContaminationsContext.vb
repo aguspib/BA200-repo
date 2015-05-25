@@ -50,8 +50,8 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
                     Select Case responseFromDispense.Action
 
                         Case IContaminationsAction.RequiredAction.Wash
-                            If responseFromDispense.InvolvedWash.WashingStrength > 0 AndAlso lookUpFilter.Contains(responseFromDispense.InvolvedWash.WashingSolutionID) = False Then
-                                lookUpFilter.Add(responseFromDispense.InvolvedWash.WashingSolutionID)
+                            If responseFromDispense.InvolvedWash.WashingStrength > 0 AndAlso lookUpFilter.Contains(responseFromDispense.InvolvedWash.WashingSolutionCode) = False Then
+                                lookUpFilter.Add(responseFromDispense.InvolvedWash.WashingSolutionCode)
                                 results.InvolvedWashes.Add(responseFromDispense.InvolvedWash)
                                 results.Action = IContaminationsAction.RequiredAction.Wash
                             End If
@@ -75,11 +75,11 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             If responseFromDispensing.Action <> IContaminationsAction.RequiredAction.RemoveRequiredWashing Then Return
 
             ' ReSharper disable once InconsistentNaming
-            Dim washingID = responseFromDispensing.InvolvedWash.WashingSolutionID
+            Dim washingID = responseFromDispensing.InvolvedWash.WashingSolutionCode
             If lookUpFilter.Contains(washingID) Then
-                lookUpFilter.Remove(responseFromDispensing.InvolvedWash.WashingSolutionID)
-                Dim washingToRemove = results.InvolvedWashes.FirstOrDefault(Function(wash) wash.WashingSolutionID = washingID)
-                If washingToRemove IsNot Nothing AndAlso washingToRemove.WashingSolutionID <> String.Empty Then
+                lookUpFilter.Remove(responseFromDispensing.InvolvedWash.WashingSolutionCode)
+                Dim washingToRemove = results.InvolvedWashes.FirstOrDefault(Function(wash) wash.WashingSolutionCode = washingID)
+                If washingToRemove IsNot Nothing AndAlso washingToRemove.WashingSolutionCode <> String.Empty Then
                     results.InvolvedWashes.Remove(washingToRemove)
                 End If
             End If

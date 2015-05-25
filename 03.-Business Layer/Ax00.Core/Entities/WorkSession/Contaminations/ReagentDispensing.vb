@@ -10,7 +10,6 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
     Public Class Ax00Dispensing
         Implements IDispensing
 
-
         Public Function RequiredActionForDispensing(dispensing As IDispensing, scope As Integer, reagentNumber As Integer) As IContaminationsAction Implements IDispensing.RequiredActionForDispensing
 
             Select Case KindOfLiquid
@@ -25,8 +24,8 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
                     If reagentNumber = 1 Then
                         Dim contaAction = New ContaminationsAction
                         contaAction.Action = IContaminationsAction.RequiredAction.RemoveRequiredWashing
-                        Dim a = Me.WashingID
-                        Dim WashingSolutionID As String = "" 'TODO: Get washing solution String ID from WashingID
+                        Dim a = WashingID
+                        Dim WashingSolutionID As String = WashingDescription.WashingSolutionCode
                         contaAction.InvolvedWash = New WashingDescription(-1, WashingSolutionID)
                         Return contaAction
                     Else
@@ -80,7 +79,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
                     'Si es PTEST, la persistencia nos da igual, ya que los dummis no limpian, por lo cual, lavamos siempre:
                 Else
-                    Dim newCleaning = New WashingDescription(washing.RequiredWashing.WashingStrength, washing.RequiredWashing.WashingSolutionID)
+                    Dim newCleaning = New WashingDescription(washing.RequiredWashing.WashingStrength, washing.RequiredWashing.WashingSolutionCode)
                     Return New ContaminationsAction() With {.Action = IContaminationsAction.RequiredAction.Wash, .InvolvedWash = newCleaning}
 
                 End If
@@ -210,13 +209,22 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             End Get
             Set(value As Integer)
                 _washingID = value
-                'TODO: GET WASHING DATA FROM ID
                 KindOfLiquid = IDispensing.KindOfDispensedLiquid.Washing
                 Dim myDao = New vWSExecutionsDAO()
-                Dim data = myDao.GetInfoExecutionByExecutionID(value)
+                Dim WashingDS = myDao.GetWashingSolution(_washingID, WSExecutionCreator.Instance.AnalyzerID, WSExecutionCreator.Instance.WorksesionID)
+                If WashingDS.WashingSolutionSELECT(0).IsSOLUTIONCODENull() OrElse WashingDS.WashingSolutionSELECT(0).SOLUTIONCODE = String.Empty Then
+                    Me.WashingDescription = New WashingDescription(1, Contaminations.WashingDescription.RegularWaterWashingID)
+
+                Else
+                    Me.WashingDescription = New WashingDescription(2, WashingDS.WashingSolutionSELECT(0).SOLUTIONCODE)
+                End If
+
 
             End Set
         End Property
+
+
+        Public Property WashingDescription As IWashingDescription Implements IDispensing.WashingDescription
     End Class
 
 End Namespace

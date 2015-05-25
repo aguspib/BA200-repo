@@ -9,10 +9,10 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
         ''' Contamination persistence cycles this washing liquid can clean. Water is 1, washing is 2, etc.
         ''' </summary>
         Public Property WashingStrength As Integer Implements IWashingDescription.WashingStrength '= 0    '0 means no washing
-        Public Property WashingSolutionID As String Implements IWashingDescription.WashingSolutionID
+        Public Property WashingSolutionID As String Implements IWashingDescription.WashingSolutionCode
 
-        Protected Const NoWashingIDRequired = ""
-        Protected Const RegularWaterWashingID = "WATER"
+        Public Const NoWashingIDRequired = ""
+        Public Const RegularWaterWashingID = "DISTW"
 
         Public Sub New(cleaningPower As Integer, washingSolution As String)
             Me.WashingStrength = cleaningPower
