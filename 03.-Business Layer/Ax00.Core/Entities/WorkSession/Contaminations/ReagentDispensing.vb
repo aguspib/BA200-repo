@@ -2,6 +2,7 @@
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Interfaces
 Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.DAL.DAO
+Imports Biosystems.Ax00.DataAccess
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Types.ExecutionsDS
 
@@ -211,6 +212,8 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
                 _washingID = value
                 'TODO: GET WASHING DATA FROM ID
                 KindOfLiquid = IDispensing.KindOfDispensedLiquid.Washing
+                Dim myDao = New vWSExecutionsDAO()
+                Dim data = myDao.GetInfoExecutionByExecutionID(value)
 
             End Set
         End Property

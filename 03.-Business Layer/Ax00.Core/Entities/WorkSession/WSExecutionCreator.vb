@@ -82,6 +82,18 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
             End Get
         End Property
 
+        Public ReadOnly Property AnalyzerID As String
+            Get
+                Return pAnalyzerID
+            End Get
+        End Property
+
+        Public ReadOnly Property WorksesionID As String
+            Get
+                Return pWorkSessionID
+            End Get
+        End Property
+
         Public Property ContaminationsSpecification As IAnalyzerContaminationsSpecification
 
         Public Function CreateWS(ByVal ppDBConnection As SqlConnection, ppAnalyzerID As String, ByVal ppWorkSessionID As String, _
