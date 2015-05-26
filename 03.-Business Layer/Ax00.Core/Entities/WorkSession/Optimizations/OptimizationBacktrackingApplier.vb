@@ -102,7 +102,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
                 End If
                 myStep(1) = dispense
                 auxContext.Steps.Append(myStep)
-                If auxContext.Steps(0) IsNot Nothing AndAlso auxContext.Steps(0)(1) IsNot Nothing Then
+                If auxContext.Steps.IsIndexValid(0) AndAlso auxContext.Steps(0) IsNot Nothing AndAlso auxContext.Steps(0)(1) IsNot Nothing Then
                     Dim result = auxContext.ActionRequiredForDispensing(auxContext.Steps(0)(1))
                     Select Case result.Action
                         Case IContaminationsAction.RequiredAction.Wash
@@ -110,6 +110,8 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
                         Case IContaminationsAction.RequiredAction.NoAction, IContaminationsAction.RequiredAction.RemoveRequiredWashing, IContaminationsAction.RequiredAction.Skip
                             'Do nothing
                     End Select
+                Else
+                    Exit For
                 End If
                 auxContext.Steps.RemoveFirst()
             Next

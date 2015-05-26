@@ -165,7 +165,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
                     Dim context = New ContaminationsContext(Me)
                     context.FillContentsFromAnalyzer(analyzerFrame)
                     _currentContext = context
-                    Debug.WriteLine("Context filled in running! ")
+                    Debug.WriteLine("Context filled in running! " & Mid(instruction, InStr(instruction, "R2B2:")))
                 End If
             Catch ex As Exception
                 Debug.WriteLine("EXCEPTION FILLING CONTEXT " & ex.Message)

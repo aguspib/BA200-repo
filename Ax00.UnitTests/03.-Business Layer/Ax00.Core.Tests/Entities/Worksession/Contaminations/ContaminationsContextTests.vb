@@ -30,6 +30,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Tests
 
             'Obtener la washing solution necesaria si le doy la técnica 12
             cont.Steps(-2)(2).RequiredActionForDispensing(New Ax00Dispensing With {.R1ReagentID = 12}, -2, 1)
+            Debug.WriteLine(cont.ToString)
 
         End Sub
 

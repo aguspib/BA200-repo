@@ -16,6 +16,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
 
 
+
         'Public Property Steps As RangedCollection(Of ContextStep) Implements IContaminationsContext.Steps
         Public ReadOnly ContaminationsSpecifications As IAnalyzerContaminationsSpecification
 
@@ -85,18 +86,24 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
                 End If
             Else
                 Debug.WriteLine("ERROR washing not found: <<" & washingSolutionCode & ">>")
+                Debug.WriteLine("")
+                Debug.WriteLine(Me)
+                Debug.WriteLine("")
             End If
         End Sub
 
         Public Sub FillContentsFromAnalyzer(instructionParameters As LAx00Frame)
             AnalyzerFrame = instructionParameters
             FillSteps()
+            Debug.WriteLine(Me)
+
         End Sub
 
         Public Sub FillContentsFromAnalyzer(rawAnalyzerFrame As String) Implements IContaminationsContext.FillContentsFromAnalyzer
             AnalyzerFrame = New LAx00Frame()
             AnalyzerFrame.ParseRawData(rawAnalyzerFrame)
             FillSteps()
+            Debug.WriteLine(Me)
         End Sub
 
         ' ReSharper disable once InconsistentNaming
@@ -274,6 +281,41 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
 
         Public Property Steps As RangedCollection(Of IContextStep) Implements IContaminationsContext.Steps
+
+        Public Overrides Function ToString() As String
+            Dim SB As New Text.StringBuilder(1024)
+            For curDispense As Integer = 1 To ContaminationsSpecifications.DispensesPerStep
+                SB.Append("|"c)
+                For curStep = Steps.Range.Minimum To Steps.Range.Maximum
+                    If Steps(curStep) Is Nothing Then
+                        SB.Append("  ?   ")
+                    ElseIf Steps(curStep)(curDispense) Is Nothing Then
+                        SB.Append("  ?   ")
+                    Else
+                        Dim dispense = Steps(curStep)(curDispense)
+                        Select Case dispense.KindOfLiquid
+                            Case IDispensing.KindOfDispensedLiquid.Washing
+                                SB.Append(" W" & Format(dispense.WashingID, "000") & " "c)
+                            Case IDispensing.KindOfDispensedLiquid.Reagent
+                                SB.Append("  " & Format(dispense.R1ReagentID, "000") & " "c)
+                            Case IDispensing.KindOfDispensedLiquid.Dummy
+                                SB.Append("  D   ")
+                            Case Else
+                                SB.Append("  ?   ")
+                        End Select
+
+                    End If
+                    SB.Append("|"c)
+                Next
+                SB.Append(vbCr)
+            Next
+            SB.Append(vbCr)
+            Return SB.ToString
+        End Function
+
+
+
+
     End Class
 
 End Namespace
