@@ -84,11 +84,11 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
                 If washingToRemove IsNot Nothing AndAlso washingToRemove.WashingSolutionCode <> String.Empty Then
                     results.InvolvedWashes.Remove(washingToRemove)
                 End If
-            Else
-                Debug.WriteLine("ERROR washing not found: <<" & washingSolutionCode & ">>")
-                Debug.WriteLine("")
-                Debug.WriteLine(Me)
-                Debug.WriteLine("")
+                'Else
+                '    Debug.WriteLine("ERROR washing not found: <<" & washingSolutionCode & ">>")
+                '    Debug.WriteLine("")
+                '    Debug.WriteLine(Me)
+                '    Debug.WriteLine("")
             End If
         End Sub
 
