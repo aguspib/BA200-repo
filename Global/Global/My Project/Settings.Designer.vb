@@ -210,15 +210,15 @@ Namespace My
             End Set
         End Property
         
-        <Global.System.Configuration.UserScopedSettingAttribute(),  _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("3.08")>  _
+        <Global.System.Configuration.UserScopedSettingAttribute(), _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.Configuration.DefaultSettingValueAttribute("3.07")> _
         Public Property DataBaseVersion() As String
             Get
-                Return CType(Me("DataBaseVersion"),String)
+                Return CType(Me("DataBaseVersion"), String)
             End Get
-            Set
-                Me("DataBaseVersion") = value
+            Set(value As String)
+                Me("DataBaseVersion") = Value
             End Set
         End Property
         

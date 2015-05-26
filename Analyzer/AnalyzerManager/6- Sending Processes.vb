@@ -310,7 +310,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     SendWhenCuvetteContaminated(actionAlreadySent, endRunToSend, myGlobal, pNextWell, emptyFieldsDetected, myAnManagerDS)
                     SendWhenISEPreparation(actionAlreadySent, endRunToSend, myGlobal, emptyFieldsDetected, iseStatusOK, myAnManagerDS)
                     SendWhenContamination(actionAlreadySent, endRunToSend, myGlobal, pNextWell, emptyFieldsDetected, myAnManagerDS)
-                    systemErrorFlag = SendWhenNormalOrPtestPreparation(actionAlreadySent, endRunToSend, myGlobal, pNextWell, emptyFieldsDetected, myAnManagerDS)
+                    systemErrorFlag = SendWhenTestOrPtestPreparation(actionAlreadySent, endRunToSend, myGlobal, pNextWell, emptyFieldsDetected, myAnManagerDS)
                 End If
 
                 SendEndRunIfNeeded(actionAlreadySent, endRunToSend, myGlobal, emptyFieldsDetected, systemErrorFlag, iseInstalledFlag, iseStatusOK)
@@ -2218,9 +2218,14 @@ Namespace Biosystems.Ax00.Core.Entities
             End If
         End Sub
 
-        Private Function SendWhenNormalOrPtestPreparation(ByRef actionAlreadySent As Boolean, ByRef endRunToSend As Boolean, ByRef myGlobal As GlobalDataTO,
+        Private Function SendWhenTestOrPtestPreparation(ByRef actionAlreadySent As Boolean, ByRef endRunToSend As Boolean, ByRef myGlobal As GlobalDataTO,
                                                      ByRef pNextWell As Integer, ByRef emptyFieldsDetected As Boolean, myAnManagerDS As AnalyzerManagerDS) As Boolean
             Dim systemErrorFlag = False
+
+            Dim disp = ContaminationsSpecification.CreateDispensing
+            disp.ExecutionID = myAnManagerDS.nextPreparation(0).ExecutionID
+            Dim requiredActionBeforeDispensing = ContaminationsSpecification.CurrentRunningContext.ActionRequiredForDispensing(disp)
+
 
             '5rh: Check if next preparation is an STD preparation and executionID <> NO_PENDING_PREPARATION_FOUND
             If Not actionAlreadySent And Not endRunToSend Then
@@ -2235,13 +2240,22 @@ Namespace Biosystems.Ax00.Core.Entities
                         Dim isPTESTinstructionFlag As Boolean = False
                         testPrepData.isPTESTinstruction(Nothing, myAnManagerDS.nextPreparation(0).ExecutionID, isPTESTinstructionFlag)
                         If Not isPTESTinstructionFlag Then 'TEST instruction
-                            myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.SEND_PREPARATION, myAnManagerDS.nextPreparation(0).ExecutionID)
-                            actionAlreadySent = True
-                            If Not myGlobal.HasError Then
-                                AddNewSentPreparationsList(Nothing, myAnManagerDS, pNextWell) 'Update sent instructions DS
+
+
+                            If requiredActionBeforeDispensing.Action = IContaminationsAction.RequiredAction.Skip Then
+                                myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.SKIP)
+                                actionAlreadySent = True
                             Else
-                                myGlobal = InformEmptyFields(myGlobal.ErrorCode, emptyFieldsDetected, UI_RefreshEvents.EXECUTION_STATUS, myAnManagerDS.nextPreparation(0).ExecutionID)
+                                myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.SEND_PREPARATION, myAnManagerDS.nextPreparation(0).ExecutionID)
+                                actionAlreadySent = True
+                                If Not myGlobal.HasError Then
+                                    AddNewSentPreparationsList(Nothing, myAnManagerDS, pNextWell) 'Update sent instructions DS
+                                Else
+                                    myGlobal = InformEmptyFields(myGlobal.ErrorCode, emptyFieldsDetected, UI_RefreshEvents.EXECUTION_STATUS, myAnManagerDS.nextPreparation(0).ExecutionID)
+                                End If
                             End If
+
+
                         Else 'PTEST instruction
                             'Before send the PTEST instruction Sw has to evaluate the well (pNextWell + WELL_OFFSET_FOR_PREDILUTION)
                             'looking for cuvette contamination or optical rejection
@@ -2260,12 +2274,19 @@ Namespace Biosystems.Ax00.Core.Entities
                                     myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.SKIP)
                                     actionAlreadySent = True
                                 Else 'PTEST 
-                                    myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.SEND_PREPARATION, myAnManagerDS.nextPreparation(0).ExecutionID)
-                                    actionAlreadySent = True
-                                    If Not myGlobal.HasError Then
-                                        AddNewSentPreparationsList(Nothing, myAnManagerDS, nextPTESTWell) 'Update sent instructions DS
+                                    'TODO: Ver si podemos
+                                    If requiredActionBeforeDispensing.Action = IContaminationsAction.RequiredAction.Skip Then
+                                        myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.SKIP)
+                                        actionAlreadySent = True
                                     Else
-                                        myGlobal = InformEmptyFields(myGlobal.ErrorCode, emptyFieldsDetected, UI_RefreshEvents.EXECUTION_STATUS, myAnManagerDS.nextPreparation(0).ExecutionID)
+                                        myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.SEND_PREPARATION, myAnManagerDS.nextPreparation(0).ExecutionID)
+                                        actionAlreadySent = True
+                                        If Not myGlobal.HasError Then
+                                            AddNewSentPreparationsList(Nothing, myAnManagerDS, nextPTESTWell) 'Update sent instructions DS
+                                        Else
+                                            myGlobal = InformEmptyFields(myGlobal.ErrorCode, emptyFieldsDetected, UI_RefreshEvents.EXECUTION_STATUS, myAnManagerDS.nextPreparation(0).ExecutionID)
+                                        End If
+
                                     End If
                                 End If
                             ElseIf myGlobal.HasError Then
