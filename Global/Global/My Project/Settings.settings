@@ -197,10 +197,10 @@
     <Setting Name="MaxRepetitionsRetry" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">1</Value>
     </Setting>
-    <Setting Name="TempDBBakupFileName" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Ax00.bak</Value>
-    </Setting>
     <Setting Name="DBBackUpFileName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Ax00TEM.bak</Value>
+    </Setting>
+    <Setting Name="TempDBBakupFileName" Type="System.String" Scope="User">
       <Value Profile="(Default)">Ax00TEM.bak</Value>
     </Setting>
   </Settings>
