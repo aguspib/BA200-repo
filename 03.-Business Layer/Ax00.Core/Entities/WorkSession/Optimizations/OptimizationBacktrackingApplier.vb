@@ -120,24 +120,39 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
 
         Private Function BacktrackingAlgorithm(ByVal Tests As List(Of ExecutionsDS.twksWSExecutionsRow), ByRef solutionSet As List(Of ExecutionsDS.twksWSExecutionsRow)) As List(Of ExecutionsDS.twksWSExecutionsRow)
             _callStackNestingLevel += 1
-            'DIM additionalNestingLevel
+            Dim additionalNestingLevel As Integer = 0
             Static foundSolution As Boolean = False
             For Each elem In Tests
+                If additionalNestingLevel > 0 Then
+                    additionalNestingLevel -= 1
+                    Continue For
+                End If
                 If IsViable(solutionSet, elem) Then
                     Dim auxTests = Tests.ToList()
                     auxTests.Remove(elem)
-                    'WHILE elem = elem+1
-                    '    SolutionSet.Add(elem+1)
-                    '    auxSet.Remove(elem+1)
-                    '   additionalNestingLevel++;
-                    '   _callStackNestingLevel++;
-                    'Wend
                     If _callStackNestingLevel = solutionSet.Count Then
                         solutionSet.Add(elem)
 
                     Else
                         solutionSet.Item(_callStackNestingLevel) = elem
                     End If
+
+                    While auxTests.Any AndAlso
+                        (auxTests(0).ReagentID = elem.ReagentID) AndAlso
+                        (auxTests(0).SampleClass = elem.SampleClass) AndAlso
+                        (auxTests(0).SampleType = elem.SampleType) AndAlso
+                        (
+                            Not (Not auxTests(0).IsPatientIDNull AndAlso Not elem.IsPatientIDNull) OrElse auxTests(0).PatientID = elem.PatientID
+                        )
+
+                        solutionSet.Add(auxTests(0))
+                        auxTests.Remove(auxTests(0))
+                        additionalNestingLevel += 1
+                        _callStackNestingLevel += 1
+                    End While
+
+
+
 
                     If IsSolution(solutionSet) Then
                         foundSolution = True
@@ -152,11 +167,15 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
                         Exit For
                     Else
                         solutionSet.Remove(elem)
+
+                        solutionSet.RemoveRange(_callStackNestingLevel - additionalNestingLevel, additionalNestingLevel)
                         lastBireactiveID.Remove(elem.ReagentID)
+                        _callStackNestingLevel -= additionalNestingLevel
+                        'additionalNestingLevel = 0
                     End If
                 End If
             Next
-            _callStackNestingLevel -= (1) '+additionalNestingLevel
+            _callStackNestingLevel -= 1 + additionalNestingLevel
 
             Return solutionSet
         End Function
