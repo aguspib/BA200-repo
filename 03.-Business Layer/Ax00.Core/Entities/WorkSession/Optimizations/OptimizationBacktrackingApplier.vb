@@ -74,7 +74,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
             auxContext.Steps.Clear()
             If Not calculateInRunning AndAlso Me.PreviousReagentID IsNot Nothing AndAlso PreviousReagentID.Any Then
                 'Iterate throug last "persistence" elements of PreviousreagentID:
-                For i As Integer = Me.PreviousReagentID.Count - ContaminationsSpecification.HighContaminationPersistence To Me.PreviousReagentID.Count - 1
+                For i As Integer = Math.Max(0, Me.PreviousReagentID.Count - ContaminationsSpecification.HighContaminationPersistence) To Me.PreviousReagentID.Count - 1
                     Dim curStep = New ContextStep(ContaminationsSpecification.DispensesPerStep)
                     curStep(1) = ContaminationsSpecification.CreateDispensing()
                     curStep(1).R1ReagentID = PreviousReagentID(i)
