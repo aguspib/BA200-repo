@@ -1299,16 +1299,11 @@ Namespace Biosystems.Ax00.Core.Entities
             Debug.Print("SeachContaminationBetweenPreviousAndFirsToSend: " & previousReagentIDSentList.Count)
             Dim context = ContaminationsSpecification.CurrentRunningContext
 
-            'Dim executionB2 = 0
-            'Dim executionB1 = 0
-            'If previousReagentIDSentList.Count >= 1 Then ExecutionB2 = previousReagentIDSentList(0).ExecutionID
-            'If previousReagentIDSentList.Count >= 2 Then ExecutionB1 = previousReagentIDSentList(1).ExecutionID
-            'context.FillContentsFromAnalyzer(String.Format("STATUS;R1B2:{0};R1B1:{1};", executionB2, executionB1))
-
             Debug.Print("CourrentContext read")
             Dim result = context.ActionRequiredForDispensing(ReagentRow)
             If result.Action <> IContaminationsAction.RequiredAction.NoAction Then
                 Debug.Print("Contaminations found")
+
                 Return True
             Else
                 Debug.Print("Contaminations not found")
@@ -1892,7 +1887,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         'Check if the required wash has been already sent or not
                         If Not contaminations(0).IsContaminationIDNull Then myContaminationID = contaminations(0).ContaminationID
 
-                        myWashSolutionType = ""
+                        myWashSolutionType = "EMPTY"
                         'If Not previousReagentIDSentList(highIndex).IsWashSolution1Null Then myWashSolutionType = previousReagentIDSentList(highIndex).WashSolution1
                         If Not contaminations(0).IsWashingSolutionR1Null Then myWashSolutionType = contaminations(0).WashingSolutionR1
 
@@ -2225,6 +2220,9 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim disp = ContaminationsSpecification.CreateDispensing
             disp.ExecutionID = myAnManagerDS.nextPreparation(0).ExecutionID
             Dim requiredActionBeforeDispensing = ContaminationsSpecification.CurrentRunningContext.ActionRequiredForDispensing(disp)
+            If requiredActionBeforeDispensing.Action = IContaminationsAction.RequiredAction.Wash Then
+                MsgBox("Incongruency found for reagent: " & disp.R1ReagentID & vbCr & ContaminationsSpecification.CurrentRunningContext.ToString)
+            End If
 
 
             '5rh: Check if next preparation is an STD preparation and executionID <> NO_PENDING_PREPARATION_FOUND

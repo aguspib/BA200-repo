@@ -13,10 +13,6 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
     Public Class ContaminationsContext
         Implements IContaminationsContext
 
-
-
-
-
         'Public Property Steps As RangedCollection(Of ContextStep) Implements IContaminationsContext.Steps
         Public ReadOnly ContaminationsSpecifications As IAnalyzerContaminationsSpecification
 
