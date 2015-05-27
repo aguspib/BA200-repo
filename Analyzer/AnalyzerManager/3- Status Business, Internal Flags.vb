@@ -230,14 +230,16 @@ Namespace Biosystems.Ax00.Core.Entities
                                     End If
                                 End If
 
-                                Dim reactRotorDlg As New ReactionsRotorDelegate
-                                futureRequestNextWell = reactRotorDlg.GetRealWellNumber(CurrentWellAttribute + 1 + wellOffset, MAX_REACTROTOR_WELLS) 'Estimation of future next well (last well received with Request + 1)
+                                'CONTAMINATIONS_
+                                'Dim reactRotorDlg As New ReactionsRotorDelegate
+                                'futureRequestNextWell = reactRotorDlg.GetRealWellNumber(CurrentWellAttribute + 1 + wellOffset, MAX_REACTROTOR_WELLS) 'Estimation of future next well (last well received with Request + 1)
 
-                                myGlobal = SearchNextPreparation(Nothing, futureRequestNextWell) 'Search for next instruction to be sent ... and sent it!!
-                                GlobalBase.CreateLogActivity("AnalyzerManagerAx00Actions.TEST_PREPARATION_RECEIVED: " + futureRequestNextWell.ToString, "AnalyzerManager.ManageRunningStatus", EventLogEntryType.Information, False)
-                                If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then '(1)
-                                    myNextPreparationToSendDS = DirectCast(myGlobal.SetDatos, AnalyzerManagerDS)
-                                End If
+                                'myGlobal = SearchNextPreparation(Nothing, futureRequestNextWell) 'Search for next instruction to be sent ... and sent it!!
+                                'GlobalBase.CreateLogActivity("AnalyzerManagerAx00Actions.TEST_PREPARATION_RECEIVED: " + futureRequestNextWell.ToString, "AnalyzerManager.ManageRunningStatus", EventLogEntryType.Information, False)
+                                'If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then '(1)
+                                '    myNextPreparationToSendDS = DirectCast(myGlobal.SetDatos, AnalyzerManagerDS)
+                                'End If
+                                '/CONTAMINATIONS_
                             End If
                             'AG 07/06/2012
 
@@ -264,16 +266,18 @@ Namespace Biosystems.Ax00.Core.Entities
                             End If
 
                 'AG 07/06/2012 - Once the wash running or skip running is accepted search for next instruction to be sent in future
-                If (Not myGlobal.HasError AndAlso myNextPreparationToSendDS.nextPreparation.Rows.Count = 0) Then
-                    Dim reactRotorDlg As New ReactionsRotorDelegate
-                    futureRequestNextWell = reactRotorDlg.GetRealWellNumber(CurrentWellAttribute + 1, MAX_REACTROTOR_WELLS) 'Estimation of future next well (last well received with Request + 1)
+                            If (Not myGlobal.HasError AndAlso myNextPreparationToSendDS.nextPreparation.Rows.Count = 0) Then
+                                'CONTAMINATIONS_
+                                'Dim reactRotorDlg As New ReactionsRotorDelegate
+                                'futureRequestNextWell = reactRotorDlg.GetRealWellNumber(CurrentWellAttribute + 1, MAX_REACTROTOR_WELLS) 'Estimation of future next well (last well received with Request + 1)
 
-                    myGlobal = SearchNextPreparation(Nothing, futureRequestNextWell) 'Search for next instruction to be sent ... and sent it!!
-                    GlobalBase.CreateLogActivity("AnalyzerManagerAx00Actions.WASHING_RUN_START: " + futureRequestNextWell.ToString, "AnalyzerManager.ManageRunningStatus", EventLogEntryType.Information, False)
-                    If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then '(1)
-                        myNextPreparationToSendDS = DirectCast(myGlobal.SetDatos, AnalyzerManagerDS)
-                    End If
-                End If
+                                'myGlobal = SearchNextPreparation(Nothing, futureRequestNextWell) 'Search for next instruction to be sent ... and sent it!!
+                                'GlobalBase.CreateLogActivity("AnalyzerManagerAx00Actions.WASHING_RUN_START: " + futureRequestNextWell.ToString, "AnalyzerManager.ManageRunningStatus", EventLogEntryType.Information, False)
+                                'If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then '(1)
+                                '    myNextPreparationToSendDS = DirectCast(myGlobal.SetDatos, AnalyzerManagerDS)
+                                'End If
+                                '/CONTAMINATIONS_
+                            End If
                 'AG 07/06/2012
 
                 'XB 15/10/2013 - BT #1318
@@ -412,14 +416,16 @@ Namespace Biosystems.Ax00.Core.Entities
                             If Not endRunAlreadySentFlagAttribute AndAlso Not abortAlreadySentFlagAttribute AndAlso Not PauseAlreadySentFlagAttribute AndAlso _
                                 mySessionFlags(AnalyzerManagerFlags.CONNECTprocess.ToString) <> "INPROCESS" Then
                                 If (Not myGlobal.HasError AndAlso myNextPreparationToSendDS.nextPreparation.Rows.Count = 0) Then
-                                    Dim reactRotorDlg As New ReactionsRotorDelegate
-                                    futureRequestNextWell = reactRotorDlg.GetRealWellNumber(CurrentWellAttribute + 1, MAX_REACTROTOR_WELLS) 'Estimation of future next well (last well received with Request + 1)
+                                    'CONTAMINATIONS_
+                                    'Dim reactRotorDlg As New ReactionsRotorDelegate
+                                    'futureRequestNextWell = reactRotorDlg.GetRealWellNumber(CurrentWellAttribute + 1, MAX_REACTROTOR_WELLS) 'Estimation of future next well (last well received with Request + 1)
 
-                                    myGlobal = SearchNextPreparation(Nothing, futureRequestNextWell) 'Search for next instruction to be sent ... and sent it!!
-                                    GlobalBase.CreateLogActivity("AnalyzerManagerAx00Actions.SOUND_DONE: " + futureRequestNextWell.ToString, "AnalyzerManager.ManageRunningStatus", EventLogEntryType.Information, False)
-                                    If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then '(1)
-                                        myNextPreparationToSendDS = DirectCast(myGlobal.SetDatos, AnalyzerManagerDS)
-                                    End If
+                                    'myGlobal = SearchNextPreparation(Nothing, futureRequestNextWell) 'Search for next instruction to be sent ... and sent it!!
+                                    'GlobalBase.CreateLogActivity("AnalyzerManagerAx00Actions.SOUND_DONE: " + futureRequestNextWell.ToString, "AnalyzerManager.ManageRunningStatus", EventLogEntryType.Information, False)
+                                    'If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then '(1)
+                                    '    myNextPreparationToSendDS = DirectCast(myGlobal.SetDatos, AnalyzerManagerDS)
+                                    'End If
+                                    '/CONTAMINATIONS_
                                 End If
                             End If
                             'AG 07/02/2014

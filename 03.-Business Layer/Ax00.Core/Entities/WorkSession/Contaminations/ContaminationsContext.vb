@@ -1,4 +1,8 @@
 ﻿Imports System.Data.Common
+Imports System.Runtime.InteropServices.ComTypes
+#If config = "Debug" Then
+Imports System.Windows.Forms
+#End If
 Imports Biosystems.Ax00.CC
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Interfaces
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Interfaces
@@ -43,7 +47,9 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
                     If Steps(curStep) Is Nothing OrElse Steps(curStep)(curDispensing) Is Nothing Then Continue For
                     Dim dispensingToAsk = Steps(curStep)(curDispensing)
                     Dim responseFromDispense = dispensingToAsk.RequiredActionForDispensing(dispensing, curStep, curDispensing)
-
+                    If curStep = -1 AndAlso Steps(curStep)(1).R1ReagentID = 69 Then
+                        Dim a = 1
+                    End If
                     Select Case responseFromDispense.Action
 
                         Case IContaminationsAction.RequiredAction.Wash
@@ -54,8 +60,8 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
                             End If
 
                         Case IContaminationsAction.RequiredAction.Skip
-                            results.Action = IContaminationsAction.RequiredAction.Skip
-                            Exit For
+                            If results.Action <> IContaminationsAction.RequiredAction.Wash Then results.Action = IContaminationsAction.RequiredAction.Skip
+                            'Exit For
 
                         Case IContaminationsAction.RequiredAction.RemoveRequiredWashing
                             RemoveWashingFromResult(responseFromDispense, lookUpFilter, results)
@@ -99,9 +105,28 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             AnalyzerFrame = New LAx00Frame()
             AnalyzerFrame.ParseRawData(rawAnalyzerFrame)
             FillSteps()
-            Debug.WriteLine(Me)
+            ShowDebugInfo(rawAnalyzerFrame)
         End Sub
-
+        Private Sub ShowDebugInfo(rawAnalyzerFrame As String)
+#If config = "Debug" Then
+            Debug.WriteLine(Me)
+            Static debugF As Form, tb As TextBox = Nothing
+            If debugF Is Nothing Then
+                debugF = New Form()
+                tb = New TextBox
+                tb.Multiline = True
+                tb.Parent = debugF
+                tb.Dock = DockStyle.Fill
+                debugF.Show()
+            End If
+            If tb.InvokeRequired Then tb.BeginInvoke(
+                Sub()
+                    tb.AppendText(rawAnalyzerFrame)
+                    tb.AppendText(Me.ToString)
+                    tb.AppendText(vbCr)
+                End Sub)
+#End If
+        End Sub
         ' ReSharper disable once InconsistentNaming
         Public Shared Sub DebugContentsFromExecutionDS(executions As ExecutionsDS, currentIndex As Integer)
 
@@ -291,15 +316,15 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
                         Dim dispense = Steps(curStep)(curDispense)
                         Select Case dispense.KindOfLiquid
                             Case IDispensing.KindOfDispensedLiquid.Washing
-                                SB.Append(" W" & Format(dispense.WashingID, "000") & " "c)
+                                SB.Append("W" & Format(dispense.WashingID, "000") & " "c)
                             Case IDispensing.KindOfDispensedLiquid.Reagent
-                                SB.Append("  " & Format(dispense.R1ReagentID, "000") & " "c)
+                                SB.Append(" " & Format(dispense.R1ReagentID, "000") & " "c)
                             Case IDispensing.KindOfDispensedLiquid.Dummy
-                                SB.Append("  D   ")
+                                SB.Append("Dumy")
                             Case Else
-                                SB.Append("  ?   ")
+                                SB.Append(" ?? ")
                         End Select
-
+                        SB.Append("/" & Format(dispense.ExecutionID, "00"))
                     End If
                     SB.Append("|"c)
                 Next

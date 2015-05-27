@@ -120,14 +120,21 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
 
         Private Function BacktrackingAlgorithm(ByVal Tests As List(Of ExecutionsDS.twksWSExecutionsRow), ByRef solutionSet As List(Of ExecutionsDS.twksWSExecutionsRow)) As List(Of ExecutionsDS.twksWSExecutionsRow)
             _callStackNestingLevel += 1
+            'DIM additionalNestingLevel
             Static foundSolution As Boolean = False
             For Each elem In Tests
                 If IsViable(solutionSet, elem) Then
                     Dim auxTests = Tests.ToList()
                     auxTests.Remove(elem)
-
+                    'WHILE elem = elem+1
+                    '    SolutionSet.Add(elem+1)
+                    '    auxSet.Remove(elem+1)
+                    '   additionalNestingLevel++;
+                    '   _callStackNestingLevel++;
+                    'Wend
                     If _callStackNestingLevel = solutionSet.Count Then
                         solutionSet.Add(elem)
+
                     Else
                         solutionSet.Item(_callStackNestingLevel) = elem
                     End If
@@ -149,7 +156,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
                     End If
                 End If
             Next
-            _callStackNestingLevel -= 1
+            _callStackNestingLevel -= (1) '+additionalNestingLevel
 
             Return solutionSet
         End Function

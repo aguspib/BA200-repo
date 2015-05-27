@@ -620,10 +620,12 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
             End If
             If _analyzerManager.AnalyzerStatus() = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
-                Dim reactRotorDlg As New ReactionsRotorDelegate
-                _analyzerManager.FutureRequestNextWellValue = reactRotorDlg.GetRealWellNumber(_analyzerManager.CurrentWell + 1, MAX_REACTROTOR_WELLS) 'Estimation of future next well (last well received with Request + 1)
-                _myGlobal = _analyzerManager.SearchNextPreparation(_dbConnection, _analyzerManager.FutureRequestNextWellValue) 'Search for next instruction to be sent ... and sent it!!
-                _analyzerManager.FillNextPreparationToSend(_myGlobal)
+                'CONTAMINATIONS_
+                'Dim reactRotorDlg As New ReactionsRotorDelegate
+                '_analyzerManager.FutureRequestNextWellValue = reactRotorDlg.GetRealWellNumber(_analyzerManager.CurrentWell + 1, MAX_REACTROTOR_WELLS) 'Estimation of future next well (last well received with Request + 1)
+                '_myGlobal = _analyzerManager.SearchNextPreparation(_dbConnection, _analyzerManager.FutureRequestNextWellValue) 'Search for next instruction to be sent ... and sent it!!
+                '_analyzerManager.FillNextPreparationToSend(_myGlobal)
+                '/CONTAMINATIONS_
             End If
 
             GlobalBase.CreateLogActivity("Instruction rejected (out of time)", "AnalyzerManager.ManageAlarms", EventLogEntryType.Information, False)

@@ -3,6 +3,7 @@ Imports Biosystems.Ax00.Core.Entities.WorkSession.Interfaces
 Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.DAL.DAO
 Imports Biosystems.Ax00.DataAccess
+Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Types.ExecutionsDS
 
@@ -209,20 +210,23 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             End Get
             Set(value As Integer)
                 _washingID = value
-                KindOfLiquid = IDispensing.KindOfDispensedLiquid.Washing
-                Dim myDao = New vWSExecutionsDAO()
-                Dim WashingDS = myDao.GetWashingSolution(_washingID, WSExecutionCreator.Instance.AnalyzerID, WSExecutionCreator.Instance.WorksesionID)
-                If WashingDS.WashingSolutionSELECT(0).IsSOLUTIONCODENull() OrElse WashingDS.WashingSolutionSELECT(0).SOLUTIONCODE = String.Empty Then
-                    Me.WashingDescription = New WashingDescription(1, Contaminations.WashingDescription.RegularWaterWashingID)
+                Try
+                    KindOfLiquid = IDispensing.KindOfDispensedLiquid.Washing
+                    Dim myDao = New vWSExecutionsDAO()
+                    Dim WashingDS = myDao.GetWashingSolution(_washingID, WSExecutionCreator.Instance.AnalyzerID, WSExecutionCreator.Instance.WorksesionID)
+                    If WashingDS.WashingSolutionSELECT(0).IsSOLUTIONCODENull() OrElse WashingDS.WashingSolutionSELECT(0).SOLUTIONCODE = String.Empty Then
+                        Me.WashingDescription = New WashingDescription(1, Contaminations.WashingDescription.RegularWaterWashingID)
 
-                Else
-                    Me.WashingDescription = New WashingDescription(2, WashingDS.WashingSolutionSELECT(0).SOLUTIONCODE)
-                    If Me.WashingDescription.WashingSolutionCode = Contaminations.WashingDescription.RegularWaterWashingID Then
-                        Me.WashingDescription.WashingStrength = 1
+                    Else
+                        Me.WashingDescription = New WashingDescription(2, WashingDS.WashingSolutionSELECT(0).SOLUTIONCODE)
+                        If Me.WashingDescription.WashingSolutionCode = Contaminations.WashingDescription.RegularWaterWashingID Then
+                            Me.WashingDescription.WashingStrength = 1
+                        End If
                     End If
-                End If
-                Debug.WriteLine("Found washing of kind $$<<" & WashingDescription.WashingSolutionCode & ">>$$ ID= " & WashingID)
-
+                    Debug.WriteLine("Found washing of kind $$<<" & WashingDescription.WashingSolutionCode & ">>$$ ID= " & WashingID)
+                Catch _exception As Exception
+                    GlobalBase.CreateLogActivity(_exception)
+                End Try
             End Set
         End Property
 

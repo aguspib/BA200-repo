@@ -84,13 +84,14 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
 
         Public ReadOnly Property AnalyzerID As String
             Get
-                Return pAnalyzerID
+                Return AnalyzerManager.GetCurrentAnalyzerManager.ActiveAnalyzer
             End Get
         End Property
 
         Public ReadOnly Property WorksesionID As String
             Get
-                Return pWorkSessionID
+                'Return pWorkSessionID
+                Return AnalyzerManager.GetCurrentAnalyzerManager.ActiveWorkSession
             End Get
         End Property
 
