@@ -156,7 +156,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
                     If foundSolution Then
                         Exit For
                     Else
-                        solutionSet.Remove(elem)
+                        solutionSet.RemoveAt(solutionSet.Count - 1) '(elem)
                         lastBireactiveID.Remove(elem.ReagentID)
                     End If
 
