@@ -55,7 +55,9 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
 
             While (result.Count = 0 AndAlso ContaminLimit < currentContaminationNumber)
                 _callStackNestingLevel = -1
+                foundSolution = False
                 result = BacktrackingAlgorithm(Tests, solutionSet)
+
                 If result.Count = 0 Then
                     ContaminLimit += 1
                 End If
@@ -69,64 +71,65 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
         End Sub
 
         Public Overrides Function GetContaminationNumber(ByVal pContaminationsDS As ContaminationsDS, ByVal orderTests As List(Of ExecutionsDS.twksWSExecutionsRow)) As Integer
-            Dim contaminaNumber As Integer = 0
-            Dim auxContext = New ContaminationsContext(ContaminationsSpecification)
-            auxContext.Steps.Clear()
-            If Not calculateInRunning AndAlso Me.PreviousReagentID IsNot Nothing AndAlso PreviousReagentID.Any Then
-                'Iterate throug last "persistence" elements of PreviousreagentID:
-                For i As Integer = Math.Max(0, Me.PreviousReagentID.Count - ContaminationsSpecification.HighContaminationPersistence) To Me.PreviousReagentID.Count - 1
-                    Dim curStep = New ContextStep(ContaminationsSpecification.DispensesPerStep)
-                    curStep(1) = ContaminationsSpecification.CreateDispensing()
-                    curStep(1).R1ReagentID = PreviousReagentID(i)
-                    auxContext.Steps.Append(curStep)
-                Next
-            ElseIf Not calculateInRunning Then
-                For i = auxContext.Steps.Range.Minimum To -1
-                    Dim curStep = New ContextStep(ContaminationsSpecification.DispensesPerStep)
-                    curStep(1) = ContaminationsSpecification.CreateDispensing()
-                    curStep(1).KindOfLiquid = IDispensing.KindOfDispensedLiquid.Dummy
-                    auxContext.Steps.Append(curStep)
-                    'dispense.f()
-                Next
-            Else
-                'Get contents from current REAL context
-            End If
+            Return WSExecutionCreator.Instance.GetContaminationNumber(calculateInRunning, PreviousReagentID, orderTests)
+            'Dim contaminaNumber As Integer = 0
+            'Dim auxContext = New ContaminationsContext(ContaminationsSpecification)
+            'auxContext.Steps.Clear()
+            'If Not calculateInRunning AndAlso Me.PreviousReagentID IsNot Nothing AndAlso PreviousReagentID.Any Then
+            '    'Iterate throug last "persistence" elements of PreviousreagentID:
+            '    For i As Integer = Math.Max(0, Me.PreviousReagentID.Count - ContaminationsSpecification.HighContaminationPersistence) To Me.PreviousReagentID.Count - 1
+            '        Dim curStep = New ContextStep(ContaminationsSpecification.DispensesPerStep)
+            '        curStep(1) = ContaminationsSpecification.CreateDispensing()
+            '        curStep(1).R1ReagentID = PreviousReagentID(i)
+            '        auxContext.Steps.Append(curStep)
+            '    Next
+            'ElseIf Not calculateInRunning Then
+            '    For i = auxContext.Steps.Range.Minimum To -1
+            '        Dim curStep = New ContextStep(ContaminationsSpecification.DispensesPerStep)
+            '        curStep(1) = ContaminationsSpecification.CreateDispensing()
+            '        curStep(1).KindOfLiquid = IDispensing.KindOfDispensedLiquid.Dummy
+            '        auxContext.Steps.Append(curStep)
+            '        'dispense.f()
+            '    Next
+            'Else
+            '    'Get contents from current REAL context
+            'End If
 
-            For i As Integer = 0 To orderTests.Count + auxContext.Steps.Range.Maximum '- 1
-                Dim myStep As New ContextStep(ContaminationsSpecification.DispensesPerStep)
-                Dim dispense = ContaminationsSpecification.CreateDispensing()
-                If i < orderTests.Count Then
-                    dispense.R1ReagentID = orderTests(i).ReagentID
-                Else
-                    dispense.KindOfLiquid = IDispensing.KindOfDispensedLiquid.Dummy
-                End If
-                myStep(1) = dispense
-                auxContext.Steps.Append(myStep)
-                If auxContext.Steps.IsIndexValid(0) AndAlso auxContext.Steps(0) IsNot Nothing AndAlso auxContext.Steps(0)(1) IsNot Nothing Then
-                    Dim result = auxContext.ActionRequiredForDispensing(auxContext.Steps(0)(1))
-                    Select Case result.Action
-                        Case IContaminationsAction.RequiredAction.Wash
-                            contaminaNumber += 1
-                        Case IContaminationsAction.RequiredAction.NoAction, IContaminationsAction.RequiredAction.RemoveRequiredWashing, IContaminationsAction.RequiredAction.Skip
-                            'Do nothing
-                    End Select
-                Else
-                    Exit For
-                End If
-                auxContext.Steps.RemoveFirst()
-            Next
-            Return contaminaNumber
+            'For i As Integer = 0 To orderTests.Count + auxContext.Steps.Range.Maximum '- 1
+            '    Dim myStep As New ContextStep(ContaminationsSpecification.DispensesPerStep)
+            '    Dim dispense = ContaminationsSpecification.CreateDispensing()
+            '    If i < orderTests.Count Then
+            '        dispense.R1ReagentID = orderTests(i).ReagentID
+            '    Else
+            '        dispense.KindOfLiquid = IDispensing.KindOfDispensedLiquid.Dummy
+            '    End If
+            '    myStep(1) = dispense
+            '    auxContext.Steps.Append(myStep)
+            '    If auxContext.Steps.IsIndexValid(0) AndAlso auxContext.Steps(0) IsNot Nothing AndAlso auxContext.Steps(0)(1) IsNot Nothing Then
+            '        Dim result = auxContext.ActionRequiredForDispensing(auxContext.Steps(0)(1))
+            '        Select Case result.Action
+            '            Case IContaminationsAction.RequiredAction.Wash
+            '                contaminaNumber += 1
+            '            Case IContaminationsAction.RequiredAction.NoAction, IContaminationsAction.RequiredAction.RemoveRequiredWashing, IContaminationsAction.RequiredAction.Skip
+            '                'Do nothing
+            '        End Select
+            '    Else
+            '        Exit For
+            '    End If
+            '    auxContext.Steps.RemoveFirst()
+            'Next
+            'Return contaminaNumber
         End Function
 
+        Private foundSolution As Boolean = False
         Private Function BacktrackingAlgorithm(ByVal Tests As List(Of ExecutionsDS.twksWSExecutionsRow), ByRef solutionSet As List(Of ExecutionsDS.twksWSExecutionsRow)) As List(Of ExecutionsDS.twksWSExecutionsRow)
             _callStackNestingLevel += 1
 
             Dim LastKnownNOTSolution As ExecutionsDS.twksWSExecutionsRow = Nothing
-
-            Static foundSolution As Boolean = False
+            'Debug.WriteLine("Stak deepth is " & _callStackNestingLevel)
             For Each elem In Tests
 
-                If IsReplicate(LastKnownNOTSolution, elem) Then
+                If LastKnownNOTSolution IsNot Nothing AndAlso IsReplicate(LastKnownNOTSolution, elem) Then
                     Continue For
                 End If
 
@@ -140,7 +143,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
                         solutionSet.Item(_callStackNestingLevel) = elem
                     End If
 
-                    If IsSolution(solutionSet) Then
+                    If IsSolution(solutionSet) Or Not auxTests.Any Then
                         foundSolution = True
                         Return solutionSet
                     End If
@@ -169,16 +172,16 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
         End Function
 
         Private Function IsReplicate(execution1 As ExecutionsDS.twksWSExecutionsRow, execution2 As ExecutionsDS.twksWSExecutionsRow) As Boolean
-
+            'Return True
             If execution1 Is Nothing OrElse execution2 Is Nothing Then Return False
             If execution1.ReagentID <> execution2.ReagentID Then Return False
-            If Not (execution1.IsSampleTypeNull AndAlso execution2.IsSampleTypeNull) Then Return False
+            If (execution1.IsSampleTypeNull <> execution2.IsSampleTypeNull) Then Return False
             If execution1.IsSampleTypeNull = False AndAlso execution1.SampleType <> execution2.SampleType Then Return False
 
             If (execution1.IsSampleClassNull() <> execution2.IsSampleClassNull()) Then Return False
             If execution1.IsSampleClassNull = False AndAlso execution1.SampleClass <> execution2.SampleClass Then Return False
 
-            If Not (execution1.IsPatientIDNull() AndAlso execution2.IsPatientIDNull) Then Return False
+            If (execution1.IsPatientIDNull <> execution2.IsPatientIDNull) Then Return False
             If execution1.IsPatientIDNull = False AndAlso execution1.PatientID <> execution2.PatientID Then Return False
 
             Return True
@@ -201,7 +204,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
         End Function
 
         Private Function IsSolution(ByVal solutionSet As List(Of ExecutionsDS.twksWSExecutionsRow)) As Boolean
-            Return (solutionSet.Count = bestResult.Count)
+            Return (solutionSet.Count >= bestResult.Count)
         End Function
 
         Private Function GetCurrentContaminationNumberInBacktracking(ByVal pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), Optional ByVal pHighContaminationPersistance As Integer = 0) As Integer
@@ -212,8 +215,8 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
 
             Dim context = New ContaminationsContext(ContaminationsSpecification)
 
-            Dim newList = pExecutions.ToList    'Pending excutions list
-            context.FillContextInStatic(newList)
+            'Dim newList = pExecutions.ToList    'Pending excutions list
+            context.FillContextInStatic(pExecutions.ToList)
 
             If calculateInRunning Then
                 Dim runningContext = ContaminationsSpecification.CurrentRunningContext

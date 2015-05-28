@@ -175,7 +175,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
         Public Property TestID As Integer Implements IDispensing.TestID
 
         Public Sub FillDispense(analyzerContaminationsSpecification As IAnalyzerContaminationsSpecification, ByVal row As twksWSExecutionsRow) Implements IDispensing.FillDispense
-
+            If row Is Nothing Then Return
             If Not row.IsReagentIDNull Then R1ReagentID = row.ReagentID
             If Not row.IsSampleClassNull Then SampleClass = row.SampleClass
             If Not row.IsOrderTestIDNull Then OrderTestID = row.OrderTestID

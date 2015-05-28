@@ -11,7 +11,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
 
         Sub New(executions As ExecutionsDS, activeAnalyzer As String)
             Me.Executions = executions
-            Me.activeAnalyzer = activeAnalyzer
+            'Me.activeAnalyzer = activeAnalyzer
         End Sub
 
 #Region "Public properties"
@@ -27,7 +27,11 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Property activeAnalyzer As String = ""
+        Public ReadOnly Property activeAnalyzer As String
+            Get
+                Return AnalyzerManager.GetCurrentAnalyzerManager.ActiveAnalyzer
+            End Get
+        End Property
 
 #End Region
 
@@ -280,7 +284,8 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
                                                             If existContamination.Count > 0 Then
                                                                 'Calculate the contaminations inside the current Element + 1 (contamination between last and next elementID)
                                                                 'TODO: See contaminations calculation
-                                                                OrderContaminationNumber = 1 + ExecutionsDelegate.GetContaminationNumber(contaminationsDataDS, StandardOrderTests, highContaminationPersitance)
+                                                                'OrderContaminationNumber = 1 + ExecutionsDelegate.GetContaminationNumber(contaminationsDataDS, StandardOrderTests, highContaminationPersitance)
+                                                                OrderContaminationNumber = 1 + WSExecutionCreator.Instance.GetContaminationNumber(False, Nothing, StandardOrderTests) ' .GetContaminationNumber(contaminationsDataDS, StandardOrderTests, highContaminationPersitance)
 
                                                             ElseIf highContaminationPersitance > 0 Then
                                                                 'If no LOW contamination exists between consecutive executions take care about the previous due the high contamination
@@ -498,10 +503,11 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
                     End If
 
                     Dim orderContaminationNumber = 0
-                    If standardExecutionTypeOrderTests.Count > 0 Then
-                        orderContaminationNumber = ExecutionsDelegate.GetContaminationNumber(contaminationsDataDS,
-                                                                                             standardExecutionTypeOrderTests,
-                                                                                             highContaminationPersitance)
+                    If standardExecutionTypeOrderTests.Any Then
+                        'orderContaminationNumber = ExecutionsDelegate.GetContaminationNumber(contaminationsDataDS,
+                        '                                                                    standardExecutionTypeOrderTests,
+                        '                                                                   highContaminationPersitance)
+                        orderContaminationNumber = WSExecutionCreator.Instance.GetContaminationNumber(False, Nothing, standardExecutionTypeOrderTests)
                     End If
 
                     returnDS = ManageContaminations(dbConnection, returnDS, standardExecutionTypeOrderTests,
