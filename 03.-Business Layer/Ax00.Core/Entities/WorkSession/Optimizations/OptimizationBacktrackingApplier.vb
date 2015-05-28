@@ -175,18 +175,20 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
         Private Function IsReplicate(execution1 As ExecutionsDS.twksWSExecutionsRow, execution2 As ExecutionsDS.twksWSExecutionsRow) As Boolean
             'Return True
             If execution1 Is Nothing OrElse execution2 Is Nothing Then Return False
-            If execution1.ReagentID <> execution2.ReagentID Then Return False
-            If (execution1.IsSampleTypeNull <> execution2.IsSampleTypeNull) Then Return False
-            If execution1.IsSampleTypeNull = False AndAlso execution1.SampleType <> execution2.SampleType Then Return False
+            'If execution1.ReagentID <> execution2.ReagentID Then Return False
+            'If (execution1.IsSampleTypeNull <> execution2.IsSampleTypeNull) Then Return False
+            'If execution1.IsSampleTypeNull = False AndAlso execution1.SampleType <> execution2.SampleType Then Return False
 
-            If (execution1.IsSampleClassNull() <> execution2.IsSampleClassNull()) Then Return False
-            If execution1.IsSampleClassNull = False AndAlso execution1.SampleClass <> execution2.SampleClass Then Return False
+            'If (execution1.IsSampleClassNull() <> execution2.IsSampleClassNull()) Then Return False
+            'If execution1.IsSampleClassNull = False AndAlso execution1.SampleClass <> execution2.SampleClass Then Return False
 
-            If (execution1.IsPatientIDNull <> execution2.IsPatientIDNull) Then Return False
-            If execution1.IsPatientIDNull = False AndAlso execution1.PatientID <> execution2.PatientID Then Return False
+            'If (execution1.IsPatientIDNull <> execution2.IsPatientIDNull) Then Return False
+            'If execution1.IsPatientIDNull = False AndAlso execution1.PatientID <> execution2.PatientID Then Return False
+
+            If execution1.OrderTestID <> execution2.OrderTestID Then Return False
 
             Return True
-            'If 
+
 
         End Function
 
