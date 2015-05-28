@@ -51,15 +51,17 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
             Dim currentContaminationNumber = GetContaminationNumber(Nothing, OrderTests)
             'currentContaminationNumber = ExecutionsDelegate.GetContaminationNumber(ContaminDS, OrderTests, HighContaminationPersistence)
 
-            ContaminLimit = 0
+            If currentContaminationNumber > 0 Then
+                ContaminLimit = 0
 
-            While (result.Count = 0 AndAlso ContaminLimit < currentContaminationNumber)
-                _callStackNestingLevel = -1
-                result = BacktrackingAlgorithm(Tests, solutionSet)
-                If result.Count = 0 Then
-                    ContaminLimit += 1
-                End If
-            End While
+                While (result.Count = 0 AndAlso ContaminLimit < currentContaminationNumber)
+                    _callStackNestingLevel = -1
+                    result = BacktrackingAlgorithm(Tests, solutionSet)
+                    If result.Count = 0 Then
+                        ContaminLimit += 1
+                    End If
+                End While
+            End If
 
             If result.Count = 0 Then
                 bestResult = OrderTests
