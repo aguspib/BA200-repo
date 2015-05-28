@@ -120,13 +120,16 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
 
         Private Function BacktrackingAlgorithm(ByVal Tests As List(Of ExecutionsDS.twksWSExecutionsRow), ByRef solutionSet As List(Of ExecutionsDS.twksWSExecutionsRow)) As List(Of ExecutionsDS.twksWSExecutionsRow)
             _callStackNestingLevel += 1
-            Dim additionalNestingLevel As Integer = 0
+
+            Dim LastKnownNOTSolution As ExecutionsDS.twksWSExecutionsRow = Nothing
+
             Static foundSolution As Boolean = False
             For Each elem In Tests
-                If additionalNestingLevel > 0 Then
-                    additionalNestingLevel -= 1
+
+                If IsReplicate(LastKnownNOTSolution, elem) Then
                     Continue For
                 End If
+
                 If IsViable(solutionSet, elem) Then
                     Dim auxTests = Tests.ToList()
                     auxTests.Remove(elem)
@@ -136,23 +139,6 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
                     Else
                         solutionSet.Item(_callStackNestingLevel) = elem
                     End If
-
-                    While auxTests.Any AndAlso
-                        (auxTests(0).ReagentID = elem.ReagentID) AndAlso
-                        (auxTests(0).SampleClass = elem.SampleClass) AndAlso
-                        (auxTests(0).SampleType = elem.SampleType) AndAlso
-                        (
-                            Not (Not auxTests(0).IsPatientIDNull AndAlso Not elem.IsPatientIDNull) OrElse auxTests(0).PatientID = elem.PatientID
-                        )
-
-                        solutionSet.Add(auxTests(0))
-                        auxTests.Remove(auxTests(0))
-                        additionalNestingLevel += 1
-                        _callStackNestingLevel += 1
-                    End While
-
-
-
 
                     If IsSolution(solutionSet) Then
                         foundSolution = True
@@ -167,21 +153,48 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
                         Exit For
                     Else
                         solutionSet.Remove(elem)
-
-                        solutionSet.RemoveRange(_callStackNestingLevel - additionalNestingLevel, additionalNestingLevel)
                         lastBireactiveID.Remove(elem.ReagentID)
-                        _callStackNestingLevel -= additionalNestingLevel
-                        'additionalNestingLevel = 0
                     End If
+
+                    LastKnownNOTSolution = Nothing
+                Else
+
+                    LastKnownNOTSolution = elem
+                    Continue For
                 End If
             Next
-            _callStackNestingLevel -= 1 + additionalNestingLevel
+            _callStackNestingLevel -= 1
 
             Return solutionSet
         End Function
 
+        Private Function IsReplicate(execution1 As ExecutionsDS.twksWSExecutionsRow, execution2 As ExecutionsDS.twksWSExecutionsRow) As Boolean
+
+            If execution1 Is Nothing OrElse execution2 Is Nothing Then Return False
+            If execution1.ReagentID <> execution2.ReagentID Then Return False
+            If Not (execution1.IsSampleTypeNull AndAlso execution2.IsSampleTypeNull) Then Return False
+            If execution1.IsSampleTypeNull = False AndAlso execution1.SampleType <> execution2.SampleType Then Return False
+
+            If (execution1.IsSampleClassNull() <> execution2.IsSampleClassNull()) Then Return False
+            If execution1.IsSampleClassNull = False AndAlso execution1.SampleClass <> execution2.SampleClass Then Return False
+
+            If Not (execution1.IsPatientIDNull() AndAlso execution2.IsPatientIDNull) Then Return False
+            If execution1.IsPatientIDNull = False AndAlso execution1.PatientID <> execution2.PatientID Then Return False
+
+            Return True
+            'If 
+
+        End Function
+
         Private Function IsViable(ByVal solutionSet As List(Of ExecutionsDS.twksWSExecutionsRow), ByVal elem As ExecutionsDS.twksWSExecutionsRow) As Boolean
+
+            If solutionSet IsNot Nothing AndAlso solutionSet.Any AndAlso IsReplicate(solutionSet.Last(), elem) Then
+                'Debug.WriteLine("Poda 2!")
+
+                Return True
+            End If
             Dim aux = solutionSet.ToList()
+
             aux.Add(elem)
 
             Return (GetCurrentContaminationNumberInBacktracking(aux, ContaminationsSpecification.HighContaminationPersistence) <= ContaminLimit)

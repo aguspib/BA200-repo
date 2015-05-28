@@ -185,7 +185,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
             If String.CompareOrdinal(pTestMode, "INST") = 0 AndAlso String.CompareOrdinal(SampleClass, "PATIENT") = 0 Then
                 DelayCyclesForDispensing = analyzerContaminationsSpecification.AdditionalPredilutionSteps - 1
-                Debug.WriteLine("ExecutionID:" & ExecutionID & " SampleClass:" & SampleClass & " OrderTestID:" & OrderTestID & " R1Reagent:" & R1ReagentID & " is a predilution.")
+                'Debug.WriteLine("ExecutionID:" & ExecutionID & " SampleClass:" & SampleClass & " OrderTestID:" & OrderTestID & " R1Reagent:" & R1ReagentID & " is a predilution.")
 
             End If
 
