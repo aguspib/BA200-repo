@@ -71,6 +71,33 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
             End If
         End Sub
 
+        Private Sub BacktrackingOptimization2(ByVal OrderTests As List(Of ExecutionsDS.twksWSExecutionsRow))
+            Dim solutionSet As New List(Of ExecutionsDS.twksWSExecutionsRow)
+            Dim Tests = OrderTests.ToList()
+            Dim result As New List(Of ExecutionsDS.twksWSExecutionsRow)
+            Dim currentContaminationNumber = GetContaminationNumber(Nothing, OrderTests)
+            'currentContaminationNumber = ExecutionsDelegate.GetContaminationNumber(ContaminDS, OrderTests, HighContaminationPersistence)
+
+            If currentContaminationNumber > 0 Then
+                ContaminLimit = 0
+
+                While (result.Count = 0 AndAlso ContaminLimit < currentContaminationNumber)
+                    _callStackNestingLevel = -1
+                    foundSolution = False
+                    result = BacktrackingAlgorithm(Tests, solutionSet)
+                    If result.Count = 0 Then
+                        ContaminLimit += 1
+                    End If
+                End While
+            End If
+
+            If result.Count = 0 Then
+                bestResult = OrderTests
+            Else
+                bestResult = result
+            End If
+        End Sub
+
         Public Overrides Function GetContaminationNumber(ByVal pContaminationsDS As ContaminationsDS, ByVal orderTests As List(Of ExecutionsDS.twksWSExecutionsRow)) As Integer
             Return WSExecutionCreator.Instance.GetContaminationNumber(calculateInRunning, PreviousReagentID, orderTests)
             'Dim contaminaNumber As Integer = 0
