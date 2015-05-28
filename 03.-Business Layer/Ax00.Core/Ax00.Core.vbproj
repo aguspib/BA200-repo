@@ -113,7 +113,6 @@
     <Compile Include="Entities\WorkSession\Optimizations\OptimizationPolicyApplier.vb" />
     <Compile Include="Entities\WorkSession\Contaminations\WashingDescription.vb" />
     <Compile Include="Entities\WorkSession\Contaminations\ReagentDispensing.vb" />
-    <Compile Include="Entities\WorkSession\Optimizations\TechniqueToSend.vb" />
     <Compile Include="Entities\WorkSession\WSExecutionCreator.vb" />
     <Compile Include="Entities\WorkSession\WSExecutionsSorter.vb" />
     <Compile Include="Services\AsyncService.vb" />
