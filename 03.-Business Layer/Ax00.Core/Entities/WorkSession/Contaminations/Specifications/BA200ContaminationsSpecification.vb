@@ -1,12 +1,16 @@
-﻿Imports System.Collections.Concurrent
-Imports Biosystems.Ax00.Core.Interfaces
-Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Core.Entities.Worksession.Contaminations.Interfaces
-Imports Biosystems.Ax00.Core.Entities.Worksession.Interfaces
-Imports Biosystems.Ax00.DAL.DAO
+﻿
+#Region "Imports"
 Imports Biosystems.Ax00.Types
+Imports Biosystems.Ax00.Global
+Imports Biosystems.Ax00.DAL.DAO
+Imports System.Collections.Concurrent
+Imports Biosystems.Ax00.Core.Interfaces
+Imports Biosystems.Ax00.Core.Entities.Worksession.Interfaces
+Imports Biosystems.Ax00.Core.Entities.Worksession.Contaminations.Interfaces
+Imports Biosystems.Ax00.Core.Entities.Worksession.Contaminations.Specifications.Dispensing
+#End Region
 
-Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
+Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specifications
     Public Class BA200ContaminationsSpecification
         Inherits Ax00ContaminationsSpecification
         Implements IAnalyzerContaminationsSpecification

@@ -1,4 +1,5 @@
-﻿Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Interfaces
+﻿Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
+Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Interfaces
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Interfaces
 Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.DAL.DAO
@@ -7,7 +8,7 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Types.ExecutionsDS
 
-Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
+Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specifications.Dispensing
     Public MustInherit Class Ax00DispensingBase
         Implements IDispensing
 
@@ -59,7 +60,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 #If Config = "Debug" Then
                     Throw New Exception("Skip can't be required to solve a contamination of a BEFORE reagent. Happy debugging!")
 #Else
-                    Return New ContaminationsAction() With {.Action = IContaminationsAction.RequiredAction.Skip}
+                    Return New RequiredAction() With {.Action = IContaminationsAction.RequiredAction.Skip}
 #End If
                 Else
                     Return New RequiredAction() With {.Action = IContaminationsAction.RequiredAction.GoAhead}
@@ -146,7 +147,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             End Set
         End Property
 
-        Protected Overridable Sub FillContaminations()
+        Private Sub FillContaminations()
             _contamines = New Dictionary(Of Integer, IDispensingContaminationDescription)()
             Dim contaminations = tparContaminationsDAO.GetAllContaminationsForAReagent(R1ReagentID)
             For Each contamination In contaminations.SetDatos
@@ -215,11 +216,11 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
                     Dim myDao = New vWSExecutionsDAO()
                     Dim WashingDS = myDao.GetWashingSolution(_washingID, WSExecutionCreator.Instance.AnalyzerID, WSExecutionCreator.Instance.WorksesionID)
                     If WashingDS.WashingSolutionSELECT(0).IsSOLUTIONCODENull() OrElse WashingDS.WashingSolutionSELECT(0).SOLUTIONCODE = String.Empty Then
-                        Me.WashingDescription = New WashingDescription(1, Contaminations.WashingDescription.RegularWaterWashingID)
+                        Me.WashingDescription = New WashingDescription(1, Context.WashingDescription.RegularWaterWashingID)
 
                     Else
                         Me.WashingDescription = New WashingDescription(2, WashingDS.WashingSolutionSELECT(0).SOLUTIONCODE)
-                        If Me.WashingDescription.WashingSolutionCode = Contaminations.WashingDescription.RegularWaterWashingID Then
+                        If Me.WashingDescription.WashingSolutionCode = Context.WashingDescription.RegularWaterWashingID Then
                             Me.WashingDescription.WashingStrength = 1
                         End If
                     End If

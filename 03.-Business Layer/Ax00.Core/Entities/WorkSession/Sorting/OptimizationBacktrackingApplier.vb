@@ -6,6 +6,7 @@ Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Interfaces
 Imports Biosystems.Ax00.Types
+Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
 
 Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
     Friend Class OptimizationBacktrackingApplier : Inherits OptimizationPolicyApplier

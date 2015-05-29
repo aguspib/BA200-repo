@@ -1,8 +1,10 @@
 ﻿Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Interfaces
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Interfaces
+Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specifications.Dispensing
 
-Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
+Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specifications
+
     Public Class BA400ContaminationsSpecification
         Inherits Ax00ContaminationsSpecification
         Implements IAnalyzerContaminationsSpecification

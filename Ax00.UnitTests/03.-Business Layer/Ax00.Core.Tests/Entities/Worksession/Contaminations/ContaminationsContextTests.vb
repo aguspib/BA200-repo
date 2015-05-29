@@ -6,6 +6,8 @@ Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Interfaces
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Interfaces
 Imports Biosystems.Ax00.Core.Interfaces
 Imports Telerik.JustMock
+Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
+Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specifications.Dispensing
 
 Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Tests
 

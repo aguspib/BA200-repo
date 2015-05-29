@@ -1819,7 +1819,7 @@ Namespace Biosystems.Ax00.Core.Entities
             '2.2) If contaminations: apply Backtracking algorithm for handling contaminations, and choose the best solution
             Dim currentResultList As List(Of ExecutionsDS.twksWSExecutionsRow)
             currentResultList = toSendList.ToList() 'Initial order                                    
-            'TODO: Confirm this is running only!!
+
             toSendList = ExecutionsDelegate.ManageContaminationsForRunningAndStatic(True, ActiveAnalyzer, dbConnection, pContaminationsDS, currentResultList, pHighContaminationPersitance, contaminNumber, myReagentsIDList, myMaxReplicatesList)
 
 #If DEBUG Then

@@ -7,7 +7,7 @@ Imports Biosystems.Ax00.Core.Entities.WorkSession.Interfaces
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Types.ExecutionsDS
 
-Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
+Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
 
 
     Public Class Context

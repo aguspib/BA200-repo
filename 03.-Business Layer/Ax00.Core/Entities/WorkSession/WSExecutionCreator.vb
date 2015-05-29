@@ -12,6 +12,7 @@ Imports Biosystems.Ax00.Core.Entities.Worksession.Contaminations
 Imports Biosystems.Ax00.Core.Entities.Worksession.Contaminations.Interfaces
 Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Interfaces
+Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
 
 Namespace Biosystems.Ax00.Core.Entities.WorkSession
 
@@ -1154,11 +1155,11 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
             Else
                 'Get contents from current REAL context
             End If
-
-            For i As Integer = 0 To orderTests.Count + auxContext.Steps.Range.Maximum '- 1
+            Dim cuenta = orderTests.Count
+            For i As Integer = 0 To cuenta + auxContext.Steps.Range.Maximum
                 Dim myStep As New ContextStep(ContaminationsSpecification.DispensesPerStep)
                 Dim dispense = ContaminationsSpecification.CreateDispensing()
-                If i < orderTests.Count Then
+                If i < cuenta Then
                     dispense.R1ReagentID = orderTests(i).ReagentID
                 Else
                     dispense.KindOfLiquid = IDispensing.KindOfDispensedLiquid.Dummy

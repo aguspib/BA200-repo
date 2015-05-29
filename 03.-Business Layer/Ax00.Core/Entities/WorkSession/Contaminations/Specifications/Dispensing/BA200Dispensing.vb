@@ -1,6 +1,7 @@
-﻿Imports Biosystems.Ax00.Core.Entities.Worksession.Contaminations.Interfaces
+﻿Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
+Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Interfaces
 
-Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
+Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specifications.Dispensing
     Public Class BA200Dispensing
         Inherits Ax00DispensingBase
 
@@ -16,8 +17,9 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
                 dispensingBeingSent.AnalysisMode = Global.AnalysisMode.MonoReactive) Then
 
                 result.Action = IContaminationsAction.RequiredAction.Wash
-                result.InvolvedWash = New WashingDescription(1, Contaminations.WashingDescription.RegularWaterWashingID)
+                result.InvolvedWash = New WashingDescription(1, Context.WashingDescription.RegularWaterWashingID)
             End If
+
             Return result
 
         End Function

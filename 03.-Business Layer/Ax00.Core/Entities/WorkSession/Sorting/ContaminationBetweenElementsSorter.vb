@@ -5,7 +5,7 @@ Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Interfaces
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Interfaces
 Imports Biosystems.Ax00.Types
-
+Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
 Public Class ContaminationBetweenElementsSorter
 
     Public Property AddContaminationBetweenGroups As Integer = 0
