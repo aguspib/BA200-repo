@@ -98,6 +98,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             AnalyzerFrame = instructionParameters
             FillSteps()
             Debug.WriteLine(Me)
+            'ShowDebugInfo(rawAnalyzerFrame)
 
         End Sub
 
@@ -294,9 +295,9 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 #End Region
 
         Public Function ActionRequiredForAGivenDispensing(ReagentID As ExecutionsDS.twksWSExecutionsRow) As ActionRequiredForDispensing Implements IContaminationsContext.ActionRequiredForDispensing
-            Dim D As New Ax00Dispensing()
-            D.FillDispense(ContaminationsSpecifications, ReagentID)
-            Return ActionRequiredForDispensing(D)
+            Dim dispense = ContaminationsSpecifications.CreateDispensing() 'As New Ax00Dispensing()
+            dispense.FillDispense(ContaminationsSpecifications, ReagentID)
+            Return ActionRequiredForDispensing(dispense)
 
         End Function
 

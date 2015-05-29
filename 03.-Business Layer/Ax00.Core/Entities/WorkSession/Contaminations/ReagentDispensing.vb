@@ -8,10 +8,10 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Types.ExecutionsDS
 
 Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
-    Public Class Ax00Dispensing
+    Public MustInherit Class Ax00DispensingBase
         Implements IDispensing
 
-        Public Function RequiredActionForDispensing(dispensing As IDispensing, scope As Integer, reagentNumber As Integer) As IContaminationsAction Implements IDispensing.RequiredActionForDispensing
+        Public Overridable Function RequiredActionForDispensing(dispensing As IDispensing, scope As Integer, reagentNumber As Integer) As IContaminationsAction Implements IDispensing.RequiredActionForDispensing
 
             Select Case KindOfLiquid
                 Case IDispensing.KindOfDispensedLiquid.Dummy
@@ -40,7 +40,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
         End Function
 
-        Private Function ReagentRequiresWashingOrSkip(scope As Integer, dispensing As IDispensing, reagentNumber As Integer) As IContaminationsAction
+        Protected Overridable Function ReagentRequiresWashingOrSkip(scope As Integer, dispensing As IDispensing, reagentNumber As Integer) As IContaminationsAction
 
             'Scope indicates the distance in cycles with the reagent that is asking us if we contaminate it.
             'A negative Scope value indicates we're BEFORE the dispensing we're checking. (contamiantions can be solved with washing)
@@ -146,7 +146,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             End Set
         End Property
 
-        Private Sub FillContaminations()
+        Protected Overridable Sub FillContaminations()
             _contamines = New Dictionary(Of Integer, IDispensingContaminationDescription)()
             Dim contaminations = tparContaminationsDAO.GetAllContaminationsForAReagent(R1ReagentID)
             For Each contamination In contaminations.SetDatos
@@ -174,7 +174,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
         Public Property TestID As Integer Implements IDispensing.TestID
 
-        Public Sub FillDispense(analyzerContaminationsSpecification As IAnalyzerContaminationsSpecification, ByVal row As twksWSExecutionsRow) Implements IDispensing.FillDispense
+        Public Overridable Sub FillDispense(analyzerContaminationsSpecification As IAnalyzerContaminationsSpecification, ByVal row As twksWSExecutionsRow) Implements IDispensing.FillDispense
             If row Is Nothing Then Return
             If Not row.IsReagentIDNull Then R1ReagentID = row.ReagentID
             If Not row.IsSampleClassNull Then SampleClass = row.SampleClass
@@ -204,7 +204,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
         End Sub
 
         Dim _washingID As Integer = -1
-        Public Property WashingID As Integer Implements IDispensing.WashingID
+        Public Overridable Property WashingID As Integer Implements IDispensing.WashingID
             Get
                 Return _washingID
             End Get
@@ -231,7 +231,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
         End Property
 
 
-        Public Property WashingDescription As IWashingDescription Implements IDispensing.WashingDescription
+        Public Overridable Property WashingDescription As IWashingDescription Implements IDispensing.WashingDescription
     End Class
 
 End Namespace

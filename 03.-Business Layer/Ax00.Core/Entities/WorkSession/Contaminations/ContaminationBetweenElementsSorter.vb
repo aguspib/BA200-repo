@@ -51,7 +51,9 @@ Public Class ContaminationBetweenElementsSorter
         For i As Integer = 1 To ContaminationsSpecification.HighContaminationPersistence
             Dim listIndex = pPreviousReagentID.Count - i
             If listIndex < 0 Then Continue For
-            Dim disp As New Ax00Dispensing() With {.R1ReagentID = pPreviousReagentID(listIndex)}
+            Dim disp  = ContaminationsSpecification.CreateDispensing()
+            disp.R1ReagentID = pPreviousReagentID(listIndex)
+
             'El elemento 1 es el Before 1, el 2 el Before 2, por eso se ponen en signo negativo en el contexto:
             context.Steps(-i)(1) = disp
         Next
