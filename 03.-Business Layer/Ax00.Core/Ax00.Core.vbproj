@@ -109,8 +109,7 @@
     <Compile Include="Entities\WorkSession\Contaminations\LAx00Frame.vb" />
     <Compile Include="Entities\WorkSession\Contaminations\Context\Context.vb" />
     <Compile Include="Entities\WorkSession\Contaminations\Context\ContextStep.vb" />
-    <Compile Include="Entities\WorkSession\Contaminations\Context\DispensingContaminationDescription.vb" />
-    <Compile Include="Entities\WorkSession\Contaminations\Context\EmptyWashing.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\Context\DispensingContamination.vb" />
     <Compile Include="Entities\WorkSession\Contaminations\Context\RegularWaterWashing.vb" />
     <Compile Include="Entities\WorkSession\Sorting\OptimizationBacktrackingApplier.vb" />
     <Compile Include="Entities\WorkSession\Sorting\OptimizationPolicyApplier.vb" />

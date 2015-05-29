@@ -98,6 +98,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
 
         Public Property ContaminationsSpecification As IAnalyzerContaminationsSpecification
 
+        ' ReSharper disable once UnusedMember.Global This method is USED by Reflection.
         Public Function CreateWS(ByVal ppDBConnection As SqlConnection, ppAnalyzerID As String, ByVal ppWorkSessionID As String, _
                                            ByVal ppWorkInRunningMode As Boolean, Optional ByVal ppOrderTestID As Integer = -1, _
                                            Optional ByVal ppPostDilutionType As String = "", Optional ByVal ppIsISEModuleReady As Boolean = False, _
