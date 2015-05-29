@@ -38,6 +38,7 @@ Namespace Biosystems.Ax00.BL
         '''              SA 25/10/2012 - When there is an active TestVersion in Historic Module, verify if it can be used or if it has to be closed (when
         '''                              values of the Calibration Curve have been changed from the screen of WorkSession Calibration Curve Results) 
         '''                              and a new one created
+        '''              IT 29/05/2015 - BA-2563
         ''' </remarks>
         Public Function CheckSTDTestSamplesInHistorics(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pHisTestSamplesDS As HisTestSamplesDS, _
                                                        ByVal pHisCalibratorsDS As HisCalibratorsDS, ByVal pHisReagentsDS As HisReagentsDS, _
@@ -59,7 +60,7 @@ Namespace Biosystems.Ax00.BL
                         Dim myTestSamplesDS As New TestSamplesDS
                         Dim myTestSamplesDelegate As New TestSamplesDelegate
 
-                        Dim myTestCalibDS As New TestCalibratorsDS
+                        Dim myTestCalibDS As New CalibratorsDS
                         Dim myTestCalibDelegate As New TestCalibratorsDelegate
 
                         Dim myTestReagentsVolsDS As New TestReagentsVolumesDS
@@ -240,7 +241,7 @@ Namespace Biosystems.Ax00.BL
                                                                                                         Where a.CalibratorType = "EXPERIMENT" _
                                                                                                        Select a).ToList()
 
-                                Dim myTestCalibValuesDS As New TestCalibratorValuesDS
+                                Dim myTestCalibValuesDS As New CalibratorsDS
                                 Dim myTestCalibValuesDelegate As New TestCalibratorValuesDelegate
                                 Dim myHisTestCalibValuesDelegate As New HisTestCalibratorsValuesDelegate
 
@@ -249,9 +250,9 @@ Namespace Biosystems.Ax00.BL
                                     If (Not row.IsAlternativeSampleTypeNull) Then mySampleType = row.AlternativeSampleType
 
                                     'Get Calibrator values for all points of the Experimental Calibrator used for the Test/Sample Type
-                                    resultData = myTestCalibValuesDelegate.GetTestCalibratorValuesByTestIDSampleType(dbConnection, row.TestID, mySampleType)
+                                    resultData = myTestCalibValuesDelegate.GetTestCalibratorValuesByTestIDSampleType(dbConnection, row.TestID, mySampleType, myTestCalibValuesDS)
                                     If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                        myTestCalibValuesDS = DirectCast(resultData.SetDatos, TestCalibratorValuesDS)
+                                        myTestCalibValuesDS = DirectCast(resultData.SetDatos, CalibratorsDS)
 
                                         'Save the Calibrator values in Historic Module
                                         resultData = myHisTestCalibValuesDelegate.Create(dbConnection, row.HistTestID, row.SampleType, row.TestVersionNumber, _

@@ -17,7 +17,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' <param name="pUpdateVersionChangesList">Global structure to save all changes executed by the Update Version process in Customer DB</param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
-        ''' Created by: SA 08/10/2014 - BA-1944 (SubTask BA-1982)
+        ''' Created by:  SA 08/10/2014 - BA-1944 (SubTask BA-1982)
+        ''' Modified by: IT 29/05/2015 - BA-2563
         ''' </remarks>
         Public Function ProcessForCALIBRATORS(ByVal pDBConnection As SqlClient.SqlConnection, ByRef pUpdateVersionChangesList As UpdateVersionChangesDS) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
@@ -50,8 +51,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
                         '(2.3) Save the FACTORY Calibrator in CUSTOMER DB 
                         If (Not myGlobalDataTO.HasError) Then
-                            myGlobalDataTO = myCalibratorsDelegate.Save(pDBConnection, myFactoryCalibratorDS, New TestCalibratorsDS, _
-                                                                        New TestCalibratorValuesDS, Nothing)
+                            myGlobalDataTO = myCalibratorsDelegate.Save(pDBConnection, myFactoryCalibratorDS, Nothing)
                         End If
 
                         '(2.4) Add a row in the global DS containing all changes in Customer DB due to the Update Version Process (sub-table AddedElements) 
@@ -89,7 +89,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' <param name="pUpdateVersionChangesList">Global structure to save all changes executed by the Update Version process in Customer DB</param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
-        ''' Created by: SA 08/10/2014 - BA-1944 (SubTask BA-1982)
+        ''' Created by:  SA 08/10/2014 - BA-1944 (SubTask BA-1982)
+        ''' Modified by: IT 29/05/2015 - BA-2563
         ''' </remarks>
         Private Function UpdateRenamedCalibrator(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalibratorName As String, _
                                                  ByRef pUpdateVersionChangesList As UpdateVersionChangesDS) As GlobalDataTO
@@ -101,7 +102,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 Dim myUpdateVersionRenamedElementsRow As UpdateVersionChangesDS.RenamedElementsRow
 
                 'Search if there is Calibrator with the same Name in Customer DB...
-                myGlobalDataTO = myCalibratorsDelegate.ReadByCalibratorName(pDBConnection, pCalibratorName)
+                myGlobalDataTO = myCalibratorsDelegate.ReadByCalibratorName(pDBConnection, pCalibratorName, myCustomerCalibratorDS)
                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                     myCustomerCalibratorDS = DirectCast(myGlobalDataTO.SetDatos, CalibratorsDS)
 
@@ -111,8 +112,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                         If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                             If (Convert.ToBoolean(myGlobalDataTO.SetDatos)) Then
                                 'Update the renamed Calibrator in Customer DB
-                                myGlobalDataTO = myCalibratorsDelegate.Save(pDBConnection, myCustomerCalibratorDS, New TestCalibratorsDS, _
-                                                                            New TestCalibratorValuesDS, Nothing)
+                                myGlobalDataTO = myCalibratorsDelegate.Save(pDBConnection, myCustomerCalibratorDS, Nothing)
 
                                 If (Not myGlobalDataTO.HasError) Then
                                     'Add a row in the global DS containing all changes in Customer DB due to the Update Version Process (sub-table RenamedElements)
@@ -152,6 +152,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' Created by:  XB 19/02/2013 - BT #1134 ==> Implement a new function to obtain a valid CalibratorName and considering DB size field limitations 
         ''' Modified by: SA 08/10/2014 - BA-1944 (SubTask BA-1982) ==> Return a Boolean value to indicate if the Calibrator has been renamed. Changes to
         '''                                                            improve the code
+        '''              IT 29/05/2015 - BA-2563
         ''' </remarks>
         Private Function RenameCalibratorName(ByVal pDBConnection As SqlClient.SqlConnection, ByRef pCalibratorsRow As CalibratorsDS.tparCalibratorsRow) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
@@ -173,7 +174,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                     If (myValidCalibName.Length > 16) Then myValidCalibName = myValidCalibName.Remove(myValidCalibName.Length - 1)
 
                     'Verify if the new Calibrator Name is unique in Customer DB (there is not another Calibrator with the same Name)
-                    myGlobalDataTO = myCalibratorsDelegate.ReadByCalibratorName(pDBConnection, myValidCalibName)
+                    myGlobalDataTO = myCalibratorsDelegate.ReadByCalibratorName(pDBConnection, myValidCalibName, myCalibratorDS)
                     If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                         isValidNewName = (DirectCast(myGlobalDataTO.SetDatos, CalibratorsDS).tparCalibrators.Count = 0)
                     Else

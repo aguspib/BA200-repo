@@ -521,6 +521,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>TemporalTableDS.xsd</DependentUpon>
     </Compile>
+    <Compile Include="TestSampleCalibratorDSs.Designer.vb">
+      <DependentUpon>TestSampleCalibratorDSs.xsd</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
     <Compile Include="TimeEstimationDS.vb">
       <DependentUpon>TimeEstimationDS.xsd</DependentUpon>
     </Compile>
@@ -869,11 +874,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>SavedWSOrderTestsDS.xsd</DependentUpon>
     </Compile>
-    <Compile Include="TestCalibratorsDS.Designer.vb">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>TestCalibratorsDS.xsd</DependentUpon>
-    </Compile>
     <Compile Include="TestControlsDS.Designer.vb">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -888,14 +888,6 @@
       <DependentUpon>twksWSReadingsDS.xsd</DependentUpon>
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-    </Compile>
-    <Compile Include="TestCalibratorValuesDS.Designer.vb">
-      <DependentUpon>TestCalibratorValuesDS.xsd</DependentUpon>
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-    </Compile>
-    <Compile Include="TestCalibratorValuesDS.vb">
-      <DependentUpon>TestCalibratorValuesDS.xsd</DependentUpon>
     </Compile>
     <Compile Include="ParametersDS.Designer.vb">
       <DependentUpon>ParametersDS.xsd</DependentUpon>
@@ -1112,11 +1104,6 @@
     </Compile>
     <Compile Include="TestReplicatesDS.vb">
       <DependentUpon>TestReplicatesDS.xsd</DependentUpon>
-    </Compile>
-    <Compile Include="TestSampleCalibratorDS.Designer.vb">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>TestSampleCalibratorDS.xsd</DependentUpon>
     </Compile>
     <Compile Include="TestSamplesDS.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -2000,6 +1987,17 @@
     <None Include="TemporalTableDS.xss">
       <DependentUpon>TemporalTableDS.xsd</DependentUpon>
     </None>
+    <None Include="TestSampleCalibratorDSs.xsc">
+      <DependentUpon>TestSampleCalibratorDSs.xsd</DependentUpon>
+    </None>
+    <None Include="TestSampleCalibratorDSs.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>TestSampleCalibratorDSs.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="TestSampleCalibratorDSs.xss">
+      <DependentUpon>TestSampleCalibratorDSs.xsd</DependentUpon>
+    </None>
     <None Include="UpdateVersionChangesDS.xsc">
       <DependentUpon>UpdateVersionChangesDS.xsd</DependentUpon>
     </None>
@@ -2660,17 +2658,6 @@
     <None Include="SavedWSOrderTestsDS.xss">
       <DependentUpon>SavedWSOrderTestsDS.xsd</DependentUpon>
     </None>
-    <None Include="TestCalibratorsDS.xsc">
-      <DependentUpon>TestCalibratorsDS.xsd</DependentUpon>
-    </None>
-    <None Include="TestCalibratorsDS.xsd">
-      <SubType>Designer</SubType>
-      <Generator>MSDataSetGenerator</Generator>
-      <LastGenOutput>TestCalibratorsDS.Designer.vb</LastGenOutput>
-    </None>
-    <None Include="TestCalibratorsDS.xss">
-      <DependentUpon>TestCalibratorsDS.xsd</DependentUpon>
-    </None>
     <None Include="TestControlsDS.xsc">
       <DependentUpon>TestControlsDS.xsd</DependentUpon>
     </None>
@@ -2703,17 +2690,6 @@
     </None>
     <None Include="twksWSReadingsDS.xss">
       <DependentUpon>twksWSReadingsDS.xsd</DependentUpon>
-    </None>
-    <None Include="TestCalibratorValuesDS.xsc">
-      <DependentUpon>TestCalibratorValuesDS.xsd</DependentUpon>
-    </None>
-    <None Include="TestCalibratorValuesDS.xsd">
-      <Generator>MSDataSetGenerator</Generator>
-      <LastGenOutput>TestCalibratorValuesDS.Designer.vb</LastGenOutput>
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="TestCalibratorValuesDS.xss">
-      <DependentUpon>TestCalibratorValuesDS.xsd</DependentUpon>
     </None>
     <None Include="ParametersDS.xsc">
       <DependentUpon>ParametersDS.xsd</DependentUpon>
@@ -3086,17 +3062,6 @@
     </None>
     <None Include="TestReplicatesDS.xss">
       <DependentUpon>TestReplicatesDS.xsd</DependentUpon>
-    </None>
-    <None Include="TestSampleCalibratorDS.xsc">
-      <DependentUpon>TestSampleCalibratorDS.xsd</DependentUpon>
-    </None>
-    <None Include="TestSampleCalibratorDS.xsd">
-      <SubType>Designer</SubType>
-      <Generator>MSDataSetGenerator</Generator>
-      <LastGenOutput>TestSampleCalibratorDS.Designer.vb</LastGenOutput>
-    </None>
-    <None Include="TestSampleCalibratorDS.xss">
-      <DependentUpon>TestSampleCalibratorDS.xsd</DependentUpon>
     </None>
     <None Include="TestSamplesDS.xsc">
       <DependentUpon>TestSamplesDS.xsd</DependentUpon>
