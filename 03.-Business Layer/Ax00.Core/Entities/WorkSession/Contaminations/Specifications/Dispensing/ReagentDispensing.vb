@@ -152,7 +152,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             For Each contamination In contaminations.SetDatos
                 If contamination.ContaminationType <> "R1" Then Continue For
 
-                Dim description = New DispensingContaminationDescription()
+                Dim description = New DispensingContamination()
                 description.ContaminedReagent = contamination.ReagentContaminatedID
                 If contamination.IsWashingSolutionR1Null Then
                     description.RequiredWashing = New RegularWaterWashing
