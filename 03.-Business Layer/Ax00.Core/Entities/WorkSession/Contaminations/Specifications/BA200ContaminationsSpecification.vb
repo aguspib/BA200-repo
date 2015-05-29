@@ -1,10 +1,4 @@
 ﻿Imports System.Collections.Concurrent
-Imports System.Data.Common
-Imports System.Data.SqlClient
-Imports Biosystems.Ax00.BL
-Imports Biosystems.Ax00.Core.Entities.Worksession.Contaminations
-Imports Biosystems.Ax00.CC
-Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Core.Entities.Worksession.Contaminations.Interfaces
@@ -53,15 +47,6 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
                 Throw
             End Try
 
-
-        End Function
-
-        Public Overrides Function AreAnalysisModesCompatible(current As AnalysisMode, expected As AnalysisMode) As Boolean
-            If (expected = current OrElse expected = AnalysisMode.MonoReactive) Then
-                Return True
-            Else
-                Return False
-            End If
 
         End Function
 

@@ -1132,7 +1132,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
 
         Function GetContaminationNumber(calculateinrunning As Boolean, previousReagentID As List(Of Integer), ByVal orderTests As IEnumerable(Of ExecutionsDS.twksWSExecutionsRow)) As Integer
             Dim contaminaNumber As Integer = 0
-            Dim auxContext = New ContaminationsContext(ContaminationsSpecification)
+            Dim auxContext = New Context(ContaminationsSpecification)
             auxContext.Steps.Clear()
             If Not calculateinrunning AndAlso previousReagentID IsNot Nothing AndAlso previousReagentID.Any Then
                 'Iterate throug last "persistence" elements of PreviousreagentID:
@@ -1169,7 +1169,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
                     Select Case result.Action
                         Case IContaminationsAction.RequiredAction.Wash
                             contaminaNumber += 1
-                        Case IContaminationsAction.RequiredAction.NoAction, IContaminationsAction.RequiredAction.RemoveRequiredWashing, IContaminationsAction.RequiredAction.Skip
+                        Case IContaminationsAction.RequiredAction.GoAhead, IContaminationsAction.RequiredAction.RemoveRequiredWashing, IContaminationsAction.RequiredAction.Skip
                             'Do nothing
                     End Select
                 Else

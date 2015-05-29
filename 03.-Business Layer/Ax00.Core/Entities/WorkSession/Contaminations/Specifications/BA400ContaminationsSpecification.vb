@@ -1,8 +1,4 @@
-﻿Imports Biosystems.Ax00.BL
-Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
-Imports Biosystems.Ax00.CC
-Imports Biosystems.Ax00.Core.Interfaces
-Imports Biosystems.Ax00.Global
+﻿Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Interfaces
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Interfaces
 
@@ -27,9 +23,6 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             Return AnalysisMode.MonoReactive
         End Function
 
-        Public Overrides Function AreAnalysisModesCompatible(current As AnalysisMode, expected As AnalysisMode) As Boolean
-            Return True
-        End Function
 
 
     End Class

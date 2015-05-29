@@ -184,7 +184,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
             ' - the last pHighContaminationPersistence reagents and the newly inserted
             ' - if the newly is bi-reactive, check if there's contamination between it and the previous bi-reactive
 
-            Dim context = New ContaminationsContext(ContaminationsSpecification)
+            Dim context = New Context(ContaminationsSpecification)
 
             context.FillContextInStatic(pExecutions.ToList)
 

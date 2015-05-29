@@ -16,21 +16,21 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             Select Case KindOfLiquid
                 Case IDispensing.KindOfDispensedLiquid.Dummy
 
-                    Return New ContaminationsAction With {.Action = IContaminationsAction.RequiredAction.NoAction}
+                    Return New RequiredAction With {.Action = IContaminationsAction.RequiredAction.GoAhead}
 
                 Case IDispensing.KindOfDispensedLiquid.Ise, IDispensing.KindOfDispensedLiquid.Reagent
                     Return ReagentRequiresWashingOrSkip(scope, dispensing, reagentNumber)
 
                 Case IDispensing.KindOfDispensedLiquid.Washing
                     If reagentNumber = 1 Then
-                        Dim contaAction = New ContaminationsAction
+                        Dim contaAction = New RequiredAction
                         contaAction.Action = IContaminationsAction.RequiredAction.RemoveRequiredWashing
                         Dim a = WashingID
                         Dim WashingSolutionID As String = WashingDescription.WashingSolutionCode
                         contaAction.InvolvedWash = New WashingDescription(-1, WashingSolutionID)
                         Return contaAction
                     Else
-                        Return New ContaminationsAction With {.Action = IContaminationsAction.RequiredAction.NoAction}
+                        Return New RequiredAction With {.Action = IContaminationsAction.RequiredAction.GoAhead}
 
                     End If
                 Case Else
@@ -47,13 +47,13 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             'A possitive Scope value indicates we're AFTER the dispensing we're checking. (contaminations can be prevented with Skip)
 
             If scope = 0 Then   'A reagent can't contamine itself
-                Return New ContaminationsAction() With {.Action = IContaminationsAction.RequiredAction.NoAction}
+                Return New RequiredAction() With {.Action = IContaminationsAction.RequiredAction.GoAhead}
 
                 'Miramos si el dispensing nos contaminará.
             ElseIf scope > 0 Then
                 Dim result = dispensing.RequiredActionForDispensing(Me, -scope, reagentNumber)
                 If result.Action = IContaminationsAction.RequiredAction.Wash Then
-                    Return New ContaminationsAction() With {.Action = IContaminationsAction.RequiredAction.Skip}
+                    Return New RequiredAction() With {.Action = IContaminationsAction.RequiredAction.Skip}
                 ElseIf result.Action = IContaminationsAction.RequiredAction.Skip Then
                     'Back to future?? --> this is impossible
 #If Config = "Debug" Then
@@ -62,12 +62,12 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
                     Return New ContaminationsAction() With {.Action = IContaminationsAction.RequiredAction.Skip}
 #End If
                 Else
-                    Return New ContaminationsAction() With {.Action = IContaminationsAction.RequiredAction.NoAction}
+                    Return New RequiredAction() With {.Action = IContaminationsAction.RequiredAction.GoAhead}
                 End If
 
                 'Miramos si contaminamos al dispensing:
             ElseIf Contamines Is Nothing OrElse Contamines.ContainsKey(dispensing.R1ReagentID) = False Then
-                Return New ContaminationsAction() With {.Action = IContaminationsAction.RequiredAction.NoAction}
+                Return New RequiredAction() With {.Action = IContaminationsAction.RequiredAction.GoAhead}
 
             Else
 
@@ -76,12 +76,12 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
                 'Si es TEST miramos persistencia para decidir si el washing es necesario
                 If dispensing.DelayCyclesForDispensing = 0 AndAlso washing.RequiredWashing.WashingStrength < Math.Abs(scope) Then
-                    Return New ContaminationsAction() With {.Action = IContaminationsAction.RequiredAction.NoAction}
+                    Return New RequiredAction() With {.Action = IContaminationsAction.RequiredAction.GoAhead}
 
                     'Si es PTEST, la persistencia nos da igual, ya que los dummis no limpian, por lo cual, lavamos siempre:
                 Else
                     Dim newCleaning = New WashingDescription(washing.RequiredWashing.WashingStrength, washing.RequiredWashing.WashingSolutionCode)
-                    Return New ContaminationsAction() With {.Action = IContaminationsAction.RequiredAction.Wash, .InvolvedWash = newCleaning}
+                    Return New RequiredAction() With {.Action = IContaminationsAction.RequiredAction.Wash, .InvolvedWash = newCleaning}
 
                 End If
             End If

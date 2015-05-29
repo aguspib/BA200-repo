@@ -22,7 +22,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Tests
             Mock.Arrange(Function() contaminations.CreateDispensing).Returns(AddressOf DispensingMockFactory)
             WSExecutionCreator.Instance.ContaminationsSpecification = contaminations
 
-            Dim cont As New ContaminationsContext(contaminations)
+            Dim cont As New Context(contaminations)
             Const testFrame = "BA350;ANSINF;R1B2:12;R2B2:9;R1B1:13;R2B1:24;R1A1:6;R2A1:9;R1A2:123;R2A2:8"
             cont.FillContentsFromAnalyzer(testFrame)
             Assert.AreEqual(cont.Steps(-2)(1).ExecutionID, 12)

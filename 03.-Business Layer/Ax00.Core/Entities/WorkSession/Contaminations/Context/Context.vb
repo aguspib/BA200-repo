@@ -1,20 +1,16 @@
-﻿Imports System.Data.Common
-Imports System.Runtime.InteropServices.ComTypes
-#If config = "Debug" Then
+﻿#If config = "Debug" Then
 Imports System.Windows.Forms
 #End If
 Imports Biosystems.Ax00.CC
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Interfaces
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Interfaces
-Imports Biosystems.Ax00.Core.Interfaces
-Imports Biosystems.Ax00.DAL.DAO
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Types.ExecutionsDS
 
 Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
 
-    Public Class ContaminationsContext
+    Public Class Context
         Implements IContaminationsContext
 
         'Public Property Steps As RangedCollection(Of ContextStep) Implements IContaminationsContext.Steps

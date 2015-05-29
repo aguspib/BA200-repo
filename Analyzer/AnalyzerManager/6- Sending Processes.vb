@@ -1301,7 +1301,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Debug.Print("CourrentContext read")
             Dim result = context.ActionRequiredForDispensing(ReagentRow)
-            If result.Action <> IContaminationsAction.RequiredAction.NoAction Then
+            If result.Action <> IContaminationsAction.RequiredAction.GoAhead Then
                 Debug.Print("Contaminations found")
 
                 Return True

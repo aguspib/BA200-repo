@@ -32,14 +32,9 @@ Namespace Biosystems.Ax00.Core.Entities.Worksession.Interfaces
 
         Function GetAnalysisModeForReagent(ByVal reagentID As Integer) As AnalysisMode
 
-        Function AreAnalysisModesCompatible(current As AnalysisMode, expected As AnalysisMode) As Boolean
-
-        'Function RequiredAnalysisModeBetweenReactions(contaminator As AnalysisMode, contamined As AnalysisMode) As AnalysisMode
 
         Sub FillContextFromAnayzerData(instruction As IEnumerable(Of InstructionParameterTO))
         Sub FillContextFromAnayzerData(instruction As String)
-
-        'ReadOnly Property AnalyzerModel As String
 
         ReadOnly Property CurrentRunningContext As IContaminationsContext
 

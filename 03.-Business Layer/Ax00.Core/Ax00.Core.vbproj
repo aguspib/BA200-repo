@@ -98,26 +98,26 @@
     <Compile Include="Entities\Enums\AnalyzerModelEnum.vb" />
     <Compile Include="Entities\BA200AnalyzerEntity.vb" />
     <Compile Include="Entities\BA400AnalyzerEntity.vb" />
-    <Compile Include="Entities\WorkSession\BA400ContaminationsSpecification.vb" />
-    <Compile Include="Entities\WorkSession\BA200ContaminationsSpecification.vb" />
-    <Compile Include="Entities\WorkSession\Contaminations\Ax00ContaminationsSpecification.vb" />
-    <Compile Include="Entities\WorkSession\Contaminations\BA200Dispensing.vb" />
-    <Compile Include="Entities\WorkSession\Contaminations\BA400Dispensing.vb" />
-    <Compile Include="Entities\WorkSession\Contaminations\ContaminationBetweenElementsSorter.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\Specifications\BA400ContaminationsSpecification.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\Specifications\BA200ContaminationsSpecification.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\Specifications\Ax00ContaminationsSpecification.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\Specifications\Dispensing\BA200Dispensing.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\Specifications\Dispensing\BA400Dispensing.vb" />
+    <Compile Include="Entities\WorkSession\Sorting\ContaminationBetweenElementsSorter.vb" />
     <Compile Include="Entities\WorkSession\Contaminations\ContaminationManager.vb" />
-    <Compile Include="Entities\WorkSession\Contaminations\ContaminationsAction.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\Context\RequiredAction.vb" />
     <Compile Include="Entities\WorkSession\Contaminations\LAx00Frame.vb" />
-    <Compile Include="Entities\WorkSession\Contaminations\ContaminationsContext.vb" />
-    <Compile Include="Entities\WorkSession\Contaminations\ContextStep.vb" />
-    <Compile Include="Entities\WorkSession\Contaminations\DispensingContaminationDescription.vb" />
-    <Compile Include="Entities\WorkSession\Contaminations\EmptyWashing.vb" />
-    <Compile Include="Entities\WorkSession\Contaminations\RegularWaterWashing.vb" />
-    <Compile Include="Entities\WorkSession\Optimizations\OptimizationBacktrackingApplier.vb" />
-    <Compile Include="Entities\WorkSession\Optimizations\OptimizationPolicyApplier.vb" />
-    <Compile Include="Entities\WorkSession\Contaminations\WashingDescription.vb" />
-    <Compile Include="Entities\WorkSession\Contaminations\ReagentDispensing.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\Context\Context.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\Context\ContextStep.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\Context\DispensingContaminationDescription.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\Context\EmptyWashing.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\Context\RegularWaterWashing.vb" />
+    <Compile Include="Entities\WorkSession\Sorting\OptimizationBacktrackingApplier.vb" />
+    <Compile Include="Entities\WorkSession\Sorting\OptimizationPolicyApplier.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\Context\WashingDescription.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\Specifications\Dispensing\ReagentDispensing.vb" />
     <Compile Include="Entities\WorkSession\WSExecutionCreator.vb" />
-    <Compile Include="Entities\WorkSession\WSExecutionsSorter.vb" />
+    <Compile Include="Entities\WorkSession\Sorting\WSExecutionsSorter.vb" />
     <Compile Include="Services\AsyncService.vb" />
     <Compile Include="Services\Enums\BaseLineStepsEnum.vb" />
     <Compile Include="Services\Interfaces\IBaseLineService.vb" />
@@ -219,9 +219,7 @@
       <Name>WorkSession</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Entities\WorkSession\Contaminations\Interfaces\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
