@@ -12,7 +12,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
         Public Sub New(assemblyName As String, analyzerModel As String, baseLine As IBaseLineEntity)
             MyBase.New(assemblyName, analyzerModel, baseLine)
-            WSExecutionCreator.Instance.ContaminationsSpecification = New BA400ContaminationsSpecification()
+            WSExecutionCreator.Instance.ContaminationsSpecification = New BA400ContaminationsSpecification(Me)
             _currentAnalyzer = Me
         End Sub
 

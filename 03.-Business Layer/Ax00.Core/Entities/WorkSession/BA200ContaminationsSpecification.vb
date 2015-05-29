@@ -14,52 +14,20 @@ Imports Biosystems.Ax00.Types
 
 Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
     Public Class BA200ContaminationsSpecification
+        Inherits Ax00ContaminationsSpecification
         Implements IAnalyzerContaminationsSpecification
 
-
-
-
-
-        Private myThread As Threading.Thread
-        Sub New()
-
-            AdditionalPredilutionSteps = SwParametersDelegate.ReadIntValue(Nothing, GlobalEnumerates.SwParameters.PREDILUTION_CYCLES, AnalyzerModel).SetDatos
-
-            Dim contaminationPersitance = SwParametersDelegate.ReadIntValue(Nothing, GlobalEnumerates.SwParameters.CONTAMIN_REAGENT_PERSIS, Nothing).SetDatos
-
-            ContaminationsContextRange = New Range(Of Integer)(-contaminationPersitance, AdditionalPredilutionSteps + contaminationPersitance - 1)
-
-            DispensesPerStep = 2    'The analyzer has R1 and R2
-
-            AddHandler LinkLayer.ActivateProtocol, AddressOf Me.RetrieveInstructions
-
-            myThread = Threading.Thread.CurrentThread
+        Sub New(analyzer As IAnalyzerManager)
+            MyBase.New(analyzer)
 
         End Sub
 
-        Private Sub RetrieveInstructions(eventKind As GlobalEnumerates.AppLayerEventList, ByRef data As String)
-            'We want to prevent this event listener from modifing data parameter that is passed ByRef, so we're adding a delegate passed ByValue.
-            ProcessInstructionReceived(eventKind, data)
-        End Sub
-        Private Sub ProcessInstructionReceived(eventKind As GlobalEnumerates.AppLayerEventList, ByVal data As String)
-            'If Threading.Thread.CurrentThread IsNot myThread Then
-            '    Debug.WriteLine("Analyzer message fr om foreign thread: " & data)
-            'Else
-            '    Debug.WriteLine("Analyzer message from main thread: " & data)
-            'End If
-        End Sub
-
-        Public Property ContaminationsContextRange As Range(Of Integer) Implements IAnalyzerContaminationsSpecification.ContaminationsContextRange
-
-        Public Property DispensesPerStep As Integer Implements IAnalyzerContaminationsSpecification.DispensesPerStep
-
-        Public Function CreateDispensing() As IDispensing Implements IAnalyzerContaminationsSpecification.CreateDispensing
+        Public Overrides Function CreateDispensing() As IDispensing
             Return New BA200Dispensing
         End Function
 
-        Public Property AdditionalPredilutionSteps As Integer Implements IAnalyzerContaminationsSpecification.AdditionalPredilutionSteps
 
-        Public Function GetAnalysisModeForReagent(reagentID As Integer) As AnalysisMode Implements IAnalyzerContaminationsSpecification.GetAnalysisModeForReagent
+        Public Overrides Function GetAnalysisModeForReagent(reagentID As Integer) As AnalysisMode
 
             <ThreadStatic> Static testReagentsDataDS As TestReagentsDS
 
@@ -88,7 +56,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
         End Function
 
-        Public Function AreAnalysisModesCompatible(current As AnalysisMode, expected As AnalysisMode) As Boolean Implements IAnalyzerContaminationsSpecification.AreAnalysisModesCompatible
+        Public Overrides Function AreAnalysisModesCompatible(current As AnalysisMode, expected As AnalysisMode) As Boolean
             If (expected = current OrElse expected = AnalysisMode.MonoReactive) Then
                 Return True
             Else
@@ -97,21 +65,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
         End Function
 
-        Public Function RequiredAnalysisModeBetweenReactions(contaminator As AnalysisMode, contamined As AnalysisMode) As AnalysisMode Implements IAnalyzerContaminationsSpecification.RequiredAnalysisModeBetweenReactions
-            If contaminator = AnalysisMode.BiReactive AndAlso contamined = AnalysisMode.BiReactive Then
-                Return AnalysisMode.BiReactive
-            Else
-                Return AnalysisMode.MonoReactive
-            End If
-        End Function
 
-        Public ReadOnly Property AnalyzerModel As String Implements IAnalyzerContaminationsSpecification.AnalyzerModel
-            Get
-                Return Enums.AnalyzerModelEnum.A200.ToString
-            End Get
-        End Property
-
-#Region "Private members"
         Private Function GetAllReagents() As TestReagentsDS
 
             Dim TestReagentsDAO As New tparTestReagentsDAO()
@@ -129,49 +83,5 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             Return testReagentsDataDS
         End Function
 
-        Dim _currentContext As ContaminationsContext
-#End Region
-
-        Public Sub FillContextFromAnayzerData(instruction As IEnumerable(Of InstructionParameterTO)) Implements IAnalyzerContaminationsSpecification.FillContextFromAnayzerData
-            Dim analyzerFrame = New LAx00Frame(instruction)
-            If analyzerFrame("R") = "1" Then
-                Dim context = New ContaminationsContext(Me)
-                context.FillContentsFromAnalyzer(analyzerFrame)
-                _currentContext = context
-                Debug.WriteLine("Context filled in running! ")
-            End If
-        End Sub
-
-
-
-        Public ReadOnly Property CurrentRunningContext As IContaminationsContext Implements IAnalyzerContaminationsSpecification.CurrentRunningContext
-            Get
-                Return _currentContext
-            End Get
-        End Property
-
-        Public ReadOnly Property HighContaminationPersistence As Integer Implements IAnalyzerContaminationsSpecification.HighContaminationPersistence
-            Get
-                <ThreadStatic> Static highContaminationPersitance As Integer = SwParametersDelegate.ReadIntValue(Nothing, GlobalEnumerates.SwParameters.CONTAMIN_REAGENT_PERSIS, Nothing).SetDatos
-                Return highContaminationPersitance
-            End Get
-        End Property
-
-        Public Sub FillContextFromAnayzerData1(instruction As String) Implements IAnalyzerContaminationsSpecification.FillContextFromAnayzerData
-            Dim analyzerFrame = New LAx00Frame()
-            Try
-                analyzerFrame.ParseRawData(instruction)
-                If analyzerFrame.KeysCollection.Contains("STATUS") AndAlso analyzerFrame("R") = "1" Then
-                    Dim context = New ContaminationsContext(Me)
-                    context.FillContentsFromAnalyzer(analyzerFrame)
-                    _currentContext = context
-                    Debug.WriteLine("Context filled in running! " & Mid(instruction, InStr(instruction, "R2B2:")))
-                End If
-            Catch ex As Exception
-                Debug.WriteLine("EXCEPTION FILLING CONTEXT " & ex.Message)
-                GlobalBase.CreateLogActivity(ex)
-            End Try
-
-        End Sub
     End Class
 End Namespace
