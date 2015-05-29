@@ -100,6 +100,8 @@
     <Compile Include="Entities\BA400AnalyzerEntity.vb" />
     <Compile Include="Entities\WorkSession\BA400ContaminationsSpecification.vb" />
     <Compile Include="Entities\WorkSession\BA200ContaminationsSpecification.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\BA200Dispensing.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\BA400Dispensing.vb" />
     <Compile Include="Entities\WorkSession\Contaminations\ContaminationBetweenElementsSorter.vb" />
     <Compile Include="Entities\WorkSession\Contaminations\ContaminationManager.vb" />
     <Compile Include="Entities\WorkSession\Contaminations\ContaminationsAction.vb" />

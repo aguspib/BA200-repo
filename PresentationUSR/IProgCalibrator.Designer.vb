@@ -50,7 +50,6 @@ Partial Class UiProgCalibrator
         Me.LotNumberTextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
         Me.NumberLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
         Me.CalibratorNameLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
-        Me.CalibIDTextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
         Me.ExpirationDateLabel = New System.Windows.Forms.Label()
         Me.ExpDatePickUpCombo = New Biosystems.Ax00.Controls.UserControls.BSDateTimePicker()
         Me.CalibNumberUpDown = New Biosystems.Ax00.Controls.UserControls.BSNumericUpDown()
@@ -66,6 +65,12 @@ Partial Class UiProgCalibrator
         Me.CalibratorListLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
         Me.CalibratorTestTab = New System.Windows.Forms.TabPage()
         Me.TestSampleCalibValues = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.BsGroupBox1 = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.BsLabel2 = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsLabel1 = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.TextBox1 = New System.Windows.Forms.TextBox()
+        Me.BsComboBox1 = New Biosystems.Ax00.Controls.UserControls.BSComboBox()
+        Me.MakeByAnalyzerChkBx = New System.Windows.Forms.CheckBox()
         Me.CancelTestSampleCalValue = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.SaveTestSampleCalValue = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.CalibrationValuesCurveLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
@@ -111,6 +116,7 @@ Partial Class UiProgCalibrator
         CType(Me.CalibratorListGrid, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.CalibratorTestTab.SuspendLayout()
         Me.TestSampleCalibValues.SuspendLayout()
+        Me.BsGroupBox1.SuspendLayout()
         CType(Me.ConcentrationGridView, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.CalibCurveInfoGroupBox.SuspendLayout()
         Me.CalibratorTestSampleGB.SuspendLayout()
@@ -205,7 +211,6 @@ Partial Class UiProgCalibrator
         Me.CalibratorInfoGroupBox.Controls.Add(Me.LotNumberTextBox)
         Me.CalibratorInfoGroupBox.Controls.Add(Me.NumberLabel)
         Me.CalibratorInfoGroupBox.Controls.Add(Me.CalibratorNameLabel)
-        Me.CalibratorInfoGroupBox.Controls.Add(Me.CalibIDTextBox)
         Me.CalibratorInfoGroupBox.Controls.Add(Me.ExpirationDateLabel)
         Me.CalibratorInfoGroupBox.Controls.Add(Me.ExpDatePickUpCombo)
         Me.CalibratorInfoGroupBox.Controls.Add(Me.CalibNumberUpDown)
@@ -298,19 +303,6 @@ Partial Class UiProgCalibrator
         Me.CalibratorNameLabel.TabIndex = 48
         Me.CalibratorNameLabel.Text = "*Calibrator Name:"
         Me.CalibratorNameLabel.Title = False
-        '
-        'CalibIDTextBox
-        '
-        Me.CalibIDTextBox.BackColor = System.Drawing.Color.White
-        Me.CalibIDTextBox.DecimalsValues = False
-        Me.CalibIDTextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
-        Me.CalibIDTextBox.IsNumeric = False
-        Me.CalibIDTextBox.Location = New System.Drawing.Point(405, 84)
-        Me.CalibIDTextBox.Mandatory = False
-        Me.CalibIDTextBox.Name = "CalibIDTextBox"
-        Me.CalibIDTextBox.Size = New System.Drawing.Size(47, 21)
-        Me.CalibIDTextBox.TabIndex = 52
-        Me.CalibIDTextBox.Visible = False
         '
         'ExpirationDateLabel
         '
@@ -507,6 +499,8 @@ Partial Class UiProgCalibrator
         '
         'TestSampleCalibValues
         '
+        Me.TestSampleCalibValues.Controls.Add(Me.BsGroupBox1)
+        Me.TestSampleCalibValues.Controls.Add(Me.MakeByAnalyzerChkBx)
         Me.TestSampleCalibValues.Controls.Add(Me.CancelTestSampleCalValue)
         Me.TestSampleCalibValues.Controls.Add(Me.SaveTestSampleCalValue)
         Me.TestSampleCalibValues.Controls.Add(Me.CalibrationValuesCurveLabel)
@@ -521,6 +515,77 @@ Partial Class UiProgCalibrator
         Me.TestSampleCalibValues.Size = New System.Drawing.Size(462, 524)
         Me.TestSampleCalibValues.TabIndex = 0
         Me.TestSampleCalibValues.TabStop = False
+        '
+        'BsGroupBox1
+        '
+        Me.BsGroupBox1.Controls.Add(Me.BsLabel2)
+        Me.BsGroupBox1.Controls.Add(Me.BsLabel1)
+        Me.BsGroupBox1.Controls.Add(Me.TextBox1)
+        Me.BsGroupBox1.Controls.Add(Me.BsComboBox1)
+        Me.BsGroupBox1.Enabled = False
+        Me.BsGroupBox1.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.BsGroupBox1.ForeColor = System.Drawing.Color.Black
+        Me.BsGroupBox1.Location = New System.Drawing.Point(267, 248)
+        Me.BsGroupBox1.Name = "BsGroupBox1"
+        Me.BsGroupBox1.Size = New System.Drawing.Size(171, 232)
+        Me.BsGroupBox1.TabIndex = 6
+        Me.BsGroupBox1.TabStop = False
+        Me.BsGroupBox1.Text = "ByAnalyzer"
+        '
+        'BsLabel2
+        '
+        Me.BsLabel2.AutoSize = True
+        Me.BsLabel2.BackColor = System.Drawing.Color.Transparent
+        Me.BsLabel2.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.BsLabel2.ForeColor = System.Drawing.Color.Black
+        Me.BsLabel2.Location = New System.Drawing.Point(8, 69)
+        Me.BsLabel2.Name = "BsLabel2"
+        Me.BsLabel2.Size = New System.Drawing.Size(87, 13)
+        Me.BsLabel2.TabIndex = 46
+        Me.BsLabel2.Text = "Dilution Liquid"
+        Me.BsLabel2.Title = False
+        '
+        'BsLabel1
+        '
+        Me.BsLabel1.AutoSize = True
+        Me.BsLabel1.BackColor = System.Drawing.Color.Transparent
+        Me.BsLabel1.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.BsLabel1.ForeColor = System.Drawing.Color.Black
+        Me.BsLabel1.Location = New System.Drawing.Point(6, 25)
+        Me.BsLabel1.Name = "BsLabel1"
+        Me.BsLabel1.Size = New System.Drawing.Size(115, 13)
+        Me.BsLabel1.TabIndex = 44
+        Me.BsLabel1.Text = "BaseConcentration"
+        Me.BsLabel1.Title = False
+        '
+        'TextBox1
+        '
+        Me.TextBox1.Location = New System.Drawing.Point(9, 41)
+        Me.TextBox1.Name = "TextBox1"
+        Me.TextBox1.Size = New System.Drawing.Size(146, 21)
+        Me.TextBox1.TabIndex = 45
+        '
+        'BsComboBox1
+        '
+        Me.BsComboBox1.BackColor = System.Drawing.Color.White
+        Me.BsComboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.BsComboBox1.Enabled = False
+        Me.BsComboBox1.ForeColor = System.Drawing.Color.Black
+        Me.BsComboBox1.FormattingEnabled = True
+        Me.BsComboBox1.Location = New System.Drawing.Point(11, 85)
+        Me.BsComboBox1.Name = "BsComboBox1"
+        Me.BsComboBox1.Size = New System.Drawing.Size(146, 21)
+        Me.BsComboBox1.TabIndex = 4
+        '
+        'MakeByAnalyzerChkBx
+        '
+        Me.MakeByAnalyzerChkBx.AutoSize = True
+        Me.MakeByAnalyzerChkBx.Location = New System.Drawing.Point(317, 41)
+        Me.MakeByAnalyzerChkBx.Name = "MakeByAnalyzerChkBx"
+        Me.MakeByAnalyzerChkBx.Size = New System.Drawing.Size(121, 17)
+        Me.MakeByAnalyzerChkBx.TabIndex = 42
+        Me.MakeByAnalyzerChkBx.Text = "MakeByAnalyzer"
+        Me.MakeByAnalyzerChkBx.UseVisualStyleBackColor = True
         '
         'CancelTestSampleCalValue
         '
@@ -545,9 +610,9 @@ Partial Class UiProgCalibrator
         Me.CalibrationValuesCurveLabel.BackColor = System.Drawing.Color.LightSteelBlue
         Me.CalibrationValuesCurveLabel.Font = New System.Drawing.Font("Verdana", 10.0!)
         Me.CalibrationValuesCurveLabel.ForeColor = System.Drawing.Color.Black
-        Me.CalibrationValuesCurveLabel.Location = New System.Drawing.Point(100, 256)
+        Me.CalibrationValuesCurveLabel.Location = New System.Drawing.Point(22, 223)
         Me.CalibrationValuesCurveLabel.Name = "CalibrationValuesCurveLabel"
-        Me.CalibrationValuesCurveLabel.Size = New System.Drawing.Size(276, 20)
+        Me.CalibrationValuesCurveLabel.Size = New System.Drawing.Size(416, 20)
         Me.CalibrationValuesCurveLabel.TabIndex = 41
         Me.CalibrationValuesCurveLabel.Text = "*Concentration Values"
         Me.CalibrationValuesCurveLabel.Title = True
@@ -584,7 +649,7 @@ Partial Class UiProgCalibrator
         Me.ConcentrationGridView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter
         Me.ConcentrationGridView.EnterToTab = False
         Me.ConcentrationGridView.GridColor = System.Drawing.Color.Silver
-        Me.ConcentrationGridView.Location = New System.Drawing.Point(101, 281)
+        Me.ConcentrationGridView.Location = New System.Drawing.Point(23, 256)
         Me.ConcentrationGridView.MultiSelect = False
         Me.ConcentrationGridView.Name = "ConcentrationGridView"
         Me.ConcentrationGridView.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.[Single]
@@ -606,7 +671,7 @@ Partial Class UiProgCalibrator
         DataGridViewCellStyle10.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
         Me.ConcentrationGridView.RowsDefaultCellStyle = DataGridViewCellStyle10
         Me.ConcentrationGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect
-        Me.ConcentrationGridView.Size = New System.Drawing.Size(275, 200)
+        Me.ConcentrationGridView.Size = New System.Drawing.Size(238, 224)
         Me.ConcentrationGridView.TabIndex = 5
         Me.ConcentrationGridView.TabToEnter = True
         '
@@ -632,9 +697,9 @@ Partial Class UiProgCalibrator
         Me.CurveValueLabel.BackColor = System.Drawing.Color.LightSteelBlue
         Me.CurveValueLabel.Font = New System.Drawing.Font("Verdana", 10.0!)
         Me.CurveValueLabel.ForeColor = System.Drawing.Color.Black
-        Me.CurveValueLabel.Location = New System.Drawing.Point(100, 80)
+        Me.CurveValueLabel.Location = New System.Drawing.Point(22, 79)
         Me.CurveValueLabel.Name = "CurveValueLabel"
-        Me.CurveValueLabel.Size = New System.Drawing.Size(276, 20)
+        Me.CurveValueLabel.Size = New System.Drawing.Size(416, 20)
         Me.CurveValueLabel.TabIndex = 39
         Me.CurveValueLabel.Text = "*Curve Values"
         Me.CurveValueLabel.Title = True
@@ -650,9 +715,9 @@ Partial Class UiProgCalibrator
         Me.CalibCurveInfoGroupBox.Controls.Add(Me.IncreasingRadioButton)
         Me.CalibCurveInfoGroupBox.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.CalibCurveInfoGroupBox.ForeColor = System.Drawing.Color.Black
-        Me.CalibCurveInfoGroupBox.Location = New System.Drawing.Point(100, 106)
+        Me.CalibCurveInfoGroupBox.Location = New System.Drawing.Point(22, 105)
         Me.CalibCurveInfoGroupBox.Name = "CalibCurveInfoGroupBox"
-        Me.CalibCurveInfoGroupBox.Size = New System.Drawing.Size(276, 140)
+        Me.CalibCurveInfoGroupBox.Size = New System.Drawing.Size(416, 97)
         Me.CalibCurveInfoGroupBox.TabIndex = 1
         Me.CalibCurveInfoGroupBox.TabStop = False
         Me.CalibCurveInfoGroupBox.Text = "*Calibration Curve"
@@ -664,7 +729,7 @@ Partial Class UiProgCalibrator
         Me.YAxisCombo.Enabled = False
         Me.YAxisCombo.ForeColor = System.Drawing.Color.Black
         Me.YAxisCombo.FormattingEnabled = True
-        Me.YAxisCombo.Location = New System.Drawing.Point(140, 104)
+        Me.YAxisCombo.Location = New System.Drawing.Point(289, 61)
         Me.YAxisCombo.Name = "YAxisCombo"
         Me.YAxisCombo.Size = New System.Drawing.Size(111, 21)
         Me.YAxisCombo.TabIndex = 4
@@ -675,7 +740,7 @@ Partial Class UiProgCalibrator
         Me.YaxisLabel.BackColor = System.Drawing.Color.Transparent
         Me.YaxisLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
         Me.YaxisLabel.ForeColor = System.Drawing.Color.Black
-        Me.YaxisLabel.Location = New System.Drawing.Point(140, 86)
+        Me.YaxisLabel.Location = New System.Drawing.Point(221, 64)
         Me.YaxisLabel.Name = "YaxisLabel"
         Me.YaxisLabel.Size = New System.Drawing.Size(55, 13)
         Me.YaxisLabel.TabIndex = 5
@@ -689,7 +754,7 @@ Partial Class UiProgCalibrator
         Me.XAxisCombo.Enabled = False
         Me.XAxisCombo.ForeColor = System.Drawing.Color.Black
         Me.XAxisCombo.FormattingEnabled = True
-        Me.XAxisCombo.Location = New System.Drawing.Point(15, 104)
+        Me.XAxisCombo.Location = New System.Drawing.Point(77, 61)
         Me.XAxisCombo.Name = "XAxisCombo"
         Me.XAxisCombo.Size = New System.Drawing.Size(111, 21)
         Me.XAxisCombo.TabIndex = 3
@@ -700,7 +765,7 @@ Partial Class UiProgCalibrator
         Me.XaxisLabel.BackColor = System.Drawing.Color.Transparent
         Me.XaxisLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
         Me.XaxisLabel.ForeColor = System.Drawing.Color.Black
-        Me.XaxisLabel.Location = New System.Drawing.Point(15, 86)
+        Me.XaxisLabel.Location = New System.Drawing.Point(15, 64)
         Me.XaxisLabel.Name = "XaxisLabel"
         Me.XaxisLabel.Size = New System.Drawing.Size(56, 13)
         Me.XaxisLabel.TabIndex = 3
@@ -714,9 +779,9 @@ Partial Class UiProgCalibrator
         Me.CurveTypeCombo.Enabled = False
         Me.CurveTypeCombo.ForeColor = System.Drawing.Color.Black
         Me.CurveTypeCombo.FormattingEnabled = True
-        Me.CurveTypeCombo.Location = New System.Drawing.Point(15, 50)
+        Me.CurveTypeCombo.Location = New System.Drawing.Point(18, 22)
         Me.CurveTypeCombo.Name = "CurveTypeCombo"
-        Me.CurveTypeCombo.Size = New System.Drawing.Size(227, 21)
+        Me.CurveTypeCombo.Size = New System.Drawing.Size(170, 21)
         Me.CurveTypeCombo.TabIndex = 2
         '
         'DecreasingRadioButton
@@ -724,7 +789,7 @@ Partial Class UiProgCalibrator
         Me.DecreasingRadioButton.AutoSize = True
         Me.DecreasingRadioButton.Enabled = False
         Me.DecreasingRadioButton.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.DecreasingRadioButton.Location = New System.Drawing.Point(146, 20)
+        Me.DecreasingRadioButton.Location = New System.Drawing.Point(306, 23)
         Me.DecreasingRadioButton.Name = "DecreasingRadioButton"
         Me.DecreasingRadioButton.Size = New System.Drawing.Size(96, 17)
         Me.DecreasingRadioButton.TabIndex = 1
@@ -737,7 +802,7 @@ Partial Class UiProgCalibrator
         Me.IncreasingRadioButton.AutoSize = True
         Me.IncreasingRadioButton.Enabled = False
         Me.IncreasingRadioButton.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.IncreasingRadioButton.Location = New System.Drawing.Point(15, 20)
+        Me.IncreasingRadioButton.Location = New System.Drawing.Point(208, 23)
         Me.IncreasingRadioButton.Name = "IncreasingRadioButton"
         Me.IncreasingRadioButton.Size = New System.Drawing.Size(92, 17)
         Me.IncreasingRadioButton.TabIndex = 0
@@ -750,7 +815,7 @@ Partial Class UiProgCalibrator
         Me.CalibratorLabel.BackColor = System.Drawing.Color.Transparent
         Me.CalibratorLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
         Me.CalibratorLabel.ForeColor = System.Drawing.Color.Black
-        Me.CalibratorLabel.Location = New System.Drawing.Point(100, 15)
+        Me.CalibratorLabel.Location = New System.Drawing.Point(22, 19)
         Me.CalibratorLabel.Name = "CalibratorLabel"
         Me.CalibratorLabel.Size = New System.Drawing.Size(260, 13)
         Me.CalibratorLabel.TabIndex = 1
@@ -766,7 +831,7 @@ Partial Class UiProgCalibrator
         Me.CalibratorListCombo.FormattingEnabled = True
         Me.CalibratorListCombo.IntegralHeight = False
         Me.CalibratorListCombo.ItemHeight = 13
-        Me.CalibratorListCombo.Location = New System.Drawing.Point(100, 33)
+        Me.CalibratorListCombo.Location = New System.Drawing.Point(22, 37)
         Me.CalibratorListCombo.MaxDropDownItems = 5
         Me.CalibratorListCombo.Name = "CalibratorListCombo"
         Me.CalibratorListCombo.Size = New System.Drawing.Size(276, 21)
@@ -964,11 +1029,10 @@ Partial Class UiProgCalibrator
         Me.CalibratorName.ReadOnly = True
         Me.CalibratorName.Width = 150
         '
-        'IProgCalibrator
+        'UiProgCalibrator
         '
         Me.AcceptButton = Me.bsAcceptButton
         Me.Appearance.BackColor = System.Drawing.Color.Gainsboro
-        Me.Appearance.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Appearance.ForeColor = System.Drawing.Color.Black
         Me.Appearance.GradientMode = System.Drawing.Drawing2D.LinearGradientMode.ForwardDiagonal
         Me.Appearance.Options.UseBackColor = True
@@ -998,6 +1062,9 @@ Partial Class UiProgCalibrator
         CType(Me.CalibratorListGrid, System.ComponentModel.ISupportInitialize).EndInit()
         Me.CalibratorTestTab.ResumeLayout(False)
         Me.TestSampleCalibValues.ResumeLayout(False)
+        Me.TestSampleCalibValues.PerformLayout()
+        Me.BsGroupBox1.ResumeLayout(False)
+        Me.BsGroupBox1.PerformLayout()
         CType(Me.ConcentrationGridView, System.ComponentModel.ISupportInitialize).EndInit()
         Me.CalibCurveInfoGroupBox.ResumeLayout(False)
         Me.CalibCurveInfoGroupBox.PerformLayout()
@@ -1023,7 +1090,6 @@ Partial Class UiProgCalibrator
     Friend WithEvents LotNumberTextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
     Friend WithEvents NumberLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
     Friend WithEvents CalibratorNameLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
-    Friend WithEvents CalibIDTextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
     Friend WithEvents ExpirationDateLabel As System.Windows.Forms.Label
     Friend WithEvents ExpDatePickUpCombo As Biosystems.Ax00.Controls.UserControls.BSDateTimePicker
     Friend WithEvents CalibNumberUpDown As Biosystems.Ax00.Controls.UserControls.BSNumericUpDown
@@ -1074,5 +1140,11 @@ Partial Class UiProgCalibrator
     Friend WithEvents DataGridViewTextBoxColumn10 As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents CancelTestSampleCalValue As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents SaveTestSampleCalValue As Biosystems.Ax00.Controls.UserControls.BSButton
+    Friend WithEvents BsGroupBox1 As Biosystems.Ax00.Controls.UserControls.BSGroupBox
+    Friend WithEvents BsLabel2 As Biosystems.Ax00.Controls.UserControls.BSLabel
+    Friend WithEvents BsLabel1 As Biosystems.Ax00.Controls.UserControls.BSLabel
+    Friend WithEvents TextBox1 As System.Windows.Forms.TextBox
+    Friend WithEvents BsComboBox1 As Biosystems.Ax00.Controls.UserControls.BSComboBox
+    Friend WithEvents MakeByAnalyzerChkBx As System.Windows.Forms.CheckBox
 
 End Class

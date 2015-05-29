@@ -987,7 +987,90 @@ Namespace Biosystems.Ax00.DAL.DAO
 
         Public Shared Function GetPredilutionModeForTest(pTestID As Integer, pSampleType As String) As String
             If pSampleType = String.Empty Then Return ""
-            Dim Query = String.Format("SELECT top (1) b.predilutionmode " &
+
+            Const Query As String = ("SELECT a.ReagentID, b.SampleType, b.predilutionmode FROM [Ax00].[dbo].[tparTestReagents] a, [Ax00].[dbo].[tpartestsamples] b where a.TestID = b.TestID ")
+            Dim connection As TypedGlobalDataTo(Of SqlConnection) = Nothing
+
+            Dim Result As String = ""
+            <ThreadStatic> Static DataTableCache As DataTable
+            Try
+
+                If DataTableCache Is Nothing Then
+                    DataTableCache = New DataTable
+                    connection = GetSafeOpenDBConnection(Nothing)
+                    If (connection.SetDatos Is Nothing) Then
+                        Return ""
+                    Else
+
+                        Dim dbCmd As New SqlCommand
+                        dbCmd.Connection = connection.SetDatos
+                        dbCmd.CommandText = Query
+                        Dim da As New SqlDataAdapter(dbCmd)
+                        da.Fill(DataTableCache)
+
+                    End If
+                End If
+
+                '2.- Parte 2 comprobar la caché:
+                <ThreadStatic> Static ValuesCache As New Dictionary(Of KeyValuePair(Of Integer, String), String)
+                If ValuesCache.TryGetValue(New KeyValuePair(Of Integer, String)(pTestID, pSampleType), Result) Then
+                    Return Result
+                Else
+                    Dim filter = (From cosica In DataTableCache Where CInt(cosica("ReagentID")) = pTestID And CType(cosica("SampleType"), String) = pSampleType).First
+                    If filter IsNot Nothing AndAlso filter.IsNull("predilutionmode") = False Then
+
+                        Result = CType(filter("predilutionmode"), String)
+                        ValuesCache.Add(New KeyValuePair(Of Integer, String)(pTestID, pSampleType), Result)
+                    Else
+                        ValuesCache.Add(New KeyValuePair(Of Integer, String)(pTestID, pSampleType), String.Empty)
+                        Result = ""
+                    End If
+                End If
+                Return Result
+            Catch ex As Exception
+                GlobalBase.CreateLogActivity(ex) '.Message, "tparTestSamplesDAO.UpdateNumOfControls", EventLogEntryType.Error, False)
+                Throw
+                'resultData.HasError = True
+                'resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                'resultData.ErrorMessage = ex.Message
+
+                'Dim myLogAcciones As New ApplicationLogManager()
+                'GlobalBase.CreateLogActivity(ex.Message, "tparTestSamplesDAO.UpdateNumOfControls", EventLogEntryType.Error, False)
+            Finally
+                If connection IsNot Nothing AndAlso connection.SetDatos IsNot Nothing Then
+                    Try
+                        connection.SetDatos.Close()
+                    Catch : End Try
+                End If
+            End Try
+
+            Return ""
+
+        End Function
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        Public Shared Function GetPredilutionModeForTest2(pTestID As Integer, pSampleType As String) As String
+
+
+
+
+
+            If pSampleType = String.Empty Then Return ""
+            Dim Query = String.Format("SELECT Top(1) b.predilutionmode " &
                                         "FROM [Ax00].[dbo].[tparTestReagents] a, [Ax00].[dbo].[tpartestsamples] b " &
                                           "where a.TestID = b.TestID and a.ReagentID = {0} and b.SampleType = '{1}'", pTestID, pSampleType)
 
@@ -1015,6 +1098,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 End If
 
             Catch ex As Exception
+                GlobalBase.CreateLogActivity(ex) '.Message, "tparTestSamplesDAO.UpdateNumOfControls", EventLogEntryType.Error, False)
                 Throw
                 'resultData.HasError = True
                 'resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()

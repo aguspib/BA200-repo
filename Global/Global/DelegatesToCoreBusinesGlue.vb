@@ -17,7 +17,9 @@ Public Class DelegatesToCoreBusinesGlue
         Dim obj = DelegatesToCoreBusinesGlue.BsCoreAssembly.GetType(TypeName)
         <ThreadStatic> Static method As MethodInfo
         <ThreadStatic> Static instance As Object = Nothing
-
+        If ppAnalyzerID Is Nothing Then
+            Dim A = 0
+        End If
         Try
             If method Is Nothing Then
                 Debug.WriteLine("CreateWS method found.")
