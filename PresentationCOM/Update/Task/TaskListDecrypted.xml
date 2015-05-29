@@ -1362,5 +1362,67 @@
 
     </UpdateScript>
   </AppVersion>
+    <AppVersion>
+    <Version>3.08</Version>
+    <StructureScript>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparTestCalibrators' AND sc.name = 'IsMakeByAnalyzer') = 0
+      BEGIN
+	      ALTER TABLE tparTestCalibrators ADD IsMakeByAnalyzer Bit NOT NULL DEFAULT 0
+      END
+      
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparTestCalibrators' AND sc.name = 'DilutionSolutionId') = 0
+      BEGIN
+	      ALTER TABLE tparTestCalibrators ADD DilutionSolutionId varchar(15) NULL
+      END
+
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparTestCalibratorValues' AND sc.name = 'RedSampleVolumeSteps') = 0
+      BEGIN
+	      ALTER TABLE tparTestCalibratorValues ADD RedSampleVolumeSteps real NULL
+      END
+
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparTestCalibratorValues' AND sc.name = 'RedReagentVolumeSteps') = 0
+      BEGIN
+	      ALTER TABLE tparTestCalibratorValues ADD RedReagentVolumeSteps real NULL
+      END
+
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparTestCalibratorValues' AND sc.name = 'IncSampleVolumeSteps') = 0
+      BEGIN
+	      ALTER TABLE tparTestCalibratorValues ADD IncSampleVolumeSteps real NULL
+      END
+
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparTestCalibratorValues' AND sc.name = 'IncReagentVolumeSteps') = 0
+      BEGIN
+	      ALTER TABLE tparTestCalibratorValues ADD IncReagentVolumeSteps real NULL
+      END
+
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparTestCalibratorValues' AND sc.name = 'IsOriginConcentration') = 0
+      BEGIN
+	      ALTER TABLE tparTestCalibratorValues ADD IsOriginConcentration bit NOT NULL DEFAULT 0
+      END
+    </StructureScript>
+    <UpdateScript>
+      IF ((SELECT COUNT(*) FROM [dbo].[tfmwFieldLimits] WHERE [LimitID] = 'PREDIL_CONCEN_CALIB' ) = 0)
+      BEGIN
+      INSERT INTO tfmwFieldLimits
+      ([LimitID],[LimitDescription],[MinValue],[MaxValue],[StepValue],[DefaultValue],[DecimalsAllowed],[AnalyzerModel])
+      VALUES ('PREDIL_CONCEN_CALIB','Allowed values for the field used to specify the Predilution Concentration for a Calibration Curve',0.1,9999999999.9,NULL,NULL,1,'A200')
+      END
+
+      IF ((SELECT COUNT(*) FROM [dbo].[tfmwFieldLimits] WHERE [LimitID] = 'PREDIL_FACTOR_CALIB' ) = 0)
+      BEGIN
+      INSERT INTO tfmwFieldLimits
+      ([LimitID],[LimitDescription],[MinValue],[MaxValue],[StepValue],[DefaultValue],[DecimalsAllowed],[AnalyzerModel])
+      VALUES ('PREDIL_FACTOR_CALIB','Allowed values for the field used to specify the Predilution Factor for a Calibrator Curve',1,200,NULL,NULL,1,'A200')
+      END
+
+      IF ((SELECT COUNT(*) FROM [dbo].[tfmwSwParameters] WHERE [ParameterName] = 'VOLUME_PREDIL_CALIB' ) = 0)
+      BEGIN
+      INSERT INTO tfmwSwParameters
+      ([ParameterName],[DependByModel],[AnalyzerModel],[ValueNumeric],[ValueText],[Description])
+      VALUES ('VOLUME_PREDIL_CALIB',1,'A200',150,NULL,'Volume Predilution for calibration curve')
+      END
+    </UpdateScript>
+  </AppVersion>
  
+
 </TaskListDS>

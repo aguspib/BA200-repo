@@ -1971,12 +1971,12 @@ Public Class UiResultsAbsCurve
 
                     Dim myGlobalDataTO As GlobalDataTO
                     Dim myTestCalibratorsDelgate As New TestCalibratorsDelegate
-                    Dim myTestCalibratorsDS As TestCalibratorsDS
+                    Dim myTestCalibratorsDS As New CalibratorsDS
 
-                    myGlobalDataTO = myTestCalibratorsDelgate.GetTestCalibratorByTestID(Nothing, pAbsRow.TestID, pAbsRow.SampleType)
+                    myGlobalDataTO = myTestCalibratorsDelgate.GetTestCalibratorByTestID(Nothing, pAbsRow.TestID, myTestCalibratorsDS, pAbsRow.SampleType) 'BA-2563
 
                     If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
-                        myTestCalibratorsDS = DirectCast(myGlobalDataTO.SetDatos, TestCalibratorsDS)
+                        myTestCalibratorsDS = DirectCast(myGlobalDataTO.SetDatos, CalibratorsDS)
                         If myTestCalibratorsDS.tparTestCalibrators.Count > 0 Then
                             bsComodinText.Text = myTestCalibratorsDS.tparTestCalibrators.First.CalibratorName
                             bsLotText.Text = myTestCalibratorsDS.tparTestCalibrators.First.LotNumber
@@ -2137,12 +2137,12 @@ Public Class UiResultsAbsCurve
 
                     Dim myGlobalDataTO As New GlobalDataTO
                     Dim myTestCalibratorsDelgate As New TestCalibratorsDelegate
-                    Dim myTestCalibratorsDS As New TestCalibratorsDS
+                    Dim myTestCalibratorsDS As New CalibratorsDS
 
-                    myGlobalDataTO = myTestCalibratorsDelgate.GetTestCalibratorByTestID(Nothing, rowExecution.TestID, rowExecution.SampleType)
+                    myGlobalDataTO = myTestCalibratorsDelgate.GetTestCalibratorByTestID(Nothing, rowExecution.TestID, myTestCalibratorsDS, rowExecution.SampleType) 'BA-2563
 
                     If Not myGlobalDataTO.HasError Then
-                        myTestCalibratorsDS = DirectCast(myGlobalDataTO.SetDatos, TestCalibratorsDS)
+                        myTestCalibratorsDS = DirectCast(myGlobalDataTO.SetDatos, CalibratorsDS)
                         If myTestCalibratorsDS.tparTestCalibrators.Count > 0 Then
                             bsComodinText.Text = myTestCalibratorsDS.tparTestCalibrators.First.CalibratorName
                             bsLotText.Text = myTestCalibratorsDS.tparTestCalibrators.First.LotNumber

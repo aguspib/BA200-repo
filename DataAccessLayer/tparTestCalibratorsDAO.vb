@@ -11,11 +11,12 @@ Namespace Biosystems.Ax00.DAL.DAO
           
 
 #Region "CRUD"
+
         ''' <summary>
         ''' Add all values of a link between an Experimental Calibrator and an specific TestID/SampleType
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pTestCalibratorsDS">Typed DataSet TestCalibratorsDS containing the information to add</param>
+        ''' <param name="pCalibratorsDS">Typed DataSet CalibratorsDS containing the information to add</param>
         ''' <returns>GlobalDataTO containing success/error information. When success also return the identity value 
         '''          automatically generated for the DB for field TestCalibratorID</returns>
         ''' <remarks>
@@ -24,8 +25,9 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              SA 27/10/2010 - Added N preffix for multilanguage of field TS_User. Other changes: if TS_User 
         '''                              is not informed in the DS, get the ID of the current logged user, if TS_DateTime 
         '''                              is not informed in the DS, use the current date and time
+        '''                  IT 29/05/2015 - BA-2563
         ''' </remarks>
-        Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestCalibratorsDS As TestCalibratorsDS) As GlobalDataTO
+        Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, pCalibratorsDS As CalibratorsDS) As GlobalDataTO
             Dim resultData As New GlobalDataTO
 
             Try
@@ -36,45 +38,45 @@ Namespace Biosystems.Ax00.DAL.DAO
                     Dim cmdText As String = ""
                     cmdText = " INSERT INTO tparTestCalibrators (TestID, SampleType, CalibratorID, CurveGrowthType, CurveType, " & _
                                                                " CurveAxisXType, CurveAxisYType, TS_User, TS_DateTime) " & _
-                              " VALUES(" & pTestCalibratorsDS.tparTestCalibrators(0).TestID & ", " & _
-                                    " '" & pTestCalibratorsDS.tparTestCalibrators(0).SampleType.ToString & "', " & _
-                                           pTestCalibratorsDS.tparTestCalibrators(0).CalibratorID & ", "
+                              " VALUES(" & pCalibratorsDS.tparTestCalibrators(0).TestID & ", " & _
+                                    " '" & pCalibratorsDS.tparTestCalibrators(0).SampleType.ToString & "', " & _
+                                           pCalibratorsDS.tparTestCalibrators(0).CalibratorID & ", "
 
-                    If (pTestCalibratorsDS.tparTestCalibrators(0).IsCurveGrowthTypeNull Or pTestCalibratorsDS.tparTestCalibrators(0).CurveGrowthType = "") Then
+                    If (pCalibratorsDS.tparTestCalibrators(0).IsCurveGrowthTypeNull Or pCalibratorsDS.tparTestCalibrators(0).CurveGrowthType = "") Then
                         cmdText &= " NULL, "
                     Else
-                        cmdText &= " '" & pTestCalibratorsDS.tparTestCalibrators(0).CurveGrowthType.ToString & "', "
+                        cmdText &= " '" & pCalibratorsDS.tparTestCalibrators(0).CurveGrowthType.ToString & "', "
                     End If
 
-                    If (pTestCalibratorsDS.tparTestCalibrators(0).IsCurveTypeNull Or pTestCalibratorsDS.tparTestCalibrators(0).CurveType = "") Then
+                    If (pCalibratorsDS.tparTestCalibrators(0).IsCurveTypeNull Or pCalibratorsDS.tparTestCalibrators(0).CurveType = "") Then
                         cmdText &= " NULL, "
                     Else
-                        cmdText &= " '" & pTestCalibratorsDS.tparTestCalibrators(0).CurveType.ToString & "', "
+                        cmdText &= " '" & pCalibratorsDS.tparTestCalibrators(0).CurveType.ToString & "', "
                     End If
 
-                    If (pTestCalibratorsDS.tparTestCalibrators(0).IsCurveAxisXTypeNull Or pTestCalibratorsDS.tparTestCalibrators(0).CurveAxisXType = "") Then
+                    If (pCalibratorsDS.tparTestCalibrators(0).IsCurveAxisXTypeNull Or pCalibratorsDS.tparTestCalibrators(0).CurveAxisXType = "") Then
                         cmdText &= " NULL, "
                     Else
-                        cmdText &= " '" & pTestCalibratorsDS.tparTestCalibrators(0).CurveAxisXType.ToString & "', "
+                        cmdText &= " '" & pCalibratorsDS.tparTestCalibrators(0).CurveAxisXType.ToString & "', "
                     End If
 
-                    If (pTestCalibratorsDS.tparTestCalibrators(0).IsCurveAxisYTypeNull Or pTestCalibratorsDS.tparTestCalibrators(0).CurveAxisYType = "") Then
+                    If (pCalibratorsDS.tparTestCalibrators(0).IsCurveAxisYTypeNull Or pCalibratorsDS.tparTestCalibrators(0).CurveAxisYType = "") Then
                         cmdText &= " NULL, "
                     Else
-                        cmdText &= " '" & pTestCalibratorsDS.tparTestCalibrators(0).CurveAxisYType.ToString & "', "
+                        cmdText &= " '" & pCalibratorsDS.tparTestCalibrators(0).CurveAxisYType.ToString & "', "
                     End If
 
-                    If (pTestCalibratorsDS.tparTestCalibrators(0).IsTS_UserNull) Then
+                    If (pCalibratorsDS.tparTestCalibrators(0).IsTS_UserNull) Then
                         'Dim myGlobalbase As New GlobalBase
                         cmdText &= " N'" & GlobalBase.GetSessionInfo.UserName.Trim.Replace("'", "''") & "', "
                     Else
-                        cmdText &= " N'" & pTestCalibratorsDS.tparTestCalibrators(0).TS_User.Trim.Replace("'", "''") & "', "
+                        cmdText &= " N'" & pCalibratorsDS.tparTestCalibrators(0).TS_User.Trim.Replace("'", "''") & "', "
                     End If
 
-                    If (pTestCalibratorsDS.tparTestCalibrators(0).IsTS_DateTimeNull) Then
+                    If (pCalibratorsDS.tparTestCalibrators(0).IsTS_DateTimeNull) Then
                         cmdText &= " '" & Now.ToString("yyyyMMdd HH:mm:ss") & "') "
                     Else
-                        cmdText &= " '" & pTestCalibratorsDS.tparTestCalibrators(0).TS_DateTime.ToString("yyyyMMdd HH:mm:ss") & "') "
+                        cmdText &= " '" & pCalibratorsDS.tparTestCalibrators(0).TS_DateTime.ToString("yyyyMMdd HH:mm:ss") & "') "
                     End If
                     cmdText &= " SELECT SCOPE_IDENTITY()"
 
@@ -83,10 +85,10 @@ Namespace Biosystems.Ax00.DAL.DAO
                     Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
                         myTestCalibratorID = CType(dbCmd.ExecuteScalar(), Integer)
                     End Using
-                    
+
                     If (myTestCalibratorID > 0) Then
                         'Set the calibrator ID to the received dataset
-                        pTestCalibratorsDS.tparTestCalibrators(0).TestCalibratorID = myTestCalibratorID
+                        pCalibratorsDS.tparTestCalibrators(0).TestCalibratorID = myTestCalibratorID
                     End If
                 End If
             Catch ex As Exception
@@ -105,13 +107,14 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' for an specific TestID/SampleType
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pTestCalibratorsDS">Typed DataSet TestCalibratorsDS containing the information to update</param>
+        ''' <param name="pCalibratorsDS">Typed DataSet CalibratorsDS containing the information to update</param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
-        ''' Created by: VR 31/01/2010 (Tested : Pending)
-        '''             SA 27/10/2010 - Added N preffix for multilanguage of field TS_User
+        ''' Created by:  VR 31/01/2010 (Tested : Pending)
+        '''              SA 27/10/2010 - Added N preffix for multilanguage of field TS_User
+        ''' Modified by: IT 29/05/2015 - BA-2563
         ''' </remarks>
-        Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestCalibratorsDS As TestCalibratorsDS) As GlobalDataTO
+        Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, pCalibratorsDS As CalibratorsDS) As GlobalDataTO
             Dim resultData As New GlobalDataTO
 
             Try
@@ -122,47 +125,47 @@ Namespace Biosystems.Ax00.DAL.DAO
                     Dim cmdText As String = ""
                     cmdText = " UPDATE tparTestCalibrators SET "
 
-                    If (pTestCalibratorsDS.tparTestCalibrators(0).IsCurveGrowthTypeNull Or pTestCalibratorsDS.tparTestCalibrators(0).CurveGrowthType = "") Then
+                    If (pCalibratorsDS.tparTestCalibrators(0).IsCurveGrowthTypeNull Or pCalibratorsDS.tparTestCalibrators(0).CurveGrowthType = "") Then
                         cmdText &= " CurveGrowthType = NULL, "
                     Else
-                        cmdText &= " CurveGrowthType = '" & pTestCalibratorsDS.tparTestCalibrators(0).CurveGrowthType.ToString & "', "
+                        cmdText &= " CurveGrowthType = '" & pCalibratorsDS.tparTestCalibrators(0).CurveGrowthType.ToString & "', "
                     End If
 
-                    If (pTestCalibratorsDS.tparTestCalibrators(0).IsCurveTypeNull Or pTestCalibratorsDS.tparTestCalibrators(0).CurveType = "") Then
+                    If (pCalibratorsDS.tparTestCalibrators(0).IsCurveTypeNull Or pCalibratorsDS.tparTestCalibrators(0).CurveType = "") Then
                         cmdText &= " CurveType = NULL, "
                     Else
-                        cmdText &= " CurveType =  '" & pTestCalibratorsDS.tparTestCalibrators(0).CurveType.ToString & "', "
+                        cmdText &= " CurveType =  '" & pCalibratorsDS.tparTestCalibrators(0).CurveType.ToString & "', "
                     End If
 
-                    If (pTestCalibratorsDS.tparTestCalibrators(0).IsCurveAxisXTypeNull Or pTestCalibratorsDS.tparTestCalibrators(0).CurveAxisXType = "") Then
+                    If (pCalibratorsDS.tparTestCalibrators(0).IsCurveAxisXTypeNull Or pCalibratorsDS.tparTestCalibrators(0).CurveAxisXType = "") Then
                         cmdText &= " CurveAxisXType = NULL, "
                     Else
-                        cmdText &= " CurveAxisXType = '" & pTestCalibratorsDS.tparTestCalibrators(0).CurveAxisXType.ToString & "', "
+                        cmdText &= " CurveAxisXType = '" & pCalibratorsDS.tparTestCalibrators(0).CurveAxisXType.ToString & "', "
                     End If
 
-                    If (pTestCalibratorsDS.tparTestCalibrators(0).IsCurveAxisYTypeNull Or pTestCalibratorsDS.tparTestCalibrators(0).CurveAxisYType = "") Then
+                    If (pCalibratorsDS.tparTestCalibrators(0).IsCurveAxisYTypeNull Or pCalibratorsDS.tparTestCalibrators(0).CurveAxisYType = "") Then
                         cmdText &= " CurveAxisYType = NULL, "
                     Else
-                        cmdText &= " CurveAxisYType = '" & pTestCalibratorsDS.tparTestCalibrators(0).CurveAxisYType.ToString & "', "
+                        cmdText &= " CurveAxisYType = '" & pCalibratorsDS.tparTestCalibrators(0).CurveAxisYType.ToString & "', "
                     End If
 
-                    If (pTestCalibratorsDS.tparTestCalibrators(0).IsTS_UserNull) Then
+                    If (pCalibratorsDS.tparTestCalibrators(0).IsTS_UserNull) Then
                         'Dim myGlobalbase As New GlobalBase
                         cmdText &= " TS_User = N'" & GlobalBase.GetSessionInfo().UserName().Replace("'", "''") & "', "
                     Else
-                        cmdText &= " TS_User = N'" & pTestCalibratorsDS.tparTestCalibrators(0).TS_User.Replace("'", "''") & "', "
+                        cmdText &= " TS_User = N'" & pCalibratorsDS.tparTestCalibrators(0).TS_User.Replace("'", "''") & "', "
                     End If
 
-                    If (pTestCalibratorsDS.tparTestCalibrators(0).IsTS_DateTimeNull) Then
+                    If (pCalibratorsDS.tparTestCalibrators(0).IsTS_DateTimeNull) Then
                         cmdText &= " TS_DateTime = '" & Now.ToString("yyyyMMdd HH:mm:ss") & "' "
                     Else
-                        cmdText &= " TS_DateTime = '" & pTestCalibratorsDS.tparTestCalibrators(0).TS_DateTime.ToString("yyyyMMdd HH:mm:ss") & "' "
+                        cmdText &= " TS_DateTime = '" & pCalibratorsDS.tparTestCalibrators(0).TS_DateTime.ToString("yyyyMMdd HH:mm:ss") & "' "
                     End If
 
-                    cmdText += "  WHERE TestCalibratorID =" & pTestCalibratorsDS.tparTestCalibrators(0).TestCalibratorID & _
-                               "  AND   TestID = " & pTestCalibratorsDS.tparTestCalibrators(0).TestID & _
-                               "  AND   SampleType = '" & pTestCalibratorsDS.tparTestCalibrators(0).SampleType & "'" & _
-                               "  AND   CalibratorID = " & pTestCalibratorsDS.tparTestCalibrators(0).CalibratorID
+                    cmdText += "  WHERE TestCalibratorID =" & pCalibratorsDS.tparTestCalibrators(0).TestCalibratorID & _
+                               "  AND   TestID = " & pCalibratorsDS.tparTestCalibrators(0).TestID & _
+                               "  AND   SampleType = '" & pCalibratorsDS.tparTestCalibrators(0).SampleType & "'" & _
+                               "  AND   CalibratorID = " & pCalibratorsDS.tparTestCalibrators(0).CalibratorID
 
                     'Execute the SQL sentence 
                     Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
@@ -208,12 +211,11 @@ Namespace Biosystems.Ax00.DAL.DAO
                         dbCmd.CommandText = cmdText
 
                         'Fill the DataSet to return 
-                        Dim testCalibratorDS As New TestCalibratorsDS
+                        Dim calibratorsDs As New CalibratorsDS
                         Dim dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-                        dbDataAdapter.Fill(testCalibratorDS.tparTestCalibrators)
+                        dbDataAdapter.Fill(calibratorsDs.tparTestCalibrators)
 
-                        resultData.SetDatos = testCalibratorDS
-
+                        resultData.SetDatos = calibratorsDs
 
                     End If
                 End If
@@ -309,8 +311,9 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' Modified by: AG 04/03/2010 - Added Order by CalibratorNum
         '''              AG 01/09/2010 - Added optinal parameter pSampleType
         '''              AG 01/02/2011 - Change Order DESC by ASC
+        '''              IT 29/05/2015 - BA-2563
         ''' </remarks>
-        Public Function GetTestCalibratorValues(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, _
+        Public Function GetTestCalibratorValues(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, calibratorsDs As CalibratorsDS, _
                                                 Optional ByVal pSampleType As String = "") As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -342,15 +345,15 @@ Namespace Biosystems.Ax00.DAL.DAO
                         'AG 01/02/2011 - change DESC for ASC
                         cmdText &= "ORDER BY CalibratorNum ASC"
 
-                        Dim testCalibratorValueData As New TestCalibratorValuesDS
+                        'Dim calibratorsDs As New CalibratorsDS 'IT 29/05/2015 - BA-2563
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
                             Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-                                dbDataAdapter.Fill(testCalibratorValueData.tparTestCalibratorValues)
+                                dbDataAdapter.Fill(CalibratorsDS.tparTestCalibratorValues)
                             End Using
 
                         End Using
 
-                        resultData.SetDatos = testCalibratorValueData
+                        resultData.SetDatos = calibratorsDs
                         resultData.HasError = False
                     End If
                 End If
@@ -380,8 +383,9 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <remarks>
         ''' Created  by: SA 12/07/2012 - Based in GetTestCalibratorValuesNEW but: changed the SQL Query to get also values of definition 
         '''                              of Calibration Curve; parameter SampleType is required, not optional
+        ''' Modified by: IT 29/05/2015 - BA-2563
         ''' </remarks>
-        Public Function GetTestCalibratorValuesNEW(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, _
+        Public Function GetTestCalibratorValuesNEW(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, calibratorsDs As CalibratorsDS, _
                                                    ByVal pSampleType As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -398,14 +402,14 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                 " AND    TC.SampleType = '" & pSampleType.Trim & "' " & vbCrLf & _
                                                 " ORDER BY TCV.CalibratorNum ASC "
 
-                        Dim testCalibratorValueData As New TestCalibratorValuesDS
+                        'Dim calibratorsDs As New CalibratorsDS 'IT 29/05/2015 - BA-2563
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
                             Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-                                dbDataAdapter.Fill(testCalibratorValueData.tparTestCalibratorValues)
+                                dbDataAdapter.Fill(calibratorsDs.tparTestCalibratorValues)
                             End Using
                         End Using
 
-                        resultData.SetDatos = testCalibratorValueData
+                        resultData.SetDatos = calibratorsDs
                         resultData.HasError = False
                     End If
                 End If
@@ -433,9 +437,10 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <returns>GlobalDataTO containing typed DataSet TestCalibratorsDS with the links between 
         '''          the specified Test (and optionally SampleType) and Experimental Calibrators</returns>
         ''' <remarks>
-        ''' Created by: TR 17/05/2010
+        ''' Created by:  TR 17/05/2010
+        ''' Modified by: IT 29/05/2015 - BA-2563
         ''' </remarks>
-        Public Function GetTestCalibratorByTestID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, _
+        Public Function GetTestCalibratorByTestID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, calibratorsDs As CalibratorsDS, _
                                                   Optional ByVal pSampleType As String = "") As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -449,14 +454,14 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                 " WHERE  TestID = " & pTestID.ToString
                         If (pSampleType.Trim <> String.Empty) Then cmdText &= " AND SampleType ='" & pSampleType & "'"
 
-                        Dim testCalibratorDS As New TestCalibratorsDS
+                        'Dim calibratorsDs As New CalibratorsDS 'IT 29/05/2015 - BA-2563
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
                             Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-                                dbDataAdapter.Fill(testCalibratorDS.tparTestCalibrators)
+                                dbDataAdapter.Fill(calibratorsDs.tparTestCalibrators)
                             End Using
                         End Using
 
-                        resultData.SetDatos = testCalibratorDS
+                        resultData.SetDatos = calibratorsDs
                         resultData.HasError = False
                     End If
                 End If

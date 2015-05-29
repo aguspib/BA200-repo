@@ -14,13 +14,14 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' Add values for one point of an experimental Calibrator when it is used for an specific Test/SampleType
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pTestCalibValueDS">Typed DataSet TestCalibratorValuesDS containing the Test Calibrator Values to add</param>
+        ''' <param name="pCalibratorsDs">Typed DataSet CalibratorsDS containing the Test Calibrator Values to add</param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
         ''' Created by:  VR 28/05/2010
         ''' Modified by: SA 08/02/2012 - Changed the function template
+        '''              IT 29/05/2015 - BA-2563
         ''' </remarks>
-        Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestCalibValueDS As TestCalibratorValuesDS) As GlobalDataTO
+        Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, pCalibratorsDs As CalibratorsDS) As GlobalDataTO
             Dim resultData As New GlobalDataTO
 
             Try
@@ -29,15 +30,15 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
                     Dim cmdText As String = " INSERT INTO tparTestCalibratorValues (TestCalibratorID, CalibratorNum, TheoricalConcentration, KitConcentrationRelation, BaseConcentration) " & vbCrLf & _
-                                            " VALUES(" & pTestCalibValueDS.tparTestCalibratorValues(0).TestCalibratorID & ", " & vbCrLf & _
-                                                         pTestCalibValueDS.tparTestCalibratorValues(0).CalibratorNum & ", " & vbCrLf & _
-                                                         ReplaceNumericString(pTestCalibValueDS.tparTestCalibratorValues(0).TheoricalConcentration) & ", " & vbCrLf & _
-                                                         ReplaceNumericString(pTestCalibValueDS.tparTestCalibratorValues(0).KitConcentrationRelation) & ", " & vbCrLf
+                                            " VALUES(" & pCalibratorsDs.tparTestCalibratorValues(0).TestCalibratorID & ", " & vbCrLf & _
+                                                         pCalibratorsDs.tparTestCalibratorValues(0).CalibratorNum & ", " & vbCrLf & _
+                                                         ReplaceNumericString(pCalibratorsDs.tparTestCalibratorValues(0).TheoricalConcentration) & ", " & vbCrLf & _
+                                                         ReplaceNumericString(pCalibratorsDs.tparTestCalibratorValues(0).KitConcentrationRelation) & ", " & vbCrLf
 
-                    If (pTestCalibValueDS.tparTestCalibratorValues(0).IsBaseConcentrationNull) Then
+                    If (pCalibratorsDs.tparTestCalibratorValues(0).IsBaseConcentrationNull) Then
                         cmdText &= " 0) " & vbCrLf
                     Else
-                        cmdText &= " '" & pTestCalibValueDS.tparTestCalibratorValues(0).BaseConcentration & "') " & vbCrLf
+                        cmdText &= " '" & pCalibratorsDs.tparTestCalibratorValues(0).BaseConcentration & "') " & vbCrLf
                     End If
 
                     Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
@@ -101,8 +102,9 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <remarks>
         ''' Created by:  TR 03/06/2010
         ''' Modified by: SA 08/02/2012 - Changed the function template
+        '''              IT 29/05/2015 - BA-2563
         ''' </remarks>
-        Public Function ReadByTestCalibratorID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestCalibratorID As Integer) As GlobalDataTO
+        Public Function ReadByTestCalibratorID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestCalibratorID As Integer, calibratorsDs As CalibratorsDS) As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -114,14 +116,14 @@ Namespace Biosystems.Ax00.DAL.DAO
                         Dim cmdText As String = " SELECT * FROM tparTestCalibratorValues " & vbCrLf & _
                                                 " WHERE  TestCalibratorID = " & pTestCalibratorID & vbCrLf
 
-                        Dim myTestCalibratorValueDS As New TestCalibratorValuesDS
+                        'Dim calibratorsDs As New CalibratorsDS 'IT 29/05/2015 - BA-2563
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
                             Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-                                dbDataAdapter.Fill(myTestCalibratorValueDS.tparTestCalibratorValues)
+                                dbDataAdapter.Fill(calibratorsDs.tparTestCalibratorValues)
                             End Using
                         End Using
-                        
-                        myGlobalDataTO.SetDatos = myTestCalibratorValueDS
+
+                        myGlobalDataTO.SetDatos = calibratorsDs
                         myGlobalDataTO.HasError = False
                     End If
                 End If
@@ -150,8 +152,9 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' Created by:  TR 14/06/2010
         ''' Modified by: SA 08/02/2012 - Changed the function template
         '''              XB 01/02/2013 - Upper conversions must be implemented in same environment (f.ex.SQL)  (Bugs tracking #1112)
+        '''              IT 29/05/2015 - BA-2563
         ''' </remarks>
-        Public Function ReadByTestIDSampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, ByVal pSampleType As String) As GlobalDataTO
+        Public Function ReadByTestIDSampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, ByVal pSampleType As String, calibratorsDs As CalibratorsDS) As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -166,14 +169,14 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                 " ORDER BY TCV.CalibratorNum DESC "
                         '" AND    UPPER(TC.SampleType) = '" & pSampleType.Trim.ToUpper & "' " & vbCrLf & _
 
-                        Dim myTestCalibratorValueDS As New TestCalibratorValuesDS
+                        'Dim calibratorsDs As New CalibratorsDS 'IT 29/05/2015 - BA-2563
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
                             Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-                                dbDataAdapter.Fill(myTestCalibratorValueDS.tparTestCalibratorValues)
+                                dbDataAdapter.Fill(CalibratorsDS.tparTestCalibratorValues)
                             End Using
                         End Using
 
-                        myGlobalDataTO.SetDatos = myTestCalibratorValueDS
+                        myGlobalDataTO.SetDatos = CalibratorsDS
                         myGlobalDataTO.HasError = False
                     End If
                 End If
@@ -195,14 +198,15 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' Update values of one point of an experimental Calibrator when it is used for an specific Test/SampleType
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pTestCalibValueDS">Typed DataSet TestCalibratorValuesDS containing the Test Calibrator Value to update</param>
+        ''' <param name="pCalibratorsDs">Typed DataSet CalibratorsDS containing the Test Calibrator Value to update</param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
         ''' Created by:  VR 28/05/2010 
         ''' Modified by: AG 31/05/2010 - Added BaseConcentration
         '''              SA 08/02/2012 - Changed the function template
+        '''              IT 29/05/2015 - BA-2563
         ''' </remarks>
-        Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestCalibValueDS As TestCalibratorValuesDS) As GlobalDataTO
+        Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, pCalibratorsDs As CalibratorsDS) As GlobalDataTO
             Dim resultData As New GlobalDataTO
 
             Try
@@ -211,11 +215,11 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
                     Dim cmdText As String = " UPDATE tparTestCalibratorValues " & vbCrLf & _
-                                            " SET    TheoricalConcentration   = " & ReplaceNumericString(pTestCalibValueDS.tparTestCalibratorValues(0).TheoricalConcentration) & ", " & vbCrLf & _
-                                                   " KitConcentrationRelation = " & ReplaceNumericString(pTestCalibValueDS.tparTestCalibratorValues(0).KitConcentrationRelation) & ", " & vbCrLf & _
-                                                   " BaseConcentration        = '" & pTestCalibValueDS.tparTestCalibratorValues(0).BaseConcentration & "' " & vbCrLf & _
-                                            " WHERE  TestCalibratorID = " & pTestCalibValueDS.tparTestCalibratorValues(0).TestCalibratorID & vbCrLf & _
-                                            " AND    CalibratorNum    = " & pTestCalibValueDS.tparTestCalibratorValues(0).CalibratorNum & vbCrLf
+                                            " SET    TheoricalConcentration   = " & ReplaceNumericString(pCalibratorsDs.tparTestCalibratorValues(0).TheoricalConcentration) & ", " & vbCrLf & _
+                                                   " KitConcentrationRelation = " & ReplaceNumericString(pCalibratorsDs.tparTestCalibratorValues(0).KitConcentrationRelation) & ", " & vbCrLf & _
+                                                   " BaseConcentration        = '" & pCalibratorsDs.tparTestCalibratorValues(0).BaseConcentration & "' " & vbCrLf & _
+                                            " WHERE  TestCalibratorID = " & pCalibratorsDs.tparTestCalibratorValues(0).TestCalibratorID & vbCrLf & _
+                                            " AND    CalibratorNum    = " & pCalibratorsDs.tparTestCalibratorValues(0).CalibratorNum & vbCrLf
 
                     Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
@@ -232,6 +236,7 @@ Namespace Biosystems.Ax00.DAL.DAO
             End Try
             Return resultData
         End Function
+
 #End Region
 
 #Region "Other Methods"
@@ -309,14 +314,15 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <returns></returns>
         ''' <remarks>
         ''' Created by:  DL 07/06/2010
+        ''' Modified by: IT 29/05/2015 - BA-2563
         ''' </remarks>
         Public Function ReadByTestCalibratorIDAndTestID(ByVal pDBConnection As SqlClient.SqlConnection, _
                                                         ByVal pTestCalibratorID As Integer, _
-                                                        ByVal pTestID As Integer) As GlobalDataTO
+                                                        ByVal pTestID As Integer, calibratorsDs As CalibratorsDS) As GlobalDataTO
 
             Dim myGlobalDataTO As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
-            Dim myTestCalibratorValueDS As New TestCalibratorValuesDS
+            'Dim calibratorsDs As New CalibratorsDS 'IT 29/05/2015 - BA-2563
 
             Try
                 myGlobalDataTO = GetOpenDBConnection(pDBConnection)
@@ -335,9 +341,9 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                         'Fill the DataSet to return 
                         Dim dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-                        dbDataAdapter.Fill(myTestCalibratorValueDS.tparTestCalibratorValues)
+                        dbDataAdapter.Fill(calibratorsDs.tparTestCalibratorValues)
 
-                        myGlobalDataTO.SetDatos = myTestCalibratorValueDS
+                        myGlobalDataTO.SetDatos = calibratorsDs
 
                     End If
                 End If

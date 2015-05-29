@@ -56,9 +56,10 @@ Namespace Biosystems.Ax00.BL
         ''' <returns>GlobalDataTO containing success/error information. When success also return the same entry 
         '''          DataSet updated with the identity value automatically generated for the DB for field TestCalibratorID</returns>
         ''' <remarks>
-        ''' Created by : TR 09/06/2010 
+        ''' Created by:   TR 09/06/2010 
+        ''' Modified by: IT 29/05/2015 - BA-2563
         ''' </remarks>
-        Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByRef pTestCalibratorDS As TestCalibratorsDS) As GlobalDataTO
+        Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByRef pTestCalibratorDS As CalibratorsDS) As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -67,12 +68,12 @@ Namespace Biosystems.Ax00.BL
                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim tempTestCalibratorDS As New TestCalibratorsDS
+                        Dim tempTestCalibratorDS As New CalibratorsDS
                         Dim myTestSampleCalibratorDS As New TestSampleCalibratorDS
                         Dim mytparTestCalibratorsDAO As New tparTestCalibratorsDAO
                         Dim myTestCalibratorValuesDelegate As New TestCalibratorValuesDelegate
 
-                        For Each TestCalibRow As TestCalibratorsDS.tparTestCalibratorsRow In pTestCalibratorDS.tparTestCalibrators.Rows
+                        For Each TestCalibRow As CalibratorsDS.tparTestCalibratorsRow In pTestCalibratorDS.tparTestCalibrators.Rows
                             'Validate if the Test and SampleType have a link with an Experimental Calibrator
                             myGlobalDataTO = mytparTestCalibratorsDAO.GetTestCalibratorData(dbConnection, TestCalibRow.TestID, TestCalibRow.SampleType)
                             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
@@ -142,12 +143,13 @@ Namespace Biosystems.Ax00.BL
         ''' for an specific TestID/SampleType
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pTestCalibratorDS">Typed DataSet TestCalibratorsDS containing the information to update</param>
+        ''' <param name="pCalibratorsDs">Typed DataSet CalibratorsDS containing the information to update</param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
-        ''' Created by : TR 09/06/2010 
+        ''' Created by:  TR 09/06/2010 
+        ''' Modified by: IT 29/05/2015 - BA-2563
         ''' </remarks>
-        Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestCalibratorDS As TestCalibratorsDS) As GlobalDataTO
+        Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalibratorsDs As CalibratorsDS) As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -156,10 +158,10 @@ Namespace Biosystems.Ax00.BL
                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim tempTestCalibratorDS As New TestCalibratorsDS
+                        Dim tempTestCalibratorDS As New CalibratorsDS
                         Dim mytparTestCalibratorsDAO As New tparTestCalibratorsDAO
 
-                        For Each TestCalibRow As TestCalibratorsDS.tparTestCalibratorsRow In pTestCalibratorDS.tparTestCalibrators.Rows
+                        For Each TestCalibRow As CalibratorsDS.tparTestCalibratorsRow In pCalibratorsDs.tparTestCalibrators.Rows
                             tempTestCalibratorDS.tparTestCalibrators.Clear()
                             tempTestCalibratorDS.tparTestCalibrators.ImportRow(TestCalibRow)
 
@@ -429,8 +431,9 @@ Namespace Biosystems.Ax00.BL
         ''' <remarks>
         ''' Created by:  DL 23/02/2010
         ''' Modified by: AG 01/09/2010 - Added optional parameter pSampleType
+        '''              IT 29/05/2015 - BA-2563
         ''' </remarks>
-        Public Function GetTestCalibratorValues(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, _
+        Public Function GetTestCalibratorValues(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, calibratorsDs As CalibratorsDS, _
                                                 Optional ByVal pSampleType As String = "") As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -441,7 +444,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim mytparTestCalibrators As New tparTestCalibratorsDAO
-                        resultData = mytparTestCalibrators.GetTestCalibratorValues(pDBConnection, pTestID, pSampleType)
+                        resultData = mytparTestCalibrators.GetTestCalibratorValues(pDBConnection, pTestID, calibratorsDs, pSampleType)
                     End If
                 End If
 
@@ -471,9 +474,10 @@ Namespace Biosystems.Ax00.BL
         ''' <remarks>
         ''' Created  by: SA 12/07/2012 - Based in GetTestCalibratorValuesNEW but: parameter SampleType is required, not optional, and
         '''                              the new function in DAO Class is called
+        ''' Modified by: IT 29/05/2015 - BA-2563
         ''' </remarks>
         Public Function GetTestCalibratorValuesNEW(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, _
-                                                   ByVal pSampleType As String) As GlobalDataTO
+                                                   ByVal pSampleType As String, calibratorsDs As CalibratorsDS) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -483,7 +487,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim mytparTestCalibrators As New tparTestCalibratorsDAO
-                        resultData = mytparTestCalibrators.GetTestCalibratorValuesNEW(pDBConnection, pTestID, pSampleType)
+                        resultData = mytparTestCalibrators.GetTestCalibratorValuesNEW(pDBConnection, pTestID, calibratorsDs, pSampleType)
                     End If
                 End If
             Catch ex As Exception
@@ -510,9 +514,10 @@ Namespace Biosystems.Ax00.BL
         ''' <returns>GlobalDataTO containing typed DataSet TestCalibratorsDS with the links between 
         '''          the specified Test (and optionally SampleType) and Experimental Calibrators</returns>
         ''' <remarks>
-        ''' Created by: TR 17/05/2010
+        ''' Created by:  TR 17/05/2010
+        ''' Modified by: IT 29/05/2015 - BA-2563
         ''' </remarks>
-        Public Function GetTestCalibratorByTestID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, _
+        Public Function GetTestCalibratorByTestID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, calibratorsDs As CalibratorsDS, _
                                                   Optional ByVal pSampleType As String = "") As GlobalDataTO
 
             Dim resultData As GlobalDataTO = Nothing
@@ -524,7 +529,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim mytparTestCalibrators As New tparTestCalibratorsDAO
-                        resultData = mytparTestCalibrators.GetTestCalibratorByTestID(dbConnection, pTestID, pSampleType)
+                        resultData = mytparTestCalibrators.GetTestCalibratorByTestID(dbConnection, pTestID, calibratorsDs, pSampleType)
                     End If
                 End If
             Catch ex As Exception
