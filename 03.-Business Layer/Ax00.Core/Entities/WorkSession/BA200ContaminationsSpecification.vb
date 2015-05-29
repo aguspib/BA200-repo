@@ -54,7 +54,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
         Public Property DispensesPerStep As Integer Implements IAnalyzerContaminationsSpecification.DispensesPerStep
 
         Public Function CreateDispensing() As IDispensing Implements IAnalyzerContaminationsSpecification.CreateDispensing
-            Return New Ax00Dispensing
+            Return New BA200Dispensing
         End Function
 
         Public Property AdditionalPredilutionSteps As Integer Implements IAnalyzerContaminationsSpecification.AdditionalPredilutionSteps

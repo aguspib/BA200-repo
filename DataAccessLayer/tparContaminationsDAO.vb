@@ -238,36 +238,48 @@ Partial Public Class tparContaminationsDAO
     End Function
 
 
-    Public Shared Function GetAllContaminationsForAReagent(ReagentID As Integer) As TypedGlobalDataTo(Of ContaminationsDS.tparContaminationsDataTable)
+    Public Shared Function GetAllContaminationsForAReagent(ReagentID As Integer) As TypedGlobalDataTo(Of EnumerableRowCollection(Of ContaminationsDS.tparContaminationsRow))
         'Dim resultData As GlobalDataTO = Nothing
         Dim dbConnection As SqlClient.SqlConnection = Nothing
 
         Try
-            Dim connection = GetSafeOpenDBConnection(Nothing)
-            dbConnection = connection.SetDatos
-            If dbConnection Is Nothing Then
+            Dim cmdText As String = "SELECT * FROM [Ax00].[dbo].[tparContaminations] Where ContaminationType = 'R1'" 'Where ReagentContaminatorID=" & ReagentID & ";"
 
-                Return New TypedGlobalDataTo(Of ContaminationsDS.tparContaminationsDataTable) _
-                    With {.SetDatos = Nothing, .HasError = True, .ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString}
+            <ThreadStatic> Static contaminationsDataDS As ContaminationsDS
+            <ThreadStatic> Static InternalDictionary As New Dictionary(Of Integer, EnumerableRowCollection(Of ContaminationsDS.tparContaminationsRow))
 
-            Else
-                Dim cmdText As String = "SELECT * FROM [Ax00].[dbo].[tparContaminations] Where ReagentContaminatorID=" & ReagentID & ";"
+            If contaminationsDataDS Is Nothing Then
+                Dim connection = GetSafeOpenDBConnection(Nothing)
+                dbConnection = connection.SetDatos
+                If dbConnection Is Nothing Then
 
-                Dim contaminationsDataDS As New ContaminationsDS
-                Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
-                    Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                    Return New TypedGlobalDataTo(Of EnumerableRowCollection(Of ContaminationsDS.tparContaminationsRow)) _
+                        With {.SetDatos = Nothing, .HasError = True, .ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString}
+                End If
+                contaminationsDataDS = New ContaminationsDS
+                Using dbCmd As New SqlCommand(cmdText, dbConnection)
+                    Using dbDataAdapter As New SqlDataAdapter(dbCmd)
                         dbDataAdapter.Fill(contaminationsDataDS.tparContaminations)
                     End Using
                 End Using
-                Dim resultData As New TypedGlobalDataTo(Of ContaminationsDS.tparContaminationsDataTable)
-                resultData.SetDatos = contaminationsDataDS.tparContaminations
-
-                resultData.HasError = False
-                Return resultData
             End If
 
+            Dim resultData As New TypedGlobalDataTo(Of EnumerableRowCollection(Of ContaminationsDS.tparContaminationsRow))
+
+
+            Dim target As EnumerableRowCollection(Of ContaminationsDS.tparContaminationsRow) = Nothing
+            If InternalDictionary.TryGetValue(ReagentID, target) Then
+                resultData.SetDatos = target
+            Else
+                Dim filter = (From var In contaminationsDataDS.tparContaminations Where var.ReagentContaminatorID = ReagentID)
+                InternalDictionary.Add(ReagentID, filter)
+                resultData.SetDatos = filter
+            End If
+
+            Return resultData
+
         Catch ex As Exception
-            Dim resultData = New TypedGlobalDataTo(Of ContaminationsDS.tparContaminationsDataTable)
+            Dim resultData = New TypedGlobalDataTo(Of EnumerableRowCollection(Of ContaminationsDS.tparContaminationsRow))
             resultData.HasError = True
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
@@ -280,7 +292,6 @@ Partial Public Class tparContaminationsDAO
         End Try
 
     End Function
-
 
 #End Region
 

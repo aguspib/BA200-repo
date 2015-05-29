@@ -11,6 +11,7 @@ Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.PresentationCOM
 Imports System.Timers
 Imports System.Globalization
+Imports System.Threading
 Imports Biosystems.Ax00.App
 Imports PesentationLayer.RotorUtils
 'Imports Biosystems.Ax00.PresentationCOM.RotorUtils
@@ -246,8 +247,8 @@ Public Class UiWSRotorPositions
     Private reagentBarcodeReaderOFF As Boolean = False
 
     'DL 16/04/2013
-    Private watchDogTimer As New Timer()
-    Private autoWSCreationTimer As New Timer() 'AG 02/01/2014 - BT #1433 (v211 patch2)
+    Private watchDogTimer As New Timers.Timer()
+    Private autoWSCreationTimer As New Timers.Timer() 'AG 02/01/2014 - BT #1433 (v211 patch2)
 
     Private ESCKeyPressed As Boolean = False  ' XB 11/03/2014 - #1523
 #End Region
@@ -7070,11 +7071,17 @@ Public Class UiWSRotorPositions
                     Dim workingThread As New Threading.Thread(AddressOf CreateWSExecutions)
                     ScreenWorkingProcess = True
                     workingThread.Start()
-
+                    UiAx00MainMDI.InitializeMarqueeProgreesBar()
+                    Dim timer = Now.AddSeconds(0.1)
+                    Dim priority = Threading.Thread.CurrentThread.Priority
+                    Thread.CurrentThread.Priority = ThreadPriority.BelowNormal
                     While ScreenWorkingProcess
-                        UiAx00MainMDI.InitializeMarqueeProgreesBar()
-                        Application.DoEvents()
+                        If timer < Now Then
+                            Application.DoEvents()
+                            timer = Now.AddSeconds(0.1)
+                        End If
                     End While
+                    Threading.Thread.CurrentThread.Priority = priority
 
                     workingThread = Nothing
                     UiAx00MainMDI.StopMarqueeProgressBar()

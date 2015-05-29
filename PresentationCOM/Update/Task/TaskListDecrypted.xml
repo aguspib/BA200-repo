@@ -1250,7 +1250,7 @@
      )
      AS
      SET NOCOUNT ON;
-     SELECT a.ExecutionID, a.AnalyzerID, a.WorkSessionID, a.SampleClass, a.OrderTestID, a.ReplicateNumber, a.ExecutionStatus, a.ExecutionType,
+          SELECT a.ExecutionID, a.AnalyzerID, a.WorkSessionID, a.SampleClass, a.OrderTestID, a.ReplicateNumber, a.ExecutionStatus, a.ExecutionType,
      a.PreparationID, b.OrderID, b.TestType, b.SampleType, d.TestID, e.ReagentID, f.PredilutionMode
      FROM twksWSExecutions a, twksOrderTests b, twksOrders c, tparTests d, tparTestReagents e, tparTestSamples f
      where A.OrderTestID = B.OrderTestID
@@ -1258,9 +1258,11 @@
      AND B.TestID = D.TestID
      AND D.TestID = E.TestID
      AND D.TestID = F.TestID
-     AND a.ExecutionID = @pEXECUTIONID
+     AND A.PreparationID = @pEXECUTIONID 
      AND E.ReagentNumber = 1
      AND B.SampleType = F.SampleType
+
+
 
      GO
 

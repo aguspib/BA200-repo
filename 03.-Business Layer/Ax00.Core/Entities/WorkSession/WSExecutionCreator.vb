@@ -8,7 +8,8 @@ Imports Biosystems.Ax00.DAL.DAO
 Imports Biosystems.Ax00.Global
 Imports System.Threading.Tasks
 Imports Biosystems.Ax00.BL
-Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
+Imports Biosystems.Ax00.Core.Entities.Worksession.Contaminations
+Imports Biosystems.Ax00.Core.Entities.Worksession.Contaminations.Interfaces
 Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Interfaces
 
@@ -84,13 +85,14 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
 
         Public ReadOnly Property AnalyzerID As String
             Get
-                Return pAnalyzerID
+                Return AnalyzerManager.GetCurrentAnalyzerManager.ActiveAnalyzer
             End Get
         End Property
 
         Public ReadOnly Property WorksesionID As String
             Get
-                Return pWorkSessionID
+                'Return pWorkSessionID
+                Return AnalyzerManager.GetCurrentAnalyzerManager.ActiveWorkSession
             End Get
         End Property
 
@@ -1126,6 +1128,56 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return resultData
+        End Function
+
+        Function GetContaminationNumber(calculateinrunning As Boolean, previousReagentID As List(Of Integer), ByVal orderTests As IEnumerable(Of ExecutionsDS.twksWSExecutionsRow)) As Integer
+            Dim contaminaNumber As Integer = 0
+            Dim auxContext = New ContaminationsContext(ContaminationsSpecification)
+            auxContext.Steps.Clear()
+            If Not calculateinrunning AndAlso previousReagentID IsNot Nothing AndAlso previousReagentID.Any Then
+                'Iterate throug last "persistence" elements of PreviousreagentID:
+                For i As Integer = Math.Max(0, previousReagentID.Count - ContaminationsSpecification.HighContaminationPersistence) To previousReagentID.Count - 1
+                    Dim curStep = New ContextStep(ContaminationsSpecification.DispensesPerStep)
+                    curStep(1) = ContaminationsSpecification.CreateDispensing()
+                    curStep(1).R1ReagentID = previousReagentID(i)
+                    auxContext.Steps.Append(curStep)
+                Next
+            ElseIf Not calculateinrunning Then
+                For i = auxContext.Steps.Range.Minimum To -1
+                    Dim curStep = New ContextStep(ContaminationsSpecification.DispensesPerStep)
+                    curStep(1) = ContaminationsSpecification.CreateDispensing()
+                    curStep(1).KindOfLiquid = IDispensing.KindOfDispensedLiquid.Dummy
+                    auxContext.Steps.Append(curStep)
+                    'dispense.f()
+                Next
+            Else
+                'Get contents from current REAL context
+            End If
+
+            For i As Integer = 0 To orderTests.Count + auxContext.Steps.Range.Maximum '- 1
+                Dim myStep As New ContextStep(ContaminationsSpecification.DispensesPerStep)
+                Dim dispense = ContaminationsSpecification.CreateDispensing()
+                If i < orderTests.Count Then
+                    dispense.R1ReagentID = orderTests(i).ReagentID
+                Else
+                    dispense.KindOfLiquid = IDispensing.KindOfDispensedLiquid.Dummy
+                End If
+                myStep(1) = dispense
+                auxContext.Steps.Append(myStep)
+                If auxContext.Steps.IsIndexValid(0) AndAlso auxContext.Steps(0) IsNot Nothing AndAlso auxContext.Steps(0)(1) IsNot Nothing Then
+                    Dim result = auxContext.ActionRequiredForDispensing(auxContext.Steps(0)(1))
+                    Select Case result.Action
+                        Case IContaminationsAction.RequiredAction.Wash
+                            contaminaNumber += 1
+                        Case IContaminationsAction.RequiredAction.NoAction, IContaminationsAction.RequiredAction.RemoveRequiredWashing, IContaminationsAction.RequiredAction.Skip
+                            'Do nothing
+                    End Select
+                Else
+                    Exit For
+                End If
+                auxContext.Steps.RemoveFirst()
+            Next
+            Return contaminaNumber
         End Function
 
     End Class

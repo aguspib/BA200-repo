@@ -1890,6 +1890,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         myWashSolutionType = "EMPTY"
                         'If Not previousReagentIDSentList(highIndex).IsWashSolution1Null Then myWashSolutionType = previousReagentIDSentList(highIndex).WashSolution1
                         If Not contaminations(0).IsWashingSolutionR1Null Then myWashSolutionType = contaminations(0).WashingSolutionR1
+                        If myWashSolutionType = "EMPTY" Then myWashSolutionType = ""
 
                         'AG 28/03/2014 - #1563 it is not necessary modify the next line , ExecutionID can not be NULL because the list has been get using Linq where executionType = PREP_STD
                         Dim previousExecutionsIDSent As Integer = previousReagentIDSentList(highIndex).ExecutionID
@@ -2217,16 +2218,18 @@ Namespace Biosystems.Ax00.Core.Entities
                                                      ByRef pNextWell As Integer, ByRef emptyFieldsDetected As Boolean, myAnManagerDS As AnalyzerManagerDS) As Boolean
             Dim systemErrorFlag = False
 
-            Dim disp = ContaminationsSpecification.CreateDispensing
-            disp.ExecutionID = myAnManagerDS.nextPreparation(0).ExecutionID
-            Dim requiredActionBeforeDispensing = ContaminationsSpecification.CurrentRunningContext.ActionRequiredForDispensing(disp)
-            If requiredActionBeforeDispensing.Action = IContaminationsAction.RequiredAction.Wash Then
-                MsgBox("Incongruency found for reagent: " & disp.R1ReagentID & vbCr & ContaminationsSpecification.CurrentRunningContext.ToString)
-            End If
 
 
             '5rh: Check if next preparation is an STD preparation and executionID <> NO_PENDING_PREPARATION_FOUND
             If Not actionAlreadySent And Not endRunToSend Then
+                Dim disp = ContaminationsSpecification.CreateDispensing
+                disp.ExecutionID = myAnManagerDS.nextPreparation(0).ExecutionID
+                Dim requiredActionBeforeDispensing = ContaminationsSpecification.CurrentRunningContext.ActionRequiredForDispensing(disp)
+                If requiredActionBeforeDispensing.Action = IContaminationsAction.RequiredAction.Wash Then
+                    Debug.WriteLine("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+                    Debug.WriteLine("Incongruency found for reagent: " & disp.R1ReagentID & vbCr & ContaminationsSpecification.CurrentRunningContext.ToString)
+                    Debug.WriteLine("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+                End If
                 If Not myAnManagerDS.nextPreparation(0).IsExecutionTypeNull AndAlso myAnManagerDS.nextPreparation(0).ExecutionType = "PREP_STD" Then
                     'endRunToSend = True  'AG 30/11/2011 comment this line (Sw has to send ENDRUN)
 
