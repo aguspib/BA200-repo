@@ -12,14 +12,12 @@ Imports Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
 
 Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
+    ' ReSharper disable once UnusedMember.Global    'It's used at runtime by Recletion glue code!!
     Public Class ContaminationManager
         Public Property currentContaminationNumber As Integer
         Public Property bestContaminationNumber As Integer
         Public Property bestResult As List(Of ExecutionsDS.twksWSExecutionsRow)
         Protected Property currentResult As List(Of ExecutionsDS.twksWSExecutionsRow)
-        Protected Property Conn As SqlConnection
-        Protected Property ActiveAnalyzer As String
-        Protected Property highContaminationPersistance As Integer
         Protected Property ContDS As ContaminationsDS
         Protected Property previousReagentID As List(Of Integer)
         Protected Property previousReagentIDMaxReplicates As List(Of Integer)
@@ -35,10 +33,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
                        Optional ByVal pPreviousReagentID As List(Of Integer) = Nothing,
                        Optional ByVal pPreviousReagentIDMaxReplicates As List(Of Integer) = Nothing)
             Me.MakeCalculationsInRunning = makeCalculationsInRunning
-            Conn = pCon
-            ActiveAnalyzer = Analyzer
             currentContaminationNumber = currentCont
-            highContaminationPersistance = pHighCont
             ContDS = contaminsDS
             previousReagentID = pPreviousReagentID
             previousReagentIDMaxReplicates = pPreviousReagentIDMaxReplicates
@@ -46,8 +41,10 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             bestResult = OrderTests.ToList()
         End Sub
 
+        ' ReSharper disable once UnusedMember.Global    'It's used by Reflection GLUE code!
         Public Sub ApplyOptimizations(ByVal myOptimizer As OptimizationPolicyApplier, ByVal OrderTests As List(Of ExecutionsDS.twksWSExecutionsRow))
             myOptimizer.calculateInRunning = MakeCalculationsInRunning
+            Dim highContaminationPersistance = WSExecutionCreator.Instance.ContaminationsSpecification.HighContaminationPersistence
             If currentContaminationNumber > 0 Then
                 currentResult = OrderTests.ToList()
                 currentContaminationNumber = myOptimizer.ExecuteOptimization(ContDS, currentResult, highContaminationPersistance, previousReagentID, previousReagentIDMaxReplicates)

@@ -8,19 +8,13 @@ Imports Biosystems.Ax00.Core.Entities.WorkSession.Interfaces
 Namespace Biosystems.Ax00.Core.Entities
 
     Public Class BA200AnalyzerEntity
-
-
         Inherits AnalyzerManager
-
-
 
         Public Sub New(assemblyName As String, analyzerModel As String, baseLine As IBaseLineEntity)
             MyBase.New(assemblyName, analyzerModel, baseLine)
             WSExecutionCreator.Instance.ContaminationsSpecification = New BA200ContaminationsSpecification()
             _currentAnalyzer = Me
         End Sub
-
-
 
 #Region "Overridden methods"
 
