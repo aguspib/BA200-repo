@@ -10,9 +10,9 @@ Public Interface IProgrammingController
     Function SaveCalibratorChanges(ByVal pCalibratorsDS As CalibratorsDS, ByVal pCalAction As CalibratorAction, _
                                            ByVal pDeleteCalibratorResult As Boolean, ByVal pDeleteTestCalibratorValue As Boolean, _
                                            ByVal myDeleteCalibratorList As List(Of DeletedCalibratorTO), ByVal isTestParammeterWindows As Boolean) As Boolean
-    Function ValidateErrorConcValuesDescOrderGrid(ByRef dataSource As TestCalibratorValuesDS, ByRef messageError As String) As Integer
-    Function ValidateInputFieldForConcentrations(ByVal dataSource As TestCalibratorValuesDS, ByVal rowIndex As Integer) As String
+    Function ValidateErrorConcValuesDescOrderGrid(ByRef dataSource As CalibratorsDS, ByRef messageError As String) As Integer
+    Function ValidateInputFieldForConcentrations(ByVal dataSource As CalibratorsDS, ByVal rowIndex As Integer) As String
 
-    Sub CalculateFactorFromConcentration(ByRef dataSource As TestCalibratorValuesDS)
+    Sub CalculateFactorFromConcentration(ByRef dataSource As CalibratorsDS)
 
 End Interface

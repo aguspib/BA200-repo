@@ -5338,6 +5338,7 @@ Namespace Biosystems.Ax00.BL
         ''' Created by:  SA 12/06/2012
         ''' Modified by: SA 25/06/2012 - Added management of Alternative Calibrators
         '''              SA 02/08/2012 - Changes to set the proper CreationOrder number for each OrderTest obtained from the saved Work Session
+        '''              IT 29/05/2015 - BA-2563
         ''' </remarks>
         Private Function MoveCalibratorsFromSavedWS(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderTestsDS As OrderTestsDS, _
                                                     Optional ByVal pMaxDaysLastCalib As String = "") As GlobalDataTO
@@ -5349,7 +5350,7 @@ Namespace Biosystems.Ax00.BL
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim myTestCalibDS As TestCalibratorsDS
+                        Dim myTestCalibDS As New CalibratorsDS 'BA-2563
                         Dim myTestCalibDelegate As New TestCalibratorsDelegate
 
                         Dim myResultsDelegate As New ResultsDelegate
@@ -5362,9 +5363,9 @@ Namespace Biosystems.Ax00.BL
                             If (row.CalibratorType = "ALTERNATIV") Then mySampleType = row.SampleTypeAlternative
 
                             'Get the Identifier of the Calibrator used for the Test/SampleType
-                            resultData = myTestCalibDelegate.GetTestCalibratorByTestID(dbConnection, row.TestID, mySampleType)
+                            resultData = myTestCalibDelegate.GetTestCalibratorByTestID(dbConnection, row.TestID, myTestCalibDS, mySampleType)
                             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                myTestCalibDS = DirectCast(resultData.SetDatos, TestCalibratorsDS)
+                                myTestCalibDS = DirectCast(resultData.SetDatos, CalibratorsDS)
 
                                 If (myTestCalibDS.tparTestCalibrators.Rows.Count = 1) Then
                                     row.BeginEdit()

@@ -235,7 +235,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''          (all Sample Types) in FACTORY DB or, if optional parameter pSampleType is informed, for all points of the Experimental Calibrator used for 
         '''          the informed STD TestID and Sample Type</returns>
         ''' <remarks>
-        ''' Created by: SA 07/10/2014 - BA-1944 (SubTask BA- 1980)
+        ''' Created by:  SA 07/10/2014 - BA-1944 (SubTask BA- 1980)
+        ''' Modified by: IT 29/05/2015 - BA-2563
         ''' </remarks>
         Public Function GetFactoryTestCalibValuesByTestID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, _
                                                           Optional ByVal pSampleType As String = "", Optional ByVal pMarkNew As Boolean = False) As GlobalDataTO
@@ -255,7 +256,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         'When informed, get data only for the specified SampleType
                         If (pSampleType.Trim <> String.Empty) Then cmdText &= " AND SampleType = '" & pSampleType.Trim & "' " & vbCrLf
 
-                        Dim factoryTestCalibValuesDS As New TestCalibratorValuesDS
+                        Dim factoryTestCalibValuesDS As New CalibratorsDS
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
                             Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
                                 dbDataAdapter.Fill(factoryTestCalibValuesDS.tparTestCalibratorValues)
@@ -357,6 +358,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' Created by:  TR
         ''' Modified by: SA 07/10/2014 - BA-1944 (SubTask BA- 1980) ==> Added new optional parameter pMarkNew with default value FALSE
         '''                                                             Changed the SQL to return value of IsNew flag depending on value of parameter pMarkNew
+        '''              IT 29/05/2015 - BA-2563
         ''' </remarks>
         Public Function GetFactoryTestCalibratorByTestID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, _
                                                          Optional ByVal pSampleType As String = "", Optional ByVal pMarkNew As Boolean = False) As GlobalDataTO
@@ -376,14 +378,14 @@ Namespace Biosystems.Ax00.DAL.DAO
                         'When informed, get data only for the specified SampleType
                         If (pSampleType.Trim <> String.Empty) Then cmdText &= " AND TC.SampleType ='" & pSampleType.Trim & "' " & vbCrLf
 
-                        Dim testCalibratorDS As New TestCalibratorsDS
+                        Dim calibratorsDs As New CalibratorsDS
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
                             Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-                                dbDataAdapter.Fill(testCalibratorDS.tparTestCalibrators)
+                                dbDataAdapter.Fill(calibratorsDs.tparTestCalibrators)
                             End Using
                         End Using
 
-                        resultData.SetDatos = testCalibratorDS
+                        resultData.SetDatos = calibratorsDs
                         resultData.HasError = False
                     End If
                 End If

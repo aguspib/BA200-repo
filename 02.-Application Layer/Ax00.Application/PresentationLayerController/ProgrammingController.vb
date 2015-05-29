@@ -123,17 +123,17 @@ Public Class ProgrammingController
 
             Select Case pCalAction
                 Case CalibratorAction.Create
-                    myGlobalDataTO = myCalibratorsDelegate.Save(Nothing, pCalibratorsDS, New TestCalibratorsDS, New TestCalibratorValuesDS, _
+                    myGlobalDataTO = myCalibratorsDelegate.Save(Nothing, pCalibratorsDS, _
                                                                 Nothing, False, pDeleteCalibratorResult, pDeleteTestCalibratorValue, _
                                                                 AnalyzerController.Instance.Analyzer.ActiveAnalyzer, AnalyzerController.Instance.Analyzer.ActiveWorkSession)
                     Exit Select
                 Case CalibratorAction.Edit
-                    myGlobalDataTO = myCalibratorsDelegate.Save(Nothing, pCalibratorsDS, New TestCalibratorsDS, New TestCalibratorValuesDS, _
+                    myGlobalDataTO = myCalibratorsDelegate.Save(Nothing, pCalibratorsDS, _
                                                                 Nothing, False, pDeleteCalibratorResult, pDeleteTestCalibratorValue, _
                                                                 AnalyzerController.Instance.Analyzer.ActiveAnalyzer, AnalyzerController.Instance.Analyzer.ActiveWorkSession)
                     Exit Select
                 Case CalibratorAction.Delete
-                    myGlobalDataTO = myCalibratorsDelegate.Save(Nothing, pCalibratorsDS, New TestCalibratorsDS, New TestCalibratorValuesDS, _
+                    myGlobalDataTO = myCalibratorsDelegate.Save(Nothing, pCalibratorsDS, _
                                                                 myDeleteCalibratorList, isTestParammeterWindows, pDeleteCalibratorResult, _
                                                                 pDeleteTestCalibratorValue, AnalyzerController.Instance.Analyzer.ActiveAnalyzer, AnalyzerController.Instance.Analyzer.ActiveWorkSession)
                     Exit Select
@@ -155,10 +155,10 @@ Public Class ProgrammingController
     '''              WE 26/01/2015 - BA-2047: Solved bug in which the program flow could enter the save process when the
     '''                              Theoretical Concentration entered by the user was rounded to 0 (zero).
     ''' </remarks>
-    Public Function ValidateErrorConcValuesDescOrderGrid(ByRef dataSource As TestCalibratorValuesDS, ByRef messageError As String) As Integer Implements IProgrammingController.ValidateErrorConcValuesDescOrderGrid
+    Public Function ValidateErrorConcValuesDescOrderGrid(ByRef dataSource As CalibratorsDS, ByRef messageError As String) As Integer Implements IProgrammingController.ValidateErrorConcValuesDescOrderGrid
         Dim numRow As Integer = 0
         Dim previousConcentration As Single = 0
-        For Each concentrationRow As TestCalibratorValuesDS.tparTestCalibratorValuesRow In dataSource.tparTestCalibratorValues
+        For Each concentrationRow As CalibratorsDS.tparTestCalibratorValuesRow In dataSource.tparTestCalibratorValues
 
 
 
@@ -199,7 +199,7 @@ Public Class ProgrammingController
     ''' - No <> numero (es posible?)
     ''' - No repetido
     ''' </remarks>
-    Public Function ValidateInputFieldForConcentrations(ByVal dataSource As TestCalibratorValuesDS, ByVal rowIndex As Integer) As String Implements IProgrammingController.ValidateInputFieldForConcentrations
+    Public Function ValidateInputFieldForConcentrations(ByVal dataSource As CalibratorsDS, ByVal rowIndex As Integer) As String Implements IProgrammingController.ValidateInputFieldForConcentrations
         If dataSource.tparTestCalibratorValues(rowIndex).IsTheoricalConcentrationNull Then Return GlobalEnumerates.Messages.NOT_NULL_VALUE.ToString()
 
         If dataSource.tparTestCalibratorValues(rowIndex).TheoricalConcentration <= 0 Then Return GlobalEnumerates.Messages.ZERO_NOTALLOW.ToString()
@@ -216,14 +216,14 @@ Public Class ProgrammingController
     ''' </summary>
     ''' <param name="dataSource"></param>
     ''' <remarks></remarks>
-    Public Sub CalculateFactorFromConcentration(ByRef dataSource As TestCalibratorValuesDS) Implements IProgrammingController.CalculateFactorFromConcentration
-        Dim localDTCalibratorValues As TestCalibratorValuesDS.tparTestCalibratorValuesDataTable = dataSource.tparTestCalibratorValues
+    Public Sub CalculateFactorFromConcentration(ByRef dataSource As CalibratorsDS) Implements IProgrammingController.CalculateFactorFromConcentration
+        Dim localDTCalibratorValues As CalibratorsDS.tparTestCalibratorValuesDataTable = dataSource.tparTestCalibratorValues
 
         Dim maxConcentration = (From x In dataSource.tparTestCalibratorValues _
                                 Where x.TheoricalConcentration = localDTCalibratorValues.Max(Function(row) row.TheoricalConcentration) _
                                 Select x.TheoricalConcentration).FirstOrDefault()
 
-        For Each concentrationRow As TestCalibratorValuesDS.tparTestCalibratorValuesRow In dataSource.tparTestCalibratorValues
+        For Each concentrationRow As CalibratorsDS.tparTestCalibratorValuesRow In dataSource.tparTestCalibratorValues
             If (concentrationRow.TheoricalConcentration = maxConcentration) Then
                 concentrationRow.KitConcentrationRelation = 1
             Else

@@ -2316,10 +2316,11 @@ Public Class UiResultsCalibCurve
 
             'Get the Calibration Programming data defined for the TestID/SampleType
             Dim myTestCalibratorsDelegate As New TestCalibratorsDelegate
+            Dim myLocalTestCalibDS As New CalibratorsDS 'BA-2563
 
-            resultData = myTestCalibratorsDelegate.GetTestCalibratorByTestID(Nothing, myTestID, mySampleType)
+            resultData = myTestCalibratorsDelegate.GetTestCalibratorByTestID(Nothing, myTestID, myLocalTestCalibDS, mySampleType) 'BA-2563
             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                Dim myLocalTestCalibDS As TestCalibratorsDS = DirectCast(resultData.SetDatos, TestCalibratorsDS)
+                myLocalTestCalibDS = DirectCast(resultData.SetDatos, CalibratorsDS) 'BA-2563
 
                 If myLocalTestCalibDS.tparTestCalibrators.Rows.Count > 0 Then
                     With myLocalTestCalibDS.tparTestCalibrators(0)

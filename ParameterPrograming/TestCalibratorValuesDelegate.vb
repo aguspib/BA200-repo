@@ -22,8 +22,9 @@ Namespace Biosystems.Ax00.BL
         ''' Created by:  TR 09/06/2010
         ''' Modified by: AG 12/11/2010 - Due to continous PK errors, before add the Test Calibrator Values, verify the TestCalibratorID already exists in DB
         '''              SA 08/02/2012 - Changed the function template
+        '''              IT 29/05/2015 - BA-2563
         ''' </remarks>
-        Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestCalibratorValuesDS As TestCalibratorValuesDS) As GlobalDataTO
+        Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestCalibratorValuesDS As CalibratorsDS) As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -37,7 +38,7 @@ Namespace Biosystems.Ax00.BL
                         myGlobalDataTO = myTCDelegate.Exists(dbConnection, pTestCalibratorValuesDS.tparTestCalibratorValues(0).TestCalibratorID)
 
                         If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                            Dim myDS As TestCalibratorsDS = DirectCast(myGlobalDataTO.SetDatos, TestCalibratorsDS)
+                            Dim myDS As CalibratorsDS = DirectCast(myGlobalDataTO.SetDatos, CalibratorsDS)
 
                             If (myDS.tparTestCalibrators.Rows.Count > 0) Then
                                 'Add the Test Calibrator Values
@@ -173,8 +174,9 @@ Namespace Biosystems.Ax00.BL
         ''' <remarks>
         ''' Created by:  TR 03/06/2010
         ''' Modified by: SA 08/02/2012 - Changed the function template
+        '''              IT 29/05/2015 - BA-2563
         ''' </remarks>
-        Public Function GetTestCalibratorValuesByTestCalibratorID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestCalibratorID As Integer) As GlobalDataTO
+        Public Function GetTestCalibratorValuesByTestCalibratorID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestCalibratorID As Integer, calibratorsDs As CalibratorsDS) As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -184,7 +186,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim testCalibratorValuesData As New tparTestCalibratorValuesDAO
-                        myGlobalDataTO = testCalibratorValuesData.ReadByTestCalibratorID(dbConnection, pTestCalibratorID)
+                        myGlobalDataTO = testCalibratorValuesData.ReadByTestCalibratorID(dbConnection, pTestCalibratorID, calibratorsDs)
                     End If
                 End If
             Catch ex As Exception
@@ -211,8 +213,9 @@ Namespace Biosystems.Ax00.BL
         ''' <remarks>
         ''' Created by:  TR 14/06/2010
         ''' Modified by: SA 08/02/2012 - Changed the function template
+        '''              IT 29/05/2015 - BA-2563
         ''' </remarks>
-        Public Function GetTestCalibratorValuesByTestIDSampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, ByVal pSampleType As String) As GlobalDataTO
+        Public Function GetTestCalibratorValuesByTestIDSampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, ByVal pSampleType As String, calibratorsDs As CalibratorsDS) As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -222,7 +225,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim testCalibratorValuesData As New tparTestCalibratorValuesDAO
-                        myGlobalDataTO = testCalibratorValuesData.ReadByTestIDSampleType(dbConnection, pTestID, pSampleType)
+                        myGlobalDataTO = testCalibratorValuesData.ReadByTestIDSampleType(dbConnection, pTestID, pSampleType, calibratorsDs)
                     End If
                 End If
             Catch ex As Exception
@@ -243,13 +246,14 @@ Namespace Biosystems.Ax00.BL
         ''' Update values of one point of an experimental Calibrator when it is used for an specific Test/SampleType
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pTestCalibratorValuesDS">Typed DataSet TestCalibratorValuesDS containing the Test Calibrator Value to update</param>
+        ''' <param name="pCalibratorsDS">Typed DataSet CalibratorsDS containing the Test Calibrator Value to update</param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
         ''' Created by:  TR 09/06/2010
         ''' Modified by: SA 08/02/2012 - Changed the function template
+        '''              IT 29/05/2015 - BA-2563
         ''' </remarks>
-        Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestCalibratorValuesDS As TestCalibratorValuesDS) As GlobalDataTO
+        Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalibratorsDS As CalibratorsDS) As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -259,7 +263,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myTestCalibratorValuesDAO As New tparTestCalibratorValuesDAO
-                        myGlobalDataTO = myTestCalibratorValuesDAO.Update(dbConnection, pTestCalibratorValuesDS)
+                        myGlobalDataTO = myTestCalibratorValuesDAO.Update(dbConnection, pCalibratorsDS)
 
                         If (Not myGlobalDataTO.HasError) Then
                             'When the Database Connection was opened locally, then the Commit is executed
@@ -299,9 +303,10 @@ Namespace Biosystems.Ax00.BL
         ''' <returns></returns>
         ''' <remarks>
         ''' Created by:  DL 07/09/2010
+        ''' Modified by: IT 29/05/2015 - BA-2563
         ''' </remarks>
         Public Function GetTestCalibratorValuesByTestCalibratorIDAndTestID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestCalibratorID As Integer, _
-                                                                           ByVal pTestID As Integer) As GlobalDataTO
+                                                                           ByVal pTestID As Integer, calibratorsDs As CalibratorsDS) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
 
@@ -311,7 +316,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim testCalibratorValuesData As New tparTestCalibratorValuesDAO
-                        myGlobalDataTO = testCalibratorValuesData.ReadByTestCalibratorIDAndTestID(dbConnection, pTestCalibratorID, pTestID)
+                        myGlobalDataTO = testCalibratorValuesData.ReadByTestCalibratorIDAndTestID(dbConnection, pTestCalibratorID, pTestID, calibratorsDs)
                     End If
                 End If
             Catch ex As Exception

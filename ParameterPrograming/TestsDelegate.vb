@@ -1280,6 +1280,7 @@ Namespace Biosystems.Ax00.BL
         '''              SA 10/10/2014 - BA-1944 (SubTask BA-1981) ==> Added new optional parameter ApplyDeleteCascade (DefaultValue = TRUE) to avoid remove 
         '''                                                            elements that are not in the DataSets when a new SampleType is added for the Test or when data 
         '''                                                            of an existing Sample Type is updated
+        '''              IT 29/05/2015 - BA-2563
         ''' </remarks>
         Public Function PrepareTestToSave(ByVal pDBConnection As SqlClient.SqlConnection, _
                                           ByVal pAnalyzerID As String, _
@@ -1290,8 +1291,6 @@ Namespace Biosystems.Ax00.BL
                                           ByVal pReagentsDS As ReagentsDS, _
                                           ByVal pTestReagentesDS As TestReagentsDS, _
                                           ByVal pCalibratorDS As CalibratorsDS, _
-                                          ByVal pTestCalibratorDS As TestCalibratorsDS, _
-                                          ByVal pTestCalibratorValuesDS As TestCalibratorValuesDS, _
                                           ByVal pTestRefRangesDS As TestRefRangesDS, _
                                           ByVal pDeleteCalibratorList As List(Of DeletedCalibratorTO), _
                                           ByVal pDelTestReagentsVolumeList As List(Of DeletedTestReagentsVolumeTO), _
@@ -1317,7 +1316,7 @@ Namespace Biosystems.Ax00.BL
                         Dim tempTestReagentsDS As New TestReagentsDS()
                         Dim tempTestSampleDS As New TestSamplesDS
                         Dim tempTestReagentVolDS As New TestReagentsVolumesDS
-                        Dim tempTestCalibratorDS As New TestCalibratorsDS
+                        Dim tempTestCalibratorDS As New CalibratorsDS
                         Dim tempCalibratorDS As New CalibratorsDS()
                         Dim tempTestRefRangesDS As New TestRefRangesDS 'SG 17/06/2010
 
@@ -1335,7 +1334,7 @@ Namespace Biosystems.Ax00.BL
                         Dim qTestReagent As New List(Of TestReagentsDS.tparTestReagentsRow)
                         Dim qTestReagentsVolume As New List(Of TestReagentsVolumesDS.tparTestReagentsVolumesRow)
                         Dim qCalibratorList As New List(Of CalibratorsDS.tparCalibratorsRow)
-                        Dim qTestCalibratorList As New List(Of TestCalibratorsDS.tparTestCalibratorsRow)
+                        Dim qTestCalibratorList As New List(Of CalibratorsDS.tparTestCalibratorsRow)
                         Dim qTestRefRangesList As New List(Of TestRefRangesDS.tparTestRefRangesRow) 'SG 17/06/2010
                         Dim myTestID As Integer = 0
                         Dim mySampleType As String = "" 'TR 29/03/2011 add to use on filter
@@ -1481,19 +1480,19 @@ Namespace Biosystems.Ax00.BL
                                 'qTestCalibratorList = (From a In pTestCalibratorDS.tparTestCalibrators _
                                 '                       Where a.TestID = myTestID And a.SampleType = mySampleType Select a).ToList()
                                 'TR 21/07/2011 -Filter by the TestID 
-                                qTestCalibratorList = (From a In pTestCalibratorDS.tparTestCalibrators _
+                                qTestCalibratorList = (From a In pCalibratorDS.tparTestCalibrators _
                                                        Where a.TestID = myTestID Select a).ToList()
 
                                 If qTestCalibratorList.Count > 0 Then
                                     'TR 17/11/2010 -Change the testID for the new test id assigned for each testcalibraor on the list.
-                                    For Each testCalibRow As TestCalibratorsDS.tparTestCalibratorsRow In qTestCalibratorList
+                                    For Each testCalibRow As CalibratorsDS.tparTestCalibratorsRow In qTestCalibratorList
                                         testCalibRow.BeginEdit()
                                         testCalibRow.TestID = tempTestsDS.tparTests(0).TestID
                                         testCalibRow.EndEdit()
                                     Next
                                     'TR 17/11/2010 -END
                                 End If
-                                pTestCalibratorDS.AcceptChanges()
+                                pCalibratorDS.AcceptChanges()
 
                             End If
                             'TR 14/06/2010 -END
@@ -1641,8 +1640,7 @@ Namespace Biosystems.Ax00.BL
                             '    tempTestCalibratorDS.tparTestCalibrators.ImportRow(qTestCalibratorList.First())
                             'End If
                             'Use the temptestcalibrator instead of ptestcalibrator
-                            myGlobalDataTO = myCalibratorDelegate.Save(dbConnection, pCalibratorDS, pTestCalibratorDS, _
-                                                                            pTestCalibratorValuesDS, pDeleteCalibratorList, True, , , pAnalyzerID, pWorkSessionID)
+                            myGlobalDataTO = myCalibratorDelegate.Save(dbConnection, pCalibratorDS, pDeleteCalibratorList, True, , , pAnalyzerID, pWorkSessionID)
 
                         End If
                         'TR 21/07/2011 -END.
@@ -1910,7 +1908,9 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pTestID">TestID</param>
         ''' <returns></returns>
-        ''' <remarks></remarks>
+        ''' <remarks>
+        ''' Modified by: IT 29/05/2015 - BA-2563
+        ''' </remarks>
         Public Function DeleteTestCascade(ByVal pDBConnection As SqlClient.SqlConnection, _
                                            ByVal pAnalyzerID As String, _
                                            ByVal pTestID As Integer, _
@@ -1948,16 +1948,15 @@ Namespace Biosystems.Ax00.BL
 
                         'CALIBRATORS
                         If Not myGlobalDataTO.HasError Then
-                            Dim myTestCalibratorDS As New TestCalibratorsDS
+                            Dim myTestCalibratorDS As New CalibratorsDS
                             'Get the calibrators value 
-                            myGlobalDataTO = myTestCalibratorDelegate.GetTestCalibratorByTestID(dbConnection, _
-                                                                                                pTestID)
+                            myGlobalDataTO = myTestCalibratorDelegate.GetTestCalibratorByTestID(dbConnection, pTestID, myTestCalibratorDS)
 
                             If Not myGlobalDataTO.HasError Then
-                                myTestCalibratorDS = DirectCast(myGlobalDataTO.SetDatos, TestCalibratorsDS)
+                                myTestCalibratorDS = DirectCast(myGlobalDataTO.SetDatos, CalibratorsDS)
 
                                 'go throught each test calibrator to delete all values.
-                                For Each testCalibRow As TestCalibratorsDS.tparTestCalibratorsRow In myTestCalibratorDS.tparTestCalibrators.Rows
+                                For Each testCalibRow As CalibratorsDS.tparTestCalibratorsRow In myTestCalibratorDS.tparTestCalibrators.Rows
                                     'Delete calibrator value.
                                     myGlobalDataTO = myTestCalibratorValuesDelegate.DeleteByTestCalibratorID(dbConnection, _
                                                                                                              testCalibRow.TestCalibratorID)
