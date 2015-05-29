@@ -74,7 +74,7 @@ Partial Class UiProgCalibrator
         Me.CancelTestSampleCalValue = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.SaveTestSampleCalValue = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.CalibrationValuesCurveLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
-        Me.ConcentrationGridView = New Biosystems.Ax00.Controls.UserControls.BSDataGridView()
+        Me.ValuePointsGridView = New Biosystems.Ax00.Controls.UserControls.BSDataGridView()
         Me.DataGridViewTextBoxColumn5 = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.DataGridViewTextBoxColumn6 = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.DataGridViewTextBoxColumn7 = New System.Windows.Forms.DataGridViewTextBoxColumn()
@@ -117,7 +117,7 @@ Partial Class UiProgCalibrator
         Me.CalibratorTestTab.SuspendLayout()
         Me.TestSampleCalibValues.SuspendLayout()
         Me.BsGroupBox1.SuspendLayout()
-        CType(Me.ConcentrationGridView, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.ValuePointsGridView, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.CalibCurveInfoGroupBox.SuspendLayout()
         Me.CalibratorTestSampleGB.SuspendLayout()
         CType(Me.CalibTestSampleListGrid, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -504,7 +504,7 @@ Partial Class UiProgCalibrator
         Me.TestSampleCalibValues.Controls.Add(Me.CancelTestSampleCalValue)
         Me.TestSampleCalibValues.Controls.Add(Me.SaveTestSampleCalValue)
         Me.TestSampleCalibValues.Controls.Add(Me.CalibrationValuesCurveLabel)
-        Me.TestSampleCalibValues.Controls.Add(Me.ConcentrationGridView)
+        Me.TestSampleCalibValues.Controls.Add(Me.ValuePointsGridView)
         Me.TestSampleCalibValues.Controls.Add(Me.CurveValueLabel)
         Me.TestSampleCalibValues.Controls.Add(Me.CalibCurveInfoGroupBox)
         Me.TestSampleCalibValues.Controls.Add(Me.CalibratorLabel)
@@ -617,27 +617,27 @@ Partial Class UiProgCalibrator
         Me.CalibrationValuesCurveLabel.Text = "*Concentration Values"
         Me.CalibrationValuesCurveLabel.Title = True
         '
-        'ConcentrationGridView
+        'ValuePointsGridView
         '
-        Me.ConcentrationGridView.AllowUserToAddRows = False
-        Me.ConcentrationGridView.AllowUserToDeleteRows = False
-        Me.ConcentrationGridView.AllowUserToResizeColumns = False
-        Me.ConcentrationGridView.AllowUserToResizeRows = False
+        Me.ValuePointsGridView.AllowUserToAddRows = False
+        Me.ValuePointsGridView.AllowUserToDeleteRows = False
+        Me.ValuePointsGridView.AllowUserToResizeColumns = False
+        Me.ValuePointsGridView.AllowUserToResizeRows = False
         DataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-        Me.ConcentrationGridView.AlternatingRowsDefaultCellStyle = DataGridViewCellStyle6
-        Me.ConcentrationGridView.BackgroundColor = System.Drawing.Color.LightGray
-        Me.ConcentrationGridView.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
-        Me.ConcentrationGridView.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None
+        Me.ValuePointsGridView.AlternatingRowsDefaultCellStyle = DataGridViewCellStyle6
+        Me.ValuePointsGridView.BackgroundColor = System.Drawing.Color.LightGray
+        Me.ValuePointsGridView.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
+        Me.ValuePointsGridView.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None
         DataGridViewCellStyle7.BackColor = System.Drawing.Color.DarkGray
         DataGridViewCellStyle7.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         DataGridViewCellStyle7.ForeColor = System.Drawing.Color.Black
         DataGridViewCellStyle7.SelectionBackColor = System.Drawing.SystemColors.Highlight
         DataGridViewCellStyle7.SelectionForeColor = System.Drawing.SystemColors.HighlightText
         DataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-        Me.ConcentrationGridView.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle7
-        Me.ConcentrationGridView.ColumnHeadersHeight = 20
-        Me.ConcentrationGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing
-        Me.ConcentrationGridView.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.DataGridViewTextBoxColumn5, Me.DataGridViewTextBoxColumn6, Me.DataGridViewTextBoxColumn7})
+        Me.ValuePointsGridView.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle7
+        Me.ValuePointsGridView.ColumnHeadersHeight = 20
+        Me.ValuePointsGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing
+        Me.ValuePointsGridView.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.DataGridViewTextBoxColumn5, Me.DataGridViewTextBoxColumn6, Me.DataGridViewTextBoxColumn7})
         DataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
         DataGridViewCellStyle8.BackColor = System.Drawing.Color.White
         DataGridViewCellStyle8.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -645,35 +645,35 @@ Partial Class UiProgCalibrator
         DataGridViewCellStyle8.SelectionBackColor = System.Drawing.Color.White
         DataGridViewCellStyle8.SelectionForeColor = System.Drawing.Color.Black
         DataGridViewCellStyle8.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-        Me.ConcentrationGridView.DefaultCellStyle = DataGridViewCellStyle8
-        Me.ConcentrationGridView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter
-        Me.ConcentrationGridView.EnterToTab = False
-        Me.ConcentrationGridView.GridColor = System.Drawing.Color.Silver
-        Me.ConcentrationGridView.Location = New System.Drawing.Point(23, 256)
-        Me.ConcentrationGridView.MultiSelect = False
-        Me.ConcentrationGridView.Name = "ConcentrationGridView"
-        Me.ConcentrationGridView.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.[Single]
+        Me.ValuePointsGridView.DefaultCellStyle = DataGridViewCellStyle8
+        Me.ValuePointsGridView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter
+        Me.ValuePointsGridView.EnterToTab = False
+        Me.ValuePointsGridView.GridColor = System.Drawing.Color.Silver
+        Me.ValuePointsGridView.Location = New System.Drawing.Point(23, 256)
+        Me.ValuePointsGridView.MultiSelect = False
+        Me.ValuePointsGridView.Name = "ValuePointsGridView"
+        Me.ValuePointsGridView.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.[Single]
         DataGridViewCellStyle9.BackColor = System.Drawing.Color.DarkGray
         DataGridViewCellStyle9.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         DataGridViewCellStyle9.ForeColor = System.Drawing.Color.Black
         DataGridViewCellStyle9.SelectionBackColor = System.Drawing.Color.Transparent
         DataGridViewCellStyle9.SelectionForeColor = System.Drawing.Color.Black
         DataGridViewCellStyle9.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-        Me.ConcentrationGridView.RowHeadersDefaultCellStyle = DataGridViewCellStyle9
-        Me.ConcentrationGridView.RowHeadersVisible = False
-        Me.ConcentrationGridView.RowHeadersWidth = 20
-        Me.ConcentrationGridView.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing
+        Me.ValuePointsGridView.RowHeadersDefaultCellStyle = DataGridViewCellStyle9
+        Me.ValuePointsGridView.RowHeadersVisible = False
+        Me.ValuePointsGridView.RowHeadersWidth = 20
+        Me.ValuePointsGridView.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing
         DataGridViewCellStyle10.BackColor = System.Drawing.Color.White
         DataGridViewCellStyle10.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         DataGridViewCellStyle10.ForeColor = System.Drawing.Color.Black
         DataGridViewCellStyle10.SelectionBackColor = System.Drawing.Color.Transparent
         DataGridViewCellStyle10.SelectionForeColor = System.Drawing.Color.Black
         DataGridViewCellStyle10.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-        Me.ConcentrationGridView.RowsDefaultCellStyle = DataGridViewCellStyle10
-        Me.ConcentrationGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect
-        Me.ConcentrationGridView.Size = New System.Drawing.Size(238, 224)
-        Me.ConcentrationGridView.TabIndex = 5
-        Me.ConcentrationGridView.TabToEnter = True
+        Me.ValuePointsGridView.RowsDefaultCellStyle = DataGridViewCellStyle10
+        Me.ValuePointsGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect
+        Me.ValuePointsGridView.Size = New System.Drawing.Size(238, 224)
+        Me.ValuePointsGridView.TabIndex = 5
+        Me.ValuePointsGridView.TabToEnter = True
         '
         'DataGridViewTextBoxColumn5
         '
@@ -1065,7 +1065,7 @@ Partial Class UiProgCalibrator
         Me.TestSampleCalibValues.PerformLayout()
         Me.BsGroupBox1.ResumeLayout(False)
         Me.BsGroupBox1.PerformLayout()
-        CType(Me.ConcentrationGridView, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.ValuePointsGridView, System.ComponentModel.ISupportInitialize).EndInit()
         Me.CalibCurveInfoGroupBox.ResumeLayout(False)
         Me.CalibCurveInfoGroupBox.PerformLayout()
         Me.CalibratorTestSampleGB.ResumeLayout(False)
@@ -1114,7 +1114,7 @@ Partial Class UiProgCalibrator
     Friend WithEvents IncreasingRadioButton As Biosystems.Ax00.Controls.UserControls.BSRadioButton
     Friend WithEvents CurveValueLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
     Friend WithEvents CalibrationValuesCurveLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
-    Friend WithEvents ConcentrationGridView As Biosystems.Ax00.Controls.UserControls.BSDataGridView
+    Friend WithEvents ValuePointsGridView As Biosystems.Ax00.Controls.UserControls.BSDataGridView
     Friend WithEvents CalibratorDefinitionLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
     Friend WithEvents CaliName As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents Lot As System.Windows.Forms.DataGridViewTextBoxColumn

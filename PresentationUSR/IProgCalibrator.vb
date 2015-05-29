@@ -207,7 +207,7 @@ Public Class UiProgCalibrator
             FillCurveControls()
 
             'Initialize the grid of Theoretical Concentration Values 
-            PrepareConcentrationGridView(currentLanguage)
+            PrepareValuePointsGridView(currentLanguage)
             Application.DoEvents()
 
         Catch ex As Exception
@@ -1091,9 +1091,9 @@ Public Class UiProgCalibrator
             End If
             CalibratorListCombo.ForeColor = LetColor
 
-            ConcentrationGridView.Enabled = pState
-            ConcentrationGridView.BackColor = BackColor
-            ConcentrationGridView.ForeColor = LetColor
+            ValuePointsGridView.Enabled = pState
+            ValuePointsGridView.BackColor = BackColor
+            ValuePointsGridView.ForeColor = LetColor
 
             SaveTestSampleCalValue.Enabled = pState
             CancelTestSampleCalValue.Enabled = pState
@@ -1153,7 +1153,7 @@ Public Class UiProgCalibrator
 
                     'Depending on the number of Calibrator points the Curve Values area is 
                     'enable (when multipoint) or disable (when single point)
-                    If (ConcentrationGridView.Rows.Count > 1) Then
+                    If (ValuePointsGridView.Rows.Count > 1) Then
                         EnableDisableCalibCurveInfoGroupBox(True)
                     Else
                         EnableDisableCalibCurveInfoGroupBox(False)
@@ -1259,17 +1259,17 @@ Public Class UiProgCalibrator
     ''' Created by:  TR 03/06/2010
     ''' Modified by: TR 26/11/2010 - Set MaxLength = 10 the DataGridViewTextBoxColumn for the Theoretical Concentration
     ''' </remarks>
-    Private Sub PrepareConcentrationGridView(ByVal pLanguageID As String)
+    Private Sub PrepareValuePointsGridView(ByVal pLanguageID As String)
         Try
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
-            ConcentrationGridView.AutoGenerateColumns = False
-            ConcentrationGridView.Enabled = True
-            ConcentrationGridView.ReadOnly = False
-            ConcentrationGridView.AutoSize = False
-            ConcentrationGridView.EditMode = DataGridViewEditMode.EditOnEnter
-            ConcentrationGridView.SelectionMode = DataGridViewSelectionMode.CellSelect
-            ConcentrationGridView.Columns.Clear()
+            ValuePointsGridView.AutoGenerateColumns = False
+            ValuePointsGridView.Enabled = True
+            ValuePointsGridView.ReadOnly = False
+            ValuePointsGridView.AutoSize = False
+            ValuePointsGridView.EditMode = DataGridViewEditMode.EditOnEnter
+            ValuePointsGridView.SelectionMode = DataGridViewSelectionMode.CellSelect
+            ValuePointsGridView.Columns.Clear()
 
             Dim CalibratorNum As New DataGridViewTextBoxColumn()
             CalibratorNum.HeaderText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Number_Short", pLanguageID)
@@ -1284,7 +1284,7 @@ Public Class UiProgCalibrator
             CalibratorNum.DefaultCellStyle.SelectionForeColor = Color.DarkGray
             CalibratorNum.SortMode = DataGridViewColumnSortMode.NotSortable
             DefineReadOnlyColumn(CalibratorNum)
-            ConcentrationGridView.Columns.Add(CalibratorNum)
+            ValuePointsGridView.Columns.Add(CalibratorNum)
 
 
             Dim TheoricalColumn As New DataGridViewTextBoxColumn()
@@ -1296,24 +1296,24 @@ Public Class UiProgCalibrator
             TheoricalColumn.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter
             TheoricalColumn.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
             TheoricalColumn.SortMode = DataGridViewColumnSortMode.NotSortable
-            ConcentrationGridView.Columns.Add(TheoricalColumn)
+            ValuePointsGridView.Columns.Add(TheoricalColumn)
 
             Dim FactorColumn As New DataGridViewTextBoxColumn()
             FactorColumn.Name = "KitConcentrationRelation"
             FactorColumn.MaxInputLength = 6
             FactorColumn.HeaderText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CalibFactor", pLanguageID)
             FactorColumn.Width = 65
-            FactorColumn.DataPropertyName = "KitConcentrationRelation"            
+            FactorColumn.DataPropertyName = "KitConcentrationRelation"
             FactorColumn.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter
             FactorColumn.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
             FactorColumn.SortMode = DataGridViewColumnSortMode.NotSortable
             FactorColumn.DefaultCellStyle.Format = "n3"
             FactorColumn.ValueType = GetType(Single)
-            ConcentrationGridView.Columns.Add(FactorColumn)
+            ValuePointsGridView.Columns.Add(FactorColumn)
 
-            ConcentrationGridView.Columns.Add("TestCalibratorID", "TestCalibratorID")
-            ConcentrationGridView.Columns("TestCalibratorID").DataPropertyName = "TestCalibratorID"
-            ConcentrationGridView.Columns("TestCalibratorID").Visible = False
+            ValuePointsGridView.Columns.Add("TestCalibratorID", "TestCalibratorID")
+            ValuePointsGridView.Columns("TestCalibratorID").DataPropertyName = "TestCalibratorID"
+            ValuePointsGridView.Columns("TestCalibratorID").Visible = False
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareConcentrationGridView ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareConcentrationGridView ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -1326,7 +1326,7 @@ Public Class UiProgCalibrator
         columnToBlock.DefaultCellStyle.ForeColor = Color.DarkGray
         columnToBlock.DefaultCellStyle.SelectionBackColor = SystemColors.MenuBar
         columnToBlock.DefaultCellStyle.SelectionForeColor = Color.DarkGray
-        columnToBlock.ReadOnly = True        
+        columnToBlock.ReadOnly = True
     End Sub
 
     Private Sub DefineWriteColumn(ByRef columnToBlock As DataGridViewTextBoxColumn)
@@ -1713,9 +1713,9 @@ Public Class UiProgCalibrator
                     End If
                 End If
 
-                ConcentrationGridView.DataSource = Nothing
-                ConcentrationGridView.DataSource = LocalConcentrationValuesDS.tparTestCalibratorValues
-                ConcentrationGridView.ClearSelection()
+                ValuePointsGridView.DataSource = Nothing
+                ValuePointsGridView.DataSource = LocalConcentrationValuesDS.tparTestCalibratorValues
+                ValuePointsGridView.ClearSelection()
             Else
                 ShowMessage(Me.Name & ".BindConcentrationValuesList ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, myGlobalDataTO.ErrorCode, Me)
             End If
@@ -1810,14 +1810,14 @@ Public Class UiProgCalibrator
                 For j As Integer = 0 To LocalConcentrationValuesDS.tparTestCalibratorValues.Rows.Count - 1
                     messageError = controller.ValidateInputFieldForConcentrations(LocalConcentrationValuesDS, j)
                     If Not String.IsNullOrWhiteSpace(messageError) Then
-                        ConcentrationGridView("TheoricalConcentration", j).Style.Alignment = DataGridViewContentAlignment.MiddleCenter
-                        ConcentrationGridView("TheoricalConcentration", j).ErrorText = GetMessageText(messageError)
+                        ValuePointsGridView("TheoricalConcentration", j).Style.Alignment = DataGridViewContentAlignment.MiddleCenter
+                        ValuePointsGridView("TheoricalConcentration", j).ErrorText = GetMessageText(messageError)
                         itsOk = False
                     End If
                 Next
 
-                ConcentrationGridView.DataSource = LocalConcentrationValuesDS.tparTestCalibratorValues
-                ConcentrationGridView.Refresh()
+                ValuePointsGridView.DataSource = LocalConcentrationValuesDS.tparTestCalibratorValues
+                ValuePointsGridView.Refresh()
             End If
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex)
@@ -2080,7 +2080,7 @@ Public Class UiProgCalibrator
 
                 'TR 08/03/2012 ' Accept change and refresh Concentration grid to avoid error on visual effects.
                 LocalConcentrationValuesDS.tparTestCalibratorValues.AcceptChanges()
-                ConcentrationGridView.Refresh()
+                ValuePointsGridView.Refresh()
                 'TR 08/03/2012
                 'Set the new numbers of calibrators to the concentration grid.
                 Dim myCalConcNumbRow As TestCalibratorValuesDS.tparTestCalibratorValuesRow
@@ -2091,7 +2091,7 @@ Public Class UiProgCalibrator
                     myCalConcNumbRow.IsNew = True
                     LocalConcentrationValuesDS.tparTestCalibratorValues.AddtparTestCalibratorValuesRow(myCalConcNumbRow)
                 Next
-                ConcentrationGridView.CurrentRow.Selected = False
+                ValuePointsGridView.CurrentRow.Selected = False
             End If
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log
@@ -3160,7 +3160,7 @@ Public Class UiProgCalibrator
         PrepareNewCalibratorValuesForTestSample()
     End Sub
 
-    Private Sub ConcentrationGridView_CellPainting(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DataGridViewCellPaintingEventArgs) Handles ConcentrationGridView.CellPainting
+    Private Sub ConcentrationGridView_CellPainting(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DataGridViewCellPaintingEventArgs) Handles ValuePointsGridView.CellPainting
         Try
             If (CalibratorListCombo.Enabled) Then
                 If (e.ColumnIndex = 0 AndAlso (e.RowIndex > -1 AndAlso e.RowIndex <= 10)) OrElse _
@@ -3195,19 +3195,19 @@ Public Class UiProgCalibrator
     ''' </summary>
     Private Sub UnSelectConcentrationGridView()
         Try
-            If (ConcentrationGridView.Rows.Count > 0) Then
-                For r As Integer = 0 To ConcentrationGridView.Rows.Count - 1 Step 1
-                    ConcentrationGridView.Rows(r).Selected = False
+            If (ValuePointsGridView.Rows.Count > 0) Then
+                For r As Integer = 0 To ValuePointsGridView.Rows.Count - 1 Step 1
+                    ValuePointsGridView.Rows(r).Selected = False
                     If (CalibratorListCombo.Enabled) Then
                         'Change to White/Black the BackColor/ForeColor of the editable cells; the rest remain as MenuBar/DarkGray
-                        ConcentrationGridView.Rows(r).Cells("TheoricalConcentration").Style.BackColor = Color.White
-                        ConcentrationGridView.Rows(r).Cells("TheoricalConcentration").Style.ForeColor = Color.Black
-                        ConcentrationGridView.Rows(r).Cells("TheoricalConcentration").ReadOnly = False
+                        ValuePointsGridView.Rows(r).Cells("TheoricalConcentration").Style.BackColor = Color.White
+                        ValuePointsGridView.Rows(r).Cells("TheoricalConcentration").Style.ForeColor = Color.Black
+                        ValuePointsGridView.Rows(r).Cells("TheoricalConcentration").ReadOnly = False
                     Else
                         'Change to MenuBar/DarkGray the BackColor/ForeColor of the editable cells
-                        ConcentrationGridView.Rows(r).Cells("TheoricalConcentration").Style.BackColor = SystemColors.MenuBar
-                        ConcentrationGridView.Rows(r).Cells("TheoricalConcentration").Style.ForeColor = Color.DarkGray
-                        ConcentrationGridView.Rows(r).Cells("TheoricalConcentration").ReadOnly = True
+                        ValuePointsGridView.Rows(r).Cells("TheoricalConcentration").Style.BackColor = SystemColors.MenuBar
+                        ValuePointsGridView.Rows(r).Cells("TheoricalConcentration").Style.ForeColor = Color.DarkGray
+                        ValuePointsGridView.Rows(r).Cells("TheoricalConcentration").ReadOnly = True
                     End If
                 Next r
             End If
@@ -3217,10 +3217,10 @@ Public Class UiProgCalibrator
         End Try
     End Sub
 
-    Private Sub ConcentrationGridView_CellFormatting(ByVal sender As System.Object, ByVal e As Windows.Forms.DataGridViewCellFormattingEventArgs) Handles ConcentrationGridView.CellFormatting
+    Private Sub ConcentrationGridView_CellFormatting(ByVal sender As System.Object, ByVal e As Windows.Forms.DataGridViewCellFormattingEventArgs) Handles ValuePointsGridView.CellFormatting
         Try
             If (e.ColumnIndex = 1) Then
-                If (Not ConcentrationGridView.Rows(e.RowIndex).Cells("Theoricalconcentration").Value Is DBNull.Value) Then
+                If (Not ValuePointsGridView.Rows(e.RowIndex).Cells("Theoricalconcentration").Value Is DBNull.Value) Then
                     e.Value = CType(e.Value, Double).ToString("F" & LocalDecimalAllow.ToString)
                 End If
             End If
@@ -3230,26 +3230,26 @@ Public Class UiProgCalibrator
         End Try
     End Sub
 
-    Private Sub ConcentrationGridView_CellLeave(ByVal sender As System.Object, ByVal e As Windows.Forms.DataGridViewCellEventArgs) Handles ConcentrationGridView.CellEndEdit
+    Private Sub ConcentrationGridView_CellLeave(ByVal sender As System.Object, ByVal e As Windows.Forms.DataGridViewCellEventArgs) Handles ValuePointsGridView.CellEndEdit
         Try
             If (LocalScreenStatus = ScreenStatusType.EditMode) Then
 
-                ConcentrationGridView("TheoricalConcentration", e.RowIndex).Style.Alignment = DataGridViewContentAlignment.MiddleRight
-                ConcentrationGridView("TheoricalConcentration", e.RowIndex).ErrorText = Nothing
-                ConcentrationGridView("KitConcentrationRelation", e.RowIndex).Value = DBNull.Value
+                ValuePointsGridView("TheoricalConcentration", e.RowIndex).Style.Alignment = DataGridViewContentAlignment.MiddleRight
+                ValuePointsGridView("TheoricalConcentration", e.RowIndex).ErrorText = Nothing
+                ValuePointsGridView("KitConcentrationRelation", e.RowIndex).Value = DBNull.Value
 
                 Dim messageError = controller.ValidateInputFieldForConcentrations(LocalConcentrationValuesDS, e.RowIndex)
 
                 If (Not String.IsNullOrWhiteSpace(messageError)) Then
-                    ConcentrationGridView("TheoricalConcentration", e.RowIndex).Style.Alignment = DataGridViewContentAlignment.MiddleCenter
-                    ConcentrationGridView("KitConcentrationRelation", e.RowIndex).Value = DBNull.Value
-                    ConcentrationGridView("TheoricalConcentration", e.RowIndex).ErrorText = GetMessageText(messageError)
+                    ValuePointsGridView("TheoricalConcentration", e.RowIndex).Style.Alignment = DataGridViewContentAlignment.MiddleCenter
+                    ValuePointsGridView("KitConcentrationRelation", e.RowIndex).Value = DBNull.Value
+                    ValuePointsGridView("TheoricalConcentration", e.RowIndex).ErrorText = GetMessageText(messageError)
                 Else
                     controller.CalculateFactorFromConcentration(LocalConcentrationValuesDS)
 
-                    ConcentrationGridView.DataSource = LocalConcentrationValuesDS.tparTestCalibratorValues
-                    ConcentrationGridView.Columns("TheoricalConcentration").DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
-                    ConcentrationGridView.Refresh()
+                    ValuePointsGridView.DataSource = LocalConcentrationValuesDS.tparTestCalibratorValues
+                    ValuePointsGridView.Columns("TheoricalConcentration").DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
+                    ValuePointsGridView.Refresh()
                 End If
                 LocalChange = True
             End If
@@ -3260,14 +3260,14 @@ Public Class UiProgCalibrator
 
     End Sub
 
-    Private Sub ConcentrationGridView_RowEnter(ByVal sender As System.Object, ByVal e As Windows.Forms.DataGridViewCellEventArgs) Handles ConcentrationGridView.RowEnter
+    Private Sub ConcentrationGridView_RowEnter(ByVal sender As System.Object, ByVal e As Windows.Forms.DataGridViewCellEventArgs) Handles ValuePointsGridView.RowEnter
 
 
     End Sub
 
-    Private Sub ConcentrationGridView_EditingControlShowing(ByVal sender As Object, ByVal e As DataGridViewEditingControlShowingEventArgs) Handles ConcentrationGridView.EditingControlShowing
+    Private Sub ConcentrationGridView_EditingControlShowing(ByVal sender As Object, ByVal e As DataGridViewEditingControlShowingEventArgs) Handles ValuePointsGridView.EditingControlShowing
         Try
-            If (Me.ConcentrationGridView.CurrentRow.Index >= 0 AndAlso Me.ConcentrationGridView.CurrentCell.ColumnIndex = 1) Then
+            If (Me.ValuePointsGridView.CurrentRow.Index >= 0 AndAlso Me.ValuePointsGridView.CurrentCell.ColumnIndex = 1) Then
                 'TR 01/07/2011 - Do not allow to show Copy/Paste/Cut Menu on cell
                 If (e.Control.GetType().Name = "DataGridViewTextBoxEditingControl") Then
                     DirectCast(e.Control, DataGridViewTextBoxEditingControl).ShortcutsEnabled = False
@@ -3515,9 +3515,9 @@ Public Class UiProgCalibrator
         'TR 16/01/2012 -END.
     End Sub
 
-    Private Sub ConcentrationGridView_Enter(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ConcentrationGridView.Enter
-        If ConcentrationGridView.Rows.Count > 0 Then
-            ConcentrationGridView.Rows(0).Cells(1).Selected = True
+    Private Sub ConcentrationGridView_Enter(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ValuePointsGridView.Enter
+        If ValuePointsGridView.Rows.Count > 0 Then
+            ValuePointsGridView.Rows(0).Cells(1).Selected = True
         End If
 
     End Sub
@@ -3751,7 +3751,7 @@ Public Class UiProgCalibrator
             If (Not CalibTestSampleListGrid.SelectedRows(0).Cells("SpecialTest").Value Is DBNull.Value) AndAlso _
                (CBool(CalibTestSampleListGrid.SelectedRows(0).Cells("SpecialTest").Value)) Then
                 CalibratorListCombo.Enabled = False
-                ConcentrationGridView.Enabled = True
+                ValuePointsGridView.Enabled = True
             End If
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SpecialTestEditionScreenEnable ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -3801,9 +3801,9 @@ Public Class UiProgCalibrator
     ''' <remarks>
     ''' Created by:  SA 21/11/2012 
     ''' </remarks>
-    Private Sub ConcentrationGridView_CellValidating(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellValidatingEventArgs) Handles ConcentrationGridView.CellValidating
+    Private Sub ConcentrationGridView_CellValidating(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellValidatingEventArgs) Handles ValuePointsGridView.CellValidating
         Try
-            If (ConcentrationGridView.Columns(e.ColumnIndex).Index = 1) Then
+            If (ValuePointsGridView.Columns(e.ColumnIndex).Index = 1) Then
                 If (Not e.FormattedValue Is DBNull.Value AndAlso Not e.FormattedValue Is Nothing AndAlso e.FormattedValue.ToString.Trim <> "" AndAlso _
                     Not IsNumeric(e.FormattedValue)) Then
                     e.Cancel = True
