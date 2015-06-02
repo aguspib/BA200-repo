@@ -124,62 +124,6 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
                 End Sub)
 #End If
         End Sub
-        ' ReSharper disable once InconsistentNaming
-        Public Shared Sub DebugContentsFromExecutionDS(executions As ExecutionsDS, currentIndex As Integer)
-
-            Dim table = executions.twksWSExecutions, count As Integer = 0
-            Debug.WriteLine("Listing executions:")
-            For Each R In table
-                If R.IsExecutionIDNull() Then
-                    Debug.Write("Expected_ID = " & count)
-                Else
-                    Debug.Write("ExecutionID = " & R.ExecutionID)
-                End If
-                Debug.Write(" type= " & R.ExecutionType)
-                If R.IsReagentIDNull Then
-                    Debug.Write(" no reagent ")
-                Else
-                    Debug.Write(" reagent = " & R.ReagentID)
-                End If
-                Debug.Write(" OrderID = " & R.OrderID)
-                Debug.Write(" OrderTestID = " & R.OrderTestID)
-                Debug.Write(" PatientID = " & R.PatientID)
-                If R.IsPreparationIDNull Then
-                    Debug.Write(" PreparationID = <void> ")
-                Else
-                    Debug.Write(" PreparationID = " & R.PreparationID)
-                End If
-                Debug.Write(" Class = " & R.SampleClass)
-                Debug.Write(" Type = " & R.SampleType)
-                Debug.Write(" Name = " & R.TestName)
-                Debug.Write(" TType = " & R.TestType)
-                If R.IsWellUsedNull Then
-                    Debug.Write(" Well = none")
-                Else
-                    Debug.Write(" Well = " & R.WellUsed)
-                End If
-                Debug.WriteLine("")
-                count += 1
-            Next
-            Debug.WriteLine("DONE!")
-        End Sub
-
-        'Public Sub FillContextInRunning(executions As ExecutionsDS)
-        '    For curStep = Steps.Range.Minimum To Steps.Range.Maximum
-        '        For curDispense = 1 To ContaminationsSpecifications.DispensesPerStep
-
-        '            Dim dispensing = Steps(curStep)(curDispense)
-        '            Dim rows = executions.twksWSExecutions.Where(Function(element As twksWSExecutionsRow) element.ExecutionID = dispensing.ExecutionID)
-
-        '            If rows IsNot Nothing And rows.Any() Then
-        '                Dim row = rows.First()
-        '                dispensing.R1ReagentID = row.ReagentID
-        '                'FillDispenseContaminations(dispensing)
-
-        '            End If
-        '        Next
-        '    Next
-        'End Sub
 
         ''' <summary>
         ''' fills context from minimum index to 0, using the ExecutionsDS.<Para>This method ONLY fills the first dispensing (R1). </Para>
@@ -187,8 +131,8 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
         ''' <param name="expectedExecutions"></param>
         ''' <remarks></remarks>
         Public Sub FillContextInStatic(expectedExecutions As ExecutionsDS) Implements IContaminationsContext.FillContextInStatic
-            Dim Lista As List(Of twksWSExecutionsRow) = expectedExecutions.twksWSExecutions.ToList()
-            FillContextInStatic(Lista)
+            Dim lista As List(Of twksWSExecutionsRow) = expectedExecutions.twksWSExecutions.ToList()
+            FillContextInStatic(lista)
         End Sub
 
         Public Sub FillContextInStatic(executionsList As List(Of ExecutionsDS.twksWSExecutionsRow)) Implements IContaminationsContext.FillContextInStatic
@@ -297,7 +241,6 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
 
         End Function
 
-
         Public Property Steps As RangedCollection(Of IContextStep) Implements IContaminationsContext.Steps
 
         Public Overrides Function ToString() As String
@@ -330,9 +273,6 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
             SB.Append(vbCr)
             Return SB.ToString
         End Function
-
-
-
 
     End Class
 
