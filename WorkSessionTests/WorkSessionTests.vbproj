@@ -140,6 +140,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Contaminations Handling\" />
+    <Folder Include="Entities\WorkSession\" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
