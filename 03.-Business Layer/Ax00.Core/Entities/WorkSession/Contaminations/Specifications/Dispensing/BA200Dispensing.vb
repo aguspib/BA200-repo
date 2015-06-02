@@ -9,16 +9,16 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
 
             Dim result = MyBase.ReagentRequiresWashingOrSkip(scope, dispensingBeingSent, reagentNumber)
 
-            If (result.Action <> IContaminationsAction.RequiredAction.Wash AndAlso
-                scope = -1 AndAlso reagentNumber = 1 AndAlso
-                Contamines IsNot Nothing AndAlso
-                Contamines.Any AndAlso
-                AnalysisMode = Global.AnalysisMode.BiReactive AndAlso
-                dispensingBeingSent.AnalysisMode = Global.AnalysisMode.MonoReactive) Then
+            'If (result.Action <> IContaminationsAction.RequiredAction.Wash AndAlso
+            '    scope = -1 AndAlso reagentNumber = 1 AndAlso
+            '    Contamines IsNot Nothing AndAlso
+            '    Contamines.Any AndAlso
+            '    AnalysisMode = Global.AnalysisMode.BiReactive AndAlso
+            '    dispensingBeingSent.AnalysisMode = Global.AnalysisMode.MonoReactive) Then
 
-                result.Action = IContaminationsAction.RequiredAction.Wash
-                result.InvolvedWash = New WashingDescription(1, Context.WashingDescription.RegularWaterWashingID)
-            End If
+            '    result.Action = IContaminationsAction.RequiredAction.Wash
+            '    result.InvolvedWash = New WashingDescription(1, Context.WashingDescription.RegularWaterWashingID)
+            'End If
 
             Return result
 

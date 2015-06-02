@@ -84,12 +84,24 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
             End Get
         End Property
 
+        ''' <summary>
+        ''' Returns the current active Analyzer ID
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks>This property is ReadOnly</remarks>
         Public ReadOnly Property AnalyzerID As String
             Get
                 Return AnalyzerManager.GetCurrentAnalyzerManager.ActiveAnalyzer
             End Get
         End Property
 
+        ''' <summary>
+        ''' Returns the current active WorkSession Id
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks>This property is ReadOnly</remarks>
         Public ReadOnly Property WorksesionID As String
             Get
                 'Return pWorkSessionID
@@ -97,16 +109,37 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
             End Get
         End Property
 
+        ''' <summary>
+        ''' Property that defines the contamination specifications
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks>Implements the IAnalyzerContaminationsSpecificiation interface</remarks>
         Public Property ContaminationsSpecification As IAnalyzerContaminationsSpecification
 
         ' ReSharper disable once UnusedMember.Global This method is USED by Reflection.
+        ''' <summary>
+        ''' Method that creates the WorkSession to run
+        ''' </summary>
+        ''' <param name="ppDBConnection"></param>
+        ''' <param name="ppAnalyzerID"></param>
+        ''' <param name="ppWorkSessionID"></param>
+        ''' <param name="ppWorkInRunningMode"></param>
+        ''' <param name="ppOrderTestID"></param>
+        ''' <param name="ppPostDilutionType"></param>
+        ''' <param name="ppIsISEModuleReady"></param>
+        ''' <param name="ppISEElectrodesList"></param>
+        ''' <param name="ppPauseMode"></param>
+        ''' <param name="ppManualRerunFlag"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
         Public Function CreateWS(ByVal ppDBConnection As SqlConnection, ppAnalyzerID As String, ByVal ppWorkSessionID As String, _
                                            ByVal ppWorkInRunningMode As Boolean, Optional ByVal ppOrderTestID As Integer = -1, _
                                            Optional ByVal ppPostDilutionType As String = "", Optional ByVal ppIsISEModuleReady As Boolean = False, _
                                            Optional ByVal ppISEElectrodesList As List(Of String) = Nothing, Optional ByVal ppPauseMode As Boolean = False, _
-                                           Optional ByVal ppManualRerunFlag As Boolean = True) As GlobalDataTO 'Implements IWSExecutionCreator.CreateWS
+                                           Optional ByVal ppManualRerunFlag As Boolean = True) As GlobalDataTO
 
-            Me.ContaminationsSpecification = ContaminationsSpecification
+            'ContaminationsSpecification = ContaminationsSpecification
 
             'Initialization from parameters
             pDBConnection = ppDBConnection
