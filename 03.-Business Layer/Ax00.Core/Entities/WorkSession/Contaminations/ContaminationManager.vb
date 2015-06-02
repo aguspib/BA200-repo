@@ -8,6 +8,10 @@ Imports Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
 Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
     ' ReSharper disable once UnusedMember.Global    'It's used at runtime by Recletion glue code!!
+    ''' <summary>
+    ''' Class that manages all the contamination related processes
+    ''' </summary>
+    ''' <remarks></remarks>
     Public Class ContaminationManager
         Public Property currentContaminationNumber As Integer
         Public Property bestContaminationNumber As Integer
@@ -37,6 +41,12 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
         End Sub
 
         ' ReSharper disable once UnusedMember.Global    'It's used by Reflection GLUE code!
+        ''' <summary>
+        ''' Method that apply the optimization algorithm defined on the system, in order to avoid as much number of contaminations as possible
+        ''' </summary>
+        ''' <param name="myOptimizer">OptimizationPolicyApplier wich defines the optimization algorithm</param>
+        ''' <param name="OrderTests">OrderTests to be sorted</param>
+        ''' <remarks></remarks>
         Public Sub ApplyOptimizations(ByVal myOptimizer As OptimizationPolicyApplier, ByVal OrderTests As List(Of ExecutionsDS.twksWSExecutionsRow))
             myOptimizer.calculateInRunning = MakeCalculationsInRunning
             Dim highContaminationPersistance = WSExecutionCreator.Instance.ContaminationsSpecification.HighContaminationPersistence

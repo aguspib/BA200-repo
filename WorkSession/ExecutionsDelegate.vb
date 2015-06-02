@@ -8076,21 +8076,6 @@ Namespace Biosystems.Ax00.BL
                 currentResult = OrderTests.ToList()
                 bestResult = ManageContaminationsForRunningAndStatic(False, activeAnalyzer, pConn, contaminationsDataDS, currentResult, highContaminationPersitance, currentContaminationNumber, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
 
-                ''A last try, if the order tests only have 2 tests that are contaminating between them, why not to interchange them?
-                'If currentContaminationNumber > 0 Then
-                '    If OrderTests.Count = 2 Then
-                '        'Okay, if there are contaminations, why not to try interchange them?
-                '        currentResult.Clear()
-                '        For z = OrderTests.Count - 1 To 0 Step -1
-                '            currentResult.Add(OrderTests(z))
-                '        Next
-                '        currentContaminationNumber = GetContaminationNumber(contaminationsDataDS, currentResult, highContaminationPersitance)
-                '        If currentContaminationNumber = 0 Then
-                '            bestResult = currentResult
-                '        End If
-                '    End If
-                'End If
-
                 Dim stdPrepFlag As Boolean = False
                 For Each wse In AllTestTypeOrderTests
                     If wse.ExecutionType <> "PREP_STD" Then
@@ -8112,7 +8097,7 @@ Namespace Biosystems.Ax00.BL
         End Sub
 
         ''' <summary>
-        ''' Applies the 4 different optimizations for solving contaminations between order tests
+        ''' Applies optimizations in sorting for solving contaminations between order tests
         ''' </summary>
         ''' <param name="ActiveAnalyzer"></param>
         ''' <param name="pConn"></param>
