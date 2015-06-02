@@ -84,6 +84,7 @@
   <ItemGroup>
     <Compile Include="Entities\Worksession\Contaminations\ContaminationsContextTests.vb" />
     <Compile Include="Entities\Worksession\Contaminations\LAx00FrameTests.vb" />
+    <Compile Include="Entities\Worksession\WSExecutionCreatorTest.vb" />
     <Compile Include="Services\BaseLineServiceTests.vb" />
     <Compile Include="Services\RotorChangeServicesTests.vb" />
     <Compile Include="Services\WarmUpServiceTests.vb" />
