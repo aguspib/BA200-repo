@@ -13,7 +13,7 @@ Imports Biosystems.Ax00.Types
 
 Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Tests
 
-    <TestFixture()> Public Class ContaminationsContextTests
+    <TestFixture()> Public Class ContextTests
 
         ''' <summary>
         ''' This method tests the basic constext constructor
