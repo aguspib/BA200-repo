@@ -29,12 +29,11 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
         Protected Property typeResult As AnalysisMode
 #End Region
 
-#Region "Enums"
-
-
-#End Region
-
 #Region "Constructor"
+        ''' <summary>
+        ''' Constructor
+        ''' </summary>
+        ''' <remarks></remarks>
         Public Sub New()
             typeExpectedResult = AnalysisMode.MonoReactive
             typeResult = AnalysisMode.MonoReactive
@@ -113,12 +112,25 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
             Return ContaminationNumber
         End Function
 
+        ''' <summary>
+        ''' Returns the contaminations specification for the current execution and analyzer
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks>This property is ReadOnly</remarks>
         Public ReadOnly Property ContaminationsSpecification() As IAnalyzerContaminationsSpecification
             Get
                 Return WSExecutionCreator.Instance.ContaminationsSpecification
             End Get
         End Property
 
+        ''' <summary>
+        ''' Returns the number of contaminations that exist inside the pExecutions list
+        ''' </summary>
+        ''' <param name="pContaminationsDS">List of all possible contaminations between reagents</param>
+        ''' <param name="pExecutions">list of executions to check</param>
+        ''' <returns>Number of existing contaminations</returns>
+        ''' <remarks></remarks>
         Public MustOverride Function GetContaminationNumber(ByVal pContaminationsDS As ContaminationsDS, pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow)) As Integer
 
 
@@ -202,10 +214,26 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
             Return result
         End Function
 
+        ''' <summary>
+        ''' Returns a boolean value about if there are contaminations between two reagents
+        ''' </summary>
+        ''' <param name="Contaminator">ReagentID considered contaminator</param>
+        ''' <param name="Contaminated">ReagentID considered contaminated</param>
+        ''' <param name="pContaminationsDS">List of contaminations between reagents</param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
         Protected Function AreThereContaminationBetweenReagents(ByVal Contaminator As Integer, ByVal Contaminated As Integer, ByVal pContaminationsDS As ContaminationsDS) As Boolean
             Return InternalGetContaminationBetweenReagents(Contaminator, Contaminated, pContaminationsDS).Any
         End Function
 
+        ''' <summary>
+        ''' Returns a list with all the contaminations between two reagents
+        ''' </summary>
+        ''' <param name="Contaminator">ReagentID considered contaminator</param>
+        ''' <param name="Contaminated">ReagentID considered contaminated</param>
+        ''' <param name="pContaminationsDS">List of contaminations between reagents</param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
         Protected Function GetContaminationBetweenReagents(ByVal Contaminator As Integer, ByVal Contaminated As Integer, ByVal pContaminationsDS As ContaminationsDS) As EnumerableRowCollection(Of ContaminationsDS.tparContaminationsRow)
             Dim result = InternalGetContaminationBetweenReagents(Contaminator, Contaminated, pContaminationsDS)
             Return result
