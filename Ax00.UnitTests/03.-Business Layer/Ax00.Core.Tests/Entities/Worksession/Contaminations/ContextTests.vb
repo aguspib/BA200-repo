@@ -122,7 +122,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Tests
         ''' In this test, we create an analyzer with a range of -2 to 2 contaminations viewport
         ''' </summary>
         ''' <remarks></remarks>
-        Private Sub CreateSpecification()
+        Public Shared Sub CreateSpecification()
             Const dispensesPerStep = 2  'Maximum 2 dispenses per Step or Cycle.
             Const before = -2
             Const after = 2
@@ -139,7 +139,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Tests
         ''' This method is the mocked Dispensing factory for this test.
         ''' </summary>
         ''' <remarks></remarks>
-        Private Function DispensingMockFactory() As IDispensing
+        Private Shared Function DispensingMockFactory() As IDispensing
             Dim dispensing = Telerik.JustMock.Mock.Create(Of IDispensing)()
 
             Mock.Arrange(Sub() dispensing.FillDispense(Arg.AnyObject, Arg.AnyObject)).DoInstead(
@@ -166,7 +166,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Tests
         ''' This method gets a ReagentID and sets all test-case contaminations.
         ''' </summary>
         ''' <remarks></remarks>
-        Private Sub SetContaminations(dispensing As IDispensing)
+        Private Shared Sub SetContaminations(dispensing As IDispensing)
 
 
             If dispensing.Contamines Is Nothing Then
@@ -204,7 +204,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Tests
         ''' This method generates a mocked version of a WashingSolution description.
         ''' </summary>
         ''' <remarks></remarks>
-        Private Function CreateWashingDescription(Strength As Integer, WSCode As String) As IWashingDescription
+        Private Shared Function CreateWashingDescription(Strength As Integer, WSCode As String) As IWashingDescription
             Dim washingDesc = Mock.Create(Of IWashingDescription)()
             washingDesc.WashingStrength = Strength
             washingDesc.WashingSolutionCode = WSCode
@@ -215,7 +215,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Tests
         ''' This method generates a mocked version of a DispensingContaminationDescription description.
         ''' </summary>
         ''' <remarks></remarks>
-        Private Function CreateDispensingContaminationDescription(contaminatedReagent As Integer, washingStrength As Integer, washingCode As String) As IDispensingContaminationDescription
+        Private Shared Function CreateDispensingContaminationDescription(contaminatedReagent As Integer, washingStrength As Integer, washingCode As String) As IDispensingContaminationDescription
             Dim dispensingContaminationDescription = Mock.Create(Of IDispensingContaminationDescription)()
             dispensingContaminationDescription.ContaminedReagent = contaminatedReagent
             dispensingContaminationDescription.RequiredWashing = CreateWashingDescription(washingStrength, washingCode)
