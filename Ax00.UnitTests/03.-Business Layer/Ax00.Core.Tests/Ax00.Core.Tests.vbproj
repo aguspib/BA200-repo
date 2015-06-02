@@ -82,9 +82,10 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Entities\Worksession\Contaminations\ContextStepTest.vb" />
-    <Compile Include="Entities\Worksession\Contaminations\ContextTests.vb" />
+    <Compile Include="Entities\Worksession\Contaminations\Context\ContextStepTest.vb" />
+    <Compile Include="Entities\Worksession\Contaminations\Context\ContextTests.vb" />
     <Compile Include="Entities\Worksession\Contaminations\LAx00FrameTests.vb" />
+    <Compile Include="Entities\Worksession\Specifications\Dispensing\ReagentDispensingTest.vb" />
     <Compile Include="Entities\Worksession\WSExecutionCreatorTest.vb" />
     <Compile Include="Services\BaseLineServiceTests.vb" />
     <Compile Include="Services\RotorChangeServicesTests.vb" />
