@@ -114,7 +114,7 @@
     <Compile Include="Entities\WorkSession\Sorting\OptimizationBacktrackingApplier.vb" />
     <Compile Include="Entities\WorkSession\Sorting\OptimizationPolicyApplier.vb" />
     <Compile Include="Entities\WorkSession\Contaminations\Context\WashingDescription.vb" />
-    <Compile Include="Entities\WorkSession\Contaminations\Specifications\Dispensing\ReagentDispensing.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\Specifications\Dispensing\Ax00DispensingBase.vb" />
     <Compile Include="Entities\WorkSession\WSExecutionCreator.vb" />
     <Compile Include="Entities\WorkSession\Sorting\WSExecutionsSorter.vb" />
     <Compile Include="Services\AsyncService.vb" />

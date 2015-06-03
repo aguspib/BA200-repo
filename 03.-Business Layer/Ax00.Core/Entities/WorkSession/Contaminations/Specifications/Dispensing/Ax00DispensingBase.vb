@@ -147,9 +147,13 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
             End Set
         End Property
 
+        'this will allow for data mocking in test situations, as we can inject another data source different from our DAL TODO: find a better solution?
+        Protected getAllContaminationsForAReagent As Func(Of Integer, TypedGlobalDataTo(Of EnumerableRowCollection(Of ContaminationsDS.tparContaminationsRow))) =
+            AddressOf tparContaminationsDAO.GetAllContaminationsForAReagent
+
         Private Sub FillContaminations()
             _contamines = New Dictionary(Of Integer, IDispensingContaminationDescription)()
-            Dim contaminations = tparContaminationsDAO.GetAllContaminationsForAReagent(R1ReagentID)
+            Dim contaminations = getAllContaminationsForAReagent(R1ReagentID) 'tparContaminationsDAO.GetAllContaminationsForAReagent(R1ReagentID)
             For Each contamination In contaminations.SetDatos
                 If contamination.ContaminationType <> "R1" Then Continue For
 
