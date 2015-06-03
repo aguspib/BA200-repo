@@ -207,6 +207,11 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
             Return resultData
         End Function
 
+        ''' <summary>
+        ''' Gets all the ordertests that are locked by LIS
+        ''' </summary>
+        ''' <returns>All the ordertests locked by LIS</returns>
+        ''' <remarks></remarks>
         Private Function GetOrderTestsLockedByLIS() As List(Of Integer)
             Dim resultData = myDao.GetOrderTestsLockedByLIS(pDBConnection, pAnalyzerID, pWorkSessionID, True)
             Dim orderTestLockedByLISList As New List(Of Integer)
@@ -219,6 +224,13 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
             Return orderTestLockedByLISList
         End Function
 
+        ''' <summary>
+        ''' Returns a valid SqlConnection.
+        ''' If WorkSession is created with multiple transactions, then only returns the connection
+        ''' Otherwise, a connection with an open transaction is returned
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
         Private Function ResolveConnection() As SqlConnection
             Dim dbConnection As New SqlConnection
             Dim resultData As GlobalDataTO
@@ -268,6 +280,13 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
             End If
         End Sub
 
+        ''' <summary>
+        ''' Creates an execution transactionally
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pExecution"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
         Private Function Create(ByVal pDBConnection As SqlConnection, ByVal pExecution As ExecutionsDS) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -359,6 +378,11 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
             Return resultData
         End Function
 
+        ''' <summary>
+        ''' Search all Order Tests which Executions can be deleted: those having ALL Executions with status PENDING or LOCKED
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
         Private Function SearchNotInCourseExecutionsToDelete() As GlobalDataTO
             Dim StartTime = Now
             'Search all Order Tests which Executions can be deleted: those having ALL Executions with status PENDING or LOCKED
@@ -387,6 +411,11 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
             Return resultData
         End Function
 
+        ''' <summary>
+        ''' Create the executions for all the ordertest that they are not still started
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
         Private Function CreateExecutionsOrderTestsNotStarted() As GlobalDataTO
             Dim myWSOrderTestsDelegate As New WSOrderTestsDelegate
             Dim resultData = myWSOrderTestsDelegate.GetInfoOrderTestsForExecutions(pDBConnection, pAnalyzerID, pWorkSessionID)
@@ -427,6 +456,10 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
             Return resultData
         End Function
 
+        ''' <summary>
+        ''' Get the executions for the blanks
+        ''' </summary>
+        ''' <remarks></remarks>
         Private Sub GetExecutionsForBlanks()  'ByRef myBlankExecutionsDS As ExecutionsDS, ByVal allOrderTestsDS As OrderTestsForExecutionsDS)
             Dim StartTime = Now
             Dim myOrderTestID As Integer = -1
@@ -459,6 +492,10 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
 
         End Sub
 
+        ''' <summary>
+        ''' Get the executions for calibrators
+        ''' </summary>
+        ''' <remarks></remarks>
         Private Sub GetExecutionsForCalibrators()  'ByRef myCalibratorExecutionsDS As ExecutionsDS, ByVal allOrderTestsDS As OrderTestsForExecutionsDS)
             Dim StartTime = Now
             Dim myOrderTestID As Integer = -1
@@ -491,6 +528,10 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
 
         End Sub
 
+        ''' <summary>
+        ''' Get the executions for the controls
+        ''' </summary>
+        ''' <remarks></remarks>
         Private Sub GetExecutionsForControls()  'ByRef myControlExecutionsDS As ExecutionsDS, allOrderTestsDS As OrderTestsForExecutionsDS)
             Dim StartTime = Now
             Dim myOrderTestID As Integer = -1
@@ -525,6 +566,10 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
 
         End Sub
 
+        ''' <summary>
+        ''' Get the executions for the patients
+        ''' </summary>
+        ''' <remarks></remarks>
         Private Sub GetExecutionsForPatients()   'ByRef myPatientExecutionsDS As ExecutionsDS, ByVal allOrderTestsDS As OrderTestsForExecutionsDS)
             Dim StartTime = Now
             Dim myOrderTestID As Integer = -1
@@ -558,6 +603,13 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
                                             "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
         End Sub
 
+        ''' <summary>
+        ''' Lock the executions for the blanks
+        ''' </summary>
+        ''' <param name="lstLockedBlanks"></param>
+        ''' <param name="myExecutionDS"></param>
+        ''' <param name="IncludeExecution"></param>
+        ''' <remarks></remarks>
         Private Sub LockTestsFromBlanks(ByVal lstLockedBlanks As List(Of Integer), ByRef myExecutionDS As ExecutionsDS, ByVal IncludeExecution As Boolean)
             For Each lockedBlank In lstLockedBlanks
                 Dim myOwnTestId = lockedBlank
@@ -584,6 +636,15 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
             Next
         End Sub
 
+        ''' <summary>
+        ''' Lock the executions for the calibrators
+        ''' </summary>
+        ''' <param name="lockedCalib"></param>
+        ''' <param name="myOrderTestID"></param>
+        ''' <param name="myControlExecutionsDS"></param>
+        ''' <param name="myPatientExecutionsDS"></param>
+        ''' <param name="allOrderTestsDS"></param>
+        ''' <remarks></remarks>
         Private Sub LockByCalibrators(ByVal lockedCalib As ExecutionsDS.twksWSExecutionsRow, ByVal myOrderTestID As Integer, ByRef myControlExecutionsDS As ExecutionsDS, ByRef myPatientExecutionsDS As ExecutionsDS, ByVal allOrderTestsDS As OrderTestsForExecutionsDS)
             If (myOrderTestID <> lockedCalib.OrderTestID) Then
                 'First verify if the Calibrator is used as alternative of another Sample Types for the same Test
@@ -631,6 +692,14 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
             End If
         End Sub
 
+        ''' <summary>
+        ''' Set the stat flag to blanks, calibrators and control executions
+        ''' </summary>
+        ''' <param name="blkCalibCtrlRow"></param>
+        ''' <param name="myBlankExecutionsDS"></param>
+        ''' <param name="myCalibratorExecutionsDS"></param>
+        ''' <param name="myControlExecutionsDS"></param>
+        ''' <remarks></remarks>
         Private Sub SetStatFlagToBlkCalCtrl(ByVal blkCalibCtrlRow As OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow,
                                             ByRef myBlankExecutionsDS As ExecutionsDS, ByRef myCalibratorExecutionsDS As ExecutionsDS,
                                             ByRef myControlExecutionsDS As ExecutionsDS)
@@ -667,6 +736,11 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
             End If
         End Sub
 
+        ''' <summary>
+        ''' Get the executions for the ordertests in the worksession
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
         Private Function GetExecutionsForTests() As GlobalDataTO
 
             'Get all executions for BLANKS included in the WorkSession
@@ -708,6 +782,10 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
             Return resultData
         End Function
 
+        ''' <summary>
+        ''' Lock all the ordertest from blanks
+        ''' </summary>
+        ''' <remarks></remarks>
         Private Sub LockAllTestsFromBlanks()
             Dim StartTime = Now
             Dim listTask As New List(Of Task)
@@ -732,6 +810,10 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
                                             "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
         End Sub
 
+        ''' <summary>
+        ''' Lock all the tests from calibrators
+        ''' </summary>
+        ''' <remarks></remarks>
         Private Sub LockAllTestsFromCalibrators()
             Dim StartTime = Now
             'Search all locked CALIBRATORS to lock also all Controls and Patient Samples
@@ -753,6 +835,11 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
                                             "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
         End Sub
 
+        ''' <summary>
+        ''' Search all Standard TestType/TestID/SampleType of all Patients requested for STAT, to mark as STAT
+        ''' all the needed Blanks, Calibrators and Controls
+        ''' </summary>
+        ''' <remarks></remarks>
         Private Sub MarkAllTestsSTAT()
             Dim StartTime = Now
             'Search all Standard TestType/TestID/SampleType of all Patients requested for STAT, to mark as STAT
@@ -801,6 +888,11 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
                                             "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
         End Sub
 
+        ''' <summary>
+        ''' Appends all the locked blanks, calibrators, controls and patients to the pending ones in a single set
+        ''' </summary>
+        ''' <returns>the merge set</returns>
+        ''' <remarks></remarks>
         Private Function MovePendingAndLockedExecutions() As ExecutionsDS
             Dim StartTime = Now
             Dim auxResult As ExecutionsDS
@@ -823,6 +915,12 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
             Return result
         End Function
 
+        ''' <summary>
+        ''' Appends the locked ordertests to the pending ones in a single set
+        ''' </summary>
+        ''' <param name="myExecutionDS"></param>
+        ''' <returns>the merge set</returns>
+        ''' <remarks></remarks>
         Private Function AppendLockedToPending(ByVal myExecutionDS As ExecutionsDS) As ExecutionsDS
             Dim auxPending As New ExecutionsDS
             Dim auxLocked As New ExecutionsDS
@@ -841,6 +939,11 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
             Return auxPending
         End Function
 
+        ''' <summary>
+        ''' Sorts the executions inside the current worksession, trying to avoid contaminations between reagents as much as possible
+        ''' </summary>
+        ''' <returns>The Worksession executions</returns>
+        ''' <remarks></remarks>
         Private Function SortAndManageContaminations() As GlobalDataTO
 
             Dim StartTime = Now
@@ -879,6 +982,11 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
             Return resultData
         End Function
 
+        ''' <summary>
+        ''' update the paused flag 
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
         Private Function UpdatePausedFlag() As GlobalDataTO
             ' - Update of the Paused flag is performed only when no Running mode
             ' - When working in Running mode, no pending executions are deleted, then SW has only to update status 
@@ -904,6 +1012,11 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
             Return resultData
         End Function
 
+        ''' <summary>
+        ''' Update the positions on the sample rotor
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
         Private Function UpdatePositionsRotorSample() As GlobalDataTO
             Dim resultData As GlobalDataTO
             'Read the current content of all positions in Samples Rotor
@@ -931,6 +1044,11 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
             Return resultData
         End Function
 
+        ''' <summary>
+        ''' Updates the status for the ISE preparations
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
         Private Function UpdateStatus() As GlobalDataTO
             Dim StartTime = Now
             Dim resultData As New GlobalDataTO
@@ -952,6 +1070,11 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
             Return resultData
         End Function
 
+        ''' <summary>
+        ''' Re calculate the status for non deleted executions 
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
         Private Function RecalculateStatusForNotDeletedExecutions() As GlobalDataTO
             Dim StartTime = Now
             Dim resultData = RecalculateStatusForNotDeletedExecutionsNEW(pDBConnection, pAnalyzerID, pWorkSessionID, pWorkInRunningMode, pPauseMode)
@@ -963,6 +1086,11 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
             Return resultData
         End Function
 
+        ''' <summary>
+        ''' Saves the pending executions for the current worksession
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
         Private Function SavePendingExecutions() As GlobalDataTO
             Dim resultData As GlobalDataTO
             If (GlobalConstants.CreateWSExecutionsWithMultipleTransactions) Then
@@ -974,6 +1102,12 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
             Return resultData
         End Function
 
+        ''' <summary>
+        ''' Updates paused ordertests transactionally
+        ''' </summary>
+        ''' <param name="myWSPausedOrderTestsDS"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
         Private Function UpdatePausedWithMultiTransaction(ByVal myWSPausedOrderTestsDS As WSPausedOrderTestsDS) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Dim myOT As New List(Of Integer)
@@ -992,6 +1126,12 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
             Return resultData
         End Function
 
+        ''' <summary>
+        ''' Updates paused ordertests
+        ''' </summary>
+        ''' <param name="myWSPausedOrderTestsDS"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
         Private Function UpdatePausedWithoutTransaction(ByVal myWSPausedOrderTestsDS As WSPausedOrderTestsDS) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Dim tempExecutionDS As ExecutionsDS
@@ -1012,6 +1152,11 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
             Return resultData
         End Function
 
+        ''' <summary>
+        ''' Updates ordertests that are locked by LIS
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks>It can be made transactionally or not</remarks>
         Private Function UpdateLocksByLIS() As GlobalDataTO
             Dim resultData As GlobalDataTO
 
@@ -1024,6 +1169,12 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
             Return resultData
         End Function
 
+        ''' <summary>
+        ''' Performs a commit or rollback in the current SqlConnection
+        ''' </summary>
+        ''' <param name="resultData"></param>
+        ''' <param name="ppDBConnection"></param>
+        ''' <remarks></remarks>
         Private Sub FinishTransaction(ByVal resultData As GlobalDataTO, ByVal ppDBConnection As SqlConnection)
             If (Not GlobalConstants.CreateWSExecutionsWithMultipleTransactions) Then
                 If (Not resultData.HasError) Then
@@ -1036,6 +1187,10 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
             End If
         End Sub
 
+        ''' <summary>
+        ''' Leaves available the semaphore, releasing it
+        ''' </summary>
+        ''' <remarks></remarks>
         Private Sub ReleaseSemaphoreToAvailable()
             If GlobalConstants.CreateWSExecutionsWithSemaphore AndAlso pManualRerunFlag Then
                 GlobalSemaphores.createWSExecutionsSemaphore.Release()
