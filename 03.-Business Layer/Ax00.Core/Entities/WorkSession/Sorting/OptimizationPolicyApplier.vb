@@ -10,7 +10,7 @@ Imports System.Threading.Tasks
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Core.Entities.Worksession.Interfaces
 
-Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
+Namespace Biosystems.Ax00.Core.Entities.WorkSession.Sorting
 
     ''' <summary>
     ''' Class that implements the different optimization's policies that are currently available
@@ -19,8 +19,10 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
     ''' Created on 17/03/2015 by AJG
     ''' </remarks>
     Public MustInherit Class OptimizationPolicyApplier
+        Implements IOptimizationPolicyApplier
+
 #Region "Properties"
-        Public Property calculateInRunning As Boolean
+        Public Property calculateInRunning As Boolean Implements IOptimizationPolicyApplier.calculateInRunning
         Protected Property ContaminationNumber As Integer
         Protected Property sortedOTList As List(Of Integer)
         Protected Property myOTListLinq As List(Of Integer)
@@ -63,7 +65,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
                                                   ByRef pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), _
                                                   ByVal pHighContaminationPersistance As Integer, _
                                                   Optional ByVal pPreviousReagentID As List(Of Integer) = Nothing, _
-                                                  Optional ByVal pPreviousReagentIDMaxReplicates As List(Of Integer) = Nothing) As Integer
+                                                  Optional ByVal pPreviousReagentIDMaxReplicates As List(Of Integer) = Nothing) As Integer Implements IOptimizationPolicyApplier.ExecuteOptimization
 
             'This code is execute only when pPreviousReagentID is informed
             'Search a ReagentID (inside pExecutions) an OrderTest which ReagentID is not contamianted by pPreviousReagentID

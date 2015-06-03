@@ -13,16 +13,16 @@ Imports Biosystems.Ax00.Core.Entities.Worksession.Contaminations.Interfaces
 Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Interfaces
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
+Imports Biosystems.Ax00.Core.Entities.WorkSession.Sorting
 
 Namespace Biosystems.Ax00.Core.Entities.WorkSession
-
     ''' <summary>
     ''' Class WSExecutionCreator. Implements a class which creates the WSExecution. It's implements through the Singleton pattern, 
     ''' so it's guaranteed that only one instance can be running.
     ''' </summary>
     ''' <remarks></remarks>
-    Public NotInheritable Class WSExecutionCreator
-        Private Shared _instance As WSExecutionCreator = Nothing
+    Public Class WSExecutionCreator
+        Implements IWSExecutionCreator
 
         'Parameters for create the Work Session Executions
 
@@ -60,29 +60,41 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
         ''' </summary>
         ''' <remarks></remarks>
         Private Sub New()
-
+            'Debug.WriteLine("CREATED AN INSTANCE OF A SINGLETON")
         End Sub
 
+        Private Shared _singletonInstance As WSExecutionCreator = Nothing
         ''' <summary>
         ''' Property which contains the only instance for this class
         ''' </summary>
         ''' <value></value>
         ''' <returns>The unique instance for this class</returns>
         ''' <remarks></remarks>
-        Public Shared ReadOnly Property Instance As WSExecutionCreator
+        Public Shared ReadOnly Property Instance() As WSExecutionCreator
             Get
                 Static myObject As Object = New Object()
 
-                If IsNothing(_instance) Then
+                If _singletonInstance Is Nothing Then
                     SyncLock myObject
-                        If IsNothing(_instance) Then
-                            _instance = New WSExecutionCreator()
+                        If _singletonInstance Is Nothing Then
+                            _singletonInstance = New WSExecutionCreator()
+                            InjectDependencies()    'done here to prevent threading concurrency issues
                         End If
                     End SyncLock
                 End If
-                Return _instance
+                Return _singletonInstance
             End Get
         End Property
+
+        ''' <summary>
+        ''' This method injects depencies on the lower-level legacy Worksession layer
+        ''' </summary>
+        ''' <remarks></remarks>
+        Private Shared Sub InjectDependencies()
+            WSDependencyInjector.WSCreator = Instance
+            WSDependencyInjector.ContaminationsManagerConstructor = AddressOf ContaminationManager.InjectableConstructor
+        End Sub
+
 
         ''' <summary>
         ''' Returns the current active Analyzer ID
@@ -90,7 +102,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>This property is ReadOnly</remarks>
-        Public ReadOnly Property AnalyzerID As String
+        Public ReadOnly Property AnalyzerID As String Implements IWSExecutionCreator.AnalyzerID
             Get
                 Return AnalyzerManager.GetCurrentAnalyzerManager.ActiveAnalyzer
             End Get
@@ -102,7 +114,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>This property is ReadOnly</remarks>
-        Public ReadOnly Property WorksesionID As String
+        Public ReadOnly Property WorksesionID As String Implements IWSExecutionCreator.WorksesionID
             Get
                 'Return pWorkSessionID
                 Return AnalyzerManager.GetCurrentAnalyzerManager.ActiveWorkSession
@@ -115,7 +127,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Implements the IAnalyzerContaminationsSpecificiation interface</remarks>
-        Public Property ContaminationsSpecification As IAnalyzerContaminationsSpecification
+        Public Property ContaminationsSpecification As IAnalyzerContaminationsSpecification Implements IWSExecutionCreator.ContaminationsSpecification
 
         ' ReSharper disable once UnusedMember.Global This method is USED by Reflection.
         ''' <summary>
@@ -137,7 +149,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
                                            ByVal ppWorkInRunningMode As Boolean, Optional ByVal ppOrderTestID As Integer = -1, _
                                            Optional ByVal ppPostDilutionType As String = "", Optional ByVal ppIsISEModuleReady As Boolean = False, _
                                            Optional ByVal ppISEElectrodesList As List(Of String) = Nothing, Optional ByVal ppPauseMode As Boolean = False, _
-                                           Optional ByVal ppManualRerunFlag As Boolean = True) As GlobalDataTO
+                                           Optional ByVal ppManualRerunFlag As Boolean = True) As GlobalDataTO Implements IWSExecutionCreator.CreateWS
 
             'ContaminationsSpecification = ContaminationsSpecification
 
@@ -1320,7 +1332,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
             Return resultData
         End Function
 
-        Function GetContaminationNumber(calculateinrunning As Boolean, previousReagentID As List(Of Integer), ByVal orderTests As IEnumerable(Of ExecutionsDS.twksWSExecutionsRow)) As Integer
+        Public Function GetContaminationNumber(calculateinrunning As Boolean, previousReagentID As List(Of Integer), ByVal orderTests As IEnumerable(Of ExecutionsDS.twksWSExecutionsRow)) As Integer Implements IWSExecutionCreator.GetContaminationNumber
             Dim contaminaNumber As Integer = 0
             Dim auxContext = New Context(ContaminationsSpecification)
             auxContext.Steps.Clear()

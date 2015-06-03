@@ -139,6 +139,10 @@
       <Project>{b23d6aff-a359-4d3e-87bf-820167228fe5}</Project>
       <Name>Ax00.CrossCutting</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Ax00.DataAccess.vb\Ax00.DataAccess.vbproj">
+      <Project>{3b94d5cf-911b-4682-9e6b-d41fc2ad4045}</Project>
+      <Name>Ax00.DataAccess</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\AX00Types\AX00Types.vbproj">
       <Project>{3b617ebf-0488-46bd-ab56-094f81d0e4c3}</Project>
       <Name>AX00Types</Name>
@@ -146,6 +150,10 @@
     <ProjectReference Include="..\..\..\Global\Global\Global.vbproj">
       <Project>{5d65020c-c2d7-4ac3-b557-223fc290e526}</Project>
       <Name>Global</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\WorkSession\WorkSession.vbproj">
+      <Project>{a883608a-3d41-4339-9c2f-feea18befb68}</Project>
+      <Name>WorkSession</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

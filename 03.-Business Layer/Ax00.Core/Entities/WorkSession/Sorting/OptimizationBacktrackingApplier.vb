@@ -8,7 +8,7 @@ Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Interfaces
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
 
-Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
+Namespace Biosystems.Ax00.Core.Entities.WorkSession.Sorting
     Friend Class OptimizationBacktrackingApplier : Inherits OptimizationPolicyApplier
 
         Private bestResult As List(Of ExecutionsDS.twksWSExecutionsRow)
@@ -41,7 +41,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Optimizations
 
         End Sub
 
- 
+
         Private Const InitialCallStackDepth As Integer = -1
         Dim _callStackNestingLevel As Integer = InitialCallStackDepth
 

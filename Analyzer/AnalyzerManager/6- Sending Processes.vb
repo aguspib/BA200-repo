@@ -1297,7 +1297,7 @@ Namespace Biosystems.Ax00.Core.Entities
             previousReagentIDSentList = (From a As AnalyzerManagerDS.sentPreparationsRow In mySentPreparationsDS.sentPreparations _
                                      Where a.ExecutionType = "PREP_STD" Select a).ToList
             Debug.Print("SeachContaminationBetweenPreviousAndFirsToSend: " & previousReagentIDSentList.Count)
-            Dim context = ContaminationsSpecification.CurrentRunningContext
+            Dim context = WSCreator.ContaminationsSpecification.CurrentRunningContext
 
             Debug.Print("CourrentContext read")
             Dim result = context.ActionRequiredForDispensing(ReagentRow)
@@ -2222,12 +2222,12 @@ Namespace Biosystems.Ax00.Core.Entities
 
             '5rh: Check if next preparation is an STD preparation and executionID <> NO_PENDING_PREPARATION_FOUND
             If Not actionAlreadySent And Not endRunToSend Then
-                Dim disp = ContaminationsSpecification.CreateDispensing
+                Dim disp = WSCreator.ContaminationsSpecification.CreateDispensing
                 disp.ExecutionID = myAnManagerDS.nextPreparation(0).ExecutionID
-                Dim requiredActionBeforeDispensing = ContaminationsSpecification.CurrentRunningContext.ActionRequiredForDispensing(disp)
+                Dim requiredActionBeforeDispensing = WSCreator.ContaminationsSpecification.CurrentRunningContext.ActionRequiredForDispensing(disp)
                 If requiredActionBeforeDispensing.Action = IContaminationsAction.RequiredAction.Wash Then
                     Debug.WriteLine("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-                    Debug.WriteLine("Incongruency found for reagent: " & disp.R1ReagentID & vbCr & ContaminationsSpecification.CurrentRunningContext.ToString)
+                    Debug.WriteLine("Incongruency found for reagent: " & disp.R1ReagentID & vbCr & WSCreator.ContaminationsSpecification.CurrentRunningContext.ToString)
                     Debug.WriteLine("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
                 End If
                 If Not myAnManagerDS.nextPreparation(0).IsExecutionTypeNull AndAlso myAnManagerDS.nextPreparation(0).ExecutionType = "PREP_STD" Then

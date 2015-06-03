@@ -2,7 +2,7 @@
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
-Namespace Biosystems.Ax00.Core.Entities.WorkSession
+Namespace Biosystems.Ax00.Core.Entities.WorkSession.Sorting
     ''' <summary>
     '''     This class handles the worksession sorting, by processing execution times and contaminations
     ''' </summary>

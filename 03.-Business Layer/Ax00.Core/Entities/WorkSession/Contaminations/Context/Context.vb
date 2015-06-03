@@ -268,7 +268,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
                     End If
                     SB.Append("|"c)
                 Next
-                SB.Append(vbCr)
+                SB.Append("     " & vbCr)
             Next
             SB.Append(vbCr)
             Return SB.ToString

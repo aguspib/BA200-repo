@@ -1,14 +1,11 @@
-﻿Imports System.IO
-Imports NUnit.Framework
+﻿Imports NUnit.Framework
 Imports Biosystems.Ax00.CC
 Imports Biosystems.Ax00.Core.Entities.WorkSession
-Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Interfaces
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Interfaces
 Imports Biosystems.Ax00.Core.Interfaces
 Imports Telerik.JustMock
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
-Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specifications.Dispensing
 Imports Biosystems.Ax00.Types
 
 Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Tests

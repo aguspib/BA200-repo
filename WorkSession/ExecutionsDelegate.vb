@@ -8123,13 +8123,10 @@ Namespace Biosystems.Ax00.BL
                                                                 Optional ByVal pPreviousReagentIDMaxReplicates As List(Of Integer) = Nothing) As List(Of ExecutionsDS.twksWSExecutionsRow)
 
 
-            Dim myContaminationManager = New DelegatesToCoreBusinesGlue.ContaminationManagerWrapper(
-                                         calculateInRunning, pConn, ActiveAnalyzer, currentContaminationNumber,
-                                         highContaminationPersistance, contaminationsDataDS, OrderTests, pPreviousReagentID,
-                                         pPreviousReagentIDMaxReplicates)
+            Dim myContaminationManager = WSDependencyInjector.ContaminationsManagerConstructor(calculateInRunning, currentContaminationNumber, contaminationsDataDS, OrderTests, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
 
             'MANEL
-            myContaminationManager.ApplyOptimizations(pConn, ActiveAnalyzer, OrderTests)
+            myContaminationManager.ApplyOptimizations(pConn, OrderTests)
 
             currentContaminationNumber = myContaminationManager.currentContaminationNumber
             Return myContaminationManager.bestResult

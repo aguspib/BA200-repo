@@ -1310,7 +1310,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         If String.Compare(pFwEntry, "", False) <> 0 Then
 
                             'ContaminationsSpecification.FillContextFromAnayzerData(_instructionReceived)
-                            AnalyzerManager.GetCurrentAnalyzerManager.ContaminationsSpecification.FillContextFromAnayzerData(pFwEntry)
+                            WSCreator.ContaminationsSpecification.FillContextFromAnayzerData(pFwEntry)
                             lastInstructionReceivedAttribute = pFwEntry 'AG 20/10/2010
 
                             Dim myLax00 As New LAX00Interpreter
