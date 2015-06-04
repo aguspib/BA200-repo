@@ -8,7 +8,6 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.Controls.UserControls
 Imports Biosystems.Ax00.PresentationCOM
-Imports System.Linq
 
 Public Class UiProgCalibrator
 
@@ -24,11 +23,9 @@ Public Class UiProgCalibrator
     Private ExternalDecimalsAllowAttribute As Integer
     Private UpdatedTestDS As New TestsDS
     Private UpdatedCalibratorsDS As New CalibratorsDS
-    'Private UpdatedTestCalibratorsDS As New CalibratorsDS
-    'Private UpdatedTestCalibratorsValuesDS As New CalibratorsDS
+    Private UpdatedTestCalibratorsDS As New TestCalibratorsDS
+    Private UpdatedTestCalibratorsValuesDS As New TestCalibratorValuesDS
     Private LocalChangesToSendAttribute As Boolean = False
-
-    Private controller As IProgrammingController
 #End Region
 
 #Region "Properties"
@@ -108,31 +105,31 @@ Public Class UiProgCalibrator
         End Set
     End Property
 
-    ' ''' <summary>
-    ' ''' When the screen has been opened from Tests Programming Screen, it contains the data of the relation between a Calibrator 
-    ' ''' and the Test/SampleType beign edited (Curve Calibration Values)
-    ' ''' </summary>
-    'Public Property ResultTestCalibrator() As CalibratorsDS
-    '    Get
-    '        Return UpdatedTestCalibratorsDS
-    '    End Get
-    '    Set(ByVal value As CalibratorsDS)
-    '        UpdatedTestCalibratorsDS = value
-    '    End Set
-    'End Property
+    ''' <summary>
+    ''' When the screen has been opened from Tests Programming Screen, it contains the data of the relation between a Calibrator 
+    ''' and the Test/SampleType beign edited (Curve Calibration Values)
+    ''' </summary>
+    Public Property ResultTestCalibrator() As TestCalibratorsDS
+        Get
+            Return UpdatedTestCalibratorsDS
+        End Get
+        Set(ByVal value As TestCalibratorsDS)
+            UpdatedTestCalibratorsDS = value
+        End Set
+    End Property
 
-    ' ''' <summary>
-    ' ''' When the screen has been opened from Tests Programming Screen, it contains the Theoretical Concentration Calibration  
-    ' ''' values for the Test/SampleType beign edited 
-    ' ''' </summary>
-    'Public Property ResultTestCalibratorsValue() As CalibratorsDS
-    '    Get
-    '        Return UpdatedTestCalibratorsValuesDS
-    '    End Get
-    '    Set(ByVal value As CalibratorsDS)
-    '        UpdatedTestCalibratorsValuesDS = value
-    '    End Set
-    'End Property
+    ''' <summary>
+    ''' When the screen has been opened from Tests Programming Screen, it contains the Theoretical Concentration Calibration  
+    ''' values for the Test/SampleType beign edited 
+    ''' </summary>
+    Public Property ResultTestCalibratorsValue() As TestCalibratorValuesDS
+        Get
+            Return UpdatedTestCalibratorsValuesDS
+        End Get
+        Set(ByVal value As TestCalibratorValuesDS)
+            UpdatedTestCalibratorsValuesDS = value
+        End Set
+    End Property
 
     ''' <summary>
     ''' Indicate if there are changes on the Calibrator screen to send to Tests Programming Screen
@@ -144,19 +141,37 @@ Public Class UiProgCalibrator
     End Property
 #End Region
 
+#Region "Enumerates"
+    Public Enum SCREEN_STATUS_TYPE
+        ReadMode
+        EditMode
+        CreateMode
+        MultiSelection
+        DisableAllButtons
+        ElementInUse
+        SpecialCalibrator
+    End Enum
+
+    Public Enum CALIBRATOR_ACTION
+        Create
+        Edit
+        Delete
+    End Enum
+#End Region
+
 #Region "Declarations"
-    Private LocalTestDS As TestsDS                        'DataSource for Calibrator by Test/SampleType Grid
-    'Private LocalCalibratorDS As CalibratorsDS            'DataSource for Calibrators Grid
-    'Private LocalConcentrationValuesDS As CalibratorsDS   'DataSource for Theoretical Concentration Values Grid
+    Private LocalTestDS As TestsDS                                 'DataSource for Calibrator by Test/SampleType Grid
+    Private LocalCalibratorDS As CalibratorsDS                     'DataSource for Calibrators Grid
+    Private LocalConcentrationValuesDS As TestCalibratorValuesDS   'DataSource for Theoretical Concentration Values Grid
 
-    Private localCalibratorsDS As New CalibratorsDS
-
-    Private LocalScreenStatus As ScreenStatusType
+    Private LocalScreenStatus As SCREEN_STATUS_TYPE
     Private LocalChange As Boolean
     Private LocalCurLanguage As String = ""
     Private LocalValidateDependencies As Boolean
     Private LocalCalibratorLotModified As Boolean
     Private LocalDecimalAllow As Integer
+    Private LocalConcPrevValue As Double = -1
+    Private LocalFirstPointValue As Double = -1
     Private currentLanguage As String
 
     'TR 09/03/2011 - Used to indicate the previous selected Test
@@ -166,17 +181,16 @@ Public Class UiProgCalibrator
 
 #Region "Contructor"
     Public Sub New()
-        Me.New(New ProgrammingController())
-    End Sub
-
-    Public Sub New(pController As IProgrammingController)
         'This call is required by the Windows Form Designer.
         InitializeComponent()
 
-        controller = pController
+        'Add any initialization after the InitializeComponent() call.
         LocalChange = False
         LocalValidateDependencies = False
         LocalCalibratorLotModified = False
+
+        LocalConcPrevValue = -1
+        LocalFirstPointValue = -1
     End Sub
 #End Region
 
@@ -188,7 +202,10 @@ Public Class UiProgCalibrator
     Private Sub InitializeScreen()
         Try
             'Get the current Language from the current Application Session
+            'Dim myGlobalbase As New GlobalBase
             currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
+
+            'LocalCurLanguage = currentLanguage
 
             'Get all screen labels in the active Language
             GetScreenLabels(currentLanguage)
@@ -209,7 +226,7 @@ Public Class UiProgCalibrator
             FillCurveControls()
 
             'Initialize the grid of Theoretical Concentration Values 
-            PrepareValuePointsGridView(currentLanguage)
+            PrepareConcentrationGridView(currentLanguage)
             Application.DoEvents()
 
         Catch ex As Exception
@@ -416,18 +433,15 @@ Public Class UiProgCalibrator
             Dim myCalibratorDelegate As New CalibratorsDelegate
 
             'Get all defined Calibrators
-            myGlobalDataTO = myCalibratorDelegate.GetAllCalibrators(Nothing, localCalibratorsDS) 'BA-2563
+            myGlobalDataTO = myCalibratorDelegate.GetAllCalibrators(Nothing)
             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                'LocalCalibratorDS = DirectCast(myGlobalDataTO.SetDatos, CalibratorsDS) 'BA-2563
-                'localCalibratorsDS = DirectCast(myGlobalDataTO.SetDatos, CalibratorsDS) 'BA-2563
-                'localCalibratorsDS.tparCalibrators.Clear() 'BA-2563
-                'DirectCast(myGlobalDataTO.SetDatos, CalibratorsDS).tparCalibrators.CopyToDataTable(localCalibratorsDS.tparCalibrators, LoadOption.OverwriteChanges) 'BA-2563
+                LocalCalibratorDS = DirectCast(myGlobalDataTO.SetDatos, CalibratorsDS)
             Else
                 'Error getting the list of Calibrators; shown it
                 ShowMessage(Me.Name & ".FillCalibratorList ", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage, Me)
             End If
 
-            CalibratorListGrid.DataSource = localCalibratorsDS.tparCalibrators
+            CalibratorListGrid.DataSource = LocalCalibratorDS.tparCalibrators
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".FillCalibratorList ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".FillCalibratorList ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -443,18 +457,18 @@ Public Class UiProgCalibrator
     ''' </remarks>
     Private Sub BindCalibratorsControls(ByVal pCalibratorID As Integer)
         Try
-            Dim qCalibratorList As List(Of CalibratorsDS.tparCalibratorsRow) = (From a As CalibratorsDS.tparCalibratorsRow In localCalibratorsDS.tparCalibrators _
+            Dim qCalibratorList As List(Of CalibratorsDS.tparCalibratorsRow) = (From a As CalibratorsDS.tparCalibratorsRow In LocalCalibratorDS.tparCalibrators _
                                                                                Where a.RowState <> DataRowState.Deleted _
                                                                              AndAlso a.CalibratorID = pCalibratorID).ToList()
 
             If (qCalibratorList.Count > 0) Then
-                controller.CalibratorIdFocused = qCalibratorList.First().CalibratorID
+                CalibIDTextBox.Text = qCalibratorList.First().CalibratorID.ToString()
                 CalibratorNameTextBox.Text = qCalibratorList.First().CalibratorName
                 LotNumberTextBox.Text = qCalibratorList.First().LotNumber
                 CalibNumberUpDown.Value = qCalibratorList.First().NumberOfCalibrators
                 ExpDatePickUpCombo.Value = qCalibratorList.First().ExpirationDate
             Else
-                controller.CalibratorIdFocused = 0
+                CalibIDTextBox.Text = "0"
                 CalibratorNameTextBox.Clear()
                 LotNumberTextBox.Clear()
                 CalibNumberUpDown.Value = CalibNumberUpDown.Minimum
@@ -478,7 +492,7 @@ Public Class UiProgCalibrator
     Private Function CalibratorExist(ByVal pCalibratorName As String, ByVal pCalibratorID As Integer) As Boolean
         Dim myResult As Boolean = False
         Try
-            Dim myCalibratorList As List(Of CalibratorsDS.tparCalibratorsRow) = (From a As CalibratorsDS.tparCalibratorsRow In localCalibratorsDS.tparCalibrators _
+            Dim myCalibratorList As List(Of CalibratorsDS.tparCalibratorsRow) = (From a As CalibratorsDS.tparCalibratorsRow In LocalCalibratorDS.tparCalibrators _
                                                                                 Where a.CalibratorName.Trim = pCalibratorName.Trim _
                                                                               AndAlso a.CalibratorID <> pCalibratorID _
                                                                                Select a).ToList()
@@ -489,6 +503,71 @@ Public Class UiProgCalibrator
             ShowMessage(Me.Name & ".CalibratorExist ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myResult
+    End Function
+
+    ''' <summary>
+    ''' Load in a CalibratorsDS, all data informed for a new Calibrator to create 
+    ''' </summary>
+    ''' <returns>Typed DataSet CalibratorsDS containing the data of the Calibrator to add</returns>
+    ''' <remarks>
+    ''' Created by: TR 14/02/2011
+    ''' </remarks>
+    Private Function CreateNewCalibrator() As CalibratorsDS
+        Dim myCalibratorDS As New CalibratorsDS
+        Try
+            Dim myCalibratorRow As CalibratorsDS.tparCalibratorsRow
+            myCalibratorRow = myCalibratorDS.tparCalibrators.NewtparCalibratorsRow
+
+            'Set a "fake" CalibratorID
+            myCalibratorRow.CalibratorID = 1000
+            CalibIDTextBox.Text = "1000"
+
+            myCalibratorRow.CalibratorName = CalibratorNameTextBox.Text
+            myCalibratorRow.LotNumber = LotNumberTextBox.Text
+            myCalibratorRow.ExpirationDate = ExpDatePickUpCombo.Value
+            myCalibratorRow.NumberOfCalibrators = CInt(CalibNumberUpDown.Value)
+            myCalibratorRow.SpecialCalib = False
+            myCalibratorRow.InUse = False
+            myCalibratorRow.TS_User = GetApplicationInfoSession.UserName
+            myCalibratorRow.TS_DateTime = DateTime.Now.Date
+            myCalibratorRow.IsNew = True
+            myCalibratorDS.tparCalibrators.AddtparCalibratorsRow(myCalibratorRow)
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CreateNewCalibrator ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".CreateNewCalibrator ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+        Return myCalibratorDS
+    End Function
+
+    ''' <summary>
+    ''' Load in a CalibratorsDS all data informed for an existing Calibrator to update 
+    ''' </summary>
+    ''' <returns>Typed DataSet CalibratorsDS containing the data of the Calibrator to update</returns>
+    ''' <remarks>
+    ''' Created by: TR 14/02/2011
+    ''' </remarks>
+    Private Function UpdatedCalibrator() As CalibratorsDS
+        Dim myCalibratorDS As New CalibratorsDS
+        Try
+            Dim myCalibratorRow As CalibratorsDS.tparCalibratorsRow
+            myCalibratorRow = myCalibratorDS.tparCalibrators.NewtparCalibratorsRow
+
+            myCalibratorRow.CalibratorID = CInt(CalibIDTextBox.Text)
+            myCalibratorRow.CalibratorName = CalibratorNameTextBox.Text
+            myCalibratorRow.LotNumber = LotNumberTextBox.Text
+            myCalibratorRow.ExpirationDate = ExpDatePickUpCombo.Value
+            myCalibratorRow.NumberOfCalibrators = CInt(CalibNumberUpDown.Value)
+            myCalibratorRow.SpecialCalib = False
+            myCalibratorRow.InUse = False
+            myCalibratorRow.TS_User = GetApplicationInfoSession.UserName
+            myCalibratorRow.TS_DateTime = DateTime.Now.Date
+            myCalibratorRow.IsNew = False
+            myCalibratorDS.tparCalibrators.AddtparCalibratorsRow(myCalibratorRow)
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".UpdatedCalibrator ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".UpdatedCalibrator ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+        Return myCalibratorDS
     End Function
 
     ''' <summary>
@@ -509,16 +588,16 @@ Public Class UiProgCalibrator
                 Dim delCalibratorValuesAndResults As Boolean = False
 
                 Select Case (LocalScreenStatus)
-                    Case ScreenStatusType.CreateMode
+                    Case SCREEN_STATUS_TYPE.CreateMode
                         '** ADD NEW CALIBRATOR **
 
                         'Fill a CalibratorsDS with all data informed for the Calibrator to add
-                        tempCalibratorDS = controller.CreateNewCalibrator(CalibratorNameTextBox.Text, LotNumberTextBox.Text, ExpDatePickUpCombo.Value, CInt(CalibNumberUpDown.Value), GetApplicationInfoSession().UserName)
+                        tempCalibratorDS = CreateNewCalibrator()
 
                         'Save the Calibrator
-                        If (controller.SaveCalibratorChanges(tempCalibratorDS, CalibratorAction.Create, False, False, Nothing, IsTestParamWinAttribute)) Then
+                        If (SaveCalibratorChanges(tempCalibratorDS, CALIBRATOR_ACTION.Create, False, False, Nothing)) Then
                             'Add the new Calibrator to the Calibrators list, and mark it as the selected row in the Grid
-                            localCalibratorsDS.tparCalibrators.ImportRow(tempCalibratorDS.tparCalibrators(0))
+                            LocalCalibratorDS.tparCalibrators.ImportRow(tempCalibratorDS.tparCalibrators(0))
                             myCalibratorID = tempCalibratorDS.tparCalibrators(0).CalibratorID
 
                             CalibratorListGrid.Rows(CalibratorListGrid.Rows.Count - 1).Selected = True
@@ -534,11 +613,11 @@ Public Class UiProgCalibrator
                         End If
                         Exit Select
 
-                    Case ScreenStatusType.EditMode
+                    Case SCREEN_STATUS_TYPE.EditMode
                         '** EDIT AN EXISTING CALIBRATOR **
 
                         'Fill a CalibratorsDS with all data informed for the Calibrator to update
-                        tempCalibratorDS = controller.UpdatedCalibrator(CalibratorNameTextBox.Text, LotNumberTextBox.Text, ExpDatePickUpCombo.Value, CInt(CalibNumberUpDown.Value), GetApplicationInfoSession().UserName)
+                        tempCalibratorDS = UpdatedCalibrator()
                         myCalibratorID = tempCalibratorDS.tparCalibrators(0).CalibratorID
 
                         Dim myCalibratorList As New List(Of Integer)
@@ -565,9 +644,9 @@ Public Class UiProgCalibrator
                         End If
 
                         'Save the Calibrator
-                        If (controller.SaveCalibratorChanges(tempCalibratorDS, CalibratorAction.Edit, delCalibratorValuesAndResults, _
-                                                  delCalibratorValuesAndResults, Nothing, IsTestParamWinAttribute)) Then
-                            Dim qCalibratorList As List(Of CalibratorsDS.tparCalibratorsRow) = (From a As CalibratorsDS.tparCalibratorsRow In localCalibratorsDS.tparCalibrators _
+                        If (SaveCalibratorChanges(tempCalibratorDS, CALIBRATOR_ACTION.Edit, delCalibratorValuesAndResults, _
+                                                  delCalibratorValuesAndResults, Nothing)) Then
+                            Dim qCalibratorList As List(Of CalibratorsDS.tparCalibratorsRow) = (From a As CalibratorsDS.tparCalibratorsRow In LocalCalibratorDS.tparCalibrators _
                                                                                                Where a.CalibratorID = myCalibratorID _
                                                                                               Select a).ToList()
                             If (qCalibratorList.Count > 0) Then
@@ -582,9 +661,9 @@ Public Class UiProgCalibrator
                             If (LocalCalibratorLotModified) Then
                                 If (IsTestParamWinAttribute) Then
                                     'Clean values from the UpdatedTestCalibratorsValuesDS
-                                    If (UpdatedCalibratorsDS.tparTestCalibratorValues.Count > 0) Then
-                                        If (UpdatedCalibratorsDS.tparCalibrators.Count > 0 AndAlso UpdatedCalibratorsDS.tparCalibrators(0).CalibratorID = myCalibratorID) Then
-                                            UpdatedCalibratorsDS.tparTestCalibratorValues.Clear()
+                                    If (UpdatedTestCalibratorsValuesDS.tparTestCalibratorValues.Count > 0) Then
+                                        If (UpdatedCalibrator.tparCalibrators.Count > 0 AndAlso UpdatedCalibrator.tparCalibrators(0).CalibratorID = myCalibratorID) Then
+                                            UpdatedTestCalibratorsValuesDS.tparTestCalibratorValues.Clear()
                                         End If
                                     End If
                                 End If
@@ -629,9 +708,9 @@ Public Class UiProgCalibrator
                 If (myOperationResult) Then
                     'Validate if the selected Calibrator is marked as SPECIAL 
                     If (DirectCast(CalibratorListGrid.SelectedRows(0).Cells("SpecialCalib").Value, Boolean)) Then
-                        SetScreenStatusTABCalibrator(ScreenStatusType.SpecialCalibrator)
+                        SetScreenStatusTABCalibrator(SCREEN_STATUS_TYPE.SpecialCalibrator)
                     Else
-                        SetScreenStatusTABCalibrator(ScreenStatusType.ReadMode)
+                        SetScreenStatusTABCalibrator(SCREEN_STATUS_TYPE.ReadMode)
                     End If
 
                     BindCalibratorsControls(myCalibratorID)
@@ -639,10 +718,63 @@ Public Class UiProgCalibrator
                 End If
             End If
         Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex)
-            ShowMessage(Name & "." & LocalScreenStatus.ToString() & ".SaveCalibratorInfo ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SaveCalibratorInfo ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".SaveCalibratorInfo ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myOperationResult
+    End Function
+
+    ''' <summary>
+    ''' Add a new Calibrator OR Update data of an existing Calibrator OR Delete a group of selected Calibrators
+    ''' </summary>
+    ''' <param name="pCalibratorsDS">Typed DataSet CalibratorsDS containing the Calibrator to add/update or the group of 
+    '''                              Calibrators to delete</param>
+    ''' <param name="pCalAction">Action to execute: Add/Update/Delete</param>
+    ''' <param name="pDeleteCalibratorResult">When TRUE, it indicates all previous results saved for the Calibrator and all its linked 
+    '''                                       Tests/SampleTypes have to be deleted</param>
+    ''' <param name="pDeleteTestCalibratorValue">When TRUE, it indicates all theoretical concentration values for the Calibrator and all 
+    '''                                          its linked Tests/SampleTypes have to be deleted</param>
+    ''' <param name="myDeleteCalibratorList">List of an object DeletedCalibratorTO containing all Calibrators selected to be deleted and,
+    '''                                      for each one of them, all its linked Tests/SampleTypes</param>
+    ''' <returns>TRUE if the saving was successfully executed</returns>
+    ''' <remarks> 
+    ''' Created by:  TR 16/02/2011
+    ''' </remarks>
+    Private Function SaveCalibratorChanges(ByVal pCalibratorsDS As CalibratorsDS, ByVal pCalAction As CALIBRATOR_ACTION, _
+                                           ByVal pDeleteCalibratorResult As Boolean, ByVal pDeleteTestCalibratorValue As Boolean, _
+                                           ByVal myDeleteCalibratorList As List(Of DeletedCalibratorTO)) As Boolean
+        Dim myResults As Boolean = False
+        Try
+            Dim myGlobalDataTO As New GlobalDataTO
+            Dim myCalibratorsDelegate As New CalibratorsDelegate
+
+            Select Case pCalAction
+                Case CALIBRATOR_ACTION.Create
+                    'CREATE PROCESS
+                    myGlobalDataTO = myCalibratorsDelegate.Save(Nothing, pCalibratorsDS, New TestCalibratorsDS, New TestCalibratorValuesDS, _
+                                                                Nothing, False, pDeleteCalibratorResult, pDeleteTestCalibratorValue, _
+                                                                AnalyzerIDAttribute, WorkSessionIDAttribute)
+                    Exit Select
+                Case CALIBRATOR_ACTION.Edit
+                    'EDIT PROCESS
+                    myGlobalDataTO = myCalibratorsDelegate.Save(Nothing, pCalibratorsDS, New TestCalibratorsDS, New TestCalibratorValuesDS, _
+                                                                Nothing, False, pDeleteCalibratorResult, pDeleteTestCalibratorValue, _
+                                                                AnalyzerIDAttribute, WorkSessionIDAttribute)
+                    Exit Select
+                Case CALIBRATOR_ACTION.Delete
+                    'DELETE PROCESS
+                    myGlobalDataTO = myCalibratorsDelegate.Save(Nothing, pCalibratorsDS, New TestCalibratorsDS, New TestCalibratorValuesDS, _
+                                                                myDeleteCalibratorList, IsTestParamWinAttribute, pDeleteCalibratorResult, _
+                                                                pDeleteTestCalibratorValue, AnalyzerIDAttribute, WorkSessionIDAttribute)
+                    Exit Select
+            End Select
+
+            myResults = (Not myGlobalDataTO.HasError)
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SaveCalibratorChanges ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".SaveCalibratorChanges ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+        Return myResults
     End Function
 
     ''' <summary>
@@ -671,11 +803,24 @@ Public Class UiProgCalibrator
                         myDeleteCalibratorTO = New DeletedCalibratorTO
                         myDeleteCalibratorTO.CalibratorID = CInt(CalibratorRow.Cells("CalibratorID").Value)
                         myDeleteCalibratorList.Add(myDeleteCalibratorTO)
+
+                        'SA 13/11/2012
+                        ''On the update elements in case came from parammeters windows search the deleted calibrator
+                        ''and remove concentration values.
+                        'If (IsTestParamWinAttribute) Then
+                        '    If (UpdatedCalibrator.tparCalibrators.Count > 0 AndAlso _
+                        '        UpdatedCalibrator.tparCalibrators(0).CalibratorID = myDeleteCalibratorTO.CalibratorID) _
+                        '                                    OrElse UpdatedCalibrator.tparCalibrators(0).CalibratorID = 0 Then
+                        '        UpdatedCalibrator.tparCalibrators.Clear()
+                        '        LocalConcentrationValuesDS.tparTestCalibratorValues.Clear()
+                        '        UpdatedTestCalibratorsValuesDS.tparTestCalibratorValues.Clear()
+                        '    End If
+                        'End If
                     Next
 
                     'Search all the Tests/SampleTypes linked to all selected Calibrators and shown them in the auxiliary screen of affected elements
                     If (ValidateCalibratorTestSampleDependencies(myCalibratorIDList) = Windows.Forms.DialogResult.OK) Then
-                        If (controller.SaveCalibratorChanges(New CalibratorsDS, CalibratorAction.Delete, True, True, myDeleteCalibratorList, IsTestParamWinAttribute)) Then
+                        If (SaveCalibratorChanges(New CalibratorsDS, CALIBRATOR_ACTION.Delete, True, True, myDeleteCalibratorList)) Then
                             'Refill the grid of Calibrators
                             FillCalibratorList()
 
@@ -683,7 +828,7 @@ Public Class UiProgCalibrator
                                 Me.CalibratorListGrid.Rows(0).Selected = True
                                 Me.CalibratorListGrid.FirstDisplayedScrollingRowIndex = 0
 
-                                SetScreenStatusTABCalibrator(ScreenStatusType.ReadMode)
+                                SetScreenStatusTABCalibrator(SCREEN_STATUS_TYPE.ReadMode)
                                 BindCalibratorsControls(CInt(Me.CalibratorListGrid.Rows(0).Cells("CalibratorID").Value))
                                 LocalChange = False
 
@@ -707,6 +852,9 @@ Public Class UiProgCalibrator
                                     End If
                                 Next
 
+                                ''Refill the calibrator list.
+                                'FillCalibratorList()
+
                                 'After updating all the status on the local structure, shown the icon in the grid of Calibrator by Test/SampleType
                                 SetTestSampleStatusIcon()
 
@@ -722,14 +870,14 @@ Public Class UiProgCalibrator
 
                                     If (DirectCast(CalibratorListGrid.SelectedRows(0).Cells("InUse").Value, Boolean)) Then
                                         'Set screen status to Element InUse mode
-                                        SetScreenStatusTABCalibrator(ScreenStatusType.ElementInUse)
+                                        SetScreenStatusTABCalibrator(SCREEN_STATUS_TYPE.ElementInUse)
 
                                     ElseIf DirectCast(CalibratorListGrid.SelectedRows(0).Cells("SpecialCalib").Value, Boolean) Then
                                         'Set screen status to Special Calibrator mode
-                                        SetScreenStatusTABCalibrator(ScreenStatusType.SpecialCalibrator)
+                                        SetScreenStatusTABCalibrator(SCREEN_STATUS_TYPE.SpecialCalibrator)
                                     Else
                                         'Set screen status to ReadOnly mode
-                                        SetScreenStatusTABCalibrator(ScreenStatusType.ReadMode)
+                                        SetScreenStatusTABCalibrator(SCREEN_STATUS_TYPE.ReadMode)
                                     End If
 
                                     BindCalibratorValues(CInt(CalibTestSampleListGrid.Rows(0).Cells("TestCalibratorID").Value), _
@@ -762,10 +910,10 @@ Public Class UiProgCalibrator
     '''              TR 23/04/2012 - Added call to new function ScreenStatusByUserLevel to enable/disable screen actions 
     '''                              according the level of the connected User
     ''' </remarks>
-    Private Sub SetScreenStatusTABCalibrator(ByVal pStatus As ScreenStatusType)
+    Private Sub SetScreenStatusTABCalibrator(ByVal pStatus As SCREEN_STATUS_TYPE)
         Try
             Select Case (pStatus)
-                Case ScreenStatusType.CreateMode
+                Case SCREEN_STATUS_TYPE.CreateMode
                     LocalScreenStatus = pStatus
 
                     'Disable Controls
@@ -780,7 +928,7 @@ Public Class UiProgCalibrator
                     EnableDisableCalibratorInfoGroupBox(True)
                     Exit Select
 
-                Case ScreenStatusType.ReadMode
+                Case SCREEN_STATUS_TYPE.ReadMode
                     LocalScreenStatus = pStatus
 
                     'Disable Controls
@@ -800,7 +948,7 @@ Public Class UiProgCalibrator
                     CalibratorListGroupBox.Enabled = True
                     Exit Select
 
-                Case ScreenStatusType.EditMode
+                Case SCREEN_STATUS_TYPE.EditMode
                     LocalScreenStatus = pStatus
 
                     'Disable Controls
@@ -815,7 +963,7 @@ Public Class UiProgCalibrator
                     EnableDisableCalibratorInfoGroupBox(True)
                     Exit Select
 
-                Case ScreenStatusType.ElementInUse
+                Case SCREEN_STATUS_TYPE.ElementInUse
                     LocalScreenStatus = pStatus
 
                     'Disable Controls
@@ -828,7 +976,7 @@ Public Class UiProgCalibrator
                     CalibratorListGroupBox.Enabled = True
                     Exit Select
 
-                Case ScreenStatusType.MultiSelection
+                Case SCREEN_STATUS_TYPE.MultiSelection
                     LocalScreenStatus = pStatus
 
                     'Disable Controls
@@ -840,7 +988,7 @@ Public Class UiProgCalibrator
                     DeleteCalbButton.Enabled = True
                     Exit Select
 
-                Case ScreenStatusType.SpecialCalibrator
+                Case SCREEN_STATUS_TYPE.SpecialCalibrator
                     LocalScreenStatus = pStatus
 
                     'Disable controls
@@ -857,6 +1005,13 @@ Public Class UiProgCalibrator
                         EditCalibButton.Enabled = True
                         DeleteCalbButton.Enabled = True
                     End If
+                    'TR 01/10/2013 -END
+
+                    'TR 01/10/2013 -Commented
+                    'Enable Controls
+                    'AddCalibButon.Enabled = True
+                    'EditCalibButton.Enabled = True
+                    'TR 01/10/2013 -END
 
                     CalibratorListGroupBox.Enabled = True
                     Exit Select
@@ -890,6 +1045,11 @@ Public Class UiProgCalibrator
                 BackColor = Color.White
                 LetColor = Color.Black
             End If
+
+            'SA 13/11/2012
+            'CalibratorListCombo.Enabled = pState
+            'CalibratorListCombo.BackColor = BackColor
+            'CalibratorListCombo.ForeColor = LetColor
 
             CalibratorNameTextBox.Enabled = pState
             CalibratorNameTextBox.BackColor = BackColor
@@ -1097,9 +1257,9 @@ Public Class UiProgCalibrator
             End If
             CalibratorListCombo.ForeColor = LetColor
 
-            ValuePointsGridView.Enabled = pState
-            ValuePointsGridView.BackColor = BackColor
-            ValuePointsGridView.ForeColor = LetColor
+            ConcentrationGridView.Enabled = pState
+            ConcentrationGridView.BackColor = BackColor
+            ConcentrationGridView.ForeColor = LetColor
 
             SaveTestSampleCalValue.Enabled = pState
             CancelTestSampleCalValue.Enabled = pState
@@ -1120,10 +1280,10 @@ Public Class UiProgCalibrator
     '''              TR 23/04/2012 - Added call to new function ScreenStatusByUserLevel to enable/disable screen actions 
     '''                              according the level of the connected User
     ''' </remarks>
-    Private Sub SetScreenStatusTABTestSampleCalib(ByVal pTestSampleCalStatus As ScreenStatusType)
+    Private Sub SetScreenStatusTABTestSampleCalib(ByVal pTestSampleCalStatus As SCREEN_STATUS_TYPE)
         Try
             Select Case (pTestSampleCalStatus)
-                Case ScreenStatusType.ReadMode
+                Case SCREEN_STATUS_TYPE.ReadMode
                     LocalScreenStatus = pTestSampleCalStatus
 
                     'Enable Controls
@@ -1135,7 +1295,7 @@ Public Class UiProgCalibrator
                     EnableDisableCalibCurveInfoGroupBox(False)
                     Exit Select
 
-                Case ScreenStatusType.ElementInUse
+                Case SCREEN_STATUS_TYPE.ElementInUse
                     LocalScreenStatus = pTestSampleCalStatus
 
                     'Enable Controls
@@ -1147,7 +1307,7 @@ Public Class UiProgCalibrator
                     EnableDisableCalibCurveInfoGroupBox(False)
                     Exit Select
 
-                Case ScreenStatusType.EditMode
+                Case SCREEN_STATUS_TYPE.EditMode
                     LocalScreenStatus = pTestSampleCalStatus
 
                     'Enable Controls
@@ -1159,7 +1319,7 @@ Public Class UiProgCalibrator
 
                     'Depending on the number of Calibrator points the Curve Values area is 
                     'enable (when multipoint) or disable (when single point)
-                    If (ValuePointsGridView.Rows.Count > 1) Then
+                    If (ConcentrationGridView.Rows.Count > 1) Then
                         EnableDisableCalibCurveInfoGroupBox(True)
                     Else
                         EnableDisableCalibCurveInfoGroupBox(False)
@@ -1265,82 +1425,62 @@ Public Class UiProgCalibrator
     ''' Created by:  TR 03/06/2010
     ''' Modified by: TR 26/11/2010 - Set MaxLength = 10 the DataGridViewTextBoxColumn for the Theoretical Concentration
     ''' </remarks>
-    Private Sub PrepareValuePointsGridView(ByVal pLanguageID As String)
+    Private Sub PrepareConcentrationGridView(ByVal pLanguageID As String)
         Try
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
-            ValuePointsGridView.AutoGenerateColumns = False
-            ValuePointsGridView.Enabled = True
-            ValuePointsGridView.ReadOnly = False
-            ValuePointsGridView.AutoSize = False
-            ValuePointsGridView.EditMode = DataGridViewEditMode.EditOnEnter
-            ValuePointsGridView.SelectionMode = DataGridViewSelectionMode.CellSelect
-            ValuePointsGridView.Columns.Clear()
+            ConcentrationGridView.AutoGenerateColumns = False
+            ConcentrationGridView.Enabled = True
+            ConcentrationGridView.ReadOnly = False
+            ConcentrationGridView.AutoSize = False
+            ConcentrationGridView.EditMode = DataGridViewEditMode.EditOnEnter
+            ConcentrationGridView.SelectionMode = DataGridViewSelectionMode.CellSelect
+            ConcentrationGridView.Columns.Clear()
 
-            Dim CalibratorNum As New DataGridViewTextBoxColumn()
-            CalibratorNum.HeaderText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Number_Short", pLanguageID)
-            CalibratorNum.Width = 50
-            CalibratorNum.DataPropertyName = "CalibratorNum"
-            CalibratorNum.ReadOnly = True
-            CalibratorNum.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter
-            CalibratorNum.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
-            CalibratorNum.DefaultCellStyle.BackColor = SystemColors.MenuBar
-            CalibratorNum.DefaultCellStyle.SelectionBackColor = SystemColors.MenuBar
-            CalibratorNum.DefaultCellStyle.ForeColor = Color.DarkGray
-            CalibratorNum.DefaultCellStyle.SelectionForeColor = Color.DarkGray
-            CalibratorNum.SortMode = DataGridViewColumnSortMode.NotSortable
-            DefineReadOnlyColumn(CalibratorNum)
-            ValuePointsGridView.Columns.Add(CalibratorNum)
+            ConcentrationGridView.Columns.Add("CalibratorNum", myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Number_Short", pLanguageID))
+            ConcentrationGridView.Columns("CalibratorNum").Width = 50
+            ConcentrationGridView.Columns("CalibratorNum").DataPropertyName = "CalibratorNum"
+            ConcentrationGridView.Columns("CalibratorNum").ReadOnly = True
+            ConcentrationGridView.Columns("CalibratorNum").HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter
+            ConcentrationGridView.Columns("CalibratorNum").DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
+            ConcentrationGridView.Columns("CalibratorNum").DefaultCellStyle.BackColor = SystemColors.MenuBar
+            ConcentrationGridView.Columns("CalibratorNum").DefaultCellStyle.SelectionBackColor = SystemColors.MenuBar
+            ConcentrationGridView.Columns("CalibratorNum").DefaultCellStyle.ForeColor = Color.DarkGray
+            ConcentrationGridView.Columns("CalibratorNum").DefaultCellStyle.SelectionForeColor = Color.DarkGray
+            ConcentrationGridView.Columns("CalibratorNum").SortMode = DataGridViewColumnSortMode.NotSortable
 
 
             Dim TheoricalColumn As New DataGridViewTextBoxColumn()
             TheoricalColumn.Name = "TheoricalConcentration"
-            TheoricalColumn.MaxInputLength = 6
+            TheoricalColumn.MaxInputLength = 10
             TheoricalColumn.HeaderText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Concentration_Long", pLanguageID)
-            TheoricalColumn.Width = 120
-            TheoricalColumn.DataPropertyName = "TheoricalConcentration"
-            TheoricalColumn.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter
-            TheoricalColumn.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
-            TheoricalColumn.SortMode = DataGridViewColumnSortMode.NotSortable
-            ValuePointsGridView.Columns.Add(TheoricalColumn)
+            ConcentrationGridView.Columns.Add(TheoricalColumn)
+            ConcentrationGridView.Columns("TheoricalConcentration").Width = 120
+            ConcentrationGridView.Columns("TheoricalConcentration").DataPropertyName = "TheoricalConcentration"
+            ConcentrationGridView.Columns("TheoricalConcentration").ReadOnly = False
+            ConcentrationGridView.Columns("TheoricalConcentration").HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter
+            ConcentrationGridView.Columns("TheoricalConcentration").DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
+            ConcentrationGridView.Columns("TheoricalConcentration").SortMode = DataGridViewColumnSortMode.NotSortable
 
-            Dim FactorColumn As New DataGridViewTextBoxColumn()
-            FactorColumn.Name = "KitConcentrationRelation"
-            FactorColumn.MaxInputLength = 6
-            FactorColumn.HeaderText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CalibFactor", pLanguageID)
-            FactorColumn.Width = 65
-            FactorColumn.DataPropertyName = "KitConcentrationRelation"
-            FactorColumn.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter
-            FactorColumn.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
-            FactorColumn.SortMode = DataGridViewColumnSortMode.NotSortable
-            FactorColumn.DefaultCellStyle.Format = "n3"
-            FactorColumn.ValueType = GetType(Single)
-            ValuePointsGridView.Columns.Add(FactorColumn)
+            ConcentrationGridView.Columns.Add("KitConcentrationRelation", myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CalibFactor", pLanguageID))
+            ConcentrationGridView.Columns("KitConcentrationRelation").Width = 65
+            ConcentrationGridView.Columns("KitConcentrationRelation").DataPropertyName = "KitConcentrationRelation"
+            ConcentrationGridView.Columns("KitConcentrationRelation").ReadOnly = True
+            ConcentrationGridView.Columns("KitConcentrationRelation").HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleRight
+            ConcentrationGridView.Columns("KitConcentrationRelation").DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
+            ConcentrationGridView.Columns("KitConcentrationRelation").DefaultCellStyle.BackColor = SystemColors.MenuBar
+            ConcentrationGridView.Columns("KitConcentrationRelation").DefaultCellStyle.ForeColor = Color.DarkGray
+            ConcentrationGridView.Columns("KitConcentrationRelation").DefaultCellStyle.SelectionBackColor = SystemColors.MenuBar
+            ConcentrationGridView.Columns("KitConcentrationRelation").DefaultCellStyle.SelectionForeColor = Color.DarkGray
+            ConcentrationGridView.Columns("KitConcentrationRelation").SortMode = DataGridViewColumnSortMode.NotSortable
 
-            ValuePointsGridView.Columns.Add("TestCalibratorID", "TestCalibratorID")
-            ValuePointsGridView.Columns("TestCalibratorID").DataPropertyName = "TestCalibratorID"
-            ValuePointsGridView.Columns("TestCalibratorID").Visible = False
+            ConcentrationGridView.Columns.Add("TestCalibratorID", "TestCalibratorID")
+            ConcentrationGridView.Columns("TestCalibratorID").DataPropertyName = "TestCalibratorID"
+            ConcentrationGridView.Columns("TestCalibratorID").Visible = False
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareConcentrationGridView ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareConcentrationGridView ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
-    End Sub
-
-
-    Private Sub DefineReadOnlyColumn(ByRef columnToBlock As DataGridViewTextBoxColumn)
-        columnToBlock.DefaultCellStyle.BackColor = SystemColors.MenuBar
-        columnToBlock.DefaultCellStyle.ForeColor = Color.DarkGray
-        columnToBlock.DefaultCellStyle.SelectionBackColor = SystemColors.MenuBar
-        columnToBlock.DefaultCellStyle.SelectionForeColor = Color.DarkGray
-        columnToBlock.ReadOnly = True
-    End Sub
-
-    Private Sub DefineWriteColumn(ByRef columnToBlock As DataGridViewTextBoxColumn)
-        columnToBlock.DefaultCellStyle.BackColor = Color.White
-        columnToBlock.DefaultCellStyle.ForeColor = Color.Black
-        columnToBlock.DefaultCellStyle.SelectionBackColor = Color.White
-        columnToBlock.DefaultCellStyle.SelectionForeColor = Color.Black
-        columnToBlock.ReadOnly = False
     End Sub
 
     ''' <summary>
@@ -1406,6 +1546,54 @@ Public Class UiProgCalibrator
             LocalTestDS.tparTests.DefaultView.Sort = "EnableStatus, CalibratorID, TestName"
             CalibTestSampleListGrid.DataSource = LocalTestDS.tparTests.DefaultView
 
+
+            ''Get all Tests/SampleTypes not linked to any Calibrator
+            'Dim qTestList As New List(Of TestsDS.tparTestsRow)
+            'qTestList = PendingTestSampleWithOutCalib()
+
+            ''Get the list of all Calibrator by Test/SampleTypes saved in DB
+            'myGlobalDataTO = myTestDelegate.GetCalibratorTestSampleList(Nothing)
+            'If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+            '    LocalTestDS = DirectCast(myGlobalDataTO.SetDatos, TestsDS)
+
+            '    'Add to the list, all the Tests/SampleTypes not linked to any Calibrator
+            '    For Each testRow As TestsDS.tparTestsRow In qTestList
+            '        LocalTestDS.tparTests.ImportRow(testRow)
+            '    Next
+
+            '    If (IsTestParamWinAttribute) Then
+            '        'Get the Test/SampleType beign edited in the screen of Tests Programming
+            '        Dim qTestsList As List(Of TestsDS.tparTestsRow) = (From a As TestsDS.tparTestsRow In LocalTestDS.tparTests _
+            '                                                          Where a.TestID = ExternalTestIDAttribute _
+            '                                                        AndAlso a.SampleType = ExternalSampleTypeAttribute _
+            '                                                         Select a).ToList()
+
+            '        If (qTestsList.Count > 0) Then
+            '            If (UpdatedCalibratorsDS.tparCalibrators.Count > 0) Then
+            '                qTestsList.First().CalibratorID = UpdatedCalibratorsDS.tparCalibrators(0).CalibratorID
+            '                qTestsList.First()("CalibratorName") = UpdatedCalibratorsDS.tparCalibrators(0).CalibratorName
+
+            '                'Set the enable value to TRUE
+            '                qTestsList.First().EnableStatus = True
+            '            End If
+            '        Else
+            '            If (UpdatedTestDS.tparTests.Count > 0) Then
+            '                LocalTestDS.tparTests.ImportRow(UpdatedTestDS.tparTests(0))
+            '            Else
+            '                SetReceivedTestSample()
+            '            End If
+            '        End If
+            '    End If
+            'Else
+            '    'Error getting the list of all Calibrator by Test/SampleTypes saved in DB; shown it
+            '    ShowMessage(Me.Name & ".FillCalibratorTestSampleList ", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage, Me)
+            'End If
+
+            ''For all Tests/SampleType not linked to any Calibrator (EnableStatus is FALSE), set the Warning icon 
+            'SetTestSampleStatusIcon()
+
+            'LocalTestDS.tparTests.DefaultView.Sort = "EnableStatus, CalibratorID, TestName"
+            'CalibTestSampleListGrid.DataSource = LocalTestDS.tparTests.DefaultView
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".FillCalibratorTestSampleList ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".FillCalibratorTestSampleList ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -1457,7 +1645,7 @@ Public Class UiProgCalibrator
             Dim myCalibratorDelegate As New CalibratorsDelegate
 
             'Get all Calibrators
-            myGlobalDataTO = myCalibratorDelegate.GetAllCalibrators(Nothing, myCalibratorDS)
+            myGlobalDataTO = myCalibratorDelegate.GetAllCalibrators(Nothing)
             If (Not myGlobalDataTO.HasError) Then
                 myCalibratorDS = DirectCast(myGlobalDataTO.SetDatos, CalibratorsDS)
             Else
@@ -1547,22 +1735,22 @@ Public Class UiProgCalibrator
         Try
 
             Dim myGlobalDataTO As New GlobalDataTO
-            Dim myTestCalibratorsDS As New CalibratorsDS
+            Dim myTestCalibratorsDS As New TestCalibratorsDS
             Dim myTestCalibratorsDelgate As New TestCalibratorsDelegate
 
             If IsTestParamWinAttribute Then
                 'validate if is the recived test name and sample type
                 If pTestID = ExternalTestIDAttribute AndAlso String.Compare(pSampleType, ExternalSampleTypeAttribute, False) = 0 Then
-                    myGlobalDataTO.SetDatos = UpdatedCalibratorsDS
+                    myGlobalDataTO.SetDatos = UpdatedTestCalibratorsDS
                 Else
-                    myGlobalDataTO = myTestCalibratorsDelgate.GetTestCalibratorByTestID(Nothing, pTestID, myTestCalibratorsDS, pSampleType) 'BA-2563
+                    myGlobalDataTO = myTestCalibratorsDelgate.GetTestCalibratorByTestID(Nothing, pTestID, pSampleType)
                 End If
             Else
-                myGlobalDataTO = myTestCalibratorsDelgate.GetTestCalibratorByTestID(Nothing, pTestID, myTestCalibratorsDS, pSampleType) 'BA-2563
+                myGlobalDataTO = myTestCalibratorsDelgate.GetTestCalibratorByTestID(Nothing, pTestID, pSampleType)
             End If
 
             If Not myGlobalDataTO.HasError Then
-                myTestCalibratorsDS = DirectCast(myGlobalDataTO.SetDatos, CalibratorsDS)
+                myTestCalibratorsDS = DirectCast(myGlobalDataTO.SetDatos, TestCalibratorsDS)
                 If myTestCalibratorsDS.tparTestCalibrators.Count > 0 Then
 
                     Dim myLocalCalibratorDS As New CalibratorsDS
@@ -1646,24 +1834,21 @@ Public Class UiProgCalibrator
             Dim myGlobalDataTO As New GlobalDataTO
             Dim myTestCalibratorValuesDelegate As New TestCalibratorValuesDelegate()
 
-            localCalibratorsDS.tparTestCalibratorValues.Clear() 'BA-2563
             If (IsTestParamWinAttribute AndAlso pTestID = ExternalTestIDAttribute) Then
-                'Dim myTemUpdateTestCalValDS As New CalibratorsDS 'BA-2563
-                UpdatedCalibratorsDS.tparTestCalibratorValues.CopyToDataTable(localCalibratorsDS.tparTestCalibratorValues, LoadOption.OverwriteChanges) 'BA-2563
-                myGlobalDataTO.SetDatos = localCalibratorsDS 'BA-2563
+                Dim myTemUpdateTestCalValDS As New TestCalibratorValuesDS
+                UpdatedTestCalibratorsValuesDS.tparTestCalibratorValues.CopyToDataTable(myTemUpdateTestCalValDS.tparTestCalibratorValues, LoadOption.OverwriteChanges)
+                myGlobalDataTO.SetDatos = myTemUpdateTestCalValDS
             Else
                 'Get the test calibrator values from DB 
-                myGlobalDataTO = myTestCalibratorValuesDelegate.GetTestCalibratorValuesByTestCalibratorIDAndTestID(Nothing, pTestCalibratorID, pTestID, localCalibratorsDS) 'BA-2563
+                myGlobalDataTO = myTestCalibratorValuesDelegate.GetTestCalibratorValuesByTestCalibratorIDAndTestID(Nothing, pTestCalibratorID, pTestID)
             End If
 
             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                'LocalConcentrationValuesDS = DirectCast(myGlobalDataTO.SetDatos, CalibratorsDS) 'BA-2563
-                'localCalibratorsDS.tparTestCalibratorValues.Clear() 'BA-2563
-                'DirectCast(myGlobalDataTO.SetDatos, CalibratorsDS).tparTestCalibratorValues.CopyToDataTable(localCalibratorsDS.tparTestCalibratorValues, LoadOption.OverwriteChanges) 'BA-2563
+                LocalConcentrationValuesDS = DirectCast(myGlobalDataTO.SetDatos, TestCalibratorValuesDS)
 
                 'If there is not Concentration Values saved, then the grid is prepared with a number of rows equal to the 
                 'Number of Points of the selected Calibrator
-                If (localCalibratorsDS.tparTestCalibratorValues.Count = 0) Then
+                If (LocalConcentrationValuesDS.tparTestCalibratorValues.Count = 0) Then
                     Dim myPointUsed As Integer = 0
                     Dim myCalibNumber As Integer = 0
 
@@ -1699,32 +1884,35 @@ Public Class UiProgCalibrator
                         myCalibratorID = CInt(Me.CalibratorListCombo.SelectedValue.ToString())
                     End If
 
-                    Dim qCalibratorList As List(Of CalibratorsDS.tparCalibratorsRow) = (From a In localCalibratorsDS.tparCalibrators _
+                    Dim qCalibratorList As List(Of CalibratorsDS.tparCalibratorsRow) = (From a In LocalCalibratorDS.tparCalibrators _
                                                                                        Where a.CalibratorID = myCalibratorID _
                                                                                       Select a).ToList()
                     If (qCalibratorList.Count > 0) Then
                         If (myCalibNumber = 0) Then myCalibNumber = qCalibratorList.First().NumberOfCalibrators
 
-                        Dim myConcValRow As CalibratorsDS.tparTestCalibratorValuesRow
+                        Dim myConcValRow As TestCalibratorValuesDS.tparTestCalibratorValuesRow
                         For i As Integer = myCalibNumber To 1 Step -1
-                            myConcValRow = localCalibratorsDS.tparTestCalibratorValues.NewtparTestCalibratorValuesRow()
+                            myConcValRow = LocalConcentrationValuesDS.tparTestCalibratorValues.NewtparTestCalibratorValuesRow()
                             myConcValRow.TestCalibratorID = pTestCalibratorID
                             myConcValRow.CalibratorNum = i
                             myConcValRow.IsNew = True
-                            localCalibratorsDS.tparTestCalibratorValues.AddtparTestCalibratorValuesRow(myConcValRow)
+                            LocalConcentrationValuesDS.tparTestCalibratorValues.AddtparTestCalibratorValuesRow(myConcValRow)
                         Next
 
                         If (pIsSpecialTest AndAlso myCalibNumber = 1 AndAlso myPointUsed <> 0) Then
-                            localCalibratorsDS.BeginInit()
-                            localCalibratorsDS.tparTestCalibratorValues.First.CalibratorNum = myPointUsed
-                            localCalibratorsDS.EndInit()
+                            LocalConcentrationValuesDS.BeginInit()
+                            LocalConcentrationValuesDS.tparTestCalibratorValues.First.CalibratorNum = myPointUsed
+                            LocalConcentrationValuesDS.EndInit()
                         End If
                     End If
+                Else
+                    'Inform the local variable containing the Theoretical Concentration value for the first Calibrator Point
+                    LocalFirstPointValue = LocalConcentrationValuesDS.tparTestCalibratorValues.First.TheoricalConcentration
                 End If
 
-                ValuePointsGridView.DataSource = Nothing
-                ValuePointsGridView.DataSource = localCalibratorsDS.tparTestCalibratorValues
-                ValuePointsGridView.ClearSelection()
+                ConcentrationGridView.DataSource = Nothing
+                ConcentrationGridView.DataSource = LocalConcentrationValuesDS.tparTestCalibratorValues
+                ConcentrationGridView.ClearSelection()
             Else
                 ShowMessage(Me.Name & ".BindConcentrationValuesList ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, myGlobalDataTO.ErrorCode, Me)
             End If
@@ -1766,7 +1954,7 @@ Public Class UiProgCalibrator
             BindConcentrationValuesList(pTestCalibratorID, pTestID, pSampleType, isSpecialTest)
 
             If (CalibTestSampleListGrid.SelectedRows.Count = 1) AndAlso (CalibratorTabControl.SelectedTab.Name = "CalibratorTestTab") AndAlso _
-               (LocalScreenStatus = ScreenStatusType.ReadMode) Then
+               (LocalScreenStatus = SCREEN_STATUS_TYPE.ReadMode) Then
                 If (PrevSelectedTest <> CalibTestSampleListGrid.SelectedRows(0).Cells("TestName").Value.ToString()) Then
                     PrevSelectedTest = CalibTestSampleListGrid.SelectedRows(0).Cells("TestName").Value.ToString()
                     'TR 22/07/2013  -BUG #1229 Not need to validate factory calibrator if comming from test programming screem, 
@@ -1783,7 +1971,7 @@ Public Class UiProgCalibrator
             If (IsTestParamWinAttribute) Then
                 If (pTestID = ExternalTestIDAttribute AndAlso pSampleType = ExternalSampleTypeAttribute) Then
                     'Get the Calibrator and assign it to the received Test/SampleType 
-                    Dim qCalibList As List(Of CalibratorsDS.tparCalibratorsRow) = (From a In localCalibratorsDS.tparCalibrators _
+                    Dim qCalibList As List(Of CalibratorsDS.tparCalibratorsRow) = (From a In LocalCalibratorDS.tparCalibrators _
                                                                                   Where a.CalibratorID = pCalibratorID _
                                                                                  Select a).ToList()
 
@@ -1801,44 +1989,6 @@ Public Class UiProgCalibrator
     End Sub
 
     ''' <summary>
-    ''' Validate all Theorical Concentration values have been informed
-    ''' </summary>
-    ''' <remarks>
-    ''' Created by:  TR 18/02/2011
-    ''' Modified by: TR 09/10/2011 - Changed all convert to INT by convert to DOUBLE
-    '''              WE 26/01/2015 - BA-2047: Solved bug in which the program flow could enter the save process when the
-    '''                              Theoretical Concentration entered by the user was rounded to 0 (zero).
-    '''              AC 28/05/2015 - Refactor all the function: the grid can be in any order
-    ''' </remarks>
-    Private Function ValidateAllFieldsForConcentrations() As Boolean
-        Dim itsOk = True
-        Try
-            If (LocalScreenStatus = ScreenStatusType.EditMode Or LocalScreenStatus = ScreenStatusType.CreateMode) Then
-                CalibratorErrorProv.Clear()
-                Dim messageError As String
-
-                For j As Integer = 0 To localCalibratorsDS.tparTestCalibratorValues.Rows.Count - 1
-                    messageError = controller.ValidateInputFieldForConcentrations(localCalibratorsDS, j)
-                    If Not String.IsNullOrWhiteSpace(messageError) Then
-                        ValuePointsGridView("TheoricalConcentration", j).Style.Alignment = DataGridViewContentAlignment.MiddleCenter
-                        ValuePointsGridView("TheoricalConcentration", j).ErrorText = GetMessageText(messageError)
-                        itsOk = False
-                    End If
-                Next
-
-                ValuePointsGridView.DataSource = localCalibratorsDS.tparTestCalibratorValues
-                ValuePointsGridView.Refresh()
-            End If
-        Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex)
-            ShowMessage(Name & ".ValidateConcentrationsValuesGrid ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-            itsOk = False
-        End Try
-        Return itsOk
-    End Function
-
-
-    ''' <summary>
     ''' Validate the calibrator information 
     ''' </summary>
     ''' <returns>
@@ -1850,14 +2000,14 @@ Public Class UiProgCalibrator
     Private Function ValidateCalibratorDataError() As Boolean
         Dim myResult As Boolean = False
         Try
-            If LocalScreenStatus = ScreenStatusType.CreateMode OrElse LocalScreenStatus = ScreenStatusType.EditMode Then
+            If LocalScreenStatus = SCREEN_STATUS_TYPE.CreateMode OrElse LocalScreenStatus = SCREEN_STATUS_TYPE.EditMode Then
                 'clear all the error marks
                 CalibratorErrorProv.Clear()
 
                 If CalibratorNameTextBox.Text = "" Then
                     CalibratorErrorProv.SetError(CalibratorNameTextBox, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString()))
                     myResult = True
-                ElseIf CalibratorExist(CalibratorNameTextBox.Text, controller.CalibratorIdFocused) Then
+                ElseIf CalibratorExist(CalibratorNameTextBox.Text, CInt(CalibIDTextBox.Text)) Then
                     CalibratorErrorProv.SetError(CalibratorNameTextBox, GetMessageText(GlobalEnumerates.Messages.DUPLICATED_CALIB_NAME.ToString()))
                     myResult = True
                 End If
@@ -2010,7 +2160,7 @@ Public Class UiProgCalibrator
                         'myDepElemenRow.Name = ResultRow.SampleClass 
 
                         'TR 26/07/2013 -BUG #921 Get calibrator name to show on Affected elements warning screen.
-                        qCalibratorList = (From a In localCalibratorsDS.tparCalibrators _
+                        qCalibratorList = (From a In LocalCalibratorDS.tparCalibrators _
                                            Where a.CalibratorID = CInt(CalibTestSampleListGrid.SelectedRows(0).Cells("CalibratorID").Value) _
                                            Select a).ToList()
                         If qCalibratorList.Count > 0 Then
@@ -2086,22 +2236,22 @@ Public Class UiProgCalibrator
                 Dim myCalibratorNumber As Integer
                 myCalibratorNumber = myCalibratorDS.tparCalibrators(0).NumberOfCalibrators
                 'Clear all values
-                localCalibratorsDS.tparTestCalibratorValues.Clear()
+                LocalConcentrationValuesDS.tparTestCalibratorValues.Clear()
 
                 'TR 08/03/2012 ' Accept change and refresh Concentration grid to avoid error on visual effects.
-                localCalibratorsDS.tparTestCalibratorValues.AcceptChanges()
-                ValuePointsGridView.Refresh()
+                LocalConcentrationValuesDS.tparTestCalibratorValues.AcceptChanges()
+                ConcentrationGridView.Refresh()
                 'TR 08/03/2012
                 'Set the new numbers of calibrators to the concentration grid.
-                Dim myCalConcNumbRow As CalibratorsDS.tparTestCalibratorValuesRow
+                Dim myCalConcNumbRow As TestCalibratorValuesDS.tparTestCalibratorValuesRow
                 For i As Integer = myCalibratorNumber To 1 Step -1
-                    myCalConcNumbRow = localCalibratorsDS.tparTestCalibratorValues.NewtparTestCalibratorValuesRow()
+                    myCalConcNumbRow = LocalConcentrationValuesDS.tparTestCalibratorValues.NewtparTestCalibratorValuesRow()
                     myCalConcNumbRow.TestCalibratorID = myTestCalibratorID
                     myCalConcNumbRow.CalibratorNum = i
                     myCalConcNumbRow.IsNew = True
-                    localCalibratorsDS.tparTestCalibratorValues.AddtparTestCalibratorValuesRow(myCalConcNumbRow)
+                    LocalConcentrationValuesDS.tparTestCalibratorValues.AddtparTestCalibratorValuesRow(myCalConcNumbRow)
                 Next
-                ValuePointsGridView.CurrentRow.Selected = False
+                ConcentrationGridView.CurrentRow.Selected = False
             End If
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log
@@ -2125,7 +2275,7 @@ Public Class UiProgCalibrator
         Dim myResultCalibraorDS As New CalibratorsDS
         Try
             Dim qCalibratorList As New List(Of CalibratorsDS.tparCalibratorsRow)
-            qCalibratorList = (From a In localCalibratorsDS.tparCalibrators _
+            qCalibratorList = (From a In LocalCalibratorDS.tparCalibrators _
                                Where a.CalibratorID = pCalibratorID _
                                Select a).ToList()
 
@@ -2178,6 +2328,25 @@ Public Class UiProgCalibrator
         End Try
 
     End Sub
+
+    ''' <summary>
+    ''' Validate if there are errors on the Calibrator Curve Values or in Concentration Values
+    ''' </summary>
+    ''' <returns>True if an error was found; False if all values are correct</returns>
+    ''' <remarks>
+    ''' Created by: TR 18/02/2011
+    ''' </remarks>
+    Private Function ValidateCalibCurveAndConcValuesHasError() As Boolean
+        Dim myResult As Boolean = False
+        Try
+            myResult = ValidateCalibratorCurveValuesHasError() OrElse _
+                       ValidateErrorConcValuesDescOrderGrid()
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidaterCalibCurveAndConcValuesHasError ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".ValidaterCalibCurveAndConcValuesHasError ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+        Return myResult
+    End Function
 
     ''' <summary>
     ''' Validate the calibrator curve values
@@ -2257,7 +2426,59 @@ Public Class UiProgCalibrator
         Return myResult
     End Function
 
+    ''' <summary>
+    ''' Validate all Theorical Concentration values have been informed and they are in descendent order
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by:  TR 18/02/2011
+    ''' Modified by: TR 09/10/2011 - Changed all convert to INT by convert to DOUBLE
+    '''              WE 26/01/2015 - BA-2047: Solved bug in which the program flow could enter the save process when the
+    '''                              Theoretical Concentration entered by the user was rounded to 0 (zero).
+    ''' </remarks>
+    Private Function ValidateErrorConcValuesDescOrderGrid() As Boolean
+        Dim myResult As Boolean = False
+        Try
+            If (LocalScreenStatus = SCREEN_STATUS_TYPE.EditMode Or LocalScreenStatus = SCREEN_STATUS_TYPE.CreateMode) Then
+                CalibratorErrorProv.Clear()
 
+                Dim myRowIndex As Integer = 0
+                For Each ConcentrationRow As DataGridViewRow In ConcentrationGridView.Rows
+                    'Validate the Theorical Concentration is informed for the row and also that it is numeric
+                    If (Not ConcentrationRow.Cells("TheoricalConcentration").Value Is DBNull.Value AndAlso _
+                        IsNumeric(ConcentrationRow.Cells("TheoricalConcentration").Value.ToString())) Then
+                        ' WE 26/01/2015 (BA-2047) - added check to prevent entering the save process when the Theoretical Conc. value is rounded to 0 (zero).
+                        If (CDbl(ConcentrationRow.Cells("TheoricalConcentration").Value) <= 0) OrElse CDbl(ConcentrationRow.Cells("TheoricalConcentration").FormattedValue) = 0 Then
+                            myResult = True
+                            Exit For
+                        End If
+
+                        If (myRowIndex > 0) Then
+                            'Compare value with the Theorical Concentration on the previous row
+                            If (CDbl(ConcentrationGridView.Rows(myRowIndex - 1).Cells("TheoricalConcentration").FormattedValue) <= _
+                                CDbl(ConcentrationRow.Cells("TheoricalConcentration").FormattedValue)) Then
+                                ConcentrationGridView.Rows(myRowIndex).Cells("TheoricalConcentration").Style.Alignment = DataGridViewContentAlignment.MiddleCenter
+                                ConcentrationGridView.Rows(myRowIndex).Cells("TheoricalConcentration").ErrorText = GetMessageText(GlobalEnumerates.Messages.VALIDCONCENTRATIONVALUE.ToString())
+                                myResult = True
+                                Exit For
+                            End If
+                        End If
+
+                    ElseIf (ConcentrationRow.Cells("TheoricalConcentration").Value Is DBNull.Value) Then
+                        ConcentrationRow.Cells("TheoricalConcentration").ErrorText = GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString())
+                        myResult = True
+                        Exit For
+                    End If
+
+                    myRowIndex += 1
+                Next
+                ConcentrationGridView.Refresh()
+            End If
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ValidateConcentrationsValuesGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".ValidateConcentrationsValuesGrid ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+        Return myResult
+    End Function
 
     ''' <summary>
     ''' Update Test Sample Calibrator values
@@ -2280,16 +2501,16 @@ Public Class UiProgCalibrator
 
         Try
             'Prepare CalibratorDS
-            Dim myCalibratorsDS As New CalibratorsDS
-            Dim qCalibratorList As List(Of CalibratorsDS.tparCalibratorsRow) = (From a As CalibratorsDS.tparCalibratorsRow In localCalibratorsDS.tparCalibrators _
+            Dim myCalibratorDS As New CalibratorsDS
+            Dim qCalibratorList As List(Of CalibratorsDS.tparCalibratorsRow) = (From a As CalibratorsDS.tparCalibratorsRow In LocalCalibratorDS.tparCalibrators _
                                                                                Where a.CalibratorID = CInt(Me.CalibratorListCombo.SelectedValue.ToString()) _
                                                                               Select a).ToList()
             For Each calibRow As CalibratorsDS.tparCalibratorsRow In qCalibratorList
-                myCalibratorsDS.tparCalibrators.ImportRow(calibRow)
+                myCalibratorDS.tparCalibrators.ImportRow(calibRow)
             Next
 
             'Prepare TestCalibratorsDS
-            'Dim myTestCalibratorsDS As New CalibratorsDS
+            Dim myTestCalibratorsDS As New TestCalibratorsDS
             Dim qTesList As New List(Of TestsDS.tparTestsRow)
 
             If (pTestCalibratorID <> -1) Then
@@ -2305,10 +2526,10 @@ Public Class UiProgCalibrator
                           Select a).ToList()
             End If
 
-            Dim myTestCalibRow As CalibratorsDS.tparTestCalibratorsRow
+            Dim myTestCalibRow As TestCalibratorsDS.tparTestCalibratorsRow
             If (qTesList.Count > 0) Then
                 For Each testRow As TestsDS.tparTestsRow In qTesList
-                    myTestCalibRow = myCalibratorsDS.tparTestCalibrators.NewtparTestCalibratorsRow()
+                    myTestCalibRow = myTestCalibratorsDS.tparTestCalibrators.NewtparTestCalibratorsRow()
                     myTestCalibRow.TestCalibratorID = pTestCalibratorID
                     myTestCalibRow.TestID = testRow.TestID
                     myTestCalibRow.SampleType = testRow.SampleType
@@ -2337,7 +2558,7 @@ Public Class UiProgCalibrator
 
                     myTestCalibRow.TS_User = GetApplicationInfoSession.UserName
                     myTestCalibRow.TS_DateTime = DateTime.Now
-                    myCalibratorsDS.tparTestCalibrators.AddtparTestCalibratorsRow(myTestCalibRow)
+                    myTestCalibratorsDS.tparTestCalibrators.AddtparTestCalibratorsRow(myTestCalibRow)
 
                     'Copy data to UpdatedTestDS and set EnableStatus to TRUE
                     UpdatedTestDS.tparTests.ImportRow(testRow)
@@ -2352,18 +2573,14 @@ Public Class UiProgCalibrator
 
             If (IsTestParamWinAttribute) Then
                 'Validate if the edited element is the received from Tests Programming Screen
-                If (myCalibratorsDS.tparTestCalibrators(0).TestID = ExternalTestIDAttribute) Then
+                If (myTestCalibratorsDS.tparTestCalibrators(0).TestID = ExternalTestIDAttribute) Then
                     SaveOnDataBase = False
                 End If
             End If
 
-            'Prepare Calibrator Values
-            myCalibratorsDS.tparTestCalibratorValues.Clear()
-            localCalibratorsDS.tparTestCalibratorValues.CopyToDataTable(myCalibratorsDS.tparTestCalibratorValues, LoadOption.OverwriteChanges) 'BA-2563
-
             If (SaveOnDataBase) Then
                 Dim myCalibratorDelegate As New CalibratorsDelegate
-                myGlobalDataTO = myCalibratorDelegate.Save(Nothing, myCalibratorsDS, _
+                myGlobalDataTO = myCalibratorDelegate.Save(Nothing, myCalibratorDS, myTestCalibratorsDS, LocalConcentrationValuesDS, _
                                                            Nothing, False, True, False, AnalyzerIDAttribute, WorkSessionIDAttribute)
                 If (Not myGlobalDataTO.HasError) Then
                     'Update the Status for the Test/SampleType
@@ -2383,6 +2600,8 @@ Public Class UiProgCalibrator
                     LocalChange = False
                     LocalValidateDependencies = False 'TR 27/09/2012
 
+                    LocalConcPrevValue = -1
+                    LocalFirstPointValue = -1
                 Else
                     myResult = False
                     ShowMessage("Error", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage, Me)
@@ -2390,17 +2609,19 @@ Public Class UiProgCalibrator
             Else
                 'Import updated values to external extructures
                 UpdatedCalibratorsDS.tparCalibrators.Clear()
-                myCalibratorsDS.tparCalibrators.CopyToDataTable(UpdatedCalibratorsDS.tparCalibrators, LoadOption.OverwriteChanges)
+                myCalibratorDS.tparCalibrators.CopyToDataTable(UpdatedCalibratorsDS.tparCalibrators, LoadOption.OverwriteChanges)
 
-                UpdatedCalibratorsDS.tparTestCalibrators.Clear()
-                myCalibratorsDS.tparTestCalibrators.CopyToDataTable(UpdatedCalibratorsDS.tparTestCalibrators, LoadOption.OverwriteChanges)
-
-                UpdatedCalibratorsDS.tparTestCalibratorValues.Clear()
-                localCalibratorsDS.tparTestCalibratorValues.CopyToDataTable(UpdatedCalibratorsDS.tparTestCalibratorValues, LoadOption.OverwriteChanges)
+                UpdatedTestCalibratorsDS.tparTestCalibrators.Clear()
+                myTestCalibratorsDS.tparTestCalibrators.CopyToDataTable(UpdatedTestCalibratorsDS.tparTestCalibrators, LoadOption.OverwriteChanges)
+                UpdatedTestCalibratorsValuesDS.tparTestCalibratorValues.Clear()
+                LocalConcentrationValuesDS.tparTestCalibratorValues.CopyToDataTable(UpdatedTestCalibratorsValuesDS.tparTestCalibratorValues, _
+                                                                                    LoadOption.OverwriteChanges)
 
                 LocalChangesToSendAttribute = True
                 LocalChange = False
 
+                LocalConcPrevValue = -1
+                LocalFirstPointValue = -1
             End If
         Catch ex As Exception
             myResult = False
@@ -2506,8 +2727,8 @@ Public Class UiProgCalibrator
 
                 'To set the calibrator id have to validate if there's and update test sample to asigned the calibrator id value
                 myTestRow.CalibratorID = 0
-                If (UpdatedCalibratorsDS.tparTestCalibrators.Count > 0) AndAlso (Not UpdatedCalibratorsDS.tparTestCalibrators(0).IsCalibratorIDNull) Then
-                    myTestRow.CalibratorID = UpdatedCalibratorsDS.tparTestCalibrators(0).CalibratorID
+                If (UpdatedTestCalibratorsDS.tparTestCalibrators.Count > 0) AndAlso (Not UpdatedTestCalibratorsDS.tparTestCalibrators(0).IsCalibratorIDNull) Then
+                    myTestRow.CalibratorID = UpdatedTestCalibratorsDS.tparTestCalibrators(0).CalibratorID
                 End If
                 LocalTestDS.tparTests.AddtparTestsRow(myTestRow)
 
@@ -2536,7 +2757,7 @@ Public Class UiProgCalibrator
                                      CInt(CalibTestSampleListGrid.SelectedRows(0).Cells("TestID").Value), _
                                      CalibTestSampleListGrid.SelectedRows(0).Cells("SampleType").Value.ToString(), _
                                      CInt(CalibTestSampleListGrid.SelectedRows(0).Cells("CalibratorID").Value))
-                SetScreenStatusTABTestSampleCalib(ScreenStatusType.EditMode)
+                SetScreenStatusTABTestSampleCalib(SCREEN_STATUS_TYPE.EditMode)
             End If
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SetRecivedTestSample ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -2593,8 +2814,8 @@ Public Class UiProgCalibrator
                                                          CalibNumberUpDown.ValueChanged, YAxisCombo.SelectedIndexChanged, XAxisCombo.SelectedIndexChanged, CurveTypeCombo.SelectedIndexChanged, CalibratorListCombo.SelectedIndexChanged, IncreasingRadioButton.CheckedChanged, DecreasingRadioButton.CheckedChanged
         Try
             'firt validate the screen status to set the local changes value.
-            If LocalScreenStatus = ScreenStatusType.CreateMode OrElse _
-                                            LocalScreenStatus = ScreenStatusType.EditMode Then
+            If LocalScreenStatus = SCREEN_STATUS_TYPE.CreateMode OrElse _
+                                            LocalScreenStatus = SCREEN_STATUS_TYPE.EditMode Then
                 LocalChange = True ' set the local change to true
 
                 If sender.GetType().Name = "BSTextBox" Then
@@ -2730,7 +2951,7 @@ Public Class UiProgCalibrator
     Private Sub CalibratorListGrid_RowEnter(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles CalibratorListGrid.RowEnter, CalibratorListGrid.CellClick
 
         Try
-            If LocalScreenStatus <> ScreenStatusType.EditMode AndAlso LocalScreenStatus <> ScreenStatusType.CreateMode Then
+            If LocalScreenStatus <> SCREEN_STATUS_TYPE.EditMode AndAlso LocalScreenStatus <> SCREEN_STATUS_TYPE.CreateMode Then
                 If CalibratorListGrid.SelectedRows.Count = 1 Then
                     BindCalibratorsControls(CInt(CalibratorListGrid.SelectedRows(0).Cells("CalibratorID").Value))
                     CalibratorListGrid.Rows(CalibratorListGrid.SelectedRows(0).Index).Selected = True 'TR 30/07/2013 -Select the corresponding row on gridview
@@ -2746,28 +2967,28 @@ Public Class UiProgCalibrator
                 If CalibratorListGrid.SelectedRows.Count = 1 Then
                     If DirectCast(CalibratorListGrid.SelectedRows(0).Cells("InUse").Value, Boolean) Then
                         'Set screen status to Edit mode.
-                        SetScreenStatusTABCalibrator(ScreenStatusType.ElementInUse)
+                        SetScreenStatusTABCalibrator(SCREEN_STATUS_TYPE.ElementInUse)
                     ElseIf DirectCast(CalibratorListGrid.SelectedRows(0).Cells("SpecialCalib").Value, Boolean) Then
                         'Set screen status to Edit mode.
-                        SetScreenStatusTABCalibrator(ScreenStatusType.SpecialCalibrator)
+                        SetScreenStatusTABCalibrator(SCREEN_STATUS_TYPE.SpecialCalibrator)
                     Else
-                        SetScreenStatusTABCalibrator(ScreenStatusType.ReadMode)
+                        SetScreenStatusTABCalibrator(SCREEN_STATUS_TYPE.ReadMode)
                     End If
 
                 ElseIf CalibratorListGrid.SelectedRows.Count > 1 Then
 
                     For Each calRow As DataGridViewRow In CalibratorListGrid.SelectedRows
                         If DirectCast(calRow.Cells("InUse").Value, Boolean) OrElse DirectCast(calRow.Cells("SpecialCalib").Value, Boolean) Then
-                            SetScreenStatusTABCalibrator(ScreenStatusType.ElementInUse)
+                            SetScreenStatusTABCalibrator(SCREEN_STATUS_TYPE.ElementInUse)
                             Exit Sub
                         End If
                     Next
 
                     'if multiselect then  set multiselect status
-                    SetScreenStatusTABCalibrator(ScreenStatusType.MultiSelection)
+                    SetScreenStatusTABCalibrator(SCREEN_STATUS_TYPE.MultiSelection)
                 Else
                     'Set screen status to Edit mode.
-                    SetScreenStatusTABCalibrator(ScreenStatusType.ReadMode)
+                    SetScreenStatusTABCalibrator(SCREEN_STATUS_TYPE.ReadMode)
                 End If
 
             End If
@@ -2794,7 +3015,7 @@ Public Class UiProgCalibrator
             ExpDatePickUpCombo.Value = Now.Date.AddMonths(3)
 
             'Set screen status to create mode.
-            SetScreenStatusTABCalibrator(ScreenStatusType.CreateMode)
+            SetScreenStatusTABCalibrator(SCREEN_STATUS_TYPE.CreateMode)
 
             LotNumberTextBox.Focus() 'TR 30/07/2013 bug dont show the kaky color.
             'Set focus
@@ -2821,16 +3042,16 @@ Public Class UiProgCalibrator
 
             If myDialogResult = Windows.Forms.DialogResult.Yes Then
                 CalibratorErrorProv.Clear()
-                Dim myScreenStatusTemp As New ScreenStatusType
+                Dim myScreenStatusTemp As New SCREEN_STATUS_TYPE
                 'TR 18/04/2012 VALIDATE IF SPECIAL CALIBRATOR.
                 'TR 29/05/2012 -Validate there is a calibrator selected. 
                 If CalibratorListGrid.SelectedRows.Count = 1 AndAlso _
                    DirectCast(CalibratorListGrid.SelectedRows(0).Cells("SpecialCalib").Value, Boolean) Then
                     'Set screen status to Edit mode.
-                    myScreenStatusTemp = ScreenStatusType.SpecialCalibrator
+                    myScreenStatusTemp = SCREEN_STATUS_TYPE.SpecialCalibrator
                     'myScreenStatusTemp = 
                 Else
-                    myScreenStatusTemp = ScreenStatusType.ReadMode
+                    myScreenStatusTemp = SCREEN_STATUS_TYPE.ReadMode
                 End If
                 'TR 18/04/2012
                 'myScreenStatusTemp = SCREEN_STATUS_TYPE.ReadMode
@@ -2844,7 +3065,7 @@ Public Class UiProgCalibrator
 
                     BindCalibratorsControls(CInt(CalibratorListGrid.SelectedRows(0).Cells("CalibratorID").Value))
                     If DirectCast(CalibratorListGrid.SelectedRows(0).Cells("InUSe").Value, Boolean) Then
-                        myScreenStatusTemp = ScreenStatusType.ElementInUse
+                        myScreenStatusTemp = SCREEN_STATUS_TYPE.ElementInUse
                     End If
                 End If
 
@@ -2855,6 +3076,8 @@ Public Class UiProgCalibrator
                 LocalValidateDependencies = False
                 LocalCalibratorLotModified = False
 
+                LocalConcPrevValue = -1
+                LocalFirstPointValue = -1
             End If
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log
@@ -2899,8 +3122,8 @@ Public Class UiProgCalibrator
 
     Private Sub CalibratorNameTextBox_Validating(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles CalibratorNameTextBox.Validating
         Try
-            If LocalScreenStatus = ScreenStatusType.CreateMode Or LocalScreenStatus = ScreenStatusType.EditMode Then
-                If CalibratorExist(CalibratorNameTextBox.Text, controller.CalibratorIdFocused) Then
+            If LocalScreenStatus = SCREEN_STATUS_TYPE.CreateMode Or LocalScreenStatus = SCREEN_STATUS_TYPE.EditMode Then
+                If CalibratorExist(CalibratorNameTextBox.Text, CInt(CalibIDTextBox.Text)) Then
                     CalibratorErrorProv.SetError(CalibratorNameTextBox, GetMessageText(GlobalEnumerates.Messages.DUPLICATED_CALIB_NAME.ToString()))
                     CalibratorNameTextBox.Focus()
                 Else
@@ -2914,7 +3137,7 @@ Public Class UiProgCalibrator
         End Try
     End Sub
 
-    Private Sub EditCalibButton_Click(ByVal sender As System.Object, ByVal e As EventArgs) Handles _
+    Private Sub EditCalibButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles _
                                                     EditCalibButton.Click, CalibratorListGrid.CellDoubleClick
 
         Try
@@ -2923,7 +3146,7 @@ Public Class UiProgCalibrator
                 If CalibratorListGrid.SelectedRows.Count = 1 AndAlso _
                     Not DirectCast(CalibratorListGrid.SelectedRows(0).Cells("InUse").Value, Boolean) Then
                     'Set screen status to Edit mode.
-                    SetScreenStatusTABCalibrator(ScreenStatusType.EditMode)
+                    SetScreenStatusTABCalibrator(SCREEN_STATUS_TYPE.EditMode)
                     'If special calibrator disable calibratorname Text box.
                     If DirectCast(CalibratorListGrid.SelectedRows(0).Cells("SpecialCalib").Value, Boolean) Then
                         CalibratorNameTextBox.Enabled = False
@@ -2972,9 +3195,9 @@ Public Class UiProgCalibrator
                     'TR 18/04/2012 VALIDATE IF SPECIAL CALIBRATOR. 
                     If DirectCast(CalibratorListGrid.SelectedRows(0).Cells("SpecialCalib").Value, Boolean) Then
                         'Set screen status to Edit mode.
-                        SetScreenStatusTABCalibrator(ScreenStatusType.SpecialCalibrator)
+                        SetScreenStatusTABCalibrator(SCREEN_STATUS_TYPE.SpecialCalibrator)
                     Else
-                        SetScreenStatusTABCalibrator(ScreenStatusType.ReadMode)
+                        SetScreenStatusTABCalibrator(SCREEN_STATUS_TYPE.ReadMode)
                     End If
                     'TR 18/04/2012
                     'SetScreenStatusTABCalibrator(SCREEN_STATUS_TYPE.ReadMode)'TR 18/04/2012 COMMENTED.
@@ -3000,17 +3223,17 @@ Public Class UiProgCalibrator
             If CalibratorListGrid.SelectedRows.Count = 1 Then
                 If Not DirectCast(CalibratorListGrid.SelectedRows(0).Cells("InUse").Value, Boolean) Then
                     'Set screen status to Edit mode.
-                    SetScreenStatusTABCalibrator(ScreenStatusType.ReadMode)
+                    SetScreenStatusTABCalibrator(SCREEN_STATUS_TYPE.ReadMode)
                 Else
                     'Set screen status to Edit mode.
-                    SetScreenStatusTABCalibrator(ScreenStatusType.ElementInUse)
+                    SetScreenStatusTABCalibrator(SCREEN_STATUS_TYPE.ElementInUse)
                 End If
             ElseIf CalibratorListGrid.SelectedRows.Count > 1 Then
                 'if multiselect then  set multiselect status
-                SetScreenStatusTABCalibrator(ScreenStatusType.MultiSelection)
+                SetScreenStatusTABCalibrator(SCREEN_STATUS_TYPE.MultiSelection)
             Else
                 'Set screen status to Edit mode.
-                SetScreenStatusTABCalibrator(ScreenStatusType.ReadMode)
+                SetScreenStatusTABCalibrator(SCREEN_STATUS_TYPE.ReadMode)
             End If
 
             'TAB CALIBRATOR BY TEST-SAMPLE.
@@ -3023,9 +3246,9 @@ Public Class UiProgCalibrator
                     LocalDecimalAllow = CInt(CalibTestSampleListGrid.SelectedRows(0).Cells("DecimalsAllowed").Value)
 
                     If CBool(CalibTestSampleListGrid.SelectedRows(0).Cells("InUse").Value) Then
-                        SetScreenStatusTABTestSampleCalib(ScreenStatusType.ElementInUse)
+                        SetScreenStatusTABTestSampleCalib(SCREEN_STATUS_TYPE.ElementInUse)
                     Else
-                        SetScreenStatusTABTestSampleCalib(ScreenStatusType.ReadMode)
+                        SetScreenStatusTABTestSampleCalib(SCREEN_STATUS_TYPE.ReadMode)
                     End If
 
                     BindCalibratorValues(CInt(CalibTestSampleListGrid.SelectedRows(0).Cells("TestCalibratorID").Value), _
@@ -3036,7 +3259,7 @@ Public Class UiProgCalibrator
                 End If
 
             Else
-                SetScreenStatusTABTestSampleCalib(ScreenStatusType.EditMode)
+                SetScreenStatusTABTestSampleCalib(SCREEN_STATUS_TYPE.EditMode)
                 SpecialTestEditionScreenEnable()
             End If
         Catch ex As Exception
@@ -3067,9 +3290,9 @@ Public Class UiProgCalibrator
                                      CInt(CalibTestSampleListGrid.Rows(rowIndex).Cells("CalibratorID").Value))
 
                 If (CBool(CalibTestSampleListGrid.Rows(rowIndex).Cells("InUse").Value)) Then
-                    SetScreenStatusTABTestSampleCalib(ScreenStatusType.ElementInUse)
+                    SetScreenStatusTABTestSampleCalib(SCREEN_STATUS_TYPE.ElementInUse)
                 Else
-                    SetScreenStatusTABTestSampleCalib(ScreenStatusType.ReadMode)
+                    SetScreenStatusTABTestSampleCalib(SCREEN_STATUS_TYPE.ReadMode)
                 End If
             End If
         Catch ex As Exception
@@ -3086,11 +3309,11 @@ Public Class UiProgCalibrator
     ''' </remarks>
     Private Sub CalibTestSampleList_RowEnter(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles CalibTestSampleListGrid.RowEnter
         Try
-            If LocalScreenStatus <> ScreenStatusType.EditMode AndAlso LocalScreenStatus <> ScreenStatusType.CreateMode Then
+            If LocalScreenStatus <> SCREEN_STATUS_TYPE.EditMode AndAlso LocalScreenStatus <> SCREEN_STATUS_TYPE.CreateMode Then
                 If CBool(CalibTestSampleListGrid.Rows(e.RowIndex).Cells("InUse").Value) Then
-                    SetScreenStatusTABTestSampleCalib(ScreenStatusType.ElementInUse)
+                    SetScreenStatusTABTestSampleCalib(SCREEN_STATUS_TYPE.ElementInUse)
                 Else
-                    SetScreenStatusTABTestSampleCalib(ScreenStatusType.ReadMode)
+                    SetScreenStatusTABTestSampleCalib(SCREEN_STATUS_TYPE.ReadMode)
                 End If
 
                 'SA 08/11/2012 - This code should not be here. RowEnter event is executed before Click event and the SelectedRow has not been
@@ -3134,7 +3357,7 @@ Public Class UiProgCalibrator
             'This functionality is not available for Users with OPERATOR Level
             If (Not CurrentUserLevel = "OPERATOR") Then
                 If (CalibTestSampleListGrid.SelectedRows.Count = 1 AndAlso Not CBool(CalibTestSampleListGrid.SelectedRows(0).Cells("InUse").Value)) Then
-                    SetScreenStatusTABTestSampleCalib(ScreenStatusType.EditMode)
+                    SetScreenStatusTABTestSampleCalib(SCREEN_STATUS_TYPE.EditMode)
                     UnSelectConcentrationGridView()
                     CalibratorListCombo.Focus()
                     SpecialTestEditionScreenEnable()
@@ -3174,7 +3397,7 @@ Public Class UiProgCalibrator
         PrepareNewCalibratorValuesForTestSample()
     End Sub
 
-    Private Sub ConcentrationGridView_CellPainting(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DataGridViewCellPaintingEventArgs) Handles ValuePointsGridView.CellPainting
+    Private Sub ConcentrationGridView_CellPainting(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DataGridViewCellPaintingEventArgs) Handles ConcentrationGridView.CellPainting
         Try
             If (CalibratorListCombo.Enabled) Then
                 If (e.ColumnIndex = 0 AndAlso (e.RowIndex > -1 AndAlso e.RowIndex <= 10)) OrElse _
@@ -3191,7 +3414,7 @@ Public Class UiProgCalibrator
                 End If
             Else
                 'If the area is not in EDIT Mode, then all cells in the DataGridView as painting as disabled
-                If (LocalScreenStatus <> ScreenStatusType.EditMode) Then
+                If (LocalScreenStatus <> SCREEN_STATUS_TYPE.EditMode) Then
                     If (e.RowIndex > -1) Then
                         e.CellStyle.BackColor = SystemColors.MenuBar
                         e.CellStyle.ForeColor = Color.DarkGray
@@ -3209,19 +3432,19 @@ Public Class UiProgCalibrator
     ''' </summary>
     Private Sub UnSelectConcentrationGridView()
         Try
-            If (ValuePointsGridView.Rows.Count > 0) Then
-                For r As Integer = 0 To ValuePointsGridView.Rows.Count - 1 Step 1
-                    ValuePointsGridView.Rows(r).Selected = False
+            If (ConcentrationGridView.Rows.Count > 0) Then
+                For r As Integer = 0 To ConcentrationGridView.Rows.Count - 1 Step 1
+                    ConcentrationGridView.Rows(r).Selected = False
                     If (CalibratorListCombo.Enabled) Then
                         'Change to White/Black the BackColor/ForeColor of the editable cells; the rest remain as MenuBar/DarkGray
-                        ValuePointsGridView.Rows(r).Cells("TheoricalConcentration").Style.BackColor = Color.White
-                        ValuePointsGridView.Rows(r).Cells("TheoricalConcentration").Style.ForeColor = Color.Black
-                        ValuePointsGridView.Rows(r).Cells("TheoricalConcentration").ReadOnly = False
+                        ConcentrationGridView.Rows(r).Cells("TheoricalConcentration").Style.BackColor = Color.White
+                        ConcentrationGridView.Rows(r).Cells("TheoricalConcentration").Style.ForeColor = Color.Black
+                        ConcentrationGridView.Rows(r).Cells("TheoricalConcentration").ReadOnly = False
                     Else
                         'Change to MenuBar/DarkGray the BackColor/ForeColor of the editable cells
-                        ValuePointsGridView.Rows(r).Cells("TheoricalConcentration").Style.BackColor = SystemColors.MenuBar
-                        ValuePointsGridView.Rows(r).Cells("TheoricalConcentration").Style.ForeColor = Color.DarkGray
-                        ValuePointsGridView.Rows(r).Cells("TheoricalConcentration").ReadOnly = True
+                        ConcentrationGridView.Rows(r).Cells("TheoricalConcentration").Style.BackColor = SystemColors.MenuBar
+                        ConcentrationGridView.Rows(r).Cells("TheoricalConcentration").Style.ForeColor = Color.DarkGray
+                        ConcentrationGridView.Rows(r).Cells("TheoricalConcentration").ReadOnly = True
                     End If
                 Next r
             End If
@@ -3231,57 +3454,178 @@ Public Class UiProgCalibrator
         End Try
     End Sub
 
-    Private Sub ConcentrationGridView_CellFormatting(ByVal sender As System.Object, ByVal e As Windows.Forms.DataGridViewCellFormattingEventArgs) Handles ValuePointsGridView.CellFormatting
+    Private Sub ConcentrationGridView_CellFormatting(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DataGridViewCellFormattingEventArgs) Handles ConcentrationGridView.CellFormatting
         Try
             If (e.ColumnIndex = 1) Then
-                If (Not ValuePointsGridView.Rows(e.RowIndex).Cells("Theoricalconcentration").Value Is DBNull.Value) Then
+                If (Not ConcentrationGridView.Rows(e.RowIndex).Cells("Theoricalconcentration").Value Is DBNull.Value) Then
                     e.Value = CType(e.Value, Double).ToString("F" & LocalDecimalAllow.ToString)
                 End If
             End If
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ConcentrationGridView_CellFormatting ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".ConcentrationGridView_CellFormatting ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+            ShowMessage(Me.Name & ".ConcentrationGridView_CellFormatting ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
-    Private Sub ConcentrationGridView_CellLeave(ByVal sender As System.Object, ByVal e As Windows.Forms.DataGridViewCellEventArgs) Handles ValuePointsGridView.CellEndEdit
+    Private Sub ConcentrationGridView_CellLeave(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles ConcentrationGridView.CellEndEdit 'ConcentrationGridView.CellLeave, 
         Try
-            If (LocalScreenStatus = ScreenStatusType.EditMode) Then
+            If (e.RowIndex >= 0) Then
+                'Variable used to determinate if Concentration of the first point has changed
+                Dim changeFirstConc As Boolean = False
 
-                ValuePointsGridView("TheoricalConcentration", e.RowIndex).Style.Alignment = DataGridViewContentAlignment.MiddleRight
-                ValuePointsGridView("TheoricalConcentration", e.RowIndex).ErrorText = Nothing
-                ValuePointsGridView("KitConcentrationRelation", e.RowIndex).Value = DBNull.Value
+                If (LocalScreenStatus = SCREEN_STATUS_TYPE.EditMode) Then
+                    If (ConcentrationGridView.Rows(e.RowIndex).Cells("TheoricalConcentration").FormattedValue Is DBNull.Value) Then
+                        'If Concentration Value is Null, an error is shown in the cell
+                        ConcentrationGridView.Rows(e.RowIndex).Cells("TheoricalConcentration").Style.Alignment = DataGridViewContentAlignment.MiddleCenter
+                        ConcentrationGridView.Rows(e.RowIndex).Cells("TheoricalConcentration").ErrorText = GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString())
+                        ConcentrationGridView.Rows(e.RowIndex).Cells("KitConcentrationRelation").Value = DBNull.Value
+                        LocalChange = True
+                        changeFirstConc = (e.RowIndex = 0)
 
-                Dim messageError = controller.ValidateInputFieldForConcentrations(localCalibratorsDS, e.RowIndex)
+                    ElseIf (ConcentrationGridView.Rows(e.RowIndex).Cells("TheoricalConcentration").FormattedValue.ToString = String.Empty) Then
+                        'If Concentration Value is empty, an error is shown in the cell
+                        ConcentrationGridView.Rows(e.RowIndex).Cells("TheoricalConcentration").Style.Alignment = DataGridViewContentAlignment.MiddleCenter
+                        ConcentrationGridView.Rows(e.RowIndex).Cells("TheoricalConcentration").ErrorText = GetMessageText(GlobalEnumerates.Messages.ZERO_NOTALLOW.ToString(), currentLanguage)
+                        ConcentrationGridView.Rows(e.RowIndex).Cells("KitConcentrationRelation").Value = DBNull.Value
+                        LocalChange = True
+                        changeFirstConc = (e.RowIndex = 0)
 
-                If (Not String.IsNullOrWhiteSpace(messageError)) Then
-                    ValuePointsGridView("TheoricalConcentration", e.RowIndex).Style.Alignment = DataGridViewContentAlignment.MiddleCenter
-                    ValuePointsGridView("KitConcentrationRelation", e.RowIndex).Value = DBNull.Value
-                    ValuePointsGridView("TheoricalConcentration", e.RowIndex).ErrorText = GetMessageText(messageError)
-                Else
-                    controller.CalculateFactorFromConcentration(localCalibratorsDS)
+                    ElseIf (CDbl(ConcentrationGridView.Rows(e.RowIndex).Cells("TheoricalConcentration").FormattedValue) = 0) Then
+                        'If Concentration Value is zero, an error is shown in the cell
+                        ConcentrationGridView.Rows(e.RowIndex).Cells("TheoricalConcentration").Style.Alignment = DataGridViewContentAlignment.MiddleCenter
+                        ConcentrationGridView.Rows(e.RowIndex).Cells("TheoricalConcentration").ErrorText = GetMessageText(GlobalEnumerates.Messages.ZERO_NOTALLOW.ToString(), currentLanguage)
+                        ConcentrationGridView.Rows(e.RowIndex).Cells("KitConcentrationRelation").Value = DBNull.Value
+                        LocalChange = True
+                        changeFirstConc = (e.RowIndex = 0)
 
-                    ValuePointsGridView.DataSource = localCalibratorsDS.tparTestCalibratorValues
-                    ValuePointsGridView.Columns("TheoricalConcentration").DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
-                    ValuePointsGridView.Refresh()
+                    ElseIf (e.RowIndex = 0) Then
+                        'First Concentration Value is always allowed if it is greater than zero
+                        ConcentrationGridView.Rows(e.RowIndex).Cells("TheoricalConcentration").ErrorText = ""
+                        ConcentrationGridView.Rows(e.RowIndex).Cells("TheoricalConcentration").Style.Alignment = DataGridViewContentAlignment.MiddleRight
+
+                        'Set 1 as Factor for the last Calibrator point
+                        ConcentrationGridView.Rows(e.RowIndex).Cells("KitConcentrationRelation").Value = 1
+
+                        If (Not ConcentrationGridView.Rows(e.RowIndex).Cells("TheoricalConcentration").IsInEditMode AndAlso _
+                            LocalConcPrevValue <> CDbl(ConcentrationGridView.Rows(e.RowIndex).Cells("TheoricalConcentration").FormattedValue)) Then
+                            'Save the Concentration value of the last Calibrator point in a global variable
+                            LocalConcPrevValue = CDbl(ConcentrationGridView.Rows(e.RowIndex).Cells("TheoricalConcentration").FormattedValue)
+
+                            'changeFirstConc = True
+                            changeFirstConc = CDbl(ConcentrationGridView.Rows(e.RowIndex).Cells("TheoricalConcentration").Value) <> LocalFirstPointValue
+                            'TR 17/07/2013 -BUG #1229 Validate the dependencies 'cause concentration value has change. Uncomment the line under.
+                            LocalValidateDependencies = True
+                        End If
+
+                    ElseIf (Not ConcentrationGridView.Rows(0).Cells("TheoricalConcentration").FormattedValue Is DBNull.Value) AndAlso _
+                           (ConcentrationGridView.Rows(0).Cells("TheoricalConcentration").FormattedValue.ToString <> String.Empty) AndAlso _
+                           (CDbl(ConcentrationGridView.Rows(0).Cells("TheoricalConcentration").FormattedValue) > 0) Then
+                        ConcentrationGridView.Rows(e.RowIndex).Cells("TheoricalConcentration").ErrorText = ""
+                        ConcentrationGridView.Rows(e.RowIndex).Cells("TheoricalConcentration").Style.Alignment = DataGridViewContentAlignment.MiddleRight
+
+                        If (LocalConcPrevValue > 0 AndAlso Not ConcentrationGridView.Rows(e.RowIndex).Cells("TheoricalConcentration").IsInEditMode AndAlso _
+                            LocalConcPrevValue <> CDbl(ConcentrationGridView.Rows(e.RowIndex).Cells("TheoricalConcentration").FormattedValue)) Then
+                            'Calculate the KitConcentrationRelation value
+                            ConcentrationGridView.Rows(e.RowIndex).Cells("KitConcentrationRelation").Value = _
+                                    (CType(ConcentrationGridView.Rows(e.RowIndex).Cells("TheoricalConcentration").Value, Double) / _
+                                     CType(ConcentrationGridView.Rows(0).Cells("TheoricalConcentration").Value, Double)).ToString("F3")
+
+                            LocalChange = True
+                            LocalValidateDependencies = True
+
+                            LocalConcPrevValue = CDbl(ConcentrationGridView.Rows(e.RowIndex).Cells("TheoricalConcentration").FormattedValue)
+
+                        ElseIf (LocalConcPrevValue < 0) Then
+                            LocalConcPrevValue = CDbl(ConcentrationGridView.Rows(e.RowIndex).Cells("TheoricalConcentration").FormattedValue)
+                        End If
+                    End If
+
+                    ''Validate if value is nothing to do the calculations
+                    'If (Not ConcentrationGridView.Rows(e.RowIndex).Cells("TheoricalConcentration").FormattedValue Is DBNull.Value AndAlso _
+                    '    ConcentrationGridView.Rows(e.RowIndex).Cells("TheoricalConcentration").FormattedValue.ToString <> String.Empty AndAlso _
+                    '    Not ConcentrationGridView.Rows(0).Cells("TheoricalConcentration").FormattedValue Is DBNull.Value AndAlso _
+                    '    CDbl(ConcentrationGridView.Rows(e.RowIndex).Cells("TheoricalConcentration").FormattedValue) <> 0) Then
+                    '    'Clear cell errors 
+                    '    ConcentrationGridView.Rows(e.RowIndex).Cells("TheoricalConcentration").ErrorText = ""
+                    '    ConcentrationGridView.Rows(e.RowIndex).Cells("TheoricalConcentration").Style.Alignment = DataGridViewContentAlignment.MiddleRight
+
+                    '    'Set the current value to a local variable to validate if there was any changes.
+                    '    ConcentrationGridView.Rows(e.RowIndex).Cells("KitConcentrationRelation").Value = _
+                    '        (CType(ConcentrationGridView.Rows(e.RowIndex).Cells("TheoricalConcentration").FormattedValue, Double) / _
+                    '         CType(ConcentrationGridView.Rows(0).Cells("TheoricalConcentration").Value, Double)).ToString("F3")
+
+                    '    'Validate if the value change to update the localChanges variable.
+                    '    If (LocalConcPrevValue > 0 AndAlso Not ConcentrationGridView.Rows(e.RowIndex).Cells("TheoricalConcentration").IsInEditMode AndAlso _
+                    '        LocalConcPrevValue <> CType(ConcentrationGridView.Rows(e.RowIndex).Cells("TheoricalConcentration").FormattedValue, Double)) Then
+
+                    '        LocalChange = True
+                    '        LocalValidateDependencies = True
+                    '        LocalConcPrevValue = CType(ConcentrationGridView.Rows(e.RowIndex).Cells("TheoricalConcentration").Value, Double)
+
+                    '        If (e.RowIndex = 0) Then
+                    '            changeFirstConc = True
+                    '        End If
+
+                    '    ElseIf (LocalConcPrevValue < 0) Then
+                    '        LocalConcPrevValue = CType(ConcentrationGridView.Rows(e.RowIndex).Cells("TheoricalConcentration").Value, Double)
+                    '    End If
+
+                    'ElseIf ConcentrationGridView.Rows(e.RowIndex).Cells("theoricalconcentration").Value Is DBNull.Value Then
+                    '    'if concentration value is null show error on cell
+                    '    ConcentrationGridView.Rows(e.RowIndex).Cells("theoricalconcentration").Style.Alignment = DataGridViewContentAlignment.MiddleCenter
+                    '    ConcentrationGridView.Rows(e.RowIndex).Cells("theoricalconcentration").ErrorText = GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString())
+
+                    'ElseIf CDbl(ConcentrationGridView.Rows(e.RowIndex).Cells("theoricalconcentration").Value) = 0 Then
+                    '    ConcentrationGridView.Rows(e.RowIndex).Cells("theoricalconcentration").Style.Alignment = DataGridViewContentAlignment.MiddleCenter
+                    '    ConcentrationGridView.Rows(e.RowIndex).Cells("theoricalconcentration").ErrorText = _
+                    '                            GetMessageText(GlobalEnumerates.Messages.ZERO_NOTALLOW.ToString(), currentLanguage)
+                    'End If
+
+                    If (changeFirstConc) Then
+                        'Validate if the first row has been changed to delete values in the rest of rows
+                        'If (ConcentrationGridView.SelectedRows.Count > 0 AndAlso ConcentrationGridView.SelectedRows(0).Index = 0) Then
+                        LocalChange = True
+                        If (Not ConcentrationGridView.Rows(0).Cells("TheoricalConcentration").FormattedValue Is DBNull.Value) AndAlso _
+                           (ConcentrationGridView.Rows(0).Cells("TheoricalConcentration").FormattedValue.ToString <> String.Empty) Then
+                            LocalFirstPointValue = CDbl(ConcentrationGridView.Rows(0).Cells("TheoricalConcentration").Value)
+                        End If
+
+                        If (ConcentrationGridView.RowCount > 1) Then
+                            For myRowIndex As Integer = 1 To ConcentrationGridView.RowCount - 1
+                                ConcentrationGridView.Rows(myRowIndex).Cells("TheoricalConcentration").Value = DBNull.Value
+                                ConcentrationGridView.Rows(myRowIndex).Cells("KitConcentrationRelation").Value = DBNull.Value
+
+                                ConcentrationGridView.Rows(myRowIndex).Cells("TheoricalConcentration").ErrorText = String.Empty
+                                ConcentrationGridView.Rows(myRowIndex).Cells("TheoricalConcentration").Style.Alignment = DataGridViewContentAlignment.MiddleRight
+                            Next
+                        End If
+                        'End If
+                    End If
+
+                    'Validate all the informed Concentrations
+                    ValidateErrorConcValuesDescOrderGrid()
                 End If
-                LocalChange = True
             End If
         Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex)
-            ShowMessage(Name & ".ConcentrationGridView_CellLeave ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ConcentrationGridView_CellLeave ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".ConcentrationGridView_CellLeave ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
 
     End Sub
 
-    Private Sub ConcentrationGridView_RowEnter(ByVal sender As System.Object, ByVal e As Windows.Forms.DataGridViewCellEventArgs) Handles ValuePointsGridView.RowEnter
-
-
+    Private Sub ConcentrationGridView_RowEnter(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles ConcentrationGridView.RowEnter
+        If (ConcentrationGridView.SelectedRows.Count > 0) Then
+            If (Not ConcentrationGridView.Rows(e.RowIndex).Cells(1).Value Is DBNull.Value) Then
+                LocalConcPrevValue = CDbl(ConcentrationGridView.Rows(e.RowIndex).Cells(1).Value)
+            Else
+                LocalConcPrevValue = -1
+            End If
+        End If
     End Sub
 
-    Private Sub ConcentrationGridView_EditingControlShowing(ByVal sender As Object, ByVal e As DataGridViewEditingControlShowingEventArgs) Handles ValuePointsGridView.EditingControlShowing
+    Private Sub ConcentrationGridView_EditingControlShowing(ByVal sender As Object, ByVal e As DataGridViewEditingControlShowingEventArgs) Handles ConcentrationGridView.EditingControlShowing
         Try
-            If (Me.ValuePointsGridView.CurrentRow.Index >= 0 AndAlso Me.ValuePointsGridView.CurrentCell.ColumnIndex = 1) Then
+            If (Me.ConcentrationGridView.CurrentRow.Index >= 0 AndAlso Me.ConcentrationGridView.CurrentCell.ColumnIndex = 1) Then
                 'TR 01/07/2011 - Do not allow to show Copy/Paste/Cut Menu on cell
                 If (e.Control.GetType().Name = "DataGridViewTextBoxEditingControl") Then
                     DirectCast(e.Control, DataGridViewTextBoxEditingControl).ShortcutsEnabled = False
@@ -3331,6 +3675,18 @@ Public Class UiProgCalibrator
                 End If
             End If
 
+            'Dim myDecimalSeparator As String = SystemInfoManager.OSDecimalSeparator
+            ''Add the Backspace key value (TR 23/12/2010 -Add the point)
+            'If e.KeyChar = myDecimalSeparator OrElse String.Compare(e.KeyChar.ToString(), CChar("").ToString(), False) = 0 OrElse e.KeyChar = CChar(".") Then
+            '    If e.KeyChar = CChar(".") Then
+            '        e.KeyChar = CChar(myDecimalSeparator) 'TR 23/12/2010
+            '    End If
+            '    e.Handled = False
+            'Else
+            '    If Not IsNumeric(e.KeyChar) Then
+            '        e.Handled = True
+            '    End If
+            'End If
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CheckNumericCell ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".CheckNumericCell ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -3376,14 +3732,14 @@ Public Class UiProgCalibrator
                 If (CalibratorTabControl.SelectedTab.Name = CalibratorInfoTab.Name) Then
                     If (CurrentRow.SpecialCalib) Then
                         'Set screen status to the mode for Special Calibrator
-                        SetScreenStatusTABCalibrator(ScreenStatusType.SpecialCalibrator)
+                        SetScreenStatusTABCalibrator(SCREEN_STATUS_TYPE.SpecialCalibrator)
                     Else
                         'SA 21/11/2012 - To avoid status of buttons EDIT and DELETE changes to ENABLED when the selected 
                         '                Calibrator is IN USE in the active WorkSession
                         If (CurrentRow.InUse) Then
-                            SetScreenStatusTABCalibrator(ScreenStatusType.ElementInUse)
+                            SetScreenStatusTABCalibrator(SCREEN_STATUS_TYPE.ElementInUse)
                         Else
-                            SetScreenStatusTABCalibrator(ScreenStatusType.ReadMode)
+                            SetScreenStatusTABCalibrator(SCREEN_STATUS_TYPE.ReadMode)
                         End If
                         'SetScreenStatusTABCalibrator(SCREEN_STATUS_TYPE.ReadMode)
                     End If
@@ -3391,9 +3747,9 @@ Public Class UiProgCalibrator
                     'SA 21/11/2012 - To avoid status of button EDIT changes to ENABLED when the selected 
                     '                Test/Sample Type is IN USE in the active WorkSession
                     If (CurrentTestSampleRow.InUse) Then
-                        SetScreenStatusTABTestSampleCalib(ScreenStatusType.ElementInUse)
+                        SetScreenStatusTABTestSampleCalib(SCREEN_STATUS_TYPE.ElementInUse)
                     Else
-                        SetScreenStatusTABTestSampleCalib(ScreenStatusType.ReadMode)
+                        SetScreenStatusTABTestSampleCalib(SCREEN_STATUS_TYPE.ReadMode)
                     End If
                     ''If (IsTestParamWinAttribute) Then
                     ''    SetScreenStatusTABTestSampleCalib(SCREEN_STATUS_TYPE.EditMode)
@@ -3529,9 +3885,9 @@ Public Class UiProgCalibrator
         'TR 16/01/2012 -END.
     End Sub
 
-    Private Sub ConcentrationGridView_Enter(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ValuePointsGridView.Enter
-        If ValuePointsGridView.Rows.Count > 0 Then
-            ValuePointsGridView.Rows(0).Cells(1).Selected = True
+    Private Sub ConcentrationGridView_Enter(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ConcentrationGridView.Enter
+        If ConcentrationGridView.Rows.Count > 0 Then
+            ConcentrationGridView.Rows(0).Cells(1).Selected = True
         End If
 
     End Sub
@@ -3567,10 +3923,10 @@ Public Class UiProgCalibrator
                 'TR 08/03/2012- Clear all errors.
                 CalibratorErrorProv.Clear()
 
-                localCalibratorsDS.tparTestCalibratorValues.Clear()
+                LocalConcentrationValuesDS.tparTestCalibratorValues.Clear()
 
-                Dim myScreenStatusTemp As New ScreenStatusType
-                myScreenStatusTemp = ScreenStatusType.ReadMode
+                Dim myScreenStatusTemp As New SCREEN_STATUS_TYPE
+                myScreenStatusTemp = SCREEN_STATUS_TYPE.ReadMode
 
                 If Me.CalibTestSampleListGrid.Rows.Count > 0 Then
                     If Me.CalibTestSampleListGrid.SelectedRows.Count = 0 Then
@@ -3579,7 +3935,7 @@ Public Class UiProgCalibrator
                     End If
 
                     'Set Read mode status.
-                    myScreenStatusTemp = ScreenStatusType.ReadMode
+                    myScreenStatusTemp = SCREEN_STATUS_TYPE.ReadMode
                 End If
 
 
@@ -3592,6 +3948,9 @@ Public Class UiProgCalibrator
 
                 LocalChange = False
                 LocalValidateDependencies = False
+
+                LocalConcPrevValue = -1
+                LocalFirstPointValue = -1
 
                 UnSelectConcentrationGridView() ' dl 19/07/2011
             End If
@@ -3618,7 +3977,7 @@ Public Class UiProgCalibrator
     Private Sub SaveTestSampleCalValue_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SaveTestSampleCalValue.Click
         Try
             If (LocalChange AndAlso CalibTestSampleListGrid.SelectedRows.Count = 1) Then
-                If (ValidateAllFieldsForConcentrations()) Then
+                If (Not ValidateCalibCurveAndConcValuesHasError()) Then
                     If (CalibratorListCombo.SelectedIndex >= 0) Then
                         Dim localDeleteCalibratorsResult As Boolean = False
                         Dim myDialogResult As DialogResult = Windows.Forms.DialogResult.None
@@ -3663,7 +4022,7 @@ Public Class UiProgCalibrator
                             If (qtestList.Count > 0) Then qtestList.First().EnableStatus = True
                             SetTestSampleStatusIcon()
 
-                            SetScreenStatusTABTestSampleCalib(ScreenStatusType.ReadMode)
+                            SetScreenStatusTABTestSampleCalib(SCREEN_STATUS_TYPE.ReadMode)
                             'CalibTestSampleListGrid.Refresh()
 
                             'SA 21/11/2012'
@@ -3671,6 +4030,18 @@ Public Class UiProgCalibrator
                             CalibTestSampleListGrid.FirstDisplayedScrollingRowIndex = myRowIndex
                             CalibTestSampleListGrid.Rows(myRowIndex).Selected = True
                             CalibTestSampleListGrid.Refresh()
+
+                            'CalibTestSampleListGrid.Focus()
+
+                            ''Select in the grid the row for the Test/SampleType
+                            'For Each myRow As DataGridViewRow In CalibTestSampleListGrid.Rows
+                            '    If (myRow.Cells("TestName").Value.ToString() = myTestName) AndAlso _
+                            '       (myRow.Cells("SampleType").Value.ToString() = mySampleType) Then
+                            '        CalibTestSampleListGrid.FirstDisplayedScrollingRowIndex = myRow.Index
+                            '        myRow.Selected = True
+                            '        Exit For
+                            '    End If
+                            'Next
 
                             BindCalibratorValues(CInt(CalibTestSampleListGrid.SelectedRows(0).Cells("TestCalibratorID").Value), _
                                                  CInt(CalibTestSampleListGrid.SelectedRows(0).Cells("TestID").Value), _
@@ -3683,11 +4054,11 @@ Public Class UiProgCalibrator
                 End If
             Else
                 'TR 26/09/2012 - If not changes made, then set SCREEN_STATUS_TYPE to Read Mode
-                SetScreenStatusTABTestSampleCalib(ScreenStatusType.ReadMode)
+                SetScreenStatusTABTestSampleCalib(SCREEN_STATUS_TYPE.ReadMode)
             End If
         Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex)
-            ShowMessage(Name & ".SaveTestSampleCalValue_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SaveTestSampleCalValue_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".SaveTestSampleCalValue_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
@@ -3765,7 +4136,7 @@ Public Class UiProgCalibrator
             If (Not CalibTestSampleListGrid.SelectedRows(0).Cells("SpecialTest").Value Is DBNull.Value) AndAlso _
                (CBool(CalibTestSampleListGrid.SelectedRows(0).Cells("SpecialTest").Value)) Then
                 CalibratorListCombo.Enabled = False
-                ValuePointsGridView.Enabled = True
+                ConcentrationGridView.Enabled = True
             End If
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SpecialTestEditionScreenEnable ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -3815,9 +4186,9 @@ Public Class UiProgCalibrator
     ''' <remarks>
     ''' Created by:  SA 21/11/2012 
     ''' </remarks>
-    Private Sub ConcentrationGridView_CellValidating(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellValidatingEventArgs) Handles ValuePointsGridView.CellValidating
+    Private Sub ConcentrationGridView_CellValidating(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellValidatingEventArgs) Handles ConcentrationGridView.CellValidating
         Try
-            If (ValuePointsGridView.Columns(e.ColumnIndex).Index = 1) Then
+            If (ConcentrationGridView.Columns(e.ColumnIndex).Index = 1) Then
                 If (Not e.FormattedValue Is DBNull.Value AndAlso Not e.FormattedValue Is Nothing AndAlso e.FormattedValue.ToString.Trim <> "" AndAlso _
                     Not IsNumeric(e.FormattedValue)) Then
                     e.Cancel = True
