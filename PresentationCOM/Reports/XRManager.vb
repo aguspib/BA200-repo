@@ -738,11 +738,10 @@ Public Class XRManager
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
             'Multilanguage. Get texts from DB.
-            Dim CalibratorsData As New CalibratorsDS 'BA-2563
-            resultData = myCalibratorsDelegate.GetCalibratorsForReport(Nothing, CurrentLanguage, CalibratorsData, SelectedCalibrators) 'IT 29/05/2015 - BA-2563
+            resultData = myCalibratorsDelegate.GetCalibratorsForReport(Nothing, CurrentLanguage, SelectedCalibrators)
 
             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                CalibratorsData = DirectCast(resultData.SetDatos, CalibratorsDS) 'IT 29/05/2015 - BA-2563
+                Dim CalibratorsData As CalibratorsDS = DirectCast(resultData.SetDatos, CalibratorsDS)
 
                 'If (CalibratorsData.tparCalibrators.Count > 0) AndAlso (CalibratorsData.tparCalibratorsTests.Count > 0) Then
                 'Set Concentration with decimals

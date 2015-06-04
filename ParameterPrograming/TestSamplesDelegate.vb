@@ -276,7 +276,6 @@ Namespace Biosystems.Ax00.BL
         ''' Modified By: TR 18/09/2012 - Removed from Calculated Tests if SampleType is inuse
         '''              AG 09/10/2012 - Added changes to mark the deleted Test/SampleType as closed in Historic Module
         '''              SA 22/10/2012 - Do not call function HIST_CloseTestVersion, it is enough call function HIST_CloseTestSample
-        '''              IT 29/05/2015 - BA-2563
         ''' </remarks>
         Public Function DeleteCascadeByTestIDSampleType(ByVal pDBConnection As SqlClient.SqlConnection, _
                                                         ByVal pTestID As Integer, _
@@ -308,16 +307,15 @@ Namespace Biosystems.Ax00.BL
                         If (Not myGlobalDataTO.HasError) Then
                             'Get the Calibrator used for the Test/SampleType
                             Dim myTestCalibratorDelegate As New TestCalibratorsDelegate()
-                            Dim myTestCalibratorDS As New CalibratorsDS 'IT 29/05/2015 - BA-2563
-                            myGlobalDataTO = myTestCalibratorDelegate.GetTestCalibratorByTestID(dbConnection, pTestID, myTestCalibratorDS, pSampleType)
+                            myGlobalDataTO = myTestCalibratorDelegate.GetTestCalibratorByTestID(dbConnection, pTestID, pSampleType)
 
                             If (Not myGlobalDataTO.HasError) Then
-
-                                myTestCalibratorDS = DirectCast(myGlobalDataTO.SetDatos, CalibratorsDS)
+                                Dim myTestCalibratorDS As New TestCalibratorsDS
+                                myTestCalibratorDS = DirectCast(myGlobalDataTO.SetDatos, TestCalibratorsDS)
 
                                 'Delete values defined for each Calibrator point
                                 Dim myTestCalibratorValuesDelegate As New TestCalibratorValuesDelegate()
-                                For Each testCalibRow As CalibratorsDS.tparTestCalibratorsRow In myTestCalibratorDS.tparTestCalibrators.Rows
+                                For Each testCalibRow As TestCalibratorsDS.tparTestCalibratorsRow In myTestCalibratorDS.tparTestCalibrators.Rows
                                     myGlobalDataTO = myTestCalibratorValuesDelegate.DeleteByTestCalibratorID(dbConnection, testCalibRow.TestCalibratorID)
                                     If (myGlobalDataTO.HasError) Then Exit For
                                 Next
@@ -449,8 +447,7 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pSampleType">Sample Type Code</param>
         ''' <returns></returns>
         ''' <remarks>
-        ''' Created by:  TR 01/03/2011
-        ''' Modified by: IT 29/05/2015 - BA-2563
+        ''' Created by: TR 01/03/2011
         ''' </remarks>
         Public Function DeleteTestCalibratorDataByTestIDSampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, _
                                                         ByVal pSampleType As String) As GlobalDataTO
@@ -468,16 +465,15 @@ Namespace Biosystems.Ax00.BL
                         If (Not myGlobalDataTO.HasError) Then
                             'Get the Calibrator used for the Test/SampleType
                             Dim myTestCalibratorDelegate As New TestCalibratorsDelegate()
-                            Dim myTestCalibratorDS As New CalibratorsDS 'T 29/05/2015 - BA-2563
-                            myGlobalDataTO = myTestCalibratorDelegate.GetTestCalibratorByTestID(dbConnection, pTestID, myTestCalibratorDS, pSampleType)
+                            myGlobalDataTO = myTestCalibratorDelegate.GetTestCalibratorByTestID(dbConnection, pTestID, pSampleType)
 
                             If (Not myGlobalDataTO.HasError) Then
-
-                                myTestCalibratorDS = DirectCast(myGlobalDataTO.SetDatos, CalibratorsDS)
+                                Dim myTestCalibratorDS As New TestCalibratorsDS
+                                myTestCalibratorDS = DirectCast(myGlobalDataTO.SetDatos, TestCalibratorsDS)
 
                                 'Delete values defined for each Calibrator point
                                 Dim myTestCalibratorValuesDelegate As New TestCalibratorValuesDelegate()
-                                For Each testCalibRow As CalibratorsDS.tparTestCalibratorsRow In myTestCalibratorDS.tparTestCalibrators.Rows
+                                For Each testCalibRow As TestCalibratorsDS.tparTestCalibratorsRow In myTestCalibratorDS.tparTestCalibrators.Rows
                                     myGlobalDataTO = myTestCalibratorValuesDelegate.DeleteByTestCalibratorID(dbConnection, testCalibRow.TestCalibratorID)
                                     If (myGlobalDataTO.HasError) Then Exit For
                                 Next

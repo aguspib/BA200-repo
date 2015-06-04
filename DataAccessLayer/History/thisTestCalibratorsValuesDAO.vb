@@ -17,15 +17,14 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pSampleType">Sample Type code</param>
         ''' <param name="pTestVersionNum">Number of the open version of the Test/SampleType in Historic Module</param>
         ''' <param name="pHistCalibratorID">Calibrator Identifier in Historic Module</param>
-        ''' <param name="pCalibratorsDS">Typed Dataset TestCalibratorValuesDS containing Calibration values for the specified
+        ''' <param name="pCalibrationValuesDS">Typed Dataset TestCalibratorValuesDS containing Calibration values for the specified
         '''                                    Test/SampleType and Experimental Calibrator</param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
-        ''' Created by:  SA 27/09/2012
-        ''' Modified by: IT 29/05/2015 - BA-2563
+        ''' Created by: SA 27/09/2012
         ''' </remarks>
         Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pHistTestID As Integer, ByVal pSampleType As String, ByVal pTestVersionNum As Integer, _
-                               ByVal pHistCalibratorID As Integer, ByVal pCalibratorsDS As CalibratorsDS) As GlobalDataTO
+                               ByVal pHistCalibratorID As Integer, ByVal pCalibrationValuesDS As TestCalibratorValuesDS) As GlobalDataTO
             Dim resultData As New GlobalDataTO
 
             Try
@@ -37,7 +36,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     Using dbCmd As New SqlClient.SqlCommand
                         dbCmd.Connection = pDBConnection
 
-                        For Each row As CalibratorsDS.tparTestCalibratorValuesRow In pCalibratorsDS.tparTestCalibratorValues
+                        For Each row As TestCalibratorValuesDS.tparTestCalibratorValuesRow In pCalibrationValuesDS.tparTestCalibratorValues
                             cmdText = " INSERT INTO thisTestCalibratorsValues (HistTestID, SampleType, TestVersionNumber, HistCalibratorID, " & vbCrLf & _
                                                                              " CalibratorNum, TheoreticalConcentration, KitConcentrationRelation) " & vbCrLf & _
                                       " VALUES (" & pHistTestID.ToString & ", '" & pSampleType & "', " & pTestVersionNum.ToString & ", " & vbCrLf & _

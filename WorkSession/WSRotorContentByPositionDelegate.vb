@@ -2665,8 +2665,7 @@ Namespace Biosystems.Ax00.BL
         '''                              NOT IN USE Rotor Position</param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
-        ''' Created by:  SA 07/01/2015 - BA-1999 (Code extracted from function GetPositionInfo)
-        ''' Modified by: IT 29/05/2015 - BA-2563
+        ''' Created by: SA 07/01/2015 - BA-1999 (Code extracted from function GetPositionInfo)
         ''' </remarks>
         Private Function GetNOT_INUSEPositionInfo(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pPositionRow As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow, _
                                                   ByRef pCellPosInfoDS As CellPositionInformationDS) As GlobalDataTO
@@ -2815,13 +2814,11 @@ Namespace Biosystems.Ax00.BL
                                         pCellPosInfoDS.PositionInformation(0).EndEdit()
 
                                         Dim myCalibratorDelegate As New CalibratorsDelegate
-                                        Dim myCalibratorDataTo As New CalibratorsDS 'IT 29/05/2015 - BA-2563
-
-                                        resultData = myCalibratorDelegate.GetCalibratorData(pDBConnection, resultDataDS.tparVirtualRotorPosititions(0).CalibratorID, myCalibratorDataTo)
+                                        resultData = myCalibratorDelegate.GetCalibratorData(pDBConnection, resultDataDS.tparVirtualRotorPosititions(0).CalibratorID)
 
                                         If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                            'Dim myCalibratorDataTo As CalibratorsDS = DirectCast(resultData.SetDatos, CalibratorsDS)
-                                            myCalibratorDataTo = DirectCast(resultData.SetDatos, CalibratorsDS) 'IT 29/05/2015 - BA-2563
+                                            Dim myCalibratorDataTo As CalibratorsDS = DirectCast(resultData.SetDatos, CalibratorsDS)
+
                                             myCellSamplesPosInfoRow = pCellPosInfoDS.Samples.NewSamplesRow()
                                             myCellSamplesPosInfoRow.MultiItemNumber = resultDataDS.tparVirtualRotorPosititions(0).MultiItemNumber
                                             myCellSamplesPosInfoRow.LotNumber = myCalibratorDataTo.tparCalibrators(0).LotNumber
@@ -3040,7 +3037,6 @@ Namespace Biosystems.Ax00.BL
         ''' Created by:  JV 14/11/2013 - BT #1382 
         ''' Modified by: JV 28/11/2013 - BT #1412 ==> Update with the changes done in 'GetPositionInfo'. Also establish a relation (not existent) between Reagents 
         '''                                           table and PositionInformation (CellNumber) in CellPositionInformationDS
-        '''              IT 29/05/2015 - BA-2563
         ''' </remarks>
         Public Function GetPositionInfoForReport(ByVal pDBConnection As SqlClient.SqlConnection, _
                                         ByVal pRotorPositionDS As WSRotorContentByPositionDS) As GlobalDataTO
@@ -3438,12 +3434,11 @@ Namespace Biosystems.Ax00.BL
                                                             myCellPosInfoDS.PositionInformation(0).EndEdit()
 
                                                             Dim myCalibratorDelegate As New CalibratorsDelegate
-                                                            Dim myCalibratorDataTo As New CalibratorsDS 'IT 29/05/2015 - BA-2563
-                                                            resultData = myCalibratorDelegate.GetCalibratorData(pDBConnection, resultDataDS.tparVirtualRotorPosititions(0).CalibratorID, myCalibratorDataTo)
+                                                            resultData = myCalibratorDelegate.GetCalibratorData(pDBConnection, resultDataDS.tparVirtualRotorPosititions(0).CalibratorID)
 
                                                             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                                                'Dim myCalibratorDataTo As CalibratorsDS = DirectCast(resultData.SetDatos, CalibratorsDS)
-                                                                myCalibratorDataTo = DirectCast(resultData.SetDatos, CalibratorsDS) 'IT 29/05/2015 - BA-2563
+                                                                Dim myCalibratorDataTo As CalibratorsDS = DirectCast(resultData.SetDatos, CalibratorsDS)
+
                                                                 myCellSamplesPosInfoRow = myCellPosInfoDS.Samples.NewSamplesRow()
                                                                 myCellSamplesPosInfoRow.MultiItemNumber = resultDataDS.tparVirtualRotorPosititions(0).MultiItemNumber
                                                                 myCellSamplesPosInfoRow.LotNumber = myCalibratorDataTo.tparCalibrators(0).LotNumber
