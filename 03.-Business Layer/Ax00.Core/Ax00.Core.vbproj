@@ -98,6 +98,7 @@
     <Compile Include="Entities\Enums\AnalyzerModelEnum.vb" />
     <Compile Include="Entities\BA200AnalyzerEntity.vb" />
     <Compile Include="Entities\BA400AnalyzerEntity.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\Context\ActionRequiredForDispensing.vb" />
     <Compile Include="Entities\WorkSession\Contaminations\Specifications\BA400ContaminationsSpecification.vb" />
     <Compile Include="Entities\WorkSession\Contaminations\Specifications\BA200ContaminationsSpecification.vb" />
     <Compile Include="Entities\WorkSession\Contaminations\Specifications\Ax00ContaminationsSpecification.vb" />

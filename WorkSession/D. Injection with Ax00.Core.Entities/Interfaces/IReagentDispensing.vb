@@ -40,7 +40,7 @@ Namespace Biosystems.Ax00.Core.Entities.Worksession.Contaminations.Interfaces
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Property DelayCyclesForDispensing As Integer
+        ReadOnly Property DelayCyclesForDispensing As Integer
 
         Sub FillDispense(analyzerContaminationsSpecification As IAnalyzerContaminationsSpecification, ByVal row As ExecutionsDS.twksWSExecutionsRow)
 

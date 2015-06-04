@@ -29,7 +29,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
 
 #Region "Public members"
 
-        Public Overridable Function RequiredActionForDispensing(dispensing As IDispensing, scope As Integer, reagentNumber As Integer) As IContaminationsAction Implements IDispensing.RequiredActionForDispensing
+        Public Overridable Function RequiredActionForDispensing(targetDispensing As IDispensing, stepIndex As Integer, dispensingNumber As Integer) As IContaminationsAction Implements IDispensing.RequiredActionForDispensing
 
             Select Case KindOfLiquid
                 Case IDispensing.KindOfDispensedLiquid.Dummy
@@ -37,10 +37,10 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
                     Return New RequiredAction With {.Action = IContaminationsAction.RequiredAction.GoAhead}
 
                 Case IDispensing.KindOfDispensedLiquid.Ise, IDispensing.KindOfDispensedLiquid.Reagent
-                    Return ReagentRequiresWashingOrSkip(scope, dispensing, reagentNumber)
+                    Return ReagentRequiresWashingOrSkip(stepIndex, targetDispensing, dispensingNumber)
 
                 Case IDispensing.KindOfDispensedLiquid.Washing
-                    If reagentNumber = 1 Then
+                    If dispensingNumber = 1 Then
                         Dim contaAction = New RequiredAction
                         contaAction.Action = IContaminationsAction.RequiredAction.RemoveRequiredWashing
                         Dim a = WashingID
@@ -105,7 +105,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
                         R1ReagentID = result.ReagentID
                         SampleClass = result.SampleClass
                         Dim predilutionMode = If(result.IsPredilutionModeNull, "", result.PredilutionMode)
-                        DelayCyclesForDispensing = If(predilutionMode = "INST", WSExecutionCreator.Instance.ContaminationsSpecification.AdditionalPredilutionSteps - 1, 0)
+                        _DelayCyclesForDispensing = If(predilutionMode = "INST", WSExecutionCreator.Instance.ContaminationsSpecification.AdditionalPredilutionSteps - 1, 0)
                     End If
                 End If
             End Set
@@ -113,7 +113,11 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
 
         Public Property KindOfLiquid As IDispensing.KindOfDispensedLiquid Implements IDispensing.KindOfLiquid
 
-        Public Property DelayCyclesForDispensing As Integer Implements IDispensing.DelayCyclesForDispensing
+        Public ReadOnly Property DelayCyclesForDispensing As Integer Implements IDispensing.DelayCyclesForDispensing
+            Get
+                Return _delayCyclesForDispensing
+            End Get
+        End Property
 
         Public Property SampleClass As String Implements IDispensing.SampleClass
 
@@ -125,7 +129,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
             Dim pTestMode = tparTestSamplesDAO.GetPredilutionModeForTest(R1ReagentID, row.SampleType)
 
             If String.CompareOrdinal(pTestMode, "INST") = 0 AndAlso String.CompareOrdinal(SampleClass, "PATIENT") = 0 Then
-                DelayCyclesForDispensing = analyzerContaminationsSpecification.AdditionalPredilutionSteps - 1
+                _delayCyclesForDispensing = analyzerContaminationsSpecification.AdditionalPredilutionSteps - 1
                 'Debug.WriteLine("ExecutionID:" & ExecutionID & " SampleClass:" & SampleClass & " OrderTestID:" & OrderTestID & " R1Reagent:" & R1ReagentID & " is a predilution.")
 
             End If
@@ -229,6 +233,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
         Private _r1ReagentId As Integer
         Private _analysisMode As Integer
         Private _contamines As Dictionary(Of Integer, IDispensingContaminationDescription)
+        Private _delayCyclesForDispensing As Integer
 #End Region
 
 #Region "Private memebers"

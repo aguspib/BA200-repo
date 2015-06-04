@@ -762,7 +762,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         Dim execDel As New ExecutionsDelegate
                         'AG 11/07/2012
                         'resultData = execDel.GetNextPendingISEExecution(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute)
-                        resultData = execDel.GetNextPendingISEExecutionNEW(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute)
+                        resultData = execDel.GetNextPendingISEExecution(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute)
                     Else
                         resultData.SetDatos = New ExecutionsDS
                     End If
@@ -1803,7 +1803,7 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim contaminNumber As Integer = 0
 
             '2.1) Calculate contaminations number with current executions sort
-            contaminNumber = 1 + ExecutionsDelegate.GetContaminationNumber(pContaminationsDS, toSendList, pHighContaminationPersitance)
+            contaminNumber = 1 + WSCreator.GetContaminationNumber(False, New List(Of Integer)(), toSendList) ' ExecutionsDelegate.GetContaminationNumber(pContaminationsDS, toSendList, pHighContaminationPersitance)
 
             'If contaminNumber > 0 Then '(5)
             Dim myReagentsIDList As New List(Of Integer) 'List of previous reagents sent before the current previousElementLastReagentID, 

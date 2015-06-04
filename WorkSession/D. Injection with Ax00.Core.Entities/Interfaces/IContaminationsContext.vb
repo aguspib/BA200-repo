@@ -5,8 +5,8 @@ Imports Biosystems.Ax00.CC
 
 Namespace Biosystems.Ax00.Core.Entities.Worksession.Interfaces
     Public Interface IContaminationsContext
-        Function ActionRequiredForDispensing(dispensing As IDispensing) As ActionRequiredForDispensing
-        Function ActionRequiredForDispensing(Execution As ExecutionsDS.twksWSExecutionsRow) As ActionRequiredForDispensing
+        Function ActionRequiredForDispensing(dispensing As IDispensing) As IActionRequiredForDispensing
+        Function ActionRequiredForDispensing(Execution As ExecutionsDS.twksWSExecutionsRow) As IActionRequiredForDispensing
         Sub FillContentsFromAnalyzer(rawAnalyzerFrame As String)
 
         ''' <summary>
@@ -21,8 +21,8 @@ Namespace Biosystems.Ax00.Core.Entities.Worksession.Interfaces
         Property Steps As RangedCollection(Of IContextStep)
     End Interface
 
-    Public Class ActionRequiredForDispensing
-        Public Property Action As IContaminationsAction.RequiredAction
-        Public Property InvolvedWashes As New List(Of IWashingDescription)
-    End Class
+    Public Interface IActionRequiredForDispensing
+        Property Action As IContaminationsAction.RequiredAction
+        Property InvolvedWashes As List(Of IWashingDescription)
+    End Interface
 End Namespace

@@ -64,6 +64,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
         End Sub
 
         Private Shared _singletonInstance As WSExecutionCreator = Nothing
+        Private Shared ReadOnly myObject As Object = New Object()
         ''' <summary>
         ''' Property which contains the only instance for this class
         ''' </summary>
@@ -72,12 +73,12 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
         ''' <remarks></remarks>
         Public Shared ReadOnly Property Instance() As WSExecutionCreator
             Get
-                Static myObject As Object = New Object()
 
                 If _singletonInstance Is Nothing Then
                     SyncLock myObject
                         If _singletonInstance Is Nothing Then
                             _singletonInstance = New WSExecutionCreator()
+                            Threading.Thread.MemoryBarrier()
                             InjectDependencies()    'done here to prevent threading concurrency issues
                         End If
                     End SyncLock

@@ -30,7 +30,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
 
         End Sub
 
-        Public Function ActionRequiredForDispensing(dispensing As IDispensing) As ActionRequiredForDispensing Implements IContaminationsContext.ActionRequiredForDispensing
+        Public Function ActionRequiredForDispensing(dispensing As IDispensing) As IActionRequiredForDispensing Implements IContaminationsContext.ActionRequiredForDispensing
 
             Dim lookUpFilter As New HashSet(Of String)
             Dim results As New ActionRequiredForDispensing 'New List(Of IWashingDescription)
@@ -70,59 +70,12 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
 
         End Function
 
-        Private Sub RemoveWashingFromResult(responseFromDispensing As IContaminationsAction, lookUpFilter As HashSet(Of String), results As ActionRequiredForDispensing)
-            If responseFromDispensing.Action <> IContaminationsAction.RequiredAction.RemoveRequiredWashing Then Return
-
-            ' ReSharper disable once InconsistentNaming
-            Dim washingSolutionCode = responseFromDispensing.InvolvedWash.WashingSolutionCode
-            If lookUpFilter.Contains(washingSolutionCode) Then
-                Debug.WriteLine("Found and removed washing: <<" & washingSolutionCode & ">>")
-                lookUpFilter.Remove(responseFromDispensing.InvolvedWash.WashingSolutionCode)
-                Dim washingToRemove = results.InvolvedWashes.FirstOrDefault(Function(wash) wash.WashingSolutionCode = washingSolutionCode)
-                If washingToRemove IsNot Nothing AndAlso washingToRemove.WashingSolutionCode <> String.Empty Then
-                    results.InvolvedWashes.Remove(washingToRemove)
-                End If
-                'Else
-                '    Debug.WriteLine("ERROR washing not found: <<" & washingSolutionCode & ">>")
-                '    Debug.WriteLine("")
-                '    Debug.WriteLine(Me)
-                '    Debug.WriteLine("")
-            End If
-        End Sub
-
         Public Sub FillContentsFromAnalyzer(instructionParameters As LAx00Frame)
             AnalyzerFrame = instructionParameters
             FillSteps()
             Debug.WriteLine(Me)
             'ShowDebugInfo(rawAnalyzerFrame)
 
-        End Sub
-
-        Public Sub FillContentsFromAnalyzer(rawAnalyzerFrame As String) Implements IContaminationsContext.FillContentsFromAnalyzer
-            AnalyzerFrame = New LAx00Frame()
-            AnalyzerFrame.ParseRawData(rawAnalyzerFrame)
-            FillSteps()
-            ShowDebugInfo(rawAnalyzerFrame)
-        End Sub
-        Private Sub ShowDebugInfo(rawAnalyzerFrame As String)
-#If config = "Debug" Then
-            Debug.WriteLine(Me)
-            Static debugF As Form, tb As TextBox = Nothing
-            If debugF Is Nothing Then
-                debugF = New Form()
-                tb = New TextBox
-                tb.Multiline = True
-                tb.Parent = debugF
-                tb.Dock = DockStyle.Fill
-                debugF.Show()
-            End If
-            If tb.InvokeRequired Then tb.BeginInvoke(
-                Sub()
-                    tb.AppendText(rawAnalyzerFrame)
-                    tb.AppendText(Me.ToString)
-                    tb.AppendText(vbCr)
-                End Sub)
-#End If
         End Sub
 
         ''' <summary>
@@ -186,8 +139,101 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
 
         End Sub
 
+
+        Public Function ActionRequiredForAGivenDispensing(ReagentID As ExecutionsDS.twksWSExecutionsRow) As IActionRequiredForDispensing Implements IContaminationsContext.ActionRequiredForDispensing
+            Dim dispense = ContaminationsSpecifications.CreateDispensing() 'As New Ax00Dispensing()
+            dispense.FillDispense(ContaminationsSpecifications, ReagentID)
+            Return ActionRequiredForDispensing(dispense)
+
+        End Function
+
+        Public Property Steps As RangedCollection(Of IContextStep) Implements IContaminationsContext.Steps
+
+        Public Overrides Function ToString() As String
+            Dim SB As New Text.StringBuilder(1024)
+            For curDispense As Integer = 1 To ContaminationsSpecifications.DispensesPerStep
+                SB.Append("|"c)
+                For curStep = Steps.Range.Minimum To Steps.Range.Maximum
+                    If Steps(curStep) Is Nothing Then
+                        SB.Append("  ?   ")
+                    ElseIf Steps(curStep)(curDispense) Is Nothing Then
+                        SB.Append("  ?   ")
+                    Else
+                        Dim dispense = Steps(curStep)(curDispense)
+                        Select Case dispense.KindOfLiquid
+                            Case IDispensing.KindOfDispensedLiquid.Washing
+                                SB.Append("W" & Format(dispense.WashingID, "000") & " "c)
+                            Case IDispensing.KindOfDispensedLiquid.Reagent
+                                SB.Append(" " & Format(dispense.R1ReagentID, "000") & " "c)
+                            Case IDispensing.KindOfDispensedLiquid.Dummy
+                                SB.Append("Dumy")
+                            Case Else
+                                SB.Append(" ?? ")
+                        End Select
+                        SB.Append("/" & Format(dispense.ExecutionID, "00"))
+                    End If
+                    SB.Append("|"c)
+                Next
+                SB.Append("     " & vbCr)
+            Next
+            SB.Append(vbCr)
+            Return SB.ToString
+
+
+        End Function
+
+
 #Region "Private elements"
         Dim AnalyzerFrame As LAx00Frame
+
+
+        Public Sub FillContentsFromAnalyzer(rawAnalyzerFrame As String) Implements IContaminationsContext.FillContentsFromAnalyzer
+            AnalyzerFrame = New LAx00Frame()
+            AnalyzerFrame.ParseRawData(rawAnalyzerFrame)
+            FillSteps()
+            ShowDebugInfo(rawAnalyzerFrame)
+        End Sub
+        Private Sub ShowDebugInfo(rawAnalyzerFrame As String)
+#If config = "Debug" Then
+            Debug.WriteLine(Me)
+            Static debugF As Form, tb As TextBox = Nothing
+            If debugF Is Nothing Then
+                debugF = New Form()
+                tb = New TextBox
+                tb.Multiline = True
+                tb.Parent = debugF
+                tb.Dock = DockStyle.Fill
+                debugF.Show()
+            End If
+            If tb.InvokeRequired Then tb.BeginInvoke(
+                Sub()
+                    tb.AppendText(rawAnalyzerFrame)
+                    tb.AppendText(Me.ToString)
+                    tb.AppendText(vbCr)
+                End Sub)
+#End If
+        End Sub
+
+
+        Private Sub RemoveWashingFromResult(responseFromDispensing As IContaminationsAction, lookUpFilter As HashSet(Of String), results As ActionRequiredForDispensing)
+            If responseFromDispensing.Action <> IContaminationsAction.RequiredAction.RemoveRequiredWashing Then Return
+
+            ' ReSharper disable once InconsistentNaming
+            Dim washingSolutionCode = responseFromDispensing.InvolvedWash.WashingSolutionCode
+            If lookUpFilter.Contains(washingSolutionCode) Then
+                Debug.WriteLine("Found and removed washing: <<" & washingSolutionCode & ">>")
+                lookUpFilter.Remove(responseFromDispensing.InvolvedWash.WashingSolutionCode)
+                Dim washingToRemove = results.InvolvedWashes.FirstOrDefault(Function(wash) wash.WashingSolutionCode = washingSolutionCode)
+                If washingToRemove IsNot Nothing AndAlso washingToRemove.WashingSolutionCode <> String.Empty Then
+                    results.InvolvedWashes.Remove(washingToRemove)
+                End If
+                'Else
+                '    Debug.WriteLine("ERROR washing not found: <<" & washingSolutionCode & ">>")
+                '    Debug.WriteLine("")
+                '    Debug.WriteLine(Me)
+                '    Debug.WriteLine("")
+            End If
+        End Sub
 
         Private Sub FillSteps()
 
@@ -233,46 +279,6 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
         End Sub
 
 #End Region
-
-        Public Function ActionRequiredForAGivenDispensing(ReagentID As ExecutionsDS.twksWSExecutionsRow) As ActionRequiredForDispensing Implements IContaminationsContext.ActionRequiredForDispensing
-            Dim dispense = ContaminationsSpecifications.CreateDispensing() 'As New Ax00Dispensing()
-            dispense.FillDispense(ContaminationsSpecifications, ReagentID)
-            Return ActionRequiredForDispensing(dispense)
-
-        End Function
-
-        Public Property Steps As RangedCollection(Of IContextStep) Implements IContaminationsContext.Steps
-
-        Public Overrides Function ToString() As String
-            Dim SB As New Text.StringBuilder(1024)
-            For curDispense As Integer = 1 To ContaminationsSpecifications.DispensesPerStep
-                SB.Append("|"c)
-                For curStep = Steps.Range.Minimum To Steps.Range.Maximum
-                    If Steps(curStep) Is Nothing Then
-                        SB.Append("  ?   ")
-                    ElseIf Steps(curStep)(curDispense) Is Nothing Then
-                        SB.Append("  ?   ")
-                    Else
-                        Dim dispense = Steps(curStep)(curDispense)
-                        Select Case dispense.KindOfLiquid
-                            Case IDispensing.KindOfDispensedLiquid.Washing
-                                SB.Append("W" & Format(dispense.WashingID, "000") & " "c)
-                            Case IDispensing.KindOfDispensedLiquid.Reagent
-                                SB.Append(" " & Format(dispense.R1ReagentID, "000") & " "c)
-                            Case IDispensing.KindOfDispensedLiquid.Dummy
-                                SB.Append("Dumy")
-                            Case Else
-                                SB.Append(" ?? ")
-                        End Select
-                        SB.Append("/" & Format(dispense.ExecutionID, "00"))
-                    End If
-                    SB.Append("|"c)
-                Next
-                SB.Append("     " & vbCr)
-            Next
-            SB.Append(vbCr)
-            Return SB.ToString
-        End Function
 
     End Class
 
