@@ -95,7 +95,6 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
             WSDependencyInjector.ContaminationsManagerConstructor = AddressOf ContaminationManager.InjectableConstructor
         End Sub
 
-
         ''' <summary>
         ''' Returns the current active Analyzer ID
         ''' </summary>

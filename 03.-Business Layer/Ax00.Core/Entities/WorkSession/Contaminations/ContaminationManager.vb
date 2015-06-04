@@ -29,14 +29,14 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
         ''' <param name="makeCalculationsInRunning"></param>
         ''' <param name="currentCont"></param>
         ''' <param name="contaminsDS"></param>
-        ''' <param name="OrderTests"></param>
+        ''' <param name="orderTests"></param>
         ''' <param name="pPreviousReagentID"></param>
         ''' <param name="pPreviousReagentIDMaxReplicates"></param>
         ''' <remarks></remarks>
         Public Sub New(ByVal makeCalculationsInRunning As Boolean,
                        ByVal currentCont As Integer,
                        ByVal contaminsDS As ContaminationsDS,
-                       ByVal OrderTests As List(Of ExecutionsDS.twksWSExecutionsRow),
+                       ByVal orderTests As List(Of ExecutionsDS.twksWSExecutionsRow),
                        Optional ByVal pPreviousReagentID As List(Of Integer) = Nothing,
                        Optional ByVal pPreviousReagentIDMaxReplicates As List(Of Integer) = Nothing)
             Me.MakeCalculationsInRunning = makeCalculationsInRunning
@@ -45,7 +45,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             previousReagentID = pPreviousReagentID
             previousReagentIDMaxReplicates = pPreviousReagentIDMaxReplicates
             bestContaminationNumber = Integer.MaxValue
-            bestResult = OrderTests.ToList()
+            bestResult = orderTests.ToList()
         End Sub
 
         ''' <summary>
@@ -54,7 +54,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
         ''' <param name="makeCalculationsInRunning"></param>
         ''' <param name="currentCont"></param>
         ''' <param name="contaminsDS"></param>
-        ''' <param name="OrderTests"></param>
+        ''' <param name="orderTests"></param>
         ''' <param name="pPreviousReagentID"></param>
         ''' <param name="pPreviousReagentIDMaxReplicates"></param>
         ''' <returns></returns>
@@ -62,11 +62,11 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
         Public Shared Function InjectableConstructor(ByVal makeCalculationsInRunning As Boolean,
                        ByVal currentCont As Integer,
                        ByVal contaminsDS As ContaminationsDS,
-                       ByVal OrderTests As List(Of ExecutionsDS.twksWSExecutionsRow),
+                       ByVal orderTests As List(Of ExecutionsDS.twksWSExecutionsRow),
                        Optional ByVal pPreviousReagentID As List(Of Integer) = Nothing,
                        Optional ByVal pPreviousReagentIDMaxReplicates As List(Of Integer) = Nothing) As IContaminationManager
 
-            Dim aux = New ContaminationManager(makeCalculationsInRunning, currentCont, contaminsDS, OrderTests, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
+            Dim aux = New ContaminationManager(makeCalculationsInRunning, currentCont, contaminsDS, orderTests, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
             Return aux
         End Function
 
@@ -75,14 +75,14 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
         ''' Method that apply the optimization algorithm defined on the system, in order to avoid as much number of contaminations as possible
         ''' </summary>
         ''' <param name="myOptimizer">OptimizationPolicyApplier wich defines the optimization algorithm</param>
-        ''' <param name="OrderTests">OrderTests to be sorted</param>
+        ''' <param name="orderTests">OrderTests to be sorted</param>
         ''' <remarks></remarks>
-        Public Sub ApplyOptimizations(ByVal myOptimizer As IOptimizationPolicyApplier, ByVal OrderTests As List(Of ExecutionsDS.twksWSExecutionsRow))
+        Private Sub InternalApplyOptimizations(ByVal myOptimizer As IOptimizationPolicyApplier, ByVal orderTests As List(Of ExecutionsDS.twksWSExecutionsRow))
             myOptimizer.calculateInRunning = MakeCalculationsInRunning
 
             Dim highContaminationPersistance = WSExecutionCreator.Instance.ContaminationsSpecification.HighContaminationPersistence
             If currentContaminationNumber > 0 Then
-                currentResult = OrderTests.ToList()
+                currentResult = orderTests.ToList()
                 currentContaminationNumber = myOptimizer.ExecuteOptimization(ContDS, currentResult, highContaminationPersistance, previousReagentID, previousReagentIDMaxReplicates)
                 If currentContaminationNumber < bestContaminationNumber Then
                     bestContaminationNumber = currentContaminationNumber
@@ -91,8 +91,8 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
             End If
         End Sub
 
-        Public Sub ApplyOptimizations(pCon As SqlConnection, OrderTests As List(Of ExecutionsDS.twksWSExecutionsRow)) Implements IContaminationManager.ApplyOptimizations
-            ApplyOptimizations(New OptimizationBacktrackingApplier(pCon), OrderTests)
+        Public Sub ApplyOptimizations(pCon As SqlConnection, orderTests As List(Of ExecutionsDS.twksWSExecutionsRow)) Implements IContaminationManager.ApplyOptimizations
+            InternalApplyOptimizations(New OptimizationBacktrackingApplier(pCon), orderTests)
         End Sub
     End Class
 End Namespace

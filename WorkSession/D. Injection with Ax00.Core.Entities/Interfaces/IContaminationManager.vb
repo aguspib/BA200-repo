@@ -12,8 +12,8 @@ Namespace Biosystems.Ax00.Core.Entities.Worksession.Contaminations
         ''' Method that apply the optimization algorithm defined on the system, in order to avoid as much number of contaminations as possible
         ''' </summary>
         ''' <param name="pCon">SQL connection if available</param>
-        ''' <param name="OrderTests">OrderTests to be sorted</param>
+        ''' <param name="orderTests">OrderTests to be sorted</param>
         ''' <remarks></remarks>
-        Sub ApplyOptimizations(pCon As SqlConnection, ByVal OrderTests As List(Of ExecutionsDS.twksWSExecutionsRow))
+        Sub ApplyOptimizations(pCon As SqlConnection, ByVal orderTests As List(Of ExecutionsDS.twksWSExecutionsRow))
     End Interface
 End Namespace

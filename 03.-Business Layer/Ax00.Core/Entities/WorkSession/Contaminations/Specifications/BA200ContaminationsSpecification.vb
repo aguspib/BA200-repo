@@ -17,13 +17,11 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
 
         Sub New(analyzer As IAnalyzerManager)
             MyBase.New(analyzer)
-
         End Sub
 
         Public Overrides Function CreateDispensing() As IDispensing
             Return New BA200Dispensing
         End Function
-
 
         Public Overrides Function GetAnalysisModeForReagent(reagentID As Integer) As AnalysisMode
 
@@ -53,7 +51,6 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
 
 
         End Function
-
 
         Private Function GetAllReagents() As TestReagentsDS
 
