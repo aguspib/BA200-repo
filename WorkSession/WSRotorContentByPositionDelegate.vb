@@ -6980,6 +6980,58 @@ Namespace Biosystems.Ax00.BL
             Return myGlobalDataTO
         End Function
 
+
+        ''' <summary>
+        ''' Count how many cells in the specified Analyzer Rotor have the informed Status
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
+        ''' <param name="pWorkSessionID">WorkSession Identifier</param>
+        ''' <param name="pRotorType">Type of Analyzer Rotor</param>
+        ''' <param name="pStatus">Cell Status to search</param>
+        ''' <param name="pRingNumber">Ring Number. Optional parameter</param>
+        ''' <returns>GlobalDataTO containing an integer value with the number of cells having the informed Status</returns>
+        ''' <remarks>
+        ''' Created by:  TR 28/01/2010 - TESTED: OK
+        ''' Modified by: TR 01/02/2010 - Added new optional parameter pRingNumber
+        ''' </remarks>
+        Private Function CountMaxCellByRotor(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+                                               ByVal pRotorType As String, ByVal pRingNumber As Integer) As Integer
+            Dim myGlobalDataTO As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim MaxCell As Integer = -1
+            Try
+                myGlobalDataTO = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myRotorContentByPositionDAO As New twksWSRotorContentByPositionDAO()
+
+                        Dim rotorConfig As New tfmwAnalyzerModelRotorsConfigDAO
+                        myGlobalDataTO = rotorConfig.GetAnalyzerRotorsRingConfiguration(dbConnection, pAnalyzerID, pRotorType, pRingNumber)
+
+                        If Not myGlobalDataTO.HasError Then
+                            'Get the last cell number
+                            MaxCell = CType(myGlobalDataTO.SetDatos, AnalyzerModelRotorsConfigDS).tfmwAnalyzerModelRotorsConfig(0).LastCellNumber
+                            myGlobalDataTO.SetDatos = MaxCell
+                        End If
+
+                    End If
+                End If
+            Catch ex As Exception
+                myGlobalDataTO = New GlobalDataTO()
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
+
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.CountMaxCellByRotor", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return MaxCell
+        End Function
+
         ''' <summary>
         ''' Search the next free position to place a Control, a Calibrator or a Patient Sample (full or diluted) in the informed
         ''' Analyzer Rotor, but the free position should be the nearest free position to an informed Reference Position (Ring and
@@ -7024,12 +7076,23 @@ Namespace Biosystems.Ax00.BL
                                 Dim ringNumber As Integer = pRefRingNumber
                                 Dim myRotorContentByPositionDAO As New twksWSRotorContentByPositionDAO()
 
+                                'Dim MaxCellRotor As Integer = CType(CountMaxCellByRotor(dbConnection, pAnalyzerID, pRotorType, pMaxRotorRingNumber), Integer)
+
                                 Dim freeCell As Boolean = False
                                 Dim notFreePosition As Boolean = False
                                 While (Not freeCell AndAlso Not notFreePosition)
+
+                                    'If pRefCellNumber <> MaxCellRotor Then
+
                                     'Search minimum free cell in the informed Ring nearest to the informed cell
                                     myGlobalDataTO = myRotorContentByPositionDAO.GetMinFreeCellByRing(dbConnection, pAnalyzerID, pRotorType, _
                                                                                                       pWorkSessionID, ringNumber, pRefCellNumber)
+                                    'Else
+                                    ''Search minimum free cell in the informed Ring nearest to the finish.
+                                    'myGlobalDataTO = myRotorContentByPositionDAO.GetMinFreeCellByRing(dbConnection, pAnalyzerID, pRotorType, _
+                                    '                                                                  pWorkSessionID, ringNumber)
+                                    'End If
+
                                     If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                                         cellNumber = 0
                                         If (Not String.IsNullOrEmpty(myGlobalDataTO.SetDatos.ToString)) Then cellNumber = CType(myGlobalDataTO.SetDatos, Integer)
@@ -7047,8 +7110,18 @@ Namespace Biosystems.Ax00.BL
                                                 'For the new ring there is not a reference cell number
                                                 pRefCellNumber = 0
                                             Else
-                                                'All Rings have been reviewed... there are not free cells in it
-                                                notFreePosition = True
+                                                'Search minimum free cell in the informed Ring nearest to the finish.
+                                                myGlobalDataTO = myRotorContentByPositionDAO.GetMinFreeCellByRing(dbConnection, pAnalyzerID, pRotorType, _
+                                                                                                                  pWorkSessionID, ringNumber)
+
+                                                If (Not String.IsNullOrEmpty(myGlobalDataTO.SetDatos.ToString)) Then cellNumber = CType(myGlobalDataTO.SetDatos, Integer)
+                                                If (cellNumber > 0) Then
+                                                    'A free cell was found in the current ring...
+                                                    freeCell = True
+                                                Else
+                                                    'All Rings have been reviewed... there are not free cells in it
+                                                    notFreePosition = True
+                                                End If
                                             End If
                                         End If
                                     Else
