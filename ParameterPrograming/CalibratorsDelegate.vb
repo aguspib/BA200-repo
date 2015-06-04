@@ -238,10 +238,9 @@ Namespace Biosystems.Ax00.BL
         ''' <returns>GlobalDataTO containing a typed DataSet CalibratorDS with data of all Calibrators</returns>
         ''' <remarks>
         ''' Created by:  TR 03/06/2010
-        ''' Modified by: SA 09/05/2012 - Changed the function template
-        '''              IT 29/05/2015 - BA-2563 
+        ''' Modified by: SA 09/05/2012 - Changed the function template 
         ''' </remarks>
-        Public Function GetAllCalibrators(ByVal pDBConnection As SqlClient.SqlConnection, calibratorsDs As CalibratorsDS) As GlobalDataTO
+        Public Function GetAllCalibrators(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -251,7 +250,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim calibratorsDataDAO As New tparCalibratorsDAO
-                        myGlobalDataTO = calibratorsDataDAO.ReadAll(dbConnection, calibratorsDs)
+                        myGlobalDataTO = calibratorsDataDAO.ReadAll(dbConnection)
                     End If
                 End If
             Catch ex As Exception
@@ -275,10 +274,9 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pCalibratorID">Calibrator Identifier</param>
         ''' <returns>GlobalDataTO containing a typed DataSet CalibratorDS with data of the informed Calibrator</returns>
         ''' <remarks>
-        ''' Created by:   DL 21/01/2010
-        ''' Modified by: IT 29/05/2015 - BA-2563
+        ''' Created by:  DL 21/01/2010
         ''' </remarks>
-        Public Function GetCalibratorData(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalibratorID As Integer, calibratorsDs As CalibratorsDS) As GlobalDataTO
+        Public Function GetCalibratorData(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalibratorID As Integer) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -288,7 +286,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim calibratorsDataDAO As New tparCalibratorsDAO
-                        resultData = calibratorsDataDAO.Read(dbConnection, pCalibratorID, calibratorsDs)
+                        resultData = calibratorsDataDAO.Read(dbConnection, pCalibratorID)
                     End If
                 End If
             Catch ex As Exception
@@ -312,10 +310,9 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="AppLang">Application Language</param>
         ''' <param name="SelectedCalibrators">List of selected Calibrators IDs</param>
         ''' <remarks>
-        ''' Created by:  RH 16/12/2011
-        ''' Modified by: IT 29/05/2015 - BA-2563
+        ''' Created by: RH 16/12/2011
         ''' </remarks>
-        Public Function GetCalibratorsForReport(ByVal pDBConnection As SqlClient.SqlConnection, ByVal AppLang As String, calibratorsDs As CalibratorsDS, _
+        Public Function GetCalibratorsForReport(ByVal pDBConnection As SqlClient.SqlConnection, ByVal AppLang As String, _
                                                 Optional ByVal SelectedCalibrators As List(Of Integer) = Nothing) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -326,7 +323,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myCalibratorsDAO As New tparCalibratorsDAO
-                        resultData = myCalibratorsDAO.GetCalibratorsForReport(dbConnection, AppLang, calibratorsDs, SelectedCalibrators)
+                        resultData = myCalibratorsDAO.GetCalibratorsForReport(dbConnection, AppLang, SelectedCalibrators)
                     End If
                 End If
             Catch ex As Exception
@@ -350,10 +347,9 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pCalibratorName">Calibrator Name</param>
         ''' <returns>GlobalDataTO containing a typed DataSet CalibratorDS with data of the informed Calibrator</returns>
         ''' <remarks>
-        ''' Created by:  TR 24/03/2011
-        ''' Modified by: IT 29/05/2015 - BA-2563
+        ''' Created by: TR 24/03/2011
         ''' </remarks>
-        Public Function ReadByCalibratorName(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalibratorName As String, calibratorsDs As CalibratorsDS) As GlobalDataTO
+        Public Function ReadByCalibratorName(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalibratorName As String) As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
             Try
@@ -362,7 +358,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim calibratorsDataDAO As New tparCalibratorsDAO
-                        myGlobalDataTO = calibratorsDataDAO.ReadByCalibratorName(dbConnection, pCalibratorName, calibratorsDs)
+                        myGlobalDataTO = calibratorsDataDAO.ReadByCalibratorName(dbConnection, pCalibratorName)
                     End If
                 End If
             Catch ex As Exception
@@ -383,7 +379,11 @@ Namespace Biosystems.Ax00.BL
         ''' Add/update/delete Calibrators with all relations (links with TestIDs/SampleType and Concentration values for each point)
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pCalibratorsDS">Typed DataSet CalibratorsDS containing data of Calibrator to add or update</param>
+        ''' <param name="pCalibratorsDS">Typed DataSet CalibratorsDS containing basic data of Calibrator to add or update</param>
+        ''' <param name="pTestCalibratorsDS">Typed DataSet TestCalibratorsDS containing the TestID/SampleType linked to the
+        '''                                  Calibrator to add or update</param>
+        ''' <param name="pTestCalibratorValueDS">Typed DataSet TestCalibratorValuesDS containing Concentration Calibrator values for the 
+        '''                                      linked Test/SampleType</param>
         ''' <param name="pDeleteCalibratorList">List of DeletedCalibratorTO containing the list of Calibrators selected to be deleted</param>
         ''' <param name="pSaveFromTestProgramming">When TRUE, it indicates the saving is executed from the Tests Programming Screen</param>
         ''' <param name="pDeleteCalibrationResult">When TRUE, it indicates all previous results saved for the Calibrator and the TestID/SampleType
@@ -394,10 +394,9 @@ Namespace Biosystems.Ax00.BL
         ''' <remarks>
         ''' Created by:  TR
         ''' Modified by: AG 12/11/2010 - Added parameter pSaveFromTestProgramming due to if a Test/SampleType is programmed as EXPERIMENTAL 
-        '''                              and then changes to FACTOR, the current code continue saving experiment
-        '''              IT 29/05/2015 - BA-2563
-        '''</remarks>
-        Public Function Save(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalibratorsDS As CalibratorsDS, ByVal pDeleteCalibratorList As List(Of DeletedCalibratorTO), _
+        '''                              and then changes to FACTOR, the current code continue saving experiment</remarks>
+        Public Function Save(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalibratorsDS As CalibratorsDS, ByVal pTestCalibratorsDS As TestCalibratorsDS, _
+                             ByVal pTestCalibratorValueDS As TestCalibratorValuesDS, ByVal pDeleteCalibratorList As List(Of DeletedCalibratorTO), _
                              Optional ByVal pSaveFromTestProgramming As Boolean = False, Optional ByVal pDeleteCalibrationResult As Boolean = False, _
                              Optional ByVal pDeleteTestCalibratorValues As Boolean = False, _
                              Optional ByVal pAnalyzerID As String = "", Optional ByVal pWorkSessionID As String = "") As GlobalDataTO
@@ -415,14 +414,14 @@ Namespace Biosystems.Ax00.BL
                         Dim mytempCalibratorDS As New CalibratorsDS
 
                         Dim myTestSampleDS As New TestSamplesDS
-                        Dim tempTestCalibratorDS As New CalibratorsDS
+                        Dim tempTestCalibratorDS As New TestCalibratorsDS
                         Dim myTestCalibratorDelegate As New TestCalibratorsDelegate
-                        Dim qTestCalibratorList As New List(Of CalibratorsDS.tparTestCalibratorsRow)
+                        Dim qTestCalibratorList As New List(Of TestCalibratorsDS.tparTestCalibratorsRow)
 
                         Dim myTestSampleDelegate As New TestSamplesDelegate
                         Dim myTestCalibratorValuesDelegate As New TestCalibratorValuesDelegate
-                        Dim tempTestCalibratorValuesDS As New CalibratorsDS
-                        Dim qTestCalibValList As New List(Of CalibratorsDS.tparTestCalibratorValuesRow)
+                        Dim tempTestCalibratorValuesDS As New TestCalibratorValuesDS
+                        Dim qTestCalibValList As New List(Of TestCalibratorValuesDS.tparTestCalibratorValuesRow)
 
                         Dim initialCalibratorID As Integer = -1 'TR 09/11/2010 -New variable to set the previous calibrator ID value.
 
@@ -480,11 +479,11 @@ Namespace Biosystems.Ax00.BL
                             'TR 09/11/2010 -End
 
                             'TR 09/11/2010 Implemented the use of initial calibratorID
-                            qTestCalibratorList = (From a In pCalibratorsDS.tparTestCalibrators _
+                            qTestCalibratorList = (From a In pTestCalibratorsDS.tparTestCalibrators _
                                                    Where a.CalibratorID = initialCalibratorID _
                                                    Select a).ToList()
 
-                            For Each TestCalibRow As CalibratorsDS.tparTestCalibratorsRow In qTestCalibratorList
+                            For Each TestCalibRow As TestCalibratorsDS.tparTestCalibratorsRow In qTestCalibratorList
                                 'Set the CalibratorID (CREATE OR UPDATE)
                                 TestCalibRow.CalibratorID = mytempCalibratorDS.tparCalibrators(0).CalibratorID
 
@@ -539,11 +538,11 @@ Namespace Biosystems.Ax00.BL
                                 End If
 
                                 'CHANGES IN TEST CALIBRATOR CONCENTRATION VALUES
-                                qTestCalibValList = (From a In pCalibratorsDS.tparTestCalibratorValues _
+                                qTestCalibValList = (From a In pTestCalibratorValueDS.tparTestCalibratorValues _
                                                     Where a.TestCalibratorID = myPrevTestCalibratorID _
                                                    Select a).ToList()
 
-                                For Each testCalibValue As CalibratorsDS.tparTestCalibratorValuesRow In qTestCalibValList
+                                For Each testCalibValue As TestCalibratorValuesDS.tparTestCalibratorValuesRow In qTestCalibValList
                                     tempTestCalibratorValuesDS.tparTestCalibratorValues.Clear()
 
                                     'Set the Process TestCalibratorID (NEW or UPDATE)
@@ -557,13 +556,12 @@ Namespace Biosystems.Ax00.BL
                                         If (myGlobalDataTO.HasError) Then Exit For
                                     Else
                                         'Validate if there are Concentration values defined for the TestID/SampleType and Calibrator  
-                                        Dim calibratorsDs As New CalibratorsDS 'IT 29/05/2015 - BA-2563
                                         myGlobalDataTO = myTestCalibratorValuesDelegate.GetTestCalibratorValuesByTestCalibratorID(dbConnection, _
-                                                                                                                                  tempTestCalibratorValuesDS.tparTestCalibratorValues(0).TestCalibratorID, calibratorsDs)
+                                                                                                                                  tempTestCalibratorValuesDS.tparTestCalibratorValues(0).TestCalibratorID)
                                         If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                                             'Validate if the Concentration for the Calibrator point is defined
-                                            Dim qTestCalValueList As New List(Of CalibratorsDS.tparTestCalibratorValuesRow)
-                                            qTestCalValueList = (From a In DirectCast(myGlobalDataTO.SetDatos, CalibratorsDS).tparTestCalibratorValues _
+                                            Dim qTestCalValueList As New List(Of TestCalibratorValuesDS.tparTestCalibratorValuesRow)
+                                            qTestCalValueList = (From a In DirectCast(myGlobalDataTO.SetDatos, TestCalibratorValuesDS).tparTestCalibratorValues _
                                                                 Where a.CalibratorNum = tempTestCalibratorValuesDS.tparTestCalibratorValues(0).CalibratorNum).ToList()
                                             If (qTestCalValueList.Count > 0) Then
                                                 'Update the value
@@ -655,12 +653,11 @@ Namespace Biosystems.Ax00.BL
 
                                 ElseIf (myDelCalibTO.TestID <> 0 AndAlso String.Compare(myDelCalibTO.SampleType, "", False) <> 0) Then
                                     'Delete only TestCalibrator and TestCalibratorValues for the specified Test/SampleType and Calibrator
-                                    Dim myTestCalibratorDS As New CalibratorsDS 'T 29/05/2015 - BA-2563
-                                    myGlobalDataTO = myTestCalibratorDelegate.GetTestCalibratorByTestID(dbConnection, myDelCalibTO.TestID, myTestCalibratorDS, myDelCalibTO.SampleType)
+                                    myGlobalDataTO = myTestCalibratorDelegate.GetTestCalibratorByTestID(dbConnection, myDelCalibTO.TestID, myDelCalibTO.SampleType)
                                     If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                                        myTestCalibratorDS = DirectCast(myGlobalDataTO.SetDatos, CalibratorsDS)
+                                        Dim myTestCalibratorDS As TestCalibratorsDS = DirectCast(myGlobalDataTO.SetDatos, TestCalibratorsDS)
 
-                                        For Each testCalibRow As CalibratorsDS.tparTestCalibratorsRow In myTestCalibratorDS.tparTestCalibrators.Rows
+                                        For Each testCalibRow As TestCalibratorsDS.tparTestCalibratorsRow In myTestCalibratorDS.tparTestCalibrators.Rows
                                             myGlobalDataTO = myTestCalibratorDelegate.DeleteTestCaliByTestID(dbConnection, testCalibRow.TestID, testCalibRow.SampleType)
                                             If (myGlobalDataTO.HasError) Then Exit For
                                         Next

@@ -21,9 +21,9 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
             Dim myTestReagentsVolumesDS As TestReagentsVolumesDS
             Dim myDeletedTestReagentsVolumeTO As List(Of DeletedTestReagentsVolumeTO)   'To indicate Volumes that have to be deleted
 
-            Dim myCalibratorsDS As CalibratorsDS
-            'Dim myTestCalibratorDS As TestCalibratorsDS 'IT 29/05/2015 - BA-2563
-            'Dim myTestCalibratorValuesDS As TestCalibratorValuesDS 'IT 29/05/2015 - BA-2563
+            Dim myCalibratorDS As CalibratorsDS
+            Dim myTestCalibratorDS As TestCalibratorsDS
+            Dim myTestCalibratorValuesDS As TestCalibratorValuesDS
 
             Dim myTestControlsDS As TestControlsDS
             Dim myTestRefRangesDS As TestRefRangesDS
@@ -36,8 +36,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' <param name="pUpdateVersionChangesList">Global structure to save all changes executed by the Update Version process in Customer DB</param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
-        ''' Created by:  SA 07/10/2014 - BA-1944 (SubTask BA-1980)
-        ''' Modified by: IT 29/05/2015 - BA-2563
+        ''' Created by: SA 07/10/2014 - BA-1944 (SubTask BA-1980)
         ''' </remarks>
         Public Function CREATENewSTDTests(ByVal pDBConnection As SqlClient.SqlConnection, ByRef pUpdateVersionChangesList As UpdateVersionChangesDS) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
@@ -109,7 +108,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
                         '(2.6) Generate the temporary TestCalibratorIDs and inform them in all Test Calibrators related DataSets
                         If (Not myGlobalDataTO.HasError) Then
-                            myGlobalDataTO = SetTempTestCalibratorID(pDBConnection, myTestStructure.myCalibratorsDS)
+                            myGlobalDataTO = SetTempTestCalibratorID(pDBConnection, myTestStructure.myTestCalibratorDS, myTestStructure.myTestCalibratorValuesDS)
                         End If
 
                         '(2.7) Save the NEW STD Test in CUSTOMER DB 
@@ -117,7 +116,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                             myGlobalDataTO = myTestsDelegate.PrepareTestToSave(pDBConnection, String.Empty, String.Empty, myNewTestDS, _
                                                                                myTestStructure.myTestSampleDS, myTestStructure.myTestReagentsVolumesDS, _
                                                                                myNewReagentsDS, myNewTestReagentsDS, _
-                                                                               myTestStructure.myCalibratorsDS, New TestRefRangesDS, _
+                                                                               myTestStructure.myCalibratorDS, myTestStructure.myTestCalibratorDS, _
+                                                                               myTestStructure.myTestCalibratorValuesDS, New TestRefRangesDS, _
                                                                                New List(Of DeletedCalibratorTO), New List(Of DeletedTestReagentsVolumeTO), _
                                                                                New List(Of DeletedTestProgramingTO), New TestSamplesMultirulesDS, _
                                                                                New TestControlsDS, Nothing)
@@ -220,13 +220,14 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' PrepareTestsToSave in TestsDelegate saves the Test data
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pCalibratorsDS">DS containing the group of relations between STD Tests and Calibrators to add</param>
+        ''' <param name="pTestCalibratorsDS">DS containing the group of relations between STD Tests and Calibrators to add</param>
+        ''' <param name="pTestCalibValuesDS">DS containing the group of Calibrator Values (by Calibrator point) for each  by STD Test/SampleType to add</param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
-        ''' Created by:   SA 09/10/2014 - BA-1944 
-        ''' Modified by: IT 29/05/2015 - BA-2563
+        ''' Created by:  SA 09/10/2014 - BA-1944 
         ''' </remarks>
-        Private Function SetTempTestCalibratorID(ByVal pDBConnection As SqlClient.SqlConnection, ByRef pCalibratorsDS As CalibratorsDS) As GlobalDataTO
+        Private Function SetTempTestCalibratorID(ByVal pDBConnection As SqlClient.SqlConnection, ByRef pTestCalibratorsDS As TestCalibratorsDS, _
+                                                 ByRef pTestCalibValuesDS As TestCalibratorValuesDS) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
 
             Try
@@ -238,13 +239,13 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                     tempTestCalibratorID = Convert.ToInt32(myGlobalDataTO.SetDatos)
 
-                    For Each testCalibratorRow As CalibratorsDS.tparTestCalibratorsRow In pCalibratorsDS.tparTestCalibrators
+                    For Each testCalibratorRow As TestCalibratorsDS.tparTestCalibratorsRow In pTestCalibratorsDS.tparTestCalibrators
                         'Generate the temporary TestCalibratorID 
                         tempTestCalibratorID += 1
 
                         'Search in pTestCalibValuesDS all rows for the Test/SampleType/Calibrator relation in process and change value of field TestCalibratorID for all of them
-                        For Each testCalibValueRow As CalibratorsDS.tparTestCalibratorValuesRow _
-                                                   In pCalibratorsDS.tparTestCalibratorValues.ToList.Where(Function(a) a.TestCalibratorID = testCalibratorRow.TestCalibratorID)
+                        For Each testCalibValueRow As TestCalibratorValuesDS.tparTestCalibratorValuesRow _
+                                                   In pTestCalibValuesDS.tparTestCalibratorValues.ToList.Where(Function(a) a.TestCalibratorID = testCalibratorRow.TestCalibratorID)
                             testCalibValueRow.TestCalibratorID = tempTestCalibratorID
                         Next
 
@@ -252,8 +253,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                         testCalibratorRow.TestCalibratorID = tempTestCalibratorID
                     Next
 
-                    pCalibratorsDS.AcceptChanges()
-                    'pTestCalibValuesDS.AcceptChanges()
+                    pTestCalibratorsDS.AcceptChanges()
+                    pTestCalibValuesDS.AcceptChanges()
                 End If
             Catch ex As Exception
                 myGlobalDataTO.HasError = True
@@ -427,8 +428,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' <param name="pSampleType">Sample Type Code. Optional parameter; when it is informed, only data of the informed Sample Type is obtained for the Test</param>
         ''' <returns>GlobalDataTO containing a TestStructure with all additional data for the Test in FACTORY DB</returns>
         ''' <remarks>
-        ''' Created by:  SA 07/10/2014 - BA-1944 (SubTask BA-1980)
-        ''' Modified by: IT 29/05/2015 - BA-2563
+        ''' Created by: SA 07/10/2014 - BA-1944 (SubTask BA-1980)
         ''' </remarks>
         Private Function GetOtherTestDataInfoFromFactory(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, _
                                                          Optional ByVal pSampleType As String = "") As GlobalDataTO
@@ -460,18 +460,18 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                     myGlobalDataTO = myTestParametersUpdateDAO.GetFactoryTestCalibratorByTestID(pDBConnection, pTestID, pSampleType, True)
                     If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                         'Fill TestCalibrators sub-table in TestStructure
-                        myTestStructure.myCalibratorsDS = DirectCast(myGlobalDataTO.SetDatos, CalibratorsDS)
+                        myTestStructure.myTestCalibratorDS = DirectCast(myGlobalDataTO.SetDatos, TestCalibratorsDS)
 
                         'Initialize Calibrators sub-table in TestStructure
-                        myTestStructure.myCalibratorsDS = New CalibratorsDS
+                        myTestStructure.myCalibratorDS = New CalibratorsDS
 
                         'For each Calibrator, search it by name in CUSTOMER DB to get the CalibratorID (it always exists due to UPDATE VERSION 
                         'processes Calibrators before STD Tests)
                         Dim myCustomerRow As CalibratorsDS.tparCalibratorsRow
                         Dim myCalibratorsDelegate As New CalibratorsDelegate
 
-                        For Each factoryRow As CalibratorsDS.tparTestCalibratorsRow In myTestStructure.myCalibratorsDS.tparTestCalibrators
-                            myGlobalDataTO = myCalibratorsDelegate.ReadByCalibratorName(pDBConnection, factoryRow.CalibratorName, myTestStructure.myCalibratorsDS)
+                        For Each factoryRow As TestCalibratorsDS.tparTestCalibratorsRow In myTestStructure.myTestCalibratorDS.tparTestCalibrators
+                            myGlobalDataTO = myCalibratorsDelegate.ReadByCalibratorName(pDBConnection, factoryRow.CalibratorName)
                             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                                 'Get the row with Calibrator information from the returned CalibratorsDS
                                 myCustomerRow = DirectCast(myGlobalDataTO.SetDatos, CalibratorsDS).tparCalibrators.First
@@ -480,8 +480,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                                 factoryRow.CalibratorID = myCustomerRow.CalibratorID
 
                                 'Add the row to Calibrators sub-table in TestStructure (if it not exists in it)
-                                If (myTestStructure.myCalibratorsDS.tparCalibrators.ToList.Where(Function(a) a.CalibratorID = myCustomerRow.CalibratorID).Count = 0) Then
-                                    myTestStructure.myCalibratorsDS.tparCalibrators.ImportRow(myCustomerRow)
+                                If (myTestStructure.myCalibratorDS.tparCalibrators.ToList.Where(Function(a) a.CalibratorID = myCustomerRow.CalibratorID).Count = 0) Then
+                                    myTestStructure.myCalibratorDS.tparCalibrators.ImportRow(myCustomerRow)
                                 End If
                             Else
                                 'Unexpected error...
@@ -496,7 +496,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                     myGlobalDataTO = myTestParametersUpdateDAO.GetFactoryTestCalibValuesByTestID(pDBConnection, pTestID, pSampleType, True)
                     If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                         'Fill TestCalibratorValuesDS sub-table in TestStructure
-                        myTestStructure.myCalibratorsDS = DirectCast(myGlobalDataTO.SetDatos, CalibratorsDS)
+                        myTestStructure.myTestCalibratorValuesDS = DirectCast(myGlobalDataTO.SetDatos, TestCalibratorValuesDS)
                     End If
 
                     'Finally, return all information inside the TestStructure 
@@ -611,8 +611,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' <param name="pUpdateVersionChangesList">Global structure to save all changes executed by the Update Version process in Customer DB</param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
-        ''' Created by:  SA 08/10/2014 - BA-1944 (SubTask BA-1983)
-        ''' Modified by: IT 29/05/2015 - BA-2563
+        ''' Created by: SA 08/10/2014 - BA-1944 (SubTask BA-1983)
         ''' </remarks>
         Public Function DELETERemovedSTDTests(ByVal pDBConnection As SqlClient.SqlConnection, ByRef pUpdateVersionChangesList As UpdateVersionChangesDS) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
@@ -645,7 +644,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
                         '(2.3) Delete the STD Test from CUSTOMER DB
                         myGlobalDataTO = myTestsDelegate.PrepareTestToSave(pDBConnection, String.Empty, String.Empty, New TestsDS, New TestSamplesDS, New TestReagentsVolumesDS, _
-                                                                           New ReagentsDS, New TestReagentsDS, New CalibratorsDS, New TestRefRangesDS, New List(Of DeletedCalibratorTO), _
+                                                                           New ReagentsDS, New TestReagentsDS, New CalibratorsDS, New TestCalibratorsDS, _
+                                                                           New TestCalibratorValuesDS, New TestRefRangesDS, New List(Of DeletedCalibratorTO), _
                                                                            New List(Of DeletedTestReagentsVolumeTO), myDeletedTestProgramingList, _
                                                                            New TestSamplesMultirulesDS, New TestControlsDS, Nothing)
 
@@ -688,8 +688,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' <param name="pUpdateVersionChangesList">Global structure to save all changes executed by the Update Version process in Customer DB</param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
-        ''' Created by:  SA 08/10/2014 - BA-1944 (SubTask BA-1983)
-        ''' Modified by: IT 29/05/2015 - BA-2563
+        ''' Created by: SA 08/10/2014 - BA-1944 (SubTask BA-1983)
         ''' </remarks>
         Public Function DELETERemovedSTDTestSamples(ByVal pDBConnection As SqlClient.SqlConnection, ByRef pUpdateVersionChangesList As UpdateVersionChangesDS) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
@@ -725,7 +724,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
                             '(2.3) Delete the STD Test/Sample Type from CUSTOMER DB
                             myGlobalDataTO = myTestsDelegate.PrepareTestToSave(pDBConnection, String.Empty, String.Empty, New TestsDS, New TestSamplesDS, New TestReagentsVolumesDS, _
-                                                                               New ReagentsDS, New TestReagentsDS, New CalibratorsDS, New TestRefRangesDS, New List(Of DeletedCalibratorTO), _
+                                                                               New ReagentsDS, New TestReagentsDS, New CalibratorsDS, New TestCalibratorsDS, _
+                                                                               New TestCalibratorValuesDS, New TestRefRangesDS, New List(Of DeletedCalibratorTO), _
                                                                                New List(Of DeletedTestReagentsVolumeTO), myDeletedTestProgramingList, _
                                                                                New TestSamplesMultirulesDS, New TestControlsDS, Nothing)
                         End If
@@ -1082,8 +1082,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' <param name="pUpdateVersionChangesList">Global structure to save all changes executed by the Update Version process in Customer DB</param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
-        ''' Created by:  SA 08/10/2014 - BA-1944 (SubTask BA-1983)
-        ''' Modified by: IT 29/05/2015 - BA-2563
+        ''' Created by: SA 08/10/2014 - BA-1944 (SubTask BA-1983)
         ''' </remarks>
         Public Function UPDATEModifiedSTDTests(ByVal pDBConnection As SqlClient.SqlConnection, ByRef pUpdateVersionChangesList As UpdateVersionChangesDS) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
@@ -1158,7 +1157,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                         '(2.6) Update the STD Test from CUSTOMER DB
                         If (Not myGlobalDataTO.HasError) Then
                             myGlobalDataTO = myTestsDelegate.PrepareTestToSave(pDBConnection, String.Empty, String.Empty, myCustomerTestDS, New TestSamplesDS, New TestReagentsVolumesDS, _
-                                                                               myReagentsDS, myTestReagentsDS, New CalibratorsDS, New TestRefRangesDS, New List(Of DeletedCalibratorTO), _
+                                                                               myReagentsDS, myTestReagentsDS, New CalibratorsDS, New TestCalibratorsDS, _
+                                                                               New TestCalibratorValuesDS, New TestRefRangesDS, New List(Of DeletedCalibratorTO), _
                                                                                myDeletedTestReagentsVolsList, myDeletedTestProgramingList, _
                                                                                New TestSamplesMultirulesDS, New TestControlsDS, Nothing, String.Empty, False)
                         End If
@@ -1189,8 +1189,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' <param name="pUpdateVersionChangesList">Global structure to save all changes executed by the Update Version process in Customer DB</param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
-        ''' Created by:  SA 09/10/2014 - BA-1944 (SubTask BA-1981)
-        ''' Modified by: IT 29/05/2015 - BA-2563
+        ''' Created by: SA 09/10/2014 - BA-1944 (SubTask BA-1981)
         ''' </remarks>
         Public Function CREATENewSamplesForSTDTests(ByVal pDBConnection As SqlClient.SqlConnection, ByRef pUpdateVersionChangesList As UpdateVersionChangesDS) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
@@ -1241,8 +1240,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
                             '(2.3.2) Generate the temporary TestCalibratorIDs and inform them in all Test Calibrators related DataSets
                             If (Not myGlobalDataTO.HasError) Then
-                                If (myTestStructure.myCalibratorsDS.tparTestCalibrators.Rows.Count > 0) Then
-                                    myGlobalDataTO = SetTempTestCalibratorID(pDBConnection, myTestStructure.myCalibratorsDS)
+                                If (myTestStructure.myTestCalibratorDS.tparTestCalibrators.Rows.Count > 0) Then
+                                    myGlobalDataTO = SetTempTestCalibratorID(pDBConnection, myTestStructure.myTestCalibratorDS, myTestStructure.myTestCalibratorValuesDS)
                                 End If
                             End If
 
@@ -1264,7 +1263,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                                 myGlobalDataTO = myTestsDelegate.PrepareTestToSave(pDBConnection, String.Empty, String.Empty, myTestDS, _
                                                                                    myTestStructure.myTestSampleDS, myTestStructure.myTestReagentsVolumesDS, _
                                                                                    myTestStructure.myReagentsDS, myTestReagentsDS, _
-                                                                                   myTestStructure.myCalibratorsDS, New TestRefRangesDS, _
+                                                                                   myTestStructure.myCalibratorDS, myTestStructure.myTestCalibratorDS, _
+                                                                                   myTestStructure.myTestCalibratorValuesDS, New TestRefRangesDS, _
                                                                                    New List(Of DeletedCalibratorTO), New List(Of DeletedTestReagentsVolumeTO), _
                                                                                    New List(Of DeletedTestProgramingTO), New TestSamplesMultirulesDS, _
                                                                                    New TestControlsDS, Nothing, String.Empty, False)
@@ -1893,7 +1893,6 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         '''          ** When its value was FALSE, GlobalDataTO contains success/error information</returns>
         ''' <remarks>
         ''' Created by:  SA 13/10/2014 - BA-1944 (SubTask BA-1985)
-        ''' Modified by: IT 29/05/2015 - BA-2563
         ''' </remarks>
         Private Function UpdateModifiedReagentVols(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pUpdateByTestSample As Boolean, _
                                                    ByRef pUpdateVersionChangesList As UpdateVersionChangesDS, Optional ByVal pTestID As Integer = -1, _
@@ -2053,7 +2052,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                                             'Call the function to delete previous results of Blank and Calibrator for the Test/SampleType
                                             myGlobalDataTO = myTestsDelegate.PrepareTestToSave(pDBConnection, String.Empty, String.Empty, New TestsDS, New TestSamplesDS, _
                                                                                                New TestReagentsVolumesDS, New ReagentsDS, New TestReagentsDS, New CalibratorsDS, _
-                                                                                               New TestRefRangesDS, _
+                                                                                               New TestCalibratorsDS, New TestCalibratorValuesDS, New TestRefRangesDS, _
                                                                                                New List(Of DeletedCalibratorTO), New List(Of DeletedTestReagentsVolumeTO), _
                                                                                                myDeletedTestProgramingList, New TestSamplesMultirulesDS, New TestControlsDS, _
                                                                                                Nothing)
@@ -2100,8 +2099,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' <param name="pUpdateVersionChangesList">Global structure to save all changes executed by the Update Version process in Customer DB</param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
-        ''' Created by:  SA 10/10/2014 - BA-1944 (SubTask BA-1985)
-        ''' Modified by: IT 29/05/2015 - BA-2563
+        ''' Created by: SA 10/10/2014 - BA-1944 (SubTask BA-1985)
         ''' </remarks>
         Public Function UPDATEModifiedSTDTestSamples(ByVal pDBConnection As SqlClient.SqlConnection, ByRef pUpdateVersionChangesList As UpdateVersionChangesDS) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
@@ -2204,8 +2202,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                         '(1.1.6) Update the STD Test from CUSTOMER DB
                         If (Not myGlobalDataTO.HasError) Then
                             myGlobalDataTO = myTestsDelegate.PrepareTestToSave(pDBConnection, String.Empty, String.Empty, myCustomerTestDS, myCustomerTestSampleDS, myCustomerReagentsVolsDS, _
-                                                                               New ReagentsDS, New TestReagentsDS, New CalibratorsDS, _
-                                                                               New TestRefRangesDS, New List(Of DeletedCalibratorTO), _
+                                                                               New ReagentsDS, New TestReagentsDS, New CalibratorsDS, New TestCalibratorsDS, _
+                                                                               New TestCalibratorValuesDS, New TestRefRangesDS, New List(Of DeletedCalibratorTO), _
                                                                                New List(Of DeletedTestReagentsVolumeTO), myDeletedTestProgramingList, _
                                                                                New TestSamplesMultirulesDS, New TestControlsDS, Nothing, String.Empty, False)
                         End If

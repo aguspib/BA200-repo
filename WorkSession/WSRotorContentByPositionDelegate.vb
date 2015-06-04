@@ -2665,8 +2665,7 @@ Namespace Biosystems.Ax00.BL
         '''                              NOT IN USE Rotor Position</param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
-        ''' Created by:  SA 07/01/2015 - BA-1999 (Code extracted from function GetPositionInfo)
-        ''' Modified by: IT 29/05/2015 - BA-2563
+        ''' Created by: SA 07/01/2015 - BA-1999 (Code extracted from function GetPositionInfo)
         ''' </remarks>
         Private Function GetNOT_INUSEPositionInfo(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pPositionRow As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow, _
                                                   ByRef pCellPosInfoDS As CellPositionInformationDS) As GlobalDataTO
@@ -2815,13 +2814,11 @@ Namespace Biosystems.Ax00.BL
                                         pCellPosInfoDS.PositionInformation(0).EndEdit()
 
                                         Dim myCalibratorDelegate As New CalibratorsDelegate
-                                        Dim myCalibratorDataTo As New CalibratorsDS 'IT 29/05/2015 - BA-2563
-
-                                        resultData = myCalibratorDelegate.GetCalibratorData(pDBConnection, resultDataDS.tparVirtualRotorPosititions(0).CalibratorID, myCalibratorDataTo)
+                                        resultData = myCalibratorDelegate.GetCalibratorData(pDBConnection, resultDataDS.tparVirtualRotorPosititions(0).CalibratorID)
 
                                         If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                            'Dim myCalibratorDataTo As CalibratorsDS = DirectCast(resultData.SetDatos, CalibratorsDS)
-                                            myCalibratorDataTo = DirectCast(resultData.SetDatos, CalibratorsDS) 'IT 29/05/2015 - BA-2563
+                                            Dim myCalibratorDataTo As CalibratorsDS = DirectCast(resultData.SetDatos, CalibratorsDS)
+
                                             myCellSamplesPosInfoRow = pCellPosInfoDS.Samples.NewSamplesRow()
                                             myCellSamplesPosInfoRow.MultiItemNumber = resultDataDS.tparVirtualRotorPosititions(0).MultiItemNumber
                                             myCellSamplesPosInfoRow.LotNumber = myCalibratorDataTo.tparCalibrators(0).LotNumber
@@ -3040,7 +3037,6 @@ Namespace Biosystems.Ax00.BL
         ''' Created by:  JV 14/11/2013 - BT #1382 
         ''' Modified by: JV 28/11/2013 - BT #1412 ==> Update with the changes done in 'GetPositionInfo'. Also establish a relation (not existent) between Reagents 
         '''                                           table and PositionInformation (CellNumber) in CellPositionInformationDS
-        '''              IT 29/05/2015 - BA-2563
         ''' </remarks>
         Public Function GetPositionInfoForReport(ByVal pDBConnection As SqlClient.SqlConnection, _
                                         ByVal pRotorPositionDS As WSRotorContentByPositionDS) As GlobalDataTO
@@ -3438,12 +3434,11 @@ Namespace Biosystems.Ax00.BL
                                                             myCellPosInfoDS.PositionInformation(0).EndEdit()
 
                                                             Dim myCalibratorDelegate As New CalibratorsDelegate
-                                                            Dim myCalibratorDataTo As New CalibratorsDS 'IT 29/05/2015 - BA-2563
-                                                            resultData = myCalibratorDelegate.GetCalibratorData(pDBConnection, resultDataDS.tparVirtualRotorPosititions(0).CalibratorID, myCalibratorDataTo)
+                                                            resultData = myCalibratorDelegate.GetCalibratorData(pDBConnection, resultDataDS.tparVirtualRotorPosititions(0).CalibratorID)
 
                                                             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                                                'Dim myCalibratorDataTo As CalibratorsDS = DirectCast(resultData.SetDatos, CalibratorsDS)
-                                                                myCalibratorDataTo = DirectCast(resultData.SetDatos, CalibratorsDS) 'IT 29/05/2015 - BA-2563
+                                                                Dim myCalibratorDataTo As CalibratorsDS = DirectCast(resultData.SetDatos, CalibratorsDS)
+
                                                                 myCellSamplesPosInfoRow = myCellPosInfoDS.Samples.NewSamplesRow()
                                                                 myCellSamplesPosInfoRow.MultiItemNumber = resultDataDS.tparVirtualRotorPosititions(0).MultiItemNumber
                                                                 myCellSamplesPosInfoRow.LotNumber = myCalibratorDataTo.tparCalibrators(0).LotNumber
@@ -6461,6 +6456,8 @@ Namespace Biosystems.Ax00.BL
         '''              AG 07/10/2014 - BA-1979 ==> Replaced call to function twksWSRotorContentByPositionDAO.Update by a call to function Update 
         '''                                          in this Delegate, informing the process who is updating the content of the Rotor Position (to 
         '''                                          search which process is inserting invalid values: positions with TubeContent but not element ID)
+        '''              MR 04/06/2015 - BA-2558 ==> Add a control before to positioned a  multipoint calibrator, to check if we have enough free cells where the user selected when the user is triying to positioned manually. 
+        '''                                          If there are cells arround we move all calibrator kit if not we suggest to the user select another starting point.
         ''' </remarks>
         Private Function CalibratorPositioning(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWSRotorContentByPositionDS As WSRotorContentByPositionDS, _
                                                ByVal pMaxRotorRingNumber As Integer, ByVal pAutoPositioning As Boolean) As GlobalDataTO
@@ -6553,77 +6550,94 @@ Namespace Biosystems.Ax00.BL
                                                     Dim cellNumber As Integer = rotorContentRow.CellNumber
                                                     Dim ringNumber As Integer = rotorContentRow.RingNumber
 
-                                                    Dim newStatus As String = String.Empty
-                                                    Dim rotorContentByPosTMP As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow
-                                                    For Each reqElementRow As WSRequiredElementsDS.twksWSRequiredElementsRow In myRequiredElementsDS.twksWSRequiredElements
-                                                        'Search next free cell to place the Tube for the Calibrator point
-                                                        myGlobalDataTO = GetNextRotorPositionForSample(dbConnection, rotorContentRow.WorkSessionID, rotorContentRow.AnalyzerID, _
-                                                                                                       rotorContentRow.RotorType, ringNumber, cellNumber, pMaxRotorRingNumber)
-                                                        'A Free Position was found?
-                                                        If (Not myGlobalDataTO.HasError AndAlso String.IsNullOrEmpty(myGlobalDataTO.ErrorCode)) Then
-                                                            Dim myRingCellNumberDS As RingCellNumbersDS = DirectCast(myGlobalDataTO.SetDatos, RingCellNumbersDS)
-
-                                                            rotorContentByPosTMP = pWSRotorContentByPositionDS.twksWSRotorContentByPosition.NewtwksWSRotorContentByPositionRow()
-                                                            rotorContentByPosTMP.AnalyzerID = rotorContentRow.AnalyzerID
-                                                            rotorContentByPosTMP.RotorType = rotorContentRow.RotorType
-                                                            rotorContentByPosTMP.RingNumber = myRingCellNumberDS.RingCellTable(0).RingNumber
-                                                            rotorContentByPosTMP.CellNumber = myRingCellNumberDS.RingCellTable(0).CellNumber
-                                                            rotorContentByPosTMP.WorkSessionID = rotorContentRow.WorkSessionID
-                                                            rotorContentByPosTMP.ElementID = reqElementRow.ElementID
-                                                            rotorContentByPosTMP.MultiItemNumber = reqElementRow.MultiItemNumber
-                                                            rotorContentByPosTMP.MultiTubeNumber = 1
-
-                                                            rotorContentByPosTMP.TubeContent = rotorContentRow.TubeContent
-                                                            rotorContentByPosTMP.TubeType = rotorContentRow.TubeType
-
-                                                            'Update Barcode fields with the same values of the first Calibrator point
-                                                            rotorContentByPosTMP.ScannedPosition = rotorContentRow.ScannedPosition
-                                                            If (rotorContentRow.ScannedPosition) Then
-                                                                rotorContentByPosTMP.BarCodeInfo = rotorContentRow.BarCodeInfo
-                                                                rotorContentByPosTMP.BarcodeStatus = rotorContentRow.BarcodeStatus
-                                                            Else
-                                                                rotorContentByPosTMP.SetBarCodeInfoNull()
-                                                                rotorContentByPosTMP.SetBarcodeStatusNull()
-                                                            End If
-
-                                                            rotorContentByPosTMP.TS_User = loggedUser
-                                                            rotorContentByPosTMP.TS_DateTime = DateTime.Now
-
-                                                            If (reqElementRow.ElementFinished) Then
-                                                                rotorContentByPosTMP.Status = "FINISHED"
-                                                            Else
-                                                                'Get position status for the Calibrator point...
-                                                                rotorContentByPosTMP.Status = "PENDING"
-                                                                myGlobalDataTO = GetSamplePositionStatus(dbConnection, rotorContentByPosTMP.WorkSessionID, rotorContentByPosTMP.AnalyzerID, _
-                                                                                                         rotorContentByPosTMP.ElementID, "CALIB", reqElementRow.MultiItemNumber)
-
-                                                                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                                                                    newStatus = DirectCast(myGlobalDataTO.SetDatos, String)
-                                                                    If (newStatus <> String.Empty AndAlso String.Compare(newStatus, "FINISHED", False) <> 0) Then rotorContentByPosTMP.Status = newStatus
-                                                                Else
-                                                                    'Error getting the position status for the Calibrator point; stop processing of the rest of Calibrator points
-                                                                    Exit For
-                                                                End If
-                                                            End If
-
-                                                            'Add the row to the entry DataSet
-                                                            pWSRotorContentByPositionDS.twksWSRotorContentByPosition.AddtwksWSRotorContentByPositionRow(rotorContentByPosTMP)
-
-                                                            'The found position is used as reference to search a free position for the next Calibrator Point
-                                                            ringNumber = myRingCellNumberDS.RingCellTable(0).RingNumber
-                                                            cellNumber = myRingCellNumberDS.RingCellTable(0).CellNumber
-
-                                                        ElseIf (myGlobalDataTO.ErrorCode <> "") Then
-                                                            'There are not enough free positions for a Calibrator kit; inform the ErrorCode and stop the processing of the rest 
-                                                            'of Calibrator points
-                                                            myGlobalDataTO.ErrorCode = "ROTOR_FULL_FOR_CALIBRATOR_KIT"
-                                                            myGlobalDataTO.HasError = False
-                                                            Exit For
-                                                        Else
-                                                            'Error getting a position for the Calibrator Point; stop the processing of the rest of Calibrator points
-                                                            Exit For
+                                                    'Check if we have enough free cells before to start positioning the first point of calibrator, if not we move our starting point.
+                                                    myGlobalDataTO = CheckEnoughFreeCellsXMultipointCalib(dbConnection, rotorContentRow.AnalyzerID, rotorContentRow.WorkSessionID, rotorContentRow.RotorType, ringNumber, _
+                                                                                                                   cellNumber, myRequiredElementsDS.twksWSRequiredElements.Rows.Count + 1)
+                                                    If (Not myGlobalDataTO.HasError AndAlso String.IsNullOrEmpty(myGlobalDataTO.ErrorCode)) Then
+                                                        cellNumber = CType(myGlobalDataTO.SetDatos, Integer)
+                                                        'If we need move our starting point, we reasigned the first element to be positioned.
+                                                        If cellNumber <> rotorContentRow.CellNumber Then
+                                                            rotorContentRow.CellNumber = cellNumber
                                                         End If
-                                                    Next
+
+                                                        Dim newStatus As String = String.Empty
+                                                        Dim rotorContentByPosTMP As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow
+                                                        For Each reqElementRow As WSRequiredElementsDS.twksWSRequiredElementsRow In myRequiredElementsDS.twksWSRequiredElements
+                                                            'Search next free cell to place the Tube for the Calibrator point
+                                                            myGlobalDataTO = GetNextRotorPositionForSample(dbConnection, rotorContentRow.WorkSessionID, rotorContentRow.AnalyzerID, _
+                                                                                                           rotorContentRow.RotorType, ringNumber, cellNumber, pMaxRotorRingNumber)
+                                                            'A Free Position was found?
+                                                            If (Not myGlobalDataTO.HasError AndAlso String.IsNullOrEmpty(myGlobalDataTO.ErrorCode)) Then
+                                                                Dim myRingCellNumberDS As RingCellNumbersDS = DirectCast(myGlobalDataTO.SetDatos, RingCellNumbersDS)
+
+                                                                rotorContentByPosTMP = pWSRotorContentByPositionDS.twksWSRotorContentByPosition.NewtwksWSRotorContentByPositionRow()
+                                                                rotorContentByPosTMP.AnalyzerID = rotorContentRow.AnalyzerID
+                                                                rotorContentByPosTMP.RotorType = rotorContentRow.RotorType
+                                                                rotorContentByPosTMP.RingNumber = myRingCellNumberDS.RingCellTable(0).RingNumber
+                                                                rotorContentByPosTMP.CellNumber = myRingCellNumberDS.RingCellTable(0).CellNumber
+                                                                rotorContentByPosTMP.WorkSessionID = rotorContentRow.WorkSessionID
+                                                                rotorContentByPosTMP.ElementID = reqElementRow.ElementID
+                                                                rotorContentByPosTMP.MultiItemNumber = reqElementRow.MultiItemNumber
+                                                                rotorContentByPosTMP.MultiTubeNumber = 1
+
+                                                                rotorContentByPosTMP.TubeContent = rotorContentRow.TubeContent
+                                                                rotorContentByPosTMP.TubeType = rotorContentRow.TubeType
+
+                                                                'Update Barcode fields with the same values of the first Calibrator point
+                                                                rotorContentByPosTMP.ScannedPosition = rotorContentRow.ScannedPosition
+                                                                If (rotorContentRow.ScannedPosition) Then
+                                                                    rotorContentByPosTMP.BarCodeInfo = rotorContentRow.BarCodeInfo
+                                                                    rotorContentByPosTMP.BarcodeStatus = rotorContentRow.BarcodeStatus
+                                                                Else
+                                                                    rotorContentByPosTMP.SetBarCodeInfoNull()
+                                                                    rotorContentByPosTMP.SetBarcodeStatusNull()
+                                                                End If
+
+                                                                rotorContentByPosTMP.TS_User = loggedUser
+                                                                rotorContentByPosTMP.TS_DateTime = DateTime.Now
+
+                                                                If (reqElementRow.ElementFinished) Then
+                                                                    rotorContentByPosTMP.Status = "FINISHED"
+                                                                Else
+                                                                    'Get position status for the Calibrator point...
+                                                                    rotorContentByPosTMP.Status = "PENDING"
+                                                                    myGlobalDataTO = GetSamplePositionStatus(dbConnection, rotorContentByPosTMP.WorkSessionID, rotorContentByPosTMP.AnalyzerID, _
+                                                                                                             rotorContentByPosTMP.ElementID, "CALIB", reqElementRow.MultiItemNumber)
+
+                                                                    If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                                                                        newStatus = DirectCast(myGlobalDataTO.SetDatos, String)
+                                                                        If (newStatus <> String.Empty AndAlso String.Compare(newStatus, "FINISHED", False) <> 0) Then rotorContentByPosTMP.Status = newStatus
+                                                                    Else
+                                                                        'Error getting the position status for the Calibrator point; stop processing of the rest of Calibrator points
+                                                                        Exit For
+                                                                    End If
+                                                                End If
+
+                                                                'Add the row to the entry DataSet
+                                                                pWSRotorContentByPositionDS.twksWSRotorContentByPosition.AddtwksWSRotorContentByPositionRow(rotorContentByPosTMP)
+
+                                                                'The found position is used as reference to search a free position for the next Calibrator Point
+                                                                ringNumber = myRingCellNumberDS.RingCellTable(0).RingNumber
+                                                                cellNumber = myRingCellNumberDS.RingCellTable(0).CellNumber
+
+                                                            ElseIf (myGlobalDataTO.ErrorCode <> "") Then
+                                                                'There are not enough free positions for a Calibrator kit; inform the ErrorCode and stop the processing of the rest 
+                                                                'of Calibrator points
+                                                                myGlobalDataTO.ErrorCode = "ROTOR_FULL_FOR_CALIBRATOR_KIT"
+                                                                myGlobalDataTO.HasError = False
+                                                                Exit For
+                                                            Else
+                                                                'Error getting a position for the Calibrator Point; stop the processing of the rest of Calibrator points
+                                                                Exit For
+                                                            End If
+                                                        Next
+
+                                                    Else
+                                                        'Set the error value when there are not enough free positions for a Calibrator kit
+                                                        myGlobalDataTO.ErrorCode = "ROTOR_FULL_FOR_CALIBRATOR_KIT"
+                                                        myGlobalDataTO.HasError = False
+
+                                                    End If
                                                 Else
                                                     'Set the error value when there are not enough free positions for a Calibrator kit
                                                     myGlobalDataTO.ErrorCode = "ROTOR_FULL_FOR_CALIBRATOR_KIT"
@@ -6693,6 +6707,138 @@ Namespace Biosystems.Ax00.BL
             End Try
             Return myGlobalDataTO
         End Function
+
+#Region "FUNCTIONS ADDED TO CONTROL THE MANUAL POSITIONING OF MULTIPOINT CALIBRATORS"
+
+        ''' <summary>
+        ''' Get the number of positions free between two points of the rotor.
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pAnalyzerID"></param>
+        ''' <param name="pWorkSessionID"></param>
+        ''' <param name="pRotorType"></param>
+        ''' <param name="pRingNumber"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Private Function CheckEnoughFreeCellsXMultipointCalib(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
+                                                              ByVal pRotorType As String, ByVal pRingNumber As Integer, ByVal pRefCellNumber As Integer, ByVal pNumElemRequired As Integer) As GlobalDataTO
+            Dim myGlobalDataTO As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim numFreePos As Integer = -1
+            Dim resCellNumber As Integer = 0
+            Try
+                myGlobalDataTO = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+
+                        Dim MaxNumCellbyRotor As Integer = 44
+
+                        'MaxNumCellbyRotor = CountMaxCellByRotor(dbConnection, pAnalyzerID, pRotorType, pRingNumber)
+
+                        Dim myWSRotorContentByPositionDAO As New twksWSRotorContentByPositionDAO
+                        myGlobalDataTO = myWSRotorContentByPositionDAO.CountPositionsByStatus(dbConnection, pAnalyzerID, pWorkSessionID, pRotorType, "FREE", pRingNumber, pRefCellNumber, MaxNumCellbyRotor)
+
+                        If (Not myGlobalDataTO.HasError) Then
+                            If (Not myGlobalDataTO.SetDatos Is Nothing AndAlso String.Compare(myGlobalDataTO.SetDatos.ToString(), "", False) <> 0) Then
+                                numFreePos = CType(myGlobalDataTO.SetDatos, Integer)
+
+                                If numFreePos >= pNumElemRequired Then
+                                    'We have enough position after selected Pos
+                                    'resCellNumber = pRefCellNumber
+                                    myGlobalDataTO.SetDatos = CType(pRefCellNumber, Integer)
+
+                                Else
+                                    'We need to move the start selectedPosition.
+                                    Dim difPos As Integer = pNumElemRequired - numFreePos
+                                    myGlobalDataTO = myWSRotorContentByPositionDAO.CountPositionsByStatus(dbConnection, pAnalyzerID, pWorkSessionID, pRotorType, "FREE", pRingNumber, pRefCellNumber - difPos, pRefCellNumber)
+
+                                    If (Not myGlobalDataTO.HasError) Then
+                                        If (Not myGlobalDataTO.SetDatos Is Nothing AndAlso String.Compare(myGlobalDataTO.SetDatos.ToString(), "", False) <> 0) Then
+                                            Dim numFreePosAnt = CType(myGlobalDataTO.SetDatos, Integer)
+                                            If numFreePosAnt > 0 AndAlso numFreePosAnt >= difPos Then
+                                                resCellNumber = pRefCellNumber - difPos
+                                                myGlobalDataTO.SetDatos = CType(resCellNumber, Integer)
+                                            Else
+                                                'We haven't enough positions before the selected point to move the multipoint calibrator, then we send a warning message, saying select other point into the rotor.
+                                                myGlobalDataTO.SetDatos = 0
+                                                myGlobalDataTO.HasError = False
+                                                myGlobalDataTO.ErrorCode = "ROTOR_FULL"
+                                            End If
+                                        End If
+                                    End If
+                                End If
+                            Else
+                                'In case the returned value is null or empty then the result value is 0
+                                myGlobalDataTO.SetDatos = 0
+                            End If
+                        End If
+
+                    End If
+                End If
+            Catch ex As Exception
+                myGlobalDataTO = New GlobalDataTO()
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
+
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.CheckEnoughFreeCellsXMultipointCalib", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Get the maximum position of rotor, depends the rotor type wwe send to check.</summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
+        ''' <param name="pRotorType">Type of Analyzer Rotor</param>
+        ''' <param name="pRingNumber">Ring Number. Optional parameter</param>
+        ''' <returns>GlobalDataTO containing an integer value with the number of cells having the informed Status</returns>
+        ''' <remarks>
+        ''' Created by:  TR 28/01/2010 - TESTED: OK
+        ''' Modified by: TR 01/02/2010 - Added new optional parameter pRingNumber
+        ''' </remarks>
+        Private Function CountMaxCellByRotor(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+                                               ByVal pRotorType As String, ByVal pRingNumber As Integer) As Integer
+            Dim myGlobalDataTO As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim MaxCell As Integer = -1
+            Try
+                myGlobalDataTO = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myRotorContentByPositionDAO As New twksWSRotorContentByPositionDAO()
+
+                        Dim rotorConfig As New tfmwAnalyzerModelRotorsConfigDAO
+                        myGlobalDataTO = rotorConfig.GetAnalyzerRotorsRingConfiguration(dbConnection, pAnalyzerID, pRotorType, pRingNumber)
+
+                        If Not myGlobalDataTO.HasError Then
+                            'Get the last cell number
+                            MaxCell = CType(myGlobalDataTO.SetDatos, AnalyzerModelRotorsConfigDS).tfmwAnalyzerModelRotorsConfig(0).LastCellNumber
+                            myGlobalDataTO.SetDatos = MaxCell
+                        End If
+
+                    End If
+                End If
+            Catch ex As Exception
+                myGlobalDataTO = New GlobalDataTO()
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
+
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.CountMaxCellByRotor", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return MaxCell
+        End Function
+
+#End Region
 
         ''' <summary>
         ''' Validate if there are available positions in the specified Rotor. In case the Rotor is full, then search if there
@@ -6978,58 +7124,6 @@ Namespace Biosystems.Ax00.BL
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return myGlobalDataTO
-        End Function
-
-
-        ''' <summary>
-        ''' Count how many cells in the specified Analyzer Rotor have the informed Status
-        ''' </summary>
-        ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
-        ''' <param name="pWorkSessionID">WorkSession Identifier</param>
-        ''' <param name="pRotorType">Type of Analyzer Rotor</param>
-        ''' <param name="pStatus">Cell Status to search</param>
-        ''' <param name="pRingNumber">Ring Number. Optional parameter</param>
-        ''' <returns>GlobalDataTO containing an integer value with the number of cells having the informed Status</returns>
-        ''' <remarks>
-        ''' Created by:  TR 28/01/2010 - TESTED: OK
-        ''' Modified by: TR 01/02/2010 - Added new optional parameter pRingNumber
-        ''' </remarks>
-        Private Function CountMaxCellByRotor(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-                                               ByVal pRotorType As String, ByVal pRingNumber As Integer) As Integer
-            Dim myGlobalDataTO As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
-            Dim MaxCell As Integer = -1
-            Try
-                myGlobalDataTO = DAOBase.GetOpenDBConnection(pDBConnection)
-                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        Dim myRotorContentByPositionDAO As New twksWSRotorContentByPositionDAO()
-
-                        Dim rotorConfig As New tfmwAnalyzerModelRotorsConfigDAO
-                        myGlobalDataTO = rotorConfig.GetAnalyzerRotorsRingConfiguration(dbConnection, pAnalyzerID, pRotorType, pRingNumber)
-
-                        If Not myGlobalDataTO.HasError Then
-                            'Get the last cell number
-                            MaxCell = CType(myGlobalDataTO.SetDatos, AnalyzerModelRotorsConfigDS).tfmwAnalyzerModelRotorsConfig(0).LastCellNumber
-                            myGlobalDataTO.SetDatos = MaxCell
-                        End If
-
-                    End If
-                End If
-            Catch ex As Exception
-                myGlobalDataTO = New GlobalDataTO()
-                myGlobalDataTO.HasError = True
-                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRotorContentByPositionDelegate.CountMaxCellByRotor", EventLogEntryType.Error, False)
-            Finally
-                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-            Return MaxCell
         End Function
 
         ''' <summary>

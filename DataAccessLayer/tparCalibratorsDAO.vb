@@ -179,9 +179,8 @@ Partial Public Class tparCalibratorsDAO
     ''' Created by:  DL 21/01/2010
     ''' Modified by: SA 09/05/2012 - Changed the function template
     ''' Modified by: DL 30/01/2013 - Add optional paramenter IsFactory
-    ''' 	         IT 29/05/2015 - BA-2563
     ''' </remarks>
-    Public Function Read(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalibratorID As Integer, calibratorsDs As CalibratorsDS, Optional pIsFactory As Boolean = False) As GlobalDataTO
+    Public Function Read(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalibratorID As Integer, Optional pIsFactory As Boolean = False) As GlobalDataTO
         Dim resultData As GlobalDataTO = Nothing
         Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -208,14 +207,14 @@ Partial Public Class tparCalibratorsDAO
                     cmdText &= "dbo.tparCalibrators" & vbCrLf
                     cmdText &= " WHERE CalibratorID = " & pCalibratorID.ToString
 
-                    'Dim calibratorsDataDS As New CalibratorsDS 'IT 29/05/2015 - BA-2563
+                    Dim calibratorsDataDS As New CalibratorsDS
                     Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
                         Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-                            dbDataAdapter.Fill(calibratorsDs.tparCalibrators)
+                            dbDataAdapter.Fill(calibratorsDataDS.tparCalibrators)
                         End Using
                     End Using
 
-                    resultData.SetDatos = calibratorsDs
+                    resultData.SetDatos = calibratorsDataDS
                     resultData.HasError = False
                 End If
             End If
@@ -242,7 +241,7 @@ Partial Public Class tparCalibratorsDAO
     ''' Created by:  VR 31/05/2010 
     ''' Modified by: SA 09/05/2012 - Changed the function template
     ''' </remarks>
-    Public Function ReadAll(ByVal pDBConnection As SqlClient.SqlConnection, calibratorsDs As CalibratorsDS) As GlobalDataTO
+    Public Function ReadAll(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
         Dim resultData As GlobalDataTO = Nothing
         Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -253,14 +252,14 @@ Partial Public Class tparCalibratorsDAO
                 If (Not dbConnection Is Nothing) Then
                     Dim cmdText As String = " SELECT * FROM tparCalibrators "
 
-                    'Dim calibratorsDataDS As New CalibratorsDS
+                    Dim calibratorsDataDS As New CalibratorsDS
                     Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
                         Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-                            dbDataAdapter.Fill(calibratorsDs.tparCalibrators)
+                            dbDataAdapter.Fill(calibratorsDataDS.tparCalibrators)
                         End Using
                     End Using
 
-                    resultData.SetDatos = calibratorsDs
+                    resultData.SetDatos = calibratorsDataDS
                     resultData.HasError = False
                 End If
             End If
@@ -289,7 +288,7 @@ Partial Public Class tparCalibratorsDAO
     ''' Modified by: SA 09/05/2012 - Changed the function template; added prefix N to the filter by CalibratorName
     ''' AG  13/03/2014 - #1538 fix issue when name contains char ' (use .Replace("'", "''"))
     ''' </remarks>
-    Public Function ReadByCalibratorName(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalibratorName As String, calibratorsDs As CalibratorsDS, Optional pIsFactory As Boolean = False) As GlobalDataTO
+    Public Function ReadByCalibratorName(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalibratorName As String, Optional pIsFactory As Boolean = False) As GlobalDataTO
         Dim resultData As GlobalDataTO = Nothing
         Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -318,14 +317,14 @@ Partial Public Class tparCalibratorsDAO
                     'cmdText &= " WHERE  CalibratorName = N'" & pCalibratorName.Trim & "' " & vbCrLf
                     cmdText &= " WHERE  CalibratorName = N'" & pCalibratorName.Trim.Replace("'", "''") & "' " & vbCrLf
 
-                    'Dim calibratorsDataDS As New CalibratorsDS
+                    Dim calibratorsDataDS As New CalibratorsDS
                     Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
                         Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-                            dbDataAdapter.Fill(calibratorsDs.tparCalibrators)
+                            dbDataAdapter.Fill(calibratorsDataDS.tparCalibrators)
                         End Using
                     End Using
 
-                    resultData.SetDatos = calibratorsDs
+                    resultData.SetDatos = calibratorsDataDS
                     resultData.HasError = False
                 End If
             End If
@@ -422,7 +421,7 @@ Partial Public Class tparCalibratorsDAO
     ''' <remarks>
     ''' Created by: RH 16/12/2011
     ''' </remarks>
-    Public Function GetCalibratorsForReport(ByVal pDBConnection As SqlClient.SqlConnection, ByVal AppLang As String, calibratorsDs As CalibratorsDS, _
+    Public Function GetCalibratorsForReport(ByVal pDBConnection As SqlClient.SqlConnection, ByVal AppLang As String, _
                                             Optional ByVal SelectedCalibrators As List(Of Integer) = Nothing) As GlobalDataTO
         Dim resultData As GlobalDataTO = Nothing
         Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -448,11 +447,11 @@ Partial Public Class tparCalibratorsDAO
                                                           " FROM   tparCalibrators TC{0}", StrSelectedCalibrators)
 
                     'Get the first table
-                    'Dim myCalibratorsDS As New CalibratorsDS
+                    Dim myCalibratorsDS As New CalibratorsDS
                     Using dbCmd As New SqlCommand(cmdText, dbConnection)
                         'Fill the DataSet to return 
                         Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-                            dbDataAdapter.Fill(calibratorsDs.tparCalibrators)
+                            dbDataAdapter.Fill(myCalibratorsDS.tparCalibrators)
                         End Using
                     End Using
 
@@ -492,8 +491,8 @@ Partial Public Class tparCalibratorsDAO
                     Using dbCmd As New SqlCommand(cmdText, dbConnection)
                         'Fill the DataSet to return 
                         Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-                            dbDataAdapter.Fill(calibratorsDs.tparCalibratorsTests)
-                            resultData.SetDatos = calibratorsDs
+                            dbDataAdapter.Fill(myCalibratorsDS.tparCalibratorsTests)
+                            resultData.SetDatos = myCalibratorsDS
                         End Using
                     End Using
                 End If

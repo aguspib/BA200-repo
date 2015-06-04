@@ -99,9 +99,6 @@
     <Compile Include="PersentationLayerListener\Requests\PresentationRequest.vb" />
     <Compile Include="PersentationLayerListener\Requests\YesNoCancelQuestion.vb" />
     <Compile Include="PersentationLayerListener\Requests\YesNoQuestion.vb" />
-    <Compile Include="PresentationLayerController\Enums\ProgrammingControllerEnum.vb" />
-    <Compile Include="PresentationLayerController\Interfaces\IProgrammingController.vb" />
-    <Compile Include="PresentationLayerController\ProgrammingController.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">

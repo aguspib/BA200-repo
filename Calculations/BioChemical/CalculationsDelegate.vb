@@ -7138,8 +7138,7 @@ Namespace Biosystems.Ax00.Calculations
         ''' <param name="pExecToCalculateRow">Row of typed DataSet ExecutionsDS (subtable twksWSExecutions) containing data of the 
         '''                                   Execution to be calculated</param>
         ''' <remarks>
-        ''' Created by:   SA 09/07/2012 - Optimization of function InitCalibration
-        ''' Modified by: IT 29/05/2015 - BA-2563
+        ''' Created by:  SA 09/07/2012 - Optimization of function InitCalibration
         ''' </remarks>
         Private Sub InitCalibrationNEW(ByVal pExecToCalculateRow As ExecutionsDS.twksWSExecutionsRow)
             Dim resultData As New GlobalDataTO
@@ -7204,20 +7203,19 @@ Namespace Biosystems.Ax00.Calculations
                         ReDim calibrator.Curve.Coefficient(3, 15) 'Idem Ax5
                     End If
 
-                    Dim myCalibratorsData As New CalibratorsDS 'IT 29/05/2015 - BA-2563
-                    resultData = testCalibratorData.GetTestCalibratorValuesNEW(Nothing, calibrator.TestID, calibrator.SampleType, myCalibratorsData)
+                    resultData = testCalibratorData.GetTestCalibratorValuesNEW(Nothing, calibrator.TestID, calibrator.SampleType)
                     If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                        myCalibratorsData = DirectCast(resultData.SetDatos, CalibratorsDS)
+                        Dim myTestCalibratorValuesData As TestCalibratorValuesDS = DirectCast(resultData.SetDatos, TestCalibratorValuesDS)
 
                         'Data of Calibration Curve is get from the first row in the returned DS (this fields have the same value for all rows)
-                        If (Not myCalibratorsData.tparTestCalibratorValues(0).IsCurveGrowthTypeNull) Then calibrator.Curve.CurveGrowthType = myCalibratorsData.tparTestCalibratorValues(0).CurveGrowthType
-                        If (Not myCalibratorsData.tparTestCalibratorValues(0).IsCurveTypeNull) Then calibrator.Curve.CurveType = myCalibratorsData.tparTestCalibratorValues(0).CurveType
-                        If (Not myCalibratorsData.tparTestCalibratorValues(0).IsCurveAxisXTypeNull) Then calibrator.Curve.CurveAxisXType = myCalibratorsData.tparTestCalibratorValues(0).CurveAxisXType
-                        If (Not myCalibratorsData.tparTestCalibratorValues(0).IsCurveAxisYTypeNull) Then calibrator.Curve.CurveAxisYType = myCalibratorsData.tparTestCalibratorValues(0).CurveAxisYType
+                        If (Not myTestCalibratorValuesData.tparTestCalibratorValues(0).IsCurveGrowthTypeNull) Then calibrator.Curve.CurveGrowthType = myTestCalibratorValuesData.tparTestCalibratorValues(0).CurveGrowthType
+                        If (Not myTestCalibratorValuesData.tparTestCalibratorValues(0).IsCurveTypeNull) Then calibrator.Curve.CurveType = myTestCalibratorValuesData.tparTestCalibratorValues(0).CurveType
+                        If (Not myTestCalibratorValuesData.tparTestCalibratorValues(0).IsCurveAxisXTypeNull) Then calibrator.Curve.CurveAxisXType = myTestCalibratorValuesData.tparTestCalibratorValues(0).CurveAxisXType
+                        If (Not myTestCalibratorValuesData.tparTestCalibratorValues(0).IsCurveAxisYTypeNull) Then calibrator.Curve.CurveAxisYType = myTestCalibratorValuesData.tparTestCalibratorValues(0).CurveAxisYType
 
                         Dim myIndex As Integer = 0
-                        ReDim calibrator.TheoreticalConcentration(myCalibratorsData.tparTestCalibratorValues.Rows.Count - 1)
-                        For Each row As CalibratorsDS.tparTestCalibratorValuesRow In myCalibratorsData.tparTestCalibratorValues
+                        ReDim calibrator.TheoreticalConcentration(myTestCalibratorValuesData.tparTestCalibratorValues.Rows.Count - 1)
+                        For Each row As TestCalibratorValuesDS.tparTestCalibratorValuesRow In myTestCalibratorValuesData.tparTestCalibratorValues
                             calibrator.TheoreticalConcentration(myIndex) = row.TheoricalConcentration
 
                             myIndex = myIndex + 1

@@ -48,7 +48,7 @@ Public Class UiProgTest
     Private SelectedReagentsDS As New ReagentsDS()
     Private SelectedTestReagentsDS As New TestReagentsDS()
     Private SelectedTestReagentsVolumesDS As New TestReagentsVolumesDS()
-    Private SelectedTestCalibratorValuesDS As New CalibratorsDS 'TR 16/05/201
+    Private SelectedTestCalibratorValuesDS As New TestCalibratorValuesDS 'TR 16/05/201
     Private SelectedTestRefRangesDS As New TestRefRangesDS 'SG 17/06/2010
     Private SelectedTestSampleCalibratorDS As New TestSampleCalibratorDS 'TR 25/02/2011
 
@@ -91,9 +91,8 @@ Public Class UiProgTest
 
     'TR 14/06/2010 local stucture use for Calibrator.
     Private UpdatedCalibratorsDS As New CalibratorsDS
-    'Private UpdatedTestCalibratorDS As New CalibratorsDS
-    'Private UpdatedTestCalibratorValuesDS As New CalibratorsDS
-
+    Private UpdatedTestCalibratorDS As New TestCalibratorsDS
+    Private UpdatedTestCalibratorValuesDS As New TestCalibratorValuesDS
     Private DeletedCalibratorList As New List(Of DeletedCalibratorTO)
 
     'SG 21/06/2010 detailed test ref ranges required control list
@@ -1459,24 +1458,24 @@ Public Class UiProgTest
 
             '
             'UpdatedTestCalibratorDS As New TestCalibratorsDS (Set IsNew to FALSE)
-            Dim myNewTestCalibrators As New List(Of CalibratorsDS.tparTestCalibratorsRow)
-            myNewTestCalibrators = (From a In UpdatedCalibratorsDS.tparTestCalibrators _
+            Dim myNewTestCalibrators As New List(Of TestCalibratorsDS.tparTestCalibratorsRow)
+            myNewTestCalibrators = (From a In UpdatedTestCalibratorDS.tparTestCalibrators _
                                         Where a.IsNew = True Select a).ToList
 
-            For Each row As CalibratorsDS.tparTestCalibratorsRow In myNewTestCalibrators
+            For Each row As TestCalibratorsDS.tparTestCalibratorsRow In myNewTestCalibrators
                 row.IsNew = False
             Next
-            If myNewTestCalibrators.Count > 0 Then UpdatedCalibratorsDS.AcceptChanges()
+            If myNewTestCalibrators.Count > 0 Then UpdatedTestCalibratorDS.AcceptChanges()
 
             'UpdatedTestCalibratorValuesDS As New TestCalibratorValuesDS (Set IsNew to FALSE)
-            Dim myNewTestCalibratorsValues As New List(Of CalibratorsDS.tparTestCalibratorValuesRow)
-            myNewTestCalibratorsValues = (From a In UpdatedCalibratorsDS.tparTestCalibratorValues _
+            Dim myNewTestCalibratorsValues As New List(Of TestCalibratorValuesDS.tparTestCalibratorValuesRow)
+            myNewTestCalibratorsValues = (From a In UpdatedTestCalibratorValuesDS.tparTestCalibratorValues _
                                         Where a.IsNew = True Select a).ToList
 
-            For Each row As CalibratorsDS.tparTestCalibratorValuesRow In myNewTestCalibratorsValues
+            For Each row As TestCalibratorValuesDS.tparTestCalibratorValuesRow In myNewTestCalibratorsValues
                 row.IsNew = False
             Next
-            If myNewTestCalibratorsValues.Count > 0 Then UpdatedCalibratorsDS.AcceptChanges()
+            If myNewTestCalibratorsValues.Count > 0 Then UpdatedTestCalibratorValuesDS.AcceptChanges()
 
             'SelectedTestRefRangesDS As New TestRefRangesDS
             'Set IsNew to FALSE
@@ -1561,15 +1560,15 @@ Public Class UiProgTest
                                     ChangesMade = False
                                     EditionMode = False
                                     'TR 22/07/2013 -BUG #1229.
-                                    UpdatedCalibratorsDS.tparTestCalibratorValues.Clear()
+                                    UpdatedTestCalibratorValuesDS.tparTestCalibratorValues.Clear()
                                     UpdatedCalibratorsDS.tparCalibrators.Clear()
-                                    UpdatedCalibratorsDS.tparTestCalibrators.Clear()
+                                    UpdatedTestCalibratorDS.tparTestCalibrators.Clear()
                                     LocalDeleteControlTOList.Clear()
                                     'TR 22/07/2013 -BUG #1229-END
 
                                 End If
                                 If TestListView.SelectedItems.Count > 0 Then
-                                    UpdatedCalibratorsDS.tparTestCalibratorValues.Clear() 'TR 01/03/2011 -Commented
+                                    UpdatedTestCalibratorValuesDS.tparTestCalibratorValues.Clear() 'TR 01/03/2011 -Commented
                                     BindControls(CType(TestListView.SelectedItems(0).Name, Integer))
                                     'Validate if enable controls.
                                     If EnableControls Then
@@ -1680,9 +1679,9 @@ Public Class UiProgTest
                     'TR 8/11/2010 -Validate if there are selected test on the list view.
                     If TestListView.SelectedItems.Count > 0 Then
                         'TR 18/11/2010 -Clear all the updated structures.
-                        UpdatedCalibratorsDS.tparTestCalibratorValues.Clear()
+                        UpdatedTestCalibratorValuesDS.tparTestCalibratorValues.Clear()
                         UpdatedCalibratorsDS.tparCalibrators.Clear()
-                        UpdatedCalibratorsDS.tparTestCalibrators.Clear()
+                        UpdatedTestCalibratorDS.tparTestCalibrators.Clear()
                         'TR 18/11/2010 -END.
 
                         LocalDeleteControlTOList.Clear() 'TR 24/05/2011
@@ -1697,7 +1696,7 @@ Public Class UiProgTest
                         Else
                             BsErrorProvider1.SetError(MultipleCalibRadioButton, _
                                             GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
-                            UpdatedCalibratorsDS.tparTestCalibratorValues.Clear()
+                            UpdatedTestCalibratorValuesDS.tparTestCalibratorValues.Clear()
                             SelectedTestCalibratorValuesDS.tparTestCalibratorValues.Clear()
                             ChangesMade = True
                             EditionMode = True
@@ -1737,9 +1736,9 @@ Public Class UiProgTest
                 'TR 8/11/2010 -Validate if there are selected test on the list view.
                 If TestListView.SelectedItems.Count > 0 Then
                     'TR 18/11/2010 -Clear all the updated structures.
-                    UpdatedCalibratorsDS.tparTestCalibratorValues.Clear()
+                    UpdatedTestCalibratorValuesDS.tparTestCalibratorValues.Clear()
                     UpdatedCalibratorsDS.tparCalibrators.Clear()
-                    UpdatedCalibratorsDS.tparTestCalibrators.Clear()
+                    UpdatedTestCalibratorDS.tparTestCalibrators.Clear()
                     'TR 18/11/2010 -END.
 
                     LocalDeleteControlTOList.Clear() 'TR 24/05/2011
@@ -2172,24 +2171,24 @@ Public Class UiProgTest
             Dim myGlobalDataTO As New GlobalDataTO
 
             Dim myTestCalibratorValuesDelegate As New TestCalibratorValuesDelegate()
-            Dim qUpdateTestCalibVal As New List(Of CalibratorsDS.tparTestCalibratorValuesRow)
-            Dim qUpdateTestCalibList As New List(Of CalibratorsDS.tparTestCalibratorsRow)
+            Dim qUpdateTestCalibVal As New List(Of TestCalibratorValuesDS.tparTestCalibratorValuesRow)
+            Dim qUpdateTestCalibList As New List(Of TestCalibratorsDS.tparTestCalibratorsRow)
 
             'Get all the concentration values  for the selected test on DB.
-            myGlobalDataTO = myTestCalibratorValuesDelegate.GetTestCalibratorValuesByTestIDSampleType(Nothing, pTestID, pSampleType, SelectedTestCalibratorValuesDS) 'BA-2563
+            myGlobalDataTO = myTestCalibratorValuesDelegate.GetTestCalibratorValuesByTestIDSampleType(Nothing, pTestID, pSampleType)
 
             If Not myGlobalDataTO.HasError Then
-                SelectedTestCalibratorValuesDS = DirectCast(myGlobalDataTO.SetDatos, CalibratorsDS)
+                SelectedTestCalibratorValuesDS = DirectCast(myGlobalDataTO.SetDatos, TestCalibratorValuesDS)
                 If SelectedTestCalibratorValuesDS.tparTestCalibratorValues.Count > 0 Then
                     'validate if data is on update concentration values.
-                    qUpdateTestCalibVal = (From a In UpdatedCalibratorsDS.tparTestCalibratorValues _
+                    qUpdateTestCalibVal = (From a In UpdatedTestCalibratorValuesDS.tparTestCalibratorValues _
                                         Where a.TestCalibratorID = SelectedTestCalibratorValuesDS.tparTestCalibratorValues(0).TestCalibratorID _
                                         Select a).ToList()
                     'if value found then replace selecte test calibrator
                     If qUpdateTestCalibVal.Count > 0 Then
                         SelectedTestCalibratorValuesDS.tparTestCalibratorValues.Clear()
                         'TR 09/11/2010 -Add for process 
-                        For Each testcalValRow As CalibratorsDS.tparTestCalibratorValuesRow In qUpdateTestCalibVal
+                        For Each testcalValRow As TestCalibratorValuesDS.tparTestCalibratorValuesRow In qUpdateTestCalibVal
                             SelectedTestCalibratorValuesDS.tparTestCalibratorValues.ImportRow(testcalValRow)
                         Next
                         'TR 09/11/2010 -END.
@@ -2197,20 +2196,20 @@ Public Class UiProgTest
                     Else
                         'TR 03/08/2010
                         'search on internal structures if has an asigned calibrator.
-                        qUpdateTestCalibList = (From a In UpdatedCalibratorsDS.tparTestCalibrators _
+                        qUpdateTestCalibList = (From a In UpdatedTestCalibratorDS.tparTestCalibrators _
                                                 Where a.TestID = pTestID And a.SampleType = pSampleType _
                                                 Select a).ToList()
 
                         If qUpdateTestCalibList.Count > 0 Then
                             'Get the values by the TestCalibratorID found on the UpdatedtestCalibDS
-                            qUpdateTestCalibVal = (From a In UpdatedCalibratorsDS.tparTestCalibratorValues _
+                            qUpdateTestCalibVal = (From a In UpdatedTestCalibratorValuesDS.tparTestCalibratorValues _
                                             Where a.TestCalibratorID = qUpdateTestCalibList.First().TestCalibratorID _
                                             Select a).ToList()
 
                             If qUpdateTestCalibVal.Count > 0 Then
                                 SelectedTestCalibratorValuesDS.tparTestCalibratorValues.Clear()
                                 'load all value found
-                                For Each TestCaliValRow As CalibratorsDS.tparTestCalibratorValuesRow In qUpdateTestCalibVal
+                                For Each TestCaliValRow As TestCalibratorValuesDS.tparTestCalibratorValuesRow In qUpdateTestCalibVal
                                     SelectedTestCalibratorValuesDS.tparTestCalibratorValues.ImportRow(TestCaliValRow)
                                 Next
 
@@ -2220,20 +2219,20 @@ Public Class UiProgTest
                     End If
                 Else
                     'search on internal structures if has an asigned calibrator.
-                    qUpdateTestCalibList = (From a In UpdatedCalibratorsDS.tparTestCalibrators _
+                    qUpdateTestCalibList = (From a In UpdatedTestCalibratorDS.tparTestCalibrators _
                                             Where a.TestID = pTestID And a.SampleType = pSampleType _
                                             Select a).ToList()
 
                     If qUpdateTestCalibList.Count > 0 Then
                         'Get the values by the TestCalibratorID found on the UpdatedtestCalibDS
-                        qUpdateTestCalibVal = (From a In UpdatedCalibratorsDS.tparTestCalibratorValues _
+                        qUpdateTestCalibVal = (From a In UpdatedTestCalibratorValuesDS.tparTestCalibratorValues _
                                         Where a.TestCalibratorID = qUpdateTestCalibList.First().TestCalibratorID _
                                         Select a).ToList()
 
                         If qUpdateTestCalibVal.Count > 0 Then
                             SelectedTestCalibratorValuesDS.tparTestCalibratorValues.Clear()
                             'load all value found
-                            For Each TestCaliValRow As CalibratorsDS.tparTestCalibratorValuesRow In qUpdateTestCalibVal
+                            For Each TestCaliValRow As TestCalibratorValuesDS.tparTestCalibratorValuesRow In qUpdateTestCalibVal
                                 SelectedTestCalibratorValuesDS.tparTestCalibratorValues.ImportRow(TestCaliValRow)
                             Next
 
@@ -2273,14 +2272,14 @@ Public Class UiProgTest
             Dim myGlobalDataTO As New GlobalDataTO
             Dim myTestCalibratorDelegate As New TestCalibratorsDelegate
 
-            Dim qUpdateTestSampleCalibList As New List(Of CalibratorsDS.tparTestCalibratorsRow)
+            Dim qUpdateTestSampleCalibList As New List(Of TestCalibratorsDS.tparTestCalibratorsRow)
 
             'Get Test calibrator data.
             myGlobalDataTO = myTestCalibratorDelegate.GetTestCalibratorData(Nothing, pTestID, pSampleType)
 
             If Not myGlobalDataTO.HasError Then
                 SelectedTestSampleCalibratorDS = DirectCast(myGlobalDataTO.SetDatos, TestSampleCalibratorDS)
-                qUpdateTestSampleCalibList = (From a In UpdatedCalibratorsDS.tparTestCalibrators _
+                qUpdateTestSampleCalibList = (From a In UpdatedTestCalibratorDS.tparTestCalibrators _
                                              Where a.TestID = pTestID And a.SampleType = pSampleType _
                                              Select a).ToList()
 
@@ -2301,15 +2300,15 @@ Public Class UiProgTest
                         SelectedTestSampleCalibratorDS.tparTestCalibrators(0).ExpirationDate = qUpdateCalibList.First().ExpirationDate
                     End If
                 Else
-                    UpdatedCalibratorsDS.tparTestCalibrators.Clear()
+                    UpdatedTestCalibratorDS.tparTestCalibrators.Clear()
                     For Each testSampleRow As TestSampleCalibratorDS.tparTestCalibratorsRow In SelectedTestSampleCalibratorDS.tparTestCalibrators.Rows
-                        UpdatedCalibratorsDS.tparTestCalibrators.ImportRow(testSampleRow)
+                        UpdatedTestCalibratorDS.tparTestCalibrators.ImportRow(testSampleRow)
                     Next
                 End If
             Else
                 'TR 17/11/2010 -Search the data on the update structures.
                 If myGlobalDataTO.ErrorCode = "MASTER_DATA_MISSING" Then
-                    qUpdateTestSampleCalibList = (From a In UpdatedCalibratorsDS.tparTestCalibrators _
+                    qUpdateTestSampleCalibList = (From a In UpdatedTestCalibratorDS.tparTestCalibrators _
                                              Where a.TestID = pTestID And a.SampleType = pSampleType _
                                              Select a).ToList()
 
@@ -5783,7 +5782,7 @@ Public Class UiProgTest
                     SelectedReagentsDS.Clear()
                     SelectedTestReagentsDS.Clear()
                     UpdatedCalibratorsDS.Clear()
-                    'UpdatedTestCalibratorDS.Clear() BA-2563
+                    UpdatedTestCalibratorDS.Clear()
                     SelectedTestCalibratorValuesDS.Clear()
                     SelectedTestRefRangesDS.Clear()
                     'TR 08/04/2011 -Clear stuctures.
@@ -5815,7 +5814,7 @@ Public Class UiProgTest
                 'Call the delagate and send the data.
                 myGlobalDataTO = myTestDelegate.PrepareTestToSave(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, _
                                                                   SelectedTestDS, SelectedTestSamplesDS, SelectedTestReagentsVolumesDS, SelectedReagentsDS, _
-                                                                  SelectedTestReagentsDS, UpdatedCalibratorsDS, _
+                                                                  SelectedTestReagentsDS, UpdatedCalibratorsDS, UpdatedTestCalibratorDS, UpdatedTestCalibratorValuesDS, _
                                                                   SelectedTestRefRangesDS, DeletedCalibratorList, DeletedTestReagentVolList, DeletedTestProgramingList, _
                                                                   SelectedTestSampleMultirulesDS, SelectedTestControlDS, LocalDeleteControlTOList, myUpdateSampleType)
 
@@ -5856,8 +5855,8 @@ Public Class UiProgTest
 
                     'TR 17/11/2010 -Clear the Updated structures
                     UpdatedCalibratorsDS.tparCalibrators.Clear()
-                    UpdatedCalibratorsDS.tparTestCalibrators.Clear()
-                    UpdatedCalibratorsDS.tparTestCalibratorValues.Clear()
+                    UpdatedTestCalibratorDS.tparTestCalibrators.Clear()
+                    UpdatedTestCalibratorValuesDS.tparTestCalibratorValues.Clear()
                     'TR 17/11/2010 -END 
 
                     'TR 06/05/2011 -Clear QCControl Data Structures
@@ -6799,22 +6798,22 @@ Public Class UiProgTest
         Dim myResult As Boolean = True
         Try
             Dim myGlobalDataTO As New GlobalDataTO
-            Dim myTestCalibratorDS As New CalibratorsDS
+            Dim myTestCalibratorDS As New TestCalibratorsDS
             Dim myTestCalibratorDelegate As New TestCalibratorsDelegate
             'Get the testCalibrator data from db.
-            myGlobalDataTO = myTestCalibratorDelegate.GetTestCalibratorByTestID(Nothing, pTestID, myTestCalibratorDS, pSampleType) 'BA-2563
+            myGlobalDataTO = myTestCalibratorDelegate.GetTestCalibratorByTestID(Nothing, pTestID, pSampleType)
 
             If Not myGlobalDataTO.HasError Then
-                myTestCalibratorDS = DirectCast(myGlobalDataTO.SetDatos, CalibratorsDS)
+                myTestCalibratorDS = DirectCast(myGlobalDataTO.SetDatos, TestCalibratorsDS)
                 If myTestCalibratorDS.tparTestCalibrators.Count > 0 Then
                     'Get the testCalibrator Values
                     Dim myTestCalibratorValuesDelegate As New TestCalibratorValuesDelegate
-                    Dim myTestCalibaratorValuesDS As New CalibratorsDS
+                    Dim myTestCalibaratorValuesDS As New TestCalibratorValuesDS
                     'Get the concentration values.
-                    myGlobalDataTO = myTestCalibratorValuesDelegate.GetTestCalibratorValuesByTestIDSampleType(Nothing, pTestID, pSampleType, myTestCalibratorDS) 'BA-2563
+                    myGlobalDataTO = myTestCalibratorValuesDelegate.GetTestCalibratorValuesByTestIDSampleType(Nothing, pTestID, pSampleType)
 
                     If Not myGlobalDataTO.HasError Then
-                        myTestCalibaratorValuesDS = DirectCast(myGlobalDataTO.SetDatos, CalibratorsDS)
+                        myTestCalibaratorValuesDS = DirectCast(myGlobalDataTO.SetDatos, TestCalibratorValuesDS)
                         If myTestCalibaratorValuesDS.tparTestCalibratorValues.Count = 0 Then
                             myResult = False
                         End If
@@ -6828,7 +6827,7 @@ Public Class UiProgTest
                     If myTestSampleDS.tparTestSamples.Count > 0 Then
                         If myTestSampleDS.tparTestSamples(0).CalibratorType = "EXPERIMENT" Then
                             SelectedTestSampleCalibratorDS.tparTestCalibrators.Clear()
-                            UpdatedCalibratorsDS.tparTestCalibratorValues.Clear()
+                            UpdatedTestCalibratorValuesDS.tparTestCalibratorValues.Clear()
                             SelectedTestCalibratorValuesDS.tparTestCalibratorValues.Clear()
                             myResult = False
                         End If
@@ -9883,226 +9882,226 @@ Public Class UiProgTest
     Private Sub ReleaseElements()
         Try
 
-            ''--- Detach variable defined using WithEvents ---
-            'DeleteButton = Nothing
-            'EditButton = Nothing
-            'AddButton = Nothing
-            'PrintTestButton = Nothing
-            'TestDetailsTabs = Nothing
-            'ProcedureTab = Nothing
-            'CalibrationTab = Nothing
-            'MultipleCalibRadioButton = Nothing
-            'FactorRadioButton = Nothing
-            'AddCalibratorButton = Nothing
-            'XLabel = Nothing
-            'CalibrationFactorTextBox = Nothing
-            'BlankReplicatesLabel = Nothing
-            'CalibratorReplicatesLabels = Nothing
-            'AlternativeCalComboBox = Nothing
-            'TestListView = Nothing
-            'TestDescriptionTextBox = Nothing
-            'VolR1Label = Nothing
-            'VolSampleLabel = Nothing
-            'FilterReferenceLabel = Nothing
-            'FilterMainLabel = Nothing
-            'ReadingModeLabel = Nothing
-            'ReadingModeCombo = Nothing
-            'ReferenceFilterCombo = Nothing
-            'MainFilterCombo = Nothing
-            'WashSolVolUpDown = Nothing
-            'VolR1UpDown = Nothing
-            'VolR2UpDown = Nothing
-            'SampleVolUpDown = Nothing
-            'SamUnitLabel = Nothing
-            'VolR2Label = Nothing
-            'VolWashLabel = Nothing
-            'Reading1Label = Nothing
-            'WashUnitLabel = Nothing
-            'R1UnitLabel = Nothing
-            'VolumesGroupBox = Nothing
-            'R2UnitLabel = Nothing
-            'TimesGroupBox = Nothing
-            'Reading2Label = Nothing
-            'CycleLabel = Nothing
-            'FirstReadingSecUpDown = Nothing
-            'FirstReadingCycleUpDown = Nothing
-            'SecondsLabel = Nothing
-            'SecondReadingSecUpDown = Nothing
-            'Div1 = Nothing
-            'PredilutionModeLabel = Nothing
-            'PredilutionModeCombo = Nothing
-            'PredilutionFactorTextBox = Nothing
-            'PredilutionFactorCheckBox = Nothing
-            'AutoRepetitionCheckbox = Nothing
-            'SaveButton = Nothing
-            'BlankReplicatesUpDown = Nothing
-            'CalReplicatesUpDown = Nothing
-            'ExitButton = Nothing
-            'SelectedSampleTypeCombo = Nothing
-            'BlankTypesLabel = Nothing
-            'BlankTypesCombo = Nothing
-            'OptionsTab = Nothing
-            'PostDilutionFactorGroupbox = Nothing
-            'IncPostDilutionFactorTextBox = Nothing
-            'MultLabel = Nothing
-            'IncreaseLabel = Nothing
-            'DivReduce = Nothing
-            'RedPostDilutionFactorTextBox = Nothing
-            'ReducedLabel = Nothing
-            'DetectionUnitLabel = Nothing
-            'LinearityUnitLabel = Nothing
-            'ValueLabel = Nothing
-            'DetectionLimitLabel = Nothing
-            'LinearityLimitLabel = Nothing
-            'KineticBlanKLimitLabel = Nothing
-            'BlankAbsorbanceLimintLabel = Nothing
-            'SecondReadingCycleUpDown = Nothing
-            'BsErrorProvider1 = Nothing
-            'BlankAbsorbanceUpDown = Nothing
-            'LinearityUpDown = Nothing
-            'DetectionUpDown = Nothing
-            'MaxValueLabel = Nothing
-            'MinValueLabel = Nothing
-            'ProzonePercentUpDown = Nothing
-            'BLabel = Nothing
-            'ALabel = Nothing
-            'PercentLabel = Nothing
-            'SubstrateDepletionLabel = Nothing
-            'SlopeFunctionLabel = Nothing
-            'SlopeBUpDown = Nothing
-            'SlopeAUpDown = Nothing
-            'ProzoneT2UpDown = Nothing
-            'ProzoneT1UpDown = Nothing
-            'ProzoneEffectLabel = Nothing
-            'T2Label = Nothing
-            'T1Label = Nothing
-            'BsLabel1 = Nothing
-            'TestLabel = Nothing
-            'BsPanel1 = Nothing
-            'BsPanel2 = Nothing
-            'AlternativeCalibRadioButton = Nothing
-            'CalibrationModeLabel = Nothing
-            'bsCalibratorValuesCurveLabel = Nothing
-            'bsBlankModeLabel = Nothing
-            'FactorLimitsLabel = Nothing
-            'FactorUpperLimitUpDown = Nothing
-            'FactorLowerLimitUpDown = Nothing
-            'RepetitionRangeLabel = Nothing
-            'RerunUpperLimitUpDown = Nothing
-            'RerunLowerLimitUpDown = Nothing
-            'Separa1 = Nothing
-            'RepetitionRangeUnitLabel = Nothing
-            'SpecificCalibInfoGroupBox = Nothing
-            'BsCalibNumberTextBox = Nothing
-            'ConcentrationGridView = Nothing
-            'CalibNumber = Nothing
-            'Concentration = Nothing
-            'Factor = Nothing
-            'CalibCurveInfoGroupBox = Nothing
-            'YAxisCombo = Nothing
-            'YaxisLabel = Nothing
-            'XAxisCombo = Nothing
-            'XaxisLabel = Nothing
-            'CurveTypeCombo = Nothing
-            'DecreasingRadioButton = Nothing
-            'IncreasingRadioButton = Nothing
-            'NumCalibratorLabel = Nothing
-            'Separa2 = Nothing
-            'ReferenceRangesLabel = Nothing
-            'bsScreenToolTips = Nothing
-            'GeneralTab = Nothing
-            'AbsCheckBox = Nothing
-            'ReactionTypeCombo = Nothing
-            'ReplicatesUpDown = Nothing
-            'DecimalsUpDown = Nothing
-            'ReportsNameTextBox = Nothing
-            'TurbidimetryCheckBox = Nothing
-            'ReportNameLabel = Nothing
-            'ReplicatesLabel = Nothing
-            'ReactionTypeLabel = Nothing
-            'DecimalsLabel = Nothing
-            'UnitsLabel = Nothing
-            'UnitsCombo = Nothing
-            'DeleteSampleTypeButton = Nothing
-            'SampleTypeLabel = Nothing
-            'AnalysisModeCombo = Nothing
-            'ShortNameTextBox = Nothing
-            'AnalysisModeLabel = Nothing
-            'ShortNameLabel = Nothing
-            'TestNameTextBox = Nothing
-            'NameLabel = Nothing
-            'ButtonCancel = Nothing
-            'CalibratorLotTextBox = Nothing
-            'CalibratorNameTextBox = Nothing
-            'LBL_CalibratorName = Nothing
-            'LBL_ExpDate_Full = Nothing
-            'LBL_Lot = Nothing
-            'CalibratorExpirationDate = Nothing
-            'KineticBlankUpDown = Nothing
-            'SampleTypePlus2 = Nothing
-            'DiluentLabel = Nothing
-            'DiluentComboBox = Nothing
-            'BsGroupBox1 = Nothing
-            'BsGroupBox2 = Nothing
-            'QCTabPage = Nothing
-            'QCValuesLabel = Nothing
-            'BsLabel2 = Nothing
-            'ControlValuesGroupBox = Nothing
-            'QCActiveCheckBox = Nothing
-            'RejectionCriteriaLabel = Nothing
-            'QCRejectionCriteria = Nothing
-            'QCReplicNumberNumeric = Nothing
-            'ControlReplicatesNumberLabel = Nothing
-            'BsGroupBox3 = Nothing
-            'TestProgHelpProvider = Nothing
-            'BsLabel3 = Nothing
-            'CalculationModeGroupBox = Nothing
-            'QCMinNumSeries = Nothing
-            'MinimumNumSeries = Nothing
-            'StaticRadioButton = Nothing
-            'ManualRadioButton = Nothing
-            'SixSigmaValuesGroupBox = Nothing
-            'RulesToApplyGroupBox = Nothing
-            'BsCheckbox1 = Nothing
-            'BsCheckbox2 = Nothing
-            'BsCheckbox3 = Nothing
-            'BsCheckbox4 = Nothing
-            'BsCheckbox5 = Nothing
-            'BsCheckbox6 = Nothing
-            'SDLabel = Nothing
-            'BsGroupBox4 = Nothing
-            'BsLabel4 = Nothing
-            'x22CheckBox = Nothing
-            's13CheckBox = Nothing
-            's12CheckBox = Nothing
-            'BsGroupBox5 = Nothing
-            'BsCheckbox8 = Nothing
-            'BsCheckbox9 = Nothing
-            'x22 = Nothing
-            'x10CheckBox = Nothing
-            's41CheckBox = Nothing
-            'r4sCheckBox = Nothing
-            'QCErrorAllowable = Nothing
-            'ErrorAllowableLabel = Nothing
-            'ControlsSelectionLabel = Nothing
-            'BsButton1 = Nothing
-            'UsedControlsGridView = Nothing
-            'AddControls = Nothing
-            'DeleteControlButton = Nothing
-            'BsDataGridView1 = Nothing
-            'BsNumericUpDown1 = Nothing
-            'BsNumericUpDown4 = Nothing
-            'TubesBySampleTypeDS1 = Nothing
-            'bsTestRefRanges = Nothing
-            'BsRadioButton1 = Nothing
-            'SubstrateDepleUpDown = Nothing
-            'BsHelpProvider1 = Nothing
-            'CopyTestButton = Nothing
-            'BsCustomOrderButton = Nothing 'AG 05/09/2014 - BA-1869
-            'SampleTypeCheckList = Nothing
-            'SampleTypeCboEx = Nothing
-            'SampleTypeCboAux = Nothing
-            'AddControlLabel = Nothing
+            '--- Detach variable defined using WithEvents ---
+            DeleteButton = Nothing
+            EditButton = Nothing
+            AddButton = Nothing
+            PrintTestButton = Nothing
+            TestDetailsTabs = Nothing
+            ProcedureTab = Nothing
+            CalibrationTab = Nothing
+            MultipleCalibRadioButton = Nothing
+            FactorRadioButton = Nothing
+            AddCalibratorButton = Nothing
+            XLabel = Nothing
+            CalibrationFactorTextBox = Nothing
+            BlankReplicatesLabel = Nothing
+            CalibratorReplicatesLabels = Nothing
+            AlternativeCalComboBox = Nothing
+            TestListView = Nothing
+            TestDescriptionTextBox = Nothing
+            VolR1Label = Nothing
+            VolSampleLabel = Nothing
+            FilterReferenceLabel = Nothing
+            FilterMainLabel = Nothing
+            ReadingModeLabel = Nothing
+            ReadingModeCombo = Nothing
+            ReferenceFilterCombo = Nothing
+            MainFilterCombo = Nothing
+            WashSolVolUpDown = Nothing
+            VolR1UpDown = Nothing
+            VolR2UpDown = Nothing
+            SampleVolUpDown = Nothing
+            SamUnitLabel = Nothing
+            VolR2Label = Nothing
+            VolWashLabel = Nothing
+            Reading1Label = Nothing
+            WashUnitLabel = Nothing
+            R1UnitLabel = Nothing
+            VolumesGroupBox = Nothing
+            R2UnitLabel = Nothing
+            TimesGroupBox = Nothing
+            Reading2Label = Nothing
+            CycleLabel = Nothing
+            FirstReadingSecUpDown = Nothing
+            FirstReadingCycleUpDown = Nothing
+            SecondsLabel = Nothing
+            SecondReadingSecUpDown = Nothing
+            Div1 = Nothing
+            PredilutionModeLabel = Nothing
+            PredilutionModeCombo = Nothing
+            PredilutionFactorTextBox = Nothing
+            PredilutionFactorCheckBox = Nothing
+            AutoRepetitionCheckbox = Nothing
+            SaveButton = Nothing
+            BlankReplicatesUpDown = Nothing
+            CalReplicatesUpDown = Nothing
+            ExitButton = Nothing
+            SelectedSampleTypeCombo = Nothing
+            BlankTypesLabel = Nothing
+            BlankTypesCombo = Nothing
+            OptionsTab = Nothing
+            PostDilutionFactorGroupbox = Nothing
+            IncPostDilutionFactorTextBox = Nothing
+            MultLabel = Nothing
+            IncreaseLabel = Nothing
+            DivReduce = Nothing
+            RedPostDilutionFactorTextBox = Nothing
+            ReducedLabel = Nothing
+            DetectionUnitLabel = Nothing
+            LinearityUnitLabel = Nothing
+            ValueLabel = Nothing
+            DetectionLimitLabel = Nothing
+            LinearityLimitLabel = Nothing
+            KineticBlanKLimitLabel = Nothing
+            BlankAbsorbanceLimintLabel = Nothing
+            SecondReadingCycleUpDown = Nothing
+            BsErrorProvider1 = Nothing
+            BlankAbsorbanceUpDown = Nothing
+            LinearityUpDown = Nothing
+            DetectionUpDown = Nothing
+            MaxValueLabel = Nothing
+            MinValueLabel = Nothing
+            ProzonePercentUpDown = Nothing
+            BLabel = Nothing
+            ALabel = Nothing
+            PercentLabel = Nothing
+            SubstrateDepletionLabel = Nothing
+            SlopeFunctionLabel = Nothing
+            SlopeBUpDown = Nothing
+            SlopeAUpDown = Nothing
+            ProzoneT2UpDown = Nothing
+            ProzoneT1UpDown = Nothing
+            ProzoneEffectLabel = Nothing
+            T2Label = Nothing
+            T1Label = Nothing
+            BsLabel1 = Nothing
+            TestLabel = Nothing
+            BsPanel1 = Nothing
+            BsPanel2 = Nothing
+            AlternativeCalibRadioButton = Nothing
+            CalibrationModeLabel = Nothing
+            bsCalibratorValuesCurveLabel = Nothing
+            bsBlankModeLabel = Nothing
+            FactorLimitsLabel = Nothing
+            FactorUpperLimitUpDown = Nothing
+            FactorLowerLimitUpDown = Nothing
+            RepetitionRangeLabel = Nothing
+            RerunUpperLimitUpDown = Nothing
+            RerunLowerLimitUpDown = Nothing
+            Separa1 = Nothing
+            RepetitionRangeUnitLabel = Nothing
+            SpecificCalibInfoGroupBox = Nothing
+            BsCalibNumberTextBox = Nothing
+            ConcentrationGridView = Nothing
+            CalibNumber = Nothing
+            Concentration = Nothing
+            Factor = Nothing
+            CalibCurveInfoGroupBox = Nothing
+            YAxisCombo = Nothing
+            YaxisLabel = Nothing
+            XAxisCombo = Nothing
+            XaxisLabel = Nothing
+            CurveTypeCombo = Nothing
+            DecreasingRadioButton = Nothing
+            IncreasingRadioButton = Nothing
+            NumCalibratorLabel = Nothing
+            Separa2 = Nothing
+            ReferenceRangesLabel = Nothing
+            bsScreenToolTips = Nothing
+            GeneralTab = Nothing
+            AbsCheckBox = Nothing
+            ReactionTypeCombo = Nothing
+            ReplicatesUpDown = Nothing
+            DecimalsUpDown = Nothing
+            ReportsNameTextBox = Nothing
+            TurbidimetryCheckBox = Nothing
+            ReportNameLabel = Nothing
+            ReplicatesLabel = Nothing
+            ReactionTypeLabel = Nothing
+            DecimalsLabel = Nothing
+            UnitsLabel = Nothing
+            UnitsCombo = Nothing
+            DeleteSampleTypeButton = Nothing
+            SampleTypeLabel = Nothing
+            AnalysisModeCombo = Nothing
+            ShortNameTextBox = Nothing
+            AnalysisModeLabel = Nothing
+            ShortNameLabel = Nothing
+            TestNameTextBox = Nothing
+            NameLabel = Nothing
+            ButtonCancel = Nothing
+            CalibratorLotTextBox = Nothing
+            CalibratorNameTextBox = Nothing
+            LBL_CalibratorName = Nothing
+            LBL_ExpDate_Full = Nothing
+            LBL_Lot = Nothing
+            CalibratorExpirationDate = Nothing
+            KineticBlankUpDown = Nothing
+            SampleTypePlus2 = Nothing
+            DiluentLabel = Nothing
+            DiluentComboBox = Nothing
+            BsGroupBox1 = Nothing
+            BsGroupBox2 = Nothing
+            QCTabPage = Nothing
+            QCValuesLabel = Nothing
+            BsLabel2 = Nothing
+            ControlValuesGroupBox = Nothing
+            QCActiveCheckBox = Nothing
+            RejectionCriteriaLabel = Nothing
+            QCRejectionCriteria = Nothing
+            QCReplicNumberNumeric = Nothing
+            ControlReplicatesNumberLabel = Nothing
+            BsGroupBox3 = Nothing
+            TestProgHelpProvider = Nothing
+            BsLabel3 = Nothing
+            CalculationModeGroupBox = Nothing
+            QCMinNumSeries = Nothing
+            MinimumNumSeries = Nothing
+            StaticRadioButton = Nothing
+            ManualRadioButton = Nothing
+            SixSigmaValuesGroupBox = Nothing
+            RulesToApplyGroupBox = Nothing
+            BsCheckbox1 = Nothing
+            BsCheckbox2 = Nothing
+            BsCheckbox3 = Nothing
+            BsCheckbox4 = Nothing
+            BsCheckbox5 = Nothing
+            BsCheckbox6 = Nothing
+            SDLabel = Nothing
+            BsGroupBox4 = Nothing
+            BsLabel4 = Nothing
+            x22CheckBox = Nothing
+            s13CheckBox = Nothing
+            s12CheckBox = Nothing
+            BsGroupBox5 = Nothing
+            BsCheckbox8 = Nothing
+            BsCheckbox9 = Nothing
+            x22 = Nothing
+            x10CheckBox = Nothing
+            s41CheckBox = Nothing
+            r4sCheckBox = Nothing
+            QCErrorAllowable = Nothing
+            ErrorAllowableLabel = Nothing
+            ControlsSelectionLabel = Nothing
+            BsButton1 = Nothing
+            UsedControlsGridView = Nothing
+            AddControls = Nothing
+            DeleteControlButton = Nothing
+            BsDataGridView1 = Nothing
+            BsNumericUpDown1 = Nothing
+            BsNumericUpDown4 = Nothing
+            TubesBySampleTypeDS1 = Nothing
+            bsTestRefRanges = Nothing
+            BsRadioButton1 = Nothing
+            SubstrateDepleUpDown = Nothing
+            BsHelpProvider1 = Nothing
+            CopyTestButton = Nothing
+            BsCustomOrderButton = Nothing 'AG 05/09/2014 - BA-1869
+            SampleTypeCheckList = Nothing
+            SampleTypeCboEx = Nothing
+            SampleTypeCboAux = Nothing
+            AddControlLabel = Nothing
             '------------------------------------------------
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -10735,25 +10734,27 @@ Public Class UiProgTest
         SampleTypeCheckList.Visible = True
     End Sub
 
-    Private Sub AddCalibratorButton_Click(ByVal sender As System.Object, ByVal e As EventArgs) Handles AddCalibratorButton.Click
+    Private Sub AddCalibratorButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AddCalibratorButton.Click
         'TR 21/06/2010
         Try
             'TR 01/03/2011
             'Validate the required data before calling the Calibrator windows.
             If TestNameTextBox.Text.Trim() = "" Then
                 'Show message indicating Test name required
-                BsErrorProvider1.SetError(MultipleCalibRadioButton, GetMessageText(Messages.TESTNAME_REQUIRED.ToString, currentLanguage))
+                BsErrorProvider1.SetError(MultipleCalibRadioButton, GetMessageText(GlobalEnumerates.Messages.TESTNAME_REQUIRED.ToString, currentLanguage))
 
                 Exit Try
+                'DL 11/01/2012. Begin
+                'ElseIf SampleTypeCombo.SelectedIndex < 0 Then
             ElseIf SampleTypeCboEx.Text Is String.Empty Then
+                'DL 11/01/2012. End
                 'Show message indicating Sample Type is required
-                BsErrorProvider1.SetError(MultipleCalibRadioButton, GetMessageText(Messages.SAMPLETYPE_REQUIRED.ToString(), currentLanguage))
+                BsErrorProvider1.SetError(MultipleCalibRadioButton, GetMessageText(GlobalEnumerates.Messages.SAMPLETYPE_REQUIRED.ToString(), currentLanguage))
                 Exit Try
             End If
 
             'RH 19/10/2010 Introduce the Using statement
-            Dim programmingController = New ProgrammingController()
-            Using myMultiCalibProgrammingForm As New UiProgCalibrator(programmingController)
+            Using myMultiCalibProgrammingForm As New UiProgCalibrator()
 
                 If SelectedTestDS.tparTests.Rows.Count > 0 Then
                     myMultiCalibProgrammingForm.StartPosition = FormStartPosition.CenterParent
@@ -10766,20 +10767,16 @@ Public Class UiProgTest
                     'TR 02/08/2010
                     myMultiCalibProgrammingForm.ResultCalibratorsDS = UpdatedCalibratorsDS
 
-                    UpdatedCalibratorsDS.tparTestCalibrators.Clear()
+                    UpdatedTestCalibratorDS.tparTestCalibrators.Clear()
                     If SelectedTestSampleCalibratorDS.tparTestCalibrators.Count > 0 Then
-                        UpdatedCalibratorsDS.tparTestCalibrators.ImportRow(SelectedTestSampleCalibratorDS.tparTestCalibrators(0))
+                        UpdatedTestCalibratorDS.tparTestCalibrators.ImportRow(SelectedTestSampleCalibratorDS.tparTestCalibrators(0))
                     End If
+                    myMultiCalibProgrammingForm.ResultTestCalibrator = UpdatedTestCalibratorDS
 
-                    myMultiCalibProgrammingForm.ResultCalibratorsDS = UpdatedCalibratorsDS
-
-                    myMultiCalibProgrammingForm.ResultCalibratorsDS.tparTestCalibratorValues.Clear()
-                    SelectedTestCalibratorValuesDS.tparTestCalibratorValues.CopyToDataTable(myMultiCalibProgrammingForm.ResultCalibratorsDS.tparTestCalibratorValues, LoadOption.OverwriteChanges) 'BA-2563
-                    'myMultiCalibProgrammingForm.ResultTestCalibratorsValue = SelectedTestCalibratorValuesDS
-
-                    UpdatedCalibratorsDS.tparTestCalibratorValues.Clear()
-                    SelectedTestCalibratorValuesDS.tparTestCalibratorValues.CopyToDataTable(UpdatedCalibratorsDS.tparTestCalibratorValues, LoadOption.OverwriteChanges)
-
+                    myMultiCalibProgrammingForm.ResultTestCalibratorsValue = SelectedTestCalibratorValuesDS
+                    UpdatedTestCalibratorValuesDS.tparTestCalibratorValues.Clear()
+                    SelectedTestCalibratorValuesDS.tparTestCalibratorValues.CopyToDataTable(UpdatedTestCalibratorValuesDS.tparTestCalibratorValues, _
+                                                                                                                            LoadOption.OverwriteChanges)
                     'TR 02/08/2010 -End
                     'TR 21/06/2010
                     'myMultiCalibProgrammingForm.FormBorderStyle = Windows.Forms.FormBorderStyle.FixedToolWindow
@@ -10788,11 +10785,13 @@ Public Class UiProgTest
 
                     'RH 20/12/2010
                     myMultiCalibProgrammingForm.Tag = "Put something here before showing, so the form will execute its normal Close()"
+                    'RH 20/12/2010 -END
 
                     'RH 11/05/2012 This is the right value
                     'It is the used througout the application
                     'It enables the aplication to show it's icon when the user press Alt + Tab. The other one not.
                     myMultiCalibProgrammingForm.FormBorderStyle = FormBorderStyle.FixedDialog
+                    'RH 11/05/2012
 
                     myMultiCalibProgrammingForm.AnalyzerID = AnalyzerIDAttribute
                     myMultiCalibProgrammingForm.WorkSessionID = WorkSessionIDAttribute
@@ -10801,12 +10800,16 @@ Public Class UiProgTest
                     'TR 15/11/2010 -Validate if there was any changes on calibrators.
                     If myMultiCalibProgrammingForm.ChangesMade Then
 
-                        UpdatedCalibratorsDS.tparTestCalibratorValues.Clear()
-                        SelectedTestCalibratorValuesDS.tparTestCalibratorValues.CopyToDataTable(UpdatedCalibratorsDS.tparTestCalibratorValues, LoadOption.OverwriteChanges)
+                        UpdatedTestCalibratorValuesDS.tparTestCalibratorValues.Clear()
+                        SelectedTestCalibratorValuesDS.tparTestCalibratorValues.CopyToDataTable(UpdatedTestCalibratorValuesDS.tparTestCalibratorValues, LoadOption.OverwriteChanges)
 
                         ' TR 01/10/2013 Do not validate  if change made on test form if there was a change on Calibrator form the set the calibrator changes to true.
+                        'If Not ChangesMade Then
+                        'ChangesMade = True
                         CalibratorChanges = True  'TR 03/12/2010 Indicate there was a change on the calibrator.
+                        'End If
                     End If
+                    'TR 15/11/2010 -END.
                 End If
 
                 'TR 17/11/2010 -Save on the local tables 
@@ -10826,6 +10829,7 @@ Public Class UiProgTest
                         ChangesMade = True
                     End If
                 End If
+                'TR 1/12/2010 -END.
             End Using
 
             'TR 08/02/2012 -After programming the calibrators validate tab.
@@ -11242,7 +11246,7 @@ Public Class UiProgTest
                         'TR 01/03/2011 -Validate if data is complete
                         If Not ValidateCalibratorDataCompleted(CInt(TestListView.SelectedItems(0).Name), SelectedSampleTypeCombo.SelectedValue.ToString()) Then
                             BsErrorProvider1.SetError(MultipleCalibRadioButton, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
-                            UpdatedCalibratorsDS.tparTestCalibratorValues.Clear()
+                            UpdatedTestCalibratorValuesDS.tparTestCalibratorValues.Clear()
                             SelectedTestCalibratorValuesDS.tparTestCalibratorValues.Clear()
                             screenClose = False
                         End If
@@ -11290,7 +11294,7 @@ Public Class UiProgTest
                     'TR 01/03/2011 -Validate if data is complete
                     If Not ValidateCalibratorDataCompleted(CInt(TestListView.SelectedItems(0).Name), SelectedSampleTypeCombo.SelectedValue.ToString()) Then
                         BsErrorProvider1.SetError(MultipleCalibRadioButton, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
-                        UpdatedCalibratorsDS.tparTestCalibratorValues.Clear()
+                        UpdatedTestCalibratorValuesDS.tparTestCalibratorValues.Clear()
                         SelectedTestCalibratorValuesDS.tparTestCalibratorValues.Clear()
                         createNew = False
                     End If
@@ -11336,9 +11340,9 @@ Public Class UiProgTest
                 SelectedTestSampleMultirulesDS.tparTestSamplesMultirules.Clear()
 
                 'TR  25/02/2011 -Clear Update structure
-                UpdatedCalibratorsDS.tparTestCalibratorValues.Clear()
+                UpdatedTestCalibratorValuesDS.tparTestCalibratorValues.Clear()
                 UpdatedCalibratorsDS.tparCalibrators.Clear()
-                UpdatedCalibratorsDS.tparTestCalibrators.Clear()
+                UpdatedTestCalibratorDS.tparTestCalibrators.Clear()
                 SelectedTestSampleCalibratorDS.tparTestCalibrators.Clear()
                 'TR  25/02/2011 -END
 
@@ -12913,9 +12917,9 @@ Public Class UiProgTest
                     EditionMode = False
                     BsErrorProvider1.Clear()
                     If TestListView.SelectedItems.Count > 0 Then
-                        UpdatedCalibratorsDS.tparTestCalibratorValues.Clear()
+                        UpdatedTestCalibratorValuesDS.tparTestCalibratorValues.Clear()
                         UpdatedCalibratorsDS.tparCalibrators.Clear()
-                        UpdatedCalibratorsDS.tparTestCalibrators.Clear()
+                        UpdatedTestCalibratorDS.tparTestCalibrators.Clear()
                         LocalDeleteControlTOList.Clear() 'TR 24/05/2011
 
                         BindControls(CType(TestListView.SelectedItems(0).Name, Integer))
@@ -14660,11 +14664,11 @@ Public Class UiProgTest
         Try
             Dim myGlobalDataTO As New GlobalDataTO
             CopyTestData = True
-            If UpdatedCalibratorsDS.tparTestCalibrators.Count > 0 Then
+            If UpdatedTestCalibratorDS.tparTestCalibrators.Count > 0 Then
 
                 Dim myCalibratorDelegate As New CalibratorsDelegate
                 Dim myTestCalibratorDelegate As New TestCalibratorsDelegate
-                Dim myTestCalibratorsValuesDS As New CalibratorsDS
+                Dim myTestCalibratorsValuesDS As New TestCalibratorValuesDS
                 Dim myTestCalibratorsValuesDelegate As New TestCalibratorValuesDelegate
                 'Dim myTestSampleDelegate As New TestSamplesDelegate
 
@@ -14674,17 +14678,15 @@ Public Class UiProgTest
                 'SelectedTestDS.tparTests(0).ShortName &= "Copy" & SelectedTestDS.tparTests(0).ShortName
 
                 'Get the test calibrator information 
-                myGlobalDataTO = myTestCalibratorDelegate.GetTestCalibratorByTestID(Nothing, SelectedTestDS.tparTests(0).TestID, UpdatedCalibratorsDS) 'BA-2563
+                myGlobalDataTO = myTestCalibratorDelegate.GetTestCalibratorByTestID(Nothing, SelectedTestDS.tparTests(0).TestID)
                 If Not myGlobalDataTO.HasError Then
-                    'UpdatedTestCalibratorDS = DirectCast(myGlobalDataTO.SetDatos, CalibratorsDS) 'BA-2563
-                    'UpdatedCalibratorsDS.tparTestCalibrators.Clear() 'BA-2563
-                    'DirectCast(myGlobalDataTO.SetDatos, CalibratorsDS).tparTestCalibrators.CopyToDataTable(UpdatedCalibratorsDS.tparTestCalibrators, LoadOption.OverwriteChanges) 'BA-2563
-
+                    UpdatedTestCalibratorDS = DirectCast(myGlobalDataTO.SetDatos, TestCalibratorsDS)
                     'Change the isnew value to True.
-                    For Each TestCalibRow As CalibratorsDS.tparTestCalibratorsRow In UpdatedCalibratorsDS.tparTestCalibrators.Rows
+                    For Each TestCalibRow As TestCalibratorsDS.tparTestCalibratorsRow In _
+                                                                        UpdatedTestCalibratorDS.tparTestCalibrators.Rows
                         TestCalibRow.IsNew = True
                         'Get the calibrator info
-                        myGlobalDataTO = myCalibratorDelegate.GetCalibratorData(Nothing, TestCalibRow.CalibratorID, myTestCalibratorsValuesDS) 'BA-2563
+                        myGlobalDataTO = myCalibratorDelegate.GetCalibratorData(Nothing, TestCalibRow.CalibratorID)
                         If Not myGlobalDataTO.HasError Then
                             If DirectCast(myGlobalDataTO.SetDatos, CalibratorsDS).tparCalibrators.Count > 0 Then
                                 UpdatedCalibratorsDS.tparCalibrators.ImportRow(DirectCast(myGlobalDataTO.SetDatos, CalibratorsDS).tparCalibrators(0))
@@ -14692,12 +14694,14 @@ Public Class UiProgTest
                         End If
                         'Get the TestCalibrator values 
                         If Not myGlobalDataTO.HasError Then
-                            myGlobalDataTO = myTestCalibratorsValuesDelegate.GetTestCalibratorValuesByTestCalibratorID(Nothing, TestCalibRow.TestCalibratorID, myTestCalibratorsValuesDS) 'BA-2563
+                            myGlobalDataTO = myTestCalibratorsValuesDelegate.GetTestCalibratorValuesByTestCalibratorID(Nothing, _
+                                                                                                        TestCalibRow.TestCalibratorID)
                             If Not myGlobalDataTO.HasError Then
-                                myTestCalibratorsValuesDS = DirectCast(myGlobalDataTO.SetDatos, CalibratorsDS)
-                                For Each TestCalValuesRow As CalibratorsDS.tparTestCalibratorValuesRow In myTestCalibratorsValuesDS.tparTestCalibratorValues.Rows
+                                myTestCalibratorsValuesDS = DirectCast(myGlobalDataTO.SetDatos, TestCalibratorValuesDS)
+                                For Each TestCalValuesRow As TestCalibratorValuesDS.tparTestCalibratorValuesRow In _
+                                                                                    myTestCalibratorsValuesDS.tparTestCalibratorValues.Rows
                                     TestCalValuesRow.IsNew = True
-                                    UpdatedCalibratorsDS.tparTestCalibratorValues.ImportRow(TestCalValuesRow)
+                                    UpdatedTestCalibratorValuesDS.tparTestCalibratorValues.ImportRow(TestCalValuesRow)
 
                                 Next
                             End If
