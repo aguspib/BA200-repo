@@ -538,8 +538,11 @@ Public Class UiSATReport
             SATFileName = FileNameTextBox.Text
             SATFilePath = FolderPathTextBox.Text
 
+
+
             Dim mySATUtil As New SATReportUtilities
-            myGlobal = mySATUtil.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_REPORT, False, String.Empty, AnalyzerController.Instance.Analyzer.AdjustmentsFilePath, SATFilePath, SATFileName)
+            myGlobal = mySATUtil.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_REPORT, False, String.Empty, AnalyzerController.Instance.Analyzer.AdjustmentsFilePath, SATFilePath, SATFileName,
+                                                 String.Empty, True, AnalyzerController.Instance.Analyzer.Model)
 
             If (Not myGlobal.HasError) Then
                 'Restore original values of First and Last Names in tparPatients
