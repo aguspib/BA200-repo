@@ -762,7 +762,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         Dim execDel As New ExecutionsDelegate
                         'AG 11/07/2012
                         'resultData = execDel.GetNextPendingISEExecution(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute)
-                        resultData = execDel.GetNextPendingISEExecutionNEW(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute)
+                        resultData = execDel.GetNextPendingISEExecution(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute)
                     Else
                         resultData.SetDatos = New ExecutionsDS
                     End If
@@ -1225,6 +1225,13 @@ Namespace Biosystems.Ax00.Core.Entities
             Return resultData
         End Function
 
+        ''' <summary>
+        ''' Sets the ElementID property to all the pending executions
+        ''' </summary>
+        ''' <param name="toSendList"></param>
+        ''' <param name="dbConnection"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
         Private Function InformElementID(ByVal toSendList As List(Of ExecutionsDS.twksWSExecutionsRow), ByVal dbConnection As SqlConnection) As List(Of ExecutionsDS.twksWSExecutionsRow)
             Dim allOrderTestsDS As OrderTestsForExecutionsDS
             Dim myWSOrderTestsDelegate As New WSOrderTestsDelegate
@@ -1265,6 +1272,16 @@ Namespace Biosystems.Ax00.Core.Entities
             Return toSendList
         End Function
 
+        ''' <summary>
+        ''' Get the list of pending executions depending the entry parameters case
+        ''' </summary>
+        ''' <param name="pSTDExecutionList"></param>
+        ''' <param name="pOrderId"></param>
+        ''' <param name="pSampleType"></param>
+        ''' <param name="pStatFlag"></param>
+        ''' <param name="pSampleClass"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
         Private Function GetExecutionsToSend(pSTDExecutionList As ExecutionsDS, ByVal pOrderId As String, ByVal pSampleType As String, ByVal pStatFlag As Boolean, ByVal pSampleClass As String) As List(Of ExecutionsDS.twksWSExecutionsRow)
             'Get the list of pending executions depending the entry parameters case
             'Apply different LINQ (where clause)
@@ -1292,23 +1309,27 @@ Namespace Biosystems.Ax00.Core.Entities
             Return toSendList
         End Function
 
+        ''' <summary>
+        ''' Returns a boolean value about if exists contamination bewteen the previous reagents sent to the analyzer and the first reagent on the list of pending executions
+        ''' </summary>
+        ''' <param name="previousReagentIDSentList"></param>
+        ''' <param name="pContaminationsDS"></param>
+        ''' <param name="ReagentRow"></param>
+        ''' <param name="pHighContaminationPersitance"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
         Private Function SeachContaminationBetweenPreviousAndFirsToSend(ByRef previousReagentIDSentList As List(Of AnalyzerManagerDS.sentPreparationsRow), pContaminationsDS As ContaminationsDS, ReagentRow As ExecutionsDS.twksWSExecutionsRow, pHighContaminationPersitance As Integer) As Boolean
 
             previousReagentIDSentList = (From a As AnalyzerManagerDS.sentPreparationsRow In mySentPreparationsDS.sentPreparations _
                                      Where a.ExecutionType = "PREP_STD" Select a).ToList
             Debug.Print("SeachContaminationBetweenPreviousAndFirsToSend: " & previousReagentIDSentList.Count)
-            Dim context = ContaminationsSpecification.CurrentRunningContext
-
-            'Dim executionB2 = 0
-            'Dim executionB1 = 0
-            'If previousReagentIDSentList.Count >= 1 Then ExecutionB2 = previousReagentIDSentList(0).ExecutionID
-            'If previousReagentIDSentList.Count >= 2 Then ExecutionB1 = previousReagentIDSentList(1).ExecutionID
-            'context.FillContentsFromAnalyzer(String.Format("STATUS;R1B2:{0};R1B1:{1};", executionB2, executionB1))
+            Dim context = WSCreator.ContaminationsSpecification.CurrentRunningContext
 
             Debug.Print("CourrentContext read")
             Dim result = context.ActionRequiredForDispensing(ReagentRow)
-            If result.Action <> IContaminationsAction.RequiredAction.NoAction Then
+            If result.Action <> IContaminationsAction.RequiredAction.GoAhead Then
                 Debug.Print("Contaminations found")
+
                 Return True
             Else
                 Debug.Print("Contaminations not found")
@@ -1802,13 +1823,28 @@ Namespace Biosystems.Ax00.Core.Entities
         End Function
 #End Region
 
+        ''' <summary>
+        ''' Obtains the next preparation to send, if there's any that doesn't contaminate. 
+        ''' Otherwise, obtains the washing to send, if there's any contamination that cannot be solved.
+        ''' It uses the ExecutionsDelegate.ManageContaminationsForRunningAndStatic method for sorting pending executions.
+        ''' </summary>
+        ''' <param name="myContaminationID"></param>
+        ''' <param name="myWashSolutionType"></param>
+        ''' <param name="indexNextToSend"></param>
+        ''' <param name="nextExecutionFound"></param>
+        ''' <param name="pContaminationsDS"></param>
+        ''' <param name="toSendList"></param>
+        ''' <param name="pHighContaminationPersitance"></param>
+        ''' <param name="previousReagentIDSentList"></param>
+        ''' <param name="dbConnection"></param>
+        ''' <remarks></remarks>
         Private Sub ObtainNextPreparationOrWash(ByRef myContaminationID As Integer, ByRef myWashSolutionType As String, ByRef indexNextToSend As Integer, ByRef nextExecutionFound As Boolean,
                                                 ByVal pContaminationsDS As ContaminationsDS, ByVal toSendList As List(Of ExecutionsDS.twksWSExecutionsRow), ByVal pHighContaminationPersitance As Integer,
                                                 ByVal previousReagentIDSentList As List(Of AnalyzerManagerDS.sentPreparationsRow), ByVal dbConnection As SqlConnection)
             Dim contaminNumber As Integer = 0
 
             '2.1) Calculate contaminations number with current executions sort
-            contaminNumber = 1 + ExecutionsDelegate.GetContaminationNumber(pContaminationsDS, toSendList, pHighContaminationPersitance)
+            contaminNumber = 1 + WSCreator.GetContaminationNumber(False, New List(Of Integer)(), toSendList) ' ExecutionsDelegate.GetContaminationNumber(pContaminationsDS, toSendList, pHighContaminationPersitance)
 
             'If contaminNumber > 0 Then '(5)
             Dim myReagentsIDList As New List(Of Integer) 'List of previous reagents sent before the current previousElementLastReagentID, 
@@ -1824,7 +1860,7 @@ Namespace Biosystems.Ax00.Core.Entities
             '2.2) If contaminations: apply Backtracking algorithm for handling contaminations, and choose the best solution
             Dim currentResultList As List(Of ExecutionsDS.twksWSExecutionsRow)
             currentResultList = toSendList.ToList() 'Initial order                                    
-            'TODO: Confirm this is running only!!
+
             toSendList = ExecutionsDelegate.ManageContaminationsForRunningAndStatic(True, ActiveAnalyzer, dbConnection, pContaminationsDS, currentResultList, pHighContaminationPersitance, contaminNumber, myReagentsIDList, myMaxReplicatesList)
 
 #If DEBUG Then
@@ -1839,6 +1875,13 @@ Namespace Biosystems.Ax00.Core.Entities
             'End If
         End Sub
 
+        ''' <summary>
+        ''' Gets a list with all the maximum number of replicates for every test previously sent
+        ''' </summary>
+        ''' <param name="myReagentsIDList"></param>
+        ''' <param name="myMaxReplicatesList"></param>
+        ''' <param name="previousReagentIDSentList"></param>
+        ''' <remarks></remarks>
         Private Sub GetMaxReplicatesList(ByRef myReagentsIDList As List(Of Integer), ByRef myMaxReplicatesList As List(Of Integer), previousReagentIDSentList As List(Of AnalyzerManagerDS.sentPreparationsRow))
             'Transform previousReagentIDSentList List(Of AnalyzerManagerDS.sentPreparationsRow) into List (Of Integer): PreviousReagentsIDList and previousMaxReplicatesList
             '(the nearest reagents use the higher indexs)
@@ -1859,6 +1902,18 @@ Namespace Biosystems.Ax00.Core.Entities
             End If
         End Sub
 
+        ''' <summary>
+        ''' In case of contamination, it informs the washing solution type. Otherwise, it informs the execution ID
+        ''' </summary>
+        ''' <param name="previousReagentIDSentList"></param>
+        ''' <param name="pHighContaminationPersitance"></param>
+        ''' <param name="myContaminationID"></param>
+        ''' <param name="myWashSolutionType"></param>
+        ''' <param name="indexNextToSend"></param>
+        ''' <param name="nextExecutionFound"></param>
+        ''' <param name="pContaminationsDS"></param>
+        ''' <param name="toSendList"></param>
+        ''' <remarks></remarks>
         Private Sub CheckIfContaminationStillExist(previousReagentIDSentList As List(Of AnalyzerManagerDS.sentPreparationsRow), pHighContaminationPersitance As Integer, ByRef myContaminationID As Integer,
                                                    ByRef myWashSolutionType As String, ByRef indexNextToSend As Integer, ByRef nextExecutionFound As Boolean, ByVal pContaminationsDS As ContaminationsDS,
                                                    ByVal toSendList As List(Of ExecutionsDS.twksWSExecutionsRow))
@@ -1892,9 +1947,10 @@ Namespace Biosystems.Ax00.Core.Entities
                         'Check if the required wash has been already sent or not
                         If Not contaminations(0).IsContaminationIDNull Then myContaminationID = contaminations(0).ContaminationID
 
-                        myWashSolutionType = ""
+                        myWashSolutionType = "EMPTY"
                         'If Not previousReagentIDSentList(highIndex).IsWashSolution1Null Then myWashSolutionType = previousReagentIDSentList(highIndex).WashSolution1
                         If Not contaminations(0).IsWashingSolutionR1Null Then myWashSolutionType = contaminations(0).WashingSolutionR1
+                        If myWashSolutionType = "EMPTY" Then myWashSolutionType = ""
 
                         'AG 28/03/2014 - #1563 it is not necessary modify the next line , ExecutionID can not be NULL because the list has been get using Linq where executionType = PREP_STD
                         Dim previousExecutionsIDSent As Integer = previousReagentIDSentList(highIndex).ExecutionID
@@ -1991,6 +2047,17 @@ Namespace Biosystems.Ax00.Core.Entities
 #End If
         End Sub
 
+        ''' <summary>
+        ''' Informs the DataSet with the proper information to sent to the analyzer (next test or washing)
+        ''' </summary>
+        ''' <param name="toSendList"></param>
+        ''' <param name="myContaminationID"></param>
+        ''' <param name="myWashSolutionType"></param>
+        ''' <param name="nextExecutionFound"></param>
+        ''' <param name="indexNextToSend"></param>
+        ''' <param name="pFound"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
         Private Function ReturnNextExecution(toSendList As List(Of ExecutionsDS.twksWSExecutionsRow), myContaminationID As Integer, myWashSolutionType As String,
                                              nextExecutionFound As Boolean, indexNextToSend As Integer, ByRef pFound As Boolean) As AnalyzerManagerDS
             'Once the best option is found prepare the variable to return
@@ -2218,17 +2285,33 @@ Namespace Biosystems.Ax00.Core.Entities
             End If
         End Sub
 
+        ''' <summary>
+        ''' Sends a Std preparation, or a prediluted preparation, if the latter doesn't contaminate. Otherwise, it sends a SKIP command
+        ''' </summary>
+        ''' <param name="actionAlreadySent"></param>
+        ''' <param name="endRunToSend"></param>
+        ''' <param name="myGlobal"></param>
+        ''' <param name="pNextWell"></param>
+        ''' <param name="emptyFieldsDetected"></param>
+        ''' <param name="myAnManagerDS"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
         Private Function SendWhenTestOrPtestPreparation(ByRef actionAlreadySent As Boolean, ByRef endRunToSend As Boolean, ByRef myGlobal As GlobalDataTO,
                                                      ByRef pNextWell As Integer, ByRef emptyFieldsDetected As Boolean, myAnManagerDS As AnalyzerManagerDS) As Boolean
             Dim systemErrorFlag = False
 
-            Dim disp = ContaminationsSpecification.CreateDispensing
-            disp.ExecutionID = myAnManagerDS.nextPreparation(0).ExecutionID
-            Dim requiredActionBeforeDispensing = ContaminationsSpecification.CurrentRunningContext.ActionRequiredForDispensing(disp)
 
 
             '5rh: Check if next preparation is an STD preparation and executionID <> NO_PENDING_PREPARATION_FOUND
             If Not actionAlreadySent And Not endRunToSend Then
+                Dim disp = WSCreator.ContaminationsSpecification.CreateDispensing
+                disp.ExecutionID = myAnManagerDS.nextPreparation(0).ExecutionID
+                Dim requiredActionBeforeDispensing = WSCreator.ContaminationsSpecification.CurrentRunningContext.ActionRequiredForDispensing(disp)
+                If requiredActionBeforeDispensing.Action = IContaminationsAction.RequiredAction.Wash Then
+                    Debug.WriteLine("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+                    Debug.WriteLine("Incongruency found for reagent: " & disp.R1ReagentID & vbCr & WSCreator.ContaminationsSpecification.CurrentRunningContext.ToString)
+                    Debug.WriteLine("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+                End If
                 If Not myAnManagerDS.nextPreparation(0).IsExecutionTypeNull AndAlso myAnManagerDS.nextPreparation(0).ExecutionType = "PREP_STD" Then
                     'endRunToSend = True  'AG 30/11/2011 comment this line (Sw has to send ENDRUN)
 
@@ -2302,6 +2385,17 @@ Namespace Biosystems.Ax00.Core.Entities
             Return systemErrorFlag
         End Function
 
+        ''' <summary>
+        ''' Sends the End command to the analyzer if there aren't more test to send on the current worksession
+        ''' </summary>
+        ''' <param name="actionAlreadySent"></param>
+        ''' <param name="endRunToSend"></param>
+        ''' <param name="myGlobal"></param>
+        ''' <param name="emptyFieldsDetected"></param>
+        ''' <param name="systemErrorFlag"></param>
+        ''' <param name="iseInstalledFlag"></param>
+        ''' <param name="iseStatusOK"></param>
+        ''' <remarks></remarks>
         Private Sub SendEndRunIfNeeded(ByRef actionAlreadySent As Boolean, ByRef endRunToSend As Boolean, ByRef myGlobal As GlobalDataTO,
                                        ByRef emptyFieldsDetected As Boolean, systemErrorFlag As Boolean, ByRef iseInstalledFlag As Boolean, ByRef iseStatusOK As Boolean)
             'New Conditions 

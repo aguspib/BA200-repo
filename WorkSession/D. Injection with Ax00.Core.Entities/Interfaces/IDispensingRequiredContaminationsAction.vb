@@ -6,7 +6,7 @@ Namespace Biosystems.Ax00.Core.Entities.Worksession.Contaminations.Interfaces
         Property InvolvedWash As IWashingDescription
 
         Enum RequiredAction
-            NoAction
+            GoAhead
             Wash
             Skip
             RemoveRequiredWashing

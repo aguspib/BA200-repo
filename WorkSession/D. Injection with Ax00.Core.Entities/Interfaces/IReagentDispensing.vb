@@ -23,9 +23,9 @@ Namespace Biosystems.Ax00.Core.Entities.Worksession.Contaminations.Interfaces
 
         Property SampleClass As String
 
-        Property OrderTestID As Integer
+        'Property OrderTestID As Integer
 
-        Property TestID As Integer
+        'Property TestID As Integer
 
         ReadOnly Property AnalysisMode As Integer 'OptimizationPolicyApplier.AnalysisMode
 
@@ -40,7 +40,7 @@ Namespace Biosystems.Ax00.Core.Entities.Worksession.Contaminations.Interfaces
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Property DelayCyclesForDispensing As Integer
+        ReadOnly Property DelayCyclesForDispensing As Integer
 
         Sub FillDispense(analyzerContaminationsSpecification As IAnalyzerContaminationsSpecification, ByVal row As ExecutionsDS.twksWSExecutionsRow)
 

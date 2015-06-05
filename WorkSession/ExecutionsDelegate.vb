@@ -1009,137 +1009,14 @@ Namespace Biosystems.Ax00.BL
             Return resultData
         End Function
 
-        ''' <summary>
-        ''' Only for biochemistry tests!!!
-        ''' Calculates the Contamination Number of an Executions group
-        ''' LOW Contaminations (system liquid) -> Persistance contamination cycles: 1
-        ''' HIHG Contaminations (wash bottle) -> Persistance contamination cycles: 2
-        ''' </summary>
-        ''' <param name="pContaminationsDS" ></param>
-        ''' <param name="pExecutions">List of Order Tests</param>
-        ''' <param name="pHighContaminationPersistance" ></param>
-        ''' <returns>
-        ''' Returns the Contamination Number
-        ''' </returns>
-        ''' <remarks>
-        ''' Created by: RH - 10/06/2010
-        ''' AG 16/09/2011 - Add clause (AndAlso pExecutions(myIndex).ExecutionStatus = "PENDING" AndAlso AndAlso pExecutions(myIndex + 1).ExecutionStatus = "PENDING")
-        '''                 due the pending and locked executions are grouped by sample
-        ''' AG 25/11/2011 - add the high contamination persistance functionality
-        ''' AG 15/12/2011 - define as public to use it in SearchNextPreparation process
-        ''' </remarks>
+        
         <Obsolete("Contamination number needs to deppend on analyzer and contaminations specification model. Don't use this!")>
         Public Shared Function GetContaminationNumber(ByVal pContaminationsDS As ContaminationsDS, _
                                                 ByVal pExecutions As IEnumerable(Of ExecutionsDS.twksWSExecutionsRow), _
                                                 Optional ByVal pHighContaminationPersistance As Integer = 0) As Integer
 
-            Dim ContaminationNumber As Integer = 0
-            Dim myIndex As Integer
+            Return WSCreator.GetContaminationNumber(False, New List(Of Integer)(), pExecutions)
 
-            For i As Integer = 0 To pExecutions.Count - 2
-                myIndex = i
-
-                'AG 16/09/2011
-                'Dim contaminations = (From wse In pContaminationsDS.tparContaminations _
-                '                      Where wse.ReagentContaminatorID = pExecutions(myIndex).ReagentID _
-                '                        AndAlso wse.ReagentContaminatedID = pExecutions(myIndex + 1).ReagentID _
-                '                      Select wse).ToList()
-
-                'Search for contamination (LOW or HIGH level contamination)
-                Dim contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                      Where wse.ReagentContaminatorID = pExecutions(myIndex).ReagentID _
-                                        AndAlso wse.ReagentContaminatedID = pExecutions(myIndex + 1).ReagentID _
-                                        AndAlso pExecutions(myIndex).ExecutionStatus = "PENDING" _
-                                        AndAlso pExecutions(myIndex).ExecutionType = "PREP_STD" _
-                                        AndAlso pExecutions(myIndex + 1).ExecutionStatus = "PENDING" _
-                                        AndAlso pExecutions(myIndex + 1).ExecutionType = "PREP_STD" _
-                                      Select wse).ToList()
-                'AG 16/09/2011
-
-                'If contaminations.Count > 0 Then ContaminationNumber += 1
-                If contaminations.Count > 0 Then
-                    ContaminationNumber += 1
-                ElseIf pHighContaminationPersistance > 0 Then
-                    'If not low contaminations exists then evaluate if a high contamination exits (only if optional parameter informed)
-                    'Search for contamination (only HIGH level contamination)
-                    For highIndex As Integer = pHighContaminationPersistance - 1 To 1
-                        Dim auxHighIndex = highIndex
-                        If (myIndex - auxHighIndex) >= 0 Then 'Avoid overflow
-                            contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                              Where wse.ReagentContaminatorID = pExecutions(myIndex - auxHighIndex).ReagentID _
-                                              AndAlso wse.ReagentContaminatedID = pExecutions(myIndex + 1).ReagentID _
-                                              AndAlso Not wse.IsWashingSolutionR1Null _
-                                              AndAlso pExecutions(myIndex - auxHighIndex).ExecutionStatus = "PENDING" _
-                                              AndAlso pExecutions(myIndex - auxHighIndex).ExecutionType = "PREP_STD" _
-                                              AndAlso pExecutions(myIndex + 1).ExecutionStatus = "PENDING" _
-                                              AndAlso pExecutions(myIndex + 1).ExecutionType = "PREP_STD" _
-                                              Select wse).ToList()
-                            If contaminations.Count > 0 Then
-                                ContaminationNumber += 1
-                                Exit For
-                            End If
-                        End If
-                    Next
-
-                End If
-
-            Next i
-
-            Return ContaminationNumber
-        End Function
-
-        ''' <summary>
-        ''' Gets the list of Execution's Element groups sorted by ReadingCycle.
-        ''' </summary>
-        ''' <param name="pExecutions">Dataset with structure of view vwksWSExecutions</param>
-        ''' <returns>
-        ''' GlobalDataTo indicating if an error has occurred or not.
-        ''' If succeed, returns an ExecutionsDS dataset with the sorted data (view vwksWSExecutions)
-        ''' </returns>
-        ''' <remarks>
-        ''' Created by: RH - 08/06/2010
-        ''' </remarks>
-        Public Function SortWSExecutionsByElementGroupTime(ByVal pExecutions As ExecutionsDS) As GlobalDataTO
-            Dim resultData As New GlobalDataTO
-            Dim returnDS As New ExecutionsDS
-
-            Try
-                Dim qOrders As List(Of ExecutionsDS.twksWSExecutionsRow)
-                Dim Index = 0
-
-                While Index < pExecutions.twksWSExecutions.Rows.Count
-                    Dim StatFlag = pExecutions.twksWSExecutions(Index).StatFlag
-                    Dim SampleClass = pExecutions.twksWSExecutions(Index).SampleClass
-
-                    qOrders = (From wse In pExecutions.twksWSExecutions _
-                           Where wse.StatFlag = StatFlag AndAlso wse.SampleClass = SampleClass _
-                           Select wse).ToList()
-
-                    Index += qOrders.Count
-
-                    If SampleClass <> "PATIENT" Then
-                        SortByExecutionTime(qOrders, returnDS)
-                    Else
-                        'When SampleClass = 'PATIENT' do not sort
-                        For Each wse In qOrders
-                            returnDS.twksWSExecutions.ImportRow(wse)
-                        Next
-                    End If
-                End While
-
-                qOrders = Nothing 'AG 19/02/2014 - #1514
-                resultData.SetDatos = returnDS
-
-            Catch ex As Exception
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
-                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.SortWSExecutionsByElementGroupTime", EventLogEntryType.Error, False)
-
-            End Try
-            Return resultData
         End Function
 
         ''' <summary>
@@ -1724,121 +1601,6 @@ Namespace Biosystems.Ax00.BL
             Return resultData
         End Function
 
-        ''' <summary>
-        ''' Get the PENDING executions and calculate the next ISE test for send
-        ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pAnalyzerID"></param>
-        ''' <param name="pWorkSessionID"></param>
-        ''' <returns>Integer inside a GlobalDataTO</returns>
-        ''' <remarks>AG 18/01/2011</remarks>
-        Public Function GetNextPendingISEPatientExecution(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-                              ByVal pWorkSessionID As String) As GlobalDataTO
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
-            Dim iseExecutionID As Integer = GlobalConstants.NO_PENDING_PREPARATION_FOUND
-
-            Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then '(1)
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-
-                    If (Not dbConnection Is Nothing) Then '(2)
-                        Dim myDAO As New twksWSExecutionsDAO
-
-                        'AG 30/11/2011 - get all pending executions (std and ise)
-                        'resultData = myDAO.GetPendingPatientExecutions(dbConnection, pAnalyzerID, pWorkSessionID)
-                        resultData = myDAO.GetPendingExecutionForSendNextProcess(dbConnection, pAnalyzerID, pWorkSessionID, False)
-
-                        If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then '(3)
-                            Dim myExDS As New ExecutionsDS
-                            myExDS = CType(resultData.SetDatos, ExecutionsDS)
-                            If myExDS.twksWSExecutions.Rows.Count > 0 Then '(4)
-
-                                'Check if there are some PREP_ISE pending
-                                Dim iseResLinq As List(Of ExecutionsDS.twksWSExecutionsRow) = _
-                                (From a In myExDS.twksWSExecutions Where a.ExecutionType = "PREP_ISE" _
-                                 Select a).ToList
-
-                                If iseResLinq.Count > 0 Then
-                                    iseExecutionID = iseResLinq(0).ExecutionID
-
-                                    'AG 30/11/2011 - ISE tests are the first preparations when a patient starts but they has lower priority over blanks, calibrator and controls
-                                    If iseExecutionID <> GlobalConstants.NO_PENDING_PREPARATION_FOUND Then
-                                        Dim myStatFlag As Boolean = False
-                                        If Not iseResLinq(0).IsStatFlagNull Then myStatFlag = iseResLinq(0).StatFlag
-
-                                        'Search if exists some BLANK or CALIBRATOR or CONTROL pending execution with the same or higher Stat level and with executionID < iseExecutionID
-                                        'if found then iseExecutionID has to wait, it is not his moment. Assign iseExecutionID = GlobalConstants.NO_PENDING_PREPARATION_FOUND
-                                        Dim noPatientPreviousExecutions As List(Of ExecutionsDS.twksWSExecutionsRow)
-                                        If myStatFlag Then
-                                            noPatientPreviousExecutions = (From a In myExDS.twksWSExecutions Where a.StatFlag = myStatFlag AndAlso a.SampleClass <> "PATIENT" _
-                                                                           AndAlso a.ExecutionID < iseExecutionID Select a).ToList
-                                        Else
-                                            noPatientPreviousExecutions = (From a In myExDS.twksWSExecutions Where a.SampleClass <> "PATIENT" _
-                                                                           AndAlso a.ExecutionID < iseExecutionID Select a).ToList
-                                        End If
-
-                                        If noPatientPreviousExecutions.Count > 0 Then
-                                            iseExecutionID = GlobalConstants.NO_PENDING_PREPARATION_FOUND
-                                        End If
-                                        noPatientPreviousExecutions = Nothing
-                                    End If
-                                    'AG 30/11/2011
-
-                                    'If the first PATIENT execution in myExDS has the same OrderID OR SampleType that the found ISE execution ... send the ISE
-                                    'otherwise Sw has to finish the previous patient - sample type before send ISE
-                                    If iseExecutionID <> GlobalConstants.NO_PENDING_PREPARATION_FOUND Then
-                                        Dim myOrderID As String = ""
-                                        Dim mySampleType As String = ""
-
-                                        If Not iseResLinq(0).IsOrderIDNull AndAlso Not iseResLinq(0).IsSampleTypeNull Then
-                                            myOrderID = iseResLinq(0).OrderID
-                                            mySampleType = iseResLinq(0).SampleType
-                                        End If
-
-                                        Dim patientResLinq As List(Of ExecutionsDS.twksWSExecutionsRow) = (From a In myExDS.twksWSExecutions Where a.SampleClass = "PATIENT" _
-                                                                                                          Select a).ToList
-                                        If patientResLinq.Count > 0 Then
-                                            If patientResLinq(0).ExecutionID <> iseExecutionID Then
-                                                If Not patientResLinq(0).IsOrderIDNull AndAlso Not patientResLinq(0).IsSampleTypeNull Then
-
-                                                    If patientResLinq(0).OrderID <> myOrderID OrElse patientResLinq(0).SampleType <> mySampleType Then
-                                                        iseExecutionID = GlobalConstants.NO_PENDING_PREPARATION_FOUND
-                                                    End If 'If patientResLinq(0).OrderID <> myOrderID OrElse patientResLinq(0).SampleType <> mySampleType Then
-
-                                                End If 'If Not patientResLinq(0).IsOrderIDNull AndAlso Not patientResLinq(0).IsSampleTypeNull Then
-                                            End If 'If patientResLinq(0).ExecutionID <> iseExecutionID Then
-                                        End If
-                                        patientResLinq = Nothing
-                                    End If
-
-
-                                End If 'If iseResLinq.Count > 0 Then
-                                iseResLinq = Nothing
-
-                            End If 'If myExDS.twksWSExecutions.Rows.Count > 0 Then '(4)
-                        End If 'If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then '(3)
-
-                    End If 'If (Not dbConnection Is Nothing) Then '(2)
-                End If 'If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then '(1)
-
-                resultData.SetDatos = iseExecutionID
-
-            Catch ex As Exception
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetNextPendingISEPatientExecution", EventLogEntryType.Error, False)
-
-            Finally
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-            Return resultData
-        End Function
-
 
         ''' <summary>
         ''' Get the PENDING executions and calculate the next ISE test for send
@@ -1849,7 +1611,7 @@ Namespace Biosystems.Ax00.BL
         ''' <returns>Integer inside a GlobalDataTO</returns>
         ''' <remarks>AG 18/01/2011
         ''' AG 11/07/2012 - adapted for control ise (copied and adapted from GetNextPendingISEPatientExecution)</remarks>
-        Public Function GetNextPendingISEExecutionNEW(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+        Public Function GetNextPendingISEExecution(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                               ByVal pWorkSessionID As String) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
@@ -1975,153 +1737,6 @@ Namespace Biosystems.Ax00.BL
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
-            Return resultData
-        End Function
-
-
-        ''' <summary>
-        ''' Get the PENDING executions and calculate the next ISE test for send
-        ''' Based on previous GetNextPendingISEPatientExecution()
-        ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pAnalyzerID"></param>
-        ''' <param name="pWorkSessionID"></param>
-        ''' <returns>An ExecutionsDS inside a GlobalDataTO with the data found</returns>
-        ''' <remarks>
-        ''' Created by: RH 26/06/2012
-        ''' AG 11/07/2012 create a new versionGetNextPendingISEExecutionNEW 
-        ''' </remarks>
-        Public Function GetNextPendingISEExecution(ByVal pDBConnection As SqlClient.SqlConnection, _
-                                                   ByVal pAnalyzerID As String, _
-                                                   ByVal pWorkSessionID As String) As GlobalDataTO
-
-            Dim resultData As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
-            Dim iseExecutionID As Integer = GlobalConstants.NO_PENDING_PREPARATION_FOUND
-            Dim returnDS As New ExecutionsDS
-
-            Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-
-                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then '(1)
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-
-                    If (Not dbConnection Is Nothing) Then '(2)
-                        Dim myDAO As New twksWSExecutionsDAO
-
-                        'AG 30/11/2011 - get all pending executions (std and ise)
-                        'resultData = myDAO.GetPendingPatientExecutions(dbConnection, pAnalyzerID, pWorkSessionID)
-                        resultData = myDAO.GetPendingExecutionForSendNextProcess(dbConnection, pAnalyzerID, pWorkSessionID, False)
-
-                        If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then '(3)
-                            Dim myExDS As ExecutionsDS
-                            myExDS = CType(resultData.SetDatos, ExecutionsDS)
-
-                            If myExDS.twksWSExecutions.Rows.Count > 0 Then '(4)
-
-                                'Check if there are some PREP_ISE pending
-                                Dim iseResLinq As List(Of ExecutionsDS.twksWSExecutionsRow)
-                                iseResLinq = (From a In myExDS.twksWSExecutions _
-                                              Where a.ExecutionType = "PREP_ISE" _
-                                              Select a).ToList()
-
-                                If iseResLinq.Count > 0 Then
-                                    iseExecutionID = iseResLinq(0).ExecutionID
-                                    returnDS.twksWSExecutions.ImportRow(iseResLinq(0))
-
-                                    'AG 30/11/2011 - ISE tests are the first preparations when a patient starts but they has lower priority over blanks and calibrator
-                                    If iseExecutionID <> GlobalConstants.NO_PENDING_PREPARATION_FOUND Then
-                                        Dim myStatFlag As Boolean = False
-
-                                        If Not iseResLinq(0).IsStatFlagNull Then myStatFlag = iseResLinq(0).StatFlag
-
-                                        'Search if exists some BLANK or CALIBRATOR pending execution with the same or higher Stat level and with executionID < iseExecutionID
-                                        'if found then iseExecutionID has to wait, it is not the moment to go. Assign iseExecutionID = GlobalConstants.NO_PENDING_PREPARATION_FOUND
-                                        Dim noPatientPreviousExecutions As List(Of ExecutionsDS.twksWSExecutionsRow)
-
-                                        If myStatFlag Then
-                                            noPatientPreviousExecutions = (From a In myExDS.twksWSExecutions _
-                                                                           Where a.StatFlag = myStatFlag _
-                                                                           AndAlso a.SampleClass <> "PATIENT" _
-                                                                           AndAlso a.SampleClass <> "CTRL" _
-                                                                           AndAlso a.ExecutionID < iseExecutionID _
-                                                                           Select a).ToList()
-                                        Else
-                                            noPatientPreviousExecutions = (From a In myExDS.twksWSExecutions _
-                                                                           Where a.SampleClass <> "PATIENT" _
-                                                                           AndAlso a.SampleClass <> "CTRL" _
-                                                                           AndAlso a.ExecutionID < iseExecutionID _
-                                                                           Select a).ToList()
-                                        End If
-
-                                        If noPatientPreviousExecutions.Count > 0 Then
-                                            iseExecutionID = GlobalConstants.NO_PENDING_PREPARATION_FOUND
-                                            returnDS.twksWSExecutions.Clear()
-                                        End If
-
-                                        noPatientPreviousExecutions = Nothing
-                                    End If
-                                    'AG 30/11/2011
-
-                                    'If the first PATIENT or CONTROL execution in myExDS has the same OrderID OR SampleType that the found ISE execution ... send the ISE
-                                    'otherwise Sw has to finish the previous patient/control - sample type before send ISE
-                                    If iseExecutionID <> GlobalConstants.NO_PENDING_PREPARATION_FOUND Then
-                                        Dim myOrderID As String = ""
-                                        Dim mySampleType As String = ""
-
-                                        If Not iseResLinq(0).IsOrderIDNull AndAlso Not iseResLinq(0).IsSampleTypeNull Then
-                                            myOrderID = iseResLinq(0).OrderID
-                                            mySampleType = iseResLinq(0).SampleType
-                                        End If
-
-                                        Dim patientResLinq As List(Of ExecutionsDS.twksWSExecutionsRow)
-                                        patientResLinq = (From a In myExDS.twksWSExecutions _
-                                                          Where a.SampleClass = "PATIENT" _
-                                                          OrElse a.SampleClass = "CTRL" _
-                                                          Select a).ToList()
-
-                                        If patientResLinq.Count > 0 Then
-                                            If patientResLinq(0).ExecutionID <> iseExecutionID Then
-                                                If Not patientResLinq(0).IsOrderIDNull AndAlso Not patientResLinq(0).IsSampleTypeNull Then
-
-                                                    If patientResLinq(0).OrderID <> myOrderID OrElse patientResLinq(0).SampleType <> mySampleType Then
-                                                        iseExecutionID = GlobalConstants.NO_PENDING_PREPARATION_FOUND
-                                                        returnDS.twksWSExecutions.Clear()
-                                                    End If
-
-                                                End If
-                                            End If
-                                        End If
-
-                                        patientResLinq = Nothing
-                                    End If
-
-                                End If
-
-                                iseResLinq = Nothing
-
-                            End If
-                        End If
-
-                    End If
-                End If
-
-                resultData.SetDatos = returnDS
-
-            Catch ex As Exception
-                resultData = New GlobalDataTO()
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
-                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetNextPendingISEExecution", EventLogEntryType.Error, False)
-
-            Finally
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-
-            End Try
-
             Return resultData
         End Function
 
@@ -8076,21 +7691,6 @@ Namespace Biosystems.Ax00.BL
                 currentResult = OrderTests.ToList()
                 bestResult = ManageContaminationsForRunningAndStatic(False, activeAnalyzer, pConn, contaminationsDataDS, currentResult, highContaminationPersitance, currentContaminationNumber, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
 
-                ''A last try, if the order tests only have 2 tests that are contaminating between them, why not to interchange them?
-                'If currentContaminationNumber > 0 Then
-                '    If OrderTests.Count = 2 Then
-                '        'Okay, if there are contaminations, why not to try interchange them?
-                '        currentResult.Clear()
-                '        For z = OrderTests.Count - 1 To 0 Step -1
-                '            currentResult.Add(OrderTests(z))
-                '        Next
-                '        currentContaminationNumber = GetContaminationNumber(contaminationsDataDS, currentResult, highContaminationPersitance)
-                '        If currentContaminationNumber = 0 Then
-                '            bestResult = currentResult
-                '        End If
-                '    End If
-                'End If
-
                 Dim stdPrepFlag As Boolean = False
                 For Each wse In AllTestTypeOrderTests
                     If wse.ExecutionType <> "PREP_STD" Then
@@ -8112,7 +7712,7 @@ Namespace Biosystems.Ax00.BL
         End Sub
 
         ''' <summary>
-        ''' Applies the 4 different optimizations for solving contaminations between order tests
+        ''' Applies optimizations in sorting for solving contaminations between order tests
         ''' </summary>
         ''' <param name="ActiveAnalyzer"></param>
         ''' <param name="pConn"></param>
@@ -8138,13 +7738,10 @@ Namespace Biosystems.Ax00.BL
                                                                 Optional ByVal pPreviousReagentIDMaxReplicates As List(Of Integer) = Nothing) As List(Of ExecutionsDS.twksWSExecutionsRow)
 
 
-            Dim myContaminationManager = New DelegatesToCoreBusinesGlue.ContaminationManagerWrapper(
-                                         calculateInRunning, pConn, ActiveAnalyzer, currentContaminationNumber,
-                                         highContaminationPersistance, contaminationsDataDS, OrderTests, pPreviousReagentID,
-                                         pPreviousReagentIDMaxReplicates)
+            Dim myContaminationManager = WSDependencyInjector.ContaminationsManagerConstructor(calculateInRunning, currentContaminationNumber, contaminationsDataDS, OrderTests, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
 
             'MANEL
-            myContaminationManager.ApplyOptimizations(pConn, ActiveAnalyzer, OrderTests)
+            myContaminationManager.ApplyOptimizations(pConn, OrderTests)
 
             currentContaminationNumber = myContaminationManager.currentContaminationNumber
             Return myContaminationManager.bestResult

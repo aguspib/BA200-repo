@@ -3,6 +3,7 @@ Imports Biosystems.Ax00.Global
 Imports System.Data
 Imports Biosystems.Ax00.Core.Entities.WorkSession
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
+Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specifications
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Interfaces
 
 Namespace Biosystems.Ax00.Core.Entities
@@ -10,10 +11,9 @@ Namespace Biosystems.Ax00.Core.Entities
     Public Class BA400AnalyzerEntity
         Inherits AnalyzerManager
 
-
         Public Sub New(assemblyName As String, analyzerModel As String, baseLine As IBaseLineEntity)
             MyBase.New(assemblyName, analyzerModel, baseLine)
-            WSExecutionCreator.Instance.ContaminationsSpecification = New BA400ContaminationsSpecification()
+            WSExecutionCreator.Instance.ContaminationsSpecification = New BA400ContaminationsSpecification(Me)
             _currentAnalyzer = Me
         End Sub
 
@@ -37,9 +37,11 @@ Namespace Biosystems.Ax00.Core.Entities
             Return MyBase.GetCurrentBaseLineIDByType(pdbConnection, pAnalyzerID, pWorkSessionID, pWell, pBaseLineWithAdjust, BaseLineTypeForCalculations.ToString())
         End Function
 
-        Public Overrides Function ContaminationsSpecification() As IAnalyzerContaminationsSpecification
-            Return WSExecutionCreator.Instance.ContaminationsSpecification
-        End Function
+        'Public Overrides Function ContaminationsSpecification() As IAnalyzerContaminationsSpecification
+        '    Return WSExecutionCreator.Instance.ContaminationsSpecification
+        'End Function
+
+
 
 #End Region
 

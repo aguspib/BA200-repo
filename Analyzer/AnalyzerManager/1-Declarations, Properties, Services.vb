@@ -402,7 +402,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
         End Property
 
-        Protected Shared _currentAnalyzer As IAnalyzerManager
+        Public Shared _currentAnalyzer As IAnalyzerManager
         Public Shared ReadOnly Property GetCurrentAnalyzerManager As IAnalyzerManager
             Get
                 Return _currentAnalyzer
@@ -2203,7 +2203,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                       Where a.ParameterName = SwParameters.PREDILUTION_CYCLES.ToString Select a).ToList
 
                             If myQRes.Count > 0 Then
-                                WELL_OFFSET_FOR_PREDILUTION = AnalyzerManager.GetCurrentAnalyzerManager().ContaminationsSpecification.AdditionalPredilutionSteps - 1  ' CInt(myQRes(0).ValueNumeric) - 1 'Well offset for predilution = (predilution cycles used for time estimation - 1)
+                                WELL_OFFSET_FOR_PREDILUTION = WSCreator.ContaminationsSpecification.AdditionalPredilutionSteps - 1  ' CInt(myQRes(0).ValueNumeric) - 1 'Well offset for predilution = (predilution cycles used for time estimation - 1)
                             End If
 
                             myQRes = (From a As ParametersDS.tfmwSwParametersRow In myParamDs.tfmwSwParameters _
@@ -3640,7 +3640,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                                     'Create the Executions
                                                     'resultData = myExecutionsDlg.CreateWSExecutions(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, runningFlag, -1, _
                                                     '                                                String.Empty, iseModuleReady, Nothing, AllowScanInRunning)
-                                                    resultData = DelegatesToCoreBusinesGlue.CreateWS(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, runningFlag, -1, _
+                                                    resultData = WSCreator.CreateWS(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, runningFlag, -1, _
                                                                                                     String.Empty, iseModuleReady, Nothing, AllowScanInRunning)
                                                     'AG 30/05/2014 #1644
 

@@ -180,7 +180,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             For Each B As Byte In in_datosByte
                 SB.Append(ChrW(B))
             Next
-            Debug.WriteLine("   PC>>> : " & SB.ToString)
+            Dim myVar = (DateTime.Now - New DateTime(1970, 1, 1)).TotalMilliseconds
+
+            Debug.WriteLine("   " & myVar & " PC>>> : " & SB.ToString)
             _debugLogger.AddLog("   PC>>> : " & SB.ToString)
 #End If
 
@@ -340,7 +342,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 #If TRACECOM Then
             _debugLogger.AddLog("   PC<<< : " & dataReceived)
-            Debug.WriteLine("   PC<<< : " & dataReceived)
+            Dim myVar = (DateTime.Now - New DateTime(1970, 1, 1)).TotalMilliseconds
+            Debug.WriteLine("   " & myVar & " PC<<< : " & dataReceived)
 #End If
 
             'AG 10/07/2012

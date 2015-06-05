@@ -83,7 +83,6 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DelegatesToCoreBusinesGlueTests.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -140,6 +139,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Contaminations Handling\" />
+    <Folder Include="Entities\WorkSession\" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

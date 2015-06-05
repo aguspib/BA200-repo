@@ -1239,13 +1239,13 @@ Public Class BSBaseForm
     '''              TR 07/02/2012 - New implementation of sending TAB key instead ENTER
     '''              SA 12/03/2012 - Undo last DL changes for screen IWSSampleRequest; they do not work
     '''              MI 30/01/2015 - http://confluence.ginper.local:8090/display/AREA/Don%27t+use+Name+property+of+WinForms+controls
+    '''              AC 03/06/2015 - Fix Button Enter
     ''' </remarks>
     Protected Overrides Function ProcessDialogKey(ByVal keyData As Keys) As Boolean
         If (Me.ActiveControl IsNot Nothing) Then
             Dim returnIsPressed = (keyData = Keys.Return)
             If returnIsPressed AndAlso ProcessEnterAsTab() AndAlso (Me.ActiveControl.GetType IsNot GetType(BSButton)) Then
-                SendKeys.Send("{Tab}")
-                Return True
+                Return MyBase.ProcessDialogKey(Keys.Tab)
             End If
         End If
         Return MyBase.ProcessDialogKey(keyData)

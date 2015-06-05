@@ -1,5 +1,5 @@
 ﻿
-Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
+Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
 
     Class RegularWaterWashing
         Inherits WashingDescription

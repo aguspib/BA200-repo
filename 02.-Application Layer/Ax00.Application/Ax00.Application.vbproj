@@ -149,6 +149,10 @@
       <Project>{5d65020c-c2d7-4ac3-b557-223fc290e526}</Project>
       <Name>Global</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\ParameterPrograming\ParametersPrograming.vbproj">
+      <Project>{3AAF43D5-55D8-4A0B-9FD3-E8841008E13E}</Project>
+      <Name>ParametersPrograming</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

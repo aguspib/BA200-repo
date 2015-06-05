@@ -2532,7 +2532,7 @@ Public Class UiISEUtilities
                                     GlobalBase.CreateLogActivity("Launch CreateWSExecutions !", Me.Name & ".PrepareTestedMode", EventLogEntryType.Information, False) 'AG 31/03/2014 - #1565
                                     'myGlobal = myExecutionDelegate.CreateWSExecutions(Nothing, AnalyzerController.Instance.Analyzer.ActiveAnalyzer, MyClass.WorkSessionIDAttribute, _
                                     '                                              createWSInRunning, -1, String.Empty, isReady, myAffectedElectrodes, pauseMode) 'AG 30/05/2014 #1644 - Redesing correction #1584 for avoid DeadLocks (new parameter pauseMode)
-                                    myGlobal = DelegatesToCoreBusinesGlue.CreateWS(Nothing, AnalyzerController.Instance.Analyzer.ActiveAnalyzer, WorkSessionIDAttribute, _
+                                    myGlobal = WSCreator.CreateWS(Nothing, AnalyzerController.Instance.Analyzer.ActiveAnalyzer, WorkSessionIDAttribute, _
                                                                                   createWSInRunning, -1, String.Empty, isReady, myAffectedElectrodes, pauseMode)
                                     If Not isReady Then Me.DisplayMessage(Messages.ISE_NOT_READY.ToString)
                                     'end SGM 25/09/2012
@@ -4662,7 +4662,7 @@ Public Class UiISEUtilities
                             Dim myExecutionDelegate As New ExecutionsDelegate
                             'myGlobal = myExecutionDelegate.CreateWSExecutions(Nothing, AnalyzerController.Instance.Analyzer.ActiveAnalyzer, MyClass.WorkSessionIDAttribute, _
                             '                                                  createWSInRunning, -1, String.Empty, isReady, myAffectedElectrodes, pauseMode) 'AG 30/05/2014 #1644 - Redesing correction #1584 for avoid DeadLocks (new parameter pauseMode)
-                            myGlobal = DelegatesToCoreBusinesGlue.CreateWS(Nothing, AnalyzerController.Instance.Analyzer.ActiveAnalyzer, WorkSessionIDAttribute, _
+                            myGlobal = WSCreator.CreateWS(Nothing, AnalyzerController.Instance.Analyzer.ActiveAnalyzer, WorkSessionIDAttribute, _
                                                                               createWSInRunning, -1, String.Empty, isReady, myAffectedElectrodes, pauseMode)
                         End If
                         If Not isReady Then Me.DisplayMessage(Messages.ISE_NOT_READY.ToString)
