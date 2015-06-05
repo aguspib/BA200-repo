@@ -103,9 +103,11 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                         'result = DBManager.RestoreTEMDataBase(ServerName, DataBaseName, DBLogin, DBPassword, _
                         'BackUpFileName)
                         'Else
+
                         result = DBManager.RestoreDataBase(ServerName, DataBaseName, DBLogin, DBPassword, _
-                                                                                   BackUpFileName)
+                                                                                       BackUpFileName)
                         'End If
+
 
                     Else
                         GlobalBase.CreateLogActivity(BackUpFileName & " file not found.", _
