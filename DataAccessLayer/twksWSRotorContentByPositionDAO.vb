@@ -616,9 +616,11 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' Created by:  TR 28/01/2010 - TESTED: OK
         ''' Modified by: TR 01/02/2010 - Added new optional parameter pRingNumber
         '''              SA 12/01/2012 - Changed the function template
+        '''              MR 04/06/2015 - Add OPTIONAL filter parameters (pNumCell, pNumMaxbyRotor)
         ''' </remarks>
         Public Function CountPositionsByStatus(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
-                                               ByVal pRotorType As String, ByVal pStatus As String, Optional ByVal pRingNumber As Integer = 0) As GlobalDataTO
+                                               ByVal pRotorType As String, ByVal pStatus As String, Optional ByVal pRingNumber As Integer = 0, _
+                                               Optional ByVal pNumCell As Integer = 0, Optional ByVal pNumMaxbyRotor As Integer = 0) As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -635,6 +637,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                 " AND   Status = '" & pStatus & "' " & vbCrLf
 
                         If (pRingNumber > 0) Then cmdText &= " AND RingNumber = " & pRingNumber
+                        If (pNumCell > 0 AndAlso pNumMaxbyRotor > 0) Then cmdText &= " AND  CellNumber BETWEEN '" & pNumCell & "' and '" & pNumMaxbyRotor & "'" & vbCrLf
+
                         cmdText &= " GROUP BY Status "
 
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
