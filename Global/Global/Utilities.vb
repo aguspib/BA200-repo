@@ -716,7 +716,6 @@ Namespace Biosystems.Ax00.Global
         '''                           process). When value of optional parameter pActionProcess is SAT_UPDATE, it is mandatory to inform this parameter</param>
         ''' <param name="pForRSATFromServiceSW">Optional parameter. When TRUE, it indicates the RSAT was requested from Service SW.
         '''                                     Default value is FALSE</param>
-        ''' <param name="Model">Optional parameter. To inform analyzer Model. Default value = ""</param>
         ''' <returns>GlobalDataTO containing a Boolean value that indicates when the Version.txt file was succesfully created</returns>
         ''' <remarks>
         ''' Created by:  SG 13/10/10
@@ -733,7 +732,7 @@ Namespace Biosystems.Ax00.Global
         '''                                              GetSoftwareVersion 
         ''' </remarks>
         Public Function CreateVersionFile(ByVal pFilePath As String, Optional pActionProcess As GlobalEnumerates.SATReportActions = GlobalEnumerates.SATReportActions.SAT_REPORT, _
-                                          Optional pAppVersion As String = "", Optional ByVal pForRSATFromServiceSW As Boolean = False, Optional ByVal Model As String = "") As GlobalDataTO
+                                          Optional pAppVersion As String = "", Optional ByVal pForRSATFromServiceSW As Boolean = False) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
 
             Try
@@ -753,8 +752,7 @@ Namespace Biosystems.Ax00.Global
                     Dim VersionFileName As String = pFilePath
 
                     Dim myStreamWriter As StreamWriter = File.CreateText(VersionFileName)
-                    myStreamWriter.WriteLine(myAppVersion)
-                    myStreamWriter.WriteLine(Model)
+                    myStreamWriter.Write(myAppVersion)
                     myStreamWriter.Close()
 
                     myGlobal.SetDatos = True

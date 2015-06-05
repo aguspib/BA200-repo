@@ -26,7 +26,6 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' <param name="pFileName">Optional parameter. Name for the Report SAT file</param>
         ''' <param name="pUserVersion">Optional parameter. User SW Version. Informed only when pAction is SAT_UPDATE or SAT_UPDATE_ERROR</param>
         ''' <param name="pIncludeZIP">Optional parameter. NOT USED: never informed. The default value is used (TRUE)</param>
-        ''' <param name="Model">Optional parameter. To inform analyzer Model. Default value = ""</param>
         ''' <returns>GlobalDataTO containing a Boolean value indicating if the RSAT has been created (TRUE) or there has been an error (FALSE)</returns>
         ''' <remarks>
         ''' Created by:  SG 13/10/2010
@@ -59,7 +58,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         Public Function CreateSATReport(ByVal pAction As GlobalEnumerates.SATReportActions, Optional ByVal pAuto As Boolean = False, _
                                         Optional ByVal ExcelPath As String = "", Optional ByVal pAdjFilePath As String = "", _
                                         Optional ByVal pFilePath As String = "", Optional ByVal pFileName As String = "", _
-                                        Optional ByVal pUserVersion As String = "", Optional ByVal pIncludeZIP As Boolean = True, Optional Model As String = "") As GlobalDataTO
+                                        Optional ByVal pUserVersion As String = "", Optional ByVal pIncludeZIP As Boolean = True) As GlobalDataTO
             ''Dim myUtil As New Utilities.
             Dim myGlobal As New GlobalDataTO
             Dim myParams As New SwParametersDelegate
@@ -274,9 +273,6 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                         End If
                 End Select
 
-                'Add Model on SAT Report file Name  
-                ReportFolderPath &= "_" & Model
-
                 '2.2 - Add the DataBase backup
                 Dim myDatabaseAdmin As New DataBaseManagerDelegate()
                 If (Not myDatabaseAdmin.BackUpDataBaseAndMoveBkFile(DAOBase.DBServer, DAOBase.CurrentDB, DAOBase.DBLogin, DAOBase.DBPassword, ReportFolderPath)) Then
@@ -482,7 +478,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' <param name="pSATReportFilePath"></param>
         ''' <returns></returns>
         ''' <remarks>Created by SG 13/10/10</remarks>
-        Public Function GetSATReportVersionAndModel(ByVal pSATReportFilePath As String) As GlobalDataTO
+        Public Function GetSATReportVersion(ByVal pSATReportFilePath As String) As GlobalDataTO
 
             Dim myGlobal As New GlobalDataTO
             ''Dim myUtil As New Utilities.
@@ -525,10 +521,6 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
             Return myGlobal
 
         End Function
-
-
-     
-
 
         ''' <summary>
         ''' Compares the Application's version to the SAT Report's version

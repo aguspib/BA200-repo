@@ -512,22 +512,6 @@ Public Class UiSATReportLoad
         Dim myGlobal As New GlobalDataTO
 
         Try
-
-            Dim SATModel As String = ""
-            SATModel = Me.bsSelectedTextBox.Text.Trim().Substring(Me.bsSelectedTextBox.Text.Trim().LastIndexOf(Convert.ToChar("_")))
-         
-            Select Case AnalyzerController.Instance.Analyzer.Model
-                Case Biosystems.Ax00.Core.Entities.Enums.AnalyzerModelEnum.A400.ToString
-                    'Check If SAT Model is A200
-                    If SATModel = Biosystems.Ax00.Core.Entities.Enums.AnalyzerModelEnum.A200.ToString Then
-                        'Todo: Error Not continue, diferent Models
-                    End If
-                Case Biosystems.Ax00.Core.Entities.Enums.AnalyzerModelEnum.A200.ToString
-                    If SATModel <> AnalyzerController.Instance.Analyzer.Model Then
-                        'Todo: Error Not continue, diferent Models
-                    End If
-            End Select
-
             'Dim myUtil As New Utilities.
             Dim mySATUtil As New SATReportUtilities
 
@@ -538,47 +522,39 @@ Public Class UiSATReportLoad
                 myAppVersion = CStr(myGlobal.SetDatos)
 
                 'obtain the SAT version
-                Dim mySATInfo As String()
-                Dim mySATVersion As String = String.Empty
-                Dim mySATModel As String = String.Empty
-                myGlobal = mySATUtil.GetSATReportVersionAndModel(pFilePath)
+                Dim mySATVersion As String
 
+                myGlobal = mySATUtil.GetSATReportVersion(pFilePath)
                 If Not myGlobal.HasError And Not myGlobal Is Nothing Then
-                    mySATInfo = CStr(myGlobal.SetDatos).Split(System.Convert.ToChar(vbCrLf))
-                    If mySATInfo.Count > 0 Then
-                        mySATVersion = mySATInfo(0)
-                        If mySATInfo.Count > 1 Then
-                            mySATModel = mySATInfo(1)
+                    mySATVersion = CStr(myGlobal.SetDatos)
+
+                    Dim myComparisonResult As New GlobalEnumerates.SATReportVersionComparison
+                    myGlobal = mySATUtil.CompareSATandAPPversions(myAppVersion, mySATVersion)
+                    If Not myGlobal.HasError And Not myGlobal Is Nothing Then
+                        myComparisonResult = CType(myGlobal.SetDatos, GlobalEnumerates.SATReportVersionComparison)
+                        Me.RestorePointPath = pFilePath
+
+                        'AG 25/10/2011 - Stop ANSINF
+                        If (AnalyzerController.IsAnalyzerInstantiated) Then
+                            If AnalyzerController.Instance.Analyzer.Connected AndAlso AnalyzerController.Instance.Analyzer.AnalyzerStatus <> GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
+                                myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STP) 'Stop ANSINF
+                            End If
+                        End If
+                        'AG 25/10/2011
+
+                        If Not myGlobal.HasError Then
+                            myGlobal = Me.ManageVersionComparison(myComparisonResult)
                         End If
 
-                        Dim myComparisonResult As New GlobalEnumerates.SATReportVersionComparison
-                        myGlobal = mySATUtil.CompareSATandAPPversions(myAppVersion, mySATVersion)
-                        If Not myGlobal.HasError And Not myGlobal Is Nothing Then
-                            myComparisonResult = CType(myGlobal.SetDatos, GlobalEnumerates.SATReportVersionComparison)
-                            Me.RestorePointPath = pFilePath
-
-                            'AG 25/10/2011 - Stop ANSINF
-                            If (AnalyzerController.IsAnalyzerInstantiated) Then
-                                If AnalyzerController.Instance.Analyzer.Connected AndAlso AnalyzerController.Instance.Analyzer.AnalyzerStatus <> GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
-                                    myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STP) 'Stop ANSINF
-                                End If
+                        'AG 25/10/2011 - Start ANSINF
+                        If Not myGlobal.HasError AndAlso (AnalyzerController.IsAnalyzerInstantiated) Then
+                            If AnalyzerController.Instance.Analyzer.Connected AndAlso AnalyzerController.Instance.Analyzer.AnalyzerStatus <> GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
+                                myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STR) 'Start ANSINF
                             End If
-                            'AG 25/10/2011
-
-                            If Not myGlobal.HasError Then
-                                myGlobal = Me.ManageVersionComparison(myComparisonResult)
-                            End If
-
-                            'AG 25/10/2011 - Start ANSINF
-                            If Not myGlobal.HasError AndAlso (AnalyzerController.IsAnalyzerInstantiated) Then
-                                If AnalyzerController.Instance.Analyzer.Connected AndAlso AnalyzerController.Instance.Analyzer.AnalyzerStatus <> GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
-                                    myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STR) 'Start ANSINF
-                                End If
-
-                            End If
-                            'AG 25/10/2011
 
                         End If
+                        'AG 25/10/2011
+
                     End If
                 End If
             End If

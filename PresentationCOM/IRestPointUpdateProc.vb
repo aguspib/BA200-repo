@@ -497,7 +497,7 @@ Public Class UiRestPointUpdateProc
                 'obtain the SAT version
                 Dim mySATVersion As String
 
-                myGlobal = mySATUtil.GetSATReportVersionAndModel(pFilePath)
+                myGlobal = mySATUtil.GetSATReportVersion(pFilePath)
                 If Not myGlobal.HasError And Not myGlobal Is Nothing Then
                     mySATVersion = CStr(myGlobal.SetDatos)
 
