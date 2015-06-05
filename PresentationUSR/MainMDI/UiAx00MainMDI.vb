@@ -1979,7 +1979,7 @@ Partial Public Class UiAx00MainMDI
                     '#End If
 
                     'IR 27/09/2012 - Kill main application process
-                    Process.GetCurrentProcess().Kill()
+                    Process.GetCurrentProcess().Kill()  'TODO: Find a better solution to this ASAP.
                 Else
                     e.Cancel = True
                 End If

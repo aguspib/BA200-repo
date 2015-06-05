@@ -5,6 +5,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
     Public Class WashingDescription
         Implements IWashingDescription
 
+
         ''' <summary>
         ''' Contamination persistence cycles this washing liquid can clean. Water is 1, washing is 2, etc.
         ''' </summary>
@@ -16,6 +17,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
 
         Public Sub New(cleaningPower As Integer, washingSolution As String)
             Me.WashingStrength = cleaningPower
+
             If Me.WashingStrength <> 0 Then
                 WashingSolutionID = washingSolution
             ElseIf washingSolution <> NoWashingIDRequired Then
@@ -24,6 +26,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
                 WashingSolutionID = NoWashingIDRequired
             End If
         End Sub
+
 
     End Class
 
