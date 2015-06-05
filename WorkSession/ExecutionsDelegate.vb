@@ -1089,60 +1089,6 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
-        ''' Gets the list of Execution's Element groups sorted by ReadingCycle.
-        ''' </summary>
-        ''' <param name="pExecutions">Dataset with structure of view vwksWSExecutions</param>
-        ''' <returns>
-        ''' GlobalDataTo indicating if an error has occurred or not.
-        ''' If succeed, returns an ExecutionsDS dataset with the sorted data (view vwksWSExecutions)
-        ''' </returns>
-        ''' <remarks>
-        ''' Created by: RH - 08/06/2010
-        ''' </remarks>
-        Public Function SortWSExecutionsByElementGroupTime(ByVal pExecutions As ExecutionsDS) As GlobalDataTO
-            Dim resultData As New GlobalDataTO
-            Dim returnDS As New ExecutionsDS
-
-            Try
-                Dim qOrders As List(Of ExecutionsDS.twksWSExecutionsRow)
-                Dim Index = 0
-
-                While Index < pExecutions.twksWSExecutions.Rows.Count
-                    Dim StatFlag = pExecutions.twksWSExecutions(Index).StatFlag
-                    Dim SampleClass = pExecutions.twksWSExecutions(Index).SampleClass
-
-                    qOrders = (From wse In pExecutions.twksWSExecutions _
-                           Where wse.StatFlag = StatFlag AndAlso wse.SampleClass = SampleClass _
-                           Select wse).ToList()
-
-                    Index += qOrders.Count
-
-                    If SampleClass <> "PATIENT" Then
-                        SortByExecutionTime(qOrders, returnDS)
-                    Else
-                        'When SampleClass = 'PATIENT' do not sort
-                        For Each wse In qOrders
-                            returnDS.twksWSExecutions.ImportRow(wse)
-                        Next
-                    End If
-                End While
-
-                qOrders = Nothing 'AG 19/02/2014 - #1514
-                resultData.SetDatos = returnDS
-
-            Catch ex As Exception
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
-                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.SortWSExecutionsByElementGroupTime", EventLogEntryType.Error, False)
-
-            End Try
-            Return resultData
-        End Function
-
-        ''' <summary>
         ''' Get the list of Order Tests Results from the Executions
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
@@ -4577,38 +4523,6 @@ Namespace Biosystems.Ax00.BL
             End Try
             Return resultData
         End Function
-
-        ''' <summary>
-        ''' Gets the list of Executions sorted by ReadingCycle
-        ''' </summary>
-        ''' <param name="pExecutions">List of twksWSExecutionsRow to be sorted</param>
-        ''' <param name="returnDS">ExecutionsDS with sorted rows</param>
-        ''' <remarks>
-        ''' Created by: RH 09/06/2010
-        ''' AG 16/09/2011 SORT CRITERIA: pending (by time) and then locked (by time)
-        ''' </remarks>
-        Private Sub SortByExecutionTime(ByVal pExecutions As List(Of ExecutionsDS.twksWSExecutionsRow), ByRef returnDS As ExecutionsDS)
-            While pExecutions.Count > 0
-
-
-                Dim wseMaxReadingCycle = (From wse In pExecutions _
-                                          Order By wse.ExecutionStatus Descending, wse.ReadingCycle Descending _
-                                          Select wse).First
-                'AG 16/09/2011
-
-                Dim wseSelected = (From wse In pExecutions _
-                       Where wse.ElementID = wseMaxReadingCycle.ElementID _
-                       Select wse).ToList()
-
-                For Each wse In wseSelected
-                    returnDS.twksWSExecutions.ImportRow(wse)
-                Next
-
-                For Each wse In wseSelected
-                    pExecutions.Remove(wse)
-                Next
-            End While
-        End Sub
 
         ''' <summary>
         ''' To avoid contamination between previous element group in WS executions last reagent and the fist in the next element group in WS executions

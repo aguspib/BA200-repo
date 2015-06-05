@@ -6981,9 +6981,7 @@ Namespace Biosystems.Ax00.BL
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pAnalyzerID">Analyzer Identifier</param>
-        ''' <param name="pWorkSessionID">WorkSession Identifier</param>
         ''' <param name="pRotorType">Type of Analyzer Rotor</param>
-        ''' <param name="pStatus">Cell Status to search</param>
         ''' <param name="pRingNumber">Ring Number. Optional parameter</param>
         ''' <returns>GlobalDataTO containing an integer value with the number of cells having the informed Status</returns>
         ''' <remarks>
