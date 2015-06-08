@@ -88,7 +88,6 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
             AnalyzerFrame = instructionParameters
             FillSteps()
             Debug.WriteLine(Me)
-            'ShowDebugInfo(rawAnalyzerFrame)
 
         End Sub
 
@@ -176,15 +175,15 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
                         Dim dispense = Steps(curStep)(curDispense)
                         Select Case dispense.KindOfLiquid
                             Case IDispensing.KindOfDispensedLiquid.Washing
-                                SB.Append("W" & Format(dispense.WashingID, "000") & " "c)
+                                SB.Append("W" & Format(dispense.WashingID, "000"))
                             Case IDispensing.KindOfDispensedLiquid.Reagent
-                                SB.Append(" " & Format(dispense.R1ReagentID, "000") & " "c)
+                                SB.Append(" " & Format(dispense.R1ReagentID, "000"))
                             Case IDispensing.KindOfDispensedLiquid.Dummy
                                 SB.Append("Dumy")
                             Case Else
                                 SB.Append(" ?? ")
                         End Select
-                        SB.Append("/" & Format(dispense.ExecutionID, "00"))
+                        SB.Append("/" & Format(dispense.ExecutionID, "00") & " "c)
                     End If
                     SB.Append("|"c)
                 Next
@@ -205,29 +204,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
             AnalyzerFrame = New LAx00Frame()
             AnalyzerFrame.ParseRawData(rawAnalyzerFrame)
             FillSteps()
-            ShowDebugInfo(rawAnalyzerFrame)
         End Sub
-        Private Sub ShowDebugInfo(rawAnalyzerFrame As String)
-#If config = "Debug" Then
-            Debug.WriteLine(Me)
-            Static debugF As Form, tb As TextBox = Nothing
-            If debugF Is Nothing Then
-                debugF = New Form()
-                tb = New TextBox
-                tb.Multiline = True
-                tb.Parent = debugF
-                tb.Dock = DockStyle.Fill
-                debugF.Show()
-            End If
-            If tb.InvokeRequired Then tb.BeginInvoke(
-                Sub()
-                    tb.AppendText(rawAnalyzerFrame)
-                    tb.AppendText(Me.ToString)
-                    tb.AppendText(vbCr)
-                End Sub)
-#End If
-        End Sub
-
 
         Private Sub RemoveWashingFromResult(responseFromDispensing As IContaminationsAction, lookUpFilter As HashSet(Of String), results As ActionRequiredForDispensing)
             If responseFromDispensing.Action <> IContaminationsAction.RequiredAction.RemoveRequiredWashing Then Return

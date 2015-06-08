@@ -13,6 +13,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Tests
             Assert.AreEqual(parser("B"), "45")
             Assert.AreEqual(parser("CDT"), "")
             Assert.AreEqual(parser("I"), "45")
+            Debug.WriteLine(parser.ToString)
         End Sub
 
     End Class
