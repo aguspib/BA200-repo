@@ -88,7 +88,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
             AnalyzerFrame = instructionParameters
             FillSteps()
             Debug.WriteLine(Me)
-            'ShowDebugInfo(rawAnalyzerFrame)
+            ShowDebugInfo(instructionParameters.ToString)
 
         End Sub
 
@@ -176,15 +176,15 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
                         Dim dispense = Steps(curStep)(curDispense)
                         Select Case dispense.KindOfLiquid
                             Case IDispensing.KindOfDispensedLiquid.Washing
-                                SB.Append("W" & Format(dispense.WashingID, "000") & " "c)
+                                SB.Append("W" & Format(dispense.WashingID, "000"))
                             Case IDispensing.KindOfDispensedLiquid.Reagent
-                                SB.Append(" " & Format(dispense.R1ReagentID, "000") & " "c)
+                                SB.Append(" " & Format(dispense.R1ReagentID, "000"))
                             Case IDispensing.KindOfDispensedLiquid.Dummy
                                 SB.Append("Dumy")
                             Case Else
                                 SB.Append(" ?? ")
                         End Select
-                        SB.Append("/" & Format(dispense.ExecutionID, "00"))
+                        SB.Append("/" & Format(dispense.ExecutionID, "00") & " "c)
                     End If
                     SB.Append("|"c)
                 Next
@@ -207,10 +207,12 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
             FillSteps()
             ShowDebugInfo(rawAnalyzerFrame)
         End Sub
+#If config = "Debug" Then
+        Shared debugF As Form, tb As TextBox = Nothing
+#End If
         Private Sub ShowDebugInfo(rawAnalyzerFrame As String)
 #If config = "Debug" Then
             Debug.WriteLine(Me)
-            Static debugF As Form, tb As TextBox = Nothing
             If debugF Is Nothing Then
                 debugF = New Form()
                 tb = New TextBox
@@ -219,12 +221,16 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
                 tb.Dock = DockStyle.Fill
                 debugF.Show()
             End If
-            If tb.InvokeRequired Then tb.BeginInvoke(
-                Sub()
-                    tb.AppendText(rawAnalyzerFrame)
-                    tb.AppendText(Me.ToString)
-                    tb.AppendText(vbCr)
-                End Sub)
+            Dim appendText = Sub()
+                                 tb.AppendText(rawAnalyzerFrame)
+                                 tb.AppendText(Me.ToString)
+                                 tb.AppendText(vbCr)
+                             End Sub
+            If tb.InvokeRequired Then
+                tb.BeginInvoke(appendText)
+            Else
+                appendText()
+            End If
 #End If
         End Sub
 

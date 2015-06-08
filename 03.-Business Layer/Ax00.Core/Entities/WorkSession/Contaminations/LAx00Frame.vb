@@ -92,6 +92,18 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 
         End Function
 
+        Public Overrides Function ToString() As String
+            Dim SB As New StringBuilder
+            For Each element In Parameters.Keys
+                SB.Append(element)
+                If Parameters(element) IsNot Nothing AndAlso Parameters(element) <> String.Empty Then
+                    SB.Append(":"c & Parameters(element))
+                End If
+                SB.Append(";"c)
+            Next
+            Return SB.ToString
+        End Function
+
         Private Function TokenizeSentence() As KeyValuePair(Of String, String)
             Dim paramName As String = String.Empty, paramValue As String = String.Empty
 
