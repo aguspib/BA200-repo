@@ -6751,7 +6751,7 @@ Namespace Biosystems.Ax00.BL
                                 Else
                                     'We need to move the start selectedPosition.
                                     Dim difPos As Integer = pNumElemRequired - numFreePos
-                                    myGlobalDataTO = myWSRotorContentByPositionDAO.CountPositionsByStatus(dbConnection, pAnalyzerID, pWorkSessionID, pRotorType, "FREE", pRingNumber, pRefCellNumber - difPos, pRefCellNumber)
+                                    myGlobalDataTO = myWSRotorContentByPositionDAO.CountPositionsByStatus(dbConnection, pAnalyzerID, pWorkSessionID, pRotorType, "FREE", pRingNumber, pRefCellNumber - difPos, pRefCellNumber - 1)
 
                                     If (Not myGlobalDataTO.HasError) Then
                                         If (Not myGlobalDataTO.SetDatos Is Nothing AndAlso String.Compare(myGlobalDataTO.SetDatos.ToString(), "", False) <> 0) Then
@@ -6765,6 +6765,11 @@ Namespace Biosystems.Ax00.BL
                                                 myGlobalDataTO.HasError = False
                                                 myGlobalDataTO.ErrorCode = "ROTOR_FULL"
                                             End If
+                                        Else
+                                            'We haven't enough positions before the selected point to move the multipoint calibrator, then we send a warning message, saying select other point into the rotor.
+                                            myGlobalDataTO.SetDatos = 0
+                                            myGlobalDataTO.HasError = False
+                                            myGlobalDataTO.ErrorCode = "ROTOR_FULL_FOR_CALIBRATOR_KIT"
                                         End If
                                     End If
                                 End If

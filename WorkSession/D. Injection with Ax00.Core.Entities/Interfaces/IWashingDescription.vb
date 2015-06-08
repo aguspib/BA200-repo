@@ -8,6 +8,7 @@
 
         Property WashingSolutionCode As String
 
+
     End Interface
 
 End Namespace
