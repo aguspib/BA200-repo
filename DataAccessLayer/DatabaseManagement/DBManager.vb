@@ -31,11 +31,11 @@ Namespace Biosystems.Ax00.DAL
         ''' </remarks>
         Public Shared Function BackUpDataBase(ByVal ServerName As String, ByVal DataBaseName As String, _
                                               ByVal DBLogin As String, ByVal DBPassword As String, _
-                                       Optional ByVal pInstalationProcess As Boolean = False) As Boolean
+                                       Optional ByVal pInstalationProcess As Boolean = False, Optional ByRef currentBackUpDirectory As String = "") As Boolean
             Dim result As Boolean = False ' keep the operation result.
             'Dim myLogAcciones As New ApplicationLogManager()
             Try
-                Dim MyServer As Server = New Server(ServerName) ' instance of SQL server
+                Dim MyServer As Server = New Server(ServerName) ' instance of SQL server 
 
                 'RH 17/05/2011
                 MyServer.ConnectionContext.LoginSecure = False
@@ -57,6 +57,8 @@ Namespace Biosystems.Ax00.DAL
                     MyBackUpDirectory = MyServer.BackupDirectory & "\" & DataBaseName & Now.ToString("ddMMyyyyHHmm") & _
                                                                        "v" & MyServer.Information.Version.Major & ".bak"
                 End If
+
+                currentBackUpDirectory = MyBackUpDirectory
 
                 Dim BackupFileName As String = MyBackUpDirectory
 
@@ -334,22 +336,25 @@ Namespace Biosystems.Ax00.DAL
         End Function
 
         ''' <summary>
-        ''' Restore a database from an specific backup file.
+        ''' Restore one database reading the file list, function allow us to create another database from a  .bak file, and restored with another name.
         ''' </summary>
         ''' <param name="ServerName">Server name to connect</param>
-        ''' <param name="DataBaseName">DataBase Name to restore</param>
-        ''' <param name="BackUpFileName">contains the file name and the file path.</param>
-        ''' <returns>True if OK (OR) False if Fail</returns>
-        ''' <remarks>
-        ''' Created by: MR 14/05/2015 - BA - 2477 ==> Function created for when we need restore our original bakcup in a  diferent database. 
-        '''                                           Ex: we use Ax00.bak to create Ax00TEM.
+        ''' <param name="DataBaseName">Name of the Database </param>
+        ''' <param name="DBLogin">Login to connect against the DB.</param>
+        ''' <param name="DBPassword">Password to connect to the DB.</param>
+        ''' <param name="BackUpFileName"> Name of the backup file from which we will restore the database. </param>
+        ''' <returns></returns>
+        ''' <remarks> Created by: MR 14/05/2015 - BA - 2477 ==> Function created for when we need restore our original backup in a  diferent database. 
+        '''                                                 Ex: we use Ax00.bak to create Ax00TEM.
+        '''                       MR 08/06/2015 - BA - 2566 ==> We use this function to rename our database depends of the analyser model start the application.
+        '''                                                 Ex: From Ax00.bak to A200 OR Ax00.bak to A400.
         ''' </remarks>
-        Public Shared Function RestoreTEMDataBase(ByVal ServerName As String, ByVal DataBaseName As String, _
-                                               ByVal DBLogin As String, ByVal DBPassword As String, _
-                                               ByVal BackUpFileName As String) As Boolean
+        Public Shared Function RestoreDBFileList(ByVal ServerName As String, ByVal DataBaseName As String, _
+                                                 ByVal DBLogin As String, ByVal DBPassword As String, _
+                                                 ByVal BackUpFileName As String) As Boolean
 
             Dim result As Boolean = False ' keep the operation result.
-            'Dim myLogAcciones As New ApplicationLogManager()
+
             Try
                 Dim LocalServer As New Server(ServerName)
 
@@ -383,25 +388,7 @@ Namespace Biosystems.Ax00.DAL
                 result = True
 
             Catch ex As Exception
-                Dim Message As String
-                If ex.InnerException IsNot Nothing AndAlso ex.InnerException.InnerException IsNot Nothing Then
-                    Message = ex.InnerException.InnerException.Message
-                Else
-                    Message = ex.Message
-                End If
-
-                GlobalBase.CreateLogActivity(Message, "RestoreTEMDataBase", EventLogEntryType.Error, False)
-
-                'Throw ex  'Commented line RH 10/11/2010
-                'Do prefer using an empty throw when catching and re-throwing an exception.
-                'This is the best way to preserve the exception call stack.
-                'http://msdn.microsoft.com/en-us/library/ms229005(v=VS.90).aspx
-                'http://exceptionalcode.wordpress.com/2010/04/13/net-exceptions-throw-ex-is-evil-but-throw-is-not-that-innocent/
-                Throw
-
-            Finally
-                'SetDataBaseMultiUser(ServerName, DataBaseName, DBLogin, DBPassword) 'SG 18/10/10
-
+                GlobalBase.CreateLogActivity(ex)
             End Try
 
             Return result
@@ -518,6 +505,43 @@ Namespace Biosystems.Ax00.DAL
                 'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.DataBaseExist", EventLogEntryType.Error, False)
 
+            End Try
+
+            Return result
+        End Function
+
+        ''' <summary>
+        '''  Function to rename the database depends of which model of analyser request open the application. This function  
+        ''' </summary>
+        ''' <param name="ServerName"></param>
+        ''' <param name="DataBaseName"></param>
+        ''' <param name="DBLogin"></param>
+        ''' <param name="DBPassword"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Shared Function RenameDB(ByVal ServerName As String, ByVal originalDataBaseName As String, ByVal newDatabaseName As String, _
+                                        ByVal DBLogin As String, ByVal DBPassword As String) As Boolean
+            Dim result As Boolean = False
+
+            Try
+                Dim currentBackUpDirectory As String = String.Empty
+                'if the name is the old name, we need to create a backup of the database and restore with a new name.
+                If BackUpDataBase(ServerName, originalDataBaseName, DBLogin, DBPassword, False, currentBackUpDirectory) Then
+
+                    RestoreTEMDataBase(ServerName, newDatabaseName, DBLogin, DBPassword, currentBackUpDirectory)
+                    DropDatabaseFromServer(ServerName, originalDataBaseName, DBLogin, DBPassword)
+                    'validate if the backupfile still exist.
+                    If IO.File.Exists(currentBackUpDirectory) Then
+                        IO.File.Delete(currentBackUpDirectory) 'remove temp. backup file.
+                    End If
+
+                    result = True
+                End If
+
+
+            Catch ex As Exception
+                GlobalBase.CreateLogActivity(ex)
+                Throw
             End Try
 
             Return result

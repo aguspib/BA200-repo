@@ -240,6 +240,42 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
             Return result
         End Function
 
+
+        ' ''' <summary>
+        ' ''' Remove the temporal database, created to move the new data.
+        ' ''' and the backup file from the temp directory too.
+        ' ''' </summary>
+        ' ''' <param name="TempBackupFile">Backup file Name, with the path.</param>
+        ' ''' <param name="ServerName">Server name</param>
+        ' ''' <param name="TempDatabaseName">Temporal Database Name.</param>
+        ' ''' <returns></returns>
+        ' ''' <remarks>
+        ' ''' Modified by: IT 08/05/2015 - BA-2471
+        ' ''' </remarks>
+        'Public Function IsRestoreNecessary(ByVal pServerName As String, ByVal pDataBaseName As String, ByVal DBLogin As String, _
+        '                                     ByVal DBPassword As String, Optional pLoadingRSAT As Boolean = False) As Boolean
+        '    Dim result As Boolean = False
+        '    Try
+        '        'A200 O A400
+        '        If DataBaseManagerDelegate.DataBaseExist(pServerName, pDataBaseName, DBLogin, DBPassword) Then 'BA-2471: IT 08/05/2015
+        '            'APLICACION
+        '        Else
+        '            'Pregunta Ax00
+        '            If DataBaseManagerDelegate.DataBaseExist(pServerName, "Ax00", DBLogin, DBPassword) Then 'BA-2471: IT 08/05/2015ç
+
+        '            End If
+        '        End If
+        '    Catch ex As Exception
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message & " --- " & ex.InnerException.ToString(), _
+        '                                        "DataBaseUpdateManager.RemoveBackupFileAndTempDatabase", EventLogEntryType.Error, False)
+        '    End Try
+        '    Return result
+        'End Function
+
+
+
+
         ''' <summary>
         ''' Method incharge to start the database Update and instalation process.
         ''' </summary>
@@ -262,6 +298,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 'GlobalBase.CreateLogActivity("InstallUpdateProcess" & ".Updateprocess -Validating if Data Base exists ", "Installation validation", EventLogEntryType.Information, False)
 
                 If DataBaseManagerDelegate.DataBaseExist(pServerName, pDataBaseName, DBLogin, DBPassword) Then 'BA-2471: IT 08/05/2015
+
                     'BT #1632 - Before start the update process, execute temporary scripts used to change the structure of tables that have to 
                     '           be already updated when the UpdateVersion process starts (f.i. ApplicationLog Table --> tfmwApplicationLog)
                     ExecuteScriptsBeforeUpdate()
@@ -273,7 +310,23 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                     'Call the Update Database delegate.
                     myGlobalDataTO = UpdateDatabase(pServerName, pDataBaseName, DBLogin, DBPassword, pLoadingRSAT)
 
+
                 Else
+
+                    ''Pregunta Ax00
+                    'If DataBaseManagerDelegate.DataBaseExist(pServerName, "Ax00", DBLogin, DBPassword) Then 'BA-2471: IT 08/05/2015
+                    '    If dbIsSameAnalyser() Then
+                    '        'Si la instancia de analizador es la misma que la de la base de datos -->Renombramos DB.
+                    '        'MR 08/06/15
+                    '        DataBaseManagerDelegate.RenameDBByModel(pServerName, pDataBaseName, DBLogin, DBPassword)
+                    '        'Application
+                    '    Else
+                    '        RestoreDB()
+                    '    End If
+                    'Else
+                    '    RestoreDB()
+                    'End If
+
                     'GlobalBase.CreateLogActivity("Before installing the DB", "Update process", EventLogEntryType.Information, False)
                     'Call the Install database delegate.
                     Dim myDBInstallerDelegate As New DataBaseInstallerManagerDelegate()
