@@ -1159,6 +1159,9 @@ Namespace Biosystems.Ax00.Core.Entities
                         End If
 
                         If toSendList.Any() Then '(3)
+#If DEBUG Then
+                            Debug.Print(String.Format("Este es el primero de la lista a enviar: {0} \n", toSendList(0).ReagentID.ToString()))
+#End If
                             Dim nextExecutionFound As Boolean = False
                             Dim indexNextToSend As Integer = 0
                             Dim previousReagentIDSentList As New List(Of AnalyzerManagerDS.sentPreparationsRow) 'The last reagents used are in the higher array indexes
@@ -2087,6 +2090,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
             myRow = myReturn.searchNext.NewsearchNextRow
             myRow.ExecutionID = toSendList(indexNextToSend).ExecutionID
+
+#If DEBUG Then
+            Debug.Print(String.Format("This is what we're informing to send to SearchNextSTDPreparation: myRow.ExecutionID = {0}; indexNextToSend = {1}; toSendList(indexNextToSend).ExecutionID = {2}; toSendList(indexNextToSend).ReagentID = {3} \n",
+                                      myRow.ExecutionID.ToString(), indexNextToSend.ToString(), toSendList(indexNextToSend).ExecutionID.ToString(), toSendList(indexNextToSend).ReagentID.ToString()))
+#End If
 
             If nextExecutionFound Then '(4)
                 'Prepare output DS with the proper information (execution to be sent)
