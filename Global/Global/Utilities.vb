@@ -754,6 +754,7 @@ Namespace Biosystems.Ax00.Global
 
                     Dim myStreamWriter As StreamWriter = File.CreateText(VersionFileName)
                     myStreamWriter.WriteLine(myAppVersion)
+                  
                     myStreamWriter.WriteLine(Model)
                     myStreamWriter.Close()
 

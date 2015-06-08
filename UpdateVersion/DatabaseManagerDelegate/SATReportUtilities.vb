@@ -407,7 +407,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
                 '2.9 - Add the plain text with the Application Version
                 Dim myVersionFileName As String = GlobalBase.VersionFileName
-                myGlobal = Utilities.CreateVersionFile(ReportFolderPath & "\" & myVersionFileName, pAction, pUserVersion, GlobalBase.IsServiceAssembly)
+                myGlobal = Utilities.CreateVersionFile(ReportFolderPath & "\" & myVersionFileName, pAction, pUserVersion, GlobalBase.IsServiceAssembly, Model)
 
                 '2.10 - Compress and delete the temporal folder
                 myGlobal = Utilities.CompressToZip(ReportFolderPath, ReportFolderPath & GlobalBase.ZIPExtension)
@@ -609,7 +609,11 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
             Const DirFormat As String = "C:\{0}"
 
             Try
-                Dim NewFolder As String = String.Format(DirFormat, System.Guid.NewGuid)
+                'Dim NewFolder As String = String.Format(DirFormat, System.Guid.NewGuid)
+                Dim NewFolder As String = Path.Combine(Path.GetTempPath(), System.Guid.NewGuid.ToString)
+                'Dim NewFolder As String = Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, System.Guid.NewGuid.ToString)
+
+
                 While Directory.Exists(NewFolder) 'Is there an existing folder named like this one?
                     NewFolder = String.Format(DirFormat, System.Guid.NewGuid)
                 End While

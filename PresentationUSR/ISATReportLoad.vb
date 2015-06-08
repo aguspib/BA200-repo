@@ -514,17 +514,32 @@ Public Class UiSATReportLoad
         Try
 
             Dim SATModel As String = ""
-            SATModel = Me.bsSelectedTextBox.Text.Trim().Substring(Me.bsSelectedTextBox.Text.Trim().LastIndexOf(Convert.ToChar("_")))
+            SATModel = Me.bsSelectedTextBox.Text.Trim().Substring(Me.bsSelectedTextBox.Text.Trim().LastIndexOf(Convert.ToChar("_")) + 1,
+                                                                  Me.bsSelectedTextBox.Text.Trim().Length - Me.bsSelectedTextBox.Text.Trim().LastIndexOf(Convert.ToChar(".")))
          
             Select Case AnalyzerController.Instance.Analyzer.Model
                 Case Biosystems.Ax00.Core.Entities.Enums.AnalyzerModelEnum.A400.ToString
                     'Check If SAT Model is A200
                     If SATModel = Biosystems.Ax00.Core.Entities.Enums.AnalyzerModelEnum.A200.ToString Then
-                        'Todo: Error Not continue, diferent Models
+                        'Incompatible Model, Not continue, diferent Models
+                        myGlobal.HasError = True
+                        myGlobal.ErrorCode = GlobalEnumerates.Messages._NONE.ToString
+                        myGlobal.ErrorMessage = "Report SAT file Model (" & SATModel & ") different than current Model (" & AnalyzerController.Instance.Analyzer.Model & ")"
+
+                        GlobalBase.CreateLogActivity(myGlobal.ErrorMessage, Me.Name & " LoadSATReport ", EventLogEntryType.Warning, GetApplicationInfoSession().ActivateSystemLog)
+
+                        Exit Try
                     End If
                 Case Biosystems.Ax00.Core.Entities.Enums.AnalyzerModelEnum.A200.ToString
                     If SATModel <> AnalyzerController.Instance.Analyzer.Model Then
-                        'Todo: Error Not continue, diferent Models
+                        'Incompatible Model, Not continue, diferent Models
+                        myGlobal.HasError = True
+                        myGlobal.ErrorCode = GlobalEnumerates.Messages.SAT_LOAD_REPORT_ERROR.ToString
+                        myGlobal.ErrorMessage = "Report SAT file Model (" & SATModel & ") different than current Model (" & AnalyzerController.Instance.Analyzer.Model & ")"
+
+                        GlobalBase.CreateLogActivity(myGlobal.ErrorMessage, Me.Name & " LoadSATReport ", EventLogEntryType.Warning, GetApplicationInfoSession().ActivateSystemLog)
+
+                        Exit Try
                     End If
             End Select
 
@@ -544,7 +559,7 @@ Public Class UiSATReportLoad
                 myGlobal = mySATUtil.GetSATReportVersionAndModel(pFilePath)
 
                 If Not myGlobal.HasError And Not myGlobal Is Nothing Then
-                    mySATInfo = CStr(myGlobal.SetDatos).Split(System.Convert.ToChar(vbCrLf))
+                    mySATInfo = CStr(myGlobal.SetDatos).Split(System.Convert.ToChar(vbCr))
                     If mySATInfo.Count > 0 Then
                         mySATVersion = mySATInfo(0)
                         If mySATInfo.Count > 1 Then

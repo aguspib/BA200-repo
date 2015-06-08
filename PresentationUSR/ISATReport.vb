@@ -237,7 +237,9 @@ Public Class UiSATReport
                     UiAx00MainMDI.StopMarqueeProgressBar()
 
                     'TR 22/12/2011 - Validate if file is created on the current folder.
-                    If (File.Exists(FolderPathTextBox.Text & "\" & FileNameTextBox.Text & GlobalBase.ZIPExtension)) Then
+                    Dim Model As String = "_" & AnalyzerController.Instance.Analyzer.Model 'To check with the Model name included in the file name
+                    'Add Model on SAT Report file Name  
+                    If (File.Exists(FolderPathTextBox.Text & "\" & FileNameTextBox.Text & Model & GlobalBase.ZIPExtension)) Then
                         'Load all SAT reports in current Dir
                         LoadFilesInSatDirectory()
                         resetSaveButtonTimer.Enabled = True

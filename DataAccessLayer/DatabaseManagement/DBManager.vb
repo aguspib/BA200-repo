@@ -275,7 +275,7 @@ Namespace Biosystems.Ax00.DAL
 
                 'Declare a BackupDeviceItem by supplying the backup device file name in the constructor, and the type of device is a file.
                 Dim bdi As BackupDeviceItem
-                bdi = New BackupDeviceItem(BackUpFileName, DeviceType.File)
+                bdi = New BackupDeviceItem("""" & BackUpFileName & """", DeviceType.File)
 
                 'Add the device to the Restore object.
                 MyRestore.Devices.Add(bdi)
