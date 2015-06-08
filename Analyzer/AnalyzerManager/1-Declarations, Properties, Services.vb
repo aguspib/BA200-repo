@@ -301,6 +301,8 @@ Namespace Biosystems.Ax00.Core.Entities
         Private LockISEAttr As Boolean = False
 
         Private IsAlreadyManagedAlarmsAttr As Boolean = False
+
+        Private numWashes As Integer = 0
 #End Region
 
 #Region "Properties"
@@ -2440,6 +2442,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 SetAllowScanInRunningValue(False)
                 AppLayer.RecoveryResultsInPause = False
 
+                numWashes = 0
             Catch ex As Exception
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ResetWorkSession", EventLogEntryType.Error, False)
             End Try
