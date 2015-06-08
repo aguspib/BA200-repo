@@ -2119,6 +2119,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 myRow.SetSampleClassNull()
                 myRow.ContaminationID = myContaminationID
                 myRow.WashingSolution1 = myWashSolutionType
+                myRow.ExecutionID += numWashes
+                numWashes += 1
 #If DEBUG Then
                 Debug.Print(String.Format("Next Wash sent: {0}, sample class {1}, contamination {2}", myRow.ExecutionID.ToString(), myRow.SampleClass, myRow.ContaminationID.ToString()))
 #End If
