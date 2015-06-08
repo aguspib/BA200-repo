@@ -479,7 +479,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
+    <None Include="..\PresentationCOM\app.config">
+      <Link>app.config</Link>
+    </None>
     <None Include="BioSystems.pfx" />
     <None Include="My Project\app.manifest" />
     <None Include="My Project\Application.myapp">

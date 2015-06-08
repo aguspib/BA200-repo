@@ -343,6 +343,10 @@
     <Compile Include="Reports\Test\XtraSubReportControls.Designer.vb">
       <DependentUpon>XtraSubReportControls.vb</DependentUpon>
     </Compile>
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="BioSystems.pfx" />
     <None Include="packages.config" />
     <None Include="Reports\Test\XtraSubReportControls.vb">

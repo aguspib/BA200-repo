@@ -962,10 +962,12 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
     <Content Include="HelpFiles\TEUS00048-01-RUS.pdf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="..\PresentationCOM\app.config">
+      <Link>app.config</Link>
+    </None>
     <None Include="BioSystems.pfx" />
     <None Include="My Project\app.manifest" />
     <None Include="My Project\Application.myapp">
