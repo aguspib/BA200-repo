@@ -477,40 +477,70 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         End Function
 
         ''' <summary>
-        ''' Gets the SAT Report's version
+        ''' Extract SAT Report file into a temporally folder
         ''' </summary>
-        ''' <param name="pSATReportFilePath"></param>
-        ''' <returns></returns>
-        ''' <remarks>Created by SG 13/10/10</remarks>
-        Public Function GetSATReportVersionAndModel(ByVal pSATReportFilePath As String) As GlobalDataTO
+        ''' <param name="pSATReportZippedFilePath">Path and File name of the Zipped Report SAT</param>
+        ''' <returns>If no error, returns the path of temporally folder where files were extracted, If error returns error Info</returns>
+        ''' <remarks></remarks>
+        Public Function ExtractZipDataInTempFolder(ByVal pSATReportZippedFilePath As String) As GlobalDataTO
 
             Dim myGlobal As New GlobalDataTO
-            ''Dim myUtil As New Utilities.
+            Dim tempFolder As String = ""
             Try
                 'extract temporaly
-                Dim tempFolder As String = Directory.GetParent(pSATReportFilePath).FullName & "\temp"
-                myGlobal = Utilities.ExtractFromZip(pSATReportFilePath, tempFolder)
-                Dim VersionData As String = String.Empty
-
-                'RH 12/11/2010 Introduce the Using statement
+                myGlobal = GetTempFolder()
                 If Not myGlobal.HasError AndAlso Not myGlobal Is Nothing Then
-                    'open the text file
-                    Using TextFileReader As New StreamReader(String.Format("{0}\{1}", tempFolder, GlobalBase.VersionFileName)) 'RH 02/02/2011
-                        'get the version
-                        VersionData = TextFileReader.ReadToEnd.TrimEnd()
-                        'Close the file to avoid error. (RH: The using statement takes care of this, but it is OK)
-                        TextFileReader.Close()
-                    End Using
-
-                    'delete temp folder
-                    If Directory.Exists(tempFolder) Then
-                        Directory.Delete(tempFolder, True)
-                    End If
-
-                    'make the special reading operations if needed
-
-                    myGlobal.SetDatos = VersionData
+                    tempFolder = CStr(myGlobal.SetDatos)
+                Else
+                    myGlobal.HasError = True
+                    myGlobal.ErrorCode = "SAT_LOAD_REPORT_ERROR"
+                    myGlobal.ErrorMessage = "Temp Folder cannot be accesed"
+                    'Dim myLogAcciones As New ApplicationLogManager()
+                    GlobalBase.CreateLogActivity(myGlobal.ErrorMessage, Me.GetType().Name & "." & System.Reflection.MethodInfo.GetCurrentMethod().ToString, EventLogEntryType.Warning, False)
+                    Exit Try
                 End If
+
+                myGlobal = Utilities.ExtractFromZip(pSATReportZippedFilePath, tempFolder)
+                If Not myGlobal.HasError AndAlso Not myGlobal Is Nothing Then
+                    'return Unzipped files tempfolder location
+                    myGlobal.SetDatos = tempFolder
+                Else
+                    myGlobal.HasError = True
+                    myGlobal.ErrorCode = "SAT_LOAD_REPORT_ERROR"
+                    myGlobal.ErrorMessage = "SAT file cannot be unzipped"
+
+                    'Dim myLogAcciones As New ApplicationLogManager()
+                    GlobalBase.CreateLogActivity(myGlobal.ErrorMessage, Me.GetType().Name & "." & System.Reflection.MethodInfo.GetCurrentMethod().ToString, EventLogEntryType.Warning, False)
+                End If
+            Catch ex As Exception
+                GlobalBase.CreateLogActivity(ex)
+            End Try
+            Return myGlobal
+        End Function
+
+
+        ''' <summary>
+        ''' Gets the SAT Report's version and Model
+        ''' </summary>
+        ''' <param name="pSATReportFileFolder">Folder path of the Report SAT unzipped files</param>
+        ''' <returns>If no error returns a string with the version and model separated with a vbCrLf</returns>
+        ''' <remarks>Created by SG 13/10/10</remarks>
+        Public Function GetSATReportVersionAndModel(ByVal pSATReportFileFolder As String) As GlobalDataTO
+            Dim myGlobal As New GlobalDataTO
+            Try
+
+                Dim VersionData As String = String.Empty
+                'RH 12/11/2010 Introduce the Using statement
+
+                'open the text file
+                Using TextFileReader As New StreamReader(String.Format("{0}\{1}", pSATReportFileFolder, GlobalBase.VersionFileName)) 'RH 02/02/2011
+                    'get the version
+                    VersionData = TextFileReader.ReadToEnd.TrimEnd()
+                    'Close the file to avoid error. (RH: The using statement takes care of this, but it is OK)
+                    TextFileReader.Close()
+                End Using
+                'make the special reading operations if needed
+                myGlobal.SetDatos = VersionData
 
             Catch ex As Exception
                 myGlobal.HasError = True
@@ -527,7 +557,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         End Function
 
 
-     
+
 
 
         ''' <summary>
@@ -595,7 +625,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         End Function
 
         ''' <summary>
-        ''' Creates a new temporal folder
+        ''' Creates a new temporal folder into All users Application Data Folder
         ''' </summary>
         ''' <returns>
         ''' A new existing temporal folder in path format "C:\{GUID value}"
@@ -606,16 +636,10 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' </remarks>
         Public Function GetTempFolder() As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
-            Const DirFormat As String = "C:\{0}"
-
             Try
-                'Dim NewFolder As String = String.Format(DirFormat, System.Guid.NewGuid)
-                Dim NewFolder As String = Path.Combine(Path.GetTempPath(), System.Guid.NewGuid.ToString)
-                'Dim NewFolder As String = Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, System.Guid.NewGuid.ToString)
-
-
+                Dim NewFolder As String = Path.Combine(My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData, System.Guid.NewGuid.ToString)
                 While Directory.Exists(NewFolder) 'Is there an existing folder named like this one?
-                    NewFolder = String.Format(DirFormat, System.Guid.NewGuid)
+                    NewFolder = Path.Combine(My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData, System.Guid.NewGuid.ToString)
                 End While
                 Directory.CreateDirectory(NewFolder)
                 myGlobal.SetDatos = NewFolder

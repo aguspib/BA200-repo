@@ -151,16 +151,15 @@ Public Class UiSATReportLoad
     ''' SAT Report's version and Application's version
     ''' </summary>
     ''' <param name="pVersionComparison">Result of the version comparison</param>
+    ''' <param name="pUnzippedSATFolder">Path of the Unzipped Report SAT Files</param>
     ''' <returns></returns>
     ''' <remarks>
     ''' Created by: SG 08/10/2010
     ''' Modified by: SA 16/05/2014 - BT #1631 ==> When pVersionComparison indicates that SAT Report Version is higher than Application Version,
     '''                                           return REPORT_SAT_VERSION_IS_HIGHER as ErrorCode instead of as ErrorMessage
     ''' </remarks>
-    Private Function ManageVersionComparison(ByVal pVersionComparison As GlobalEnumerates.SATReportVersionComparison) As GlobalDataTO
+    Private Function ManageVersionComparison(ByVal pVersionComparison As GlobalEnumerates.SATReportVersionComparison, ByVal pUnzippedSATFolder As String) As GlobalDataTO
         Dim myGlobal As New GlobalDataTO
-        'Dim myUtil As New Utilities.
-        Dim tempFolder As String = ""
         Dim mySATUtil As New SATReportUtilities
 
         Try
@@ -238,95 +237,77 @@ Public Class UiSATReportLoad
                         End If
                     End If
 
-                    'extract temporaly
-                    'RH 12/11/2010 tempFolder can not be so long. RestoreDB will throw an exception.
-                    'So, we need a tempFolder like "C:\tempFolder"
-                    'tempFolder = Directory.GetParent(RestorePointPath).FullName & "\temp"
-                    myGlobal = mySATUtil.GetTempFolder() 'New function
+                    'search for the .bak file
+                    Dim myFiles As String() = Directory.GetFiles(pUnzippedSATFolder, "*.bak")
+                    If myFiles.Length > 0 Then
+                        Me.RestoreDBFilePath = myFiles(0)
+                        Dim RestoreThread As New Threading.Thread(AddressOf RestoreDataBase)
+                        Me.RestoringDB = True
+                        ScreenWorkingProcess = True 'AG 08/11/2012 - inform this flag because the MDI requires it
+                        Application.DoEvents() 'RH 16/11/2010
 
-                    If Not myGlobal.HasError AndAlso Not myGlobal Is Nothing Then
-                        tempFolder = CStr(myGlobal.SetDatos)
-                    Else
-                        ShowMessage(Me.Name & ".ManageVersionComparison", GlobalEnumerates.Messages.SAT_DB_RESTORE_ERROR.ToString())
-                        Exit Select
-                    End If
-                    'RH 12/11/2010 tempFolder
+                        RestoreThread.Start()
 
-                    myGlobal = Utilities.ExtractFromZip(RestorePointPath, tempFolder)
+                        While Me.RestoringDB 'RH 16/11/2010
+                            UiAx00MainMDI.InitializeMarqueeProgreesBar()
+                            Application.DoEvents()
+                            Threading.Thread.Sleep(100)
+                        End While
+                        UiAx00MainMDI.StopMarqueeProgressBar()
 
-                    If Not myGlobal.HasError AndAlso Not myGlobal Is Nothing Then
-                        'search for the .bak file
-                        Dim myFiles As String() = Directory.GetFiles(tempFolder, "*.bak")
-                        If myFiles.Length > 0 Then
-                            Me.RestoreDBFilePath = myFiles(0)
-                            Dim RestoreThread As New Threading.Thread(AddressOf RestoreDataBase)
-                            Me.RestoringDB = True
-                            ScreenWorkingProcess = True 'AG 08/11/2012 - inform this flag because the MDI requires it
-                            Application.DoEvents() 'RH 16/11/2010
+                        RestoreThread.Join()
 
-                            RestoreThread.Start()
-
-                            While Me.RestoringDB 'RH 16/11/2010
-                                UiAx00MainMDI.InitializeMarqueeProgreesBar()
-                                Application.DoEvents()
-                                Threading.Thread.Sleep(100)
-                            End While
-                            UiAx00MainMDI.StopMarqueeProgressBar()
-
-                            RestoreThread.Join()
-
-                            If Not DBRestored Then
-                                ShowMessage(Me.Name & ".ManageVersionComparison", GlobalEnumerates.Messages.SAT_DB_RESTORE_ERROR.ToString)
-                                'The DataBase was not restored successfully
-                            Else
-                                'REPORT VERSION < APPLICATION VERSION
-                                If pVersionComparison = GlobalEnumerates.SATReportVersionComparison.LowerThanAPP Then
-
-                                    Dim UpdateThread As New Threading.Thread(AddressOf UpdateDataBase)
-                                    Me.UpdatingDB = True
-                                    ScreenWorkingProcess = True 'AG 08/11/2012 - inform this flag because the MDI requires it
-
-                                    UpdateThread.Start()
-
-                                    While Me.UpdatingDB 'RH 16/11/2010
-                                        UiAx00MainMDI.InitializeMarqueeProgreesBar()
-                                        Application.DoEvents()
-                                        Threading.Thread.Sleep(100)
-                                    End While
-                                    UiAx00MainMDI.StopMarqueeProgressBar()
-
-                                    UpdateThread.Join()
-
-                                    'If Not DBUpdated Then
-                                    '    'ShowMessage(Me.Name & ".ManageVersionComparison", GlobalEnumerates.Messages.SAT_DB_UPDATE_ERROR.ToString) 'TR 29/01/2013 commented
-                                    'End If
-                                End If
-
-                                Application.DoEvents()
-
-                                If Me.RestorePointMode Then
-                                    ShowMessage(Me.Name & ".ManageVersionComparison", GlobalEnumerates.Messages.SAT_LOAD_RESTORE_POINT_OK.ToString)
-                                ElseIf DBUpdated Then
-                                    ShowMessage(Me.Name & ".ManageVersionComparison", GlobalEnumerates.Messages.SAT_LOAD_REPORT_OK.ToString)
-                                End If
-
-                                'AG 11/06/2014 #1661 - After load a RSAT (or restore point) remove all report templates not preloaded those designers do not exists on local computer
-                                Dim templateList As New ReportTemplatesDelegate
-                                myGlobal = templateList.DeleteNonExistingReportTemplates(Nothing)
-                                'AG 11/06/2014 #1661
-
-                                UiAx00MainMDI.InitializeAnalyzerAndWorkSession(False) 'AG 24/11/2010
-                            End If
+                        If Not DBRestored Then
+                            ShowMessage(Me.Name & ".ManageVersionComparison", GlobalEnumerates.Messages.SAT_DB_RESTORE_ERROR.ToString)
+                            'The DataBase was not restored successfully
                         Else
-                            If Me.RestorePointMode Then
-                                ShowMessage(Me.Name & ".ManageVersionComparison", GlobalEnumerates.Messages.SAT_LOAD_RESTORE_POINT_ERROR.ToString)
-                            Else
-                                ShowMessage(Me.Name & ".ManageVersionComparison", GlobalEnumerates.Messages.SAT_LOAD_REPORT_ERROR.ToString)
+                            'REPORT VERSION < APPLICATION VERSION
+                            If pVersionComparison = GlobalEnumerates.SATReportVersionComparison.LowerThanAPP Then
+
+                                Dim UpdateThread As New Threading.Thread(AddressOf UpdateDataBase)
+                                Me.UpdatingDB = True
+                                ScreenWorkingProcess = True 'AG 08/11/2012 - inform this flag because the MDI requires it
+
+                                UpdateThread.Start()
+
+                                While Me.UpdatingDB 'RH 16/11/2010
+                                    UiAx00MainMDI.InitializeMarqueeProgreesBar()
+                                    Application.DoEvents()
+                                    Threading.Thread.Sleep(100)
+                                End While
+                                UiAx00MainMDI.StopMarqueeProgressBar()
+
+                                UpdateThread.Join()
+
+                                'If Not DBUpdated Then
+                                '    'ShowMessage(Me.Name & ".ManageVersionComparison", GlobalEnumerates.Messages.SAT_DB_UPDATE_ERROR.ToString) 'TR 29/01/2013 commented
+                                'End If
                             End If
+
+                            Application.DoEvents()
+
+                            If Me.RestorePointMode Then
+                                ShowMessage(Me.Name & ".ManageVersionComparison", GlobalEnumerates.Messages.SAT_LOAD_RESTORE_POINT_OK.ToString)
+                            ElseIf DBUpdated Then
+                                ShowMessage(Me.Name & ".ManageVersionComparison", GlobalEnumerates.Messages.SAT_LOAD_REPORT_OK.ToString)
+                            End If
+
+                            'AG 11/06/2014 #1661 - After load a RSAT (or restore point) remove all report templates not preloaded those designers do not exists on local computer
+                            Dim templateList As New ReportTemplatesDelegate
+                            myGlobal = templateList.DeleteNonExistingReportTemplates(Nothing)
+                            'AG 11/06/2014 #1661
+
+                            UiAx00MainMDI.InitializeAnalyzerAndWorkSession(False) 'AG 24/11/2010
                         End If
+                    Else
+                        If Me.RestorePointMode Then
+                            ShowMessage(Me.Name & ".ManageVersionComparison", GlobalEnumerates.Messages.SAT_LOAD_RESTORE_POINT_ERROR.ToString)
+                        Else
+                            ShowMessage(Me.Name & ".ManageVersionComparison", GlobalEnumerates.Messages.SAT_LOAD_REPORT_ERROR.ToString)
+                        End If
+                    End If
 
                         'Else
-                    End If
             End Select
 
         Catch ex As Exception
@@ -336,15 +317,10 @@ Public Class UiSATReportLoad
 
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ManageVersionComparison", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ManageVersionComparison", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-
         Finally
-
-            If Directory.Exists(tempFolder) Then DeleteDirectory(tempFolder) 'RH 31/05/2011
-
             If ErrorMessage <> String.Empty Then
                 ShowMessage(Me.Name & ".ManageVersionComparison", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ErrorMessage)
             End If
-
         End Try
 
         Return myGlobal
@@ -510,7 +486,7 @@ Public Class UiSATReportLoad
     ''' </remarks>
     Private Function LoadSATReport(ByVal pFilePath As String) As GlobalDataTO
         Dim myGlobal As New GlobalDataTO
-
+        Dim SATTempFolderPath As String = ""
         Try
 
             Dim SATModel As String = ""
@@ -552,47 +528,53 @@ Public Class UiSATReportLoad
             If Not myGlobal.HasError And Not myGlobal Is Nothing Then
                 myAppVersion = CStr(myGlobal.SetDatos)
 
-                'obtain the SAT version
-                Dim mySATInfo As String()
-                Dim mySATVersion As String = String.Empty
-                Dim mySATModel As String = String.Empty
-                myGlobal = mySATUtil.GetSATReportVersionAndModel(pFilePath)
+                myGlobal = mySATUtil.ExtractZipDataInTempFolder(pFilePath)
 
                 If Not myGlobal.HasError And Not myGlobal Is Nothing Then
-                    mySATInfo = CStr(myGlobal.SetDatos).Split(System.Convert.ToChar(vbCr))
-                    If mySATInfo.Count > 0 Then
-                        mySATVersion = mySATInfo(0)
-                        If mySATInfo.Count > 1 Then
-                            mySATModel = mySATInfo(1)
-                        End If
+                    SATTempFolderPath = myGlobal.SetDatos.ToString
 
-                        Dim myComparisonResult As New GlobalEnumerates.SATReportVersionComparison
-                        myGlobal = mySATUtil.CompareSATandAPPversions(myAppVersion, mySATVersion)
-                        If Not myGlobal.HasError And Not myGlobal Is Nothing Then
-                            myComparisonResult = CType(myGlobal.SetDatos, GlobalEnumerates.SATReportVersionComparison)
-                            Me.RestorePointPath = pFilePath
+                    'obtain the SAT version and Model
+                    Dim mySATInfo As String()
+                    Dim mySATVersion As String = String.Empty
+                    Dim mySATModel As String = String.Empty
+                    myGlobal = mySATUtil.GetSATReportVersionAndModel(SATTempFolderPath)
 
-                            'AG 25/10/2011 - Stop ANSINF
-                            If (AnalyzerController.IsAnalyzerInstantiated) Then
-                                If AnalyzerController.Instance.Analyzer.Connected AndAlso AnalyzerController.Instance.Analyzer.AnalyzerStatus <> GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
-                                    myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STP) 'Stop ANSINF
+                    If Not myGlobal.HasError And Not myGlobal Is Nothing Then
+                        mySATInfo = CStr(myGlobal.SetDatos).Split(System.Convert.ToChar(vbCr))
+                        If mySATInfo.Count > 0 Then
+                            mySATVersion = mySATInfo(0).Trim
+                            If mySATInfo.Count > 1 Then
+                                mySATModel = mySATInfo(1).Trim
+                            End If
+
+                            Dim myComparisonResult As New GlobalEnumerates.SATReportVersionComparison
+                            myGlobal = mySATUtil.CompareSATandAPPversions(myAppVersion, mySATVersion)
+                            If Not myGlobal.HasError And Not myGlobal Is Nothing Then
+                                myComparisonResult = CType(myGlobal.SetDatos, GlobalEnumerates.SATReportVersionComparison)
+                                Me.RestorePointPath = pFilePath
+
+                                'AG 25/10/2011 - Stop ANSINF
+                                If (AnalyzerController.IsAnalyzerInstantiated) Then
+                                    If AnalyzerController.Instance.Analyzer.Connected AndAlso AnalyzerController.Instance.Analyzer.AnalyzerStatus <> GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
+                                        myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STP) 'Stop ANSINF
+                                    End If
                                 End If
-                            End If
-                            'AG 25/10/2011
+                                'AG 25/10/2011
 
-                            If Not myGlobal.HasError Then
-                                myGlobal = Me.ManageVersionComparison(myComparisonResult)
-                            End If
-
-                            'AG 25/10/2011 - Start ANSINF
-                            If Not myGlobal.HasError AndAlso (AnalyzerController.IsAnalyzerInstantiated) Then
-                                If AnalyzerController.Instance.Analyzer.Connected AndAlso AnalyzerController.Instance.Analyzer.AnalyzerStatus <> GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
-                                    myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STR) 'Start ANSINF
+                                If Not myGlobal.HasError Then
+                                    myGlobal = Me.ManageVersionComparison(myComparisonResult, SATTempFolderPath)
                                 End If
 
-                            End If
-                            'AG 25/10/2011
+                                'AG 25/10/2011 - Start ANSINF
+                                If Not myGlobal.HasError AndAlso (AnalyzerController.IsAnalyzerInstantiated) Then
+                                    If AnalyzerController.Instance.Analyzer.Connected AndAlso AnalyzerController.Instance.Analyzer.AnalyzerStatus <> GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
+                                        myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STR) 'Start ANSINF
+                                    End If
 
+                                End If
+                                'AG 25/10/2011
+
+                            End If
                         End If
                     End If
                 End If
@@ -605,7 +587,16 @@ Public Class UiSATReportLoad
 
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " LoadSATReport ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ErrorMessage = ex.Message
-
+        Finally
+            Try
+                If Not String.IsNullOrEmpty(SATTempFolderPath) Then
+                    If Directory.Exists(SATTempFolderPath) Then
+                        System.IO.Directory.Delete(SATTempFolderPath, True)
+                    End If
+                End If
+            Catch ex As Exception
+                GlobalBase.CreateLogActivity(ex)
+            End Try
         End Try
 
         Return myGlobal
