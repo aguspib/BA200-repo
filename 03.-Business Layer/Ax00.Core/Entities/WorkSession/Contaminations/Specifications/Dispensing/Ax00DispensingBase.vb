@@ -231,12 +231,16 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
                 Select Case KindOfLiquid
                     Case IDispensing.KindOfDispensedLiquid.Dummy
                         Return "Dummy " & Me.GetType.Name
+
                     Case IDispensing.KindOfDispensedLiquid.Reagent
-                        Return "Reagent " & R1ReagentID & " SC " & Me.SampleClass & " " & Me.GetType.Name
+                        Return "Reagent ID:" & R1ReagentID & " SC " & Me.SampleClass & " " & Me.GetType.Name
+
                     Case IDispensing.KindOfDispensedLiquid.Washing
-                        Return "Washing W" & WashingID & " " & Me.WashingDescription.WashingSolutionCode & " Strength " & Me.WashingDescription.WashingStrength & " " & Me.GetType.Name
+                        Return "Washing ID:W" & WashingID & " " & Me.WashingDescription.WashingSolutionCode & " Strength " & Me.WashingDescription.WashingStrength & " " & Me.GetType.Name
+
                     Case Else
                         Return MyBase.ToString()
+
                 End Select
             Catch
                 Return MyBase.ToString
