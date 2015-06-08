@@ -496,11 +496,16 @@ Namespace Biosystems.Ax00.Core.Entities
                                     nextRow.ExecutionID = executionFound 'Execution that requires the washing
                                     nextRow.ExecutionType = "PREP_STD"
 
+                                    nextRow.SetReagentIDNull()
+
                                     nextPreparationDS.nextPreparation.AddnextPreparationRow(nextRow)
 
                                     GlobalBase.CreateLogActivity("SearchNextSTDPreparation (Check if exist reagents contaminations): " + nextRow.ExecutionID.ToString, "AnalyzerManager.SearchNextPreparation", EventLogEntryType.Information, False)
 
                                 Else 'STD execution or NO_PENDING_PREPARATION_FOUND
+                                    Dim miAnManDS = DirectCast(resultData.SetDatos, AnalyzerManagerDS)
+                                    Dim myRowSearchNext = miAnManDS.searchNext(0).ReagentID
+
                                     nextRow = nextPreparationDS.nextPreparation.NewnextPreparationRow
                                     nextRow.ExecutionType = "PREP_STD"
                                     nextRow.ExecutionID = executionFound
@@ -511,6 +516,8 @@ Namespace Biosystems.Ax00.Core.Entities
                                     nextRow.ReagentContaminationFlag = False
                                     nextRow.SetWashSolution1Null()
                                     nextRow.SetWashSolution2Null()
+
+                                    nextRow.ReagentID = myRowSearchNext
 
                                     nextPreparationDS.nextPreparation.AddnextPreparationRow(nextRow)
                                     GlobalBase.CreateLogActivity("SearchNextSTDPreparation (STD execution or NO_PENDING_PREPARATION_FOUND): " + nextRow.ExecutionID.ToString, "AnalyzerManager.SearchNextPreparation", EventLogEntryType.Information, False)
@@ -2344,7 +2351,7 @@ Namespace Biosystems.Ax00.Core.Entities
             '5rh: Check if next preparation is an STD preparation and executionID <> NO_PENDING_PREPARATION_FOUND
             If Not actionAlreadySent And Not endRunToSend Then
                 Dim disp = WSCreator.ContaminationsSpecification.CreateDispensing
-                disp.ExecutionID = myAnManagerDS.nextPreparation(0).ExecutionID
+                disp.R1ReagentID = myAnManagerDS.nextPreparation(0).ReagentID
                 Dim requiredActionBeforeDispensing = WSCreator.ContaminationsSpecification.CurrentRunningContext.ActionRequiredForDispensing(disp)
                 If requiredActionBeforeDispensing.Action = IContaminationsAction.RequiredAction.Wash Then
                     Debug.WriteLine("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
