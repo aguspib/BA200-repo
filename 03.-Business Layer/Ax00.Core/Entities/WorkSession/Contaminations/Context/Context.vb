@@ -88,7 +88,6 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
             AnalyzerFrame = instructionParameters
             FillSteps()
             Debug.WriteLine(Me)
-            ShowDebugInfo(instructionParameters.ToString)
 
         End Sub
 
@@ -205,35 +204,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
             AnalyzerFrame = New LAx00Frame()
             AnalyzerFrame.ParseRawData(rawAnalyzerFrame)
             FillSteps()
-            ShowDebugInfo(rawAnalyzerFrame)
         End Sub
-#If config = "Debug" Then
-        Shared debugF As Form, tb As TextBox = Nothing
-#End If
-        Private Sub ShowDebugInfo(rawAnalyzerFrame As String)
-#If config = "Debug" Then
-            Debug.WriteLine(Me)
-            If debugF Is Nothing Then
-                debugF = New Form()
-                tb = New TextBox
-                tb.Multiline = True
-                tb.Parent = debugF
-                tb.Dock = DockStyle.Fill
-                debugF.Show()
-            End If
-            Dim appendText = Sub()
-                                 tb.AppendText(rawAnalyzerFrame)
-                                 tb.AppendText(Me.ToString)
-                                 tb.AppendText(vbCr)
-                             End Sub
-            If tb.InvokeRequired Then
-                tb.BeginInvoke(appendText)
-            Else
-                appendText()
-            End If
-#End If
-        End Sub
-
 
         Private Sub RemoveWashingFromResult(responseFromDispensing As IContaminationsAction, lookUpFilter As HashSet(Of String), results As ActionRequiredForDispensing)
             If responseFromDispensing.Action <> IContaminationsAction.RequiredAction.RemoveRequiredWashing Then Return

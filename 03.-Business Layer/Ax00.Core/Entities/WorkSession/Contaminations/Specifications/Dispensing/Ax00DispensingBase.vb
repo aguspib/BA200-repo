@@ -225,6 +225,23 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
                 End If
             End If
         End Function
+
+        Overrides Function ToString() As String
+            Try
+                Select Case KindOfLiquid
+                    Case IDispensing.KindOfDispensedLiquid.Dummy
+                        Return "Dummy " & Me.GetType.Name
+                    Case IDispensing.KindOfDispensedLiquid.Reagent
+                        Return "Reagent " & R1ReagentID & " SC " & Me.SampleClass & " " & Me.GetType.Name
+                    Case IDispensing.KindOfDispensedLiquid.Washing
+                        Return "Washing W" & WashingID & " " & Me.WashingDescription.WashingSolutionCode & " Strength " & Me.WashingDescription.WashingStrength & " " & Me.GetType.Name
+                    Case Else
+                        Return MyBase.ToString()
+                End Select
+            Catch
+                Return MyBase.ToString
+            End Try
+        End Function
 #End Region
 
 #Region "attributes"
@@ -255,6 +272,8 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
             Next
         End Sub
 #End Region
+
+
 
 
     End Class
