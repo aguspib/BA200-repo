@@ -515,6 +515,11 @@ Namespace Biosystems.Ax00.Core.Entities
                                     nextPreparationDS.nextPreparation.AddnextPreparationRow(nextRow)
                                     GlobalBase.CreateLogActivity("SearchNextSTDPreparation (STD execution or NO_PENDING_PREPARATION_FOUND): " + nextRow.ExecutionID.ToString, "AnalyzerManager.SearchNextPreparation", EventLogEntryType.Information, False)
                                 End If '(4.2)
+
+#If DEBUG Then
+                                Debug.Print(String.Format("ElementID on nextRow = {0} \n", nextRow.ExecutionID.ToString()))
+                                Debug.Print(String.Format("SearchNextPreparation: Number of elements on nextPreparation table = {0} \n", nextPreparationDS.nextPreparation.Count.ToString()))
+#End If
                             End If '(4.1)
                         End If '(4.0
 
@@ -910,6 +915,11 @@ Namespace Biosystems.Ax00.Core.Entities
                                             pExecutionSTDFound = nextToSend.searchNext(0).ExecutionID
                                             If Not nextToSend.searchNext(0).IsSampleClassNull Then pSampleClassFound = nextToSend.searchNext(0).SampleClass
                                         End If
+
+#If DEBUG Then
+                                        Debug.Print(String.Format("SearchNextSTDPreparation: Execution found to pExecutionSTDFound = {0} \n", pExecutionSTDFound))
+                                        Debug.Print(String.Format("SearchNextSTDPreparation: Number of elements on searchNext table = {0} \n", nextToSend.searchNext.Count.ToString()))
+#End If
 
                                     End If '(6)
 
@@ -2109,6 +2119,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 myRow.SetSampleClassNull()
                 myRow.ContaminationID = myContaminationID
                 myRow.WashingSolution1 = myWashSolutionType
+                myRow.ExecutionID += numWashes
+                numWashes += 1
 #If DEBUG Then
                 Debug.Print(String.Format("Next Wash sent: {0}, sample class {1}, contamination {2}", myRow.ExecutionID.ToString(), myRow.SampleClass, myRow.ContaminationID.ToString()))
 #End If

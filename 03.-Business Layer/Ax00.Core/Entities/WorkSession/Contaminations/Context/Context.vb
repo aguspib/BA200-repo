@@ -37,11 +37,9 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
                 Dim anali As AnalyzerManager = TryCast(AnalyzerManager.GetCurrentAnalyzerManager(), AnalyzerManager)
                 If anali.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
                     If dispensing.KindOfLiquid = IDispensing.KindOfDispensedLiquid.Reagent Then
-                        Debug.WriteLine("  Asked context for reagent " & dispensing.R1ReagentID)
+                        Debug.WriteLine("  Asked context for reagent " & dispensing.R1ReagentID & " SC:" & dispensing.SampleClass)
                     ElseIf dispensing.KindOfLiquid = IDispensing.KindOfDispensedLiquid.Washing Then
-                        Debug.WriteLine("  Asked context for washing with ID  " & dispensing.WashingID)
-                    Else
-                        Debug.WriteLine("  Asked context for dummy dispensing. ")
+                        Debug.WriteLine("  Asked context for washing " & dispensing.WashingID & " WS:" & dispensing.WashingDescription.WashingSolutionCode)
                     End If
                 End If
             Catch : End Try
