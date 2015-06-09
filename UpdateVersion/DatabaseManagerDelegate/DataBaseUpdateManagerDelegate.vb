@@ -16,6 +16,182 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
     ''' <remarks></remarks>
     Public Class DataBaseUpdateManagerDelegate
 
+#Region "   INSTALL AND UPDATE PROCESS"
+
+        ''' <summary>
+        ''' Method incharge to start the database Update and instalation process.
+        ''' </summary>
+        ''' <remarks>
+        ''' Created by:  TR
+        ''' Modified by: AG 16/01/2013 v1.0.1 - Evaluate if successfully or not and continue business (see update version process design)
+        '''              TR 29/01/2013 v1.0.1 - Add the new parameter pLoadingRSAT to indicate if user is loading a RSAT
+        '''              SA 16/05/2014 - BT #1632 ==> Before start the update process, execute the temporary script used to change the structure 
+        '''                                           of ApplicationLog table (tfmwApplicationLog) 
+        '''              IT 08/05/2015 - BA-2471
+        '''              MR 09/06/2015 - BA-2566 ==> We change the flow of the function adding the functionality of rename the Database depends on which 
+        '''                                          Intance Analyzer start the Application.
+        ''' </remarks>
+        Public Function InstallUpdateProcess(ByVal pServerName As String, ByVal pDataBaseName As String, ByVal DBLogin As String, _
+                                             ByVal DBPassword As String, Optional pLoadingRSAT As Boolean = False) As GlobalDataTO
+
+            Dim myGlobalDataTO As New GlobalDataTO
+            'Dim myDBDatabaseManager As New DataBaseManagerDelegate
+            Dim initialTimeUpdate As New DateTime 'TR Variable used to validate the time 
+            Try
+                'GlobalBase.CreateLogActivity("InstallUpdateProcess" & ".Updateprocess -Validating if Data Base exists ", "Installation validation", EventLogEntryType.Information, False)
+                initialTimeUpdate = Now 'Set the start time 
+                Debug.Print("INICIO-->" & initialTimeUpdate.TimeOfDay.ToString()) 'Print the time
+                GlobalBase.CreateLogActivity("InstallUpdateProcess" & ".Updateprocess - Database found", "Installation validation", _
+                                                                                                   EventLogEntryType.Information, False)
+                'if A200 or A400 exist
+                If DataBaseManagerDelegate.DataBaseExist(pServerName, pDataBaseName, DBLogin, DBPassword) Then 'BA-2471: IT 08/05/2015
+                    myGlobalDataTO = updateProcessApplication(pServerName, pDataBaseName, DBLogin, DBPassword, pLoadingRSAT)
+                Else
+                    'Ax00 Exist
+                    If DataBaseManagerDelegate.DataBaseExist(pServerName, GlobalBase.CommonDatabaseName, DBLogin, DBPassword) Then 'BA-2471: IT 08/05/2015
+                        'The Ax00 DB belong to the same analyzer A200 or A400 active=true
+                        If IsSameAnalyzer() Then
+
+                            'if we start the same instance we rename the database, to a intance name.and we follow with the update process.
+                            DataBaseManagerDelegate.RenameDBByModel(pServerName, pDataBaseName, DBLogin, DBPassword)
+                            myGlobalDataTO = updateProcessApplication(pServerName, pDataBaseName, DBLogin, DBPassword, pLoadingRSAT)
+                        Else
+                            'if isn't the same Analyzer we restored the database saying the name of the instance (A200 or A400) we not override the current DB.
+                            myGlobalDataTO = installProcessApplication(pServerName, pDataBaseName, DBLogin, DBPassword)
+                        End If
+                    Else
+                        'if we haven't our db we restore one from .bak file.
+                        myGlobalDataTO = installProcessApplication(pServerName, pDataBaseName, DBLogin, DBPassword)
+                    End If
+                End If
+
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorMessage = ex.Message
+            Finally
+                'TR 21/01/2013 v1.0.1 Delete db temp bak file  and remove from server.
+                RemoveBackupFileAndTempDatabase(GlobalBase.TemporalDirectory & GlobalBase.TempDBBakupFileName, _
+                                                pServerName, DBLogin, DBPassword, GlobalBase.TemporalDBName)
+                Debug.Print("FIN-->" & Now.TimeOfDay.ToString()) 'print the finish time
+                Debug.Print("TOTAL-->" & (Now - initialTimeUpdate).ToString()) 'get the diference.
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Function to call to internal functions to follow with the InstallAplication Process doing a restore of the database.
+        ''' Function used in two scenarios: 
+        ''' 1 - First installation 
+        ''' 2 - Restore .bak file we distribute with the software.
+        ''' </summary>
+        ''' <param name="pServerName">Name of the Server where CUSTOMER DB is installed</param>
+        ''' <param name="pDataBaseName">CUSTOMER DB Name by Instance </param>
+        ''' <param name="DBLogin">DB Login</param>
+        ''' <param name="DBPassword">DB Password</param>
+        ''' <returns>GlobalDataTO with the result of the Install procces: if the Installation was successfully executed, the function
+        '''          returns TRUE; otherwise it returns FALSE. If the Installation is executed but an error is raised during execution, the 
+        '''          Error is informed in fields ErrorCode and ErrorDescription in the GlobalDataTO, and HasError is set to TRUE</returns>
+        ''' <remarks> Created by:  MR 09/06/2015 ==> BA-2566 - Peace of code was placed in InstallUpdateProcess and is needed it more than once. Then I created this function.</remarks>
+        Private Function installProcessApplication(ByVal pServerName As String, ByVal pDataBaseName As String, ByVal DBLogin As String, _
+                                             ByVal DBPassword As String) As GlobalDataTO
+
+
+            Dim myGlobalDataTO As New GlobalDataTO
+
+            Try
+                'GlobalBase.CreateLogActivity("Before installing the DB", "Update process", EventLogEntryType.Information, False)
+                'Call the Install database delegate.
+                Dim myDBInstallerDelegate As New DataBaseInstallerManagerDelegate()
+                'TR 22/01/2013 v1.0.1 -Change to recive a globalTO instead of boolean.
+                myGlobalDataTO = myDBInstallerDelegate.InstallApplicationDataBase(pServerName, pDataBaseName, DBLogin, DBPassword)
+                'RH 01/03/2012 Wait a moment, while the recently created DB becomes ready to work
+                If Not myGlobalDataTO.HasError Then
+                    System.Threading.Thread.Sleep(5000)
+                End If
+                myGlobalDataTO.HasError = False 'AG 16/01/2013 - clear the error flag. Validation will be done in method IAx00Login.CheckDataBaseAvailability
+                ' in case this function do not return error
+
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorMessage = ex.Message
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Function who follow with the update process.
+        ''' </summary>
+        ''' <param name="pServerName">Name of the Server where CUSTOMER DB is installed</param>
+        ''' <param name="pDataBaseName">CUSTOMER DB Name by Instance</param>
+        ''' <param name="DBLogin">DB Login</param>
+        ''' <param name="DBPassword">DB Password</param>
+        ''' <param name="pLoadingRSAT">Optional parameter to say if will load a SAT report.</param>
+        ''' <returns>GlobalDataTO with the result of the Update procces: if the Update was successfully executed, the function
+        '''          returns TRUE; otherwise it returns FALSE. If the Update is executed but an error is raised during execution, the 
+        '''          Error is informed in fields ErrorCode and ErrorDescription in the GlobalDataTO, and HasError is set to TRUE</returns>
+        ''' <remarks> Created by:  MR 09/06/2015 ==> BA-2566 - Peace of code was placed in InstallUpdateProcessand we need it more than once. Then I created this function. </remarks>
+        Private Function updateProcessApplication(ByVal pServerName As String, ByVal pDataBaseName As String, ByVal DBLogin As String, _
+                                        ByVal DBPassword As String, Optional pLoadingRSAT As Boolean = False) As GlobalDataTO
+
+            Dim myGlobalDataTO As New GlobalDataTO
+            Dim initialTimeUpdate As New DateTime 'TR Variable used to validate the time 
+
+            Try
+                'BT #1632 - Before start the update process, execute temporary scripts used to change the structure of tables that have to 
+                '           be already updated when the UpdateVersion process starts (f.i. ApplicationLog Table --> tfmwApplicationLog)
+                ExecuteScriptsBeforeUpdate()
+
+                'Call the Update Database delegate.
+                myGlobalDataTO = UpdateDatabase(pServerName, pDataBaseName, DBLogin, DBPassword, pLoadingRSAT)
+
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorMessage = ex.Message
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Function that checks from which analyzer belong the current Database 'Ax00'
+        ''' </summary>
+        ''' <returns> Boolean attribute saying if the AnalyzerModel active in the database is the same of who started the instance of the application.</returns>
+        ''' <remarks>Created by:  MR 09/06/2015 ==> BA-2566 </remarks>
+        Private Function IsSameAnalyzer() As Boolean
+            Dim result As Boolean = False
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                Dim connection = DAOBase.GetOpenDBConnection(Nothing)
+                If (Not connection.HasError AndAlso Not connection.SetDatos Is Nothing) Then
+                    dbConnection = CType(connection.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim tcfAnalyzerDAO As New DAL.DAO.tcfgAnalyzersDAO
+                        Dim returnData As GlobalDataTO = Nothing
+                        returnData = tcfAnalyzerDAO.ReadByAnalyzerActive(dbConnection)
+                        If Not returnData.HasError AndAlso Not returnData.SetDatos Is Nothing Then
+                            Dim AnalyzerObj As AnalyzersDS = CType(returnData.SetDatos, AnalyzersDS)
+                            'The app only can have one active analyzer.
+                            If (AnalyzerObj.tcfgAnalyzers.Rows.Count > 0 AndAlso AnalyzerObj.tcfgAnalyzers.Rows.Count = 1) Then
+                                Dim AnalyzerRow As AnalyzersDS.tcfgAnalyzersRow = AnalyzerObj.tcfgAnalyzers(0)
+                                If AnalyzerRow.AnalyzerModel.ToUpper.Trim().Equals(GlobalBase.DatabaseName.ToUpper.Trim()) Then
+                                    result = True
+                                End If
+                            End If
+                        End If
+                    End If
+                End If
+
+            Catch ex As Exception
+                GlobalBase.CreateLogActivity(ex)
+                Throw
+            Finally
+                If (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return result
+        End Function
+
+#End Region
+
 #Region "Public Methods"
 
         ''' <summary>
@@ -240,119 +416,6 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
             Return result
         End Function
 
-
-        ' ''' <summary>
-        ' ''' Remove the temporal database, created to move the new data.
-        ' ''' and the backup file from the temp directory too.
-        ' ''' </summary>
-        ' ''' <param name="TempBackupFile">Backup file Name, with the path.</param>
-        ' ''' <param name="ServerName">Server name</param>
-        ' ''' <param name="TempDatabaseName">Temporal Database Name.</param>
-        ' ''' <returns></returns>
-        ' ''' <remarks>
-        ' ''' Modified by: IT 08/05/2015 - BA-2471
-        ' ''' </remarks>
-        'Public Function IsRestoreNecessary(ByVal pServerName As String, ByVal pDataBaseName As String, ByVal DBLogin As String, _
-        '                                     ByVal DBPassword As String, Optional pLoadingRSAT As Boolean = False) As Boolean
-        '    Dim result As Boolean = False
-        '    Try
-        '        'A200 O A400
-        '        If DataBaseManagerDelegate.DataBaseExist(pServerName, pDataBaseName, DBLogin, DBPassword) Then 'BA-2471: IT 08/05/2015
-        '            'APLICACION
-        '        Else
-        '            'Pregunta Ax00
-        '            If DataBaseManagerDelegate.DataBaseExist(pServerName, "Ax00", DBLogin, DBPassword) Then 'BA-2471: IT 08/05/2015ç
-
-        '            End If
-        '        End If
-        '    Catch ex As Exception
-        '        'Dim myLogAcciones As New ApplicationLogManager()
-        '        GlobalBase.CreateLogActivity(ex.Message & " --- " & ex.InnerException.ToString(), _
-        '                                        "DataBaseUpdateManager.RemoveBackupFileAndTempDatabase", EventLogEntryType.Error, False)
-        '    End Try
-        '    Return result
-        'End Function
-
-
-
-
-        ''' <summary>
-        ''' Method incharge to start the database Update and instalation process.
-        ''' </summary>
-        ''' <remarks>
-        ''' Created by:  TR
-        ''' Modified by: AG 16/01/2013 v1.0.1 - Evaluate if successfully or not and continue business (see update version process design)
-        '''              TR 29/01/2013 v1.0.1 - Add the new parameter pLoadingRSAT to indicate if user is loading a RSAT
-        '''              SA 16/05/2014 - BT #1632 ==> Before start the update process, execute the temporary script used to change the structure 
-        '''                                           of ApplicationLog table (tfmwApplicationLog) 
-        '''              IT 08/05/2015 - BA-2471   
-        ''' </remarks>
-        Public Function InstallUpdateProcess(ByVal pServerName As String, ByVal pDataBaseName As String, ByVal DBLogin As String, _
-                                             ByVal DBPassword As String, Optional pLoadingRSAT As Boolean = False) As GlobalDataTO
-
-            Dim myGlobalDataTO As New GlobalDataTO
-            'Dim myDBDatabaseManager As New DataBaseManagerDelegate
-            Dim initialTimeUpdate As New DateTime 'TR Variable used to validate the time 
-
-            Try
-                'GlobalBase.CreateLogActivity("InstallUpdateProcess" & ".Updateprocess -Validating if Data Base exists ", "Installation validation", EventLogEntryType.Information, False)
-
-                If DataBaseManagerDelegate.DataBaseExist(pServerName, pDataBaseName, DBLogin, DBPassword) Then 'BA-2471: IT 08/05/2015
-
-                    'BT #1632 - Before start the update process, execute temporary scripts used to change the structure of tables that have to 
-                    '           be already updated when the UpdateVersion process starts (f.i. ApplicationLog Table --> tfmwApplicationLog)
-                    ExecuteScriptsBeforeUpdate()
-
-                    initialTimeUpdate = Now 'Set the start time 
-                    Debug.Print("INICIO-->" & initialTimeUpdate.TimeOfDay.ToString()) 'Print the time
-                    GlobalBase.CreateLogActivity("InstallUpdateProcess" & ".Updateprocess - Database found", "Installation validation", _
-                                                                                                        EventLogEntryType.Information, False)
-                    'Call the Update Database delegate.
-                    myGlobalDataTO = UpdateDatabase(pServerName, pDataBaseName, DBLogin, DBPassword, pLoadingRSAT)
-
-
-                Else
-
-                    ''Pregunta Ax00
-                    'If DataBaseManagerDelegate.DataBaseExist(pServerName, "Ax00", DBLogin, DBPassword) Then 'BA-2471: IT 08/05/2015
-                    '    If dbIsSameAnalyser() Then
-                    '        'Si la instancia de analizador es la misma que la de la base de datos -->Renombramos DB.
-                    '        'MR 08/06/15
-                    '        DataBaseManagerDelegate.RenameDBByModel(pServerName, pDataBaseName, DBLogin, DBPassword)
-                    '        'Application
-                    '    Else
-                    '        RestoreDB()
-                    '    End If
-                    'Else
-                    '    RestoreDB()
-                    'End If
-
-                    'GlobalBase.CreateLogActivity("Before installing the DB", "Update process", EventLogEntryType.Information, False)
-                    'Call the Install database delegate.
-                    Dim myDBInstallerDelegate As New DataBaseInstallerManagerDelegate()
-                    'TR 22/01/2013 v1.0.1 -Change to recive a globalTO instead of boolean.
-                    myGlobalDataTO = myDBInstallerDelegate.InstallApplicationDataBase(pServerName, pDataBaseName, DBLogin, DBPassword)
-                    'RH 01/03/2012 Wait a moment, while the recently created DB becomes ready to work
-                    If Not myGlobalDataTO.HasError Then
-                        System.Threading.Thread.Sleep(5000)
-                    End If
-                    myGlobalDataTO.HasError = False 'AG 16/01/2013 - clear the error flag. Validation will be done in method IAx00Login.CheckDataBaseAvailability
-                    ' in case this function do not return error
-                End If
-
-            Catch ex As Exception
-                'GlobalBase.CreateLogActivity(ex.Message, "DataBaseManagerDelegate.RestoreDatabase", EventLogEntryType.Error, False)
-                myGlobalDataTO.HasError = True
-                myGlobalDataTO.ErrorMessage = ex.Message
-            Finally
-                'TR 21/01/2013 v1.0.1 Delete db temp bak file  and remove from server.
-                RemoveBackupFileAndTempDatabase(GlobalBase.TemporalDirectory & GlobalBase.TempDBBakupFileName, _
-                                                                       pServerName, DBLogin, DBPassword, GlobalBase.TemporalDBName)
-                Debug.Print("FIN-->" & Now.TimeOfDay.ToString()) 'print the finish time
-                Debug.Print("TOTAL-->" & (Now - initialTimeUpdate).ToString()) 'get the diference.
-            End Try
-            Return myGlobalDataTO
-        End Function
 
 #End Region
 
@@ -742,7 +805,6 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
             End Try
             Return myGlobalDataTO
         End Function
-
 
         Private Function InitializeDatabase(ByVal dataBaseName As String, ByRef server As Server) As Boolean
             Try

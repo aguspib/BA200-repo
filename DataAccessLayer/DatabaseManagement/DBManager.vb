@@ -17,6 +17,10 @@ Namespace Biosystems.Ax00.DAL
     ''' </remarks>
     Public Class DBManager
 
+#Region "PUBLIC FUNCTIONS"
+
+#Region "       BACKUP AND RESTORE FUNCTIONS "
+
         ''' <summary>
         ''' Create a Backup file into SQL instance Backup Directory containing the
         '''  Database name and the creation datetime. 
@@ -394,6 +398,11 @@ Namespace Biosystems.Ax00.DAL
             Return result
         End Function
 
+
+#End Region
+
+#Region "       EXECUTE SCRIPTS FUNCTIONS"
+
         ''' <summary>
         ''' Executes scripts in a selected server.
         ''' </summary>
@@ -471,6 +480,219 @@ Namespace Biosystems.Ax00.DAL
         End Function
 
         ''' <summary>
+        ''' Updates the database structure and data.
+        ''' </summary>
+        ''' <param name="pServer">Server Name </param>
+        ''' <param name="SQLScript">Script with structure modification.</param>
+        ''' <returns>True if success or False if fail</returns>
+        ''' <remarks></remarks>
+        Public Shared Function RunDatabaseScript(ByVal pServer As Server, ByVal DataBaseName As String, _
+                                             ByVal SQLScript As String) As Boolean
+            Dim result As Boolean = False
+            'Dim myLogAcciones As New ApplicationLogManager()
+
+            Try
+                If Not String.IsNullOrEmpty(SQLScript) Then ' validate if not empty
+                    result = ExecuteScripts(pServer, DataBaseName, SQLScript) ' execute the script and validate the result(True/False)
+                    GlobalBase.CreateLogActivity("Script success", "DataBaseManager.RunDatabaseScript", EventLogEntryType.Information, False)
+                Else
+                    GlobalBase.CreateLogActivity("Empty Script. Failed to run it", "DataBaseManager.RunDatabaseScript", EventLogEntryType.Information, False)
+                End If
+
+            Catch ex As Exception
+                GlobalBase.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.RunDatabaseScript", EventLogEntryType.Error, False)
+
+            End Try
+
+            Return result
+        End Function
+
+#End Region
+
+#Region "       SELECT, DROP, ALTER FUNCTIONS"
+
+        ''' <summary>
+        ''' Delete a database from an specific server.
+        ''' </summary>
+        ''' <param name="pServerName">Server Name</param>
+        ''' <param name="DataBaseName">Database name to Delete</param>
+        ''' <returns>True if Delete Succes, False if Delete fail.</returns>
+        ''' <remarks></remarks>
+        Public Shared Function DropDatabaseFromServer(ByVal pServerName As String, ByVal DataBaseName As String, _
+                                                      ByVal DBLogin As String, ByVal DBPassword As String) As Boolean
+            Dim result As Boolean = False
+
+            Try
+                If DataBaseExist(pServerName, DataBaseName, DBLogin, DBPassword) Then ' validate if the database exist.
+                    Dim MyServer As Server = New Server(pServerName) 'SQL server instance.
+
+                    'RH 17/05/2011
+                    MyServer.ConnectionContext.LoginSecure = False
+                    MyServer.ConnectionContext.Login = DBLogin
+                    MyServer.ConnectionContext.Password = DBPassword
+
+                    'TR 10/01/2013
+                    'Close all open connection to the DB. Put DB offline.
+                    Dim myTSQL As String = String.Format("ALTER DATABASE {0} SET OFFLINE WITH ROLLBACK IMMEDIATE", DataBaseName)
+                    result = ExecuteScripts(MyServer, "master", myTSQL)
+
+                    'Put DB online
+                    myTSQL = String.Format("ALTER DATABASE {0} SET ONLINE", DataBaseName)
+                    result = ExecuteScripts(MyServer, "master", myTSQL)
+                    'TR 10/01/2013
+                    'SQL command to drop the database, first close the connection and then drop the database.
+                    Dim DropDatabase As String = "DROP DATABASE " & DataBaseName
+                    result = RunDatabaseScript(MyServer, "master", DropDatabase)
+                    'Dim MyDataBase As New Database(MyServer, DataBaseName) 'Database instance.
+                    ''MyDataBase.dr
+                    'MyDataBase.Drop() ' Eliminate the database.
+                    'result = True
+
+                End If
+
+            Catch ex As Exception
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.DropDatabaseFromServer", EventLogEntryType.Error, False)
+
+            End Try
+
+            Return result
+        End Function
+
+        ''' <summary>
+        ''' This will return two result sets, the first one containing the database name, size, and unallocated space
+        ''' and the second containing a breakdown of the database's size into how much size is reserved and how much 
+        ''' of that is taken up by data, how much by indexes, and how much remains unused.
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Shared Function GetDataBaseSizeInformation() As DataSet
+            Dim result As New DataSet()
+
+            Try
+                'RH 18/05/2011 - Introduce the Using statement
+                Using MySQLConnection As New SqlClient.SqlConnection(DAOBase.GetConnectionString())
+                    'command to execute the system database StoreProcesure.
+                    Dim MySQLCommand As SqlClient.SqlCommand = MySQLConnection.CreateCommand()
+                    MySQLCommand.CommandType = CommandType.StoredProcedure
+                    MySQLCommand.CommandText = "sp_spaceused"
+
+                    'DataAdapter to fill the dataset with the results.
+                    Dim MySQLDataAdapter As New SqlClient.SqlDataAdapter(MySQLCommand)
+
+                    'fill the dataset with the information 
+                    MySQLDataAdapter.Fill(result)
+                End Using
+            Catch ex As Exception
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.StartSQLService", EventLogEntryType.Error, False)
+            End Try
+            Return result
+        End Function
+
+        ''' <summary>
+        ''' Sets the database as SINGLE USER
+        ''' </summary>
+        ''' <param name="ServerName"></param>
+        ''' <param name="DataBaseName"></param>
+        ''' <returns></returns>
+        ''' <remarks>
+        ''' Created by:  SG 18/10/10
+        ''' Modified by: RH 18/05/2011
+        ''' </remarks>
+        Public Shared Function SetDataBaseSingleUser(ByVal ServerName As String, ByVal DataBaseName As String, _
+                                                     ByVal DBLogin As String, ByVal DBPassword As String) As Boolean
+            Dim result As Boolean = False
+            Dim MyServer As Server = Nothing
+
+            Try
+                MyServer = New Server(ServerName) 'SQL server instance.
+
+                MyServer.ConnectionContext.LoginSecure = False
+                MyServer.ConnectionContext.Login = DBLogin
+                MyServer.ConnectionContext.Password = DBPassword
+                MyServer.ConnectionContext.DatabaseName = "master"
+
+                'Close all open connection to the DB. Put DB offline.
+                Dim myTSQL As String = String.Format("ALTER DATABASE {0} SET OFFLINE WITH ROLLBACK IMMEDIATE", DataBaseName)
+                result = ExecuteScripts(MyServer, DataBaseName, myTSQL)
+
+                'Put DB online
+                myTSQL = String.Format("ALTER DATABASE {0} SET ONLINE", DataBaseName)
+                result = ExecuteScripts(MyServer, "master", myTSQL)
+
+                'Set Single User
+                myTSQL = String.Format( _
+                        "ALTER DATABASE {0} SET SINGLE_USER WITH ROLLBACK IMMEDIATE", DataBaseName)
+
+                result = ExecuteScripts(MyServer, DataBaseName, myTSQL)
+
+                Dim db As Database = MyServer.Databases(DataBaseName)
+                result = (db.UserAccess = DatabaseUserAccess.Single)
+
+            Catch ex As Exception
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.SetDataBaseSingleUser", EventLogEntryType.Error, False)
+
+            Finally
+                If Not MyServer Is Nothing Then
+                    MyServer.ConnectionContext.Disconnect()
+                End If
+
+            End Try
+
+            Return result
+        End Function
+
+        ''' <summary>
+        ''' Sets the database as MULTI USER
+        ''' </summary>
+        ''' <param name="ServerName"></param>
+        ''' <param name="DataBaseName"></param>
+        ''' <returns></returns>
+        ''' <remarks>
+        ''' Created by:  SG 18/10/10
+        ''' Modified by: RH 18/05/2011
+        ''' </remarks>
+        Public Shared Function SetDataBaseMultiUser(ByVal ServerName As String, ByVal DataBaseName As String, _
+                                                    ByVal DBLogin As String, ByVal DBPassword As String) As Boolean
+            Dim result As Boolean = False
+            Dim MyServer As Server = Nothing
+
+            Try
+                MyServer = New Server(ServerName) 'SQL server instance.
+
+                MyServer.ConnectionContext.LoginSecure = False
+                MyServer.ConnectionContext.Login = DBLogin
+                MyServer.ConnectionContext.Password = DBPassword
+                MyServer.ConnectionContext.DatabaseName = "master"
+
+                'Set Multi User
+                Dim myTSQL As String = String.Format( _
+                        "ALTER DATABASE {0} SET MULTI_USER WITH ROLLBACK IMMEDIATE", DataBaseName)
+
+                result = ExecuteScripts(MyServer, DataBaseName, myTSQL)
+
+                Dim db As Database = MyServer.Databases(DataBaseName)
+                result = (db.UserAccess = DatabaseUserAccess.Multiple)
+
+            Catch ex As Exception
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.SetDataBaseMultiUser", EventLogEntryType.Error, False)
+
+            Finally
+                If Not MyServer Is Nothing Then
+                    MyServer.ConnectionContext.Disconnect()
+                End If
+            End Try
+
+            Return result
+        End Function
+
+#End Region
+
+#Region "       OTHER FUNCTIONS"
+        ''' <summary>
         ''' Validate if a database exist on the server.
         ''' </summary>
         ''' <param name="ServerName">Server Name to connect</param>
@@ -528,7 +750,7 @@ Namespace Biosystems.Ax00.DAL
                 'if the name is the old name, we need to create a backup of the database and restore with a new name.
                 If BackUpDataBase(ServerName, originalDataBaseName, DBLogin, DBPassword, False, currentBackUpDirectory) Then
 
-                    RestoreTEMDataBase(ServerName, newDatabaseName, DBLogin, DBPassword, currentBackUpDirectory)
+                    RestoreDBFileList(ServerName, newDatabaseName, DBLogin, DBPassword, currentBackUpDirectory)
                     DropDatabaseFromServer(ServerName, originalDataBaseName, DBLogin, DBPassword)
                     'validate if the backupfile still exist.
                     If IO.File.Exists(currentBackUpDirectory) Then
@@ -547,117 +769,9 @@ Namespace Biosystems.Ax00.DAL
             Return result
         End Function
 
-        ''' <summary>
-        ''' Detects if the server engine is Express 2005
-        ''' </summary>
-        ''' <param name="ServerName">Server Name</param>
-        ''' <returns>
-        ''' True if ServerName is Express 2005, False otherwise
-        ''' </returns>
-        ''' <remarks>
-        ''' Created by: TR and RH some time ago
-        ''' </remarks>
-        Public Shared Function IsSQLServer2005(ByVal ServerName As String, _
-                                               ByVal DBLogin As String, ByVal DBPassword As String) As Boolean
-            Dim result As Boolean = False
-            Try
-                Dim MyServer As Server = New Server(ServerName)
+#End Region
 
-                'RH 17/05/2011
-                MyServer.ConnectionContext.LoginSecure = False
-                MyServer.ConnectionContext.Login = DBLogin
-                MyServer.ConnectionContext.Password = DBPassword
-
-                Dim Product As String = MyServer.Information.Product
-                Dim Edition As String = MyServer.Information.Edition
-                Dim Version As Integer = MyServer.Information.Version.Major
-
-                result = (Product = "Microsoft SQL Server") AndAlso (Edition = "Express Edition") AndAlso (Version = 9)
-
-            Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.IsSQLServer2005", EventLogEntryType.Error, False)
-
-            End Try
-
-            Return result
-        End Function
-
-        ''' <summary>
-        ''' Delete a database from an specific server.
-        ''' </summary>
-        ''' <param name="pServerName">Server Name</param>
-        ''' <param name="DataBaseName">Database name to Delete</param>
-        ''' <returns>True if Delete Succes, False if Delete fail.</returns>
-        ''' <remarks></remarks>
-        Public Shared Function DropDatabaseFromServer(ByVal pServerName As String, ByVal DataBaseName As String, _
-                                                      ByVal DBLogin As String, ByVal DBPassword As String) As Boolean
-            Dim result As Boolean = False
-
-            Try
-                If DataBaseExist(pServerName, DataBaseName, DBLogin, DBPassword) Then ' validate if the database exist.
-                    Dim MyServer As Server = New Server(pServerName) 'SQL server instance.
-
-                    'RH 17/05/2011
-                    MyServer.ConnectionContext.LoginSecure = False
-                    MyServer.ConnectionContext.Login = DBLogin
-                    MyServer.ConnectionContext.Password = DBPassword
-
-                    'TR 10/01/2013
-                    'Close all open connection to the DB. Put DB offline.
-                    Dim myTSQL As String = String.Format("ALTER DATABASE {0} SET OFFLINE WITH ROLLBACK IMMEDIATE", DataBaseName)
-                    result = ExecuteScripts(MyServer, "master", myTSQL)
-
-                    'Put DB online
-                    myTSQL = String.Format("ALTER DATABASE {0} SET ONLINE", DataBaseName)
-                    result = ExecuteScripts(MyServer, "master", myTSQL)
-                    'TR 10/01/2013
-                    'SQL command to drop the database, first close the connection and then drop the database.
-                    Dim DropDatabase As String = "DROP DATABASE " & DataBaseName
-                    result = RunDatabaseScript(MyServer, "master", DropDatabase)
-                    'Dim MyDataBase As New Database(MyServer, DataBaseName) 'Database instance.
-                    ''MyDataBase.dr
-                    'MyDataBase.Drop() ' Eliminate the database.
-                    'result = True
-
-                End If
-
-            Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.DropDatabaseFromServer", EventLogEntryType.Error, False)
-
-            End Try
-
-            Return result
-        End Function
-
-        ''' <summary>
-        ''' Updates the database structure and data.
-        ''' </summary>
-        ''' <param name="pServer">Server Name </param>
-        ''' <param name="SQLScript">Script with structure modification.</param>
-        ''' <returns>True if success or False if fail</returns>
-        ''' <remarks></remarks>
-        Public Shared Function RunDatabaseScript(ByVal pServer As Server, ByVal DataBaseName As String, _
-                                             ByVal SQLScript As String) As Boolean
-            Dim result As Boolean = False
-            'Dim myLogAcciones As New ApplicationLogManager()
-
-            Try
-                If Not String.IsNullOrEmpty(SQLScript) Then ' validate if not empty
-                    result = ExecuteScripts(pServer, DataBaseName, SQLScript) ' execute the script and validate the result(True/False)
-                    GlobalBase.CreateLogActivity("Script success", "DataBaseManager.RunDatabaseScript", EventLogEntryType.Information, False)
-                Else
-                    GlobalBase.CreateLogActivity("Empty Script. Failed to run it", "DataBaseManager.RunDatabaseScript", EventLogEntryType.Information, False)
-                End If
-
-            Catch ex As Exception
-                GlobalBase.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.RunDatabaseScript", EventLogEntryType.Error, False)
-
-            End Try
-
-            Return result
-        End Function
+#Region "       SERVICE SQL FUNCTIONS"
 
         ''' <summary>
         ''' Start SQL Services (SqlServer, SqlBrowser and SqlWriter) in case they are not activated
@@ -847,134 +961,44 @@ Namespace Biosystems.Ax00.DAL
         End Function
 
         ''' <summary>
-        ''' This will return two result sets, the first one containing the database name, size, and unallocated space
-        ''' and the second containing a breakdown of the database's size into how much size is reserved and how much 
-        ''' of that is taken up by data, how much by indexes, and how much remains unused.
+        ''' Detects if the server engine is Express 2005
         ''' </summary>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public Shared Function GetDataBaseSizeInformation() As DataSet
-            Dim result As New DataSet()
-
-            Try
-                'RH 18/05/2011 - Introduce the Using statement
-                Using MySQLConnection As New SqlClient.SqlConnection(DAOBase.GetConnectionString())
-                    'command to execute the system database StoreProcesure.
-                    Dim MySQLCommand As SqlClient.SqlCommand = MySQLConnection.CreateCommand()
-                    MySQLCommand.CommandType = CommandType.StoredProcedure
-                    MySQLCommand.CommandText = "sp_spaceused"
-
-                    'DataAdapter to fill the dataset with the results.
-                    Dim MySQLDataAdapter As New SqlClient.SqlDataAdapter(MySQLCommand)
-
-                    'fill the dataset with the information 
-                    MySQLDataAdapter.Fill(result)
-                End Using
-            Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.StartSQLService", EventLogEntryType.Error, False)
-            End Try
-            Return result
-        End Function
-
-        ''' <summary>
-        ''' Sets the database as SINGLE USER
-        ''' </summary>
-        ''' <param name="ServerName"></param>
-        ''' <param name="DataBaseName"></param>
-        ''' <returns></returns>
+        ''' <param name="ServerName">Server Name</param>
+        ''' <returns>
+        ''' True if ServerName is Express 2005, False otherwise
+        ''' </returns>
         ''' <remarks>
-        ''' Created by:  SG 18/10/10
-        ''' Modified by: RH 18/05/2011
+        ''' Created by: TR and RH some time ago
         ''' </remarks>
-        Public Shared Function SetDataBaseSingleUser(ByVal ServerName As String, ByVal DataBaseName As String, _
-                                                     ByVal DBLogin As String, ByVal DBPassword As String) As Boolean
+        Public Shared Function IsSQLServer2005(ByVal ServerName As String, _
+                                               ByVal DBLogin As String, ByVal DBPassword As String) As Boolean
             Dim result As Boolean = False
-            Dim MyServer As Server = Nothing
-
             Try
-                MyServer = New Server(ServerName) 'SQL server instance.
+                Dim MyServer As Server = New Server(ServerName)
 
+                'RH 17/05/2011
                 MyServer.ConnectionContext.LoginSecure = False
                 MyServer.ConnectionContext.Login = DBLogin
                 MyServer.ConnectionContext.Password = DBPassword
-                MyServer.ConnectionContext.DatabaseName = "master"
 
-                'Close all open connection to the DB. Put DB offline.
-                Dim myTSQL As String = String.Format("ALTER DATABASE {0} SET OFFLINE WITH ROLLBACK IMMEDIATE", DataBaseName)
-                result = ExecuteScripts(MyServer, DataBaseName, myTSQL)
+                Dim Product As String = MyServer.Information.Product
+                Dim Edition As String = MyServer.Information.Edition
+                Dim Version As Integer = MyServer.Information.Version.Major
 
-                'Put DB online
-                myTSQL = String.Format("ALTER DATABASE {0} SET ONLINE", DataBaseName)
-                result = ExecuteScripts(MyServer, "master", myTSQL)
-
-                'Set Single User
-                myTSQL = String.Format( _
-                        "ALTER DATABASE {0} SET SINGLE_USER WITH ROLLBACK IMMEDIATE", DataBaseName)
-
-                result = ExecuteScripts(MyServer, DataBaseName, myTSQL)
-
-                Dim db As Database = MyServer.Databases(DataBaseName)
-                result = (db.UserAccess = DatabaseUserAccess.Single)
+                result = (Product = "Microsoft SQL Server") AndAlso (Edition = "Express Edition") AndAlso (Version = 9)
 
             Catch ex As Exception
                 'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.SetDataBaseSingleUser", EventLogEntryType.Error, False)
-
-            Finally
-                If Not MyServer Is Nothing Then
-                    MyServer.ConnectionContext.Disconnect()
-                End If
+                GlobalBase.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.IsSQLServer2005", EventLogEntryType.Error, False)
 
             End Try
 
             Return result
         End Function
 
-        ''' <summary>
-        ''' Sets the database as MULTI USER
-        ''' </summary>
-        ''' <param name="ServerName"></param>
-        ''' <param name="DataBaseName"></param>
-        ''' <returns></returns>
-        ''' <remarks>
-        ''' Created by:  SG 18/10/10
-        ''' Modified by: RH 18/05/2011
-        ''' </remarks>
-        Public Shared Function SetDataBaseMultiUser(ByVal ServerName As String, ByVal DataBaseName As String, _
-                                                    ByVal DBLogin As String, ByVal DBPassword As String) As Boolean
-            Dim result As Boolean = False
-            Dim MyServer As Server = Nothing
+#End Region
 
-            Try
-                MyServer = New Server(ServerName) 'SQL server instance.
-
-                MyServer.ConnectionContext.LoginSecure = False
-                MyServer.ConnectionContext.Login = DBLogin
-                MyServer.ConnectionContext.Password = DBPassword
-                MyServer.ConnectionContext.DatabaseName = "master"
-
-                'Set Multi User
-                Dim myTSQL As String = String.Format( _
-                        "ALTER DATABASE {0} SET MULTI_USER WITH ROLLBACK IMMEDIATE", DataBaseName)
-
-                result = ExecuteScripts(MyServer, DataBaseName, myTSQL)
-
-                Dim db As Database = MyServer.Databases(DataBaseName)
-                result = (db.UserAccess = DatabaseUserAccess.Multiple)
-
-            Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.SetDataBaseMultiUser", EventLogEntryType.Error, False)
-
-            Finally
-                If Not MyServer Is Nothing Then
-                    MyServer.ConnectionContext.Disconnect()
-                End If
-            End Try
-
-            Return result
-        End Function
+#End Region
 
 #Region "NEW FUNCTIONS FOR BACKUP/RESTORE DATABASE"
         ''' <summary>
