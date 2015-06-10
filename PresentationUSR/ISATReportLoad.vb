@@ -537,9 +537,6 @@ Public Class UiSATReportLoad
 
         Dim SATTempFolderPath As String = ""
         Try
-            'Dim myUtil As New Utilities.
-            'Dim mySATUtil As New SATReportUtilities
-
             'obtain the APP version
             Dim myAppVersion As String
             myGlobal = Utilities.GetSoftwareVersion()
@@ -547,13 +544,16 @@ Public Class UiSATReportLoad
 
                 myAppVersion = CStr(myGlobal.SetDatos)
 
-                'obtain the SAT version
-                Dim mySATVersion As String
+                'Extract Data and get extracted folder path
                 myGlobal = SATReportUtilities.ExtractZipDataInTempFolder(pFilePath)
-
-                myGlobal = SATReportUtilities.GetSATReportVersionAndModel(pFilePath) 'BA-2471: IT 08/05/2015
                 If Not myGlobal.HasError And Not myGlobal Is Nothing Then
                     SATTempFolderPath = myGlobal.SetDatos.ToString
+                End If
+
+                'obtain the SAT version
+                Dim mySATVersion As String
+                myGlobal = SATReportUtilities.GetSATReportVersionAndModel(pFilePath) 'BA-2471: IT 08/05/2015
+                If Not myGlobal.HasError And Not myGlobal Is Nothing Then
 
                     'obtain the SAT Version and Model
                     Dim mySATInfo As String()
