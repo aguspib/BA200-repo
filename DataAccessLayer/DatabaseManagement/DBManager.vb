@@ -736,7 +736,7 @@ Namespace Biosystems.Ax00.DAL
         '''  Function to rename the database depends of which model of analyser request open the application. This function  
         ''' </summary>
         ''' <param name="ServerName"></param>
-        ''' <param name="DataBaseName"></param>
+        ''' <param name="originalDataBaseName"></param>
         ''' <param name="DBLogin"></param>
         ''' <param name="DBPassword"></param>
         ''' <returns></returns>

@@ -237,7 +237,7 @@ Public Class UiSATReport
                     UiAx00MainMDI.StopMarqueeProgressBar()
 
                     'TR 22/12/2011 - Validate if file is created on the current folder.
-                    If (File.Exists(FolderPathTextBox.Text & "\" & FileNameTextBox.Text & GlobalBase.ZIPExtension)) Then
+                    If (File.Exists(FolderPathTextBox.Text & "\" & FileNameTextBox.Text & "." & AnalyzerController.Instance.Analyzer.Model)) Then
                         'Load all SAT reports in current Dir
                         LoadFilesInSatDirectory()
                         resetSaveButtonTimer.Enabled = True
@@ -539,7 +539,8 @@ Public Class UiSATReport
             SATFilePath = FolderPathTextBox.Text
 
             'Dim mySATUtil As New SATReportUtilities
-            myGlobal = SATReportUtilities.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_REPORT, False, String.Empty, AnalyzerController.Instance.Analyzer.AdjustmentsFilePath, SATFilePath, SATFileName) 'BA-2471: IT 08/05/2015
+            Dim Model As String = AnalyzerController.Instance.Analyzer.Model
+            myGlobal = SATReportUtilities.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_REPORT, False, String.Empty, AnalyzerController.Instance.Analyzer.AdjustmentsFilePath, SATFilePath, SATFileName, "", True, Model) 'BA-2471: IT 08/05/2015
 
             If (Not myGlobal.HasError) Then
                 'Restore original values of First and Last Names in tparPatients
