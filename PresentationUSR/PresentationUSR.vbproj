@@ -1001,10 +1001,6 @@
       <Project>{0fbb1ec8-80ea-4cf2-a0cb-b8802c7f7d37}</Project>
       <Name>Ax00.Framework.Application</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Ax00.CrossCutting\Ax00.CrossCutting.vbproj">
-      <Project>{b23d6aff-a359-4d3e-87bf-820167228fe5}</Project>
-      <Name>Ax00.CrossCutting</Name>
-    </ProjectReference>
     <ProjectReference Include="..\bax00framework\05.-Cross Cutting Layer\Ax00.Framework.CrossCutting\Ax00.Framework.CrossCutting.vbproj">
       <Project>{d880e48a-3a14-4916-a60b-45b8251fe010}</Project>
       <Name>Ax00.Framework.CrossCutting</Name>

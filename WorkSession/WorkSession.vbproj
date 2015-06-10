@@ -225,7 +225,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Ax00.CrossCutting\Ax00.CrossCutting.vbproj">
+    <ProjectReference Include="..\05.-Cross Cutting Layer\Ax00.CrossCutting\Ax00.CrossCutting.vbproj">
       <Project>{b23d6aff-a359-4d3e-87bf-820167228fe5}</Project>
       <Name>Ax00.CrossCutting</Name>
     </ProjectReference>

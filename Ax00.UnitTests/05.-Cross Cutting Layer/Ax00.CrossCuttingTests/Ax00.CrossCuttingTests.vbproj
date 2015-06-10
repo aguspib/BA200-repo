@@ -3,10 +3,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{3CC1C284-FA99-45FD-A0C1-338A6B2709E8}</ProjectGuid>
+    <ProjectGuid>{B79024A6-DDEB-4BD0-8601-4C0A422B639C}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>GlobalTests1</RootNamespace>
-    <AssemblyName>GlobalTests1</AssemblyName>
+    <RootNamespace>Ax00.CrossCuttingTests</RootNamespace>
+    <AssemblyName>Ax00.CrossCuttingTests</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>Windows</MyType>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
@@ -23,7 +23,7 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\Debug\</OutputPath>
-    <DocumentationFile>GlobalTests1.xml</DocumentationFile>
+    <DocumentationFile>Ax00.CrossCuttingTests.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
@@ -33,7 +33,7 @@
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DocumentationFile>GlobalTests1.xml</DocumentationFile>
+    <DocumentationFile>Ax00.CrossCuttingTests.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
@@ -51,7 +51,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="nunit.framework">
-      <HintPath>..\packages\NUnit.2.6.2\lib\nunit.framework.dll</HintPath>
+      <HintPath>..\..\..\packages\NUnit.2.6.2\lib\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -78,7 +78,6 @@
     <Import Include="System.Linq" />
     <Import Include="System.Xml.Linq" />
     <Import Include="System.Threading.Tasks" />
-    <Import Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="My Project\AssemblyInfo.vb" />
@@ -96,6 +95,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="RangedCollectionTests.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">
@@ -118,17 +118,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\03.-Business Layer\Ax00.Core\Ax00.Core.vbproj">
-      <Project>{bd38761f-269a-428a-a15e-9d40b387f992}</Project>
-      <Name>Ax00.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\AX00Types\AX00Types.vbproj">
-      <Project>{3b617ebf-0488-46bd-ab56-094f81d0e4c3}</Project>
-      <Name>AX00Types</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Global\Global\Global.vbproj">
-      <Project>{5D65020C-C2D7-4AC3-B557-223FC290E526}</Project>
-      <Name>Global</Name>
+    <ProjectReference Include="..\..\..\05.-Cross Cutting Layer\Ax00.CrossCutting\Ax00.CrossCutting.vbproj">
+      <Project>{B23D6AFF-A359-4D3E-87BF-820167228FE5}</Project>
+      <Name>Ax00.CrossCutting</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

@@ -1,5 +1,4 @@
 ﻿Imports System.Reflection
-Imports Biosystems.Ax00.CC
 Imports Biosystems.Ax00.Core.Entities.WorkSession
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Interfaces
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Interfaces
