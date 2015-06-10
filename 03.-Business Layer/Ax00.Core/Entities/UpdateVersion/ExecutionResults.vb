@@ -19,6 +19,8 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
 
         Public Sub WriteLog()
 
+            Dim debugLogger As DebugLogger = New DebugLogger()
+
             DebugLogger.AddLog(" --------------------------------------------", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
             DebugLogger.AddLog(" Execution Results: ", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
             DebugLogger.AddLog(String.Format(" - Process finished successfully: {0}", Success), GlobalBase.UpdateVersionDatabaseProcessLogFileName)

@@ -1172,14 +1172,16 @@ Public Class UiAx00Login
         'Private Shared Sub InstallUpdateProcess()
         ''Dim myLogAcciones As New ApplicationLogManager()
         Dim myGlobalDataTO As New GlobalDataTO
+        Dim debugLogger As DebugLogger = New DebugLogger()
+
         Try
 
-            DebugLogger.AddLog(" --------------------------------------------", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
-            DebugLogger.AddLog(" UPDATE VERSION - LOGIN PROCESS (INI)", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+            debugLogger.AddLog(" --------------------------------------------", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+            debugLogger.AddLog(" UPDATE VERSION - LOGIN PROCESS (INI)", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
             'GlobalBase.CreateLogActivity(Me.Name & ".Updateprocess -Validating if Data Base exists ", "Installation validation", EventLogEntryType.Information, False)
             myGlobalDataTO = UpdaterController.Instance.InstallUpdateProcess(DAOBase.DBServer, DAOBase.CurrentDB, DAOBase.DBLogin, DAOBase.DBPassword) 'BA-2471: IT 08/05/2015
-            DebugLogger.AddLog(" UPDATE VERSION - LOGIN PROCESS (END)", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
-            DebugLogger.AddLog(" --------------------------------------------", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+            debugLogger.AddLog(" UPDATE VERSION - LOGIN PROCESS (END)", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+            debugLogger.AddLog(" --------------------------------------------", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
 
         Catch ex As Exception
             MessageBox.Show(ex.Message + " ((" + ex.HResult.ToString + "))")

@@ -62,6 +62,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private CurrentChannel As String 'SGM 06/07/2012
         Private CurrentSettings As String 'SGM 06/07/2012
 
+        ReadOnly _debugLogger As DebugLogger = New DebugLogger()
 #End Region
 
 #Region "Methods"
@@ -180,8 +181,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             For Each B As Byte In in_datosByte
                 SB.Append(ChrW(B))
             Next
-            Debug.WriteLine("   PC>>> : " & SB.ToString)
-            DebugLogger.AddLog("   PC>>> : " & SB.ToString)
+            Dim myVar = (DateTime.Now - New DateTime(1970, 1, 1)).TotalMilliseconds
+
+            Debug.WriteLine("   " & myVar & " PC>>> : " & SB.ToString)
+            _debugLogger.AddLog("   PC>>> : " & SB.ToString)
 #End If
 
 
@@ -339,8 +342,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 
 #If TRACECOM Then
-            DebugLogger.AddLog("   PC<<< : " & dataReceived)
-            Debug.WriteLine("   PC<<< : " & dataReceived)
+            _debugLogger.AddLog("   PC<<< : " & dataReceived)
+            Dim myVar = (DateTime.Now - New DateTime(1970, 1, 1)).TotalMilliseconds
+            Debug.WriteLine("   " & myVar & " PC<<< : " & dataReceived)
 #End If
 
             'AG 10/07/2012
@@ -443,6 +447,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Try
 
         End Function
+
+        Public Shared Sub SimulateDataReception(data As String)
+            RaiseEvent ActivateProtocol(GlobalEnumerates.AppLayerEventList.RECEIVE, data)
+        End Sub
 
 #End Region
 

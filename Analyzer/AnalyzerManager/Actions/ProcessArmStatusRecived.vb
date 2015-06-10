@@ -869,12 +869,14 @@ Namespace Biosystems.Ax00.Core.Entities
                                 wellOffset = WELL_OFFSET_FOR_ISETEST_URI
                             End If
                         End If
-                        Dim reactRotorDlg As New ReactionsRotorDelegate
-                        _analyzerManager.FutureRequestNextWellValue = reactRotorDlg.GetRealWellNumber(_analyzerManager.CurrentWell + 1 + wellOffset, MAX_REACTROTOR_WELLS) 'Estimation of future next well (last well received with Request + 1)
-                        myGlobal = _analyzerManager.SearchNextPreparation(dbConnection, _analyzerManager.FutureRequestNextWellValue) 'Search for next instruction to be sent ... and sent it!!
-                        If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then '(1)
-                            _analyzerManager.NextPreparationsAnalyzerManagerDS = CType(myGlobal.SetDatos, AnalyzerManagerDS)
-                        End If
+                        'CONTAMINATIONS_
+                        'Dim reactRotorDlg As New ReactionsRotorDelegate
+                        '_analyzerManager.FutureRequestNextWellValue = reactRotorDlg.GetRealWellNumber(_analyzerManager.CurrentWell + 1 + wellOffset, MAX_REACTROTOR_WELLS) 'Estimation of future next well (last well received with Request + 1)
+                        'myGlobal = _analyzerManager.SearchNextPreparation(dbConnection, _analyzerManager.FutureRequestNextWellValue) 'Search for next instruction to be sent ... and sent it!!
+                        'If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then '(1)
+                        '   _analyzerManager.NextPreparationsAnalyzerManagerDS = CType(myGlobal.SetDatos, AnalyzerManagerDS)
+                        'End If
+                        '/CONTAMINATIONS_
                     End If
 
                 End If

@@ -1484,7 +1484,7 @@ Partial Public Class UiAx00MainMDI
                                 'TR 04/10/2011 - Implemented new method
                                 EnableButtonAndMenus(False)   'AG 08/11/2012 - Moved after 'If (myResult = DialogResult.OK) Then'
 
-                                MDILISManager.ClearQueueOfSpecimenNotResponded()   'AG 23/07/2013 - Patients are removed from rotor during Reset, so it has no sense keep this queue
+                                If MDILISManager IsNot Nothing Then MDILISManager.ClearQueueOfSpecimenNotResponded() 'AG 23/07/2013 - Patients are removed from rotor during Reset, so it has no sense keep this queue
                                 Dim workingThread As New Threading.Thread(AddressOf ResetSession)
                                 ScreenWorkingProcess = True
                                 processingReset = True
@@ -1979,7 +1979,7 @@ Partial Public Class UiAx00MainMDI
                     '#End If
 
                     'IR 27/09/2012 - Kill main application process
-                    Process.GetCurrentProcess().Kill()
+                    Process.GetCurrentProcess().Kill()  'TODO: Find a better solution to this ASAP.
                 Else
                     e.Cancel = True
                 End If
@@ -3061,19 +3061,6 @@ Partial Public Class UiAx00MainMDI
             ElseIf showPAUSEWSiconFlag Then
                 GlobalBase.CreateLogActivity("Btn Pause WS", Me.Name & ".bsTSMultiFunctionSessionButton_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
 
-                'AG 20/01/2014 - Move this code inside PauseSessionActions method
-                ''JV + AG #1391 26/11/2013
-                'Dim resultData As New GlobalDataTO
-                'Dim myExDlg As New ExecutionsDelegate
-                'resultData = myExDlg.ExistCriticalPauseTests(Nothing, AnalyzerIDAttribute, AnalyzerModelAttribute, WorkSessionIDAttribute)
-                'If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-                '    If CType(resultData.SetDatos, Boolean) AndAlso _
-                '        BSCustomMessageBox.Show(Me, infoCritical, My.Application.Info.Title, MessageBoxButtons.YesNo, MessageBoxIcon.Warning, BSCustomMessageBox.BSMessageBoxDefaultButton.LeftButton, _
-                '                                "", waitButton, tooltipPause) = DialogResult.Yes Then Return
-                'End If
-                ''JV + AG #1391 26/11/2013
-                'AG 20/01/2014 
-
                 PauseSessionActions()
             End If
         Catch ex As Exception
@@ -3094,7 +3081,7 @@ Partial Public Class UiAx00MainMDI
             'JV + AG revision 18/10/2013 task # 1341
             SetHQProcessByUserFlag(False) 'AG 30/07/2013 - on press START WS button reset the flag for host query from MDI
             'Normal business
-            MyClass.InitiateStartSession()
+            InitiateStartSession()
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PlaySessionActions ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".PlaySessionActions ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -3722,7 +3709,7 @@ Partial Public Class UiAx00MainMDI
             Application.DoEvents()
             ' XB 07/11/2013
 
-            MyClass.StartSession(pFromHostQueryMDIButton) 'AG 14/01/2014 - BT #1435
+            StartSession(pFromHostQueryMDIButton) 'AG 14/01/2014 - BT #1435
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitiateStartSession ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".InitiateStartSession ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -3870,25 +3857,6 @@ Partial Public Class UiAx00MainMDI
                 If (ChangeReactionsRotorRecommendedWarning = 0) Then
                     Dim userAnswer As DialogResult = DialogResult.Yes
 
-                    ''Verify if the WorkSession can be fully executed with the current level of Washing Solutions and High Contamination Waste bottles
-                    'Dim ex_delg As New ExecutionsDelegate
-                    'myGlobal = ex_delg.CalculateIfBottleLevelsAreSufficientForWS(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, _
-                    '                                                             AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.BOTTLE_WASHSOLUTION), _
-                    '                                                             AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.BOTTLE_HIGHCONTAMINATION_WASTE))
-
-                    'If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
-                    '    If (CType(myGlobal.SetDatos, Boolean)) Then
-                    '        Volume is not OK; a warning Message is shown, but the User can choose between stop the WS Start/Continue process to solve the problem
-                    '        or to continue with the execution despite of the problem
-                    '        userAnswer = ShowMessage(Me.Name & ".bsTSContinueSessionButton_Click", GlobalEnumerates.Messages.CHANGE_BOTTLE_RECOMMEND.ToString)
-                    '    End If
-                    'Else
-                    '    Error verifying the current level of Washing Solutions and High Contamination Waste bottles; shown it
-                    '    ShowMessage(Me.Name & ".bsTSContinueSessionButton_Click", myGlobal.ErrorCode, myGlobal.ErrorMessage, Me)
-                    'End If
-
-                    'If there is at least a requested ISE Test pending to execute in the WorkSession, verify if ISE Module is 
-                    'installed and ready to be used
                     Dim wsReadyToBeSent As Boolean = True 'This flag only can be false if user do not want to regenerate the executions in method CreateExecutionsProcess
                     If (Not myGlobal.HasError AndAlso userAnswer = DialogResult.Yes) Then
 
@@ -3981,286 +3949,14 @@ Partial Public Class UiAx00MainMDI
                                 End If
                             End If
 
-                            ''Verify if there are ISE Tests requested in the WorkSession and pending of execution
-                            'Dim updateExecutions As Boolean = False
-                            'Dim myOrderTestsDelegate As New OrderTestsDelegate
-
-                            'myGlobal = myOrderTestsDelegate.IsThereAnyTestByType(Nothing, WorkSessionIDAttribute, "ISE")
-                            'If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
-                            '    If (CType(myGlobal.SetDatos, Boolean)) Then
-                            '        If (AnalyzerController.Instance.Analyzer.ISEAnalyzer Is Nothing) OrElse (Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEModuleReady) Then
-                            '            'ISE Module is not available, verify is there is at least an STANDARD Test pending of execution
-                            '            'to shown the proper Message 
-                            '            myGlobal = myOrderTestsDelegate.IsThereAnyTestByType(Nothing, WorkSessionIDAttribute, "STD")
-                            '            If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
-                            '                If (CType(myGlobal.SetDatos, Boolean)) Then
-                            '                    'ISE Module is not ready to be used but there are STD Tests pending of execution; a question Message is shown, and the User 
-                            '                    'can choose between stop the WS Start/Continue process to solve the problem or to continue with the execution despite of the problem
-                            '                    userAnswer = ShowMessage(Me.Name & ".bsTSStartSessionButton_Click", GlobalEnumerates.Messages.ISE_MODULE_NOT_AVAILABLE.ToString)
-
-                            '                    If (userAnswer = DialogResult.Yes) Then
-                            '                        'User has selected continue WS without ISE Tests; all pending ISE Tests will be blocked
-                            '                        updateExecutions = True
-
-                            '                    End If
-                            '                Else
-                            '                    'ISE Module is not ready and there are not STD Tests pending of execution; an error Message is shown due to 
-                            '                    'the WS can not be started
-                            '                    userAnswer = DialogResult.No
-                            '                    ShowMessage(Me.Name & ".bsTSStartSessionButton_Click", GlobalEnumerates.Messages.ONLY_ISE_WS_NOT_STARTED.ToString)
-
-                            '                    'All ISE Pending Tests will be blocked
-                            '                    updateExecutions = True
-                            '                End If
-
-                            '                If (updateExecutions) Then
-                            '                    If (Me.ActiveMdiChild Is Nothing) OrElse (Not TypeOf ActiveMdiChild Is IWSRotorPositions) Then
-                            '                        Dim myExecutionsDelegate As New ExecutionsDelegate
-                            '                        myGlobal = myExecutionsDelegate.UpdateStatusByExecutionTypeAndStatus(Nothing, WorkSessionIDAttribute, AnalyzerIDAttribute, "PREP_ISE", "PENDING", "LOCKED")
-                            '                    End If
-
-                            '                    If (Not Me.ActiveMdiChild Is Nothing) AndAlso (TypeOf ActiveMdiChild Is IMonitor) Then
-                            '                        'Refresh the status of ISE Preparations in Monitor Screen if it is the active screen
-                            '                        Dim myDummyUIRefresh As New UIRefreshDS
-                            '                        IMonitor.UpdateWSState(myDummyUIRefresh)
-                            '                    End If
-                            '                End If
-                            '            End If
-
-                            '            ' XBC 26/06/2012 - ISE self-maintenance
-                            '        Else
-                            '            AnalyzerController.Instance.Analyzer.ISEAnalyzer.WorkSessionID = WorkSessionIDAttribute
-                            '            myGlobal = myOrderTestsDelegate.IsThereAnyTestByType(Nothing, WorkSessionIDAttribute, "STD")
-                            '            If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
-                            '                If (CType(myGlobal.SetDatos, Boolean)) Then
-                            '                    AnalyzerController.Instance.Analyzer.ISEAnalyzer.WorkSessionTestsByType = "ALL"
-                            '                Else
-                            '                    AnalyzerController.Instance.Analyzer.ISEAnalyzer.WorkSessionTestsByType = "ISE"
-                            '                End If
-                            '            End If
-
-                            '            If executeSTD Then
-                            '                executeSTD = False
-                            '                ' Do nothing. leaving to continue with the work session execution
-                            '                ' Previously existing ISE preparations have been locked
-                            '            Else
-                            '                ' Check ISE calibrations required
-                            '                If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer Is Nothing Then
-                            '                    If AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEModuleReady Then
-                            '                        ' Check if initial Purges are required. This is required when any calibration is required
-                            '                        Dim ElectrodesCalibrationRequired As Boolean = False
-                            '                        Dim PumpsCalibrationRequired As Boolean = False
-                            '                        Dim BubblesCalibrationRequired As Boolean = False
-                            '                        ' Check if ISE Electrodes calibration is required
-                            '                        myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.CheckElectrodesCalibrationIsNeeded
-                            '                        If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
-                            '                            ElectrodesCalibrationRequired = CType(myGlobal.SetDatos, Boolean)
-                            '                        End If
-                            '                        ' Check if ISE Pumps calibration is required
-                            '                        myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.CheckPumpsCalibrationIsNeeded
-                            '                        If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
-                            '                            PumpsCalibrationRequired = CType(myGlobal.SetDatos, Boolean)
-                            '                        End If
-                            '                        ' Check if ISE Bubbles calibration is required 
-                            '                        myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.CheckBubbleCalibrationIsNeeded
-                            '                        If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
-                            '                            BubblesCalibrationRequired = CType(myGlobal.SetDatos, Boolean)
-                            '                        End If
-
-
-                            '                        If ElectrodesCalibrationRequired Or PumpsCalibrationRequired Or BubblesCalibrationRequired Then
-                            '                            If Not StartSessionisInitialPUGsent Then
-                            '                                ' Execute initial Purge A and Purge B
-                            '                                Me.StartSessionisInitialPUGsent = True
-                            '                                myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.DoMaintenanceExit() ' this function throws Purge A and Purge B 
-                            '                                If Not myGlobal.HasError Then
-                            '                                    AnalyzerController.Instance.Analyzer.ISEAnalyzer.PurgeAbyFirmware += 1
-                            '                                    AnalyzerController.Instance.Analyzer.ISEAnalyzer.PurgeBbyFirmware += 1
-                            '                                    ShowStatus(Messages.STARTING_SESSION)
-                            '                                    Me.StartSessionisPending = True
-                            '                                    EnableButtonAndMenus(False)
-                            '                                    Cursor = Cursors.WaitCursor
-                            '                                    SetEnableMainTab(False)
-                            '                                    ' XBC 29/08/2012 - Disable Monitor Panel
-                            '                                    'If Not Me.ActiveMdiChild Is Nothing Then
-                            '                                    '    Me.ActiveMdiChild.Enabled = False
-                            '                                    'End If
-                            '                                    InitializeMarqueeProgreesBar()
-                            '                                End If
-                            '                                ' waiting until CALIBRATION operation is performed
-                            '                                ' then will be back to continue Work Session
-                            '                                Exit Sub
-
-                            '                            Else
-                            '                                ' Execute required Calibrations
-
-                            '                                If ElectrodesCalibrationRequired And Not Me.SkipCALB Then
-                            '                                    Me.StartSessionisCALBsent = True
-                            '                                    myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.DoElectrodesCalibration()
-                            '                                    If myGlobal.HasError Then
-                            '                                        ShowMessage("Error", GlobalEnumerates.Messages.ISE_CALB_WRONG.ToString)
-                            '                                    Else
-                            '                                        ShowStatus(Messages.STARTING_SESSION)
-                            '                                        Me.StartSessionisPending = True
-                            '                                        EnableButtonAndMenus(False)
-                            '                                        Cursor = Cursors.WaitCursor
-                            '                                        SetEnableMainTab(False)
-                            '                                        ' XBC 29/08/2012 - Disable Monitor Panel
-                            '                                        'If Not Me.ActiveMdiChild Is Nothing Then
-                            '                                        '    Me.ActiveMdiChild.Enabled = False
-                            '                                        'End If
-                            '                                        InitializeMarqueeProgreesBar()
-                            '                                    End If
-                            '                                    ' waiting until CALIBRATION operation is performed
-                            '                                    ' then will be back to continue Work Session
-                            '                                    Exit Sub
-                            '                                End If
-
-
-                            '                                If PumpsCalibrationRequired And Not Me.SkipPMCL Then
-                            '                                    Me.StartSessionisPMCLsent = True
-                            '                                    myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.DoPumpsCalibration()
-                            '                                    If myGlobal.HasError Then
-                            '                                        ShowMessage("Error", GlobalEnumerates.Messages.ISE_PMCL_WRONG.ToString)
-                            '                                    Else
-                            '                                        ShowStatus(Messages.STARTING_SESSION)
-                            '                                        Me.StartSessionisPending = True
-                            '                                        EnableButtonAndMenus(False)
-                            '                                        Cursor = Cursors.WaitCursor
-                            '                                        SetEnableMainTab(False)
-                            '                                        ' XBC 29/08/2012 - Disable Monitor Panel
-                            '                                        'If Not Me.ActiveMdiChild Is Nothing Then
-                            '                                        '    Me.ActiveMdiChild.Enabled = False
-                            '                                        'End If
-                            '                                        InitializeMarqueeProgreesBar()
-                            '                                    End If
-                            '                                    ' waiting until CALIBRATION operation is performed
-                            '                                    ' then will be back to continue Work Session
-                            '                                    Exit Sub
-                            '                                End If
-
-
-                            '                                If BubblesCalibrationRequired And Not Me.SkipBMCL Then
-                            '                                    Me.StartSessionisBMCLsent = True
-                            '                                    myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.DoBubblesCalibration()
-                            '                                    If myGlobal.HasError Then
-                            '                                        ShowMessage("Error", GlobalEnumerates.Messages.ISE_BMCL_WRONG.ToString)
-                            '                                    Else
-                            '                                        ShowStatus(Messages.STARTING_SESSION)
-                            '                                        Me.StartSessionisPending = True
-                            '                                        EnableButtonAndMenus(False)
-                            '                                        Cursor = Cursors.WaitCursor
-                            '                                        SetEnableMainTab(False)
-                            '                                        ' XBC 29/08/2012 - Disable Monitor Panel
-                            '                                        'If Not Me.ActiveMdiChild Is Nothing Then
-                            '                                        '    Me.ActiveMdiChild.Enabled = False
-                            '                                        'End If
-                            '                                        InitializeMarqueeProgreesBar()
-                            '                                    End If
-                            '                                    ' waiting until CALIBRATION operation is performed
-                            '                                    ' then will be back to continue Work Session
-                            '                                    Exit Sub
-                            '                                End If
-
-                            '                            End If
-
-                            '                        End If
-
-                            '                    End If
-
-                            '                End If
-                            '            End If
-                            '        End If
-
-                            '    Else
-                            '        If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer Is Nothing Then
-                            '            AnalyzerController.Instance.Analyzer.ISEAnalyzer.WorkSessionTestsByType = "STD"
-                            '        End If
-                            '        ' XBC 26/06/2012
-
-                            '    End If
-                            'Else
-                            '    'Error verifying if there are requested ISE Tests pending of execution in the active Work Session; shown it
-                            '    ShowMessage(Me.Name & ".bsTSStartSessionButton_Click", myGlobal.ErrorCode, myGlobal.ErrorMessage, Me)
-                            'End If
-                            'AG 15/07/2013 - End block of code moved into function VerifyISEConditioningBeforeRunning
 
                         End If 'AG 12/07/2013 - UserAnswer: NO
                     End If
 
-                    'AG 15/07/2013 - The following code is commented but moved into function VerifyISEConditioningBeforeRunning
-                    '                in order to be reused also for the process of automatic WS creation with LIS only by START WS click
-
-                    ' XBC 23/07/2012
-                    'Me.StartSessionisPending = False
-                    'If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer Is Nothing Then
-                    '    If Not ActiveMdiChild Is Nothing Then
-                    '        If (TypeOf ActiveMdiChild Is IMonitor) Then
-                    '            Dim CurrentMdiChild As IMonitor = CType(ActiveMdiChild, IMonitor)
-                    '            AnalyzerController.Instance.Analyzer.ISEAnalyzer.WorkSessionOverallTime = CurrentMdiChild.remainingTime
-                    '        End If
-                    '    End If
-                    'End If
-                    'AG 15/07/2013 - End block of code moved into function VerifyISEConditioningBeforeRunning
 
                     'The WS START/CONTINUE process can continue...
                     If (Not myGlobal.HasError AndAlso userAnswer = DialogResult.Yes) Then
 
-                        'AG 15/07/2013 - The following code is commented but moved into function VerifyISEConditioningBeforeRunning
-                        '                in order to be reused also for the process of automatic WS creation with LIS only by START WS click
-
-                        ' XBC 17/07/2012 - Estimated ISE Consumption by Firmware
-                        'If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer Is Nothing Then
-
-                        '    'SGM 01/10/2012 - If no calibration is needed set ISE preparations as PENDING
-                        '    Dim myOrderTestsDelegate As New OrderTestsDelegate
-                        '    myGlobal = myOrderTestsDelegate.IsThereAnyTestByType(Nothing, WorkSessionIDAttribute, "ISE")
-                        '    If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
-                        '        If CBool(myGlobal.SetDatos) Then
-
-                        '            ' XBC 12/04/2013 - Create Executions is a long time process so is need to be called on threading mode
-                        '            'Dim isReady As Boolean = False
-                        '            'Dim myAffectedElectrodes As List(Of String)
-                        '            'myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.CheckAnyCalibrationIsNeeded(myAffectedElectrodes)
-                        '            'If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
-                        '            '    isReady = Not (CBool(myGlobal.SetDatos) And myAffectedElectrodes Is Nothing)
-                        '            'End If
-
-                        '            'Dim myExecutionDelegate As New ExecutionsDelegate
-                        '            'Dim createWSInRunning As Boolean = (AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING)
-                        '            'myGlobal = myExecutionDelegate.CreateWSExecutions(Nothing, AnalyzerController.Instance.Analyzer.ActiveAnalyzer, AnalyzerController.Instance.Analyzer.ActiveWorkSession, _
-                        '            '                                              createWSInRunning, -1, String.Empty, isReady, myAffectedElectrodes)
-
-                        '            ''refresh WS grid
-                        '            'If (Not Me.ActiveMdiChild Is Nothing) AndAlso (TypeOf ActiveMdiChild Is IMonitor) Then
-                        '            '    'Refresh the status of ISE Preparations in Monitor Screen if it is the active screen
-                        '            '    Dim myDummyUIRefresh As New UIRefreshDS
-                        '            '    IMonitor.UpdateWSState(myDummyUIRefresh)
-                        '            'End If
-
-                        '            Me.StartSessionisPending = True
-                        '            myGlobal = CreateExecutionsProcessByISEChanges()
-                        '            If Not myGlobal.HasError Then
-                        '                WSExecutionsAlreadyCreated = True
-                        '                Me.StartSessionisPending = False
-                        '            End If
-                        '            ' XBC 12/04/2013
-
-                        '        End If
-                        '    End If
-
-                        '    AnalyzerController.Instance.Analyzer.ISEAnalyzer.WorkSessionIsRunning = True
-
-                        '    ''Dim myLogAcciones As New ApplicationLogManager()    ' TO COMMENT !!!
-                        '    'GlobalBase.CreateLogActivity("Update Consumptions - Update Last Date WS ISE Operation [ " & DateTime.Now.ToString & "]", "Ax00MainMDI.StartSession", EventLogEntryType.Information, False)   ' TO COMMENT !!!
-                        '    ' Update date for the ISE test executed while running
-                        '    AnalyzerController.Instance.Analyzer.ISEAnalyzer.UpdateISEInfoSetting(ISEModuleSettings.LAST_OPERATION_WS_DATE, DateTime.Now.ToString, True)
-                        '    'end SGM 01/10/2012
-                        'End If
-                        ' XBC 17/07/2012
-                        'AG 15/07/2013 - End block of code moved into function VerifyISEConditioningBeforeRunning
-
-                        'Disable all buttons and menu options until Analyzer accepts the new instruction
                         SetActionButtonsEnableProperty(False)
                         EnableButtonAndMenus(False)
 
@@ -4328,51 +4024,6 @@ Partial Public Class UiAx00MainMDI
                         If Not myGlobal.HasError And wsReadyToBeSent Then 'AG 10/05/2012
                             readBarcodeIfConfigured = True 'AG 08/03/2013 - Enter running but ,if configured, read barcode before
                             StartEnterInRunningMode() 'AG 08/03/2013 - previous code has been move to this method because it is called from several parts
-
-                            '¡¡¡DO NOT DELETE THIS CODE!!! --> SA 21/03/2012
-                            'If (processingBeforeRunning = "2") Then
-                            '    If (AnalyzerController.Instance.Analyzer.GetSensorValue(AnalyzerSensors.ISE_WARNINGS) = 1) Then
-                            '        'ISE conditioning failed. Do you want to continue locking all ISE Tests preparations?
-                            '        If (ShowMessage("Question", GlobalEnumerates.Messages.ISE_CONDITION_FAILED.ToString) = Windows.Forms.DialogResult.Yes) Then
-                            '            '1) Lock all pending ISE Tests preparations
-                            '            myGlobal = ex_delg.UpdateStatusByExecutionTypeAndStatus(Nothing, WorkSessionIDAttribute, AnalyzerIDAttribute, "PREP_ISE", "PENDING", "LOCKED")
-
-                            '            '2) Enter Running
-                            '            If (Not myGlobal.HasError) Then
-                            '                myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.RUNNING, True)
-                            '                If (myGlobal.HasError) Then
-                            '                    ShowMessage("Error", myGlobal.ErrorCode, myGlobal.ErrorMessage)
-                            '                End If
-
-                            '                If (Not AnalyzerController.Instance.Analyzer.Connected Or myGlobal.HasError) Then
-                            '                    SetActionButtonsEnableProperty(True)
-                            '                Else
-                            '                    SetWorkSessionUserCommandFlags(WorkSessionUserActions.START_WS)
-
-                            '                    'Set WorkSession Status to INPROCESS
-                            '                    Dim myWSAnalyzerDelegate As New WSAnalyzersDelegate
-                            '                    myGlobal = myWSAnalyzerDelegate.UpdateWSStatus(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, "INPROCESS")
-                            '                    If (Not myGlobal.HasError) Then
-                            '                        WSStatusAttribute = "INPROCESS"
-                            '                    Else
-                            '                        'Error updating the WS Status to INPROCESS
-                            '                        If (Not myGlobal.ErrorCode Is Nothing) Then ShowMessage("Error", myGlobal.ErrorCode, myGlobal.ErrorMessage)
-                            '                    End If
-                            '                End If
-                            '            End If
-
-                            '            'Else
-                            '            '1) Abort Enter Running: Do nothing
-                            '        End If
-                            '        AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_WARNINGS) = 0 'clear sensor
-                            '    Else
-                            '        ShowMessage("Error", myGlobal.ErrorCode, myGlobal.ErrorMessage)
-                            '    End If
-                            '    'AG 24/01/2012
-                            'Else
-                            '    SetActionButtonsEnableProperty(True)
-                            '    Me.ElapsedTimeTimer.Start()
-                            'End If
 
                         Else
                             'AG 10/05/2012
@@ -5116,11 +4767,13 @@ Partial Public Class UiAx00MainMDI
                 ''AG 31/03/2014 - #1565
 
                 GlobalBase.CreateLogActivity("Update ISE executions after conditioning !", Name & ".CreateWSExecutionsWithISEChanges ", EventLogEntryType.Information, False)
-                Dim myExecutionDelegate As New ExecutionsDelegate
-                Dim createWSInRunning As Boolean = (AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING)
+                'Dim myExecutionDelegate As New ExecutionsDelegate
+                Dim createWSInRunning As Boolean = (AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.RUNNING)
 
                 'AG 30/05/2014 #1644 - Redesing correction #1584 for avoid DeadLocks (add parameter AllowScanInRunning)
-                myGlobal = myExecutionDelegate.CreateWSExecutions(Nothing, AnalyzerController.Instance.Analyzer.ActiveAnalyzer, AnalyzerController.Instance.Analyzer.ActiveWorkSession, _
+                'myGlobal = myExecutionDelegate.CreateWSExecutions(Nothing, AnalyzerController.Instance.Analyzer.ActiveAnalyzer, AnalyzerController.Instance.Analyzer.ActiveWorkSession, _
+                '                                                  createWSInRunning, -1, String.Empty, isReady, myAffectedElectrodes, AnalyzerController.Instance.Analyzer.AllowScanInRunning)
+                myGlobal = WSCreator.CreateWS(Nothing, AnalyzerController.Instance.Analyzer.ActiveAnalyzer, AnalyzerController.Instance.Analyzer.ActiveWorkSession, _
                                                                   createWSInRunning, -1, String.Empty, isReady, myAffectedElectrodes, AnalyzerController.Instance.Analyzer.AllowScanInRunning)
                 ' XB 16/04/2014 - #1599
 
@@ -8698,9 +8351,9 @@ Partial Public Class UiAx00MainMDI
                 'AG 06/09/2012 - Analyzer manager initialization requires WorkSessionID to be informed before AnalyzerID
 
                 'AG 10/11/2014 BA-2082 use the AnalyzerModel read from database instead of the enumerate AnalyzerModelEnum (inform the analyzer model before createAnalyzer)
-                MyClass.AnalyzerModel = AnalyzerModelAttribute
+                AnalyzerModel = AnalyzerModelAttribute
                 '#REFACTORING
-                MDIAnalyzerManager = AnalyzerController.Instance.CreateAnalyzer(My.Application.Info.AssemblyName, MyClass.AnalyzerModel, pStartingApplication, WorkSessionIDAttribute, AnalyzerIDAttribute, FwVersionAttribute)
+                MDIAnalyzerManager = AnalyzerController.Instance.CreateAnalyzer(My.Application.Info.AssemblyName, AnalyzerModel, pStartingApplication, WorkSessionIDAttribute, AnalyzerIDAttribute, FwVersionAttribute)
 
                 Application.DoEvents()
 
@@ -11852,10 +11505,10 @@ Partial Public Class UiAx00MainMDI
 #End Region
 
 #Region "Help Area"
-    ''' <summary>
-    ''' Get the help file name on the current application language.
-    ''' </summary>
-    ''' <remarks>CREATED BY: TR 03/11/2011</remarks>
+        ''' <summary>
+        ''' Get the help file name on the current application language.
+        ''' </summary>
+        ''' <remarks>CREATED BY: TR 03/11/2011</remarks>
     Public Sub SetHelpProvider()
         Try
 
@@ -11894,4 +11547,32 @@ Partial Public Class UiAx00MainMDI
     Private Sub AuxBA200ToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AuxBA200ToolStripMenuItem.Click
         BA200TestForm.Show()
     End Sub
+
+    Private Sub UiAx00MainMDI_MdiChildActivate(sender As Object, e As EventArgs) Handles Me.MdiChildActivate
+        If ActiveMdiChild Is Nothing Then Return
+        Try
+            Dim differentWidth = Me.ActiveMdiChild.Width - Me.GetMdiClientWindow.ClientSize.Width
+            If differentWidth > 0 Then
+                Me.Width += differentWidth
+                Me.Left -= CInt(differentWidth / 2)
+            End If
+
+            Dim differentHeight = Me.ActiveMdiChild.Height - Me.GetMdiClientWindow.ClientSize.Height
+            If differentHeight > 0 Then
+                Me.Height += differentHeight
+                Me.Top -= CInt(differentHeight / 2)
+            End If
+        Catch
+        End Try
+    End Sub
+
+    Private Function GetMdiClientWindow() As MdiClient
+        For Each ctl As Control In Me.Controls
+            If TypeOf ctl Is MdiClient Then
+                Return TryCast(ctl, MdiClient)
+            End If
+        Next
+        Return Nothing
+    End Function
+
 End Class

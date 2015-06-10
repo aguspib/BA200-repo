@@ -7,7 +7,8 @@ Imports NUnit.Framework
 Imports Telerik.JustMock
 
 Namespace Biosystems.Ax00.Core.Services.Tests
-    <TestFixture()> Public Class BaseLineServiceTests
+
+    <TestFixture()> Public Class BaseLineServiceTests
 
         ''' <summary>
         ''' 

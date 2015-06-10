@@ -1,0 +1,278 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{A883608A-3D41-4339-9C2F-FEEA18BEFB68}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>
+    </RootNamespace>
+    <AssemblyName>WorkSession</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <MyType>Windows</MyType>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <OptionExplicit>On</OptionExplicit>
+    <OptionCompare>Binary</OptionCompare>
+    <OptionStrict>On</OptionStrict>
+    <OptionInfer>On</OptionInfer>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DocumentationFile>WorkSession.xml</DocumentationFile>
+    <NoWarn>42353,42354,42355</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
+    <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DocumentationFile>WorkSession.xml</DocumentationFile>
+    <NoWarn>42353,42354,42355</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
+    <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DocumentationFile>WorkSession.xml</DocumentationFile>
+    <NoWarn>42353,42354,42355</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+    <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DocumentationFile>WorkSession.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <NoWarn>42353,42354,42355</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+    <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DocumentationFile>WorkSession.xml</DocumentationFile>
+    <NoWarn>42353,42354,42355</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+    <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DocumentationFile>WorkSession.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <NoWarn>42353,42354,42355</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+    <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>BioSystems.pfx</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Collections.Generic" />
+    <Import Include="System.Data" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.Linq" />
+    <Import Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AG_Delete.vb" />
+    <Compile Include="AutoReportsDelegate.vb" />
+    <Compile Include="BarcodeWSDelegate.vb" />
+    <Compile Include="BarcodePositionsWithNoRequestsDelegate.vb" />
+    <Compile Include="Contaminations Handling\AnalysisMode.vb" />
+    <Compile Include="ExportDelegate.vb" />
+    <Compile Include="D. Injection with Ax00.Core.Entities\Interfaces\IAnalyzerContaminationSpecification.vb" />
+    <Compile Include="D. Injection with Ax00.Core.Entities\Interfaces\IContaminationManager.vb" />
+    <Compile Include="D. Injection with Ax00.Core.Entities\Interfaces\IContaminationsContext.vb" />
+    <Compile Include="D. Injection with Ax00.Core.Entities\Interfaces\IContextStep.vb" />
+    <Compile Include="D. Injection with Ax00.Core.Entities\Interfaces\IDispensingContaminationDescription.vb" />
+    <Compile Include="D. Injection with Ax00.Core.Entities\Interfaces\IDispensingRequiredContaminationsAction.vb" />
+    <Compile Include="ImportErrorsLogDelegate.vb" />
+    <Compile Include="D. Injection with Ax00.Core.Entities\Interfaces\IOptimizationPolicyApplier.vb" />
+    <Compile Include="D. Injection with Ax00.Core.Entities\Interfaces\IReagentDispensing.vb" />
+    <Compile Include="D. Injection with Ax00.Core.Entities\Interfaces\IWashingDescription.vb" />
+    <Compile Include="D. Injection with Ax00.Core.Entities\Interfaces\IWSExecutionCreator.vb" />
+    <Compile Include="OperateCalculatedTestDelegate.vb" />
+    <Compile Include="OrderTestsLISInfoDelegate.vb" />
+    <Compile Include="PreparationTestDataDelegate.vb" />
+    <Compile Include="ReactionsRotorDelegate.vb" />
+    <Compile Include="RepetitionsDelegate.vb" />
+    <Compile Include="ResultAlarmsDelegate.vb" />
+    <Compile Include="ViewOrderCalculatedTestsDelegate.vb" />
+    <Compile Include="CurveResultsDelegate.vb" />
+    <Compile Include="OrderCalculatedTestsDelegate.vb" />
+    <Compile Include="D. Injection with Ax00.Core.Entities\WorksessionDependencyInjector.vb" />
+    <Compile Include="WSAnalyzerAlarmsDelegate.vb" />
+    <Compile Include="WSBLinesByWellDelegate.vb" />
+    <Compile Include="WSExecutionAlarmsDelegate.vb" />
+    <Compile Include="WSPausedOrderTestsDelegate.vb" />
+    <Compile Include="WSPreparationsDelegate.vb" />
+    <Compile Include="WSReadingsDelegate.vb" />
+    <Compile Include="WSBLinesDelegate.vb" />
+    <Compile Include="ExecutionsDelegate.vb" />
+    <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="My Project\Application.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Application.myapp</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Settings.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="OrdersDelegate.vb" />
+    <Compile Include="OrdersDemographicsDelegate.vb" />
+    <Compile Include="OrderTestDelegate.vb" />
+    <Compile Include="ResultsDelegate.vb" />
+    <Compile Include="WorkSessionsDelegate.vb" />
+    <Compile Include="WSAnalyzersDelegate.vb" />
+    <Compile Include="WSNotInUseRotorPositionsDelegate.vb" />
+    <Compile Include="WSOrderTestsDelegate.vb" />
+    <Compile Include="WSRepetitionsToAddDelegate.vb">
+    </Compile>
+    <Compile Include="WSRequiredElemByOrderTestDelegate.vb" />
+    <Compile Include="WSRequiredElementsDelegate.vb" />
+    <Compile Include="WSRequiredElementsTubesDelegate.vb" />
+    <Compile Include="WSRotorContentByPositionDelegate.vb" />
+    <Compile Include="WSRotorPositionsInProcessDelegate.vb" />
+    <Compile Include="WSStatusRecalculatorForBlanks.vb" />
+    <Compile Include="WSStatusRecalculatorForCalibs.vb" />
+    <Compile Include="WSStatusRecalculatorForCtrlPatientsSTD.vb" />
+    <Compile Include="WSStatusRecalculatorForCtrlPatientsWithISE.vb" />
+    <Compile Include="WSStatusRecalculatorForNotDeletedExecutions.vb" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="My Project\Resources.resx">
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="BioSystems.pfx" />
+    <None Include="My Project\Application.myapp">
+      <Generator>MyApplicationCodeGenerator</Generator>
+      <LastGenOutput>Application.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="My Project\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <CustomToolNamespace>My</CustomToolNamespace>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+<<<<<<< HEAD
+    <ProjectReference Include="..\bax00framework\AX00Types\AX00Types.vbproj">
+      <Project>{19114cc5-ba39-4d35-89fa-41d9efb7a931}</Project>
+=======
+    <ProjectReference Include="..\Ax00.CrossCutting\Ax00.CrossCutting.vbproj">
+      <Project>{b23d6aff-a359-4d3e-87bf-820167228fe5}</Project>
+      <Name>Ax00.CrossCutting</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AX00Types\AX00Types.vbproj">
+      <Project>{3B617EBF-0488-46BD-AB56-094F81D0E4C3}</Project>
+>>>>>>> develop-project/BA200
+      <Name>AX00Types</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\bax00framework\Global\Global.vbproj">
+      <Project>{5d65020c-c2d7-4ac3-b557-223fc290e526}</Project>
+      <Name>Global</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\bax00framework\History\History.vbproj">
+      <Project>{2f6892a0-72d7-45f6-b429-61dbad015128}</Project>
+      <Name>History</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\bax00framework\ParameterPrograming\ParametersPrograming.vbproj">
+      <Project>{3aaf43d5-55d8-4a0b-9fd3-e8841008e13e}</Project>
+      <Name>ParametersPrograming</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BussinessLayer\ConfigurationSetup\ConfigurationSetup.vbproj">
+      <Project>{BC01C1BD-2A93-4002-B74F-7BCF9793309D}</Project>
+      <Name>ConfigurationSetup</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BussinessLayer\Framework\Framework.vbproj">
+      <Project>{806A1F2F-07C1-43D2-AF67-59ACCF4B5754}</Project>
+      <Name>Framework</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DataAccessLayer\DataAccessLayer.vbproj">
+      <Project>{51863CF3-A3E9-4E41-8924-C69704796FB9}</Project>
+      <Name>DataAccessLayer</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{3259AA49-8AA1-44D3-9025-A0B520596A8C}" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

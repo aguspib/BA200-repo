@@ -237,9 +237,6 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <summary>
         ''' 
         ''' </summary>
-        ''' <remarks>
-        ''' Search if exists alarm ISE_TIMEOUT_ERR with status TRUE, in this case set flag myISETimeoutErrorFixed = True (FIXED) in order to mark it as fixed
-        ''' </remarks>
         Private Sub GlfBoardErrorDuringFBLD()
             If _analyzerManager.CanManageRetryAlarm Then
                 _analyzerManager.CanManageRetryAlarm = False
@@ -623,10 +620,12 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
             End If
             If _analyzerManager.AnalyzerStatus() = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
-                Dim reactRotorDlg As New ReactionsRotorDelegate
-                _analyzerManager.FutureRequestNextWellValue = reactRotorDlg.GetRealWellNumber(_analyzerManager.CurrentWell + 1, MAX_REACTROTOR_WELLS) 'Estimation of future next well (last well received with Request + 1)
-                _myGlobal = _analyzerManager.SearchNextPreparation(_dbConnection, _analyzerManager.FutureRequestNextWellValue) 'Search for next instruction to be sent ... and sent it!!
-                _analyzerManager.FillNextPreparationToSend(_myGlobal)
+                'CONTAMINATIONS_
+                'Dim reactRotorDlg As New ReactionsRotorDelegate
+                '_analyzerManager.FutureRequestNextWellValue = reactRotorDlg.GetRealWellNumber(_analyzerManager.CurrentWell + 1, MAX_REACTROTOR_WELLS) 'Estimation of future next well (last well received with Request + 1)
+                '_myGlobal = _analyzerManager.SearchNextPreparation(_dbConnection, _analyzerManager.FutureRequestNextWellValue) 'Search for next instruction to be sent ... and sent it!!
+                '_analyzerManager.FillNextPreparationToSend(_myGlobal)
+                '/CONTAMINATIONS_
             End If
 
             GlobalBase.CreateLogActivity("Instruction rejected (out of time)", "AnalyzerManager.ManageAlarms", EventLogEntryType.Information, False)

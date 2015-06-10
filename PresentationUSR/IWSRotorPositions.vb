@@ -11,7 +11,9 @@ Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.PresentationCOM
 Imports System.Timers
 Imports System.Globalization
+Imports System.Threading
 Imports Biosystems.Ax00.App
+Imports Biosystems.Ax00.Core.Entities
 Imports PesentationLayer.RotorUtils
 'Imports Biosystems.Ax00.PresentationCOM.RotorUtils
 
@@ -246,8 +248,8 @@ Public Class UiWSRotorPositions
     Private reagentBarcodeReaderOFF As Boolean = False
 
     'DL 16/04/2013
-    Private watchDogTimer As New Timer()
-    Private autoWSCreationTimer As New Timer() 'AG 02/01/2014 - BT #1433 (v211 patch2)
+    Private watchDogTimer As New Timers.Timer()
+    Private autoWSCreationTimer As New Timers.Timer() 'AG 02/01/2014 - BT #1433 (v211 patch2)
 
     Private ESCKeyPressed As Boolean = False  ' XB 11/03/2014 - #1523
 #End Region
@@ -6393,10 +6395,12 @@ Public Class UiWSRotorPositions
             Dim finalTime As String = "" 'AG 18/02/2014 #1505
 
             'Generate the WS Executions
-            'Dim resultData As GlobalDataTO
-            Dim myExecutionDelegate As New ExecutionsDelegate
-            'AG 30/05/2014 #1644 - Redesing correction #1584 for avoid DeadLocks (add parameter pauseMode)
-            resultData = myExecutionDelegate.CreateWSExecutions(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, createWSInRunning, -1, String.Empty, iseModuleReady, AffectedISEElectrodes, pauseMode) 'SGM 07/09/2012 - inform affected electrodes for locking them
+            'Dim myExecutionDelegate As New ExecutionsDelegate
+            ''AG 30/05/2014 #1644 - Redesing correction #1584 for avoid DeadLocks (add parameter pauseMode)
+            'resultData = myExecutionDelegate.CreateWSExecutions(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, createWSInRunning, -1, String.Empty, iseModuleReady, AffectedISEElectrodes, pauseMode) 'SGM 07/09/2012 - inform affected electrodes for locking them
+
+            Dim contaminathings = Biosystems.Ax00.App.AnalyzerController.Instance.Analyzer
+            resultData = WSCreator.CreateWS(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, createWSInRunning, -1, String.Empty, iseModuleReady, AffectedISEElectrodes, pauseMode)
 
             If (resultData.HasError) Then
                 ErrorOnCreateWSExecutions = String.Format("{0}|{1}", resultData.ErrorCode, resultData.ErrorMessage)
@@ -7068,11 +7072,17 @@ Public Class UiWSRotorPositions
                     Dim workingThread As New Threading.Thread(AddressOf CreateWSExecutions)
                     ScreenWorkingProcess = True
                     workingThread.Start()
-
+                    UiAx00MainMDI.InitializeMarqueeProgreesBar()
+                    Dim timer = Now.AddSeconds(0.1)
+                    Dim priority = Threading.Thread.CurrentThread.Priority
+                    Thread.CurrentThread.Priority = ThreadPriority.BelowNormal
                     While ScreenWorkingProcess
-                        UiAx00MainMDI.InitializeMarqueeProgreesBar()
-                        Application.DoEvents()
+                        If timer < Now Then
+                            Application.DoEvents()
+                            timer = Now.AddSeconds(0.1)
+                        End If
                     End While
+                    Threading.Thread.CurrentThread.Priority = priority
 
                     workingThread = Nothing
                     UiAx00MainMDI.StopMarqueeProgressBar()

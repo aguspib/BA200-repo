@@ -400,6 +400,8 @@ Public Class UiRestPointUpdateProc
 
             'TR 29/01/2013 -Implementation Update process.
             Dim myGlobalDataTO As New GlobalDataTO
+            Dim debugLogger As DebugLogger = New DebugLogger()
+
             DebugLogger.AddLog(" --------------------------------------------", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
             DebugLogger.AddLog(" UPDATE VERSION - RESTORE POINT PROCESS (INI)", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
             myGlobalDataTO = UpdaterController.Instance.InstallUpdateProcess(DAOBase.DBServer, DAOBase.CurrentDB, DAOBase.DBLogin, DAOBase.DBPassword, True) 'BA-2471: IT 08/05/2015
@@ -460,10 +462,8 @@ Public Class UiRestPointUpdateProc
     Private Sub CreateRestorePoint()
         'Cursor.Current = Cursors.WaitCursor
         Dim myGlobal As GlobalDataTO
-
         Try
-
-            'Dim mySATUtil As New SATReportUtilities
+            'Dim mySATUtil As New SATReportUtilities 
             myGlobal = SATReportUtilities.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_RESTORE, False, "", AnalyzerController.Instance.Analyzer.AdjustmentsFilePath) 'BA-2471: IT 08/05/2015
             If Not myGlobal.HasError AndAlso Not myGlobal Is Nothing Then
                 SATReportCreated = CBool(myGlobal.SetDatos)
@@ -504,7 +504,7 @@ Public Class UiRestPointUpdateProc
                 'obtain the SAT version
                 Dim mySATVersion As String
 
-                myGlobal = SATReportUtilities.GetSATReportVersion(pFilePath) 'BA-2471: IT 08/05/2015
+                myGlobal = SATReportUtilities.GetSATReportVersionAndModel(pFilePath) 'BA-2471: IT 08/05/2015
                 If Not myGlobal.HasError And Not myGlobal Is Nothing Then
                     mySATVersion = CStr(myGlobal.SetDatos)
 

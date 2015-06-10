@@ -1,6 +1,8 @@
 ﻿Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Core.Services
 Imports Biosystems.Ax00.App.PresentationLayerListener
+Imports Biosystems.Ax00.App.PresentationLayerListener.Requests
+Imports Biosystems.Ax00.Core.Entities.Enums
 Imports Biosystems.Ax00.Core.Services.Interfaces
 
 Namespace Biosystems.Ax00.App

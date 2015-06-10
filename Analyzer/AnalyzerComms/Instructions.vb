@@ -2,6 +2,7 @@
 Option Explicit On
 
 Imports Biosystems.Ax00.BL
+Imports Biosystems.Ax00.Core.Entities
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.DAL.DAO
@@ -493,7 +494,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Dim myExecutionDelegate As New ExecutionsDelegate
                 Dim myPreparationTestDataDS As New PreparationsTestDataDS
                 Dim myPreparationPositionDS As New PreparationsPositionDataDS
-                Dim myPreparationTestDataDAO As New vwksPreparationsTestDataDAO
                 Dim myPreparationPositionDataDAO As New vwksPreparationsPositionDataDAO
 
                 Dim myPreparationParameterList As New List(Of InstructionParameterTO)
@@ -507,7 +507,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         Dim myOrderTestID As Integer = myWSExecutionDS.twksWSExecutions(0).OrderTestID
 
                         'Get the preparation test data.
-                        myGlobalDataTO = myPreparationTestDataDAO.ReadByOrderTestID(Nothing, myOrderTestID)
+                        myGlobalDataTO = vwksPreparationsTestDataDAO.ReadByOrderTestID(Nothing, myOrderTestID)
                         If Not myGlobalDataTO.HasError Then
                             'TODO: currently this function only works for STANDARD Tests (data in the view is filtered
                             '      by TestType = 'STD')
@@ -610,168 +610,55 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Dim qRCPList As New List(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow)
 
                 If pWashingDataDS.nextPreparation.Count > 0 Then
-
                     myPreparationParameterList = GetInstructionParameter("WRUN")
-                    If myPreparationParameterList.Count > 0 Then
-                        For Each myInstructionTO As InstructionParameterTO In myPreparationParameterList
-                            Select Case myInstructionTO.ParameterIndex
-                                Case 1 'Axxx -Analyzer Description
-                                    'myInstructionTO.Parameter = "A400"
-                                    myInstructionTO.ParameterValue = "A400" '1st & 2on characters: model, 3th & 4th characters: analyzer number
-                                    Exit Select
-                                Case 2 'WRUN -Instruction Code
-                                    myInstructionTO.ParameterValue = myInstructionTO.InstructionType
-                                    Exit Select
 
-                                Case 3 'M -Washing Mode.
-                                    If Not pWashingDataDS.nextPreparation(0).IsReagentContaminationFlagNull AndAlso pWashingDataDS.nextPreparation(0).ReagentContaminationFlag Then
-                                        myInstructionTO.ParameterValue = "1" 'Running Mode (System Water R1,R2 - WS from a Bottle R1,R2).
-                                    ElseIf Not pWashingDataDS.nextPreparation(0).IsCuvetteContaminationFlagNull AndAlso pWashingDataDS.nextPreparation(0).CuvetteContaminationFlag Then
-                                        myInstructionTO.ParameterValue = "2" 'Running Mode - Rotor Well Wash.
+                    If myPreparationParameterList.Any() Then
+                        Dim index As Integer = 0
 
-                                    Else 'DL 26/06/2012
-                                        myGlobalDataTO.HasError = True  'DL 26/06/2012
-                                        Exit For   'DL 26/06/2012
-                                    End If
+                        'Axxx -Analyzer Description
+                        SetAnalyzerDescription(myPreparationParameterList, index)
+                        'WRUN -Instruction Code
+                        SetInstructionCode(myPreparationParameterList, index)
+                        'M -Washing Mode.
+                        SetWashingMode(myPreparationParameterList, index, pWashingDataDS, myGlobalDataTO)
+                        'S -Source.
+                        SetSource(myPreparationParameterList, index, pWashingDataDS, myGlobalDataTO)
 
-                                    ''AG 28/09/2012 - auxiliary code for test incomplete instruction
-                                    'myGlobalDataTO.HasError = True
-                                    'Exit For
-                                    ''AG 28/09/2012
-                                    Exit Select
-
-                                Case 4 ' S -Source.
-                                    If pWashingDataDS.nextPreparation(0).IsWashSolution1Null And pWashingDataDS.nextPreparation(0).IsWashSolution2Null Then
-                                        myInstructionTO.ParameterValue = "1" 'System Water.
-
-                                    ElseIf Not pWashingDataDS.nextPreparation(0).IsReagentContaminationFlagNull AndAlso _
-                                                     pWashingDataDS.nextPreparation(0).ReagentContaminationFlag AndAlso _
-                                                                    Not pWashingDataDS.nextPreparation(0).IsWashSolution1Null Then
-                                        myInstructionTO.ParameterValue = "2" 'External WS
-
-                                    ElseIf Not pWashingDataDS.nextPreparation(0).IsCuvetteContaminationFlagNull AndAlso _
-                                                      pWashingDataDS.nextPreparation(0).CuvetteContaminationFlag AndAlso _
-                                                      Not pWashingDataDS.nextPreparation(0).IsWashSolution1Null AndAlso _
-                                                      Not pWashingDataDS.nextPreparation(0).IsWashSolution2Null Then
-                                        myInstructionTO.ParameterValue = "2" 'External WS
-
-                                    ElseIf Not pWashingDataDS.nextPreparation(0).IsCuvetteContaminationFlagNull AndAlso _
-                                                     pWashingDataDS.nextPreparation(0).CuvetteContaminationFlag AndAlso _
-                                                     Not pWashingDataDS.nextPreparation(0).IsWashSolution1Null AndAlso _
-                                                     pWashingDataDS.nextPreparation(0).IsWashSolution2Null Then
-                                        myInstructionTO.ParameterValue = "3" 'R1 with External WS + R2 with Internal (Mode 2 Only)
-
-                                    Else 'DL 26/06/2012
-                                        myGlobalDataTO.HasError = True  'DL 26/06/2012
-                                        Exit For   'DL 26/06/2012
-                                    End If
-                                    Exit Select
-
-                                Case 5 ' BP1 -Bottle Position R1.
-                                    myInstructionTO.ParameterValue = "0" 'AG 09/02/2012
-                                    If Not pWashingDataDS.nextPreparation(0).IsWashSolution1Null Then
-
-                                        'Get the solution 1 information by solution code.
-                                        myGlobalDataTO = myRotorContentByPositionDelegate.GetWashingSolutionPosInfoBySolutionCode(Nothing, _
-                                                                                                                                  pWashingDataDS.nextPreparation(0).WashSolution1)
-                                        If Not myGlobalDataTO.HasError Then
-                                            Dim myWSRotorContentPosDS As New WSRotorContentByPositionDS
-                                            myWSRotorContentPosDS = DirectCast(myGlobalDataTO.SetDatos, WSRotorContentByPositionDS)
-                                            'Filter deplete position.
-                                            'AG 03/08/2011 - Add condition Status <> LOCKED AND (BarcodeStatus IS NULL OR BarcodeStatus <> ‘ERROR’ )
-                                            qRCPList = (From a In myWSRotorContentPosDS.twksWSRotorContentByPosition _
-                                                        Where a.Status <> "DEPLETED" AndAlso a.Status <> "LOCKED" AndAlso (a.IsBarcodeStatusNull OrElse a.BarcodeStatus <> "ERROR") _
-                                                        Select a).ToList()
-                                            If qRCPList.Count > 0 Then
-                                                myInstructionTO.ParameterValue = qRCPList.First().CellNumber.ToString()
-                                            Else                                    'DL 26/06/2012
-                                                myGlobalDataTO.HasError = True      'DL 26/06/2012
-                                                Exit For                            'DL 26/06/2012
-                                            End If
-                                        Else
-                                            Exit For
-                                        End If
-                                    End If
-                                    Exit Select
-
-                                Case 6 ' BT1 -Bottle Type.
-                                    'With the previous values on the qRCPList get the BOTTLE Type.
-                                    If qRCPList.Count > 0 Then
-                                        myInstructionTO.ParameterValue = GetBottleCode(qRCPList.First().TubeType)
-                                    Else
-                                        myInstructionTO.ParameterValue = "0" 'AG 09/02/2012
-                                    End If
-                                    Exit Select
-
-                                Case 7 'BRT1 -Bottle Rack Type.
-                                    myInstructionTO.ParameterValue = "1" 'Type 1 (Original)
-                                    Exit Select
-
-                                Case 8 ' BP2 -Bottle Position R2.
-                                    myInstructionTO.ParameterValue = "0" 'AG 09/02/2012
-                                    If Not pWashingDataDS.nextPreparation(0).IsWashSolution2Null Then
-                                        'Get the solution 1 information by solution code.
-                                        myGlobalDataTO = myRotorContentByPositionDelegate.GetWashingSolutionPosInfoBySolutionCode(Nothing, _
-                                                                                             pWashingDataDS.nextPreparation(0).WashSolution2)
-                                        If Not myGlobalDataTO.HasError Then
-                                            Dim myWSRotorContentPosDS As New WSRotorContentByPositionDS
-                                            myWSRotorContentPosDS = DirectCast(myGlobalDataTO.SetDatos, WSRotorContentByPositionDS)
-                                            'Filter deplete position
-                                            'AG 03/08/2011 - Add condition Status <> LOCKED AND (BarcodeStatus IS NULL OR BarcodeStatus <> ‘ERROR’ )
-                                            qRCPList = (From a In myWSRotorContentPosDS.twksWSRotorContentByPosition _
-                                                        Where a.Status <> "DEPLETED" AndAlso a.Status <> "LOCKED" AndAlso (a.IsBarcodeStatusNull OrElse a.BarcodeStatus <> "ERROR") _
-                                                        Select a).ToList()
-
-                                            If qRCPList.Count > 0 Then
-                                                myInstructionTO.ParameterValue = qRCPList.First().CellNumber.ToString()
-                                            Else                                    'DL 26/06/2012
-                                                myGlobalDataTO.HasError = True      'DL 26/06/2012
-                                                Exit For                            'DL 26/06/2012
-                                            End If
-                                        Else
-                                            Exit For
-                                        End If
-                                    End If
-                                    Exit Select
-
-                                Case 9 'BT2 -Bottle Type.
-                                    'With the previous values on the qRCPList get the BOTTLE Type.
-                                    If qRCPList.Count > 0 Then
-                                        myInstructionTO.ParameterValue = GetBottleCode(qRCPList.First().TubeType)
-                                    Else
-                                        myInstructionTO.ParameterValue = "0" 'AG 09/02/2012
-                                    End If
-                                    Exit Select
-
-                                Case 10 'BRT2 -Bottle Rack Type.
-                                    myInstructionTO.ParameterValue = "1" 'Type 1 Original.
-                                    Exit Select
-
-                                Case Else 'exit select
-                                    Exit Select
-                            End Select
-                        Next
-
-                        If Not myGlobalDataTO.HasError Then 'DL 26/06/2012
-                            myGlobalDataTO.SetDatos = myPreparationParameterList
-                        Else
-                            'DL 26/06/2012
-                            'Dim myLogAcciones As New ApplicationLogManager()
-                            GlobalBase.CreateLogActivity("Instruction with empty fields.", "Instructions.GenerateWSRunInstruction", EventLogEntryType.Information, False)
-                            'DL 26/06/2012
-                            myGlobalDataTO.ErrorCode = "EMPTY_FIELDS" 'AG 27/09/2012 - inform not system error, it is a protection
+                        'ID -Identification
+                        If AnalyzerManager.GetCurrentAnalyzerManager().WashingIDRequired Then
+                            SetIdentification(myPreparationParameterList, index, pWashingDataDS)
                         End If
 
+                        'BP1 -Bottle Position R1.
+                        SetBottlePositionR1(myPreparationParameterList, index, pWashingDataDS, myGlobalDataTO, qRCPList)
+                        'BT1 -Bottle Type.
+                        SetBottleType(myPreparationParameterList, index, qRCPList)
+                        'BRT1 -Bottle Rack Type.
+                        SetBottleRackType(myPreparationParameterList, index)
+                        'BP2 -Bottle Position R2.
+                        SetBottlePositionR2(myPreparationParameterList, index, pWashingDataDS, myGlobalDataTO, qRCPList)
+                        'BT2 -Bottle Type.
+                        SetBottleType(myPreparationParameterList, index, qRCPList)
+                        'BRT2 -Bottle Rack Type.
+                        SetBottleRackType(myPreparationParameterList, index)
                     End If
+
+                    If Not myGlobalDataTO.HasError Then 'DL 26/06/2012
+                        myGlobalDataTO.SetDatos = myPreparationParameterList
+                    Else
+                        'DL 26/06/2012
+                        GlobalBase.CreateLogActivity("Instruction with empty fields.", "Instructions.GenerateWSRunInstruction", EventLogEntryType.Information, False)
+                        'DL 26/06/2012
+                        myGlobalDataTO.ErrorCode = "EMPTY_FIELDS" 'AG 27/09/2012 - inform not system error, it is a protection
+                    End If
+
                 End If
-                qRCPList = Nothing 'AG 02/08/2012 - free memory
 
             Catch ex As Exception
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "Instructions.GenerateWRunInstruction", EventLogEntryType.Error, False)
             End Try
 
@@ -5016,6 +4903,218 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 #End Region
 
+        ''' <summary>
+        ''' Returns the ExecutionID value for the preparation
+        ''' </summary>
+        ''' <param name="pWashingDataDS"></param>
+        ''' <returns>Returns the ExecutionID value for the washing</returns>
+        ''' <remarks></remarks>
+        Private Function GetValueExecutionID(pWashingDataDS As AnalyzerManagerDS) As String
+            If (pWashingDataDS.nextPreparation.Any() AndAlso Not pWashingDataDS.nextPreparation(0).IsExecutionIDNull) Then
+                Return pWashingDataDS.nextPreparation(0).ExecutionID.ToString()
+            End If
+            Return "0"
+        End Function
+
+        ''' <summary>
+        ''' Sets the Analyzer Model to the ParameterValue field
+        ''' </summary>
+        ''' <param name="myPreparationParameterList"></param>
+        ''' <param name="index"></param>
+        ''' <remarks></remarks>
+        Private Sub SetAnalyzerDescription(ByRef myPreparationParameterList As List(Of InstructionParameterTO), ByRef index As Integer)
+            Dim myInstructionTO = myPreparationParameterList(index)
+            myInstructionTO.ParameterValue = AnalyzerManager.GetCurrentAnalyzerManager().GetModelValue(AnalyzerManager.GetCurrentAnalyzerManager().ActiveAnalyzer)
+        End Sub
+
+        ''' <summary>
+        ''' Sets the instruction code to the ParameterValue field
+        ''' </summary>
+        ''' <param name="myPreparationParameterList"></param>
+        ''' <param name="index"></param>
+        ''' <remarks></remarks>
+        Private Sub SetInstructionCode(ByRef myPreparationParameterList As List(Of InstructionParameterTO), ByRef index As Integer)
+            index += 1
+            Dim myInstructionTO = myPreparationParameterList(index)
+            myInstructionTO.ParameterValue = myInstructionTO.InstructionType
+        End Sub
+
+        ''' <summary>
+        ''' Sets the washing mode to the ParameterValue field
+        ''' </summary>
+        ''' <param name="myPreparationParameterList"></param>
+        ''' <param name="index"></param>
+        ''' <param name="pWashingDataDS"></param>
+        ''' <param name="myGlobalDataTO"></param>
+        ''' <remarks></remarks>
+        Private Sub SetWashingMode(ByRef myPreparationParameterList As List(Of InstructionParameterTO), ByRef index As Integer, ByVal pWashingDataDS As AnalyzerManagerDS,
+                                   ByRef myGlobalDataTO As GlobalDataTO)
+            index += 1
+            Dim myInstructionTO = myPreparationParameterList(index)
+
+            If Not pWashingDataDS.nextPreparation(0).IsReagentContaminationFlagNull AndAlso pWashingDataDS.nextPreparation(0).ReagentContaminationFlag Then
+                myInstructionTO.ParameterValue = "1" 'Running Mode (System Water R1,R2 - WS from a Bottle R1,R2).
+            ElseIf Not pWashingDataDS.nextPreparation(0).IsCuvetteContaminationFlagNull AndAlso pWashingDataDS.nextPreparation(0).CuvetteContaminationFlag Then
+                myInstructionTO.ParameterValue = "2" 'Running Mode - Rotor Well Wash.
+            Else
+                myGlobalDataTO.HasError = True
+            End If
+        End Sub
+
+
+        ''' <summary>
+        ''' Sets the source to the ParameterValue field
+        ''' </summary>
+        ''' <param name="myPreparationParameterList"></param>
+        ''' <param name="index"></param>
+        ''' <param name="pWashingDataDS"></param>
+        ''' <param name="myGlobalDataTO"></param>
+        ''' <remarks></remarks>
+        Private Sub SetSource(ByRef myPreparationParameterList As List(Of InstructionParameterTO), ByRef index As Integer, pWashingDataDS As AnalyzerManagerDS,
+                              ByRef myGlobalDataTO As GlobalDataTO)
+            index += 1
+            Dim myInstructionTO = myPreparationParameterList(index)
+            If pWashingDataDS.nextPreparation(0).IsWashSolution1Null And pWashingDataDS.nextPreparation(0).IsWashSolution2Null Then
+                myInstructionTO.ParameterValue = "1" 'System Water.
+
+            ElseIf Not pWashingDataDS.nextPreparation(0).IsReagentContaminationFlagNull AndAlso _
+                             pWashingDataDS.nextPreparation(0).ReagentContaminationFlag AndAlso _
+                                            Not pWashingDataDS.nextPreparation(0).IsWashSolution1Null Then
+                myInstructionTO.ParameterValue = "2" 'External WS
+
+            ElseIf Not pWashingDataDS.nextPreparation(0).IsCuvetteContaminationFlagNull AndAlso _
+                              pWashingDataDS.nextPreparation(0).CuvetteContaminationFlag AndAlso _
+                              Not pWashingDataDS.nextPreparation(0).IsWashSolution1Null AndAlso _
+                              Not pWashingDataDS.nextPreparation(0).IsWashSolution2Null Then
+                myInstructionTO.ParameterValue = "2" 'External WS
+
+            ElseIf Not pWashingDataDS.nextPreparation(0).IsCuvetteContaminationFlagNull AndAlso _
+                             pWashingDataDS.nextPreparation(0).CuvetteContaminationFlag AndAlso _
+                             Not pWashingDataDS.nextPreparation(0).IsWashSolution1Null AndAlso _
+                             pWashingDataDS.nextPreparation(0).IsWashSolution2Null Then
+                myInstructionTO.ParameterValue = "3" 'R1 with External WS + R2 with Internal (Mode 2 Only)
+
+            Else 'DL 26/06/2012
+                myGlobalDataTO.HasError = True  'DL 26/06/2012
+            End If
+        End Sub
+
+        ''' <summary>
+        ''' Sets the ExecutionID to the ParameterValue field
+        ''' </summary>
+        ''' <param name="myPreparationParameterList"></param>
+        ''' <param name="index"></param>
+        ''' <param name="pWashingDataDS"></param>
+        ''' <remarks></remarks>
+        Private Sub SetIdentification(ByRef myPreparationParameterList As List(Of InstructionParameterTO), ByRef index As Integer, pWashingDataDS As AnalyzerManagerDS)
+            index += 1
+            Dim myInstructionTO = myPreparationParameterList(index)
+            myInstructionTO.ParameterValue = GetValueExecutionID(pWashingDataDS)
+        End Sub
+
+        ''' <summary>
+        ''' Sets the bottle position for the R1 reagent, to the ParameterValue field
+        ''' </summary>
+        ''' <param name="myPreparationParameterList"></param>
+        ''' <param name="index"></param>
+        ''' <param name="pWashingDataDS"></param>
+        ''' <param name="myGlobalDataTO"></param>
+        ''' <param name="qRCPList"></param>
+        ''' <remarks></remarks>
+        Private Sub SetBottlePositionR1(ByRef myPreparationParameterList As List(Of InstructionParameterTO), ByRef index As Integer, pWashingDataDS As AnalyzerManagerDS,
+                                        ByRef myGlobalDataTO As GlobalDataTO, ByRef qRCPList As List(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow))
+            index += 1
+            Dim myInstructionTO = myPreparationParameterList(index)
+
+            myInstructionTO.ParameterValue = "0" 'AG 09/02/2012
+            If Not pWashingDataDS.nextPreparation(0).IsWashSolution1Null Then
+
+                'Get the solution 1 information by solution code.
+                myGlobalDataTO = New WSRotorContentByPositionDelegate().GetWashingSolutionPosInfoBySolutionCode(Nothing, _
+                                                                                                          pWashingDataDS.nextPreparation(0).WashSolution1)
+                If Not myGlobalDataTO.HasError Then
+                    Dim myWSRotorContentPosDS As New WSRotorContentByPositionDS
+                    myWSRotorContentPosDS = DirectCast(myGlobalDataTO.SetDatos, WSRotorContentByPositionDS)
+                    'Filter deplete position.
+                    'AG 03/08/2011 - Add condition Status <> LOCKED AND (BarcodeStatus IS NULL OR BarcodeStatus <> ‘ERROR’ )
+                    qRCPList = (From a In myWSRotorContentPosDS.twksWSRotorContentByPosition _
+                                Where a.Status <> "DEPLETED" AndAlso a.Status <> "LOCKED" AndAlso (a.IsBarcodeStatusNull OrElse a.BarcodeStatus <> "ERROR") _
+                                Select a).ToList()
+                    If qRCPList.Count > 0 Then
+                        myInstructionTO.ParameterValue = qRCPList.First().CellNumber.ToString()
+                    Else                                    'DL 26/06/2012
+                        myGlobalDataTO.HasError = True      'DL 26/06/2012
+                    End If
+                End If
+            End If
+        End Sub
+
+        ''' <summary>
+        ''' Sets the Bottle Type to the ParameterValue field
+        ''' </summary>
+        ''' <param name="myPreparationParameterList"></param>
+        ''' <param name="index"></param>
+        ''' <param name="qRCPList"></param>
+        ''' <remarks></remarks>
+        Private Sub SetBottleType(ByRef myPreparationParameterList As List(Of InstructionParameterTO), ByRef index As Integer,
+                                  qRCPList As List(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow))
+            index += 1
+            Dim myInstructionTO = myPreparationParameterList(index)
+            'With the previous values on the qRCPList get the BOTTLE Type.
+            If qRCPList.Count > 0 Then
+                myInstructionTO.ParameterValue = GetBottleCode(qRCPList.First().TubeType)
+            Else
+                myInstructionTO.ParameterValue = "0" 'AG 09/02/2012
+            End If
+        End Sub
+
+        ''' <summary>
+        ''' Sets the Bottle rack type to the ParameterValue field
+        ''' </summary>
+        ''' <param name="myPreparationParameterList"></param>
+        ''' <param name="index"></param>
+        ''' <remarks></remarks>
+        Private Sub SetBottleRackType(ByRef myPreparationParameterList As List(Of InstructionParameterTO), ByRef index As Integer)
+            index += 1
+            Dim myInstructionTO = myPreparationParameterList(index)
+            myInstructionTO.ParameterValue = "1" 'Type 1 (Original)
+        End Sub
+
+        ''' <summary>
+        ''' Sets the bottle position for the R2 reagent, to the ParameterValue field.
+        ''' </summary>
+        ''' <param name="myPreparationParameterList"></param>
+        ''' <param name="index"></param>
+        ''' <param name="pWashingDataDS"></param>
+        ''' <param name="myGlobalDataTO"></param>
+        ''' <param name="qRCPList"></param>
+        ''' <remarks></remarks>
+        Private Sub SetBottlePositionR2(ByRef myPreparationParameterList As List(Of InstructionParameterTO), ByRef index As Integer, pWashingDataDS As AnalyzerManagerDS,
+                                        ByRef myGlobalDataTO As GlobalDataTO, ByRef qRCPList As List(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow))
+            index += 1
+            Dim myInstructionTO = myPreparationParameterList(index)
+            myInstructionTO.ParameterValue = "0" 'AG 09/02/2012
+            If Not pWashingDataDS.nextPreparation(0).IsWashSolution2Null Then
+                'Get the solution 1 information by solution code.
+                myGlobalDataTO = New WSRotorContentByPositionDelegate().GetWashingSolutionPosInfoBySolutionCode(Nothing, _
+                                                                     pWashingDataDS.nextPreparation(0).WashSolution2)
+                If Not myGlobalDataTO.HasError Then
+                    Dim myWSRotorContentPosDS As New WSRotorContentByPositionDS
+                    myWSRotorContentPosDS = DirectCast(myGlobalDataTO.SetDatos, WSRotorContentByPositionDS)
+                    'Filter deplete position
+                    'AG 03/08/2011 - Add condition Status <> LOCKED AND (BarcodeStatus IS NULL OR BarcodeStatus <> ‘ERROR’ )
+                    qRCPList = (From a In myWSRotorContentPosDS.twksWSRotorContentByPosition _
+                                Where a.Status <> "DEPLETED" AndAlso a.Status <> "LOCKED" AndAlso (a.IsBarcodeStatusNull OrElse a.BarcodeStatus <> "ERROR") _
+                                Select a).ToList()
+
+                    If qRCPList.Count > 0 Then
+                        myInstructionTO.ParameterValue = qRCPList.First().CellNumber.ToString()
+                    Else                                    'DL 26/06/2012
+                        myGlobalDataTO.HasError = True      'DL 26/06/2012
+                    End If
+                End If
+            End If
+        End Sub
     End Class
 
 End Namespace

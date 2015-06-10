@@ -158,6 +158,8 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
 
         Private Sub WriteLog()
 
+            Dim debugLogger As DebugLogger = New DebugLogger()
+
             DebugLogger.AddLog(" --------------------------------------------", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
             DebugLogger.AddLog(" Update Version: Generated Update Pack (INI)", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
             DebugLogger.AddLog(String.Format(" From Version: {0}  Common Revision: {1} Data Revision: {2} To Version: {3}", FromVersion, FromCommonRevisionNumber, FromDataRevisionNumber, ToVersion), GlobalBase.UpdateVersionDatabaseProcessLogFileName)

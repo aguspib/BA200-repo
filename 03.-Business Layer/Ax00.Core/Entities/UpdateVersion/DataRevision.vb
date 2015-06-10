@@ -46,12 +46,13 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
 
         Public Sub WriteLog()
 
+            Dim debugLogger As DebugLogger = New DebugLogger()
             Dim content As New StringBuilder()
 
             content.AppendLine(String.Format(" Data Revision JiraId: {0} RevisionNumber: {1}", JiraId, RevisionNumber))
             content.AppendLine(String.Format("      DataScript: {0}", DataScript))
 
-            DebugLogger.AddLog(content.ToString(), GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+            debugLogger.AddLog(content.ToString(), GlobalBase.UpdateVersionDatabaseProcessLogFileName)
 
         End Sub
 

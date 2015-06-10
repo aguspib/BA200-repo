@@ -362,8 +362,7 @@ Namespace Biosystems.Ax00.BL
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim mytwksWSExecutionsDAO As New twksWSExecutionsDAO
-                        resultData = mytwksWSExecutionsDAO.GetExecution(dbConnection, pExecutionID, pAnalyzerID, pWorkSessionID)
+                        resultData = twksWSExecutionsDAO.GetExecution(dbConnection, pExecutionID, pAnalyzerID, pWorkSessionID)
                     End If
                 End If
             Catch ex As Exception
@@ -1010,136 +1009,14 @@ Namespace Biosystems.Ax00.BL
             Return resultData
         End Function
 
-        ''' <summary>
-        ''' Only for biochemistry tests!!!
-        ''' Calculates the Contamination Number of an Executions group
-        ''' LOW Contaminations (system liquid) -> Persistance contamination cycles: 1
-        ''' HIHG Contaminations (wash bottle) -> Persistance contamination cycles: 2
-        ''' </summary>
-        ''' <param name="pContaminationsDS" ></param>
-        ''' <param name="pExecutions">List of Order Tests</param>
-        ''' <param name="pHighContaminationPersistance" ></param>
-        ''' <returns>
-        ''' Returns the Contamination Number
-        ''' </returns>
-        ''' <remarks>
-        ''' Created by: RH - 10/06/2010
-        ''' AG 16/09/2011 - Add clause (AndAlso pExecutions(myIndex).ExecutionStatus = "PENDING" AndAlso AndAlso pExecutions(myIndex + 1).ExecutionStatus = "PENDING")
-        '''                 due the pending and locked executions are grouped by sample
-        ''' AG 25/11/2011 - add the high contamination persistance functionality
-        ''' AG 15/12/2011 - define as public to use it in SearchNextPreparation process
-        ''' </remarks>
+        
+        <Obsolete("Contamination number needs to deppend on analyzer and contaminations specification model. Don't use this!")>
         Public Shared Function GetContaminationNumber(ByVal pContaminationsDS As ContaminationsDS, _
                                                 ByVal pExecutions As IEnumerable(Of ExecutionsDS.twksWSExecutionsRow), _
                                                 Optional ByVal pHighContaminationPersistance As Integer = 0) As Integer
 
-            Dim ContaminationNumber As Integer = 0
-            Dim myIndex As Integer
+            Return WSCreator.GetContaminationNumber(False, New List(Of Integer)(), pExecutions)
 
-            For i As Integer = 0 To pExecutions.Count - 2
-                myIndex = i
-
-                'AG 16/09/2011
-                'Dim contaminations = (From wse In pContaminationsDS.tparContaminations _
-                '                      Where wse.ReagentContaminatorID = pExecutions(myIndex).ReagentID _
-                '                        AndAlso wse.ReagentContaminatedID = pExecutions(myIndex + 1).ReagentID _
-                '                      Select wse).ToList()
-
-                'Search for contamination (LOW or HIGH level contamination)
-                Dim contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                      Where wse.ReagentContaminatorID = pExecutions(myIndex).ReagentID _
-                                        AndAlso wse.ReagentContaminatedID = pExecutions(myIndex + 1).ReagentID _
-                                        AndAlso pExecutions(myIndex).ExecutionStatus = "PENDING" _
-                                        AndAlso pExecutions(myIndex).ExecutionType = "PREP_STD" _
-                                        AndAlso pExecutions(myIndex + 1).ExecutionStatus = "PENDING" _
-                                        AndAlso pExecutions(myIndex + 1).ExecutionType = "PREP_STD" _
-                                      Select wse).ToList()
-                'AG 16/09/2011
-
-                'If contaminations.Count > 0 Then ContaminationNumber += 1
-                If contaminations.Count > 0 Then
-                    ContaminationNumber += 1
-                ElseIf pHighContaminationPersistance > 0 Then
-                    'If not low contaminations exists then evaluate if a high contamination exits (only if optional parameter informed)
-                    'Search for contamination (only HIGH level contamination)
-                    For highIndex As Integer = pHighContaminationPersistance - 1 To 1
-                        Dim auxHighIndex = highIndex
-                        If (myIndex - auxHighIndex) >= 0 Then 'Avoid overflow
-                            contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                              Where wse.ReagentContaminatorID = pExecutions(myIndex - auxHighIndex).ReagentID _
-                                              AndAlso wse.ReagentContaminatedID = pExecutions(myIndex + 1).ReagentID _
-                                              AndAlso Not wse.IsWashingSolutionR1Null _
-                                              AndAlso pExecutions(myIndex - auxHighIndex).ExecutionStatus = "PENDING" _
-                                              AndAlso pExecutions(myIndex - auxHighIndex).ExecutionType = "PREP_STD" _
-                                              AndAlso pExecutions(myIndex + 1).ExecutionStatus = "PENDING" _
-                                              AndAlso pExecutions(myIndex + 1).ExecutionType = "PREP_STD" _
-                                              Select wse).ToList()
-                            If contaminations.Count > 0 Then
-                                ContaminationNumber += 1
-                                Exit For
-                            End If
-                        End If
-                    Next
-
-                End If
-
-            Next i
-
-            Return ContaminationNumber
-        End Function
-
-        ''' <summary>
-        ''' Gets the list of Execution's Element groups sorted by ReadingCycle.
-        ''' </summary>
-        ''' <param name="pExecutions">Dataset with structure of view vwksWSExecutions</param>
-        ''' <returns>
-        ''' GlobalDataTo indicating if an error has occurred or not.
-        ''' If succeed, returns an ExecutionsDS dataset with the sorted data (view vwksWSExecutions)
-        ''' </returns>
-        ''' <remarks>
-        ''' Created by: RH - 08/06/2010
-        ''' </remarks>
-        Public Function SortWSExecutionsByElementGroupTime(ByVal pExecutions As ExecutionsDS) As GlobalDataTO
-            Dim resultData As New GlobalDataTO
-            Dim returnDS As New ExecutionsDS
-
-            Try
-                Dim qOrders As List(Of ExecutionsDS.twksWSExecutionsRow)
-                Dim Index = 0
-
-                While Index < pExecutions.twksWSExecutions.Rows.Count
-                    Dim StatFlag = pExecutions.twksWSExecutions(Index).StatFlag
-                    Dim SampleClass = pExecutions.twksWSExecutions(Index).SampleClass
-
-                    qOrders = (From wse In pExecutions.twksWSExecutions _
-                           Where wse.StatFlag = StatFlag AndAlso wse.SampleClass = SampleClass _
-                           Select wse).ToList()
-
-                    Index += qOrders.Count
-
-                    If SampleClass <> "PATIENT" Then
-                        SortByExecutionTime(qOrders, returnDS)
-                    Else
-                        'When SampleClass = 'PATIENT' do not sort
-                        For Each wse In qOrders
-                            returnDS.twksWSExecutions.ImportRow(wse)
-                        Next
-                    End If
-                End While
-
-                qOrders = Nothing 'AG 19/02/2014 - #1514
-                resultData.SetDatos = returnDS
-
-            Catch ex As Exception
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
-                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.SortWSExecutionsByElementGroupTime", EventLogEntryType.Error, False)
-
-            End Try
-            Return resultData
         End Function
 
         ''' <summary>
@@ -1724,121 +1601,6 @@ Namespace Biosystems.Ax00.BL
             Return resultData
         End Function
 
-        ''' <summary>
-        ''' Get the PENDING executions and calculate the next ISE test for send
-        ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pAnalyzerID"></param>
-        ''' <param name="pWorkSessionID"></param>
-        ''' <returns>Integer inside a GlobalDataTO</returns>
-        ''' <remarks>AG 18/01/2011</remarks>
-        Public Function GetNextPendingISEPatientExecution(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-                              ByVal pWorkSessionID As String) As GlobalDataTO
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
-            Dim iseExecutionID As Integer = GlobalConstants.NO_PENDING_PREPARATION_FOUND
-
-            Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then '(1)
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-
-                    If (Not dbConnection Is Nothing) Then '(2)
-                        Dim myDAO As New twksWSExecutionsDAO
-
-                        'AG 30/11/2011 - get all pending executions (std and ise)
-                        'resultData = myDAO.GetPendingPatientExecutions(dbConnection, pAnalyzerID, pWorkSessionID)
-                        resultData = myDAO.GetPendingExecutionForSendNextProcess(dbConnection, pAnalyzerID, pWorkSessionID, False)
-
-                        If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then '(3)
-                            Dim myExDS As New ExecutionsDS
-                            myExDS = CType(resultData.SetDatos, ExecutionsDS)
-                            If myExDS.twksWSExecutions.Rows.Count > 0 Then '(4)
-
-                                'Check if there are some PREP_ISE pending
-                                Dim iseResLinq As List(Of ExecutionsDS.twksWSExecutionsRow) = _
-                                (From a In myExDS.twksWSExecutions Where a.ExecutionType = "PREP_ISE" _
-                                 Select a).ToList
-
-                                If iseResLinq.Count > 0 Then
-                                    iseExecutionID = iseResLinq(0).ExecutionID
-
-                                    'AG 30/11/2011 - ISE tests are the first preparations when a patient starts but they has lower priority over blanks, calibrator and controls
-                                    If iseExecutionID <> GlobalConstants.NO_PENDING_PREPARATION_FOUND Then
-                                        Dim myStatFlag As Boolean = False
-                                        If Not iseResLinq(0).IsStatFlagNull Then myStatFlag = iseResLinq(0).StatFlag
-
-                                        'Search if exists some BLANK or CALIBRATOR or CONTROL pending execution with the same or higher Stat level and with executionID < iseExecutionID
-                                        'if found then iseExecutionID has to wait, it is not his moment. Assign iseExecutionID = GlobalConstants.NO_PENDING_PREPARATION_FOUND
-                                        Dim noPatientPreviousExecutions As List(Of ExecutionsDS.twksWSExecutionsRow)
-                                        If myStatFlag Then
-                                            noPatientPreviousExecutions = (From a In myExDS.twksWSExecutions Where a.StatFlag = myStatFlag AndAlso a.SampleClass <> "PATIENT" _
-                                                                           AndAlso a.ExecutionID < iseExecutionID Select a).ToList
-                                        Else
-                                            noPatientPreviousExecutions = (From a In myExDS.twksWSExecutions Where a.SampleClass <> "PATIENT" _
-                                                                           AndAlso a.ExecutionID < iseExecutionID Select a).ToList
-                                        End If
-
-                                        If noPatientPreviousExecutions.Count > 0 Then
-                                            iseExecutionID = GlobalConstants.NO_PENDING_PREPARATION_FOUND
-                                        End If
-                                        noPatientPreviousExecutions = Nothing
-                                    End If
-                                    'AG 30/11/2011
-
-                                    'If the first PATIENT execution in myExDS has the same OrderID OR SampleType that the found ISE execution ... send the ISE
-                                    'otherwise Sw has to finish the previous patient - sample type before send ISE
-                                    If iseExecutionID <> GlobalConstants.NO_PENDING_PREPARATION_FOUND Then
-                                        Dim myOrderID As String = ""
-                                        Dim mySampleType As String = ""
-
-                                        If Not iseResLinq(0).IsOrderIDNull AndAlso Not iseResLinq(0).IsSampleTypeNull Then
-                                            myOrderID = iseResLinq(0).OrderID
-                                            mySampleType = iseResLinq(0).SampleType
-                                        End If
-
-                                        Dim patientResLinq As List(Of ExecutionsDS.twksWSExecutionsRow) = (From a In myExDS.twksWSExecutions Where a.SampleClass = "PATIENT" _
-                                                                                                          Select a).ToList
-                                        If patientResLinq.Count > 0 Then
-                                            If patientResLinq(0).ExecutionID <> iseExecutionID Then
-                                                If Not patientResLinq(0).IsOrderIDNull AndAlso Not patientResLinq(0).IsSampleTypeNull Then
-
-                                                    If patientResLinq(0).OrderID <> myOrderID OrElse patientResLinq(0).SampleType <> mySampleType Then
-                                                        iseExecutionID = GlobalConstants.NO_PENDING_PREPARATION_FOUND
-                                                    End If 'If patientResLinq(0).OrderID <> myOrderID OrElse patientResLinq(0).SampleType <> mySampleType Then
-
-                                                End If 'If Not patientResLinq(0).IsOrderIDNull AndAlso Not patientResLinq(0).IsSampleTypeNull Then
-                                            End If 'If patientResLinq(0).ExecutionID <> iseExecutionID Then
-                                        End If
-                                        patientResLinq = Nothing
-                                    End If
-
-
-                                End If 'If iseResLinq.Count > 0 Then
-                                iseResLinq = Nothing
-
-                            End If 'If myExDS.twksWSExecutions.Rows.Count > 0 Then '(4)
-                        End If 'If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then '(3)
-
-                    End If 'If (Not dbConnection Is Nothing) Then '(2)
-                End If 'If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then '(1)
-
-                resultData.SetDatos = iseExecutionID
-
-            Catch ex As Exception
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetNextPendingISEPatientExecution", EventLogEntryType.Error, False)
-
-            Finally
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-            Return resultData
-        End Function
-
 
         ''' <summary>
         ''' Get the PENDING executions and calculate the next ISE test for send
@@ -1849,7 +1611,7 @@ Namespace Biosystems.Ax00.BL
         ''' <returns>Integer inside a GlobalDataTO</returns>
         ''' <remarks>AG 18/01/2011
         ''' AG 11/07/2012 - adapted for control ise (copied and adapted from GetNextPendingISEPatientExecution)</remarks>
-        Public Function GetNextPendingISEExecutionNEW(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+        Public Function GetNextPendingISEExecution(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                               ByVal pWorkSessionID As String) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
@@ -1978,153 +1740,6 @@ Namespace Biosystems.Ax00.BL
             Return resultData
         End Function
 
-
-        ''' <summary>
-        ''' Get the PENDING executions and calculate the next ISE test for send
-        ''' Based on previous GetNextPendingISEPatientExecution()
-        ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pAnalyzerID"></param>
-        ''' <param name="pWorkSessionID"></param>
-        ''' <returns>An ExecutionsDS inside a GlobalDataTO with the data found</returns>
-        ''' <remarks>
-        ''' Created by: RH 26/06/2012
-        ''' AG 11/07/2012 create a new versionGetNextPendingISEExecutionNEW 
-        ''' </remarks>
-        Public Function GetNextPendingISEExecution(ByVal pDBConnection As SqlClient.SqlConnection, _
-                                                   ByVal pAnalyzerID As String, _
-                                                   ByVal pWorkSessionID As String) As GlobalDataTO
-
-            Dim resultData As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
-            Dim iseExecutionID As Integer = GlobalConstants.NO_PENDING_PREPARATION_FOUND
-            Dim returnDS As New ExecutionsDS
-
-            Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-
-                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then '(1)
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-
-                    If (Not dbConnection Is Nothing) Then '(2)
-                        Dim myDAO As New twksWSExecutionsDAO
-
-                        'AG 30/11/2011 - get all pending executions (std and ise)
-                        'resultData = myDAO.GetPendingPatientExecutions(dbConnection, pAnalyzerID, pWorkSessionID)
-                        resultData = myDAO.GetPendingExecutionForSendNextProcess(dbConnection, pAnalyzerID, pWorkSessionID, False)
-
-                        If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then '(3)
-                            Dim myExDS As ExecutionsDS
-                            myExDS = CType(resultData.SetDatos, ExecutionsDS)
-
-                            If myExDS.twksWSExecutions.Rows.Count > 0 Then '(4)
-
-                                'Check if there are some PREP_ISE pending
-                                Dim iseResLinq As List(Of ExecutionsDS.twksWSExecutionsRow)
-                                iseResLinq = (From a In myExDS.twksWSExecutions _
-                                              Where a.ExecutionType = "PREP_ISE" _
-                                              Select a).ToList()
-
-                                If iseResLinq.Count > 0 Then
-                                    iseExecutionID = iseResLinq(0).ExecutionID
-                                    returnDS.twksWSExecutions.ImportRow(iseResLinq(0))
-
-                                    'AG 30/11/2011 - ISE tests are the first preparations when a patient starts but they has lower priority over blanks and calibrator
-                                    If iseExecutionID <> GlobalConstants.NO_PENDING_PREPARATION_FOUND Then
-                                        Dim myStatFlag As Boolean = False
-
-                                        If Not iseResLinq(0).IsStatFlagNull Then myStatFlag = iseResLinq(0).StatFlag
-
-                                        'Search if exists some BLANK or CALIBRATOR pending execution with the same or higher Stat level and with executionID < iseExecutionID
-                                        'if found then iseExecutionID has to wait, it is not the moment to go. Assign iseExecutionID = GlobalConstants.NO_PENDING_PREPARATION_FOUND
-                                        Dim noPatientPreviousExecutions As List(Of ExecutionsDS.twksWSExecutionsRow)
-
-                                        If myStatFlag Then
-                                            noPatientPreviousExecutions = (From a In myExDS.twksWSExecutions _
-                                                                           Where a.StatFlag = myStatFlag _
-                                                                           AndAlso a.SampleClass <> "PATIENT" _
-                                                                           AndAlso a.SampleClass <> "CTRL" _
-                                                                           AndAlso a.ExecutionID < iseExecutionID _
-                                                                           Select a).ToList()
-                                        Else
-                                            noPatientPreviousExecutions = (From a In myExDS.twksWSExecutions _
-                                                                           Where a.SampleClass <> "PATIENT" _
-                                                                           AndAlso a.SampleClass <> "CTRL" _
-                                                                           AndAlso a.ExecutionID < iseExecutionID _
-                                                                           Select a).ToList()
-                                        End If
-
-                                        If noPatientPreviousExecutions.Count > 0 Then
-                                            iseExecutionID = GlobalConstants.NO_PENDING_PREPARATION_FOUND
-                                            returnDS.twksWSExecutions.Clear()
-                                        End If
-
-                                        noPatientPreviousExecutions = Nothing
-                                    End If
-                                    'AG 30/11/2011
-
-                                    'If the first PATIENT or CONTROL execution in myExDS has the same OrderID OR SampleType that the found ISE execution ... send the ISE
-                                    'otherwise Sw has to finish the previous patient/control - sample type before send ISE
-                                    If iseExecutionID <> GlobalConstants.NO_PENDING_PREPARATION_FOUND Then
-                                        Dim myOrderID As String = ""
-                                        Dim mySampleType As String = ""
-
-                                        If Not iseResLinq(0).IsOrderIDNull AndAlso Not iseResLinq(0).IsSampleTypeNull Then
-                                            myOrderID = iseResLinq(0).OrderID
-                                            mySampleType = iseResLinq(0).SampleType
-                                        End If
-
-                                        Dim patientResLinq As List(Of ExecutionsDS.twksWSExecutionsRow)
-                                        patientResLinq = (From a In myExDS.twksWSExecutions _
-                                                          Where a.SampleClass = "PATIENT" _
-                                                          OrElse a.SampleClass = "CTRL" _
-                                                          Select a).ToList()
-
-                                        If patientResLinq.Count > 0 Then
-                                            If patientResLinq(0).ExecutionID <> iseExecutionID Then
-                                                If Not patientResLinq(0).IsOrderIDNull AndAlso Not patientResLinq(0).IsSampleTypeNull Then
-
-                                                    If patientResLinq(0).OrderID <> myOrderID OrElse patientResLinq(0).SampleType <> mySampleType Then
-                                                        iseExecutionID = GlobalConstants.NO_PENDING_PREPARATION_FOUND
-                                                        returnDS.twksWSExecutions.Clear()
-                                                    End If
-
-                                                End If
-                                            End If
-                                        End If
-
-                                        patientResLinq = Nothing
-                                    End If
-
-                                End If
-
-                                iseResLinq = Nothing
-
-                            End If
-                        End If
-
-                    End If
-                End If
-
-                resultData.SetDatos = returnDS
-
-            Catch ex As Exception
-                resultData = New GlobalDataTO()
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
-                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetNextPendingISEExecution", EventLogEntryType.Error, False)
-
-            Finally
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-
-            End Try
-
-            Return resultData
-        End Function
-
         ''' <summary>
         ''' Returns additonal information for inform the TEST preparation send and required for apply the send preparation algorithm
         ''' </summary>
@@ -2243,7 +1858,7 @@ Namespace Biosystems.Ax00.BL
 
                         If (pSampleClass = String.Empty) Then
                             'If the parameter is not informed, search the SampleClass of the informed Execution
-                            resultData = myDAO.GetExecution(dbConnection, pExecutionID, pAnalyzerID, pWorkSessionID)
+                            resultData = twksWSExecutionsDAO.GetExecution(dbConnection, pExecutionID, pAnalyzerID, pWorkSessionID)
                             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                                 pSampleClass = DirectCast(resultData.SetDatos, ExecutionsDS).twksWSExecutions.First.SampleClass
                             End If
@@ -3177,7 +2792,7 @@ Namespace Biosystems.Ax00.BL
                         'AG 24/04/2012 - check if is a special test (calib HbTotal)
                         'resultData = myDAO.GetElementInfoByExecutionID(dbConnection, pAnalyzerID, pWorkSessionID, pExecutionID, pAlsoReagentElementInfo)
                         Dim myRealMultiItemNumber As Integer = -1 'Only used for special test calibrators (HbTotal)
-                        resultData = myDAO.GetExecution(dbConnection, pExecutionID)
+                        resultData = twksWSExecutionsDAO.GetExecution(dbConnection, pExecutionID)
                         If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                             Dim wsExecDS As New ExecutionsDS
                             wsExecDS = CType(resultData.SetDatos, ExecutionsDS)
@@ -4168,163 +3783,6 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
-        ''' For the specified Test and SampleType, verify the type of the needed Calibrator and if it is  locked or not:
-        ''' ** If CalibratorType = EXPERIMENTAL, verify if the Calibrator defined for the Test and SampleType is locked
-        ''' ** If CalibratorType = FACTOR, returns the Calibrator is unlocked 
-        ''' ** If CalibratorType = ALTERNATIVE:
-        '''       If the Calibrator needed for the Test and the Alternative SampleType is EXPERIMENTAL, verify if it is locked 
-        '''       If the Calibrator needed for the Test and the Alternative SampleType is FACTOR, returns that it is unlocked 
-        ''' </summary>
-        ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pWorkSessionID">Work Session Identifier</param>
-        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
-        ''' <param name="pTestID">Test Identifier</param>
-        ''' <param name="pSampleType">Sample Type Code</param>
-        ''' <param name="pAlternativeST">When the Calibrator needed for the specified Test and SampleType is an Alternative one,
-        '''                              the Alternative SampleType is returned in this parameter. Optional parameter needed only
-        '''                              when the verification is done to set the status of Executions for Patient Samples</param>
-        ''' <returns>GlobalDataTO containing a boolean value: True if the Calibrator needed for the specified Test and 
-        '''          SampleType is locked; otherwise, False</returns>
-        ''' <remarks>
-        ''' Created by:  SA 10/05/2010
-        ''' Modified by: SA 01/09/2010 - Before verify if the needed Calibrator is positioned in the Analyzer Rotor, verify if it
-        '''                              has to be executed in the active WS or if a previous result will be used; in case of reusing
-        '''                              a result, it is not needed verifying if the Calibrator is positioned                            
-        ''' </remarks>
-        Private Function VerifyLockedCalibrator(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, ByVal pAnalyzerID As String, _
-                                                ByVal pTestID As Integer, ByVal pSampleType As String, Optional ByRef pAlternativeST As String = "") As GlobalDataTO
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
-            Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        '...Verify the type of Calibrator required for the Test and SampleType
-                        Dim sampleTypeToVerify As String = ""
-                        Dim verifyCalibLocked As Boolean = False
-                        Dim myTestCalibratorDelegate As New TestCalibratorsDelegate
-
-                        resultData = myTestCalibratorDelegate.GetTestCalibratorData(dbConnection, pTestID, pSampleType)
-                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                            Dim myTestSampleCalibratorDS As TestSampleCalibratorDS
-                            myTestSampleCalibratorDS = DirectCast(resultData.SetDatos, TestSampleCalibratorDS)
-
-                            If (myTestSampleCalibratorDS.tparTestCalibrators.Rows.Count = 1) Then
-                                verifyCalibLocked = (myTestSampleCalibratorDS.tparTestCalibrators(0).CalibratorType = "EXPERIMENT")
-                                sampleTypeToVerify = pSampleType
-                            ElseIf (myTestSampleCalibratorDS.tparTestCalibrators.Rows.Count > 1) Then
-                                'Calibrator is Alternative...verify if the SampleType Alternative needs an Experimental Calibrator
-                                verifyCalibLocked = (myTestSampleCalibratorDS.tparTestCalibrators(0).CalibratorType = "EXPERIMENT")
-                                sampleTypeToVerify = myTestSampleCalibratorDS.tparTestCalibrators(0).SampleType
-
-                                'Set value of the parameter used to return the Alternative SampleType
-                                pAlternativeST = myTestSampleCalibratorDS.tparTestCalibrators(0).SampleType
-                            End If
-
-                            '...If the Calibrator needed is Experimental, first verify it has to be executed in the current WorkSession
-                            '(if a previous result was selected to be used it is not needed verify if the Calibrator is positioned)
-                            Dim reqElemNoPos As Boolean = False
-                            If (verifyCalibLocked) Then
-                                Dim myWSOrderTestsDelegate As New WSOrderTestsDelegate
-                                resultData = myWSOrderTestsDelegate.VerifyToSendFlag(dbConnection, pAnalyzerID, pWorkSessionID, "CALIB", _
-                                                                                     pTestID, sampleTypeToVerify)
-                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                    verifyCalibLocked = Convert.ToBoolean(resultData.SetDatos)
-
-                                    '...If the Calibrator needed is Experimental and has to be executed,then verify if it is Locked
-                                    If (verifyCalibLocked) Then
-                                        Dim myExecutionsDAO As New twksWSExecutionsDAO
-                                        resultData = myExecutionsDAO.VerifyUnlockedExecution(dbConnection, pAnalyzerID, pWorkSessionID, "CALIB", _
-                                                                                             pTestID, sampleTypeToVerify)
-                                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                            reqElemNoPos = (Not Convert.ToBoolean(resultData.SetDatos))
-                                        End If
-                                    End If
-                                End If
-                            End If
-
-                            If (Not resultData.HasError) Then resultData.SetDatos = reqElemNoPos
-                        End If
-                    End If
-                End If
-            Catch ex As Exception
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.VerifyLockedCalibrator", EventLogEntryType.Error, False)
-            Finally
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-            Return resultData
-        End Function
-
-        ''' <summary>
-        ''' For the specified Test and SampleType, verify if it is required or not
-        ''' When required verify if it is locked or not:
-        ''' </summary>
-        ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pWorkSessionID">Work Session Identifier</param>
-        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
-        ''' <param name="pTestID">Test Identifier</param>
-        ''' <param name="pSampleType">Sample Type Code</param>
-        ''' <returns>GlobalDataTO containing a boolean value: True if the Calibrator needed for the specified Test and 
-        '''          SampleType is locked; otherwise, False</returns>
-        ''' <remarks>
-        ''' Created by:  AG 20/04/2012 - Based on VerifyLockedCalibrator
-        ''' </remarks>
-        Private Function VerifyLockedBlank(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, ByVal pAnalyzerID As String, _
-                                                ByVal pTestID As Integer, ByVal pSampleType As String) As GlobalDataTO
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
-            Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-
-                        Dim verifyBlankLocked As Boolean = False
-
-                        '...BLANK, first verify it has to be executed in the current WorkSession
-                        '(if a previous result was selected to be used it is not needed verify if the Blank is positioned)
-                        Dim reqElemNoPos As Boolean = False
-                        Dim myWSOrderTestsDelegate As New WSOrderTestsDelegate
-                        resultData = myWSOrderTestsDelegate.VerifyToSendFlag(dbConnection, pAnalyzerID, pWorkSessionID, "BLANK", _
-                                                                             pTestID, pSampleType)
-                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                            verifyBlankLocked = Convert.ToBoolean(resultData.SetDatos)
-
-                            '...If the Calibrator needed is Experimental and has to be executed,then verify if it is Locked
-                            If (verifyBlankLocked) Then
-                                Dim myExecutionsDAO As New twksWSExecutionsDAO
-                                resultData = myExecutionsDAO.VerifyUnlockedExecution(dbConnection, pAnalyzerID, pWorkSessionID, "BLANK", _
-                                                                                     pTestID, pSampleType)
-                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                    reqElemNoPos = (Not Convert.ToBoolean(resultData.SetDatos))
-                                End If
-                            End If
-                        End If
-
-                        If (Not resultData.HasError) Then resultData.SetDatos = reqElemNoPos
-                    End If
-                End If
-
-            Catch ex As Exception
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.VerifyLockedBlank", EventLogEntryType.Error, False)
-            Finally
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-            Return resultData
-        End Function
-
-        ''' <summary>
         ''' When a new repetition (manual or automatic) is become to be generated we inform the executions with the 
         ''' postdilution type they are generated
         ''' 
@@ -4998,934 +4456,6 @@ Namespace Biosystems.Ax00.BL
 #Region "CREATE EXECUTIONS - NEW 19-03-2014"
 
         ''' <summary>
-        ''' Create all Executions for the specified Analyzer WorkSession
-        ''' (Divide into multiple transactions instead of a unique one) - Avoiding deadlocks
-        ''' </summary>
-        ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
-        ''' <param name="pWorkSessionID">WorkSession Identifier</param>
-        ''' <param name="pWorkInRunningMode">When True, indicates the Analyzer is connected and running a WorkSession</param>
-        ''' <param name="pOrderTestID">Identifier of the Order Test for which a Rerun has been requested. Optional parameter</param>
-        ''' <param name="pPostDilutionType">Type of post Dilution to apply when a Rerun has been requested. Optional parameter</param>
-        ''' <param name="pIsISEModuleReady">Flag indicating if the ISE Module is ready to be used. Optional parameter</param>
-        ''' <param name="pISEElectrodesList">String list containing ISE Electrodes (ISE_ResultID) with wrong/pending calibration</param>
-        ''' <param name="pPauseMode"></param>
-        ''' <param name="pManualRerunFlag">Always TRUE except when autoreruns are triggered</param>
-        ''' <returns>GlobalDataTO containing success/error information</returns>
-        ''' <remarks>
-        ''' Created by:  SA 09/02/2011
-        ''' Modified by: TR 29/08/2011 - Declarations inside loops have been removed an put outside them to improve the memory use
-        '''              AG 15/09/2011 - NO different executions tables: Pending Table + Locked Table: only one table with executions 
-        '''                              grouped by patient (pending, locked)
-        '''              AG 19/09/2011 - Added new parameter pWorkInRunningMode
-        '''              SA 09/11/2011 - For Patient Samples, inform ElementID = CreationOrder (from allOrderTestsDS)
-        '''              SA 31/01/2012 - When function is called to manage creation of Executions of a requested Rerun (an OrderTestID is specified)
-        '''                              do not update the status of the related Rotor Positions, due to that process is done in function 
-        '''                              Manage Repetitions in RepetitionsDelegate Class
-        '''              SA 08/02/2012 - Do not update the status of cells in Samples Rotor containing tubes marked as DEPLETED or with FEW volume
-        '''              SA 31/05/2012 - Changed the way of searching and deleting PENDING or LOCKED executions
-        '''              SA 20/06/2012 - Lock of Controls due to locked needed Blanks or Calibrators is applied only for STD preparations 
-        '''                            - Removed filter by TestType=STD when searching STAT Patient request; instead of it, get all different 
-        '''                              TestType/TestID/SampleType requested for STAT and filter by each specific TestType when searching the 
-        '''                              needed Blanks, Calibrators and Controls to mark them as STAT 
-        '''              SA 26/07/2012 - Added optional parameter to indicate if the ISE Module is ready to be used; when it is not ready, the status 
-        '''                              of all pending ISE Executions is changed to LOCKED
-        '''              SA 31/07/2012 - When the function is called in STANDBY (pWorkInRunningMode = False), before deleting affected Executions, delete 
-        '''                              their Readings (to avoid System Error due to violation of FK when delete records in twksWSExecutions)
-        '''              SA 07/09/2012 - Added optional parameter pISEElectrodesList to inform the list of ISE Electrodes with wrong/pending calibration. 
-        '''                              When this parameter is informed, all Executions for the ISE Tests contained in the list will be locked
-        '''              AG 25/03/2013 - Before modify the current executions table get those ordertests locked by LIS
-        '''                              After generate the new executions set ExecutionStatus = LOCKED and LockedByLIS = True for the executions of these ordertests
-        '''              AG 19/02/2014 - #1514 improvements memory app/sql
-        '''              AG 19/03/2014 - #1545 (adapt the CreateWSExecutions active until 19/03/2014 and adapt it for use multiples)
-        '''                              New method does not open transaction, dbConnection is nothing unless it has been received from parameter
-        '''              AG 30/05/2014 - #1584 new parameter pPauseMode (for recalculate status for executions LOCKED and also PENDING)!!! (in normal running only the LOCKED are recalculated)
-        '''              AG 02/06/2014 - #1644 new optional parameter pManualRerunFlag (when FALSE Software cannot use the semaphore because it has been set to busy when ANSPHR started to be processed)
-        ''' </remarks> 
-        Public Function CreateWSExecutionsMultipleTransactions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
-                                           ByVal pWorkInRunningMode As Boolean, Optional ByVal pOrderTestID As Integer = -1, _
-                                           Optional ByVal pPostDilutionType As String = "", Optional ByVal pIsISEModuleReady As Boolean = False, _
-                                           Optional ByVal pISEElectrodesList As List(Of String) = Nothing, Optional ByVal pPauseMode As Boolean = False, _
-                                           Optional ByVal pManualRerunFlag As Boolean = True) As GlobalDataTO
-            Dim resultData As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
-
-            Try
-                '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                Dim StartTime As DateTime = Now
-                'Dim myLogAcciones As New ApplicationLogManager()
-                '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-
-                'AG 02/06/2014 #1644 - Set the semaphore to busy value (EXCEPT when called from auto rerun business)
-                If GlobalConstants.CreateWSExecutionsWithSemaphore AndAlso pManualRerunFlag Then
-                    GlobalBase.CreateLogActivity("CreateWSExecutions semaphore: Waiting (timeout = " & GlobalConstants.SEMAPHORE_TOUT_CREATE_EXECUTIONS.ToString & ")", "AnalyzerManager.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
-                    GlobalSemaphores.createWSExecutionsSemaphore.WaitOne(GlobalConstants.SEMAPHORE_TOUT_CREATE_EXECUTIONS)
-                    GlobalSemaphores.createWSExecutionsQueue = 1 'Only 1 thread is allowed, so set to 1 instead of increment ++1 'GlobalSemaphores.createWSExecutionsQueue += 1
-                    GlobalBase.CreateLogActivity("CreateWSExecutions semaphore: Passed through, semaphore busy", "AnalyzerManager.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
-                End If
-
-                'AG 19/03/2014 - #1545 - Do not open transaction, use the parameter as connection
-                'resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
-                'If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                '    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-                '    If (Not dbConnection Is Nothing) Then
-                dbConnection = pDBConnection
-                'AG 19/03/2014 - #1545
-
-                Dim calledForRerun As Boolean = (pOrderTestID <> -1)
-                StartTime = Now '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-
-                'Delete all Executions with status PENDING or LOCKED belonging OrderTests not started!!!
-                'If an OrderTestID is not informed, only Pending and Locked Executions for Rerun=1 are deleted
-                Dim myDAO As New twksWSExecutionsDAO
-
-                'AG 25/03/2013 - Get the current distinct ordertests locked by lis
-                resultData = myDAO.GetOrderTestsLockedByLIS(dbConnection, pAnalyzerID, pWorkSessionID, True)
-                Dim orderTestLockedByLISList As New List(Of Integer)
-                If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-                    For Each row As ExecutionsDS.twksWSExecutionsRow In DirectCast(resultData.SetDatos, ExecutionsDS).twksWSExecutions
-                        If Not row.IsOrderTestIDNull AndAlso Not orderTestLockedByLISList.Contains(row.OrderTestID) Then orderTestLockedByLISList.Add(row.OrderTestID)
-                    Next
-                End If
-                'AG 25/03/2013
-
-                'AJG ADDED BECAUSE THE ANALYZER MODEL IS NEEDED BECAUSE MANAGING CONTAMINATIONS IS ANALYZER DEPENDANT
-                Dim activeAnalyzer As String = GetActiveAnalyzer(dbConnection)
-
-                If (Not pWorkInRunningMode) Then 'AG 19/02/2014 - #1514 note that this parameter value is FALSE when called from create repetitions process!!!
-                    'Search all Order Tests which Executions can be deleted: those having ALL Executions with status PENDING or LOCKED
-                    resultData = myDAO.SearchNotInCourseExecutionsToDelete(dbConnection, pAnalyzerID, pWorkSessionID, pOrderTestID)
-                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                        Dim myOrderTestsToDelete As OrderTestsDS = DirectCast(resultData.SetDatos, OrderTestsDS)
-
-                        If (myOrderTestsToDelete.twksOrderTests.Count > 0) Then
-                            'Delete all Readings of the Executions for all OrderTests returned by the previous called function
-                            Dim myReadingsDelegate As New WSReadingsDelegate
-                            resultData = myReadingsDelegate.DeleteReadingsForNotInCourseExecutions(dbConnection, pAnalyzerID, pWorkSessionID, myOrderTestsToDelete)
-
-                            If (Not resultData.HasError) Then
-                                'AG 19/03/2014 - #1545 call the delegate instead of the DAO (with this action we can use dbConnection = Nothing)
-                                'Delete the Executions for all OrderTests returned by the previous called function
-                                'resultData = myDAO.DeleteNotInCourseExecutionsNEW(dbConnection, pAnalyzerID, pWorkSessionID, myOrderTestsToDelete)
-                                resultData = DeleteNotInCourseExecutionsNEW(dbConnection, pAnalyzerID, pWorkSessionID, myOrderTestsToDelete)
-
-                            End If
-                        End If
-                    End If
-
-                    '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                    GlobalBase.CreateLogActivity("Not RUNNING: Search and Delete NOT IN COURSE " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                                    "ExecutionsDelegate.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
-                    StartTime = Now
-                    '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                End If
-
-                'NEW 19/09/2011 - Lock / Unlock process:
-                'pWorkInRunningMode = FALSE -> Recalculate status for all executions with RerunNumber > 1 with current status is PENDING or LOCKED
-                '                              (note that in this case ALL the PENDING or LOCKED executions with RerunNumber = 1 have been deleted in mehtod DeleteNotInCurseExecutions)
-                '
-                'pWorkInRuuningMode = TRUE ->  Recalculate status for all existing executions with status PENDING or LOCKED
-                'Table twksWSExecutions is updated at this point
-                If (Not calledForRerun) Then
-
-                    'AG 28/05/2014 - #1644 - Do not delete readings here!! They will be removed when the new preparation receives his 1st reading
-                    ''In RUNNING Mode, delete all Readings of all LOCKED Executions 
-                    'Dim myReadingsDelegate As New WSReadingsDelegate
-                    'resultData = myReadingsDelegate.DeleteReadingsForNotInCourseExecutions(dbConnection, pAnalyzerID, pWorkSessionID, Nothing)
-
-                    'AG 30/05/2014 - #1644 new parameter pPauseMode required
-                    resultData = RecalculateStatusForNotDeletedExecutionsNEW(dbConnection, pAnalyzerID, pWorkSessionID, pWorkInRunningMode, pPauseMode)
-
-                    '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                    GlobalBase.CreateLogActivity("Recalculate Status " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                                    "ExecutionsDelegate.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
-                    StartTime = Now
-                    '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                End If
-                'AG 19/09/2011
-
-                'Now we can create executions for all ordertests not started (with no executions in twksWSExecutions table) ... <the initial process>
-                If (Not resultData.HasError) Then
-                    'Get detailed information of all Order Tests to be executed in the WS
-                    Dim allOrderTestsDS As OrderTestsForExecutionsDS
-                    Dim myWSOrderTestsDelegate As New WSOrderTestsDelegate
-
-                    resultData = myWSOrderTestsDelegate.GetInfoOrderTestsForExecutions(dbConnection, pAnalyzerID, pWorkSessionID)
-                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                        allOrderTestsDS = DirectCast(resultData.SetDatos, OrderTestsForExecutionsDS)
-
-                        If (allOrderTestsDS.OrderTestsForExecutionsTable.Rows.Count > 0) Then
-                            'Get all executions for BLANKS included in the WorkSession
-                            Dim myBlankExecutionsDS As New ExecutionsDS
-                            resultData = CreateBlankExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pOrderTestID, pPostDilutionType)
-                            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                myBlankExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
-
-                                Dim myOrderTestID As Integer = -1
-                                Dim blankInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow) = Nothing
-
-                                For Each rowBlank As ExecutionsDS.twksWSExecutionsRow In myBlankExecutionsDS.twksWSExecutions
-                                    If (rowBlank.OrderTestID <> myOrderTestID) Then
-                                        myOrderTestID = rowBlank.OrderTestID
-                                        'Search information for the Blank
-                                        blankInfo = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
-                                                    Where a.OrderTestID = myOrderTestID _
-                                                   Select a).ToList()
-                                    End If
-
-                                    '...and complete fields for the Blank
-                                    If (blankInfo.Count = 1) Then
-                                        rowBlank.BeginEdit()
-                                        rowBlank.TestID = blankInfo(0).TestID
-                                        rowBlank.ReadingCycle = blankInfo(0).ReadingCycle
-                                        rowBlank.ReagentID = blankInfo(0).ReagentID
-                                        rowBlank.OrderID = blankInfo(0).OrderID
-                                        rowBlank.ElementID = NullElementID     'rowBlank.ReagentID 'RH 29/09/2011
-                                        rowBlank.EndEdit()
-                                    End If
-                                Next
-                                myBlankExecutionsDS.AcceptChanges()
-                                blankInfo = Nothing 'AG 19/02/2014 - #1514
-                            End If
-
-                            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                            GlobalBase.CreateLogActivity("Get Executions For BLANKS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                                            "ExecutionsDelegate.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
-                            StartTime = Now
-                            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-
-                            'Get all executions for CALIBRATORS included in the WorkSession
-                            Dim myCalibratorExecutionsDS As ExecutionsDS = Nothing
-
-                            If (Not resultData.HasError) Then
-                                resultData = CreateCalibratorExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pOrderTestID, pPostDilutionType)
-                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                    myCalibratorExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
-
-                                    Dim myOrderTestID As Integer = -1
-                                    Dim calibInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow) = Nothing
-
-                                    For Each rowCalib As ExecutionsDS.twksWSExecutionsRow In myCalibratorExecutionsDS.twksWSExecutions
-                                        'Dim calibInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
-                                        If (rowCalib.OrderTestID <> myOrderTestID) Then
-                                            myOrderTestID = rowCalib.OrderTestID
-                                            'Search information for the Calibrator
-                                            calibInfo = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
-                                                        Where a.OrderTestID = myOrderTestID _
-                                                       Select a).ToList()
-                                        End If
-
-                                        '...and complete fields for the Calibrator
-                                        If (calibInfo.Count = 1) Then
-                                            rowCalib.BeginEdit()
-                                            rowCalib.TestID = calibInfo(0).TestID
-                                            rowCalib.SampleType = calibInfo(0).SampleType
-                                            rowCalib.ReadingCycle = calibInfo(0).ReadingCycle
-                                            rowCalib.ReagentID = calibInfo(0).ReagentID
-                                            rowCalib.OrderID = calibInfo(0).OrderID
-                                            rowCalib.ElementID = calibInfo(0).ElementID
-                                            rowCalib.EndEdit()
-                                        End If
-                                    Next
-                                    myCalibratorExecutionsDS.AcceptChanges()
-                                    calibInfo = Nothing 'AG 19/02/2014 - #1514
-                                End If
-                            End If
-
-                            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                            GlobalBase.CreateLogActivity("Get Executions For CALIBRATORS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                                            "ExecutionsDelegate.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
-                            StartTime = Now
-                            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-
-                            'Get all executions for CONTROLS included in the WorkSession
-                            Dim myControlExecutionsDS As ExecutionsDS = Nothing
-
-                            If (Not resultData.HasError) Then
-                                resultData = CreateControlExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pOrderTestID, pPostDilutionType)
-                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                    myControlExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
-
-                                    Dim myOrderTestID As Integer = -1
-                                    Dim controlInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow) = Nothing
-
-                                    For Each rowControl As ExecutionsDS.twksWSExecutionsRow In myControlExecutionsDS.twksWSExecutions
-                                        'Dim controlInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
-                                        If (rowControl.OrderTestID <> myOrderTestID) Then
-                                            myOrderTestID = rowControl.OrderTestID
-                                            'Search information for the Control
-                                            controlInfo = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
-                                                          Where a.OrderTestID = myOrderTestID _
-                                                         Select a).ToList()
-                                        End If
-
-                                        '...and complete fields for the Control (more than one record is possible when several
-                                        'controls are used for the TestType/Test/Sample Type)
-                                        If (controlInfo.Count >= 1) Then
-                                            rowControl.BeginEdit()
-                                            rowControl.TestID = controlInfo(0).TestID
-                                            rowControl.SampleType = controlInfo(0).SampleType
-                                            rowControl.ReadingCycle = controlInfo(0).ReadingCycle
-                                            rowControl.ReagentID = controlInfo(0).ReagentID
-                                            rowControl.OrderID = controlInfo(0).OrderID
-                                            rowControl.ElementID = controlInfo(0).ElementID
-
-                                            If orderTestLockedByLISList.Contains(rowControl.OrderTestID) Then rowControl.ExecutionStatus = "LOCKED" 'AG 25/03/2013 - Locked by LIS not by volume missing
-                                            rowControl.EndEdit()
-                                        End If
-                                    Next
-                                    controlInfo = Nothing 'AG 19/02/2014 - #1514
-                                End If
-                            End If
-
-                            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                            GlobalBase.CreateLogActivity("Get Executions For CONTROLS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                                            "ExecutionsDelegate.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
-                            StartTime = Now
-                            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-
-                            'Get all executions for PATIENT SAMPLES included in the WorkSession
-                            Dim myPatientExecutionsDS As ExecutionsDS = Nothing
-
-                            If (Not resultData.HasError) Then
-                                resultData = CreatePatientExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pOrderTestID, pPostDilutionType)
-                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                    myPatientExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
-
-                                    Dim myOrderTestID As Integer = -1
-                                    Dim patientInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow) = Nothing
-
-                                    For Each rowPatient As ExecutionsDS.twksWSExecutionsRow In myPatientExecutionsDS.twksWSExecutions
-                                        'Dim patientInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
-                                        If (rowPatient.OrderTestID <> myOrderTestID) Then
-                                            myOrderTestID = rowPatient.OrderTestID
-
-                                            'Search information for the Patient Sample
-                                            patientInfo = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
-                                                          Where a.OrderTestID = myOrderTestID _
-                                                         Select a).ToList()
-                                        End If
-
-                                        '...and complete fields for the Patient Sample
-                                        If (patientInfo.Count = 1) Then
-                                            rowPatient.BeginEdit()
-                                            rowPatient.TestID = patientInfo(0).TestID
-                                            rowPatient.SampleType = patientInfo(0).SampleType
-                                            rowPatient.ReadingCycle = patientInfo(0).ReadingCycle
-                                            rowPatient.ReagentID = patientInfo(0).ReagentID
-                                            rowPatient.OrderID = patientInfo(0).OrderID
-
-                                            'AG 27/04/2012 Activate this line again (RH 08/03/2012 Remove this line)
-                                            rowPatient.ElementID = patientInfo(0).CreationOrder 'Convert.ToInt32(patientInfo(0).OrderID.Substring(8, 4))
-                                            If orderTestLockedByLISList.Contains(rowPatient.OrderTestID) Then rowPatient.ExecutionStatus = "LOCKED" 'AG 25/03/2013 - Locked by LIS not by volume missing
-                                            rowPatient.EndEdit()
-                                        End If
-                                    Next
-                                    patientInfo = Nothing 'AG 19/02/2014 - #1514
-                                End If
-                            End If
-
-                            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                            GlobalBase.CreateLogActivity("Get Executions For PATIENTS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                                            "ExecutionsDelegate.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
-                            StartTime = Now
-                            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-
-                            If (Not resultData.HasError) Then
-                                'Search all locked BLANKS to lock also all Calibrators, Control and Patient Samples
-                                'for the same Standard Test
-                                Dim lstLockedBlanks As List(Of Integer)
-                                lstLockedBlanks = (From a In myBlankExecutionsDS.twksWSExecutions _
-                                                  Where a.ExecutionStatus = "LOCKED" _
-                                                 Select a.TestID Distinct).ToList()
-
-                                Dim myTestID As Integer
-                                Dim lstLockedCtrls As List(Of ExecutionsDS.twksWSExecutionsRow)
-                                Dim lstLockedCalibs As List(Of ExecutionsDS.twksWSExecutionsRow)
-                                Dim lstLockedPatients As List(Of ExecutionsDS.twksWSExecutionsRow)
-
-                                For Each lockedBlank In lstLockedBlanks
-                                    myTestID = lockedBlank
-                                    '...LOCK the correspondent Calibrators
-                                    lstLockedCalibs = (From a In myCalibratorExecutionsDS.twksWSExecutions _
-                                                      Where a.TestID = myTestID _
-                                                    AndAlso a.ExecutionStatus <> "LOCKED" _
-                                                     Select a).ToList()
-
-                                    For Each lockedCalib In lstLockedCalibs
-                                        lockedCalib.BeginEdit()
-                                        lockedCalib.ExecutionStatus = "LOCKED"
-                                        lockedCalib.EndEdit()
-                                    Next
-
-                                    '...LOCK the correspondent Controls - Apply only to STD Preparations
-                                    lstLockedCtrls = (From a In myControlExecutionsDS.twksWSExecutions _
-                                                      Where a.ExecutionType = "PREP_STD" _
-                                                    AndAlso a.TestID = myTestID _
-                                                    AndAlso a.ExecutionStatus <> "LOCKED" _
-                                                     Select a).ToList()
-
-                                    For Each lockedCtrl In lstLockedCtrls
-                                        lockedCtrl.BeginEdit()
-                                        lockedCtrl.ExecutionStatus = "LOCKED"
-                                        lockedCtrl.EndEdit()
-                                    Next
-
-                                    '...LOCK the correspondent Patients
-                                    lstLockedPatients = (From a In myPatientExecutionsDS.twksWSExecutions _
-                                                        Where a.ExecutionType = "PREP_STD" _
-                                                      AndAlso a.TestID = myTestID _
-                                                      AndAlso a.ExecutionStatus <> "LOCKED" _
-                                                       Select a).ToList()
-
-                                    For Each lockedPatient In lstLockedPatients
-                                        lockedPatient.BeginEdit()
-                                        lockedPatient.ExecutionStatus = "LOCKED"
-                                        lockedPatient.EndEdit()
-                                    Next
-                                Next
-
-                                myCalibratorExecutionsDS.AcceptChanges()
-                                myControlExecutionsDS.AcceptChanges()
-                                myPatientExecutionsDS.AcceptChanges()
-
-                                'AG 19/02/2014 - #1514
-                                lstLockedBlanks = Nothing
-                                lstLockedCtrls = Nothing
-                                lstLockedCalibs = Nothing
-                                lstLockedPatients = Nothing
-                                'AG 19/02/2014 - #1514
-                            End If
-
-                            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                            GlobalBase.CreateLogActivity("Locks for BLANKS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                                            "ExecutionsDelegate.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
-                            StartTime = Now
-                            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-
-                            If (Not resultData.HasError) Then
-                                'Search all locked CALIBRATORS to lock also all Controls and Patient Samples
-                                'for the same Standard Test and SampleType
-                                Dim lstLockedCalibs As List(Of ExecutionsDS.twksWSExecutionsRow)
-                                lstLockedCalibs = (From a In myCalibratorExecutionsDS.twksWSExecutions _
-                                                  Where a.ExecutionStatus = "LOCKED" _
-                                                 Select a Order By a.OrderTestID).ToList()
-
-                                Dim myOrderTestID As Integer = -1
-                                Dim lstAlternativeST As List(Of String)
-                                Dim myTestID As Integer
-                                Dim mySampleType As String
-                                Dim lstLockedCtrls As New List(Of ExecutionsDS.twksWSExecutionsRow)
-                                Dim lstLockedPatients As List(Of ExecutionsDS.twksWSExecutionsRow)
-
-                                For Each lockedCalib In lstLockedCalibs
-                                    If (myOrderTestID <> lockedCalib.OrderTestID) Then
-                                        'First verify if the Calibrator is used as alternative of another Sample Types for the same Test
-                                        myOrderTestID = lockedCalib.OrderTestID
-                                        lstAlternativeST = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
-                                                           Where a.SampleClass = "CALIB" _
-                                                         AndAlso Not a.IsAlternativeOrderTestIDNull _
-                                                         AndAlso a.AlternativeOrderTestID = myOrderTestID _
-                                                          Select a.SampleType Distinct).ToList
-
-                                        For i As Integer = 0 To (lstAlternativeST.Count)
-                                            myTestID = lockedCalib.TestID
-                                            mySampleType = lockedCalib.SampleType
-
-                                            If (i > 0) Then mySampleType = lstAlternativeST(i - 1)
-
-                                            '...LOCK the correspondent Controls - Apply only to STD Preparations
-                                            lstLockedCtrls = (From a In myControlExecutionsDS.twksWSExecutions _
-                                                              Where a.ExecutionType = "PREP_STD" _
-                                                            AndAlso a.TestID = myTestID _
-                                                            AndAlso a.SampleType = mySampleType _
-                                                            AndAlso a.ExecutionStatus <> "LOCKED" _
-                                                             Select a).ToList()
-
-                                            For Each lockedCtrl In lstLockedCtrls
-                                                lockedCtrl.BeginEdit()
-                                                lockedCtrl.ExecutionStatus = "LOCKED"
-                                                lockedCtrl.EndEdit()
-                                            Next
-
-                                            '...LOCK the correspondent Patients.
-                                            lstLockedPatients = (From a In myPatientExecutionsDS.twksWSExecutions _
-                                                                Where a.ExecutionType = "PREP_STD" _
-                                                              AndAlso a.TestID = myTestID _
-                                                              AndAlso a.SampleType = mySampleType _
-                                                              AndAlso a.ExecutionStatus <> "LOCKED" _
-                                                               Select a).ToList()
-
-                                            For Each lockedPatient In lstLockedPatients
-                                                lockedPatient.BeginEdit()
-                                                lockedPatient.ExecutionStatus = "LOCKED"
-                                                lockedPatient.EndEdit()
-                                            Next
-                                        Next
-                                    End If
-                                Next
-
-                                myControlExecutionsDS.AcceptChanges()
-                                myPatientExecutionsDS.AcceptChanges()
-
-                                'AG 19/02/2014 - #1514
-                                lstLockedCalibs = Nothing
-                                lstAlternativeST = Nothing
-                                lstLockedCtrls = Nothing
-                                lstLockedPatients = Nothing
-                                'AG 19/02/2014 - #1514
-                            End If
-
-                            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                            GlobalBase.CreateLogActivity("Locks for CALIBRATORS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                                            "ExecutionsDelegate.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
-                            StartTime = Now
-                            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-
-                            If (Not resultData.HasError) Then
-                                If (Not calledForRerun) Then
-                                    'Search all Standard TestType/TestID/SampleType of all Patients requested for STAT, to mark as STAT
-                                    'all the needed Blanks, Calibrators and Controls
-                                    Dim lstSTATS As List(Of String)
-                                    lstSTATS = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
-                                               Where a.SampleClass = "PATIENT" _
-                                             AndAlso a.StatFlag = True _
-                                              Select String.Format("{0}|{1}|{2}", a.TestType, a.TestID, a.SampleType) Distinct).ToList
-
-                                    Dim pos1 As Integer
-                                    Dim pos2 As Integer
-                                    Dim myTestID As Integer
-                                    Dim myTestType As String
-                                    Dim mySampleType As String
-                                    Dim myOrderTestID As Integer
-                                    Dim lstBlanks As List(Of ExecutionsDS.twksWSExecutionsRow)
-                                    Dim lstBlkCalibCtrls As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
-                                    Dim lstCalibs As List(Of ExecutionsDS.twksWSExecutionsRow) 'AG 19/02/2014 - #1514
-                                    Dim lstCtrls As List(Of ExecutionsDS.twksWSExecutionsRow) 'AG 19/02/2014 - #1514
-
-                                    'SA 19/06/2012 - Filter linq also by TestType
-                                    For Each statPatient In lstSTATS
-                                        pos1 = statPatient.IndexOf("|")
-                                        myTestType = statPatient.Substring(0, pos1)
-
-                                        pos2 = statPatient.LastIndexOf("|")
-                                        mySampleType = statPatient.Substring(pos2 + 1)
-                                        myTestID = Convert.ToInt32(statPatient.Substring(pos1 + 1, pos2 - pos1 - 1))
-
-
-                                        'Search all Controls, Calibrators and Blanks for the TestType/TestID/SampleType
-                                        lstBlkCalibCtrls = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
-                                                            Where a.TestType = myTestType _
-                                                          AndAlso a.TestID = myTestID _
-                                                          AndAlso ((a.SampleClass = "BLANK") _
-                                                           OrElse (a.SampleClass = "CALIB" AndAlso a.SampleType = mySampleType) _
-                                                           OrElse (a.SampleClass = "CTRL" AndAlso a.SampleType = mySampleType)) _
-                                                           Select a Order By a.SampleClass).ToList()
-
-                                        For Each blkCalibCtrlRow In lstBlkCalibCtrls
-                                            myOrderTestID = blkCalibCtrlRow.OrderTestID
-                                            If (blkCalibCtrlRow.SampleClass = "CALIB") AndAlso (Not blkCalibCtrlRow.IsAlternativeOrderTestIDNull) Then
-                                                myOrderTestID = blkCalibCtrlRow.AlternativeOrderTestID
-                                            End If
-
-                                            'Search the OrderTestID to update the StatFlag
-                                            If (blkCalibCtrlRow.SampleClass = "BLANK") Then
-                                                lstBlanks = (From a In myBlankExecutionsDS.twksWSExecutions _
-                                                            Where a.OrderTestID = myOrderTestID _
-                                                           Select a).ToList()
-
-                                                For Each blank In lstBlanks
-                                                    blank.StatFlag = True
-                                                Next
-                                            ElseIf (blkCalibCtrlRow.SampleClass = "CALIB") Then
-                                                'Dim lstCalibs As List(Of ExecutionsDS.twksWSExecutionsRow) 'AG 19/02/2014 - #1514
-                                                lstCalibs = (From a In myCalibratorExecutionsDS.twksWSExecutions _
-                                                            Where a.OrderTestID = myOrderTestID _
-                                                           Select a).ToList()
-
-                                                For Each calibrator In lstCalibs
-                                                    calibrator.StatFlag = True
-                                                Next
-                                            ElseIf (blkCalibCtrlRow.SampleClass = "CTRL") Then
-                                                'Dim lstCtrls As List(Of ExecutionsDS.twksWSExecutionsRow) 'AG 19/02/2014 - #1514
-                                                lstCtrls = (From a In myControlExecutionsDS.twksWSExecutions _
-                                                            Where a.OrderTestID = myOrderTestID _
-                                                           Select a).ToList()
-
-                                                For Each control In lstCtrls
-                                                    control.StatFlag = True
-                                                Next
-                                            End If
-                                        Next
-                                        myBlankExecutionsDS.AcceptChanges()
-                                        myCalibratorExecutionsDS.AcceptChanges()
-                                        myControlExecutionsDS.AcceptChanges()
-                                    Next
-
-                                    'AG 19/02/2014 - #1514
-                                    lstSTATS = Nothing
-                                    lstBlanks = Nothing
-                                    lstBlkCalibCtrls = Nothing
-                                    lstCalibs = Nothing
-                                    lstCtrls = Nothing
-                                    'AG 19/02/2014 - #1514
-                                End If
-                            End If
-
-                            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                            GlobalBase.CreateLogActivity("Mark STATS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                                            "ExecutionsDelegate.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
-                            StartTime = Now
-                            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-
-
-                            'Unify all locked Executions and all pending Executions (all types) 
-                            Dim lockedExecutionsDS As New ExecutionsDS
-                            Dim pendingExecutionsDS As New ExecutionsDS
-
-                            If (Not resultData.HasError) Then
-                                'Move executions for BLANKS
-                                For Each blank As ExecutionsDS.twksWSExecutionsRow In myBlankExecutionsDS.twksWSExecutions
-                                    If (blank.ExecutionStatus = "LOCKED") Then
-                                        lockedExecutionsDS.twksWSExecutions.ImportRow(blank)
-                                    ElseIf (blank.ExecutionStatus = "PENDING") Then
-                                        pendingExecutionsDS.twksWSExecutions.ImportRow(blank)
-                                    End If
-                                Next
-
-                                'AG 19/02/2014 - #1514 use merge instead of loops
-                                ''AG 15/09/2011 - Add locked executions at the botton of the pending ones
-                                'For Each lockedEx As ExecutionsDS.twksWSExecutionsRow In lockedExecutionsDS.twksWSExecutions
-                                '    pendingExecutionsDS.twksWSExecutions.ImportRow(lockedEx)
-                                'Next
-                                pendingExecutionsDS.twksWSExecutions.Merge(lockedExecutionsDS.twksWSExecutions)
-                                lockedExecutionsDS.Clear()
-                                'AG 15/09/2011
-
-                                'Move executions for CALIBRATORS
-                                For Each calib As ExecutionsDS.twksWSExecutionsRow In myCalibratorExecutionsDS.twksWSExecutions
-                                    If (calib.ExecutionStatus = "LOCKED") Then
-                                        lockedExecutionsDS.twksWSExecutions.ImportRow(calib)
-                                    ElseIf (calib.ExecutionStatus = "PENDING") Then
-                                        pendingExecutionsDS.twksWSExecutions.ImportRow(calib)
-                                    End If
-                                Next
-
-                                'AG 19/02/2014 - #1514 use merge instead of loops
-                                ''AG 15/09/2011 - Add locked executions at the botton of the pending ones
-                                'For Each lockedEx As ExecutionsDS.twksWSExecutionsRow In lockedExecutionsDS.twksWSExecutions
-                                '    pendingExecutionsDS.twksWSExecutions.ImportRow(lockedEx)
-                                'Next
-                                pendingExecutionsDS.twksWSExecutions.Merge(lockedExecutionsDS.twksWSExecutions)
-                                lockedExecutionsDS.Clear()
-                                'AG 15/09/2011
-
-                                'Move executions for CONTROLS
-                                For Each ctrl As ExecutionsDS.twksWSExecutionsRow In myControlExecutionsDS.twksWSExecutions
-                                    If (ctrl.ExecutionStatus = "LOCKED") Then
-                                        lockedExecutionsDS.twksWSExecutions.ImportRow(ctrl)
-                                    ElseIf (ctrl.ExecutionStatus = "PENDING") Then
-                                        pendingExecutionsDS.twksWSExecutions.ImportRow(ctrl)
-                                    End If
-                                Next
-
-                                'AG 19/02/2014 - #1514 use merge instead of loops
-                                ''AG 15/09/2011 - Add locked executions at the botton of the pending ones
-                                'For Each lockedEx As ExecutionsDS.twksWSExecutionsRow In lockedExecutionsDS.twksWSExecutions
-                                '    pendingExecutionsDS.twksWSExecutions.ImportRow(lockedEx)
-                                'Next
-                                pendingExecutionsDS.twksWSExecutions.Merge(lockedExecutionsDS.twksWSExecutions)
-                                lockedExecutionsDS.Clear()
-                                'AG 15/09/2011
-
-                                'Move executions for PATIENTS
-                                For Each patient As ExecutionsDS.twksWSExecutionsRow In myPatientExecutionsDS.twksWSExecutions
-                                    If (patient.ExecutionStatus = "LOCKED") Then
-                                        lockedExecutionsDS.twksWSExecutions.ImportRow(patient)
-                                    ElseIf (patient.ExecutionStatus = "PENDING") Then
-                                        pendingExecutionsDS.twksWSExecutions.ImportRow(patient)
-                                    End If
-                                Next
-
-                                'AG 19/02/2014 - #1514 use merge instead of loops
-                                ''AG 15/09/2011 - Add locked executions at the botton of the pending ones
-                                'For Each lockedEx As ExecutionsDS.twksWSExecutionsRow In lockedExecutionsDS.twksWSExecutions
-                                '    pendingExecutionsDS.twksWSExecutions.ImportRow(lockedEx)
-                                'Next
-                                pendingExecutionsDS.twksWSExecutions.Merge(lockedExecutionsDS.twksWSExecutions)
-                                lockedExecutionsDS.Clear()
-                                'AG 15/09/2011
-
-                                '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                                GlobalBase.CreateLogActivity("Unify all Pending and Locked " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                                                "ExecutionsDelegate.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
-                                StartTime = Now
-                                '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-
-                                If (Not calledForRerun) Then
-                                    'Sort PENDING executions 
-                                    If (pendingExecutionsDS.twksWSExecutions.Rows.Count > 0) Then
-                                        'AG 30/11/2011 - NEW: When a patient has Ise & std test executions the ISE executions are the first
-
-                                        'AG 15/09/2011 - Locked executions at the botton his sample
-                                        'pendingExecutionsDS.twksWSExecutions.DefaultView.Sort = _
-                                        '        "StatFlag DESC, SampleClass, ElementID, SampleType, " & _
-                                        '        "ExecutionType DESC, ReadingCycle DESC"
-                                        'pendingExecutionsDS.twksWSExecutions.DefaultView.Sort = _
-                                        '    "StatFlag DESC, SampleClass, ElementID, SampleType, " & _
-                                        '    "ExecutionType DESC, ExecutionStatus DESC, ReadingCycle DESC"
-                                        ''AG 15/09/2011
-
-                                        pendingExecutionsDS.twksWSExecutions.DefaultView.Sort = "StatFlag DESC, SampleClass, ElementID, SampleType, " & _
-                                                                                                "ExecutionType, ExecutionStatus DESC, ReadingCycle DESC"
-                                        'AG 30/11/2011 - NEW: When a patient has Ise & std test executions the ISE executions are the first
-
-                                        Dim executionDataDS As New ExecutionsDS
-                                        'AG 12/07/2012
-                                        'For Each pendingExecution As DataRow In pendingExecutionsDS.twksWSExecutions.DefaultView.ToTable.Rows
-                                        '    executionDataDS.twksWSExecutions.ImportRow(pendingExecution)
-                                        'Next
-                                        executionDataDS = CType(pendingExecutionsDS, ExecutionsDS)
-                                        'AG 12/07/2012
-
-                                        'AG 28/11/2011 - Code for evaluate method execution time (comment after the evaluation has been performed)
-                                        'Dim startTime As DateTime = Now
-
-                                        'Sort by Contamination
-                                        Dim sorter = New WSExecutionsSorter(executionDataDS, activeAnalyzer)
-                                        If sorter.SortByContamination(dbConnection) Then
-                                            resultData.SetDatos = sorter.Executions
-                                            executionDataDS = sorter.Executions
-                                        Else
-                                            resultData.SetDatos = Nothing
-                                            resultData.HasError = True
-                                        End If
-
-                                        If (Not resultData.HasError AndAlso Not executionDataDS Is Nothing) Then
-
-                                            'Sort Orders by ReadingCycle
-                                            If sorter.SortByElementGroupTime() Then
-                                                resultData.SetDatos = sorter.Executions
-
-                                            Else
-                                                resultData.HasError = True
-                                            End If
-
-                                            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                                executionDataDS = sorter.Executions
-                                                resultData = SortWSExecutionsByElementGroupContaminationNew(activeAnalyzer, dbConnection, executionDataDS) 'AG 07/11/2011
-
-                                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                                    executionDataDS = DirectCast(resultData.SetDatos, ExecutionsDS)
-                                                End If
-
-                                            End If
-                                        End If
-
-                                        'AG 28/11/2011 - Code for evaluate method execution time (comment after the evaluation has been performed)
-                                        'Dim elapsedTime As Double = 0
-                                        'elapsedTime = Now.Subtract(startTime).TotalMilliseconds
-
-                                        'Finally, save the sorted PENDING executions
-                                        If (Not resultData.HasError) Then
-                                            'AG 19/03/2014 - #1545 - call method in delegate instead of in DAO
-                                            'resultData = myDAO.Create(dbConnection, executionDataDS)
-                                            resultData = Create(dbConnection, executionDataDS)
-                                        End If
-                                    End If
-
-                                    '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                                    GlobalBase.CreateLogActivity("Sort and create all PENDING " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                                                    "ExecutionsDelegate.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
-                                    StartTime = Now
-                                    '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                                Else
-                                    'Save PENDING executions  
-                                    'AG 19/03/2014 - #1545 - call method in delegate instead of in DAO
-                                    'resultData = myDAO.Create(dbConnection, pendingExecutionsDS)
-                                    resultData = Create(dbConnection, pendingExecutionsDS)
-                                End If
-
-                                'Save LOCKED executions
-                                If (lockedExecutionsDS.twksWSExecutions.Rows.Count > 0) Then
-                                    If (Not resultData.HasError) Then
-                                        'AG 19/03/2014 - #1545 - call method in delegate instead of in DAO
-                                        'resultData = myDAO.Create(dbConnection, lockedExecutionsDS)
-                                        resultData = Create(dbConnection, lockedExecutionsDS)
-                                    End If
-                                End If
-
-                                '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                                GlobalBase.CreateLogActivity("Save all LOCKED " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                                                "ExecutionsDelegate.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
-                                StartTime = Now
-                                '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-
-                                If (Not resultData.HasError) Then
-                                    'AG 19/09/2011 - Update of the Paused flag is performed only when no Running mode
-                                    '              - When working in Running mode, no pending executions are deleted, then SW has only to update status 
-                                    '                (business already performed)
-                                    If (Not calledForRerun AndAlso Not pWorkInRunningMode) Then
-                                        Dim tempExecutionDS As New ExecutionsDS
-                                        Dim myWSPausedOrderTestsDS As New WSPausedOrderTestsDS
-                                        Dim myWSPausedOrderTestsDelegate As New WSPausedOrderTestsDelegate
-
-                                        resultData = myWSPausedOrderTestsDelegate.ReadByAnalyzerAndWorkSession(dbConnection, pAnalyzerID, pWorkSessionID)
-                                        If (Not resultData.HasError) Then
-                                            myWSPausedOrderTestsDS = DirectCast(resultData.SetDatos, WSPausedOrderTestsDS)
-                                            'AG 19/03/2014 - #1545 - avoid loop and call UpdatePaused (2on signature)
-                                            'For Each pausedOTRow As WSPausedOrderTestsDS.twksWSPausedOrderTestsRow In myWSPausedOrderTestsDS.twksWSPausedOrderTests.Rows
-                                            '    resultData = myDAO.ReadByOrderTestIDAndRerunNumber(dbConnection, pausedOTRow.OrderTestID, pausedOTRow.RerunNumber)
-                                            '    If resultData.HasError Then Exit For
-
-                                            '    tempExecutionDS = DirectCast(resultData.SetDatos, ExecutionsDS)
-                                            '    If (tempExecutionDS.twksWSExecutions.Count > 0) Then
-                                            '        'If found, then update
-                                            '        For Each executionRow As ExecutionsDS.twksWSExecutionsRow In tempExecutionDS.twksWSExecutions.Rows
-                                            '            resultData = myDAO.UpdatePaused(dbConnection, True, executionRow.ExecutionID)
-                                            '            If (resultData.HasError) Then Exit For
-                                            '        Next
-                                            '    End If
-                                            'Next
-                                            Dim myOT As New List(Of Integer)
-                                            Dim myRerun As New List(Of Integer)
-                                            For Each auxRow As WSPausedOrderTestsDS.twksWSPausedOrderTestsRow In myWSPausedOrderTestsDS.twksWSPausedOrderTests
-                                                If Not auxRow.IsOrderTestIDNull AndAlso Not myOT.Contains(auxRow.OrderTestID) Then
-                                                    myOT.Add(auxRow.OrderTestID)
-                                                    myRerun.Add(auxRow.RerunNumber)
-                                                End If
-                                            Next
-                                            If myOT.Count > 0 AndAlso myOT.Count = myRerun.Count Then
-                                                resultData = UpdatePaused(dbConnection, myOT, myRerun, True, pAnalyzerID, pWorkSessionID)
-                                            End If
-                                            myOT.Clear()
-                                            myRerun.Clear()
-                                            myOT = Nothing
-                                            myRerun = Nothing
-                                            'AG 19/03/2014 - #1545
-                                        End If
-                                    End If
-                                    'AG 19/09/2011
-                                End If
-
-                                If (Not resultData.HasError) Then
-                                    If (Not calledForRerun) Then
-                                        'Do nothing ... business has been already performed in previous call to RecalculateStatusForNotDeletedExecutions method
-                                    Else
-                                        'If function was called for a Rerun, change the Status of the Order Test to PENDING
-                                        Dim myOrderTestDelegate As New OrderTestsDelegate
-                                        resultData = myOrderTestDelegate.UpdateStatusByOrderTestID(dbConnection, pOrderTestID, "PENDING")
-                                    End If
-
-                                    'AG 25/03/2013 - Update executions locked by lis
-                                    If Not resultData.HasError AndAlso orderTestLockedByLISList.Count > 0 Then
-                                        'AG 19/03/2014 - #1545 - call method in delegate instead of in DAO
-                                        'resultData = myDAO.UpdateLockedByLIS(dbConnection, orderTestLockedByLISList, True)
-                                        resultData = UpdateLockedByLIS(dbConnection, orderTestLockedByLISList, True)
-                                    End If
-                                    'AG 25/03/2013
-
-                                End If
-                            End If
-                        End If
-                    End If
-                End If
-
-                'AG 20/09/2011 - When the WorkSession is modified, all samples rotor status can change 
-                '                when new tests are added using a tube with status finished (finished -> pending)
-                If (Not resultData.HasError AndAlso Not calledForRerun) Then
-                    'Read the current content of all positions in Samples Rotor
-                    Dim rcp_del As New WSRotorContentByPositionDelegate
-                    resultData = rcp_del.ReadByCellNumber(dbConnection, pAnalyzerID, pWorkSessionID, "SAMPLES", -1)
-
-                    If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-                        Dim samplesRotorDS As WSRotorContentByPositionDS = DirectCast(resultData.SetDatos, WSRotorContentByPositionDS)
-
-                        'Get only positions with tubes for required WorkSession Elements not marked as Depleted or with not enough volume
-                        Dim linqRes As List(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow)
-                        linqRes = (From a As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In samplesRotorDS.twksWSRotorContentByPosition _
-                              Where Not a.IsElementIDNull _
-                                AndAlso a.Status <> "DEPLETED" _
-                                AndAlso a.Status <> "FEW" _
-                                 Select a).ToList
-
-                        Dim newStatus As String = ""
-                        For Each row As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In linqRes
-                            newStatus = row.Status
-                            resultData = rcp_del.UpdateSamplePositionStatus(dbConnection, -1, pWorkSessionID, pAnalyzerID, row.ElementID, _
-                                                                            row.TubeContent, 1, newStatus, row.CellNumber)
-                        Next
-                        linqRes = Nothing 'AG 19/02/2014 - #1514
-
-                    End If
-                End If
-                'AG 20/09/2011
-
-                If (Not resultData.HasError) Then
-
-                    'check if there are Electrodes with wrong Calibration
-                    If (Not pISEElectrodesList Is Nothing AndAlso pISEElectrodesList.Count > 0) Then
-                        For Each electrode As String In pISEElectrodesList
-                            resultData = UpdateStatusByISETestType(dbConnection, pWorkSessionID, pAnalyzerID, electrode, "PENDING", "LOCKED")
-                            If (resultData.HasError) Then Exit For
-                        Next
-                    ElseIf (Not pIsISEModuleReady) Then
-                        'ISE Module cannot be used; all pending ISE Preparations are LOCKED
-                        resultData = UpdateStatusByExecutionTypeAndStatus(dbConnection, pWorkSessionID, pAnalyzerID, "PREP_ISE", "PENDING", "LOCKED")
-                    End If
-
-                End If
-
-                '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                GlobalBase.CreateLogActivity("Final Processing " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                                "ExecutionsDelegate.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
-                StartTime = Now
-                '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-
-                'AG 19/03/2014 - #1545 - New method does not open transaction, so do not close it
-                'If (Not resultData.HasError) Then
-                '    'When the Database Connection was opened locally, then the Commit is executed
-                '    If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-                'Else
-                '    'When the Database Connection was opened locally, then the Rollback is executed
-                '    If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-                'End If
-                'AG 19/03/2014 - #1545
-
-                orderTestLockedByLISList = Nothing 'AG 19/02/2014 - #1514
-
-                'AG 19/03/2014 - #1545
-                '    End If
-                'End If
-                'AG 19/03/2014 - #1545
-
-            Catch ex As Exception
-                'When the Database Connection was opened locally, then the Rollback is executed
-                'If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection) 'AG 19/03/2014 - #1545 - New method does not open transaction, so do not close it
-
-                resultData = New GlobalDataTO()
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
-                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Error, False)
-            Finally
-                'If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close() 'AG 19/03/2014 - #1545 - New method does not open transaction, so do not close it
-
-                'AG 02/06/2014 #1644 - Set the semaphore to free value (EXCEPT when called from auto rerun business)
-                If GlobalConstants.CreateWSExecutionsWithSemaphore AndAlso pManualRerunFlag Then
-                    GlobalSemaphores.createWSExecutionsSemaphore.Release()
-                    GlobalSemaphores.createWSExecutionsQueue = 0 'Only 1 thread is allowed, so reset to 0 instead of decrement --1 'GlobalSemaphores.createWSExecutionsQueue -= 1
-                    'Dim myLogAcciones As New ApplicationLogManager()
-                    GlobalBase.CreateLogActivity("CreateWSExecutions semaphore: Released, semaphore free", "AnalyzerManager.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
-                End If
-
-            End Try
-            Return resultData
-        End Function
-
-        ''' <summary>
         ''' Gets the active analyzer model
         ''' </summary>
         ''' <param name="dbConnection">Connection to db</param>
@@ -5966,1015 +4496,9 @@ Namespace Biosystems.Ax00.BL
         End Function
 
 
-        ''' <summary>
-        ''' Delete all Executions for a group of Order Tests that fulfill the following condition: ALL their Executions 
-        ''' have Execution Status PENDING or LOCKED 
-        ''' </summary>
-        ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
-        ''' <param name="pWorkSessionID">Work Session Identifier</param>
-        ''' <param name="pOrderTestsListDS">Typed DataSet OrderTestsDS containing the list of OrderTestIDs which Executions can be 
-        '''                                 deleted (because all of them have status PENDING or LOCKED)</param>
-        ''' <returns>GlobalDataTO containing sucess/error information</returns>
-        ''' <remarks>
-        ''' AG 19/03/2014 - create the delegate - #1545
-        ''' </remarks>
-        Public Function DeleteNotInCourseExecutionsNEW(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
-                                                      ByVal pOrderTestsListDS As OrderTestsDS) As GlobalDataTO
-            Dim resultData As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
-
-            Try
-                resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
-                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        Dim myDAO As New twksWSExecutionsDAO
-                        resultData = myDAO.DeleteNotInCourseExecutionsNEW(dbConnection, pAnalyzerID, pWorkSessionID, pOrderTestsListDS)
-
-                        If (Not resultData.HasError) Then
-                            'When the Database Connection was opened locally, then the Commit is executed
-                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-                            'resultData.SetDatos = <value to return; if any>
-                        Else
-                            'When the Database Connection was opened locally, then the Rollback is executed
-                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-                        End If
-                    End If
-                End If
-
-            Catch ex As Exception
-                'When the Database Connection was opened locally, then the Rollback is executed
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-                resultData = New GlobalDataTO()
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
-                resultData.ErrorMessage = ex.Message
-
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.DeleteNotInCourseExecutionsNEW", EventLogEntryType.Error, False)
-
-            Finally
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-            Return resultData
-        End Function
-
-
-        ''' <summary>
-        ''' Create a group of Executions in table twksWSExecutions
-        ''' </summary>
-        ''' <param name="pDBConnection">Open Database Connection</param>
-        ''' <param name="pExecution">Typed Dataset ExecutionsDS with all Executions to create</param>
-        ''' <returns>GlobalDataTO containing success/error information</returns>
-        ''' <remarks>
-        ''' AG 19/03/2014 - Creation #1545
-        ''' </remarks>
-        Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pExecution As ExecutionsDS) As GlobalDataTO
-            Dim resultData As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
-
-            Try
-                resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
-                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        Dim myDAO As New twksWSExecutionsDAO
-                        resultData = myDAO.Create(dbConnection, pExecution)
-
-                        If (Not resultData.HasError) Then
-                            'When the Database Connection was opened locally, then the Commit is executed
-                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-                            'resultData.SetDatos = <value to return; if any>
-                        Else
-                            'When the Database Connection was opened locally, then the Rollback is executed
-                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-                        End If
-                    End If
-                End If
-
-            Catch ex As Exception
-                'When the Database Connection was opened locally, then the Rollback is executed
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-                resultData = New GlobalDataTO()
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
-                resultData.ErrorMessage = ex.Message
-
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.Create", EventLogEntryType.Error, False)
-
-            Finally
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-            Return resultData
-        End Function
-
 #End Region
 
 #Region "OUT OF DATE 19-03-2014 - CREATE EXECUTIONS - NEW 15-09-2011"
-
-        ''' <summary>
-        ''' Create all Executions for the specified Analyzer WorkSession
-        ''' </summary>
-        ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
-        ''' <param name="pWorkSessionID">WorkSession Identifier</param>
-        ''' <param name="pWorkInRunningMode">When True, indicates the Analyzer is connected and running a WorkSession</param>
-        ''' <param name="pOrderTestID">Identifier of the Order Test for which a Rerun has been requested. Optional parameter</param>
-        ''' <param name="pPostDilutionType">Type of post Dilution to apply when a Rerun has been requested. Optional parameter</param>
-        ''' <param name="pIsISEModuleReady">Flag indicating if the ISE Module is ready to be used. Optional parameter</param>
-        ''' <param name="pISEElectrodesList">String list containing ISE Electrodes (ISE_ResultID) with wrong/pending calibration</param>
-        ''' <param name="pPauseMode"></param>
-        ''' <param name="pManualRerunFlag">Always TRUE except when autoreruns are triggered</param>
-        ''' <returns>GlobalDataTO containing success/error information</returns>
-        ''' <remarks>
-        ''' Created by:  SA 09/02/2011
-        ''' Modified by: TR 29/08/2011 - Declarations inside loops have been removed an put outside them to improve the memory use
-        '''              AG 15/09/2011 - NO different executions tables: Pending Table + Locked Table: only one table with executions 
-        '''                              grouped by patient (pending, locked)
-        '''              AG 19/09/2011 - Added new parameter pWorkInRunningMode
-        '''              SA 09/11/2011 - For Patient Samples, inform ElementID = CreationOrder (from allOrderTestsDS)
-        '''              SA 31/01/2012 - When function is called to manage creation of Executions of a requested Rerun (an OrderTestID is specified)
-        '''                              do not update the status of the related Rotor Positions, due to that process is done in function 
-        '''                              Manage Repetitions in RepetitionsDelegate Class
-        '''              SA 08/02/2012 - Do not update the status of cells in Samples Rotor containing tubes marked as DEPLETED or with FEW volume
-        '''              SA 31/05/2012 - Changed the way of searching and deleting PENDING or LOCKED executions
-        '''              SA 20/06/2012 - Lock of Controls due to locked needed Blanks or Calibrators is applied only for STD preparations 
-        '''                            - Removed filter by TestType=STD when searching STAT Patient request; instead of it, get all different 
-        '''                              TestType/TestID/SampleType requested for STAT and filter by each specific TestType when searching the 
-        '''                              needed Blanks, Calibrators and Controls to mark them as STAT 
-        '''              SA 26/07/2012 - Added optional parameter to indicate if the ISE Module is ready to be used; when it is not ready, the status 
-        '''                              of all pending ISE Executions is changed to LOCKED
-        '''              SA 31/07/2012 - When the function is called in STANDBY (pWorkInRunningMode = False), before deleting affected Executions, delete 
-        '''                              their Readings (to avoid System Error due to violation of FK when delete records in twksWSExecutions)
-        '''              SA 07/09/2012 - Added optional parameter pISEElectrodesList to inform the list of ISE Electrodes with wrong/pending calibration. 
-        '''                              When this parameter is informed, all Executions for the ISE Tests contained in the list will be locked
-        '''              AG 25/03/2013 - Before modify the current executions table get those ordertests locked by LIS
-        '''                              After generate the new executions set ExecutionStatus = LOCKED and LockedByLIS = True for the executions of these ordertests
-        '''              AG 19/02/2014 - #1514 improvements memory app/sql
-        '''              AG 20/03/2014 - #1545 call create WS executions method with multiple transactions
-        '''              AG 30/05/2014 - #1584 new parameter pPauseMode (for recalculate status for executions LOCKED and also PENDING)!!! (in normal running only the LOCKED are recalculated)
-        '''              AG 02/06/2014 - #1644 new optional parameter pManualRerunFlag (when FALSE Software cannot use the semaphore because it has been set to busy when ANSPHR started to be processed)
-        ''' </remarks> 
-        Public Function CreateWSExecutions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
-                                           ByVal pWorkInRunningMode As Boolean, Optional ByVal pOrderTestID As Integer = -1, _
-                                           Optional ByVal pPostDilutionType As String = "", Optional ByVal pIsISEModuleReady As Boolean = False, _
-                                           Optional ByVal pISEElectrodesList As List(Of String) = Nothing, Optional ByVal pPauseMode As Boolean = False, _
-                                           Optional ByVal pManualRerunFlag As Boolean = True) As GlobalDataTO
-            Dim resultData As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
-
-            Try
-
-                'AG 20/03/2014 - #1545 - call the new create execution method that uses multiple transactions
-                If (GlobalConstants.CreateWSExecutionsWithMultipleTransactions) Then
-                    resultData = CreateWSExecutionsMultipleTransactions(pDBConnection, pAnalyzerID, pWorkSessionID, pWorkInRunningMode, _
-                                                       pOrderTestID, pPostDilutionType, pIsISEModuleReady, pISEElectrodesList, pPauseMode, pManualRerunFlag)
-                    Exit Try 'Exit Try and not execute the old code
-                End If
-                'AG 20/03/2014 - #1545
-
-                '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                Dim StartTime As DateTime = Now
-                'Dim myLogAcciones As New ApplicationLogManager()
-                '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-
-                'AG 02/06/2014 #1644 - Set the semaphore to busy value (EXCEPT when called from auto rerun business)
-                If GlobalConstants.CreateWSExecutionsWithSemaphore AndAlso pManualRerunFlag Then
-                    GlobalBase.CreateLogActivity("CreateWSExecutions semaphore: Waiting (timeout = " & GlobalConstants.SEMAPHORE_TOUT_CREATE_EXECUTIONS.ToString & ")", "AnalyzerManager.CreateWSExecutions", EventLogEntryType.Information, False)
-                    GlobalSemaphores.createWSExecutionsSemaphore.WaitOne(GlobalConstants.SEMAPHORE_TOUT_CREATE_EXECUTIONS)
-                    GlobalSemaphores.createWSExecutionsQueue = 1 'Only 1 thread is allowed, so set to 1 instead of increment ++1 'GlobalSemaphores.createWSExecutionsQueue += 1
-                    GlobalBase.CreateLogActivity("CreateWSExecutions semaphore: Passed through, semaphore busy", "AnalyzerManager.CreateWSExecutions", EventLogEntryType.Information, False)
-                End If
-
-                resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
-                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        Dim calledForRerun As Boolean = (pOrderTestID <> -1)
-
-                        StartTime = Now '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-
-                        'Delete all Executions with status PENDING or LOCKED belonging OrderTests not started!!!
-                        'If an OrderTestID is not informed, only Pending and Locked Executions for Rerun=1 are deleted
-                        Dim myDAO As New twksWSExecutionsDAO
-
-                        'AG 25/03/2013 - Get the current distinct ordertests locked by lis
-                        resultData = myDAO.GetOrderTestsLockedByLIS(dbConnection, pAnalyzerID, pWorkSessionID, True)
-                        Dim orderTestLockedByLISList As New List(Of Integer)
-                        If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-                            For Each row As ExecutionsDS.twksWSExecutionsRow In DirectCast(resultData.SetDatos, ExecutionsDS).twksWSExecutions
-                                If Not row.IsOrderTestIDNull AndAlso Not orderTestLockedByLISList.Contains(row.OrderTestID) Then orderTestLockedByLISList.Add(row.OrderTestID)
-                            Next
-                        End If
-                        'AG 25/03/2013
-
-                        'AJG ADDED BECAUSE THE ANALYZER MODEL IS NEEDED BECAUSE MANAGING CONTAMINATIONS IS ANALYZER DEPENDANT
-                        Dim activeAnalyzer As String = GetActiveAnalyzer(dbConnection)
-
-                        If (Not pWorkInRunningMode) Then 'AG 19/02/2014 - #1514 note that this parameter value is FALSE when called from create repetitions process!!!
-                            'Search all Order Tests which Executions can be deleted: those having ALL Executions with status PENDING or LOCKED
-                            resultData = myDAO.SearchNotInCourseExecutionsToDelete(dbConnection, pAnalyzerID, pWorkSessionID, pOrderTestID)
-                            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                Dim myOrderTestsToDelete As OrderTestsDS = DirectCast(resultData.SetDatos, OrderTestsDS)
-
-                                If (myOrderTestsToDelete.twksOrderTests.Count > 0) Then
-                                    'Delete all Readings of the Executions for all OrderTests returned by the previous called function
-                                    Dim myReadingsDelegate As New WSReadingsDelegate
-                                    resultData = myReadingsDelegate.DeleteReadingsForNotInCourseExecutions(dbConnection, pAnalyzerID, pWorkSessionID, myOrderTestsToDelete)
-
-                                    If (Not resultData.HasError) Then
-                                        'Delete the Executions for all OrderTests returned by the previous called function
-                                        resultData = myDAO.DeleteNotInCourseExecutionsNEW(dbConnection, pAnalyzerID, pWorkSessionID, myOrderTestsToDelete)
-                                    End If
-                                End If
-                            End If
-
-                            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                            GlobalBase.CreateLogActivity("Not RUNNING: Search and Delete NOT IN COURSE " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                                            "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
-                            StartTime = Now
-                            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                        End If
-
-                        'NEW 19/09/2011 - Lock / Unlock process:
-                        'pWorkInRunningMode = FALSE -> Recalculate status for all executions with RerunNumber > 1 with current status is PENDING or LOCKED
-                        '                              (note that in this case ALL the PENDING or LOCKED executions with RerunNumber = 1 have been deleted in mehtod DeleteNotInCurseExecutions)
-                        '
-                        'pWorkInRuuningMode = TRUE ->  Recalculate status for all existing executions with status PENDING or LOCKED
-                        'Table twksWSExecutions is updated at this point
-                        If (Not calledForRerun) Then
-
-                            'AG 28/05/2014 - #1644 - Do not delete readings here!! They will be removed when the new preparation receives his 1st reading
-                            ''In RUNNING Mode, delete all Readings of all LOCKED Executions 
-                            'Dim myReadingsDelegate As New WSReadingsDelegate
-                            'resultData = myReadingsDelegate.DeleteReadingsForNotInCourseExecutions(dbConnection, pAnalyzerID, pWorkSessionID, Nothing)
-
-                            'AG 30/05/2014 - #1644 new parameter pPauseMode required
-                            resultData = RecalculateStatusForNotDeletedExecutionsNEW(dbConnection, pAnalyzerID, pWorkSessionID, pWorkInRunningMode, pPauseMode)
-
-                            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                            GlobalBase.CreateLogActivity("Recalculate Status " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                                            "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
-                            StartTime = Now
-                            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                        End If
-                        'AG 19/09/2011
-
-                        'Now we can create executions for all ordertests not started (with no executions in twksWSExecutions table) ... <the initial process>
-                        If (Not resultData.HasError) Then
-                            'Get detailed information of all Order Tests to be executed in the WS
-                            Dim allOrderTestsDS As OrderTestsForExecutionsDS
-                            Dim myWSOrderTestsDelegate As New WSOrderTestsDelegate
-
-                            resultData = myWSOrderTestsDelegate.GetInfoOrderTestsForExecutions(dbConnection, pAnalyzerID, pWorkSessionID)
-                            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                allOrderTestsDS = DirectCast(resultData.SetDatos, OrderTestsForExecutionsDS)
-
-                                'Get all executions for BLANKS included in the WorkSession
-                                Dim myBlankExecutionsDS As New ExecutionsDS
-                                'Get all executions for CALIBRATORS included in the WorkSession
-                                Dim myCalibratorExecutionsDS As ExecutionsDS = Nothing
-                                'Get all executions for CONTROLS included in the WorkSession
-                                Dim myControlExecutionsDS As ExecutionsDS = Nothing
-                                'Get all executions for PATIENT SAMPLES included in the WorkSession
-                                Dim myPatientExecutionsDS As ExecutionsDS = Nothing
-
-                                If (allOrderTestsDS.OrderTestsForExecutionsTable.Rows.Count > 0) Then
-                                    resultData = CreateBlankExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pOrderTestID, pPostDilutionType)
-                                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                        myBlankExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
-                                    End If
-                                    resultData = CreateCalibratorExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pOrderTestID, pPostDilutionType)
-                                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                        myCalibratorExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
-                                    End If
-                                    resultData = CreateControlExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pOrderTestID, pPostDilutionType)
-                                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                        myControlExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
-                                    End If
-                                    resultData = CreatePatientExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pOrderTestID, pPostDilutionType)
-                                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                        myPatientExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
-                                    End If
-
-                                    Dim listTask As New List(Of Task)
-
-                                    listTask.Add(Task.Factory.StartNew(Sub()
-                                                                           Dim myOrderTestID As Integer = -1
-                                                                           Dim blankInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow) = Nothing
-
-                                                                           For Each rowBlank As ExecutionsDS.twksWSExecutionsRow In myBlankExecutionsDS.twksWSExecutions
-                                                                               If (rowBlank.OrderTestID <> myOrderTestID) Then
-                                                                                   myOrderTestID = rowBlank.OrderTestID
-                                                                                   'Search information for the Blank
-                                                                                   blankInfo = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
-                                                                                               Where a.OrderTestID = myOrderTestID _
-                                                                                              Select a).ToList()
-                                                                               End If
-
-                                                                               '...and complete fields for the Blank
-                                                                               If (blankInfo.Count = 1) Then
-                                                                                   rowBlank.BeginEdit()
-                                                                                   rowBlank.TestID = blankInfo(0).TestID
-                                                                                   rowBlank.ReadingCycle = blankInfo(0).ReadingCycle
-                                                                                   rowBlank.ReagentID = blankInfo(0).ReagentID
-                                                                                   rowBlank.OrderID = blankInfo(0).OrderID
-                                                                                   rowBlank.ElementID = NullElementID     'rowBlank.ReagentID 'RH 29/09/2011
-                                                                                   rowBlank.EndEdit()
-                                                                               End If
-                                                                           Next
-                                                                           myBlankExecutionsDS.AcceptChanges()
-                                                                           blankInfo = Nothing 'AG 19/02/2014 - #1514
-                                                                           'End If
-                                                                           GlobalBase.CreateLogActivity("Get Executions For BLANKS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                                                                                           "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
-                                                                       End Sub))
-
-
-                                    listTask.Add(Task.Factory.StartNew(Sub()
-                                                                           Dim myOrderTestID As Integer = -1
-                                                                           Dim calibInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow) = Nothing
-
-                                                                           For Each rowCalib As ExecutionsDS.twksWSExecutionsRow In myCalibratorExecutionsDS.twksWSExecutions
-                                                                               'Dim calibInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
-                                                                               If (rowCalib.OrderTestID <> myOrderTestID) Then
-                                                                                   myOrderTestID = rowCalib.OrderTestID
-                                                                                   'Search information for the Calibrator
-                                                                                   calibInfo = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
-                                                                                               Where a.OrderTestID = myOrderTestID _
-                                                                                              Select a).ToList()
-                                                                               End If
-
-                                                                               '...and complete fields for the Calibrator
-                                                                               If (calibInfo.Count = 1) Then
-                                                                                   rowCalib.BeginEdit()
-                                                                                   rowCalib.TestID = calibInfo(0).TestID
-                                                                                   rowCalib.SampleType = calibInfo(0).SampleType
-                                                                                   rowCalib.ReadingCycle = calibInfo(0).ReadingCycle
-                                                                                   rowCalib.ReagentID = calibInfo(0).ReagentID
-                                                                                   rowCalib.OrderID = calibInfo(0).OrderID
-                                                                                   rowCalib.ElementID = calibInfo(0).ElementID
-                                                                                   rowCalib.EndEdit()
-                                                                               End If
-                                                                           Next
-                                                                           'myCalibratorExecutionsDS.AcceptChanges()
-                                                                           calibInfo = Nothing 'AG 19/02/2014 - #1514
-                                                                           'End If
-                                                                           GlobalBase.CreateLogActivity("Get Executions For CALIBRATORS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                                                                                           "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
-                                                                       End Sub))
-
-
-                                    listTask.Add(Task.Factory.StartNew(Sub()
-                                                                           Dim myOrderTestID As Integer = -1
-                                                                           Dim controlInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow) = Nothing
-
-                                                                           For Each rowControl As ExecutionsDS.twksWSExecutionsRow In myControlExecutionsDS.twksWSExecutions
-                                                                               'Dim controlInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
-                                                                               If (rowControl.OrderTestID <> myOrderTestID) Then
-                                                                                   myOrderTestID = rowControl.OrderTestID
-                                                                                   'Search information for the Control
-                                                                                   controlInfo = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
-                                                                                                 Where a.OrderTestID = myOrderTestID _
-                                                                                                Select a).ToList()
-                                                                               End If
-
-                                                                               '...and complete fields for the Control (more than one record is possible when several
-                                                                               'controls are used for the TestType/Test/Sample Type)
-                                                                               If (controlInfo.Count >= 1) Then
-                                                                                   rowControl.BeginEdit()
-                                                                                   rowControl.TestID = controlInfo(0).TestID
-                                                                                   rowControl.SampleType = controlInfo(0).SampleType
-                                                                                   rowControl.ReadingCycle = controlInfo(0).ReadingCycle
-                                                                                   rowControl.ReagentID = controlInfo(0).ReagentID
-                                                                                   rowControl.OrderID = controlInfo(0).OrderID
-                                                                                   rowControl.ElementID = controlInfo(0).ElementID
-
-                                                                                   If orderTestLockedByLISList.Contains(rowControl.OrderTestID) Then rowControl.ExecutionStatus = "LOCKED" 'AG 25/03/2013 - Locked by LIS not by volume missing
-                                                                                   rowControl.EndEdit()
-                                                                               End If
-                                                                           Next
-                                                                           controlInfo = Nothing 'AG 19/02/2014 - #1514
-                                                                           'End If
-                                                                           GlobalBase.CreateLogActivity("Get Executions For CONTROLS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                                                                                           "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
-                                                                       End Sub))
-
-
-                                    listTask.Add(Task.Factory.StartNew(Sub()
-                                                                           Dim myOrderTestID As Integer = -1
-                                                                           Dim patientInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow) = Nothing
-
-                                                                           For Each rowPatient As ExecutionsDS.twksWSExecutionsRow In myPatientExecutionsDS.twksWSExecutions
-                                                                               'Dim patientInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
-                                                                               If (rowPatient.OrderTestID <> myOrderTestID) Then
-                                                                                   myOrderTestID = rowPatient.OrderTestID
-
-                                                                                   'Search information for the Patient Sample
-                                                                                   patientInfo = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
-                                                                                                 Where a.OrderTestID = myOrderTestID _
-                                                                                                Select a).ToList()
-                                                                               End If
-
-                                                                               '...and complete fields for the Patient Sample
-                                                                               If (patientInfo.Count = 1) Then
-                                                                                   rowPatient.BeginEdit()
-                                                                                   rowPatient.TestID = patientInfo(0).TestID
-                                                                                   rowPatient.SampleType = patientInfo(0).SampleType
-                                                                                   rowPatient.ReadingCycle = patientInfo(0).ReadingCycle
-                                                                                   rowPatient.ReagentID = patientInfo(0).ReagentID
-                                                                                   rowPatient.OrderID = patientInfo(0).OrderID
-
-                                                                                   'AG 27/04/2012 Activate this line again (RH 08/03/2012 Remove this line)
-                                                                                   rowPatient.ElementID = patientInfo(0).CreationOrder 'Convert.ToInt32(patientInfo(0).OrderID.Substring(8, 4))
-                                                                                   If orderTestLockedByLISList.Contains(rowPatient.OrderTestID) Then rowPatient.ExecutionStatus = "LOCKED" 'AG 25/03/2013 - Locked by LIS not by volume missing
-                                                                                   rowPatient.EndEdit()
-                                                                               End If
-                                                                           Next
-                                                                           patientInfo = Nothing 'AG 19/02/2014 - #1514
-                                                                           'End If
-                                                                           GlobalBase.CreateLogActivity("Get Executions For PATIENTS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                                                                                           "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
-                                                                       End Sub))
-
-
-                                    Task.WaitAll(listTask.ToArray())
-
-                                    listTask.Clear()
-
-                                    If (Not resultData.HasError) Then
-                                        'Search all locked BLANKS to lock also all Calibrators, Control and Patient Samples
-                                        'for the same Standard Test
-                                        Dim lstLockedBlanks As List(Of Integer)
-                                        lstLockedBlanks = (From a In myBlankExecutionsDS.twksWSExecutions _
-                                                          Where a.ExecutionStatus = "LOCKED" _
-                                                         Select a.TestID Distinct).ToList()
-
-                                        'AJG
-                                        Dim lstLockedCtrls As List(Of ExecutionsDS.twksWSExecutionsRow)
-                                        Dim lstLockedCalibs As List(Of ExecutionsDS.twksWSExecutionsRow)
-                                        Dim lstLockedPatients As List(Of ExecutionsDS.twksWSExecutionsRow)
-
-                                        listTask.Add(task.Factory.StartNew(Sub()
-                                                                               For Each lockedBlank In lstLockedBlanks
-                                                                                   Dim myOwnTestId = lockedBlank
-                                                                                   '...LOCK the correspondent Calibrators
-                                                                                   lstLockedCalibs = (From a In myCalibratorExecutionsDS.twksWSExecutions _
-                                                                                                     Where a.TestID = myOwnTestId _
-                                                                                                   AndAlso a.ExecutionStatus <> "LOCKED" _
-                                                                                                    Select a).ToList()
-
-                                                                                   For Each lockedCalib In lstLockedCalibs
-                                                                                       lockedCalib.BeginEdit()
-                                                                                       lockedCalib.ExecutionStatus = "LOCKED"
-                                                                                       lockedCalib.EndEdit()
-                                                                                   Next
-                                                                               Next
-                                                                           End Sub))
-
-                                        listTask.Add(task.Factory.StartNew(Sub()
-                                                                               For Each lockedBlank In lstLockedBlanks
-                                                                                   Dim myOwnTestId = lockedBlank
-                                                                                   '...LOCK the correspondent Controls - Apply only to STD Preparations
-                                                                                   lstLockedCtrls = (From a In myControlExecutionsDS.twksWSExecutions _
-                                                                                                     Where a.ExecutionType = "PREP_STD" _
-                                                                                                   AndAlso a.TestID = myOwnTestId _
-                                                                                                   AndAlso a.ExecutionStatus <> "LOCKED" _
-                                                                                                    Select a).ToList()
-
-                                                                                   For Each lockedCtrl In lstLockedCtrls
-                                                                                       lockedCtrl.BeginEdit()
-                                                                                       lockedCtrl.ExecutionStatus = "LOCKED"
-                                                                                       lockedCtrl.EndEdit()
-                                                                                   Next
-                                                                               Next
-                                                                           End Sub))
-
-                                        listTask.Add(task.Factory.StartNew(Sub()
-                                                                               For Each lockedBlank In lstLockedBlanks
-                                                                                   Dim myOwnTestId = lockedBlank
-                                                                                   '...LOCK the correspondent Patients
-                                                                                   lstLockedPatients = (From a In myPatientExecutionsDS.twksWSExecutions _
-                                                                                                       Where a.ExecutionType = "PREP_STD" _
-                                                                                                     AndAlso a.TestID = myOwnTestId _
-                                                                                                     AndAlso a.ExecutionStatus <> "LOCKED" _
-                                                                                                      Select a).ToList()
-
-                                                                                   For Each lockedPatient In lstLockedPatients
-                                                                                       lockedPatient.BeginEdit()
-                                                                                       lockedPatient.ExecutionStatus = "LOCKED"
-                                                                                       lockedPatient.EndEdit()
-                                                                                   Next
-                                                                               Next
-                                                                           End Sub))
-
-
-                                        task.WaitAll(listTask.ToArray())
-                                        listTask.Clear()
-
-                                        myCalibratorExecutionsDS.AcceptChanges()
-                                        myControlExecutionsDS.AcceptChanges()
-                                        myPatientExecutionsDS.AcceptChanges()
-
-                                        'AG 19/02/2014 - #1514
-                                        lstLockedBlanks = Nothing
-                                        lstLockedCtrls = Nothing
-                                        lstLockedCalibs = Nothing
-                                        lstLockedPatients = Nothing
-                                        'AG 19/02/2014 - #1514
-                                    End If
-
-                                    '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                                    GlobalBase.CreateLogActivity("Locks for BLANKS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                                                    "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
-                                    StartTime = Now
-                                    '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-
-                                    If (Not resultData.HasError) Then
-                                        'Search all locked CALIBRATORS to lock also all Controls and Patient Samples
-                                        'for the same Standard Test and SampleType
-                                        Dim lstLockedCalibs As List(Of ExecutionsDS.twksWSExecutionsRow)
-                                        lstLockedCalibs = (From a In myCalibratorExecutionsDS.twksWSExecutions _
-                                                          Where a.ExecutionStatus = "LOCKED" _
-                                                         Select a Order By a.OrderTestID).ToList()
-
-                                        Dim myOrderTestID As Integer = -1
-
-                                        Parallel.ForEach(lstLockedCalibs, Sub(lockedCalib)
-                                                                              If (myOrderTestID <> lockedCalib.OrderTestID) Then
-                                                                                  'First verify if the Calibrator is used as alternative of another Sample Types for the same Test
-                                                                                  myOrderTestID = lockedCalib.OrderTestID
-                                                                                  Dim lstAlternativeST = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
-                                                                                                     Where a.SampleClass = "CALIB" _
-                                                                                                   AndAlso Not a.IsAlternativeOrderTestIDNull _
-                                                                                                   AndAlso a.AlternativeOrderTestID = myOrderTestID _
-                                                                                                    Select a.SampleType Distinct).ToList
-
-                                                                                  For i As Integer = 0 To (lstAlternativeST.Count)
-                                                                                      Dim myTestID = lockedCalib.TestID
-                                                                                      Dim mySampleType = lockedCalib.SampleType
-
-                                                                                      If (i > 0) Then mySampleType = lstAlternativeST(i - 1)
-
-                                                                                      '...LOCK the correspondent Controls - Apply only to STD Preparations
-                                                                                      Dim lstLockedCtrls = (From a In myControlExecutionsDS.twksWSExecutions _
-                                                                                                        Where a.ExecutionType = "PREP_STD" _
-                                                                                                      AndAlso a.TestID = myTestID _
-                                                                                                      AndAlso a.SampleType = mySampleType _
-                                                                                                      AndAlso a.ExecutionStatus <> "LOCKED" _
-                                                                                                       Select a).ToList()
-
-                                                                                      Parallel.ForEach(lstLockedCtrls, Sub(lockedCtrl)
-                                                                                                                           lockedCtrl.BeginEdit()
-                                                                                                                           lockedCtrl.ExecutionStatus = "LOCKED"
-                                                                                                                           lockedCtrl.EndEdit()
-                                                                                                                       End Sub)
-
-                                                                                      '...LOCK the correspondent Patients.
-                                                                                      Dim lstLockedPatients = (From a In myPatientExecutionsDS.twksWSExecutions _
-                                                                                                          Where a.ExecutionType = "PREP_STD" _
-                                                                                                        AndAlso a.TestID = myTestID _
-                                                                                                        AndAlso a.SampleType = mySampleType _
-                                                                                                        AndAlso a.ExecutionStatus <> "LOCKED" _
-                                                                                                         Select a).ToList()
-
-                                                                                      Parallel.ForEach(lstLockedPatients, Sub(lockedPatient)
-                                                                                                                              lockedPatient.BeginEdit()
-                                                                                                                              lockedPatient.ExecutionStatus = "LOCKED"
-                                                                                                                              lockedPatient.EndEdit()
-                                                                                                                          End Sub)
-                                                                                  Next
-                                                                              End If
-                                                                          End Sub)
-
-                                        myControlExecutionsDS.AcceptChanges()
-                                        myPatientExecutionsDS.AcceptChanges()
-
-                                        'AG 19/02/2014 - #1514
-                                        lstLockedCalibs = Nothing
-                                        'AG 19/02/2014 - #1514
-                                    End If
-
-                                    '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                                    GlobalBase.CreateLogActivity("Locks for CALIBRATORS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                                                    "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
-                                    StartTime = Now
-                                    '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-
-                                    If (Not resultData.HasError) Then
-                                        If (Not calledForRerun) Then
-                                            'Search all Standard TestType/TestID/SampleType of all Patients requested for STAT, to mark as STAT
-                                            'all the needed Blanks, Calibrators and Controls
-                                            Dim lstSTATS As List(Of String)
-                                            lstSTATS = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
-                                                       Where a.SampleClass = "PATIENT" _
-                                                     AndAlso a.StatFlag = True _
-                                                      Select String.Format("{0}|{1}|{2}", a.TestType, a.TestID, a.SampleType) Distinct).ToList
-
-                                            Dim pos1 As Integer
-                                            Dim pos2 As Integer
-                                            Dim myTestID As Integer
-                                            Dim myTestType As String
-                                            Dim mySampleType As String
-                                            Dim lstBlkCalibCtrls As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
-
-                                            'SA 19/06/2012 - Filter linq also by TestType
-                                            For Each statPatient In lstSTATS
-                                                pos1 = statPatient.IndexOf("|")
-                                                myTestType = statPatient.Substring(0, pos1)
-
-                                                pos2 = statPatient.LastIndexOf("|")
-                                                mySampleType = statPatient.Substring(pos2 + 1)
-                                                myTestID = Convert.ToInt32(statPatient.Substring(pos1 + 1, pos2 - pos1 - 1))
-
-
-                                                'Search all Controls, Calibrators and Blanks for the TestType/TestID/SampleType
-                                                lstBlkCalibCtrls = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
-                                                                    Where a.TestType = myTestType _
-                                                                  AndAlso a.TestID = myTestID _
-                                                                  AndAlso ((a.SampleClass = "BLANK") _
-                                                                   OrElse (a.SampleClass = "CALIB" AndAlso a.SampleType = mySampleType) _
-                                                                   OrElse (a.SampleClass = "CTRL" AndAlso a.SampleType = mySampleType)) _
-                                                                   Select a Order By a.SampleClass).ToList()
-
-
-                                                Parallel.ForEach(lstBlkCalibCtrls, Sub(blkCalibCtrlRow)
-                                                                                       Dim myOrderTestID = blkCalibCtrlRow.OrderTestID
-                                                                                       If (blkCalibCtrlRow.SampleClass = "CALIB") AndAlso (Not blkCalibCtrlRow.IsAlternativeOrderTestIDNull) Then
-                                                                                           myOrderTestID = blkCalibCtrlRow.AlternativeOrderTestID
-                                                                                       End If
-
-                                                                                       'Search the OrderTestID to update the StatFlag
-                                                                                       If (blkCalibCtrlRow.SampleClass = "BLANK") Then
-                                                                                           Dim lstBlanks = (From a In myBlankExecutionsDS.twksWSExecutions _
-                                                                                                       Where a.OrderTestID = myOrderTestID _
-                                                                                                      Select a).ToList()
-
-                                                                                           For Each blank In lstBlanks
-                                                                                               blank.StatFlag = True
-                                                                                           Next
-                                                                                       ElseIf (blkCalibCtrlRow.SampleClass = "CALIB") Then
-                                                                                           'Dim lstCalibs As List(Of ExecutionsDS.twksWSExecutionsRow) 'AG 19/02/2014 - #1514
-                                                                                           Dim lstCalibs = (From a In myCalibratorExecutionsDS.twksWSExecutions _
-                                                                                                       Where a.OrderTestID = myOrderTestID _
-                                                                                                      Select a).ToList()
-
-                                                                                           For Each calibrator In lstCalibs
-                                                                                               calibrator.StatFlag = True
-                                                                                           Next
-                                                                                       ElseIf (blkCalibCtrlRow.SampleClass = "CTRL") Then
-                                                                                           'Dim lstCtrls As List(Of ExecutionsDS.twksWSExecutionsRow) 'AG 19/02/2014 - #1514
-                                                                                           Dim lstCtrls = (From a In myControlExecutionsDS.twksWSExecutions _
-                                                                                                       Where a.OrderTestID = myOrderTestID _
-                                                                                                      Select a).ToList()
-
-                                                                                           For Each control In lstCtrls
-                                                                                               control.StatFlag = True
-                                                                                           Next
-                                                                                       End If
-                                                                                   End Sub)
-
-                                                myBlankExecutionsDS.AcceptChanges()
-                                                myCalibratorExecutionsDS.AcceptChanges()
-                                                myControlExecutionsDS.AcceptChanges()
-                                            Next
-
-                                            'AG 19/02/2014 - #1514
-                                            lstSTATS = Nothing
-                                            lstBlkCalibCtrls = Nothing
-                                            'AG 19/02/2014 - #1514
-                                        End If
-                                    End If
-
-                                    '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                                    GlobalBase.CreateLogActivity("Mark STATS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                                                    "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
-                                    StartTime = Now
-                                    '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-
-
-                                    'Unify all locked Executions and all pending Executions (all types) 
-                                    Dim lockedExecutionsDS As New ExecutionsDS
-                                    Dim pendingExecutionsDS As New ExecutionsDS
-
-                                    If (Not resultData.HasError) Then
-                                        'Move executions for BLANKS
-                                        For Each blank As ExecutionsDS.twksWSExecutionsRow In myBlankExecutionsDS.twksWSExecutions
-                                            If (blank.ExecutionStatus = "LOCKED") Then
-                                                lockedExecutionsDS.twksWSExecutions.ImportRow(blank)
-                                            ElseIf (blank.ExecutionStatus = "PENDING") Then
-                                                pendingExecutionsDS.twksWSExecutions.ImportRow(blank)
-                                            End If
-                                        Next
-
-                                        'AG 19/02/2014 - #1514 use merge instead of loops
-                                        ''AG 15/09/2011 - Add locked executions at the botton of the pending ones
-                                        'For Each lockedEx As ExecutionsDS.twksWSExecutionsRow In lockedExecutionsDS.twksWSExecutions
-                                        '    pendingExecutionsDS.twksWSExecutions.ImportRow(lockedEx)
-                                        'Next
-                                        pendingExecutionsDS.twksWSExecutions.Merge(lockedExecutionsDS.twksWSExecutions)
-                                        lockedExecutionsDS.Clear()
-                                        'AG 15/09/2011
-
-                                        'Move executions for CALIBRATORS
-                                        For Each calib As ExecutionsDS.twksWSExecutionsRow In myCalibratorExecutionsDS.twksWSExecutions
-                                            If (calib.ExecutionStatus = "LOCKED") Then
-                                                lockedExecutionsDS.twksWSExecutions.ImportRow(calib)
-                                            ElseIf (calib.ExecutionStatus = "PENDING") Then
-                                                pendingExecutionsDS.twksWSExecutions.ImportRow(calib)
-                                            End If
-                                        Next
-
-                                        'AG 19/02/2014 - #1514 use merge instead of loops
-                                        ''AG 15/09/2011 - Add locked executions at the botton of the pending ones
-                                        'For Each lockedEx As ExecutionsDS.twksWSExecutionsRow In lockedExecutionsDS.twksWSExecutions
-                                        '    pendingExecutionsDS.twksWSExecutions.ImportRow(lockedEx)
-                                        'Next
-                                        pendingExecutionsDS.twksWSExecutions.Merge(lockedExecutionsDS.twksWSExecutions)
-                                        lockedExecutionsDS.Clear()
-                                        'AG 15/09/2011
-
-                                        'Move executions for CONTROLS
-                                        For Each ctrl As ExecutionsDS.twksWSExecutionsRow In myControlExecutionsDS.twksWSExecutions
-                                            If (ctrl.ExecutionStatus = "LOCKED") Then
-                                                lockedExecutionsDS.twksWSExecutions.ImportRow(ctrl)
-                                            ElseIf (ctrl.ExecutionStatus = "PENDING") Then
-                                                pendingExecutionsDS.twksWSExecutions.ImportRow(ctrl)
-                                            End If
-                                        Next
-
-                                        'AG 19/02/2014 - #1514 use merge instead of loops
-                                        ''AG 15/09/2011 - Add locked executions at the botton of the pending ones
-                                        'For Each lockedEx As ExecutionsDS.twksWSExecutionsRow In lockedExecutionsDS.twksWSExecutions
-                                        '    pendingExecutionsDS.twksWSExecutions.ImportRow(lockedEx)
-                                        'Next
-                                        pendingExecutionsDS.twksWSExecutions.Merge(lockedExecutionsDS.twksWSExecutions)
-                                        lockedExecutionsDS.Clear()
-                                        'AG 15/09/2011
-
-                                        'Move executions for PATIENTS
-                                        For Each patient As ExecutionsDS.twksWSExecutionsRow In myPatientExecutionsDS.twksWSExecutions
-                                            If (patient.ExecutionStatus = "LOCKED") Then
-                                                lockedExecutionsDS.twksWSExecutions.ImportRow(patient)
-                                            ElseIf (patient.ExecutionStatus = "PENDING") Then
-                                                pendingExecutionsDS.twksWSExecutions.ImportRow(patient)
-                                            End If
-                                        Next
-
-                                        'AG 19/02/2014 - #1514 use merge instead of loops
-                                        ''AG 15/09/2011 - Add locked executions at the botton of the pending ones
-                                        'For Each lockedEx As ExecutionsDS.twksWSExecutionsRow In lockedExecutionsDS.twksWSExecutions
-                                        '    pendingExecutionsDS.twksWSExecutions.ImportRow(lockedEx)
-                                        'Next
-                                        pendingExecutionsDS.twksWSExecutions.Merge(lockedExecutionsDS.twksWSExecutions)
-                                        lockedExecutionsDS.Clear()
-                                        'AG 15/09/2011
-
-                                        '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                                        GlobalBase.CreateLogActivity("Unify all Pending and Locked " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                                                        "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
-                                        StartTime = Now
-                                        '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-
-                                        If (Not calledForRerun) Then
-                                            'Sort PENDING executions 
-                                            If (pendingExecutionsDS.twksWSExecutions.Rows.Count > 0) Then
-                                                'AG 30/11/2011 - NEW: When a patient has Ise & std test executions the ISE executions are the first
-
-                                                'AG 15/09/2011 - Locked executions at the botton his sample
-                                                'pendingExecutionsDS.twksWSExecutions.DefaultView.Sort = _
-                                                '        "StatFlag DESC, SampleClass, ElementID, SampleType, " & _
-                                                '        "ExecutionType DESC, ReadingCycle DESC"
-                                                'pendingExecutionsDS.twksWSExecutions.DefaultView.Sort = _
-                                                '    "StatFlag DESC, SampleClass, ElementID, SampleType, " & _
-                                                '    "ExecutionType DESC, ExecutionStatus DESC, ReadingCycle DESC"
-                                                ''AG 15/09/2011
-
-                                                pendingExecutionsDS.twksWSExecutions.DefaultView.Sort = "StatFlag DESC, SampleClass, ElementID, SampleType, " & _
-                                                                                                        "ExecutionType, ExecutionStatus DESC, ReadingCycle DESC"
-                                                'AG 30/11/2011 - NEW: When a patient has Ise & std test executions the ISE executions are the first
-
-                                                Dim executionDataDS As New ExecutionsDS
-                                                'AG 12/07/2012
-                                                'For Each pendingExecution As DataRow In pendingExecutionsDS.twksWSExecutions.DefaultView.ToTable.Rows
-                                                '    executionDataDS.twksWSExecutions.ImportRow(pendingExecution)
-                                                'Next
-                                                executionDataDS = CType(pendingExecutionsDS, ExecutionsDS)
-                                                'AG 12/07/2012
-
-                                                'AG 28/11/2011 - Code for evaluate method execution time (comment after the evaluation has been performed)
-                                                'Dim startTime As DateTime = Now
-
-                                                'Sort by Contamination
-
-                                                Dim sorter = New WSExecutionsSorter(executionDataDS, activeAnalyzer)
-                                                If sorter.SortByContamination(dbConnection) Then
-                                                    resultData.SetDatos = sorter.Executions
-                                                    executionDataDS = sorter.Executions
-                                                Else
-                                                    resultData.SetDatos = Nothing
-                                                    resultData.HasError = True
-                                                End If
-
-                                                If (Not resultData.HasError AndAlso executionDataDS IsNot Nothing) Then
-
-                                                    'Sort Orders by ReadingCycle
-                                                    If sorter.SortByElementGroupTime() Then
-                                                        executionDataDS = sorter.Executions
-                                                    Else
-                                                        resultData.HasError = True
-                                                    End If
-
-
-                                                    If (Not resultData.HasError AndAlso executionDataDS IsNot Nothing) Then
-
-                                                        If sorter.SortByGroupContamination(dbConnection) Then
-                                                            executionDataDS = sorter.Executions
-                                                        End If
-
-                                                        'resultData = SortWSExecutionsByElementGroupContaminationNew(activeAnalyzer, dbConnection, executionDataDS) 'AG 07/11/2011
-
-                                                        'If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                                        'executionDataDS = DirectCast(resultData.SetDatos, ExecutionsDS)
-                                                        'End If
-
-                                                    End If
-                                                End If
-
-                                                'AG 28/11/2011 - Code for evaluate method execution time (comment after the evaluation has been performed)
-                                                'Dim elapsedTime As Double = 0
-                                                'elapsedTime = Now.Subtract(startTime).TotalMilliseconds
-
-                                                'Finally, save the sorted PENDING executions
-                                                If (Not resultData.HasError) Then
-                                                    resultData = myDAO.Create(dbConnection, executionDataDS)
-                                                End If
-                                            End If
-
-                                            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                                            GlobalBase.CreateLogActivity("Sort and create all PENDING " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                                                            "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
-                                            StartTime = Now
-                                            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                                        Else
-                                            'Save PENDING executions  
-                                            resultData = myDAO.Create(dbConnection, pendingExecutionsDS)
-                                        End If
-
-                                        'Save LOCKED executions
-                                        If (lockedExecutionsDS.twksWSExecutions.Rows.Count > 0) Then
-                                            If (Not resultData.HasError) Then
-                                                resultData = myDAO.Create(dbConnection, lockedExecutionsDS)
-                                            End If
-                                        End If
-
-                                        '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                                        GlobalBase.CreateLogActivity("Save all LOCKED " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                                                        "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
-                                        StartTime = Now
-                                        '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-
-                                        If (Not resultData.HasError) Then
-                                            'AG 19/09/2011 - Update of the Paused flag is performed only when no Running mode
-                                            '              - When working in Running mode, no pending executions are deleted, then SW has only to update status 
-                                            '                (business already performed)
-                                            If (Not calledForRerun AndAlso Not pWorkInRunningMode) Then
-                                                Dim tempExecutionDS As New ExecutionsDS
-                                                Dim myWSPausedOrderTestsDS As New WSPausedOrderTestsDS
-                                                Dim myWSPausedOrderTestsDelegate As New WSPausedOrderTestsDelegate
-
-                                                resultData = myWSPausedOrderTestsDelegate.ReadByAnalyzerAndWorkSession(dbConnection, pAnalyzerID, pWorkSessionID)
-                                                If (Not resultData.HasError) Then
-                                                    myWSPausedOrderTestsDS = DirectCast(resultData.SetDatos, WSPausedOrderTestsDS)
-
-                                                    For Each pausedOTRow As WSPausedOrderTestsDS.twksWSPausedOrderTestsRow In myWSPausedOrderTestsDS.twksWSPausedOrderTests.Rows
-                                                        resultData = myDAO.ReadByOrderTestIDAndRerunNumber(dbConnection, pausedOTRow.OrderTestID, pausedOTRow.RerunNumber)
-                                                        If resultData.HasError Then Exit For
-
-                                                        tempExecutionDS = DirectCast(resultData.SetDatos, ExecutionsDS)
-                                                        If (tempExecutionDS.twksWSExecutions.Count > 0) Then
-                                                            'If found, then update
-                                                            For Each executionRow As ExecutionsDS.twksWSExecutionsRow In tempExecutionDS.twksWSExecutions.Rows
-                                                                resultData = myDAO.UpdatePaused(dbConnection, True, executionRow.ExecutionID)
-                                                                If (resultData.HasError) Then Exit For
-                                                            Next
-                                                        End If
-                                                    Next
-                                                End If
-                                            End If
-                                            'AG 19/09/2011
-                                        End If
-
-                                        If (Not resultData.HasError) Then
-                                            If (Not calledForRerun) Then
-                                                'Do nothing ... business has been already performed in previous call to RecalculateStatusForNotDeletedExecutions method
-                                            Else
-                                                'If function was called for a Rerun, change the Status of the Order Test to PENDING
-                                                Dim myOrderTestDelegate As New OrderTestsDelegate
-                                                resultData = myOrderTestDelegate.UpdateStatusByOrderTestID(dbConnection, pOrderTestID, "PENDING")
-                                            End If
-
-                                            'AG 25/03/2013 - Update executions locked by lis
-                                            If Not resultData.HasError AndAlso orderTestLockedByLISList.Count > 0 Then
-                                                resultData = myDAO.UpdateLockedByLIS(dbConnection, orderTestLockedByLISList, True)
-                                            End If
-                                            'AG 25/03/2013
-
-                                        End If
-                                    End If
-                                End If
-                            End If
-                        End If
-
-                        'AG 20/09/2011 - When the WorkSession is modified, all samples rotor status can change 
-                        '                when new tests are added using a tube with status finished (finished -> pending)
-                        If (Not resultData.HasError AndAlso Not calledForRerun) Then
-                            'Read the current content of all positions in Samples Rotor
-                            Dim rcp_del As New WSRotorContentByPositionDelegate
-                            resultData = rcp_del.ReadByCellNumber(dbConnection, pAnalyzerID, pWorkSessionID, "SAMPLES", -1)
-
-                            If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-                                Dim samplesRotorDS As WSRotorContentByPositionDS = DirectCast(resultData.SetDatos, WSRotorContentByPositionDS)
-
-                                'Get only positions with tubes for required WorkSession Elements not marked as Depleted or with not enough volume
-                                Dim linqRes As List(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow)
-                                linqRes = (From a As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In samplesRotorDS.twksWSRotorContentByPosition _
-                                      Where Not a.IsElementIDNull _
-                                        AndAlso a.Status <> "DEPLETED" _
-                                        AndAlso a.Status <> "FEW" _
-                                         Select a).ToList
-
-                                Dim newStatus As String = ""
-                                For Each row As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In linqRes
-                                    newStatus = row.Status
-                                    resultData = rcp_del.UpdateSamplePositionStatus(dbConnection, -1, pWorkSessionID, pAnalyzerID, row.ElementID, _
-                                                                                    row.TubeContent, 1, newStatus, row.CellNumber)
-                                Next
-                                linqRes = Nothing 'AG 19/02/2014 - #1514
-                            End If
-                        End If
-                        'AG 20/09/2011
-
-                        If (Not resultData.HasError) Then
-
-                            'check if there are Electrodes with wrong Calibration
-                            If (Not pISEElectrodesList Is Nothing AndAlso pISEElectrodesList.Count > 0) Then
-                                For Each electrode As String In pISEElectrodesList
-                                    resultData = UpdateStatusByISETestType(dbConnection, pWorkSessionID, pAnalyzerID, electrode, "PENDING", "LOCKED")
-                                    If (resultData.HasError) Then Exit For
-                                Next
-                            ElseIf (Not pIsISEModuleReady) Then
-                                'ISE Module cannot be used; all pending ISE Preparations are LOCKED
-                                resultData = UpdateStatusByExecutionTypeAndStatus(dbConnection, pWorkSessionID, pAnalyzerID, "PREP_ISE", "PENDING", "LOCKED")
-                            End If
-
-                        End If
-
-                        '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                        GlobalBase.CreateLogActivity("Final Processing " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                                        "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
-                        StartTime = Now
-                        '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-
-                        If (Not resultData.HasError) Then
-                            'When the Database Connection was opened locally, then the Commit is executed
-                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-                        Else
-                            'When the Database Connection was opened locally, then the Rollback is executed
-                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-                        End If
-
-                        orderTestLockedByLISList = Nothing 'AG 19/02/2014 - #1514
-                    End If
-                End If
-
-            Catch ex As Exception
-                'When the Database Connection was opened locally, then the Rollback is executed
-                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-
-                resultData = New GlobalDataTO()
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
-                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Error, False)
-            Finally
-                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
-
-                'AG 02/06/2014 #1644 - Set the semaphore to free value (EXCEPT when called from auto rerun business)
-                If GlobalConstants.CreateWSExecutionsWithSemaphore AndAlso pManualRerunFlag Then
-                    GlobalSemaphores.createWSExecutionsSemaphore.Release()
-                    GlobalSemaphores.createWSExecutionsQueue = 0 'Only 1 thread is allowed, so reset to 0 instead of decrement --1 'GlobalSemaphores.createWSExecutionsQueue -= 1
-                    'Dim myLogAcciones As New ApplicationLogManager()
-                    GlobalBase.CreateLogActivity("CreateWSExecutions semaphore: Released, semaphore free", "AnalyzerManager.CreateWSExecutions", EventLogEntryType.Information, False)
-                End If
-
-            End Try
-            Return resultData
-        End Function
 
         ''' <summary>
         ''' Gets the list of Executions sorted by Contamination.
@@ -7845,332 +5369,332 @@ Namespace Biosystems.Ax00.BL
             Return resultData
         End Function
 
-        ''' <summary>
-        ''' Gets the list of Execution's Element groups sorted by Contamination
-        ''' The previous group have no changes, this algorithm changes the current group executions to minimize the number of contaminations
-        ''' between [Previous Group (last execution) -> Current Group (First execution) + Current Group All his executions]
-        ''' 
-        ''' </summary>
-        ''' <param name="pExecutions">Dataset with structure of view vwksWSExecutions</param>
-        ''' <returns>
-        ''' GlobalDataTo indicating if an error has occurred or not.
-        ''' If succeed, returns an ExecutionsDS dataset with the ordered data (view vwksWSExecutions)
-        ''' </returns>
-        ''' <remarks>
-        ''' Created by:  RH - 08/06/2010
-        ''' Modified by: SA            - Changed function called to get the R1 Contaminations for a one in the Delegated Class
-        '''              RH 08/04/2011 - Changed order field from OrderID to ElementID
-        '''              RH 29/09/2011 - Sort PATIENT executions. Sort inter SampleClass executions. Keep locked exections in place.
-        '''              AG 09/11/2011 - Change the whole method business (the old method SortWSExecutionsByElementGroupContamination is kept)
-        '''                              this is an adapted version of the ols SortWSExecutionsByContamination method
-        '''              AG 25/11/2011 - Added the high contamination persistance functionality
-        '''              AG 20/06/2012 - Executions for CONTROLS have to be processed in the same way than Executions for PATIENT Samples
-        '''              AG 27/05/2013 - Add new samples types LIQ and SER
-        '''              AJ 19/03/2015 - Added the activeAnalyzer parameter. Needed for solving contaminations by AnalyzerModel
-        ''' </remarks>
-        Public Function SortWSExecutionsByElementGroupContaminationNew(ByVal activeAnalyzer As String, ByVal pDBConnection As SqlClient.SqlConnection, ByVal pExecutions As ExecutionsDS) As GlobalDataTO
-            Dim resultData As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
+        '''' <summary>
+        '''' Gets the list of Execution's Element groups sorted by Contamination
+        '''' The previous group have no changes, this algorithm changes the current group executions to minimize the number of contaminations
+        '''' between [Previous Group (last execution) -> Current Group (First execution) + Current Group All his executions]
+        '''' 
+        '''' </summary>
+        '''' <param name="pExecutions">Dataset with structure of view vwksWSExecutions</param>
+        '''' <returns>
+        '''' GlobalDataTo indicating if an error has occurred or not.
+        '''' If succeed, returns an ExecutionsDS dataset with the ordered data (view vwksWSExecutions)
+        '''' </returns>
+        '''' <remarks>
+        '''' Created by:  RH - 08/06/2010
+        '''' Modified by: SA            - Changed function called to get the R1 Contaminations for a one in the Delegated Class
+        ''''              RH 08/04/2011 - Changed order field from OrderID to ElementID
+        ''''              RH 29/09/2011 - Sort PATIENT executions. Sort inter SampleClass executions. Keep locked exections in place.
+        ''''              AG 09/11/2011 - Change the whole method business (the old method SortWSExecutionsByElementGroupContamination is kept)
+        ''''                              this is an adapted version of the ols SortWSExecutionsByContamination method
+        ''''              AG 25/11/2011 - Added the high contamination persistance functionality
+        ''''              AG 20/06/2012 - Executions for CONTROLS have to be processed in the same way than Executions for PATIENT Samples
+        ''''              AG 27/05/2013 - Add new samples types LIQ and SER
+        ''''              AJ 19/03/2015 - Added the activeAnalyzer parameter. Needed for solving contaminations by AnalyzerModel
+        '''' </remarks>
+        'Public Function SortWSExecutionsByElementGroupContaminationNew(ByVal activeAnalyzer As String, ByVal pDBConnection As SqlClient.SqlConnection, ByVal pExecutions As ExecutionsDS) As GlobalDataTO
+        '    Dim resultData As GlobalDataTO = Nothing
+        '    Dim dbConnection As SqlClient.SqlConnection = Nothing
 
-            Dim bestResult As List(Of ExecutionsDS.twksWSExecutionsRow)
-            Dim currentResult As List(Of ExecutionsDS.twksWSExecutionsRow)
-            Dim bestContaminationNumber As Integer = Integer.MaxValue
-            'Dim currentContaminationNumber As Integer
-            Dim contaminationsDataDS As ContaminationsDS = Nothing
+        '    Dim bestResult As List(Of ExecutionsDS.twksWSExecutionsRow)
+        '    Dim currentResult As List(Of ExecutionsDS.twksWSExecutionsRow)
+        '    Dim bestContaminationNumber As Integer = Integer.MaxValue
+        '    'Dim currentContaminationNumber As Integer
+        '    Dim contaminationsDataDS As ContaminationsDS = Nothing
 
-            Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        'Get all R1 Contaminations 
-                        resultData = ContaminationsDelegate.GetContaminationsByType(dbConnection, "R1")
+        '    Try
+        '        resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+        '        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+        '            dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+        '            If (Not dbConnection Is Nothing) Then
+        '                'Get all R1 Contaminations 
+        '                resultData = ContaminationsDelegate.GetContaminationsByType(dbConnection, "R1")
 
-                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                            contaminationsDataDS = DirectCast(resultData.SetDatos, ContaminationsDS)
+        '                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+        '                    contaminationsDataDS = DirectCast(resultData.SetDatos, ContaminationsDS)
 
-                            Dim highContaminationPersitance As Integer = 0
+        '                    Dim highContaminationPersitance As Integer = 0
 
-                            resultData = SwParametersDelegate.ReadNumValueByParameterName(Nothing, GlobalEnumerates.SwParameters.CONTAMIN_REAGENT_PERSIS.ToString, Nothing)
-                            If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-                                highContaminationPersitance = CInt(resultData.SetDatos)
-                            End If
+        '                    resultData = SwParametersDelegate.ReadNumValueByParameterName(Nothing, GlobalEnumerates.SwParameters.CONTAMIN_REAGENT_PERSIS.ToString, Nothing)
+        '                    If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+        '                        highContaminationPersitance = CInt(resultData.SetDatos)
+        '                    End If
 
-                            Dim Stats() As Boolean = {True, False}
-                            Dim SampleClasses() As String = {"BLANK", "CALIB", "CTRL", "PATIENT"}
-                            'TR 27/05/2013 -Get a list of sample types separated by commas
-                            Dim SampleTypes() As String = Nothing
-                            Dim myMasterDataDelegate As New MasterDataDelegate
+        '                    Dim Stats() As Boolean = {True, False}
+        '                    Dim SampleClasses() As String = {"BLANK", "CALIB", "CTRL", "PATIENT"}
+        '                    'TR 27/05/2013 -Get a list of sample types separated by commas
+        '                    Dim SampleTypes() As String = Nothing
+        '                    Dim myMasterDataDelegate As New MasterDataDelegate
 
-                            resultData = MasterDataDelegate.GetSampleTypes(dbConnection)
-                            If Not resultData.HasError Then
-                                SampleTypes = resultData.SetDatos.ToString.Split(CChar(","))
-                            End If
-                            'Dim SampleTypes() As String = {"SER", "URI", "PLM", "WBL", "CSF", "LIQ", "SEM"}
-                            Dim stdOrderTestsCount As Integer = 0
+        '                    resultData = MasterDataDelegate.GetSampleTypes(dbConnection)
+        '                    If Not resultData.HasError Then
+        '                        SampleTypes = resultData.SetDatos.ToString.Split(CChar(","))
+        '                    End If
+        '                    'Dim SampleTypes() As String = {"SER", "URI", "PLM", "WBL", "CSF", "LIQ", "SEM"}
+        '                    Dim stdOrderTestsCount As Integer = 0
 
-                            'Different Stat, SampleClasses and SampleTypes in WorkSession
-                            Dim differentStatValues As List(Of Boolean) = (From wse In pExecutions.twksWSExecutions Select wse.StatFlag Distinct).ToList
-                            Dim differentSampleClassValues As List(Of String) = (From wse In pExecutions.twksWSExecutions Select wse.SampleClass Distinct).ToList
-                            Dim differentSampleTypeValues As List(Of String) = (From wse In pExecutions.twksWSExecutions Select wse.SampleType Distinct).ToList
-
-
-                            Dim returnDS As New ExecutionsDS
-                            Dim previousElementLastReagentID As Integer = -1
-                            Dim PreviousReagentsIDList As New List(Of Integer) 'List of previous reagents sent before the current previousElementLastReagentID, 
-                            '                                                   remember this information in order to check the high contamination persistance
-                            '                                                   (One Item for each different OrderTest)
-
-                            Dim previousElementLastMaxReplicates As Integer = 1
-                            Dim previousOrderTestMaxReplicatesList As New List(Of Integer) 'AG 19/12/2011 - Same item number as previous list, indicates the replicate number for each item in previous list
-
-                            Dim OrderContaminationNumber As Integer = 0
-
-                            For Each StatFlag In Stats
-                                If differentStatValues.Contains(StatFlag) Then
-
-                                    For Each SampleClass In SampleClasses
-                                        If differentSampleClassValues.Contains(SampleClass) Then
-
-                                            'AG 27/04/2012 AG + RH - Search the elementid for each sampleClass (the elementid code can be repeated from different sampleclasses)
-                                            'Dim Elements = (From wse In pExecutions.twksWSExecutions _
-                                            '              Select wse.ElementID Distinct).ToList()
-                                            Dim Elements = (From wse In pExecutions.twksWSExecutions _
-                                                            Where wse.SampleClass = SampleClass _
-                                                            Select wse.ElementID Distinct).ToList()
-                                            'AG 27/04/2012
-
-                                            For Each elementID In Elements
-                                                Dim ID = elementID
-                                                Dim Stat As Boolean = StatFlag
-                                                Dim SClass As String = SampleClass
-
-                                                For Each sortedSampleType In SampleTypes
-                                                    'AG 30/08/2012 - add OrElse differentSampleTypeValues.Contains("") because when create a ws only with blanks there not exists sampletype!!
-                                                    If differentSampleTypeValues.Contains(sortedSampleType) OrElse _
-                                                       (differentSampleClassValues.Count = 1 AndAlso differentSampleClassValues.Contains("BLANK")) Then
-
-                                                        Dim SType As String = sortedSampleType
-
-                                                        Dim AllTestTypeOrderTests As List(Of ExecutionsDS.twksWSExecutionsRow) 'All test type order tests
-                                                        Dim OrderTests As List(Of ExecutionsDS.twksWSExecutionsRow) = Nothing  'Only STD test order tests
-
-                                                        'NEW: When a patient or ctrl has Ise & std test executions the ISE executions are the first
-                                                        If SClass = "PATIENT" OrElse SClass = "CTRL" Then 'Apply OrderBy sample type order {"SER", "URI", "PLM", "WBL", "CSF"} (case one PATIENT with several sample types) + execution type
-                                                            AllTestTypeOrderTests = (From wse In pExecutions.twksWSExecutions _
-                                                                             Where wse.StatFlag = Stat AndAlso _
-                                                                             wse.SampleClass = SClass AndAlso _
-                                                                             wse.SampleType = SType AndAlso _
-                                                                             wse.ElementID = ID _
-                                                                             Select wse Order By wse.ExecutionType).ToList()
-
-                                                            If AllTestTypeOrderTests.Count > 0 Then
-                                                                'Look for the STD orderTests
-                                                                OrderTests = (From wse In pExecutions.twksWSExecutions _
-                                                                         Where wse.StatFlag = Stat AndAlso _
-                                                                         wse.SampleClass = SClass AndAlso _
-                                                                         wse.SampleType = SType AndAlso _
-                                                                         wse.ElementID = ID AndAlso _
-                                                                         wse.ExecutionType = "PREP_STD" _
-                                                                         Select wse).ToList()
-                                                                stdOrderTestsCount = OrderTests.Count
-                                                            Else
-                                                                stdOrderTestsCount = 0
-                                                            End If
-
-                                                        Else 'Do not apply OrderBy & do not take care about sample type order inside the same SAMPLE
-                                                            AllTestTypeOrderTests = (From wse In pExecutions.twksWSExecutions _
-                                                                                     Where wse.StatFlag = Stat AndAlso _
-                                                                                     wse.SampleClass = SClass AndAlso _
-                                                                                     wse.ElementID = ID _
-                                                                                     Select wse).ToList()
-
-                                                            If AllTestTypeOrderTests.Count > 0 Then
-                                                                'Look for the STD orderTests
-                                                                OrderTests = (From wse In pExecutions.twksWSExecutions _
-                                                                              Where wse.StatFlag = Stat AndAlso _
-                                                                              wse.SampleClass = SClass AndAlso _
-                                                                              wse.ElementID = ID AndAlso _
-                                                                              wse.ExecutionType = "PREP_STD" _
-                                                                              Select wse).ToList()
-                                                                stdOrderTestsCount = OrderTests.Count
-                                                            Else
-                                                                stdOrderTestsCount = 0
-                                                            End If
-                                                        End If
+        '                    'Different Stat, SampleClasses and SampleTypes in WorkSession
+        '                    Dim differentStatValues As List(Of Boolean) = (From wse In pExecutions.twksWSExecutions Select wse.StatFlag Distinct).ToList
+        '                    Dim differentSampleClassValues As List(Of String) = (From wse In pExecutions.twksWSExecutions Select wse.SampleClass Distinct).ToList
+        '                    Dim differentSampleTypeValues As List(Of String) = (From wse In pExecutions.twksWSExecutions Select wse.SampleType Distinct).ToList
 
 
-                                                        If stdOrderTestsCount > 0 Then
-                                                            OrderContaminationNumber = 0
+        '                    Dim returnDS As New ExecutionsDS
+        '                    Dim previousElementLastReagentID As Integer = -1
+        '                    Dim PreviousReagentsIDList As New List(Of Integer) 'List of previous reagents sent before the current previousElementLastReagentID, 
+        '                    '                                                   remember this information in order to check the high contamination persistance
+        '                    '                                                   (One Item for each different OrderTest)
 
-                                                            'Only move the contaminated tests, so no changes into first element tests and also when the
-                                                            'last reagent on previous element do not contaminates the first reagent in current element
-                                                            If previousElementLastReagentID <> -1 Then
-                                                                Dim pendingOrderTestInNewElement = (From wse In OrderTests _
-                                                                                                            Where wse.ExecutionStatus = "PENDING" _
-                                                                                                            Select wse).ToList()
-                                                                If pendingOrderTestInNewElement.Count > 0 Then
-                                                                    'Search contamination between Elements
-                                                                    Dim existContamination = (From wse In contaminationsDataDS.tparContaminations _
-                                                                                                Where wse.ReagentContaminatorID = previousElementLastReagentID _
-                                                                                                AndAlso wse.ReagentContaminatedID = pendingOrderTestInNewElement(0).ReagentID _
-                                                                                                Select wse).ToList()
+        '                    Dim previousElementLastMaxReplicates As Integer = 1
+        '                    Dim previousOrderTestMaxReplicatesList As New List(Of Integer) 'AG 19/12/2011 - Same item number as previous list, indicates the replicate number for each item in previous list
 
-                                                                    If existContamination.Count > 0 Then
-                                                                        'Calculate the contaminations inside the current Element + 1 (contamination between last and next elementID)
-                                                                        OrderContaminationNumber = 1 + GetContaminationNumber(contaminationsDataDS, OrderTests, highContaminationPersitance)
+        '                    Dim OrderContaminationNumber As Integer = 0
 
-                                                                    ElseIf highContaminationPersitance > 0 Then
-                                                                        'If no LOW contamination exists between consecutive executions take care about the previous due the high contamination
-                                                                        'has persistance > 1 (Evaluate only when last OrderTest has MaxReplicates < pHighContaminationPersistance)
-                                                                        If previousElementLastMaxReplicates < highContaminationPersitance Then
+        '                    For Each StatFlag In Stats
+        '                        If differentStatValues.Contains(StatFlag) Then
 
-                                                                            'Evaluate if the last reagents sent contaminates (HIGH contamination) the first pending to be sent
-                                                                            For highIndex As Integer = PreviousReagentsIDList.Count - highContaminationPersitance To PreviousReagentsIDList.Count - 2
-                                                                                Dim auxHighIndex = highIndex
-                                                                                If auxHighIndex >= 0 Then 'Avoid overflow
-                                                                                    existContamination = (From wse In contaminationsDataDS.tparContaminations _
-                                                                                                      Where wse.ReagentContaminatorID = PreviousReagentsIDList(auxHighIndex) _
-                                                                                                      AndAlso wse.ReagentContaminatedID = pendingOrderTestInNewElement(0).ReagentID _
-                                                                                                      AndAlso Not wse.IsWashingSolutionR1Null _
-                                                                                                      Select wse).ToList()
-                                                                                    If existContamination.Count > 0 Then
-                                                                                        Exit For
-                                                                                    End If
-                                                                                End If
-                                                                            Next
+        '                            For Each SampleClass In SampleClasses
+        '                                If differentSampleClassValues.Contains(SampleClass) Then
 
-                                                                            'If previous step has no contamination then evaluate if the LAST reagent sent contaminates (HIGH contamination) the second, third,... reagent pending to be sent
-                                                                            If existContamination.Count = 0 Then
-                                                                                Dim newPendingOrderTestMaxReplicates As Integer = 1
-                                                                                newPendingOrderTestMaxReplicates = (From wse In pendingOrderTestInNewElement _
-                                                                                                                    Select wse.ReplicateNumber).Max
-                                                                                If newPendingOrderTestMaxReplicates < highContaminationPersitance Then
-                                                                                    For i = 1 To highContaminationPersitance - 1
-                                                                                        Dim aux_i = i
-                                                                                        If aux_i <= pendingOrderTestInNewElement.Count - 1 Then 'Avoid overflow
-                                                                                            existContamination = (From wse In contaminationsDataDS.tparContaminations _
-                                                                                                              Where wse.ReagentContaminatorID = PreviousReagentsIDList(PreviousReagentsIDList.Count - 1) _
-                                                                                                              AndAlso wse.ReagentContaminatedID = pendingOrderTestInNewElement(aux_i).ReagentID _
-                                                                                                              AndAlso Not wse.IsWashingSolutionR1Null _
-                                                                                                              Select wse).ToList()
-                                                                                            If existContamination.Count > 0 Then
-                                                                                                Exit For
-                                                                                            End If
-                                                                                        End If
-                                                                                    Next
-                                                                                End If
-                                                                            End If
+        '                                    'AG 27/04/2012 AG + RH - Search the elementid for each sampleClass (the elementid code can be repeated from different sampleclasses)
+        '                                    'Dim Elements = (From wse In pExecutions.twksWSExecutions _
+        '                                    '              Select wse.ElementID Distinct).ToList()
+        '                                    Dim Elements = (From wse In pExecutions.twksWSExecutions _
+        '                                                    Where wse.SampleClass = SampleClass _
+        '                                                    Select wse.ElementID Distinct).ToList()
+        '                                    'AG 27/04/2012
 
-                                                                            If existContamination.Count > 0 Then
-                                                                                'Calculate the contaminations inside the current Element + 1 (contamination between last and next elementID)
-                                                                                OrderContaminationNumber = 1 + GetContaminationNumber(contaminationsDataDS, OrderTests, highContaminationPersitance)
-                                                                            End If
+        '                                    For Each elementID In Elements
+        '                                        Dim ID = elementID
+        '                                        Dim Stat As Boolean = StatFlag
+        '                                        Dim SClass As String = SampleClass
 
-                                                                        End If 'If previousElementLastMaxReplicates < highContaminationPersitance Then
-                                                                    End If ' If existContamination.Count > 0 Then
+        '                                        For Each sortedSampleType In SampleTypes
+        '                                            'AG 30/08/2012 - add OrElse differentSampleTypeValues.Contains("") because when create a ws only with blanks there not exists sampletype!!
+        '                                            If differentSampleTypeValues.Contains(sortedSampleType) OrElse _
+        '                                               (differentSampleClassValues.Count = 1 AndAlso differentSampleClassValues.Contains("BLANK")) Then
 
-                                                                End If 'If pendingOrderTestInNewElement.Count > 0 Then
-                                                            End If 'If previousElementLastReagentID <> -1 Then
+        '                                                Dim SType As String = sortedSampleType
 
-                                                            ManageContaminations(activeAnalyzer, dbConnection, returnDS, contaminationsDataDS, highContaminationPersitance, OrderTests, AllTestTypeOrderTests, OrderContaminationNumber, PreviousReagentsIDList, previousOrderTestMaxReplicatesList)
+        '                                                Dim AllTestTypeOrderTests As List(Of ExecutionsDS.twksWSExecutionsRow) 'All test type order tests
+        '                                                Dim OrderTests As List(Of ExecutionsDS.twksWSExecutionsRow) = Nothing  'Only STD test order tests
 
-                                                            'AG 07/11/2011 - search the last reagentID of the current Element before change the ElementID
-                                                            OrderTests = (From wse In returnDS.twksWSExecutions _
-                                                                            Where wse.StatFlag = Stat AndAlso _
-                                                                            wse.SampleClass = SClass AndAlso _
-                                                                            wse.ElementID = ID AndAlso _
-                                                                            wse.ExecutionStatus = "PENDING" _
-                                                                            Select wse).ToList()
+        '                                                'NEW: When a patient or ctrl has Ise & std test executions the ISE executions are the first
+        '                                                If SClass = "PATIENT" OrElse SClass = "CTRL" Then 'Apply OrderBy sample type order {"SER", "URI", "PLM", "WBL", "CSF"} (case one PATIENT with several sample types) + execution type
+        '                                                    AllTestTypeOrderTests = (From wse In pExecutions.twksWSExecutions _
+        '                                                                     Where wse.StatFlag = Stat AndAlso _
+        '                                                                     wse.SampleClass = SClass AndAlso _
+        '                                                                     wse.SampleType = SType AndAlso _
+        '                                                                     wse.ElementID = ID _
+        '                                                                     Select wse Order By wse.ExecutionType).ToList()
 
-                                                            If OrderTests.Count > 0 Then
-                                                                'AG 19/12/2011 - Inform the list of reagents and replicates using the executions of the last element group
-                                                                'The last reagentID used has the higher indexes
-                                                                Dim maxReplicates As Integer
-                                                                For item = 0 To OrderTests.Count - 1
-                                                                    Dim itemIndex = item
-                                                                    maxReplicates = (From wse In returnDS.twksWSExecutions _
-                                                                                                        Where wse.OrderTestID = OrderTests(itemIndex).OrderTestID _
-                                                                                                        Select wse.ReplicateNumber).Max
+        '                                                    If AllTestTypeOrderTests.Count > 0 Then
+        '                                                        'Look for the STD orderTests
+        '                                                        OrderTests = (From wse In pExecutions.twksWSExecutions _
+        '                                                                 Where wse.StatFlag = Stat AndAlso _
+        '                                                                 wse.SampleClass = SClass AndAlso _
+        '                                                                 wse.SampleType = SType AndAlso _
+        '                                                                 wse.ElementID = ID AndAlso _
+        '                                                                 wse.ExecutionType = "PREP_STD" _
+        '                                                                 Select wse).ToList()
+        '                                                        stdOrderTestsCount = OrderTests.Count
+        '                                                    Else
+        '                                                        stdOrderTestsCount = 0
+        '                                                    End If
 
-                                                                    If PreviousReagentsIDList.Count = 0 Then
-                                                                        PreviousReagentsIDList.Add(OrderTests(itemIndex).ReagentID)
-                                                                        previousOrderTestMaxReplicatesList.Add(maxReplicates)
+        '                                                Else 'Do not apply OrderBy & do not take care about sample type order inside the same SAMPLE
+        '                                                    AllTestTypeOrderTests = (From wse In pExecutions.twksWSExecutions _
+        '                                                                             Where wse.StatFlag = Stat AndAlso _
+        '                                                                             wse.SampleClass = SClass AndAlso _
+        '                                                                             wse.ElementID = ID _
+        '                                                                             Select wse).ToList()
 
-                                                                        'When reagent changes
-                                                                    ElseIf PreviousReagentsIDList(PreviousReagentsIDList.Count - 1) <> OrderTests(itemIndex).ReagentID Then
-                                                                        PreviousReagentsIDList.Add(OrderTests(itemIndex).ReagentID)
-                                                                        previousOrderTestMaxReplicatesList.Add(maxReplicates)
-                                                                    End If
-
-                                                                    If itemIndex = OrderTests.Count - 1 Then
-                                                                        previousElementLastReagentID = OrderTests(itemIndex).ReagentID
-                                                                        previousElementLastMaxReplicates = maxReplicates
-                                                                    End If
-                                                                    'AG 19/12/2011
-                                                                Next
-                                                            Else
-                                                                'Do nothing, the sentence previousElementLastReagentID = -1 is not allowed due
-                                                                'WS could contain a Element LOCKED completely
-                                                            End If
-                                                            'AG 07/11/2011
-                                                        Else
-                                                            'AG 14/12/2011 - Different test types
-                                                            For Each wse In AllTestTypeOrderTests
-                                                                returnDS.twksWSExecutions.ImportRow(wse)
-                                                            Next
-                                                            'AG 14/12/2011
-                                                        End If
-
-                                                        If SClass <> "PATIENT" AndAlso SClass <> "CTRL" Then Exit For 'For blank, calib do not take care about the sample type inside the same SAMPLE
-
-                                                        'AG 20/02/2014 - #1514
-                                                        AllTestTypeOrderTests = Nothing
-                                                        OrderTests = Nothing
-                                                        'AG 20/02/2014 - #1514
-
-                                                    End If
-                                                Next 'For Each mySampleType
-
-                                            Next 'For each elementID
+        '                                                    If AllTestTypeOrderTests.Count > 0 Then
+        '                                                        'Look for the STD orderTests
+        '                                                        OrderTests = (From wse In pExecutions.twksWSExecutions _
+        '                                                                      Where wse.StatFlag = Stat AndAlso _
+        '                                                                      wse.SampleClass = SClass AndAlso _
+        '                                                                      wse.ElementID = ID AndAlso _
+        '                                                                      wse.ExecutionType = "PREP_STD" _
+        '                                                                      Select wse).ToList()
+        '                                                        stdOrderTestsCount = OrderTests.Count
+        '                                                    Else
+        '                                                        stdOrderTestsCount = 0
+        '                                                    End If
+        '                                                End If
 
 
-                                        End If
-                                    Next 'For each SampleClass
+        '                                                If stdOrderTestsCount > 0 Then
+        '                                                    OrderContaminationNumber = 0
 
-                                End If
-                            Next 'For each StatFlag
+        '                                                    'Only move the contaminated tests, so no changes into first element tests and also when the
+        '                                                    'last reagent on previous element do not contaminates the first reagent in current element
+        '                                                    If previousElementLastReagentID <> -1 Then
+        '                                                        Dim pendingOrderTestInNewElement = (From wse In OrderTests _
+        '                                                                                                    Where wse.ExecutionStatus = "PENDING" _
+        '                                                                                                    Select wse).ToList()
+        '                                                        If pendingOrderTestInNewElement.Count > 0 Then
+        '                                                            'Search contamination between Elements
+        '                                                            Dim existContamination = (From wse In contaminationsDataDS.tparContaminations _
+        '                                                                                        Where wse.ReagentContaminatorID = previousElementLastReagentID _
+        '                                                                                        AndAlso wse.ReagentContaminatedID = pendingOrderTestInNewElement(0).ReagentID _
+        '                                                                                        Select wse).ToList()
 
-                            resultData.SetDatos = returnDS
-                            'AG 20/02/2014 - #1514
-                            differentStatValues = Nothing
-                            differentSampleClassValues = Nothing
-                            differentSampleTypeValues = Nothing
-                            PreviousReagentsIDList = Nothing
-                            previousOrderTestMaxReplicatesList = Nothing
-                            'AG 20/02/2014 - #1514
-                        End If
+        '                                                            If existContamination.Count > 0 Then
+        '                                                                'Calculate the contaminations inside the current Element + 1 (contamination between last and next elementID)
+        '                                                                OrderContaminationNumber = 1 + GetContaminationNumber(contaminationsDataDS, OrderTests, highContaminationPersitance)
 
-                    End If
-                End If
+        '                                                            ElseIf highContaminationPersitance > 0 Then
+        '                                                                'If no LOW contamination exists between consecutive executions take care about the previous due the high contamination
+        '                                                                'has persistance > 1 (Evaluate only when last OrderTest has MaxReplicates < pHighContaminationPersistance)
+        '                                                                If previousElementLastMaxReplicates < highContaminationPersitance Then
 
-            Catch ex As Exception
-                resultData = New GlobalDataTO()
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
-                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
+        '                                                                    'Evaluate if the last reagents sent contaminates (HIGH contamination) the first pending to be sent
+        '                                                                    For highIndex As Integer = PreviousReagentsIDList.Count - highContaminationPersitance To PreviousReagentsIDList.Count - 2
+        '                                                                        Dim auxHighIndex = highIndex
+        '                                                                        If auxHighIndex >= 0 Then 'Avoid overflow
+        '                                                                            existContamination = (From wse In contaminationsDataDS.tparContaminations _
+        '                                                                                              Where wse.ReagentContaminatorID = PreviousReagentsIDList(auxHighIndex) _
+        '                                                                                              AndAlso wse.ReagentContaminatedID = pendingOrderTestInNewElement(0).ReagentID _
+        '                                                                                              AndAlso Not wse.IsWashingSolutionR1Null _
+        '                                                                                              Select wse).ToList()
+        '                                                                            If existContamination.Count > 0 Then
+        '                                                                                Exit For
+        '                                                                            End If
+        '                                                                        End If
+        '                                                                    Next
 
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.SortWSExecutionsByElementGroupContaminationNew", EventLogEntryType.Error, False)
+        '                                                                    'If previous step has no contamination then evaluate if the LAST reagent sent contaminates (HIGH contamination) the second, third,... reagent pending to be sent
+        '                                                                    If existContamination.Count = 0 Then
+        '                                                                        Dim newPendingOrderTestMaxReplicates As Integer = 1
+        '                                                                        newPendingOrderTestMaxReplicates = (From wse In pendingOrderTestInNewElement _
+        '                                                                                                            Select wse.ReplicateNumber).Max
+        '                                                                        If newPendingOrderTestMaxReplicates < highContaminationPersitance Then
+        '                                                                            For i = 1 To highContaminationPersitance - 1
+        '                                                                                Dim aux_i = i
+        '                                                                                If aux_i <= pendingOrderTestInNewElement.Count - 1 Then 'Avoid overflow
+        '                                                                                    existContamination = (From wse In contaminationsDataDS.tparContaminations _
+        '                                                                                                      Where wse.ReagentContaminatorID = PreviousReagentsIDList(PreviousReagentsIDList.Count - 1) _
+        '                                                                                                      AndAlso wse.ReagentContaminatedID = pendingOrderTestInNewElement(aux_i).ReagentID _
+        '                                                                                                      AndAlso Not wse.IsWashingSolutionR1Null _
+        '                                                                                                      Select wse).ToList()
+        '                                                                                    If existContamination.Count > 0 Then
+        '                                                                                        Exit For
+        '                                                                                    End If
+        '                                                                                End If
+        '                                                                            Next
+        '                                                                        End If
+        '                                                                    End If
 
-            End Try
-            'AG 19/02/2014 - #1514
-            bestResult = Nothing
-            currentResult = Nothing
-            'AG 19/02/2014 - #1514
+        '                                                                    If existContamination.Count > 0 Then
+        '                                                                        'Calculate the contaminations inside the current Element + 1 (contamination between last and next elementID)
+        '                                                                        OrderContaminationNumber = 1 + GetContaminationNumber(contaminationsDataDS, OrderTests, highContaminationPersitance)
+        '                                                                    End If
 
-            Return resultData
-        End Function
+        '                                                                End If 'If previousElementLastMaxReplicates < highContaminationPersitance Then
+        '                                                            End If ' If existContamination.Count > 0 Then
+
+        '                                                        End If 'If pendingOrderTestInNewElement.Count > 0 Then
+        '                                                    End If 'If previousElementLastReagentID <> -1 Then
+
+        '                                                    ManageContaminations(activeAnalyzer, dbConnection, returnDS, contaminationsDataDS, highContaminationPersitance, OrderTests, AllTestTypeOrderTests, OrderContaminationNumber, PreviousReagentsIDList, previousOrderTestMaxReplicatesList)
+
+        '                                                    'AG 07/11/2011 - search the last reagentID of the current Element before change the ElementID
+        '                                                    OrderTests = (From wse In returnDS.twksWSExecutions _
+        '                                                                    Where wse.StatFlag = Stat AndAlso _
+        '                                                                    wse.SampleClass = SClass AndAlso _
+        '                                                                    wse.ElementID = ID AndAlso _
+        '                                                                    wse.ExecutionStatus = "PENDING" _
+        '                                                                    Select wse).ToList()
+
+        '                                                    If OrderTests.Count > 0 Then
+        '                                                        'AG 19/12/2011 - Inform the list of reagents and replicates using the executions of the last element group
+        '                                                        'The last reagentID used has the higher indexes
+        '                                                        Dim maxReplicates As Integer
+        '                                                        For item = 0 To OrderTests.Count - 1
+        '                                                            Dim itemIndex = item
+        '                                                            maxReplicates = (From wse In returnDS.twksWSExecutions _
+        '                                                                                                Where wse.OrderTestID = OrderTests(itemIndex).OrderTestID _
+        '                                                                                                Select wse.ReplicateNumber).Max
+
+        '                                                            If PreviousReagentsIDList.Count = 0 Then
+        '                                                                PreviousReagentsIDList.Add(OrderTests(itemIndex).ReagentID)
+        '                                                                previousOrderTestMaxReplicatesList.Add(maxReplicates)
+
+        '                                                                'When reagent changes
+        '                                                            ElseIf PreviousReagentsIDList(PreviousReagentsIDList.Count - 1) <> OrderTests(itemIndex).ReagentID Then
+        '                                                                PreviousReagentsIDList.Add(OrderTests(itemIndex).ReagentID)
+        '                                                                previousOrderTestMaxReplicatesList.Add(maxReplicates)
+        '                                                            End If
+
+        '                                                            If itemIndex = OrderTests.Count - 1 Then
+        '                                                                previousElementLastReagentID = OrderTests(itemIndex).ReagentID
+        '                                                                previousElementLastMaxReplicates = maxReplicates
+        '                                                            End If
+        '                                                            'AG 19/12/2011
+        '                                                        Next
+        '                                                    Else
+        '                                                        'Do nothing, the sentence previousElementLastReagentID = -1 is not allowed due
+        '                                                        'WS could contain a Element LOCKED completely
+        '                                                    End If
+        '                                                    'AG 07/11/2011
+        '                                                Else
+        '                                                    'AG 14/12/2011 - Different test types
+        '                                                    For Each wse In AllTestTypeOrderTests
+        '                                                        returnDS.twksWSExecutions.ImportRow(wse)
+        '                                                    Next
+        '                                                    'AG 14/12/2011
+        '                                                End If
+
+        '                                                If SClass <> "PATIENT" AndAlso SClass <> "CTRL" Then Exit For 'For blank, calib do not take care about the sample type inside the same SAMPLE
+
+        '                                                'AG 20/02/2014 - #1514
+        '                                                AllTestTypeOrderTests = Nothing
+        '                                                OrderTests = Nothing
+        '                                                'AG 20/02/2014 - #1514
+
+        '                                            End If
+        '                                        Next 'For Each mySampleType
+
+        '                                    Next 'For each elementID
+
+
+        '                                End If
+        '                            Next 'For each SampleClass
+
+        '                        End If
+        '                    Next 'For each StatFlag
+
+        '                    resultData.SetDatos = returnDS
+        '                    'AG 20/02/2014 - #1514
+        '                    differentStatValues = Nothing
+        '                    differentSampleClassValues = Nothing
+        '                    differentSampleTypeValues = Nothing
+        '                    PreviousReagentsIDList = Nothing
+        '                    previousOrderTestMaxReplicatesList = Nothing
+        '                    'AG 20/02/2014 - #1514
+        '                End If
+
+        '            End If
+        '        End If
+
+        '    Catch ex As Exception
+        '        resultData = New GlobalDataTO()
+        '        resultData.HasError = True
+        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+        '        resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
+
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.SortWSExecutionsByElementGroupContaminationNew", EventLogEntryType.Error, False)
+
+        '    End Try
+        '    'AG 19/02/2014 - #1514
+        '    bestResult = Nothing
+        '    currentResult = Nothing
+        '    'AG 19/02/2014 - #1514
+
+        '    Return resultData
+        'End Function
 
 #End Region
 
@@ -9046,265 +6570,6 @@ Namespace Biosystems.Ax00.BL
             Return resultData
         End Function
 
-
-        ''' <summary>
-        ''' Recalculate status for all not deleted existing executions with status PENDING or LOCKED (standBy or pause mode)
-        ''' In running normal mode: Do not evaluate the possible status change PENDING to LOCKED because in running remove rotor position is not allowed
-        ''' Summary
-        ''' PENDING to LOCKED: Only when pWorkInRunningMode = FALSE
-        ''' LOCKED to PENDING: Always
-        ''' </summary>
-        ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
-        ''' <param name="pWorkSessionID">Work Session Identifier</param>
-        ''' <param name="pWorkInRunningMode">Flag indicating if the function is executed when a WorkSession is running in the Analyzer
-        '''                                  It is not necessary just now, but it is defined for future use if it is finally needed</param>
-        ''' <returns>GlobalDataTO containing sucess/error information</returns>
-        ''' <remarks>
-        ''' Created by:  SA 03/07/2012 - Based in RecalculateStatusForNotDeletedExecutions; changes to improve the function perfomance
-        ''' Modified by AG 25/03/2013 - When the ordertest has been locked by lis assign LOCKED value instead of PENDING, otherwise although 
-        '''                             the final result is OK the sort by contaminations can be affected
-        ''' AG 30/05/2014 - #1644 add parameter pPauseMode
-        ''' </remarks>
-        Public Function RecalculateStatusForNotDeletedExecutionsNEW(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-                                                                    ByVal pWorkSessionID As String, ByVal pWorkInRunningMode As Boolean, ByVal pPauseMode As Boolean) As GlobalDataTO
-            Dim resultData As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
-
-            Try
-                resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
-                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        Dim myExecutionsDAO As New twksWSExecutionsDAO
-
-                        'Get all Pending and Locked Executions in the Analyzer WorkSession
-                        resultData = myExecutionsDAO.GetPendingAndLockedGroupedExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pWorkInRunningMode, pPauseMode)
-                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                            Dim myExecutionsDS As ExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
-
-                            Dim newExecStatus As String
-                            Dim noPOSElements As Integer
-                            Dim myWSOrderTests As New WSOrderTestsDelegate
-                            Dim reqElementsDS As New WSOrderTestsForExecutionsDS
-                            Dim lstSampleClassExecutions As List(Of ExecutionsDS.twksWSExecutionsRow)
-                            Dim lstToPENDING As List(Of ExecutionsDS.twksWSExecutionsRow) 'AG 19/02/2014 - #1514
-                            Dim lstToLOCKED As List(Of ExecutionsDS.twksWSExecutionsRow) 'AG 19/02/2014 - #1514
-
-                            If (myExecutionsDS.twksWSExecutions.Rows.Count > 0) Then
-                                'Get all BLANK Order Tests having Pending and/or Locked Executions
-                                lstSampleClassExecutions = (From a As ExecutionsDS.twksWSExecutionsRow In myExecutionsDS.twksWSExecutions _
-                                                           Where a.SampleClass = "BLANK" _
-                                                          Select a).ToList()
-
-                                If (lstSampleClassExecutions.Count > 0) Then
-                                    For Each blankOT As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions
-                                        'Get the list of Elements required for the Blank Order Test 
-                                        resultData = myWSOrderTests.GetOrderTestsForExecutions(dbConnection, pAnalyzerID, pWorkSessionID, blankOT.SampleClass, blankOT.OrderTestID)
-                                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                            reqElementsDS = DirectCast(resultData.SetDatos, WSOrderTestsForExecutionsDS)
-
-                                            'Verify if at least one of the required Elements is not positioned
-                                            noPOSElements = (From b As WSOrderTestsForExecutionsDS.WSOrderTestsForExecutionsRow In reqElementsDS.WSOrderTestsForExecutions _
-                                                            Where b.ElementStatus = "NOPOS" _
-                                                           Select b).ToList.Count()
-
-                                            'The Executions for the Blank Order Test will be marked as LOCKED if there are not positioned elements
-                                            blankOT.ExecutionStatus = IIf(noPOSElements > 0, "LOCKED", "PENDING").ToString
-                                        Else
-                                            Exit For
-                                        End If
-                                    Next
-
-                                    'Finally, update the status of the Executions for each Blank OrderTest
-                                    'AG 19/02/2014 - #1514
-                                    'If (Not resultData.HasError) Then resultData = myExecutionsDAO.UpdateStatusByOTAndRerunNumber(dbConnection, lstSampleClassExecutions)
-                                    lstToPENDING = (From a As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions Where a.ExecutionStatus = "PENDING" Select a).ToList
-                                    lstToLOCKED = (From a As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions Where a.ExecutionStatus = "LOCKED" Select a).ToList
-                                    If (Not resultData.HasError) Then resultData = myExecutionsDAO.UpdateStatusByOTAndRerunNumber(dbConnection, lstToPENDING, lstToLOCKED)
-                                    'AG 19/02/2014 - #1514
-
-                                End If
-
-                                If (Not resultData.HasError) Then
-                                    'Get all CALIBRATOR Order Tests having Pending and/or Locked Executions
-                                    lstSampleClassExecutions = (From a As ExecutionsDS.twksWSExecutionsRow In myExecutionsDS.twksWSExecutions _
-                                                               Where a.SampleClass = "CALIB" _
-                                                              Select a).ToList()
-
-                                    If (lstSampleClassExecutions.Count > 0) Then
-                                        For Each calibOT As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions
-                                            'Get the list of Elements required for the Calibrator Order Test 
-                                            resultData = myWSOrderTests.GetOrderTestsForExecutions(dbConnection, pAnalyzerID, pWorkSessionID, calibOT.SampleClass, calibOT.OrderTestID)
-                                            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                                reqElementsDS = DirectCast(resultData.SetDatos, WSOrderTestsForExecutionsDS)
-
-                                                'Verify if at least one of the required Elements is not positioned
-                                                noPOSElements = (From b As WSOrderTestsForExecutionsDS.WSOrderTestsForExecutionsRow In reqElementsDS.WSOrderTestsForExecutions _
-                                                                Where b.ElementStatus = "NOPOS" _
-                                                               Select b).ToList.Count()
-
-                                                newExecStatus = "PENDING"
-                                                If (noPOSElements > 0) Then
-                                                    'There are required Elements not positioned; the Executions of the Order Test will be marked as locked
-                                                    newExecStatus = "LOCKED"
-                                                Else
-                                                    'Elements required for the Calibrator are positioned, verify if the elements needed for the Blank are also positioned
-                                                    resultData = VerifyLockedBlank(dbConnection, pWorkSessionID, pAnalyzerID, reqElementsDS.WSOrderTestsForExecutions.First.TestID, _
-                                                                                   reqElementsDS.WSOrderTestsForExecutions.First.SampleType)
-                                                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                                        If (DirectCast(resultData.SetDatos, Boolean)) Then newExecStatus = "LOCKED"
-                                                    Else
-                                                        Exit For
-                                                    End If
-                                                End If
-                                                calibOT.ExecutionStatus = newExecStatus
-                                            Else
-                                                Exit For
-                                            End If
-                                        Next
-
-                                        'Finally, update the status of the Executions for each Calibrator OrderTest
-                                        'AG 19/02/2014 - #1514
-                                        'If (Not resultData.HasError) Then resultData = myExecutionsDAO.UpdateStatusByOTAndRerunNumber(dbConnection, lstSampleClassExecutions)
-                                        lstToPENDING = (From a As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions Where a.ExecutionStatus = "PENDING" Select a).ToList
-                                        lstToLOCKED = (From a As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions Where a.ExecutionStatus = "LOCKED" Select a).ToList
-                                        If (Not resultData.HasError) Then resultData = myExecutionsDAO.UpdateStatusByOTAndRerunNumber(dbConnection, lstToPENDING, lstToLOCKED)
-                                        'AG 19/02/2014 - #1514
-                                    End If
-                                End If
-
-                                If (Not resultData.HasError) Then
-                                    'Get all CONTROL and PATIENT Order Tests having Pending and/or Locked Executions for ISE Tests 
-                                    lstSampleClassExecutions = (From a As ExecutionsDS.twksWSExecutionsRow In myExecutionsDS.twksWSExecutions _
-                                                               Where (a.SampleClass = "CTRL" OrElse a.SampleClass = "PATIENT") _
-                                                             AndAlso a.ExecutionType = "PREP_ISE" _
-                                                              Select a).ToList()
-
-                                    If (lstSampleClassExecutions.Count > 0) Then
-                                        For Each sampleIseOT As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions
-                                            'Get the list of Elements required for the Control or Patient ISE Order Test 
-                                            resultData = myWSOrderTests.GetOrderTestsForExecutions(dbConnection, pAnalyzerID, pWorkSessionID, sampleIseOT.SampleClass, sampleIseOT.OrderTestID)
-                                            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                                reqElementsDS = DirectCast(resultData.SetDatos, WSOrderTestsForExecutionsDS)
-
-                                                'Verify if at least one of the required Elements is not positioned
-                                                noPOSElements = (From b As WSOrderTestsForExecutionsDS.WSOrderTestsForExecutionsRow In reqElementsDS.WSOrderTestsForExecutions _
-                                                                Where b.ElementStatus = "NOPOS" _
-                                                               Select b).ToList.Count()
-
-                                                'The Executions for the Control or Patient ISE Order Test will be marked as LOCKED if there are not positioned elements
-                                                sampleIseOT.ExecutionStatus = IIf(noPOSElements > 0, "LOCKED", "PENDING").ToString
-                                                If Not sampleIseOT.IsLockedByLISNull AndAlso sampleIseOT.LockedByLIS Then sampleIseOT.ExecutionStatus = "LOCKED" 'AG 25/03/2013 - Locked by LIS not by volume missing
-                                            Else
-                                                Exit For
-                                            End If
-                                        Next
-
-                                        'Finally, update the status of the Executions for each Control or Patient ISE Order Test
-                                        'AG 19/02/2014 - #1514
-                                        'If (Not resultData.HasError) Then resultData = myExecutionsDAO.UpdateStatusByOTAndRerunNumber(dbConnection, lstSampleClassExecutions)
-                                        lstToPENDING = (From a As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions Where a.ExecutionStatus = "PENDING" Select a).ToList
-                                        lstToLOCKED = (From a As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions Where a.ExecutionStatus = "LOCKED" Select a).ToList
-                                        If (Not resultData.HasError) Then resultData = myExecutionsDAO.UpdateStatusByOTAndRerunNumber(dbConnection, lstToPENDING, lstToLOCKED)
-                                        'AG 19/02/2014 - #1514
-                                    End If
-
-                                    If (Not resultData.HasError) Then
-                                        'Get all CONTROL and PATIENT Order Tests having Pending and/or Locked Executions for STANDARD Tests 
-                                        lstSampleClassExecutions = (From a As ExecutionsDS.twksWSExecutionsRow In myExecutionsDS.twksWSExecutions _
-                                                                   Where (a.SampleClass = "CTRL" OrElse a.SampleClass = "PATIENT") _
-                                                                 AndAlso a.ExecutionType = "PREP_STD" _
-                                                                  Select a).ToList()
-
-                                        If (lstSampleClassExecutions.Count > 0) Then
-                                            For Each sampleStdOT As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions
-                                                'Get the list of Elements required for the Control or Patient STANDARD Order Test 
-                                                resultData = myWSOrderTests.GetOrderTestsForExecutions(dbConnection, pAnalyzerID, pWorkSessionID, sampleStdOT.SampleClass, sampleStdOT.OrderTestID)
-                                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                                    reqElementsDS = DirectCast(resultData.SetDatos, WSOrderTestsForExecutionsDS)
-
-                                                    'Verify if at least one of the required Elements is not positioned
-                                                    noPOSElements = (From b As WSOrderTestsForExecutionsDS.WSOrderTestsForExecutionsRow In reqElementsDS.WSOrderTestsForExecutions _
-                                                                    Where b.ElementStatus = "NOPOS" _
-                                                                   Select b).ToList.Count()
-
-                                                    newExecStatus = "PENDING"
-                                                    If Not sampleStdOT.IsLockedByLISNull AndAlso sampleStdOT.LockedByLIS Then newExecStatus = "LOCKED" 'AG 25/03/2013 - Locked by LIS not by volume missing
-
-                                                    If (noPOSElements > 0) Then
-                                                        'There are required Elements not positioned; the Executions of the Order Test will be marked as locked
-                                                        newExecStatus = "LOCKED"
-                                                    ElseIf newExecStatus = "PENDING" Then 'Else 'AG 25/03/2013 - improve change Else for Else PENDING and reduce queries
-                                                        'Elements required for the Control or Patient are positioned, verify if the elements needed for the Calibrator are also positioned
-                                                        resultData = VerifyLockedCalibrator(dbConnection, pWorkSessionID, pAnalyzerID, reqElementsDS.WSOrderTestsForExecutions.First.TestID, _
-                                                                                            reqElementsDS.WSOrderTestsForExecutions.First.SampleType)
-                                                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                                            If (DirectCast(resultData.SetDatos, Boolean)) Then
-                                                                newExecStatus = "LOCKED"
-                                                            Else
-                                                                'Verify if the elements needed for the Blank are also positioned
-                                                                resultData = VerifyLockedBlank(dbConnection, pWorkSessionID, pAnalyzerID, reqElementsDS.WSOrderTestsForExecutions.First.TestID, _
-                                                                                               reqElementsDS.WSOrderTestsForExecutions.First.SampleType)
-
-                                                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                                                    If (DirectCast(resultData.SetDatos, Boolean)) Then newExecStatus = "LOCKED"
-                                                                Else
-                                                                    Exit For
-                                                                End If
-                                                            End If
-                                                        Else
-                                                            Exit For
-                                                        End If
-                                                    End If
-                                                    sampleStdOT.ExecutionStatus = newExecStatus
-                                                Else
-                                                    Exit For
-                                                End If
-                                            Next
-
-                                            'Finally, update the status of the Executions for each Control or Patient ISE Order Test
-                                            'AG 19/02/2014 - #1514
-                                            'If (Not resultData.HasError) Then resultData = myExecutionsDAO.UpdateStatusByOTAndRerunNumber(dbConnection, lstSampleClassExecutions)
-                                            lstToPENDING = (From a As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions Where a.ExecutionStatus = "PENDING" Select a).ToList
-                                            lstToLOCKED = (From a As ExecutionsDS.twksWSExecutionsRow In lstSampleClassExecutions Where a.ExecutionStatus = "LOCKED" Select a).ToList
-                                            If (Not resultData.HasError) Then resultData = myExecutionsDAO.UpdateStatusByOTAndRerunNumber(dbConnection, lstToPENDING, lstToLOCKED)
-                                            'AG 19/02/2014 - #1514
-                                        End If
-                                    End If
-                                End If
-                            End If
-                            lstSampleClassExecutions = Nothing
-                            lstToPENDING = Nothing  'AG 19/02/2014 - #1514
-                            lstToLOCKED = Nothing 'AG 19/02/2014 - #1514
-
-                            If (Not resultData.HasError) Then
-                                'When the Database Connection was opened locally, then the Commit is executed
-                                If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-                            Else
-                                'When the Database Connection was opened locally, then the Rollback is executed
-                                If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-                            End If
-                        End If
-                    End If
-                End If
-            Catch ex As Exception
-                'When the Database Connection was opened locally, then the Rollback is executed
-                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-
-                resultData = New GlobalDataTO()
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.RecalculateStatusForNotDeletedExecutions", EventLogEntryType.Error, False)
-            Finally
-                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-            Return resultData
-        End Function
-
         ''' <summary>
         ''' For the specified ExecutionID, update the InUse flag
         ''' </summary>
@@ -9722,7 +6987,7 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pNewLockedValue"></param>
         ''' <returns></returns>
         ''' <remarks>AG 25/03/2013</remarks>
-        Public Function UpdateLockedByLIS(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAffectedOrderTests As List(Of Integer), ByVal pNewLockedValue As Boolean) As GlobalDataTO
+        Public Function UpdateLockedByLISa(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAffectedOrderTests As List(Of Integer), ByVal pNewLockedValue As Boolean) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -10424,22 +7689,7 @@ Namespace Biosystems.Ax00.BL
 
                 currentContaminationNumber = OrderContaminationNumber
                 currentResult = OrderTests.ToList()
-                bestResult = ManageContaminationsForRunningAndStatic(activeAnalyzer, pConn, contaminationsDataDS, currentResult, highContaminationPersitance, currentContaminationNumber, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
-
-                ''A last try, if the order tests only have 2 tests that are contaminating between them, why not to interchange them?
-                'If currentContaminationNumber > 0 Then
-                '    If OrderTests.Count = 2 Then
-                '        'Okay, if there are contaminations, why not to try interchange them?
-                '        currentResult.Clear()
-                '        For z = OrderTests.Count - 1 To 0 Step -1
-                '            currentResult.Add(OrderTests(z))
-                '        Next
-                '        currentContaminationNumber = GetContaminationNumber(contaminationsDataDS, currentResult, highContaminationPersitance)
-                '        If currentContaminationNumber = 0 Then
-                '            bestResult = currentResult
-                '        End If
-                '    End If
-                'End If
+                bestResult = ManageContaminationsForRunningAndStatic(False, activeAnalyzer, pConn, contaminationsDataDS, currentResult, highContaminationPersitance, currentContaminationNumber, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
 
                 Dim stdPrepFlag As Boolean = False
                 For Each wse In AllTestTypeOrderTests
@@ -10462,7 +7712,7 @@ Namespace Biosystems.Ax00.BL
         End Sub
 
         ''' <summary>
-        ''' Applies the 4 different optimizations for solving contaminations between order tests
+        ''' Applies optimizations in sorting for solving contaminations between order tests
         ''' </summary>
         ''' <param name="ActiveAnalyzer"></param>
         ''' <param name="pConn"></param>
@@ -10478,7 +7728,7 @@ Namespace Biosystems.Ax00.BL
         ''' <remarks>
         ''' Created on 19/03/2015 by AJG
         ''' </remarks>
-        Public Shared Function ManageContaminationsForRunningAndStatic(ByVal ActiveAnalyzer As String,
+        Public Shared Function ManageContaminationsForRunningAndStatic(ByVal calculateInRunning As Boolean, ByVal ActiveAnalyzer As String,
                                                                 ByVal pConn As SqlConnection,
                                                                 ByVal contaminationsDataDS As ContaminationsDS,
                                                                 ByRef OrderTests As List(Of ExecutionsDS.twksWSExecutionsRow),
@@ -10488,26 +7738,14 @@ Namespace Biosystems.Ax00.BL
                                                                 Optional ByVal pPreviousReagentIDMaxReplicates As List(Of Integer) = Nothing) As List(Of ExecutionsDS.twksWSExecutionsRow)
 
 
-            Dim myContaminationManager As New ContaminationManager(pConn, ActiveAnalyzer, currentContaminationNumber, highContaminationPersistance, contaminationsDataDS, OrderTests, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
+            Dim myContaminationManager = WSDependencyInjector.ContaminationsManagerConstructor(calculateInRunning, currentContaminationNumber, contaminationsDataDS, OrderTests, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
 
-            ''Apply Optimization Policy A. (move contaminated OrderTest down until it becomes no contaminated)
-            'myContaminationManager.ApplyOptimizations(New OptimizationAPolicyApplier(pConn, ActiveAnalyzer), OrderTests)
-
-            ''Apply Optimization Policy B. (move contaminated OrderTest up until it becomes no contaminated)
-            'myContaminationManager.ApplyOptimizations(New OptimizationBPolicyApplier(pConn, ActiveAnalyzer), OrderTests)
-
-            ''Apply Optimization Policy C. (move contaminator OrderTest down until it no contaminates)
-            'myContaminationManager.ApplyOptimizations(New OptimizationCPolicyApplier(pConn, ActiveAnalyzer), OrderTests)
-
-            ''Apply Optimization Policy D. (move contaminator OrderTest up until it no contaminates)
-            'myContaminationManager.ApplyOptimizations(New OptimizationDPolicyApplier(pConn, ActiveAnalyzer), OrderTests)
-
-            'Apply Optimization using Backtracking algorithm. If exists it'll return an optimal solution with no contaminations
-            myContaminationManager.ApplyOptimizations(New OptimizationBacktrackingApplier(pConn, ActiveAnalyzer), OrderTests)
+            'MANEL
+            myContaminationManager.ApplyOptimizations(pConn, OrderTests)
 
             currentContaminationNumber = myContaminationManager.currentContaminationNumber
             Return myContaminationManager.bestResult
-
+            '/MANEL
         End Function
 
     End Class

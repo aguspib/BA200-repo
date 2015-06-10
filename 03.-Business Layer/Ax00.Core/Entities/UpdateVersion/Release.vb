@@ -155,6 +155,8 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
 
         Public Sub WriteLog()
 
+            Dim debugLogger As DebugLogger = New DebugLogger()
+
             DebugLogger.AddLog(" --------------------------------------------", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
             DebugLogger.AddLog(String.Format(" Release: {0}", Version), GlobalBase.UpdateVersionDatabaseProcessLogFileName)
             DebugLogger.AddLog(" 1.- Common scripts", GlobalBase.UpdateVersionDatabaseProcessLogFileName)

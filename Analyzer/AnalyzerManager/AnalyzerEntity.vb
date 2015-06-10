@@ -2,11 +2,13 @@
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports System.Data
+Imports Biosystems.Ax00.Core.Entities.Worksession.Interfaces
 
 Namespace Biosystems.Ax00.Core.Entities
 
     Partial Public MustInherit Class AnalyzerManager
         Implements IAnalyzerManager
+
 
         Private WithEvents _baseLine As IBaseLineEntity
         Private WithEvents _iseAnalyzer As IISEManager
@@ -69,6 +71,11 @@ Namespace Biosystems.Ax00.Core.Entities
                                                       ByVal pWorkSessionID As String, ByVal pWell As Integer, ByVal pBaseLineWithAdjust As Boolean) As GlobalDataTO
 
 #End Region
+
+        'Public MustOverride Function ContaminationsSpecification() As IAnalyzerContaminationsSpecification Implements IAnalyzerManager.ContaminationsSpecification
+
+        Public MustOverride ReadOnly Property WashingIDRequired As Boolean Implements IAnalyzerManager.WashingIDRequired
+
 
     End Class
 End Namespace

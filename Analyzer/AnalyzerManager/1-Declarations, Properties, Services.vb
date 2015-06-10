@@ -301,6 +301,8 @@ Namespace Biosystems.Ax00.Core.Entities
         Private LockISEAttr As Boolean = False
 
         Private IsAlreadyManagedAlarmsAttr As Boolean = False
+
+        Private numWashes As Integer = 0
 #End Region
 
 #Region "Properties"
@@ -400,6 +402,13 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
             End Set
 
+        End Property
+
+        Public Shared _currentAnalyzer As IAnalyzerManager
+        Public Shared ReadOnly Property GetCurrentAnalyzerManager As IAnalyzerManager
+            Get
+                Return _currentAnalyzer
+            End Get
         End Property
 
         Public Property ActiveFwVersion() As String Implements IAnalyzerManager.ActiveFwVersion  'SGM 28/11/2011
@@ -2196,7 +2205,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                       Where a.ParameterName = SwParameters.PREDILUTION_CYCLES.ToString Select a).ToList
 
                             If myQRes.Count > 0 Then
-                                WELL_OFFSET_FOR_PREDILUTION = CInt(myQRes(0).ValueNumeric) - 1 'Well offset for predilution = (predilution cycles used for time estimation - 1)
+                                WELL_OFFSET_FOR_PREDILUTION = WSCreator.ContaminationsSpecification.AdditionalPredilutionSteps - 1  ' CInt(myQRes(0).ValueNumeric) - 1 'Well offset for predilution = (predilution cycles used for time estimation - 1)
                             End If
 
                             myQRes = (From a As ParametersDS.tfmwSwParametersRow In myParamDs.tfmwSwParameters _
@@ -2433,6 +2442,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 SetAllowScanInRunningValue(False)
                 AppLayer.RecoveryResultsInPause = False
 
+                numWashes = 0
             Catch ex As Exception
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ResetWorkSession", EventLogEntryType.Error, False)
             End Try
@@ -3631,7 +3641,9 @@ Namespace Biosystems.Ax00.Core.Entities
                                                     Dim runningFlag As Boolean = (AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING)
 
                                                     'Create the Executions
-                                                    resultData = myExecutionsDlg.CreateWSExecutions(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, runningFlag, -1, _
+                                                    'resultData = myExecutionsDlg.CreateWSExecutions(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, runningFlag, -1, _
+                                                    '                                                String.Empty, iseModuleReady, Nothing, AllowScanInRunning)
+                                                    resultData = WSCreator.CreateWS(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, runningFlag, -1, _
                                                                                                     String.Empty, iseModuleReady, Nothing, AllowScanInRunning)
                                                     'AG 30/05/2014 #1644
 
@@ -4270,5 +4282,7 @@ Namespace Biosystems.Ax00.Core.Entities
 #End Region
 
     End Class
+
+
 
 End Namespace

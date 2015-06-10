@@ -234,7 +234,7 @@ Namespace Biosystems.Ax00.Core.Services
                 Case WarmUpStepsEnum.BaseLine
 #If DEBUG Then
                     If Not StatusParameters.IsActive Then
-                        Dim result = System.Windows.Forms.MessageBox.Show("Do want to do the complete base line?", "Baseline shortcut question", System.Windows.Forms.MessageBoxButtons.YesNo)
+                        Dim result = System.Windows.Forms.MessageBox.Show("Do you want to perform the whole baseline process?", "Baseline shortcut question", System.Windows.Forms.MessageBoxButtons.YesNo)
                         If result = System.Windows.Forms.DialogResult.Yes Then
                             ExecuteBaseLineStep()
                         Else

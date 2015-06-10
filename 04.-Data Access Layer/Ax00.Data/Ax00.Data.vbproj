@@ -6,8 +6,9 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{0BBD4088-B6AD-4125-91F7-E8947ABA910B}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>Ax00.Data</RootNamespace>
-    <AssemblyName>Ax00.Data</AssemblyName>
+    <RootNamespace>
+    </RootNamespace>
+    <AssemblyName>Biosystems.Ax00.Data</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>Windows</MyType>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
@@ -18,7 +19,7 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\Debug\</OutputPath>
-    <DocumentationFile>Ax00.Data.xml</DocumentationFile>
+    <DocumentationFile>Biosystems.Ax00.Data.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -27,7 +28,7 @@
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DocumentationFile>Ax00.Data.xml</DocumentationFile>
+    <DocumentationFile>Biosystems.Ax00.Data.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
@@ -62,6 +63,7 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Interfaces\IvWSExecutionsDAO.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -76,6 +78,15 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="vWSExecutionsDAO.vb" />
+    <Compile Include="vWSExecutionsDS.Designer.vb">
+      <DependentUpon>vWSExecutionsDS.xsd</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="vWSExecutionsDS.vb">
+      <DependentUpon>vWSExecutionsDS.xsd</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -95,6 +106,17 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="vWSExecutionsDS.xsc">
+      <DependentUpon>vWSExecutionsDS.xsd</DependentUpon>
+    </None>
+    <None Include="vWSExecutionsDS.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>vWSExecutionsDS.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="vWSExecutionsDS.xss">
+      <DependentUpon>vWSExecutionsDS.xsd</DependentUpon>
     </None>
   </ItemGroup>
   <ItemGroup>

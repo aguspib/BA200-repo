@@ -1,16 +1,17 @@
 ﻿Option Explicit On
 Option Strict On
 Option Infer On
+
 Imports System.Windows.Forms
 Imports Biosystems.Ax00.App
 
 Imports Biosystems.Ax00.BL
+Imports Biosystems.Ax00.CC
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.Controls.UserControls
 Imports Biosystems.Ax00.Core.Services
-
 
 Public Class Ax00MainForm
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
@@ -339,6 +340,6 @@ Public Class Ax00MainForm
 #End Region
 
     Private Sub MITestButtonClick(sender As Object, e As EventArgs) Handles MITestProcess.Click
-
+        LinkLayer.SimulateDataReception("A200;STATUS;R2B2:15;R2B1:11;")
     End Sub
 End Class

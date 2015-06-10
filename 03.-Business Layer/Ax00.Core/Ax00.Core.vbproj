@@ -103,6 +103,29 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Entities\Enums\AnalyzerModelEnum.vb" />
+    <Compile Include="Entities\BA200AnalyzerEntity.vb" />
+    <Compile Include="Entities\BA400AnalyzerEntity.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\Context\ActionRequiredForDispensing.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\Specifications\BA400ContaminationsSpecification.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\Specifications\BA200ContaminationsSpecification.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\Specifications\Ax00ContaminationsSpecification.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\Specifications\Dispensing\BA200Dispensing.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\Specifications\Dispensing\BA400Dispensing.vb" />
+    <Compile Include="Entities\WorkSession\Sorting\ContaminationBetweenElementsSorter.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\ContaminationManager.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\Context\RequiredAction.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\LAx00Frame.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\Context\Context.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\Context\ContextStep.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\Context\DispensingContamination.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\Context\RegularWaterWashing.vb" />
+    <Compile Include="Entities\WorkSession\Sorting\OptimizationBacktrackingApplier.vb" />
+    <Compile Include="Entities\WorkSession\Sorting\OptimizationPolicyApplier.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\Context\WashingDescription.vb" />
+    <Compile Include="Entities\WorkSession\Contaminations\Specifications\Dispensing\Ax00DispensingBase.vb" />
+    <Compile Include="Entities\WorkSession\WSExecutionCreator.vb" />
+    <Compile Include="Entities\WorkSession\Sorting\WSExecutionsSorter.vb" />
     <Compile Include="Services\AsyncService.vb" />
     <Compile Include="Services\Enums\BaseLineStepsEnum.vb" />
     <Compile Include="Services\Interfaces\IBaseLineService.vb" />
@@ -161,6 +184,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\04.-Data Access Layer\Ax00.Data\Ax00.Data.vbproj">
+      <Project>{0bbd4088-b6ad-4125-91f7-e8947aba910b}</Project>
+      <Name>Ax00.Data</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Analyzer\Analyzer.vbproj">
       <Project>{bd816d19-6903-4603-8a75-a14c099d4eb2}</Project>
       <Name>Analyzer</Name>
@@ -169,6 +196,10 @@
       <Project>{dc90b322-5a1d-4e45-943f-a76447ad0016}</Project>
       <Name>Ax00.Framework.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Ax00.CrossCutting\Ax00.CrossCutting.vbproj">
+      <Project>{b23d6aff-a359-4d3e-87bf-820167228fe5}</Project>
+      <Name>Ax00.CrossCutting</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\bax00framework\AX00Types\AX00Types.vbproj">
       <Project>{19114cc5-ba39-4d35-89fa-41d9efb7a931}</Project>
       <Name>AX00Types</Name>
@@ -176,6 +207,10 @@
     <ProjectReference Include="..\..\bax00framework\Global\Global.vbproj">
       <Project>{5d65020c-c2d7-4ac3-b557-223fc290e526}</Project>
       <Name>Global</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\bax00framework\ParameterPrograming\ParametersPrograming.vbproj">
+      <Project>{3aaf43d5-55d8-4a0b-9fd3-e8841008e13e}</Project>
+      <Name>ParametersPrograming</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\BussinessLayer\ConfigurationSetup\ConfigurationSetup.vbproj">
       <Project>{bc01c1bd-2a93-4002-b74f-7bcf9793309d}</Project>

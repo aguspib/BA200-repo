@@ -82,6 +82,7 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AnalyzerComms\LAX00InterpreterTests.vb" />
     <Compile Include="AnalyzerManager\Actions\AnalyzerAlarmsTests.vb" />
     <Compile Include="AnalyzerManager\Actions\ProcessStatusReceivedTest.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />

@@ -4,6 +4,7 @@ Option Explicit On
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
+Imports Biosystems.Ax00.Core.Entities
 
 Namespace Biosystems.Ax00.CommunicationsSwFw
 
@@ -1929,66 +1930,96 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private Sub GetWRUNInstruction(ByRef Instructions As List(Of InstructionParameterTO))
             Try
                 Dim myInstructionTO As New InstructionParameterTO
+                Dim Index = 1
 
                 'WRUN INSTRUCTION (Sw -> Fw)
                 ''''''''''''''''''''''''''''
                 myInstructionTO.InstructionType = "WRUN"
                 myInstructionTO.Parameter = "" 'myInstructionTO.Parameter = "A"
-                myInstructionTO.ParameterIndex = 1
+                myInstructionTO.ParameterIndex = Index
                 Instructions.Add(myInstructionTO)
+
+                Index += 1
 
                 myInstructionTO = New InstructionParameterTO
                 myInstructionTO.InstructionType = "WRUN"
                 myInstructionTO.Parameter = "" 'myInstructionTO.Parameter = "TYPE"
-                myInstructionTO.ParameterIndex = 2
+                myInstructionTO.ParameterIndex = Index
                 Instructions.Add(myInstructionTO)
+
+                Index += 1
 
                 myInstructionTO = New InstructionParameterTO
                 myInstructionTO.InstructionType = "WRUN"
                 myInstructionTO.Parameter = "M"
-                myInstructionTO.ParameterIndex = 3
+                myInstructionTO.ParameterIndex = Index
                 Instructions.Add(myInstructionTO)
+
+                Index += 1
 
                 myInstructionTO = New InstructionParameterTO
                 myInstructionTO.InstructionType = "WRUN"
                 myInstructionTO.Parameter = "S"
-                myInstructionTO.ParameterIndex = 4
+                myInstructionTO.ParameterIndex = Index
                 Instructions.Add(myInstructionTO)
+
+                'ID -Identification
+                If AnalyzerManager.GetCurrentAnalyzerManager().WashingIDRequired Then
+                    Index += 1
+
+                    myInstructionTO = New InstructionParameterTO
+                    myInstructionTO.InstructionType = "WRUN"
+                    myInstructionTO.Parameter = "ID"
+                    myInstructionTO.ParameterIndex = Index
+                    Instructions.Add(myInstructionTO)
+                End If
+
+                Index += 1
 
                 myInstructionTO = New InstructionParameterTO
                 myInstructionTO.InstructionType = "WRUN"
                 myInstructionTO.Parameter = "BP1"
-                myInstructionTO.ParameterIndex = 5
+                myInstructionTO.ParameterIndex = Index
                 Instructions.Add(myInstructionTO)
+
+                Index += 1
 
                 myInstructionTO = New InstructionParameterTO
                 myInstructionTO.InstructionType = "WRUN"
                 myInstructionTO.Parameter = "BT1"
-                myInstructionTO.ParameterIndex = 6
+                myInstructionTO.ParameterIndex = Index
                 Instructions.Add(myInstructionTO)
+
+                Index += 1
 
                 myInstructionTO = New InstructionParameterTO
                 myInstructionTO.InstructionType = "WRUN"
                 myInstructionTO.Parameter = "BRT1"
-                myInstructionTO.ParameterIndex = 7
+                myInstructionTO.ParameterIndex = Index
                 Instructions.Add(myInstructionTO)
+
+                Index += 1
 
                 myInstructionTO = New InstructionParameterTO
                 myInstructionTO.InstructionType = "WRUN"
                 myInstructionTO.Parameter = "BP2"
-                myInstructionTO.ParameterIndex = 8
+                myInstructionTO.ParameterIndex = Index
                 Instructions.Add(myInstructionTO)
+
+                Index += 1
 
                 myInstructionTO = New InstructionParameterTO
                 myInstructionTO.InstructionType = "WRUN"
                 myInstructionTO.Parameter = "BT2"
-                myInstructionTO.ParameterIndex = 9
+                myInstructionTO.ParameterIndex = Index
                 Instructions.Add(myInstructionTO)
+
+                Index += 1
 
                 myInstructionTO = New InstructionParameterTO
                 myInstructionTO.InstructionType = "WRUN"
                 myInstructionTO.Parameter = "BRT2"
-                myInstructionTO.ParameterIndex = 10
+                myInstructionTO.ParameterIndex = Index
                 Instructions.Add(myInstructionTO)
 
                 myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496
@@ -3761,7 +3792,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myInstructionTO.Parameter = "PHFM"   'Photometry memory state
                 myInstructionTO.ParameterIndex = 28
                 Instructions.Add(myInstructionTO)
-                
+
                 myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496
 
             Catch ex As Exception
@@ -3879,8 +3910,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myInstructionTO.ParameterIndex = 2
                 Instructions.Add(myInstructionTO)
 
-          
-              
+
+
                 'STRESS RECEIVED INSTRUCTION (Fw -> Sw)
                 ''''''''''''''''''''''''''''''
                 myInstructionTO = New InstructionParameterTO

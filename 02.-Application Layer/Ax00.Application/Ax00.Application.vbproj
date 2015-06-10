@@ -168,6 +168,10 @@
       <Project>{fbbae46c-213f-4ca1-ad81-b088480494ea}</Project>
       <Name>UpdateVersion</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\bax00framework\ParameterPrograming\ParametersPrograming.vbproj">
+      <Project>{3AAF43D5-55D8-4A0B-9FD3-E8841008E13E}</Project>
+      <Name>ParametersPrograming</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

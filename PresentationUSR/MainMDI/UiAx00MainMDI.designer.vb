@@ -104,6 +104,7 @@ Partial Class UiAx00MainMDI
         Me.InstrumentInfoToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.AboutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.BorrameToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.AuxBA200ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.HistoricalReportsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.StandardReportToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.CustomReportsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -176,7 +177,6 @@ Partial Class UiAx00MainMDI
         Me.ElapsedTimeTimer = New Biosystems.Ax00.Controls.UserControls.BSTimer()
         Me.BsLoadDefaultReportTemplates = New Biosystems.Ax00.Controls.UserControls.BSBackgroundWorker()
         Me.BsUpdateGlobesTimer = New Biosystems.Ax00.Controls.UserControls.BSTimer()
-        Me.AuxBA200ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.BsAx00MenuStrip.SuspendLayout()
         CType(Me.ProgressBar.Properties, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.LedsPanel.SuspendLayout()
@@ -591,6 +591,11 @@ Partial Class UiAx00MainMDI
         '
         Me.BorrameToolStripMenuItem.Name = "BorrameToolStripMenuItem"
         resources.ApplyResources(Me.BorrameToolStripMenuItem, "BorrameToolStripMenuItem")
+        '
+        'AuxBA200ToolStripMenuItem
+        '
+        Me.AuxBA200ToolStripMenuItem.Name = "AuxBA200ToolStripMenuItem"
+        resources.ApplyResources(Me.AuxBA200ToolStripMenuItem, "AuxBA200ToolStripMenuItem")
         '
         'HistoricalReportsToolStripMenuItem
         '
@@ -1109,19 +1114,14 @@ Partial Class UiAx00MainMDI
         '
         Me.BsUpdateGlobesTimer.Interval = 500
         '
-        'AuxBA200ToolStripMenuItem
-        '
-        Me.AuxBA200ToolStripMenuItem.Name = "AuxBA200ToolStripMenuItem"
-        resources.ApplyResources(Me.AuxBA200ToolStripMenuItem, "AuxBA200ToolStripMenuItem")
-        '
-        'IAx00MainMDI
+        'UiAx00MainMDI
         '
         Me.Appearance.BackColor = CType(resources.GetObject("UiAx00MainMDI.Appearance.BackColor"), System.Drawing.Color)
         Me.Appearance.GradientMode = CType(resources.GetObject("UiAx00MainMDI.Appearance.GradientMode"), System.Drawing.Drawing2D.LinearGradientMode)
         Me.Appearance.Options.UseBackColor = True
         Me.Appearance.Options.UseFont = True
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None
         resources.ApplyResources(Me, "$this")
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.Controls.Add(Me.BsLISPanel)
         Me.Controls.Add(Me.ProgressBar)
         Me.Controls.Add(Me.LedsPanel)
