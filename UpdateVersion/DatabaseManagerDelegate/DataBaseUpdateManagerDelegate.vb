@@ -32,7 +32,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         '''                                          Intance Analyzer start the Application.
         ''' </remarks>
         Public Function InstallUpdateProcess(ByVal pServerName As String, ByVal pDataBaseName As String, ByVal DBLogin As String, _
-                                             ByVal DBPassword As String, Optional pLoadingRSAT As Boolean = False) As GlobalDataTO
+                                             ByVal DBPassword As String, Optional pLoadingRSAT As Boolean = False, Optional pModel As String = "") As GlobalDataTO
 
             Dim myGlobalDataTO As New GlobalDataTO
             'Dim myDBDatabaseManager As New DataBaseManagerDelegate
@@ -43,9 +43,12 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 Debug.Print("INICIO-->" & initialTimeUpdate.TimeOfDay.ToString()) 'Print the time
                 GlobalBase.CreateLogActivity("InstallUpdateProcess" & ".Updateprocess - Database found", "Installation validation", _
                                                                                                    EventLogEntryType.Information, False)
+
+                If String.IsNullOrEmpty(pModel) Then pModel = GetAnalyzerModel()
+
                 'if A200 or A400 exist
                 If DataBaseManagerDelegate.DataBaseExist(pServerName, pDataBaseName, DBLogin, DBPassword) Then 'BA-2471: IT 08/05/2015
-                    myGlobalDataTO = updateProcessApplication(pServerName, pDataBaseName, DBLogin, DBPassword, pLoadingRSAT)
+                    myGlobalDataTO = updateProcessApplication(pServerName, pDataBaseName, DBLogin, DBPassword, pLoadingRSAT, pModel)
                 Else
                     'Ax00 Exist
                     If DataBaseManagerDelegate.DataBaseExist(pServerName, GlobalBase.CommonDatabaseName, DBLogin, DBPassword) Then 'BA-2471: IT 08/05/2015
@@ -54,7 +57,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
                             'if we start the same instance we rename the database, to a intance name.and we follow with the update process.
                             DataBaseManagerDelegate.RenameDBByModel(pServerName, pDataBaseName, DBLogin, DBPassword)
-                            myGlobalDataTO = updateProcessApplication(pServerName, pDataBaseName, DBLogin, DBPassword, pLoadingRSAT)
+                            myGlobalDataTO = updateProcessApplication(pServerName, pDataBaseName, DBLogin, DBPassword, pLoadingRSAT, pModel)
                         Else
                             'if isn't the same Analyzer we restored the database saying the name of the instance (A200 or A400) we not override the current DB.
                             myGlobalDataTO = installProcessApplication(pServerName, pDataBaseName, DBLogin, DBPassword)
@@ -131,7 +134,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         '''          Error is informed in fields ErrorCode and ErrorDescription in the GlobalDataTO, and HasError is set to TRUE</returns>
         ''' <remarks> Created by:  MR 09/06/2015 ==> BA-2566 - Peace of code was placed in InstallUpdateProcessand we need it more than once. Then I created this function. </remarks>
         Private Function updateProcessApplication(ByVal pServerName As String, ByVal pDataBaseName As String, ByVal DBLogin As String, _
-                                        ByVal DBPassword As String, Optional pLoadingRSAT As Boolean = False) As GlobalDataTO
+                                        ByVal DBPassword As String, Optional pLoadingRSAT As Boolean = False, Optional pModel As String = "") As GlobalDataTO
 
             Dim myGlobalDataTO As New GlobalDataTO
             Dim initialTimeUpdate As New DateTime 'TR Variable used to validate the time 
@@ -142,7 +145,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 ExecuteScriptsBeforeUpdate()
 
                 'Call the Update Database delegate.
-                myGlobalDataTO = UpdateDatabase(pServerName, pDataBaseName, DBLogin, DBPassword, pLoadingRSAT)
+                myGlobalDataTO = UpdateDatabase(pServerName, pDataBaseName, DBLogin, DBPassword, pLoadingRSAT, pModel)
 
             Catch ex As Exception
                 myGlobalDataTO.HasError = True
@@ -150,6 +153,45 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
             End Try
             Return myGlobalDataTO
         End Function
+
+
+        ''' <summary>
+        ''' Function that returns the name of the Active Analyzer Model on the Database
+        ''' </summary>
+        ''' <returns> String with the active Analyzer Model name on the Database</returns>
+        ''' <remarks>Created by:  AC 11/06/2015 ==> BA-2594 </remarks>
+        Private Function GetAnalyzerModel() As String
+            Dim Model As String = ""
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                Dim connection = DAOBase.GetOpenDBConnection(Nothing)
+                If (Not connection.HasError AndAlso Not connection.SetDatos Is Nothing) Then
+                    dbConnection = CType(connection.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim tcfAnalyzerDAO As New DAL.DAO.tcfgAnalyzersDAO
+                        Dim returnData As GlobalDataTO = Nothing
+                        returnData = tcfAnalyzerDAO.ReadByAnalyzerActive(dbConnection)
+                        If Not returnData.HasError AndAlso Not returnData.SetDatos Is Nothing Then
+                            Dim AnalyzerObj As AnalyzersDS = CType(returnData.SetDatos, AnalyzersDS)
+                            'The app only can have one active analyzer.
+                            If (AnalyzerObj.tcfgAnalyzers.Rows.Count > 0 AndAlso AnalyzerObj.tcfgAnalyzers.Rows.Count = 1) Then
+                                Dim AnalyzerRow As AnalyzersDS.tcfgAnalyzersRow = AnalyzerObj.tcfgAnalyzers(0)
+                                Return AnalyzerRow.AnalyzerModel.ToUpper.Trim()
+                            End If
+                        End If
+                    End If
+                End If
+              
+            Catch ex As Exception
+                GlobalBase.CreateLogActivity(ex)
+                Throw
+            Finally
+                If (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return Model
+        End Function
+
 
         ''' <summary>
         ''' Function that checks from which analyzer belong the current Database 'Ax00'
@@ -219,7 +261,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         '''              IT 08/05/2015 - BA-2471
         ''' </remarks>
         Public Function UpdateDatabase(ByVal pServerName As String, ByVal pDataBaseName As String, ByVal pDBLogin As String, ByVal pDBPassword As String, _
-                                       Optional pLoadingRSAT As Boolean = False) As GlobalDataTO
+                                       Optional pLoadingRSAT As Boolean = False, Optional pModel As String = "") As GlobalDataTO
 
             Dim myGlobalDataTO As New GlobalDataTO
             Dim update As Boolean = False
@@ -251,7 +293,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
                     LoadDataBaseVersions(usSwVersion, srvSwVersion) 'BA-2471: IT 08/05/2015
 
-                    myGlobal = SATReportUtilities.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_UPDATE, False, "", "", "", "", usSwVersion) 'BA-2471: IT 08/05/2015
+
+                    myGlobal = SATReportUtilities.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_UPDATE, False, "", "", "", "", usSwVersion, True, pModel) 'BA-2471: IT 08/05/2015
                     If (Not myGlobal.HasError) Then
                         'Dim myDatabaseAdmin As New DataBaseManagerDelegate()
 
@@ -311,7 +354,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                                     'CREATE a RSAT and copy the XML file containing the LOG of the Update Process 
                                     myGlobal = SATReportUtilities.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_UPDATE_ERR, False, String.Empty, _
                                                                          myLogFile, Application.StartupPath & GlobalBase.PreviousFolder, _
-                                                                         "RSATUpdateError", usSwVersion) 'BA-2471: IT 08/05/2015
+                                                                         "RSATUpdateError", usSwVersion, True, pModel) 'BA-2471: IT 08/05/2015
 
                                     'Remove the UpdateLog File because it is included on the RSAT
                                     If (File.Exists(myLogFile)) Then File.Delete(myLogFile)

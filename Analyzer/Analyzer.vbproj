@@ -107,6 +107,10 @@
     <AssemblyOriginatorKeyFile>BioSystems.pfx</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Interop.CommunicationsAx00">
+      <HintPath>obj\x86\Debug\Interop.CommunicationsAx00.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Management" />
@@ -244,16 +248,6 @@
       <Project>{A883608A-3D41-4339-9C2F-FEEA18BEFB68}</Project>
       <Name>WorkSession</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <COMReference Include="CommunicationsAx00">
-      <Guid>{8D341D78-B5EE-4363-BC4D-B36B69A18E98}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-    </COMReference>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />

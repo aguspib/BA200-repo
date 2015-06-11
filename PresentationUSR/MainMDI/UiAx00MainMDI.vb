@@ -5137,7 +5137,9 @@ Partial Public Class UiAx00MainMDI
                     '' DL 14/06/2011
 
                     'Dim mySATUtil As New SATReportUtilities
-                    myGlobal = SATReportUtilities.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_REPORT, True, ExcelPath, myAdjustmentsFilePath) 'BA-2471: IT 08/05/2015
+                    Dim Model As String = AnalyzerController.Instance.Analyzer.Model
+
+                    myGlobal = SATReportUtilities.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_REPORT, True, ExcelPath, myAdjustmentsFilePath, "", "", "", True, Model) 'BA-2471: IT 08/05/2015
 
                     'TR 21/11/2011 -Reset the time variable.
                     LocalElapsedTimeAttribute = New DateTime

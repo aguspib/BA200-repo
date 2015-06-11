@@ -508,7 +508,9 @@ Public Class UiSATReportLoad
         Try
 
             'Dim mySATUtil As New SATReportUtilities
-            myGlobal = SATReportUtilities.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_RESTORE, False, "", AnalyzerController.Instance.Analyzer.AdjustmentsFilePath) 'BA-2471: IT 08/05/2015
+            Dim Model As String = AnalyzerController.Instance.Analyzer.Model
+
+            myGlobal = SATReportUtilities.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_RESTORE, False, "", AnalyzerController.Instance.Analyzer.AdjustmentsFilePath, "", "", "", True, Model) 'BA-2471: IT 08/05/2015
             If Not myGlobal.HasError AndAlso Not myGlobal Is Nothing Then
                 SATReportCreated = CBool(myGlobal.SetDatos)
             End If
@@ -787,7 +789,7 @@ Public Class UiSATReportLoad
                 Dim myInstalledAppVersion As Integer = CInt(Application.ProductVersion.Replace(CChar("."), ""))
 
                 If Not Directory.Exists(myRestoreDataPath) Then Directory.CreateDirectory(myRestoreDataPath)
-                Dim DirList As String() = Directory.GetFiles(myRestoreDataPath, "*" & myZipExtension)
+                Dim DirList As String() = Directory.GetFiles(myRestoreDataPath, "*" & myZipExtension).Union(Directory.GetFiles(myRestoreDataPath, "*." & AnalyzerController.Instance.Analyzer.Model)).ToArray()
 
                 Dim TemporalFileVersion As String = String.Empty
                 For i As Integer = 0 To DirList.Count - 1
@@ -879,9 +881,11 @@ Public Class UiSATReportLoad
                 .InitialDirectory = GetSATReportDirectory()
                 'PG 11/01/2011
                 '.Filter = "SAT Report files|*" & zipExtension & "|All files|*.*"
-                .Filter = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SATReport_File", CurrentLanguage) & "|*" & zipExtension & "|" & myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SATReport_FilesAll", CurrentLanguage) & "|*.*"
+                '.Filter = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SATReport_File", CurrentLanguage) & "|*" & zipExtension & "|" & myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SATReport_FilesAll", CurrentLanguage) & "|*.*"
+                'Take Model extensio or All files
+                .Filter = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SATReport_File", CurrentLanguage) & "|*." & AnalyzerController.Instance.Analyzer.Model & "|" & myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SATReport_FilesAll", CurrentLanguage) & "|*.*"
                 .FilterIndex = 0
-                .DefaultExt = zipExtension
+                .DefaultExt = "." & AnalyzerController.Instance.Analyzer.Model
                 .CheckFileExists = True
                 .CheckPathExists = True
                 .Multiselect = False
