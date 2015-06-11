@@ -26,9 +26,10 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
+                        'IT 11/06/2015 - BA-2613
                         Dim cmdText As String = " SELECT TestID FROM " & GlobalBase.TemporalDBName & ".[dbo].[tparTests] " & vbCrLf & _
                                                 " EXCEPT " & vbCrLf & _
-                                                " SELECT TestID FROM [Ax00].[dbo].[tparTests] " & vbCrLf
+                                                " SELECT TestID FROM " & GlobalBase.DatabaseName & ".[dbo].[tparTests] " & vbCrLf
 
                         Dim factoryTestsDS As New TestsDS
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
@@ -419,7 +420,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim cmdText As String = " SELECT TestID FROM [Ax00].[dbo].[tparTests] " & vbCrLf & _
+                        'IT 11/06/2015 - BA-2613
+                        Dim cmdText As String = " SELECT TestID FROM " & GlobalBase.DatabaseName & ".[dbo].[tparTests] " & vbCrLf & _
                                                 " WHERE  PreloadedTest = 1 " & vbCrLf & _
                                                 " EXCEPT " & vbCrLf & _
                                                 " SELECT TestID FROM " & GlobalBase.TemporalDBName & ".[dbo].[tparTests] " & vbCrLf
@@ -467,8 +469,9 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
+                        'IT 11/06/2015 - BA-2613
                         Dim cmdText As String = " SELECT TS.TestID, TS.SampleType " & vbCrLf & _
-                                                " FROM [Ax00].[dbo].[tparTestSamples] TS INNER JOIN [Ax00].[dbo].[tparTests] T " & vbCrLf & _
+                                                " FROM " & GlobalBase.DatabaseName & ".[dbo].[tparTestSamples] TS INNER JOIN " & GlobalBase.DatabaseName & ".[dbo].[tparTests] T " & vbCrLf & _
                                                                                                " ON TS.TestID = T.TestID " & vbCrLf & _
                                                 " WHERE  PreloadedTest = 1 " & vbCrLf & _
                                                 " EXCEPT " & vbCrLf & _
@@ -516,13 +519,14 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
+                        'IT 11/06/2015 - BA-2613
                         Dim cmdText As String = " SELECT TestID, AnalysisMode, ReactionType, ReadingMode, MainWaveLength, ReferenceWaveLength, " & vbCrLf & _
                                                        " FirstReadingCycle, SecondReadingCycle, KineticBlankLimit, ReagentsNumber " & vbCrLf & _
                                                 " FROM " & GlobalBase.TemporalDBName & ".[dbo].[tparTests] " & vbCrLf & _
                                                 " EXCEPT " & vbCrLf & _
                                                 " SELECT TestID, AnalysisMode, ReactionType, ReadingMode, MainWaveLength, ReferenceWaveLength, " & vbCrLf & _
                                                        " FirstReadingCycle, SecondReadingCycle, KineticBlankLimit, ReagentsNumber " & vbCrLf & _
-                                                " FROM   [Ax00].[dbo].[tparTests] " & vbCrLf
+                                                " FROM   " & GlobalBase.DatabaseName & ".[dbo].[tparTests] " & vbCrLf
 
                         Dim factoryTestsDS As New TestsDS
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
@@ -566,9 +570,10 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
+                        'IT 11/06/2015 - BA-2613
                         Dim cmdText As String = " SELECT TestID, SampleType FROM " & GlobalBase.TemporalDBName & ".[dbo].[tparTestSamples] " & vbCrLf & _
                                                 " EXCEPT " & vbCrLf & _
-                                                " SELECT TestID, SampleType FROM [Ax00].[dbo].[tparTestSamples] " & vbCrLf
+                                                " SELECT TestID, SampleType FROM " & GlobalBase.DatabaseName & ".[dbo].[tparTestSamples] " & vbCrLf
 
                         Dim factoryTestsDS As New TestsDS
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
@@ -615,6 +620,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
+                        'IT 11/06/2015 - BA-2613
                         Dim cmdText As String = " SELECT TestID, SampleType, SampleVolume, SampleVolumeSteps, PredilutionUseFlag, PredilutionMode, " & vbCrLf & _
                                                        " PredilutionFactor, PredilutedSampleVol, PredilutedSampleVolSteps, PredilutedDiluentVol, PreDiluentVolSteps, " & vbCrLf & _
                                                        " DiluentSolution, IncPostdilutionFactor, IncPostSampleVolume, IncPostSampleVolumeSteps, " & vbCrLf & _
@@ -631,7 +637,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                        " BlankAbsorbanceLimit, LinearityLimit, DetectionLimit, FactorLowerLimit, " & vbCrLf & _
                                                        " FactorUpperLimit, SubstrateDepletionValue,SlopeFactorA, SlopeFactorB, " & vbCrLf & _
                                                        " CalibratorType, CalibrationFactor, SampleTypeAlternative " & vbCrLf & _
-                                                " FROM [Ax00].[dbo].[tparTestSamples] TS INNER JOIN [Ax00].[dbo].[tparTests] T ON TS.TestID = T.TestID " & vbCrLf & _
+                                                " FROM " & GlobalBase.DatabaseName & ".[dbo].[tparTestSamples] TS INNER JOIN " & GlobalBase.DatabaseName & ".[dbo].[tparTests] T ON TS.TestID = T.TestID " & vbCrLf & _
                                                 " WHERE T.PreloadedTest = 1 "
 
                         Dim factoryTestSamplesDS As New TestSamplesDS
@@ -686,12 +692,13 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                 " AND TRV.SampleType = '" & pSampleType.Trim & "' " & vbCrLf
                         End If
 
+                        'IT 11/06/2015 - BA-2613
                         Dim cmdText As String = " SELECT TRV.TestID, TRV.SampleType, TRV.ReagentNumber, TRV.ReagentVolume " & vbCrLf & _
                                                 " FROM " & GlobalBase.TemporalDBName & ".[dbo].[tparTestReagentsVolumes] TRV " & vbCrLf & _
                                                 IIf(myOptionalFilters = String.Empty, String.Empty, " WHERE " & myOptionalFilters).ToString & _
                                                 " EXCEPT " & vbCrLf & _
                                                 " SELECT TRV.TestID, TRV.SampleType, TRV.ReagentNumber, TRV.ReagentVolume " & vbCrLf & _
-                                                " FROM   [Ax00].[dbo].[tparTestReagentsVolumes] TRV INNER JOIN [Ax00].[dbo].[tparTests] T ON TRV.TestID = T.TestID " & vbCrLf & _
+                                                " FROM   " & GlobalBase.DatabaseName & ".[dbo].[tparTestReagentsVolumes] TRV INNER JOIN " & GlobalBase.DatabaseName & ".[dbo].[tparTests] T ON TRV.TestID = T.TestID " & vbCrLf & _
                                                 " WHERE  T.PreloadedTest = 1 " & vbCrLf & _
                                                 IIf(myOptionalFilters = String.Empty, String.Empty, " AND " & myOptionalFilters).ToString
 

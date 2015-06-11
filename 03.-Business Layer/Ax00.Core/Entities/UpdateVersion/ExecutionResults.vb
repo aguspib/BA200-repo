@@ -17,9 +17,9 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
             IntegrityCheckScript
         End Enum
 
-        Public Sub WriteLog()
+        Public Sub WriteLog(debugLogger As DebugLogger)
 
-            Dim debugLogger As DebugLogger = New DebugLogger()
+            'Dim debugLogger As DebugLogger = New DebugLogger()
 
             DebugLogger.AddLog(" --------------------------------------------", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
             DebugLogger.AddLog(" Execution Results: ", GlobalBase.UpdateVersionDatabaseProcessLogFileName)

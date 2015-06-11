@@ -25,9 +25,10 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
+                        'IT 11/06/2015 - BA-2613
                         Dim cmdText As String = " SELECT BiosystemsID FROM " & GlobalBase.TemporalDBName & ".[dbo].[tparOffSystemTests] " & vbCrLf & _
                                                 " EXCEPT " & vbCrLf & _
-                                                " SELECT BiosystemsID FROM [Ax00].[dbo].[tparOffSystemTests] " & vbCrLf & _
+                                                " SELECT BiosystemsID FROM " & GlobalBase.DatabaseName & ".[dbo].[tparOffSystemTests] " & vbCrLf & _
                                                 " WHERE  PreloadedOffSystemTest = 1 " & vbCrLf
 
                         Dim newOFFSTestsDS As New OffSystemTestsDS
@@ -127,7 +128,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim cmdText As String = " SELECT BiosystemsID FROM [Ax00].[dbo].[tparOffSystemTests] " & vbCrLf & _
+                        'IT 11/06/2015 - BA-2613
+                        Dim cmdText As String = " SELECT BiosystemsID FROM " & GlobalBase.DatabaseName & ".[dbo].[tparOffSystemTests] " & vbCrLf & _
                                                 " WHERE  PreloadedOffSystemTest = 1 " & vbCrLf & _
                                                 " EXCEPT " & vbCrLf & _
                                                 " SELECT BiosystemsID FROM " & GlobalBase.TemporalDBName & ".[dbo].[tparOffSystemTests] " & vbCrLf & _
@@ -175,12 +177,13 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
+                        'IT 11/06/2015 - BA-2613
                         Dim cmdText As String = " SELECT OT.BiosystemsID, OT.ResultType, OT.Units, OT.Decimals, OTS.SampleType, OTS.DefaultValue, OTS.ActiveRangeType " & vbCrLf & _
                                                 " FROM " & GlobalBase.TemporalDBName & ".[dbo].[tparOffSystemTests] OT INNER JOIN " & GlobalBase.TemporalDBName & ".[dbo].[tparOffSystemTestSamples] OTS " & vbCrLf & _
                                                                                                                              " ON OT.OffSystemTestID = OTS.OffSystemTestID " & vbCrLf & _
                                                 " EXCEPT " & vbCrLf & _
                                                 " SELECT OT.BiosystemsID, OT.ResultType, OT.Units, OT.Decimals, OTS.SampleType, OTS.DefaultValue, OTS.ActiveRangeType " & vbCrLf & _
-                                                " FROM   [Ax00].[dbo].[tparOffSystemTests] OT INNER JOIN [Ax00].[dbo].[tparOffSystemTestSamples] OTS ON OT.OffSystemTestID = OTS.OffSystemTestID " & vbCrLf & _
+                                                " FROM   " & GlobalBase.DatabaseName & ".[dbo].[tparOffSystemTests] OT INNER JOIN " & GlobalBase.DatabaseName & ".[dbo].[tparOffSystemTestSamples] OTS ON OT.OffSystemTestID = OTS.OffSystemTestID " & vbCrLf & _
                                                 " WHERE  OT.PreloadedOffSystemTest = 1 " & vbCrLf
 
                         Dim factoryOFFSTestsDS As New OffSystemTestsDS

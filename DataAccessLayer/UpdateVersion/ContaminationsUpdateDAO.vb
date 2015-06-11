@@ -27,6 +27,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myOptionalFilters As String = String.Empty
+                        'IT 11/06/2015 - BA-2613
                         Dim cmdText As String = " SELECT C.ContaminationType, T.TestID AS TestContaminatorID, T1.TestID AS TestContaminatedID, C.WashingSolutionR1 " & vbCrLf & _
                                                 " FROM       " & GlobalBase.TemporalDBName & ".[dbo].[tparContaminations] C " & vbCrLf & _
                                                 " INNER JOIN " & GlobalBase.TemporalDBName & ".[dbo].[tparTestReagents] TR ON C.ReagentContaminatorID = TR.ReagentID " & vbCrLf & _
@@ -36,11 +37,11 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                 " WHERE C.ContaminationType = 'R1' " & vbCrLf & _
                                                 " EXCEPT " & vbCrLf & _
                                                 " SELECT C.ContaminationType, T.TestID AS TestContaminatorID, T1.TestID AS TestContaminatedID, C.WashingSolutionR1 " & vbCrLf & _
-                                                " FROM       [Ax00].[dbo].[tparContaminations] C " & vbCrLf & _
-                                                " INNER JOIN [Ax00].[dbo].[tparTestReagents] TR ON C.ReagentContaminatorID = TR.ReagentID " & vbCrLf & _
-                                                " INNER JOIN [Ax00].[dbo].[tparTests] T ON TR.TestID = T.TestID " &
-                                                " INNER JOIN [Ax00].[dbo].[tparTestReagents] TR1 ON C.ReagentContaminatedID = TR1.ReagentID " & vbCrLf & _
-                                                " INNER JOIN [Ax00].[dbo].[tparTests] T1 ON TR1.TestID = T1.TestID " &
+                                                " FROM       " & GlobalBase.DatabaseName & ".[dbo].[tparContaminations] C " & vbCrLf & _
+                                                " INNER JOIN " & GlobalBase.DatabaseName & ".[dbo].[tparTestReagents] TR ON C.ReagentContaminatorID = TR.ReagentID " & vbCrLf & _
+                                                " INNER JOIN " & GlobalBase.DatabaseName & ".[dbo].[tparTests] T ON TR.TestID = T.TestID " &
+                                                " INNER JOIN " & GlobalBase.DatabaseName & ".[dbo].[tparTestReagents] TR1 ON C.ReagentContaminatedID = TR1.ReagentID " & vbCrLf & _
+                                                " INNER JOIN " & GlobalBase.DatabaseName & ".[dbo].[tparTests] T1 ON TR1.TestID = T1.TestID " &
                                                 " WHERE C.ContaminationType = 'R1' " & vbCrLf
 
                         Dim r1ContaminationsDS As New ContaminationsDS
@@ -87,12 +88,13 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myOptionalFilters As String = String.Empty
+                        'IT 11/06/2015 - BA-2613
                         Dim cmdText As String = " SELECT C.ContaminationType, C.TestContaminaCuvetteID, C.WashingSolutionR1, C.WashingSolutionR2 " & vbCrLf & _
                                                 " FROM " & GlobalBase.TemporalDBName & ".[dbo].[tparContaminations] C " & vbCrLf & _
                                                 " WHERE  C.ContaminationType = 'CUVETTES' " & vbCrLf & _
                                                 " EXCEPT " & vbCrLf & _
                                                 " SELECT C.ContaminationType, C.TestContaminaCuvetteID, C.WashingSolutionR1, C.WashingSolutionR2 " & vbCrLf & _
-                                                " FROM   [Ax00].[dbo].[tparContaminations] C " & vbCrLf & _
+                                                " FROM   " & GlobalBase.DatabaseName & ".[dbo].[tparContaminations] C " & vbCrLf & _
                                                 " WHERE  C.ContaminationType = 'CUVETTES' " & vbCrLf
 
                         Dim cuvettesContaminationsDS As New ContaminationsDS
@@ -138,12 +140,13 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myOptionalFilters As String = String.Empty
+                        'IT 11/06/2015 - BA-2613
                         Dim cmdText As String = " SELECT C.ContaminationType, T.TestID AS TestContaminatorID, T1.TestID AS TestContaminatedID " & vbCrLf & _
-                                                " FROM       [Ax00].[dbo].[tparContaminations] C " & vbCrLf & _
-                                                " INNER JOIN [Ax00].[dbo].[tparTestReagents] TR ON C.ReagentContaminatorID = TR.ReagentID " & vbCrLf & _
-                                                " INNER JOIN [Ax00].[dbo].[tparTests] T ON TR.TestID = T.TestID " &
-                                                " INNER JOIN [Ax00].[dbo].[tparTestReagents] TR1 ON C.ReagentContaminatedID = TR1.ReagentID " & vbCrLf & _
-                                                " INNER JOIN [Ax00].[dbo].[tparTests] T1 ON TR1.TestID = T1.TestID " &
+                                                " FROM       " & GlobalBase.DatabaseName & ".[dbo].[tparContaminations] C " & vbCrLf & _
+                                                " INNER JOIN " & GlobalBase.DatabaseName & ".[dbo].[tparTestReagents] TR ON C.ReagentContaminatorID = TR.ReagentID " & vbCrLf & _
+                                                " INNER JOIN " & GlobalBase.DatabaseName & ".[dbo].[tparTests] T ON TR.TestID = T.TestID " &
+                                                " INNER JOIN " & GlobalBase.DatabaseName & ".[dbo].[tparTestReagents] TR1 ON C.ReagentContaminatedID = TR1.ReagentID " & vbCrLf & _
+                                                " INNER JOIN " & GlobalBase.DatabaseName & ".[dbo].[tparTests] T1 ON TR1.TestID = T1.TestID " &
                                                 " WHERE C.ContaminationType = 'R1' " & vbCrLf & _
                                                 " AND   T.PreloadedTest = 1 " & vbCrLf & _
                                                 " AND   T1.PreloadedTest = 1 " & vbCrLf & _
@@ -199,8 +202,9 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myOptionalFilters As String = String.Empty
+                        'IT 11/06/2015 - BA-2613
                         Dim cmdText As String = " SELECT C.ContaminationType, C.TestContaminaCuvetteID " & vbCrLf & _
-                                                " FROM   [Ax00].[dbo].[tparContaminations] C INNER JOIN [Ax00].[dbo].[tparTests] T ON C.TestContaminaCuvetteID = T.TestID " & vbCrLf & _
+                                                " FROM   " & GlobalBase.DatabaseName & ".[dbo].[tparContaminations] C INNER JOIN " & GlobalBase.DatabaseName & ".[dbo].[tparTests] T ON C.TestContaminaCuvetteID = T.TestID " & vbCrLf & _
                                                 " WHERE  C.ContaminationType = 'CUVETTES' " & vbCrLf & _
                                                 " AND    T.PreloadedTest = 1 " & vbCrLf & _
                                                 " EXCEPT " & vbCrLf & _

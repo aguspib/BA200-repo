@@ -988,7 +988,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         Public Shared Function GetPredilutionModeForTest(pTestID As Integer, pSampleType As String) As String
             If pSampleType = String.Empty Then Return ""
 
-            Const Query As String = ("SELECT a.ReagentID, b.SampleType, b.predilutionmode FROM [Ax00].[dbo].[tparTestReagents] a, [Ax00].[dbo].[tpartestsamples] b where a.TestID = b.TestID ")
+            Dim Query As String = String.Format("SELECT a.ReagentID, b.SampleType, b.predilutionmode FROM {0}.[dbo].[tparTestReagents] a, {0}.[dbo].[tpartestsamples] b where a.TestID = b.TestID ", GlobalBase.DatabaseName) 'IT 11/06/2015 - BA-2613
             Dim connection As TypedGlobalDataTo(Of SqlConnection) = Nothing
 
             Dim Result As String = ""
@@ -1071,8 +1071,8 @@ Namespace Biosystems.Ax00.DAL.DAO
 
             If pSampleType = String.Empty Then Return ""
             Dim Query = String.Format("SELECT Top(1) b.predilutionmode " &
-                                        "FROM [Ax00].[dbo].[tparTestReagents] a, [Ax00].[dbo].[tpartestsamples] b " &
-                                          "where a.TestID = b.TestID and a.ReagentID = {0} and b.SampleType = '{1}'", pTestID, pSampleType)
+                                        "FROM {2}.[dbo].[tparTestReagents] a, {2}.[dbo].[tpartestsamples] b " &
+                                          "where a.TestID = b.TestID and a.ReagentID = {0} and b.SampleType = '{1}'", pTestID, pSampleType, GlobalBase.DatabaseName) 'IT 11/06/2015 - BA-2613
 
             Dim resultData As New GlobalDataTO
             Dim connection = GetSafeOpenDBConnection(Nothing)
