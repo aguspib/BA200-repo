@@ -249,7 +249,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                                 Select Case myInstructionTO.ParameterIndex
                                     Case 1 'Axxx Analyzer Description
-                                        myInstructionTO.ParameterValue = "A400" '1st & 2on characters: model, 3th & 4th characters: analyzer number
+                                        myInstructionTO.ParameterValue = AnalyzerManager.GetCurrentAnalyzerManager().GetModelValue(AnalyzerManager.GetCurrentAnalyzerManager().ActiveAnalyzer) ' "A400" '1st & 2on characters: model, 3th & 4th characters: analyzer number
                                         Exit Select
 
                                     Case 2 'Instruction Code
@@ -723,7 +723,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 For Each myInstructionTO As InstructionParameterTO In myWashInstruction
                     Select Case myInstructionTO.ParameterIndex
                         Case 1 'Analyzer Model and Number
-                            myInstructionTO.ParameterValue = "A400"
+                            myInstructionTO.ParameterValue = AnalyzerManager.GetCurrentAnalyzerManager().GetModelValue(AnalyzerManager.GetCurrentAnalyzerManager().ActiveAnalyzer) '"A400"
                             Exit Select
                         Case 2 'Instruction Code
                             myInstructionTO.ParameterValue = "WASH"
@@ -796,7 +796,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 For Each myInstructionTO As InstructionParameterTO In myALIGHTInstruction
                     Select Case myInstructionTO.ParameterIndex
                         Case 1 'Analyzer Model and Number.
-                            myInstructionTO.ParameterValue = "A400"
+                            myInstructionTO.ParameterValue = AnalyzerManager.GetCurrentAnalyzerManager().GetModelValue(AnalyzerManager.GetCurrentAnalyzerManager().ActiveAnalyzer) '"A400"
                             Exit Select
                         Case 2 'Instruction Code.
                             myInstructionTO.ParameterValue = "ALIGHT"
@@ -844,7 +844,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 For Each myInstructionTO As InstructionParameterTO In myWSCTRLInstruction
                     Select Case myInstructionTO.ParameterIndex
                         Case 1 'Analyzer Model and Number.
-                            myInstructionTO.ParameterValue = "A400"
+                            myInstructionTO.ParameterValue = AnalyzerManager.GetCurrentAnalyzerManager().GetModelValue(AnalyzerManager.GetCurrentAnalyzerManager().ActiveAnalyzer) '"A400"
                             Exit Select
                         Case 2 'Instruction Code.
                             myInstructionTO.ParameterValue = "WSCTRL"
@@ -1031,7 +1031,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         Select Case myInstructionTO.ParameterIndex
                             Case 1 'Axxx Analyzer Description
                                 'myInstructionTO.Parameter = "A400"
-                                myInstructionTO.ParameterValue = "A400" '1st & 2on characters: model, 3th & 4th characters: analyzer number
+                                myInstructionTO.ParameterValue = AnalyzerManager.GetCurrentAnalyzerManager().GetModelValue(AnalyzerManager.GetCurrentAnalyzerManager().ActiveAnalyzer) '"A400" '1st & 2on characters: model, 3th & 4th characters: analyzer number
                                 Exit Select
                             Case 2 'Instruction Type
                                 myInstructionTO.ParameterValue = myInstructionTO.InstructionType
@@ -1085,7 +1085,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 For Each myInstructionTO As InstructionParameterTO In myINFOInstruction
                     Select Case myInstructionTO.ParameterIndex
                         Case 1 'Analyzer Model and Number.
-                            myInstructionTO.ParameterValue = "A400"
+                            myInstructionTO.ParameterValue = AnalyzerManager.GetCurrentAnalyzerManager().GetModelValue(AnalyzerManager.GetCurrentAnalyzerManager().ActiveAnalyzer) '"A400"
                             Exit Select
                         Case 2 'Instruction Code.
                             myInstructionTO.ParameterValue = "INFO"
@@ -1130,7 +1130,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 For Each myInstructionTO As InstructionParameterTO In myALIGHTInstruction
                     Select Case myInstructionTO.ParameterIndex
                         Case 1 'Analyzer Model and Number.
-                            myInstructionTO.ParameterValue = "A400"
+                            myInstructionTO.ParameterValue = AnalyzerManager.GetCurrentAnalyzerManager().GetModelValue(AnalyzerManager.GetCurrentAnalyzerManager().ActiveAnalyzer) '"A400"
                             Exit Select
                         Case 2 'Instruction Code.
                             myInstructionTO.ParameterValue = "ALIGHT"
@@ -1178,7 +1178,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 For Each myInstructionTO As InstructionParameterTO In myBLIGHTInstruction
                     Select Case myInstructionTO.ParameterIndex
                         Case 1 'Analyzer Model and Number.
-                            myInstructionTO.ParameterValue = "A400"
+                            myInstructionTO.ParameterValue = AnalyzerManager.GetCurrentAnalyzerManager().GetModelValue(AnalyzerManager.GetCurrentAnalyzerManager().ActiveAnalyzer) '"A400"
                             Exit Select
                         Case 2 'Instruction Code.
                             myInstructionTO.ParameterValue = "BLIGHT"
@@ -1225,7 +1225,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 For Each myInstructionTO As InstructionParameterTO In myFLIGHTInstruction
                     Select Case myInstructionTO.ParameterIndex
                         Case 1 'Analyzer Model and Number.
-                            myInstructionTO.ParameterValue = "A400"
+                            myInstructionTO.ParameterValue = AnalyzerManager.GetCurrentAnalyzerManager().GetModelValue(AnalyzerManager.GetCurrentAnalyzerManager().ActiveAnalyzer) '"A400"
                             Exit Select
                         Case 2 'Instruction Code.
                             myInstructionTO.ParameterValue = "FLIGHT"
@@ -1273,7 +1273,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 For Each myInstructionTO As InstructionParameterTO In myREADADJInstruction
                     Select Case myInstructionTO.ParameterIndex
                         Case 1 'Analyzer Model and Number.
-                            myInstructionTO.ParameterValue = "A400"
+                            myInstructionTO.ParameterValue = AnalyzerManager.GetCurrentAnalyzerManager().GetModelValue(AnalyzerManager.GetCurrentAnalyzerManager().ActiveAnalyzer) '"A400"
                             Exit Select
                         Case 2 'Instruction Code.
                             myInstructionTO.ParameterValue = "READADJ"
@@ -1318,7 +1318,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 For Each myInstructionTO As InstructionParameterTO In myISECMDInstruction
                     Select Case myInstructionTO.ParameterIndex
                         Case 1 'Analyzer Model and Number.
-                            myInstructionTO.ParameterValue = "A400"
+                            myInstructionTO.ParameterValue = AnalyzerManager.GetCurrentAnalyzerManager().GetModelValue(AnalyzerManager.GetCurrentAnalyzerManager().ActiveAnalyzer) '"A400"
                             Exit Select
                         Case 2 'Instruction Code.
                             myInstructionTO.ParameterValue = "ISECMD"
@@ -1386,7 +1386,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 For Each myInstructionTO As InstructionParameterTO In myFWUTILInstruction
                     Select Case myInstructionTO.ParameterIndex
                         Case 1 'Analyzer Model and Number.
-                            myInstructionTO.ParameterValue = "A400"
+                            myInstructionTO.ParameterValue = AnalyzerManager.GetCurrentAnalyzerManager().GetModelValue(AnalyzerManager.GetCurrentAnalyzerManager().ActiveAnalyzer) '"A400"
                             Exit Select
                         Case 2 'Instruction Code.
                             myInstructionTO.ParameterValue = "FWUTIL"
@@ -1446,7 +1446,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     For Each myInstructionTO As InstructionParameterTO In myLOADADJInstruction
                         Select Case myInstructionTO.ParameterIndex
                             Case 1 'Analyzer Model and Number.
-                                myInstructionTO.ParameterValue = "A400"
+                                myInstructionTO.ParameterValue = AnalyzerManager.GetCurrentAnalyzerManager().GetModelValue(AnalyzerManager.GetCurrentAnalyzerManager().ActiveAnalyzer) '"A400"
                                 Exit Select
                             Case 2 'Instruction Code.
                                 myInstructionTO.ParameterValue = "LOADADJ"
@@ -1495,7 +1495,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 For Each myInstructionTO As InstructionParameterTO In myRESETInstruction
                     Select Case myInstructionTO.ParameterIndex
                         Case 1 'Analyzer Model and Number.
-                            myInstructionTO.ParameterValue = "A400"
+                            myInstructionTO.ParameterValue = AnalyzerManager.GetCurrentAnalyzerManager().GetModelValue(AnalyzerManager.GetCurrentAnalyzerManager().ActiveAnalyzer) '"A400"
                             Exit Select
                         Case 2 'Instruction Code.
                             myInstructionTO.ParameterValue = "RESET"
@@ -1536,7 +1536,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 For Each myInstructionTO As InstructionParameterTO In myLoadFactoryInstruction
                     Select Case myInstructionTO.ParameterIndex
                         Case 1 'Analyzer Model and Number.
-                            myInstructionTO.ParameterValue = "A400"
+                            myInstructionTO.ParameterValue = AnalyzerManager.GetCurrentAnalyzerManager().GetModelValue(AnalyzerManager.GetCurrentAnalyzerManager().ActiveAnalyzer) '"A400"
                             Exit Select
                         Case 2 'Instruction Code.
                             myInstructionTO.ParameterValue = "LOADFACTORYADJ"
@@ -1584,7 +1584,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 For Each myInstructionTO As InstructionParameterTO In myUPDATEFWInstruction
                     Select Case myInstructionTO.ParameterIndex
                         Case 1 'Analyzer Model and Number.
-                            myInstructionTO.ParameterValue = "A400"
+                            myInstructionTO.ParameterValue = AnalyzerManager.GetCurrentAnalyzerManager().GetModelValue(AnalyzerManager.GetCurrentAnalyzerManager().ActiveAnalyzer) '"A400"
                             Exit Select
                         Case 2 'Instruction Code.
                             myInstructionTO.ParameterValue = "UPDATEFW"
@@ -1630,7 +1630,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 For Each myInstructionTO As InstructionParameterTO In myINFOInstruction
                     Select Case myInstructionTO.ParameterIndex
                         Case 1 'Analyzer Model and Number.
-                            myInstructionTO.ParameterValue = "A400"
+                            myInstructionTO.ParameterValue = AnalyzerManager.GetCurrentAnalyzerManager().GetModelValue(AnalyzerManager.GetCurrentAnalyzerManager().ActiveAnalyzer) '"A400"
                             Exit Select
                         Case 2 'Instruction Code.
                             myInstructionTO.ParameterValue = "TANKSTEST"
@@ -1679,7 +1679,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 For Each myInstructionTO As InstructionParameterTO In mySTRESSInstruction
                     Select Case myInstructionTO.ParameterIndex
                         Case 1 'Analyzer Model and Number.
-                            myInstructionTO.ParameterValue = "A400"
+                            myInstructionTO.ParameterValue = AnalyzerManager.GetCurrentAnalyzerManager().GetModelValue(AnalyzerManager.GetCurrentAnalyzerManager().ActiveAnalyzer) '"A400"
                             Exit Select
                         Case 2 'Instruction Code.
                             myInstructionTO.ParameterValue = "SDMODE"
@@ -1736,7 +1736,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 For Each myInstructionTO As InstructionParameterTO In mySTRESSInstruction
                     Select Case myInstructionTO.ParameterIndex
                         Case 1 'Analyzer Model and Number.
-                            myInstructionTO.ParameterValue = "A400"
+                            myInstructionTO.ParameterValue = AnalyzerManager.GetCurrentAnalyzerManager().GetModelValue(AnalyzerManager.GetCurrentAnalyzerManager().ActiveAnalyzer) '"A400"
                             Exit Select
                         Case 2 'Instruction Code.
                             myInstructionTO.ParameterValue = "SDPOLL"
@@ -1819,7 +1819,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 For Each myInstructionTO As InstructionParameterTO In myPOLLHWInstruction
                     Select Case myInstructionTO.ParameterIndex
                         Case 1 'Analyzer Model and Number.
-                            myInstructionTO.ParameterValue = "A400"
+                            myInstructionTO.ParameterValue = AnalyzerManager.GetCurrentAnalyzerManager().GetModelValue(AnalyzerManager.GetCurrentAnalyzerManager().ActiveAnalyzer) '"A400"
                             Exit Select
                         Case 2 'Instruction Code.
                             myInstructionTO.ParameterValue = "POLLHW"
@@ -1863,7 +1863,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 For Each myInstructionTO As InstructionParameterTO In myENABLEEVENTSInstruction
                     Select Case myInstructionTO.ParameterIndex
                         Case 1 'Analyzer Model and Number.
-                            myInstructionTO.ParameterValue = "A400"
+                            myInstructionTO.ParameterValue = AnalyzerManager.GetCurrentAnalyzerManager().GetModelValue(AnalyzerManager.GetCurrentAnalyzerManager().ActiveAnalyzer) '"A400"
                             Exit Select
                         Case 2 'Instruction Code.
                             myInstructionTO.ParameterValue = "ENABLE_EVENTS"
@@ -1904,7 +1904,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 For Each myInstructionTO As InstructionParameterTO In myDISABLEEVENTSInstruction
                     Select Case myInstructionTO.ParameterIndex
                         Case 1 'Analyzer Model and Number.
-                            myInstructionTO.ParameterValue = "A400"
+                            myInstructionTO.ParameterValue = AnalyzerManager.GetCurrentAnalyzerManager().GetModelValue(AnalyzerManager.GetCurrentAnalyzerManager().ActiveAnalyzer) '"A400"
                             Exit Select
                         Case 2 'Instruction Code.
                             myInstructionTO.ParameterValue = "DISABLE_EVENTS"
@@ -1945,7 +1945,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 For Each myInstructionTO As InstructionParameterTO In myPOLLFWInstruction
                     Select Case myInstructionTO.ParameterIndex
                         Case 1 'Analyzer Model and Number.
-                            myInstructionTO.ParameterValue = "A400"
+                            myInstructionTO.ParameterValue = AnalyzerManager.GetCurrentAnalyzerManager().GetModelValue(AnalyzerManager.GetCurrentAnalyzerManager().ActiveAnalyzer) '"A400"
                             Exit Select
                         Case 2
                             myInstructionTO.ParameterValue = "POLLFW"
@@ -2054,7 +2054,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         For Each myInstructionTO As InstructionParameterTO In myCODEBRInstruction
                             Select Case myInstructionTO.ParameterIndex
                                 Case 1 'Analyzer Model and Number.
-                                    myInstructionTO.ParameterValue = "A400"
+                                    myInstructionTO.ParameterValue = AnalyzerManager.GetCurrentAnalyzerManager().GetModelValue(AnalyzerManager.GetCurrentAnalyzerManager().ActiveAnalyzer) '"A400"
                                     Exit Select
                                 Case 2 'Instruction Code.
                                     myInstructionTO.ParameterValue = "CODEBR"
@@ -2328,7 +2328,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 For Each myInstructionTO As InstructionParameterTO In mySOUNDInstruction
                     Select Case myInstructionTO.ParameterIndex
                         Case 1 'Analyzer Model and Number.
-                            myInstructionTO.ParameterValue = "A400"
+                            myInstructionTO.ParameterValue = AnalyzerManager.GetCurrentAnalyzerManager().GetModelValue(AnalyzerManager.GetCurrentAnalyzerManager().ActiveAnalyzer) '"A400"
                             Exit Select
                         Case 2 'Instruction Code.
                             myInstructionTO.ParameterValue = "SOUND"
@@ -2379,7 +2379,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 For Each myInstructionTO As InstructionParameterTO In myCONFIGInstruction
                     Select Case myInstructionTO.ParameterIndex
                         Case 1 'Analyzer Model and Number.
-                            myInstructionTO.ParameterValue = "A400"
+                            myInstructionTO.ParameterValue = AnalyzerManager.GetCurrentAnalyzerManager().GetModelValue(AnalyzerManager.GetCurrentAnalyzerManager().ActiveAnalyzer) '"A400"
                             Exit Select
                         Case 2 'Instruction Code.
                             myInstructionTO.ParameterValue = "CONFIG"
@@ -2457,7 +2457,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 For Each myInstructionTO As InstructionParameterTO In myUTILInstruction
                     Select Case myInstructionTO.ParameterIndex
                         Case 1 'Analyzer Model and Number.
-                            myInstructionTO.ParameterValue = "A400"
+                            myInstructionTO.ParameterValue = AnalyzerManager.GetCurrentAnalyzerManager().GetModelValue(AnalyzerManager.GetCurrentAnalyzerManager().ActiveAnalyzer) '"A400"
                             Exit Select
                         Case 2 'Instruction Code.
                             myInstructionTO.ParameterValue = "UTIL"
@@ -2509,7 +2509,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 For Each myInstructionTO As InstructionParameterTO In myPOLLSNInstruction
                     Select Case myInstructionTO.ParameterIndex
                         Case 1 'Analyzer Model and Number.
-                            myInstructionTO.ParameterValue = "A400"
+                            myInstructionTO.ParameterValue = AnalyzerManager.GetCurrentAnalyzerManager().GetModelValue(AnalyzerManager.GetCurrentAnalyzerManager().ActiveAnalyzer) '"A400"
                             Exit Select
                         Case 2 'Instruction Code.
                             myInstructionTO.ParameterValue = "POLLSN"
@@ -2770,7 +2770,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Select Case myInstructionTO.ParameterIndex
                         Case 1 'Axxx Analyzer Description
                             'myInstructionTO.Parameter = "A400"
-                            myInstructionTO.ParameterValue = "A400" '1st & 2on characters: model, 3th & 4th characters: analyzer number
+                            myInstructionTO.ParameterValue = AnalyzerManager.GetCurrentAnalyzerManager().GetModelValue(AnalyzerManager.GetCurrentAnalyzerManager().ActiveAnalyzer) '"A400" '1st & 2on characters: model, 3th & 4th characters: analyzer number
                             Exit Select
                         Case 2 'PREP Instruction Type
                             'myInstructionTO.Parameter = "PREP"
@@ -3317,7 +3317,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 For Each myInstructionTO As InstructionParameterTO In pPreparationParameterList
                     Select Case myInstructionTO.ParameterIndex
                         Case 1 'Axxx Analyzer Description
-                            myInstructionTO.ParameterValue = "A400" '1st & 2on characters: model, 3th & 4th characters: analyzer number
+                            myInstructionTO.ParameterValue = AnalyzerManager.GetCurrentAnalyzerManager().GetModelValue(AnalyzerManager.GetCurrentAnalyzerManager().ActiveAnalyzer) '"A400" '1st & 2on characters: model, 3th & 4th characters: analyzer number
                             Exit Select
 
                         Case 2 'PREP Instruction Type
@@ -4286,7 +4286,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 For Each myInstructionTO As InstructionParameterTO In myREADCYCLESInstruction
                     Select Case myInstructionTO.ParameterIndex
                         Case 1 'Analyzer Model and Number.
-                            myInstructionTO.ParameterValue = "A400"
+                            myInstructionTO.ParameterValue = AnalyzerManager.GetCurrentAnalyzerManager().GetModelValue(AnalyzerManager.GetCurrentAnalyzerManager().ActiveAnalyzer) '"A400"
                             Exit Select
                         Case 2 'Instruction Code.
                             myInstructionTO.ParameterValue = "READCYCLES"
@@ -4340,7 +4340,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     For Each myInstructionTO As InstructionParameterTO In myWRITECYCLESInstruction
                         Select Case myInstructionTO.ParameterIndex
                             Case 1 'Analyzer Model and Number.
-                                myInstructionTO.ParameterValue = "A400"
+                                myInstructionTO.ParameterValue = AnalyzerManager.GetCurrentAnalyzerManager().GetModelValue(AnalyzerManager.GetCurrentAnalyzerManager().ActiveAnalyzer) '"A400"
                                 Exit Select
                             Case 2 'Instruction Code.
                                 myInstructionTO.ParameterValue = "WRITECYCLES"
@@ -4653,7 +4653,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 For Each myInstructionTO As InstructionParameterTO In myPOLLRDInstruction
                     Select Case myInstructionTO.ParameterIndex
                         Case 1 'Analyzer Model and Number.
-                            myInstructionTO.ParameterValue = "A400"
+                            myInstructionTO.ParameterValue = AnalyzerManager.GetCurrentAnalyzerManager().GetModelValue(AnalyzerManager.GetCurrentAnalyzerManager().ActiveAnalyzer) '"A400"
                             Exit Select
                         Case 2 'Instruction Code.
                             myInstructionTO.ParameterValue = "POLLRD"
