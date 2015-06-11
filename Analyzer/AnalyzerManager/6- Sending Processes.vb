@@ -504,9 +504,6 @@ Namespace Biosystems.Ax00.Core.Entities
                                     GlobalBase.CreateLogActivity("SearchNextSTDPreparation (Check if exist reagents contaminations): " + nextRow.ExecutionID.ToString, "AnalyzerManager.SearchNextPreparation", EventLogEntryType.Information, False)
 
                                 Else 'STD execution or NO_PENDING_PREPARATION_FOUND
-                                    Dim miAnManDS = DirectCast(resultData.SetDatos, AnalyzerManagerDS)
-                                    Dim myRowSearchNext = miAnManDS.searchNext(0).ReagentID
-
                                     nextRow = nextPreparationDS.nextPreparation.NewnextPreparationRow
                                     nextRow.ExecutionType = "PREP_STD"
                                     nextRow.ExecutionID = executionFound
@@ -518,15 +515,19 @@ Namespace Biosystems.Ax00.Core.Entities
                                     nextRow.SetWashSolution1Null()
                                     nextRow.SetWashSolution2Null()
 
-                                    nextRow.ReagentID = myRowSearchNext
+                                    Dim miAnManDS = TryCast(resultData.SetDatos, AnalyzerManagerDS)
+                                    If miAnManDS IsNot Nothing Then
+                                        Dim myRowSearchNext = miAnManDS.searchNext(0).ReagentID
+                                        nextRow.ReagentID = myRowSearchNext
+                                    End If
 
                                     nextPreparationDS.nextPreparation.AddnextPreparationRow(nextRow)
                                     GlobalBase.CreateLogActivity("SearchNextSTDPreparation (STD execution or NO_PENDING_PREPARATION_FOUND): " + nextRow.ExecutionID.ToString, "AnalyzerManager.SearchNextPreparation", EventLogEntryType.Information, False)
-                                End If '(4.2)
+                                    End If '(4.2)
 
 #If DEBUG Then
-                                Debug.Print(String.Format("ElementID on nextRow = {0} \n", nextRow.ExecutionID.ToString()))
-                                Debug.Print(String.Format("SearchNextPreparation: Number of elements on nextPreparation table = {0} \n", nextPreparationDS.nextPreparation.Count.ToString()))
+                                    Debug.Print(String.Format("ElementID on nextRow = {0} \n", nextRow.ExecutionID.ToString()))
+                                    Debug.Print(String.Format("SearchNextPreparation: Number of elements on nextPreparation table = {0} \n", nextPreparationDS.nextPreparation.Count.ToString()))
 #End If
                             End If '(4.1)
                         End If '(4.0
@@ -851,6 +852,8 @@ Namespace Biosystems.Ax00.Core.Entities
                                     If Not sentLinqList(sentLinqList.Count - 1).IsOrderIDNull Then lastOrderID = sentLinqList(sentLinqList.Count - 1).OrderID
                                     If Not sentLinqList(sentLinqList.Count - 1).IsSampleTypeNull Then lastSampleType = sentLinqList(sentLinqList.Count - 1).SampleType
                                     If Not sentLinqList(sentLinqList.Count - 1).IsSampleClassNull Then lastSampleClass = sentLinqList(sentLinqList.Count - 1).SampleClass
+                                    'AJG. When Blanks are being processed, they don't have to be filtered by SampleType
+                                    If lastSampleClass = "BLANK" Then lastSampleType = ""
                                 End If
 
                                 'AG 28/11/2011 - 1) Get all R1 Contaminations and HIGH contamination persistance
@@ -2114,6 +2117,8 @@ Namespace Biosystems.Ax00.Core.Entities
                                       myRow.ExecutionID.ToString(), indexNextToSend.ToString(), toSendList(indexNextToSend).ExecutionID.ToString(), toSendList(indexNextToSend).ReagentID.ToString()))
 #End If
 
+            myRow.ReagentID = toSendList(indexNextToSend).ReagentID
+
             If nextExecutionFound Then '(4)
                 'Prepare output DS with the proper information (execution to be sent)
                 myRow.SampleClass = toSendList(indexNextToSend).SampleClass
@@ -2347,22 +2352,21 @@ Namespace Biosystems.Ax00.Core.Entities
                                                      ByRef pNextWell As Integer, ByRef emptyFieldsDetected As Boolean, myAnManagerDS As AnalyzerManagerDS) As Boolean
             Dim systemErrorFlag = False
 
-
-
             '5rh: Check if next preparation is an STD preparation and executionID <> NO_PENDING_PREPARATION_FOUND
             If Not actionAlreadySent And Not endRunToSend Then
-                Dim disp = WSCreator.ContaminationsSpecification.CreateDispensing
-                disp.R1ReagentID = myAnManagerDS.nextPreparation(0).ReagentID
-                Dim requiredActionBeforeDispensing = WSCreator.ContaminationsSpecification.CurrentRunningContext.ActionRequiredForDispensing(disp)
-                If requiredActionBeforeDispensing.Action = IContaminationsAction.RequiredAction.Wash Then
-                    Debug.WriteLine("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-                    Debug.WriteLine("Incongruency found for reagent: " & disp.R1ReagentID & vbCr & WSCreator.ContaminationsSpecification.CurrentRunningContext.ToString)
-                    Debug.WriteLine("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-                End If
                 If Not myAnManagerDS.nextPreparation(0).IsExecutionTypeNull AndAlso myAnManagerDS.nextPreparation(0).ExecutionType = "PREP_STD" Then
                     'endRunToSend = True  'AG 30/11/2011 comment this line (Sw has to send ENDRUN)
 
                     If Not myAnManagerDS.nextPreparation(0).IsExecutionIDNull AndAlso myAnManagerDS.nextPreparation(0).ExecutionID <> GlobalConstants.NO_PENDING_PREPARATION_FOUND Then
+                        Dim disp = WSCreator.ContaminationsSpecification.CreateDispensing
+                        disp.R1ReagentID = myAnManagerDS.nextPreparation(0).ReagentID
+                        Dim requiredActionBeforeDispensing = WSCreator.ContaminationsSpecification.CurrentRunningContext.ActionRequiredForDispensing(disp)
+                        If requiredActionBeforeDispensing.Action = IContaminationsAction.RequiredAction.Wash Then
+                            Debug.WriteLine("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+                            Debug.WriteLine("Incongruency found for reagent: " & disp.R1ReagentID & vbCr & WSCreator.ContaminationsSpecification.CurrentRunningContext.ToString)
+                            Debug.WriteLine("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+                        End If
+
                         Dim StartTime = Now 'AG 28/06/2012
 
                         'AG 31/05/2012 - Evaluate the proper well for contamination or rejection for PTEST case

@@ -99,13 +99,13 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
                 If release.Version < pFromVersion Then
                     'Ignore previous versions
                     Continue For
-                    'ElseIf release.Version = pFromVersion Then
+                ElseIf release.Version = pFromVersion Then
                     '    'Ignore previous subversions, but get required subversion
-                    '    updatesManager.Releases.Add(release.GenerateRevisionPack(pFromCommonRevisionNumberFrom, pFromDataRevisionNumber))
+                    updatesManager.Releases.Add(release.GenerateRevisionPack(pFromCommonRevisionNumberFrom, pFromDataRevisionNumber))
                     'Else
                     '    'Add newer versions
                     '    updatesManager.Releases.Add(release)
-                ElseIf ((release.Version >= pFromVersion) And (release.Version <= pToVersion)) Then
+                ElseIf ((release.Version > pFromVersion) And (release.Version <= pToVersion)) Then
                     updatesManager.Releases.Add(release)
                 End If
 
