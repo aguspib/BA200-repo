@@ -107,10 +107,6 @@
     <AssemblyOriginatorKeyFile>BioSystems.pfx</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Interop.CommunicationsAx00">
-      <HintPath>..\Tools\Interop.CommunicationsAx00.dll</HintPath>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Management" />
