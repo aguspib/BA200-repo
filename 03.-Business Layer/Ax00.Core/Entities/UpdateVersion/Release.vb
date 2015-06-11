@@ -153,25 +153,23 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
 
         End Sub
 
-        Public Sub WriteLog()
+        Public Sub WriteLog(debugLogger As DebugLogger)
 
-            Dim debugLogger As DebugLogger = New DebugLogger()
-
-            DebugLogger.AddLog(" --------------------------------------------", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
-            DebugLogger.AddLog(String.Format(" Release: {0}", Version), GlobalBase.UpdateVersionDatabaseProcessLogFileName)
-            DebugLogger.AddLog(" 1.- Common scripts", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+            debugLogger.AddLog(" --------------------------------------------", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+            debugLogger.AddLog(String.Format(" Release: {0}", Version), GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+            debugLogger.AddLog(" 1.- Common scripts", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
 
             For Each revision As CommonRevision In CommonRevisions
-                revision.WriteLog()
+                revision.WriteLog(debugLogger)
             Next
 
-            DebugLogger.AddLog(" 2.- Data scripts", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+            debugLogger.AddLog(" 2.- Data scripts", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
 
             For Each revision As DataRevision In DataRevisions
-                revision.WriteLog()
+                revision.WriteLog(debugLogger)
             Next
 
-            DebugLogger.AddLog(" --------------------------------------------", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+            debugLogger.AddLog(" --------------------------------------------", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
 
         End Sub
 

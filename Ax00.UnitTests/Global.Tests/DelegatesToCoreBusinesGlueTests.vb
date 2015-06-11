@@ -5,7 +5,7 @@ Imports Biosystems.Ax00.Core.Entities.WorkSession.Interfaces
 Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Types
 Imports NUnit.Framework
-Imports Telerik.JustMock
+
 
 Namespace Tests
 

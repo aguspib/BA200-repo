@@ -73,11 +73,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not dataToReturn.HasError AndAlso Not dataToReturn.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(dataToReturn.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
+                        'IT 11/06/2015 - BA-2613
                         Dim cmdText As String = " SELECT CalibratorName, NumberOfCalibrators, SpecialCalib " & vbCrLf & _
                                                 " FROM " & GlobalBase.TemporalDBName & ".[dbo].[tparCalibrators] " & vbCrLf & _
                                                 " EXCEPT " & vbCrLf & _
                                                 " SELECT CalibratorName, NumberOfCalibrators, SpecialCalib " & vbCrLf & _
-                                                " FROM   [Ax00].[dbo].[tparCalibrators] " & vbCrLf
+                                                " FROM   " & GlobalBase.DatabaseName & ".[dbo].[tparCalibrators] " & vbCrLf
 
                         Dim myCalibrators As New CalibratorsDS
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)

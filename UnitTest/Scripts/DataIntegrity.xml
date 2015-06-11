@@ -4,7 +4,7 @@
     <Version>3.06</Version>
     <Label>Data validation in tfmwVersions Table for package 3.0.6</Label>
     <Script>
-      IF (SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwVersions] WHERE UserSoftware = '3.0.6'
+      IF (SELECT COUNT(*) FROM [dbo].[tfmwVersions] WHERE UserSoftware = '3.0.6'
       AND ServiceSoftware = '1.2.4' AND FirmwareScripts = '1.1.0' AND Firmware = '0.20')= 1
       SELECT 'True'
       ELSE
@@ -61,7 +61,7 @@
       SELECT * , 'Ax00' AS DBName
       FROM (
       SELECT *
-      FROM [Ax00].[dbo].[tfmwMultiLanguageResources]
+      FROM [dbo].[tfmwMultiLanguageResources]
       EXCEPT
       SELECT *
       FROM [Ax00TEM].[dbo].[tfmwMultiLanguageResources] ) AS T
@@ -72,7 +72,7 @@
       FROM [Ax00TEM].[dbo].[tfmwMultiLanguageResources]
       EXCEPT
       SELECT *
-      FROM [Ax00].[dbo].[tfmwMultiLanguageResources]) AS  T
+      FROM [dbo].[tfmwMultiLanguageResources]) AS  T
 
       IF (SELECT COUNT(*) FROM @Resultado) = 0
       SELECT 'True'
@@ -300,7 +300,7 @@
     <Version>2.0</Version>
     <Label>Exist SettingID BARCODE_SAMPLEID_FLAG On tcfgUserSettings </Label>
     <Script>
-      IF (SELECT COUNT(*) FROM [Ax00].[dbo].[tcfgUserSettings]
+      IF (SELECT COUNT(*) FROM [dbo].[tcfgUserSettings]
       WHERE SettingID = 'BARCODE_SAMPLEID_FLAG' AND SettingDataType = 'BOOLEAN'
       AND Status = '1') = 1
       SELECT 'True'
@@ -313,7 +313,7 @@
     <Version>2.0</Version>
     <Label>Exist for change in Start WS with read barcode functionality</Label>
     <Script>
-      IF (SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwMessages]
+      IF (SELECT COUNT(*) FROM [dbo].[tfmwMessages]
       WHERE MessageID = 'CONFIRM_BARCODE_WARNING') = 1
       SELECT 'True'
       ELSE
@@ -503,7 +503,7 @@
     <Version>2.0</Version>
     <Label>LIS parameters export modes MANUAL_EXPORT_FILENAME And ONLINE_EXPORT_FILENAME</Label>
     <Script>
-      IF (SELECT COUNT(*) FROM [AX00].[dbo].tfmwSwParameters WHERE [ParameterName] = 'MANUAL_EXPORT_FILENAME'
+      IF (SELECT COUNT(*) FROM [dbo].tfmwSwParameters WHERE [ParameterName] = 'MANUAL_EXPORT_FILENAME'
       or [ParameterName] = 'ONLINE_EXPORT_FILENAME') = 2
       SELECT 'True'
       ELSE
@@ -586,7 +586,7 @@
     <Version>2.0</Version>
     <Label>Validate the LIS_HOST_QUERY Setting Type and Default Value</Label>
     <Script>
-      IF ((SELECT COUNT(*) FROM [AX00].[dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_HOST_QUERY' AND [SettingDataType]= 'BOOLEAN' AND [CurrentValue] = '1' ) = 1)
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_HOST_QUERY' AND [SettingDataType]= 'BOOLEAN' AND [CurrentValue] = '1' ) = 1)
       SELECT 'True'
       ELSE
       SELECT 'False'
@@ -597,7 +597,7 @@
     <Version>2.0</Version>
     <Label>Validate the LIS_ACCEPT_UNSOLICITED Setting Type and Default Value</Label>
     <Script>
-      IF ((SELECT COUNT(*) FROM [AX00].[dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_ACCEPT_UNSOLICITED' AND [SettingDataType]= 'BOOLEAN' AND [CurrentValue] = '1' ) = 1)
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_ACCEPT_UNSOLICITED' AND [SettingDataType]= 'BOOLEAN' AND [CurrentValue] = '1' ) = 1)
       SELECT 'True'
       ELSE
       SELECT 'False'
@@ -609,7 +609,7 @@
     <Version>2.0</Version>
     <Label>Validate the LIS_DOWNLOAD_ONRUNNING Setting Type and Default Value</Label>
     <Script>
-      IF ((SELECT COUNT(*) FROM [AX00].[dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_DOWNLOAD_ONRUNNING' AND [SettingDataType]= 'BOOLEAN' AND [CurrentValue] = '1' ) = 1)
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_DOWNLOAD_ONRUNNING' AND [SettingDataType]= 'BOOLEAN' AND [CurrentValue] = '1' ) = 1)
       SELECT 'True'
       ELSE
       SELECT 'False'
@@ -620,7 +620,7 @@
     <Version>2.0</Version>
     <Label>Validate the LIS_WORKING_MODE_RERUNS Setting Type and Default Value</Label>
     <Script>
-      IF ((SELECT COUNT(*) FROM [AX00].[dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_WORKING_MODE_RERUNS' AND [SettingDataType]= 'CHAR' AND [CurrentValue] = 'BOTH' ) = 1)
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_WORKING_MODE_RERUNS' AND [SettingDataType]= 'CHAR' AND [CurrentValue] = 'BOTH' ) = 1)
       SELECT 'True'
       ELSE
       SELECT 'False'
@@ -631,7 +631,7 @@
     <Version>2.0</Version>
     <Label>Validate the LIS_WORKING_MODE_REFLEX_TESTS Setting Type and Default Value</Label>
     <Script>
-      IF ((SELECT COUNT(*) FROM [AX00].[dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_WORKING_MODE_REFLEX_TESTS' AND [SettingDataType]= 'CHAR' AND [CurrentValue] = '0' ) = 1)
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_WORKING_MODE_REFLEX_TESTS' AND [SettingDataType]= 'CHAR' AND [CurrentValue] = '0' ) = 1)
       SELECT 'True'
       ELSE
       SELECT 'False'
@@ -642,7 +642,7 @@
     <Version>2.0</Version>
     <Label>Validate the LIS_UPLOAD_UNSOLICITED_PAT_RES Setting Type and Default Value.</Label>
     <Script>
-      IF ((SELECT COUNT(*) FROM [AX00].[dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_UPLOAD_UNSOLICITED_PAT_RES' AND [SettingDataType]= 'BOOLEAN' AND [CurrentValue] = '1' ) = 1)
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_UPLOAD_UNSOLICITED_PAT_RES' AND [SettingDataType]= 'BOOLEAN' AND [CurrentValue] = '1' ) = 1)
       SELECT 'True'
       ELSE
       SELECT 'False'
@@ -1326,7 +1326,7 @@
     <Version>2.0</Version>
     <Label>Message error to LIS Storage limits inside Config settings LIS screen</Label>
     <Script>
-      IF (SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwMessages]
+      IF (SELECT COUNT(*) FROM [dbo].[tfmwMessages]
       WHERE MessageID = 'LIS_STORAGE_LIMIT') = 1
       SELECT 'True'
       ELSE
@@ -1338,7 +1338,7 @@
     <Version>2.0</Version>
     <Label>Message error information about Reset WS functionality</Label>
     <Script>
-      IF (SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwMessages]
+      IF (SELECT COUNT(*) FROM [dbo].[tfmwMessages]
       WHERE MessageID = 'RESET_WS_FAILED') = 1
       SELECT 'True'
       ELSE
@@ -1350,7 +1350,7 @@
     <Version>2.0</Version>
     <Label>Message MSG_REMOVE_NOTINUSE exist</Label>
     <Script>
-      IF ((SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwMessages] WHERE [MessageID] = 'REMOVE_NOTINUSE') = 1)
+      IF ((SELECT COUNT(*) FROM [dbo].[tfmwMessages] WHERE [MessageID] = 'REMOVE_NOTINUSE') = 1)
       SELECT 'True'
       ELSE
       SELECT 'False'
@@ -1361,7 +1361,7 @@
     <Version>2.0</Version>
     <Label>Exist Sample Type SEM (Semen) on tcfgBarCodeSampleTypesMapping Table</Label>
     <Script>
-      IF ((SELECT COUNT(*) FROM [Ax00].dbo.tcfgBarCodeSampleTypesMapping WHERE SampleType = 'SEM') = 1)
+      IF ((SELECT COUNT(*) FROM dbo.tcfgBarCodeSampleTypesMapping WHERE SampleType = 'SEM') = 1)
       SELECT 'True'
       ELSE
       SELECT 'False'
@@ -1372,7 +1372,7 @@
     <Version>2.0</Version>
     <Label>Exist Sample Type LIQ (Biological Liquid) on tcfgBarCodeSampleTypesMapping Table</Label>
     <Script>
-      IF ((SELECT COUNT(*) FROM [Ax00].dbo.tcfgBarCodeSampleTypesMapping WHERE SampleType = 'LIQ') = 1)
+      IF ((SELECT COUNT(*) FROM dbo.tcfgBarCodeSampleTypesMapping WHERE SampleType = 'LIQ') = 1)
       SELECT 'True'
       ELSE
       SELECT 'False'
@@ -1383,7 +1383,7 @@
     <Version>2.0</Version>
     <Label>Message LIS_MAPPING_WARNING exist on tfmwMessages Table </Label>
     <Script>
-      IF ((SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwMessages] WHERE [MessageID] = 'LIS_MAPPING_WARNING') = 1)
+      IF ((SELECT COUNT(*) FROM [dbo].[tfmwMessages] WHERE [MessageID] = 'LIS_MAPPING_WARNING') = 1)
       SELECT 'True'
       ELSE
       SELECT 'False'
@@ -1394,7 +1394,7 @@
     <Version>2.0</Version>
     <Label>Message LIS_DUPLICATED_NAME exist on tfmwMessages Table </Label>
     <Script>
-      IF ((SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwMessages] WHERE [MessageID] = 'LIS_DUPLICATED_NAME') = 1)
+      IF ((SELECT COUNT(*) FROM [dbo].[tfmwMessages] WHERE [MessageID] = 'LIS_DUPLICATED_NAME') = 1)
       SELECT 'True'
       ELSE
       SELECT 'False'
@@ -1405,7 +1405,7 @@
     <Version>2.0</Version>
     <Label>Sample Type LIQ exist on master data </Label>
     <Script>
-      IF ((SELECT COUNT(*) FROM [Ax00].[dbo].tcfgMasterData WHERE SubTableID = 'SAMPLE_TYPES' AND ItemID = 'LIQ') = 1)
+      IF ((SELECT COUNT(*) FROM [dbo].tcfgMasterData WHERE SubTableID = 'SAMPLE_TYPES' AND ItemID = 'LIQ') = 1)
       SELECT 'True'
       ELSE
       SELECT 'False'
@@ -1416,7 +1416,7 @@
     <Version>2.0</Version>
     <Label>Sample Type SEM exist on master data </Label>
     <Script>
-      IF ((SELECT COUNT(*) FROM [Ax00].[dbo].tcfgMasterData WHERE SubTableID = 'SAMPLE_TYPES' AND ItemID = 'SEM') = 1)
+      IF ((SELECT COUNT(*) FROM [dbo].tcfgMasterData WHERE SubTableID = 'SAMPLE_TYPES' AND ItemID = 'SEM') = 1)
       SELECT 'True'
       ELSE
       SELECT 'False'
@@ -1438,7 +1438,7 @@
     <Version>2.0</Version>
     <Label>Validating HQ Icon exist on tfmwPreloadedMasterData</Label>
     <Script>
-      IF ((SELECT COUNT(*) FROM [Ax00].[dbo].tfmwPreloadedMasterData WHERE SubtableID = 'ICON_PATHS' AND ItemID = 'HQ' ) = 1)
+      IF ((SELECT COUNT(*) FROM [dbo].tfmwPreloadedMasterData WHERE SubtableID = 'ICON_PATHS' AND ItemID = 'HQ' ) = 1)
       SELECT 'True'
       ELSE
       SELECT 'False'
@@ -1449,7 +1449,7 @@
     <Version>2.0</Version>
     <Label>Validate new value for parameter MAX_REACTROTOR_DAYS = 7 </Label>
     <Script>
-      IF( (SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwSwParameters] WHERE ParameterName ='MAX_REACTROTOR_DAYS' AND ValueNumeric = 7) = 1)
+      IF( (SELECT COUNT(*) FROM [dbo].[tfmwSwParameters] WHERE ParameterName ='MAX_REACTROTOR_DAYS' AND ValueNumeric = 7) = 1)
       SELECT 'True'
       ELSE
       SELECT 'False'
@@ -1471,7 +1471,7 @@
     <Version>2.1</Version>
     <Label>Validate the sample volume for STD TEST GAMMA-GT </Label>
     <Script>
-      IF (SELECT COUNT(*)  FROM [Ax00].[dbo].[tparTestSamples] WHERE TestID = 30 AND SampleType = 'SER' AND SampleVolume = 20)= 1
+      IF (SELECT COUNT(*)  FROM [dbo].[tparTestSamples] WHERE TestID = 30 AND SampleType = 'SER' AND SampleVolume = 20)= 1
       SELECT 'True'
       ELSE
       SELECT 'False'
@@ -1614,7 +1614,7 @@
     <Version>2.1</Version>
     <Label>Message MSG_AUTOLIS_LIS_NOT_READY exist</Label>
     <Script>
-      IF ((SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwMessages] WHERE [MessageID] = 'AUTOLIS_LIS_NOT_READY') = 1)
+      IF ((SELECT COUNT(*) FROM [dbo].[tfmwMessages] WHERE [MessageID] = 'AUTOLIS_LIS_NOT_READY') = 1)
       SELECT 'True'
       ELSE
       SELECT 'False'
@@ -1625,7 +1625,7 @@
     <Version>2.1</Version>
     <Label>Message MSG_AUTOLIS_NO_TUBES_FOUND exist</Label>
     <Script>
-      IF ((SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwMessages] WHERE [MessageID] = 'AUTOLIS_NO_TUBES_FOUND') = 1)
+      IF ((SELECT COUNT(*) FROM [dbo].[tfmwMessages] WHERE [MessageID] = 'AUTOLIS_NO_TUBES_FOUND') = 1)
       SELECT 'True'
       ELSE
       SELECT 'False'
@@ -1636,7 +1636,7 @@
     <Version>2.1</Version>
     <Label>Message MSG_AUTOLIS_BARCODE_DISABLED exist</Label>
     <Script>
-      IF ((SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwMessages] WHERE [MessageID] = 'AUTOLIS_BARCODE_DISABLED') = 1)
+      IF ((SELECT COUNT(*) FROM [dbo].[tfmwMessages] WHERE [MessageID] = 'AUTOLIS_BARCODE_DISABLED') = 1)
       SELECT 'True'
       ELSE
       SELECT 'False'
@@ -1647,7 +1647,7 @@
     <Version>2.1</Version>
     <Label>Message MSG_BARCODE_AUTOLIS_WARNING exist</Label>
     <Script>
-      IF ((SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwMessages] WHERE [MessageID] = 'BARCODE_AUTOLIS_WARNING') = 1)
+      IF ((SELECT COUNT(*) FROM [dbo].[tfmwMessages] WHERE [MessageID] = 'BARCODE_AUTOLIS_WARNING') = 1)
       SELECT 'True'
       ELSE
       SELECT 'False'
@@ -1658,7 +1658,7 @@
     <Version>2.1</Version>
     <Label>Message MSG_AUTOLIS_ALL_ORDERS_WRONG exist</Label>
     <Script>
-      IF ((SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwMessages] WHERE [MessageID] = 'AUTOLIS_ALL_ORDERS_WRONG') = 1)
+      IF ((SELECT COUNT(*) FROM [dbo].[tfmwMessages] WHERE [MessageID] = 'AUTOLIS_ALL_ORDERS_WRONG') = 1)
       SELECT 'True'
       ELSE
       SELECT 'False'
@@ -1669,7 +1669,7 @@
     <Version>2.1</Version>
     <Label>Message AUTOLIS_NO_TUBES_MATCHED exist</Label>
     <Script>
-      IF ((SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwMessages] WHERE [MessageID] = 'AUTOLIS_NO_TUBES_MATCHED') = 1)
+      IF ((SELECT COUNT(*) FROM [dbo].[tfmwMessages] WHERE [MessageID] = 'AUTOLIS_NO_TUBES_MATCHED') = 1)
       SELECT 'True'
       ELSE
       SELECT 'False'
@@ -1680,7 +1680,7 @@
     <Version>2.1</Version>
     <Label>Validate user Setting AUTOMATIC_EXPORT and current value</Label>
     <Script>
-      IF ((SELECT COUNT(*) FROM [Ax00].[dbo].[tcfgUserSettings] WHERE SettingID = 'AUTOMATIC_EXPORT' AND CurrentValue = 1) = 1)
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE SettingID = 'AUTOMATIC_EXPORT' AND CurrentValue = 1) = 1)
       SELECT 'True'
       ELSE
       SELECT 'False'
@@ -2035,7 +2035,7 @@
     <Version>3.0</Version>
     <Label>Exist MESSAGEID PAUSE_IN_RUNNING ON tfrmwMessages</Label>
     <Script>
-      IF (SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwMessages]
+      IF (SELECT COUNT(*) FROM [dbo].[tfmwMessages]
       WHERE MessageID = 'PAUSE_IN_RUNNING') = 1
       SELECT 'True'
       ELSE

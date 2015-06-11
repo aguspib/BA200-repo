@@ -35,14 +35,14 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                                              ByVal DBPassword As String, Optional pLoadingRSAT As Boolean = False) As GlobalDataTO
 
             Dim myGlobalDataTO As New GlobalDataTO
-            'Dim myDBDatabaseManager As New DataBaseManagerDelegate
             Dim initialTimeUpdate As New DateTime 'TR Variable used to validate the time 
+
             Try
+
                 'GlobalBase.CreateLogActivity("InstallUpdateProcess" & ".Updateprocess -Validating if Data Base exists ", "Installation validation", EventLogEntryType.Information, False)
                 initialTimeUpdate = Now 'Set the start time 
                 Debug.Print("INICIO-->" & initialTimeUpdate.TimeOfDay.ToString()) 'Print the time
-                GlobalBase.CreateLogActivity("InstallUpdateProcess" & ".Updateprocess - Database found", "Installation validation", _
-                                                                                                   EventLogEntryType.Information, False)
+                GlobalBase.CreateLogActivity("InstallUpdateProcess" & ".Updateprocess - Database found", "Installation validation", EventLogEntryType.Information, False)
                 'if A200 or A400 exist
                 If DataBaseManagerDelegate.DataBaseExist(pServerName, pDataBaseName, DBLogin, DBPassword) Then 'BA-2471: IT 08/05/2015
                     myGlobalDataTO = updateProcessApplication(pServerName, pDataBaseName, DBLogin, DBPassword, pLoadingRSAT)
@@ -50,10 +50,10 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                     'Ax00 Exist
                     If DataBaseManagerDelegate.DataBaseExist(pServerName, GlobalBase.CommonDatabaseName, DBLogin, DBPassword) Then 'BA-2471: IT 08/05/2015
                         'The Ax00 DB belong to the same analyzer A200 or A400 active=true
-                        If IsSameAnalyzer() Then
+                        If IsSameAnalyzer(pServerName, GlobalBase.CommonDatabaseName, DBLogin, DBPassword) Then
 
-                            'if we start the same instance we rename the database, to a intance name.and we follow with the update process.
-                            DataBaseManagerDelegate.RenameDBByModel(pServerName, pDataBaseName, DBLogin, DBPassword)
+                            'if we start the same instance we rename the database, to a intance name and we follow with the update process.
+                            DataBaseManagerDelegate.RenameDBByModel(pServerName, GlobalBase.CommonDatabaseName, pDataBaseName, DBLogin, DBPassword)
                             myGlobalDataTO = updateProcessApplication(pServerName, pDataBaseName, DBLogin, DBPassword, pLoadingRSAT)
                         Else
                             'if isn't the same Analyzer we restored the database saying the name of the instance (A200 or A400) we not override the current DB.
@@ -156,26 +156,34 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' </summary>
         ''' <returns> Boolean attribute saying if the AnalyzerModel active in the database is the same of who started the instance of the application.</returns>
         ''' <remarks>Created by:  MR 09/06/2015 ==> BA-2566 </remarks>
-        Private Function IsSameAnalyzer() As Boolean
+        Private Function IsSameAnalyzer(ByVal pServerName As String, ByVal pDataBaseName As String, ByVal DBLogin As String, _
+                                        ByVal DBPassword As String) As Boolean
             Dim result As Boolean = False
             Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim dataToReturn As GlobalDataTO = Nothing
 
             Try
-                Dim connection = DAOBase.GetOpenDBConnection(Nothing)
-                If (Not connection.HasError AndAlso Not connection.SetDatos Is Nothing) Then
-                    dbConnection = CType(connection.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        Dim tcfAnalyzerDAO As New DAL.DAO.tcfgAnalyzersDAO
-                        Dim returnData As GlobalDataTO = Nothing
-                        returnData = tcfAnalyzerDAO.ReadByAnalyzerActive(dbConnection)
-                        If Not returnData.HasError AndAlso Not returnData.SetDatos Is Nothing Then
-                            Dim AnalyzerObj As AnalyzersDS = CType(returnData.SetDatos, AnalyzersDS)
-                            'The app only can have one active analyzer.
-                            If (AnalyzerObj.tcfgAnalyzers.Rows.Count > 0 AndAlso AnalyzerObj.tcfgAnalyzers.Rows.Count = 1) Then
-                                Dim AnalyzerRow As AnalyzersDS.tcfgAnalyzersRow = AnalyzerObj.tcfgAnalyzers(0)
-                                If AnalyzerRow.AnalyzerModel.ToUpper.Trim().Equals(GlobalBase.DatabaseName.ToUpper.Trim()) Then
-                                    result = True
-                                End If
+                Dim LocalServer As New Server(pServerName)
+
+                LocalServer.ConnectionContext.LoginSecure = False
+                LocalServer.ConnectionContext.Login = DBLogin
+                LocalServer.ConnectionContext.Password = DBPassword
+                LocalServer.ConnectionContext.DatabaseName = pDataBaseName
+
+                dbConnection = LocalServer.ConnectionContext.SqlConnectionObject()
+
+
+                If (Not dbConnection Is Nothing) Then
+                    Dim tcfAnalyzerDAO As New DAL.DAO.tcfgAnalyzersDAO
+                    Dim returnData As GlobalDataTO = Nothing
+                    returnData = tcfAnalyzerDAO.ReadByAnalyzerActive(dbConnection)
+                    If Not returnData.HasError AndAlso Not returnData.SetDatos Is Nothing Then
+                        Dim AnalyzerObj As AnalyzersDS = CType(returnData.SetDatos, AnalyzersDS)
+                        'The app only can have one active analyzer.
+                        If (AnalyzerObj.tcfgAnalyzers.Rows.Count > 0 AndAlso AnalyzerObj.tcfgAnalyzers.Rows.Count = 1) Then
+                            Dim AnalyzerRow As AnalyzersDS.tcfgAnalyzersRow = AnalyzerObj.tcfgAnalyzers(0)
+                            If AnalyzerRow.AnalyzerModel.ToUpper.Trim().Equals(GlobalBase.DatabaseName.ToUpper.Trim()) Then
+                                result = True
                             End If
                         End If
                     End If

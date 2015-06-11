@@ -176,10 +176,10 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
             DebugLogger.AddLog(" --------------------------------------------", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
             DebugLogger.AddLog(" Update Version: Run Scripts (INI)", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
             For Each release In Releases
-                release.WriteLog()
+                release.WriteLog(debugLogger)
             Next
 
-            Results.WriteLog()
+            Results.WriteLog(debugLogger)
 
             DebugLogger.AddLog(" Update Version: Run Scripts (END)", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
             DebugLogger.AddLog(" --------------------------------------------", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
