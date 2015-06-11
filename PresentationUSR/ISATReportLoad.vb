@@ -552,12 +552,10 @@ Public Class UiSATReportLoad
                     SATTempFolderPath = myGlobal.SetDatos.ToString
                 End If
 
-                'obtain the SAT version
-                Dim mySATVersion As String
-                myGlobal = SATReportUtilities.GetSATReportVersionAndModel(pFilePath) 'BA-2471: IT 08/05/2015
                 If Not myGlobal.HasError And Not myGlobal Is Nothing Then
 
                     'obtain the SAT Version and Model
+                    Dim mySATVersion As String
                     Dim mySATInfo As String()
                     Dim mySATModel As String = String.Empty
                     myGlobal = SATReportUtilities.GetSATReportVersionAndModel(SATTempFolderPath)
