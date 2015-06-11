@@ -464,7 +464,8 @@ Public Class UiRestPointUpdateProc
         Dim myGlobal As GlobalDataTO
         Try
             'Dim mySATUtil As New SATReportUtilities 
-            myGlobal = SATReportUtilities.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_RESTORE, False, "", AnalyzerController.Instance.Analyzer.AdjustmentsFilePath) 'BA-2471: IT 08/05/2015
+            Dim Model As String = AnalyzerController.Instance.Analyzer.Model
+            myGlobal = SATReportUtilities.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_RESTORE, False, "", AnalyzerController.Instance.Analyzer.AdjustmentsFilePath, "", "", "", True, Model) 'BA-2471: IT 08/05/2015
             If Not myGlobal.HasError AndAlso Not myGlobal Is Nothing Then
                 SATReportCreated = CBool(myGlobal.SetDatos)
             End If

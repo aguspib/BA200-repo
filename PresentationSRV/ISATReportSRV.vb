@@ -654,7 +654,7 @@ Public Class UiSATReportSRV
         Dim ExistFileName As Boolean = False
         Try
             'Searh on selected directory if a file with the same name exist
-            If (File.Exists(FolderPathTextBox.Text & "\" & FileNameTextBox.Text & GlobalBase.ZIPExtension)) Then
+            If (File.Exists(FolderPathTextBox.Text & "\" & FileNameTextBox.Text & "." & AnalyzerController.Instance.Analyzer.Model)) Then
                 ExistFileName = True
             End If
 

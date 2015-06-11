@@ -18,7 +18,6 @@ Public Class UiSATReport
 
 #Region "Declaration"
 
-    Private zipExtension As String
     Private checkAllItems As Boolean = True
     Private processing As Boolean = False
 
@@ -82,7 +81,7 @@ Public Class UiSATReport
             FileNameTextBox.Text = GetDefaultReportSATName()
             LoadFilesInSatDirectory()
 
-            If File.Exists(FolderPathTextBox.Text & "\" & FileNameTextBox.Text & GlobalBase.ZIPExtension) Then
+            If File.Exists(FolderPathTextBox.Text & "\" & FileNameTextBox.Text & "." & AnalyzerController.Instance.Analyzer.Model) Then
                 bsSaveSATRepButton.Enabled = False
                 resetSaveButtonTimer.Enabled = True
             Else
@@ -373,7 +372,7 @@ Public Class UiSATReport
     End Sub
 
     Private Sub resetSaveButtonTimer_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles resetSaveButtonTimer.Tick
-        If Not File.Exists(FolderPathTextBox.Text & "\" & FileNameTextBox.Text & GlobalBase.ZIPExtension) Then
+        If Not File.Exists(FolderPathTextBox.Text & "\" & FileNameTextBox.Text & "." & AnalyzerController.Instance.Analyzer.Model) Then
             bsSaveSATRepButton.Enabled = True
             resetSaveButtonTimer.Enabled = False
         End If
@@ -711,16 +710,21 @@ Public Class UiSATReport
     ''' Created by: TR 20/12/2011
     ''' </remarks>
     Private Sub LoadFilesInSatDirectory()
+        Dim zipExtension As String
         Try
             'TR - Validate if Path exists
             If Not FolderPathTextBox.Text = String.Empty AndAlso Directory.Exists(FolderPathTextBox.Text) Then
-                zipExtension = ".SAT"
+                ZIPExtension = ".SAT"
                 Dim DirList As New DirectoryInfo(FolderPathTextBox.Text)
                 bsSATDirListBox.Items.Clear()
-                For Each SATFile As FileSystemInfo In DirList.GetFileSystemInfos("*" & zipExtension).ToList()
+                For Each SATFile As FileSystemInfo In DirList.GetFileSystemInfos("*" & ZIPExtension).ToList()
                     bsSATDirListBox.Items.Add(SATFile.Name)
                 Next
-
+                'Include .Model SAT Files
+                zipExtension = "." & AnalyzerController.Instance.Analyzer.Model
+                For Each SATFile As FileSystemInfo In DirList.GetFileSystemInfos("*" & AnalyzerController.Instance.Analyzer.Model).ToList()
+                    bsSATDirListBox.Items.Add(SATFile.Name)
+                Next
                 'Enable/Disable Delete Button And Select all CheckBox
                 bsDeleteButton.Enabled = (bsSATDirListBox.CheckedIndices.Count > 0)
 
@@ -770,7 +774,7 @@ Public Class UiSATReport
         Dim ExistFileName As Boolean = False
         Try
             'Searh on selected directory if a file with the same name exist
-            If File.Exists(FolderPathTextBox.Text & "\" & FileNameTextBox.Text & GlobalBase.ZIPExtension) Then
+            If File.Exists(FolderPathTextBox.Text & "\" & FileNameTextBox.Text & "." & AnalyzerController.Instance.Analyzer.Model) Then
                 ExistFileName = True
             End If
 
