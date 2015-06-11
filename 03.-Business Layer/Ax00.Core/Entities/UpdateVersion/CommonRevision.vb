@@ -47,9 +47,9 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
             Return result.Success
         End Function
 
-        Public Sub WriteLog()
+        Public Sub WriteLog(debugLogger As DebugLogger)
 
-            Dim debugLogger As DebugLogger = New DebugLogger()
+            'Dim debugLogger As DebugLogger = New DebugLogger()
             Dim content As New StringBuilder()
 
             content.AppendLine(String.Format(" Common Revision JiraId: {0} RevisionNumber: {1}", JiraId, RevisionNumber))

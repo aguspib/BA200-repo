@@ -243,8 +243,7 @@ Partial Public Class tparContaminationsDAO
         Dim dbConnection As SqlClient.SqlConnection = Nothing
 
         Try
-            Dim cmdText As String = "SELECT * FROM [Ax00].[dbo].[tparContaminations] Where ContaminationType = 'R1'" 'Where ReagentContaminatorID=" & ReagentID & ";"
-
+            Dim cmdText As String = String.Format("SELECT * FROM {0}.[dbo].[tparContaminations] Where ContaminationType = 'R1'", GlobalBase.DatabaseName) 'IT 11/06/2015 - BA-2613
             <ThreadStatic> Static contaminationsDataDS As ContaminationsDS
             <ThreadStatic> Static InternalDictionary As New Dictionary(Of Integer, EnumerableRowCollection(Of ContaminationsDS.tparContaminationsRow))
 

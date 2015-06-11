@@ -142,7 +142,7 @@
             -- BA-2406
             IF((SELECT COUNT(*) FROM dbo.tfmwSwFlags WHERE FlagID LIKE 'Barcode') = 0)
             BEGIN
-            INSERT INTO [Ax00].[dbo].[tfmwSwFlags] VALUES ('Barcode', 'INI, END, CANCELED or NULL')
+            INSERT INTO [dbo].[tfmwSwFlags] VALUES ('Barcode', 'INI, END, CANCELED or NULL')
             END
             GO
           </DataScript>

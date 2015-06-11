@@ -60,7 +60,7 @@ Public Class IntegrityDAO
                 If (Not dbConnection Is Nothing) Then
 
                     Dim CmdText As String = " SELECT DBSoftware "
-                    CmdText &= " FROM [Ax00].[dbo].[tfmwVersions]"
+                    CmdText &= String.Format(" FROM {0}.[dbo].[tfmwVersions]", GlobalBase.DatabaseName) 'IT 11/06/2015 - BA-2613
                     Dim dbCmd As New SqlClient.SqlCommand
                     dbCmd.Connection = dbConnection
                     dbCmd.CommandText = CmdText

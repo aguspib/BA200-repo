@@ -27,6 +27,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
+                        'IT 11/06/2015 - BA-2613
                         Dim cmdText As String = " SELECT IT.ISETestID, IT.ISE_ResultID, IT.ISE_Units, IT.Units AS MeasureUnit, ITS.SampleType, ITS.SampleType_ResultID, " & vbCrLf & _
                                                        " ITS.ISE_Volume, ITS.ISE_DilutionFactor " & vbCrLf & _
                                                 " FROM " & GlobalBase.TemporalDBName & ".[dbo].[tparISETests] IT " & vbCrLf & _
@@ -34,7 +35,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                 " EXCEPT " & vbCrLf & _
                                                 " SELECT IT.ISETestID, IT.ISE_ResultID, IT.ISE_Units, IT.Units AS MeasureUnit, ITS.SampleType, ITS.SampleType_ResultID, " & vbCrLf & _
                                                        " ITS.ISE_Volume, ITS.ISE_DilutionFactor " & vbCrLf & _
-                                                " FROM [Ax00].[dbo].[tparISETests] IT INNER JOIN [Ax00].[dbo].[tparISETestSamples] ITS ON IT.ISETestID = ITS.ISETestID " & vbCrLf
+                                                " FROM " & GlobalBase.DatabaseName & ".[dbo].[tparISETests] IT INNER JOIN " & GlobalBase.DatabaseName & ".[dbo].[tparISETestSamples] ITS ON IT.ISETestID = ITS.ISETestID " & vbCrLf
 
                         Dim factoryISETestSamplesDS As New ISETestSamplesDS
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)

@@ -251,7 +251,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
                     LoadDataBaseVersions(usSwVersion, srvSwVersion) 'BA-2471: IT 08/05/2015
 
-                    myGlobal = SATReportUtilities.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_UPDATE, False, "", "", "", "", usSwVersion) 'BA-2471: IT 08/05/2015
+                    'myGlobal = SATReportUtilities.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_UPDATE, False, "", "", "", "", usSwVersion) 'BA-2471: IT 08/05/2015
                     If (Not myGlobal.HasError) Then
                         'Dim myDatabaseAdmin As New DataBaseManagerDelegate()
 
