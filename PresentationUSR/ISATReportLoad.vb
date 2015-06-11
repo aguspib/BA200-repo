@@ -998,7 +998,7 @@ Public Class UiSATReportLoad
                 End If
 
                 'BT #1631 - The path is wrong. The "\" added before myRestoreDataPath produces a double slash due to the value in myRestoreDataPath contains a slash on the left
-                Dim myRestoringFile As String = Application.StartupPath & myRestoreDataPath & Me.bsSATDirListBox.SelectedItem.ToString & myZipExtension
+                Dim myRestoringFile As String = Application.StartupPath & myRestoreDataPath & Me.bsSATDirListBox.SelectedItem.ToString ' & myZipExtension
                 'Dim myRestoringFile As String = Application.StartupPath & "\" & myRestoreDataPath & Me.bsSATDirListBox.SelectedItem.ToString & myZipExtension
 
                 myGlobal = LoadSATReport(myRestoringFile)
