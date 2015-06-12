@@ -240,22 +240,6 @@ Public Class UiSATReportLoad
                         End If
                     End If
 
-                    'extract temporaly
-                    'RH 12/11/2010 tempFolder can not be so long. RestoreDB will throw an exception.
-                    'So, we need a tempFolder like "C:\tempFolder"
-                    'tempFolder = Directory.GetParent(RestorePointPath).FullName & "\temp"
-                    myGlobal = SATReportUtilities.GetTempFolder() 'BA-2471: IT 08/05/2015
-
-                    If Not myGlobal.HasError AndAlso Not myGlobal Is Nothing Then
-                        tempFolder = CStr(myGlobal.SetDatos)
-                    Else
-                        ShowMessage(Me.Name & ".ManageVersionComparison", GlobalEnumerates.Messages.SAT_DB_RESTORE_ERROR.ToString())
-                        Exit Select
-                    End If
-                    'RH 12/11/2010 tempFolder
-
-                    myGlobal = Utilities.ExtractFromZip(RestorePointPath, tempFolder)
-
                     If Not myGlobal.HasError AndAlso Not myGlobal Is Nothing Then
                         'search for the .bak file
                         Dim myFiles As String() = Directory.GetFiles(pUnzippedSATFolder, "*.bak")
@@ -552,12 +536,10 @@ Public Class UiSATReportLoad
                     SATTempFolderPath = myGlobal.SetDatos.ToString
                 End If
 
-                'obtain the SAT version
-                Dim mySATVersion As String
-                myGlobal = SATReportUtilities.GetSATReportVersionAndModel(pFilePath) 'BA-2471: IT 08/05/2015
                 If Not myGlobal.HasError And Not myGlobal Is Nothing Then
 
                     'obtain the SAT Version and Model
+                    Dim mySATVersion As String
                     Dim mySATInfo As String()
                     Dim mySATModel As String = String.Empty
                     myGlobal = SATReportUtilities.GetSATReportVersionAndModel(SATTempFolderPath)
@@ -596,6 +578,18 @@ Public Class UiSATReportLoad
                                             Exit Try
                                         End If
                                 End Select
+                            Else
+                                If AnalyzerController.Instance.Analyzer.Model <> AnalyzerModelEnum.A400.ToString Then
+                                    'Incompatible Model, Not continue, diferent Models
+                                    myGlobal.HasError = True
+                                    myGlobal.ErrorCode = GlobalEnumerates.Messages.SAT_LOAD_REPORT_ERROR.ToString
+                                    'Todo: Dynamic Translate message acording to lenguage
+                                    myGlobal.ErrorMessage = "Report SAT file Model (" & AnalyzerModelEnum.A400.ToString & ") different than current Model (" & AnalyzerController.Instance.Analyzer.Model & ")"
+
+                                    GlobalBase.CreateLogActivity(myGlobal.ErrorMessage, Me.Name & " LoadSATReport ", EventLogEntryType.Warning, GetApplicationInfoSession().ActivateSystemLog)
+
+                                    Exit Try
+                                End If
                             End If
 
                             Dim myComparisonResult As New GlobalEnumerates.SATReportVersionComparison
@@ -1000,7 +994,7 @@ Public Class UiSATReportLoad
                 End If
 
                 'BT #1631 - The path is wrong. The "\" added before myRestoreDataPath produces a double slash due to the value in myRestoreDataPath contains a slash on the left
-                Dim myRestoringFile As String = Application.StartupPath & myRestoreDataPath & Me.bsSATDirListBox.SelectedItem.ToString & myZipExtension
+                Dim myRestoringFile As String = Application.StartupPath & myRestoreDataPath & Me.bsSATDirListBox.SelectedItem.ToString ' & myZipExtension
                 'Dim myRestoringFile As String = Application.StartupPath & "\" & myRestoreDataPath & Me.bsSATDirListBox.SelectedItem.ToString & myZipExtension
 
                 myGlobal = LoadSATReport(myRestoringFile)

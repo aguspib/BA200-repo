@@ -30,6 +30,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         '''              IT 08/05/2015 - BA-2471
         '''              MR 09/06/2015 - BA-2566 ==> We change the flow of the function adding the functionality of rename the Database depends on which 
         '''                                          Intance Analyzer start the Application.
+        '''              IT 11/06/2015 - BA-2600
         ''' </remarks>
         Public Function InstallUpdateProcess(ByVal pServerName As String, ByVal pDataBaseName As String, ByVal DBLogin As String, _
                                              ByVal DBPassword As String, Optional pLoadingRSAT As Boolean = False, Optional pModel As String = "") As GlobalDataTO
@@ -44,29 +45,16 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 Debug.Print("INICIO-->" & initialTimeUpdate.TimeOfDay.ToString()) 'Print the time
                 GlobalBase.CreateLogActivity("InstallUpdateProcess" & ".Updateprocess - Database found", "Installation validation", _
                                                                                                    EventLogEntryType.Information, False)
-
                 If String.IsNullOrEmpty(pModel) Then pModel = GetAnalyzerModel()
 
-                'if A200 or A400 exist
-                If DataBaseManagerDelegate.DataBaseExist(pServerName, pDataBaseName, DBLogin, DBPassword) Then 'BA-2471: IT 08/05/2015
-                    myGlobalDataTO = updateProcessApplication(pServerName, pDataBaseName, DBLogin, DBPassword, pLoadingRSAT, pModel)
-                Else
-                    'Ax00 Exist
-                    If DataBaseManagerDelegate.DataBaseExist(pServerName, GlobalBase.CommonDatabaseName, DBLogin, DBPassword) Then 'BA-2471: IT 08/05/2015
-                        'The Ax00 DB belong to the same analyzer A200 or A400 active=true
-                        If IsSameAnalyzer(pServerName, GlobalBase.CommonDatabaseName, DBLogin, DBPassword) Then
+                ValidateDatabaseName(pServerName, pDataBaseName, DBLogin, DBPassword)
 
-                            'if we start the same instance we rename the database, to a intance name and we follow with the update process.
-                            DataBaseManagerDelegate.RenameDBByModel(pServerName, GlobalBase.CommonDatabaseName, pDataBaseName, DBLogin, DBPassword)
-                            myGlobalDataTO = updateProcessApplication(pServerName, pDataBaseName, DBLogin, DBPassword, pLoadingRSAT, pModel)
-                        Else
-                            'if isn't the same Analyzer we restored the database saying the name of the instance (A200 or A400) we not override the current DB.
-                            myGlobalDataTO = installProcessApplication(pServerName, pDataBaseName, DBLogin, DBPassword)
-                        End If
-                    Else
-                        'if we haven't our db we restore one from .bak file.
-                        myGlobalDataTO = installProcessApplication(pServerName, pDataBaseName, DBLogin, DBPassword)
-                    End If
+                If Not DataBaseManagerDelegate.DataBaseExist(pServerName, pDataBaseName, DBLogin, DBPassword) Then 'BA-2471: IT 08/05/2015
+                    myGlobalDataTO = InstallProcessApplication(pServerName, pDataBaseName, DBLogin, DBPassword)
+                End If
+
+                If (Not myGlobalDataTO.HasError) Then
+                    myGlobalDataTO = UpdateProcessApplication(pServerName, pDataBaseName, DBLogin, DBPassword, pLoadingRSAT, pModel)
                 End If
 
             Catch ex As Exception
@@ -74,8 +62,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorMessage = ex.Message
             Finally
                 'TR 21/01/2013 v1.0.1 Delete db temp bak file  and remove from server.
-                RemoveBackupFileAndTempDatabase(GlobalBase.TemporalDirectory & GlobalBase.TempDBBakupFileName, _
-                                                pServerName, DBLogin, DBPassword, GlobalBase.TemporalDBName)
+                RemoveBackupFileAndTempDatabase(GlobalBase.TemporalDirectory & GlobalBase.TempDBBakupFileName, pServerName, DBLogin, DBPassword, GlobalBase.TemporalDBName)
                 Debug.Print("FIN-->" & Now.TimeOfDay.ToString()) 'print the finish time
                 Debug.Print("TOTAL-->" & (Now - initialTimeUpdate).ToString()) 'get the diference.
             End Try
@@ -96,7 +83,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         '''          returns TRUE; otherwise it returns FALSE. If the Installation is executed but an error is raised during execution, the 
         '''          Error is informed in fields ErrorCode and ErrorDescription in the GlobalDataTO, and HasError is set to TRUE</returns>
         ''' <remarks> Created by:  MR 09/06/2015 ==> BA-2566 - Peace of code was placed in InstallUpdateProcess and is needed it more than once. Then I created this function.</remarks>
-        Private Function installProcessApplication(ByVal pServerName As String, ByVal pDataBaseName As String, ByVal DBLogin As String, _
+        Private Function InstallProcessApplication(ByVal pServerName As String, ByVal pDataBaseName As String, ByVal DBLogin As String, _
                                              ByVal DBPassword As String) As GlobalDataTO
 
 
@@ -134,7 +121,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         '''          returns TRUE; otherwise it returns FALSE. If the Update is executed but an error is raised during execution, the 
         '''          Error is informed in fields ErrorCode and ErrorDescription in the GlobalDataTO, and HasError is set to TRUE</returns>
         ''' <remarks> Created by:  MR 09/06/2015 ==> BA-2566 - Peace of code was placed in InstallUpdateProcessand we need it more than once. Then I created this function. </remarks>
-        Private Function updateProcessApplication(ByVal pServerName As String, ByVal pDataBaseName As String, ByVal DBLogin As String, _
+        Private Function UpdateProcessApplication(ByVal pServerName As String, ByVal pDataBaseName As String, ByVal DBLogin As String, _
                                         ByVal DBPassword As String, Optional pLoadingRSAT As Boolean = False, Optional pModel As String = "") As GlobalDataTO
 
             Dim myGlobalDataTO As New GlobalDataTO
@@ -154,7 +141,6 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
             End Try
             Return myGlobalDataTO
         End Function
-
 
         ''' <summary>
         ''' Function that returns the name of the Active Analyzer Model on the Database
@@ -192,7 +178,6 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
             End Try
             Return Model
         End Function
-
 
         ''' <summary>
         ''' Function that checks from which analyzer belong the current Database 'Ax00'
@@ -881,6 +866,29 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
             End Try
         End Function
 
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="pServerName"></param>
+        ''' <param name="pDataBaseName"></param>
+        ''' <param name="DBLogin"></param>
+        ''' <param name="DBPassword"></param>
+        ''' <remarks>
+        ''' Modified by: IT 11/06/2015 - BA-2600
+        ''' </remarks>
+        Private Sub ValidateDatabaseName(ByVal pServerName As String, ByVal pDataBaseName As String, ByVal DBLogin As String, ByVal DBPassword As String)
+            'if A200 or A400 exist
+            If Not DataBaseManagerDelegate.DataBaseExist(pServerName, pDataBaseName, DBLogin, DBPassword) Then 'BA-2471: IT 08/05/2015
+                'Ax00 Exist
+                If DataBaseManagerDelegate.DataBaseExist(pServerName, GlobalBase.CommonDatabaseName, DBLogin, DBPassword) Then 'BA-2471: IT 08/05/2015
+                    'The Ax00 DB belong to the same analyzer A200 or A400 active=true
+                    If IsSameAnalyzer(pServerName, GlobalBase.CommonDatabaseName, DBLogin, DBPassword) Then
+                        'if we start the same instance we rename the database, to a intance name and we follow with the update process.
+                        DataBaseManagerDelegate.RenameDBByModel(pServerName, GlobalBase.CommonDatabaseName, pDataBaseName, DBLogin, DBPassword)
+                    End If
+                End If
+            End If
+        End Sub
 
 #Region "TEMPORARY FUNCTIONS TO UPDATE STRUCTURE FOR v3.0.1"
         ''' <summary>
