@@ -12,6 +12,7 @@ Imports Biosystems.Ax00.PresentationCOM
 Imports System.Timers
 Imports System.Globalization
 Imports System.Threading
+Imports System.Threading.Tasks
 Imports Biosystems.Ax00.App
 Imports Biosystems.Ax00.Core.Entities
 Imports PesentationLayer.RotorUtils
@@ -7054,7 +7055,7 @@ Public Class UiWSRotorPositions
                     Application.DoEvents()
 
                     For Each c As Control In FunctionalityArea.Controls
-                        If TypeOf (c) Is BSButton Then
+                        If TypeOf (c) Is BSButton AndAlso c.Enabled Then
                             c.Enabled = False
                         End If
                     Next
@@ -7077,43 +7078,18 @@ Public Class UiWSRotorPositions
                     Dim priority = Threading.Thread.CurrentThread.Priority
                     Thread.CurrentThread.Priority = ThreadPriority.BelowNormal
                     While ScreenWorkingProcess
-                        If timer < Now Then
-                            Application.DoEvents()
-                            timer = Now.AddSeconds(0.1)
-                        End If
+                        Application.DoEvents()
+                        Dim a = Task.Delay(100)
+                        a.Wait()
                     End While
                     Threading.Thread.CurrentThread.Priority = priority
 
                     workingThread = Nothing
                     UiAx00MainMDI.StopMarqueeProgressBar()
 
-                    'AG 11/12/2013 - BT #1433 ==> Comment these code lines because they fail when START/CONTINUE WS is clicked with Rotor
-                    '                             Positions Screen open and no Tubes are found or LIS does not respond anything (v211 patch1)
-                    'Leave the previous code active
-
-                    'If AutoWSCreationWithLISModeAttribute AndAlso OpenByAutomaticProcessAttribute Then
-                    '    'AG 19/07/2013 v2.1.1 - when called from the automatic WS creation with LIS process do nothing, else keep previous code that enable controls
-                    '    'Do nothing!!!
-                    'Else
-                    '    'Previous code
-                    '    'AG 10/05/2012- when called from own screen do nothing (it will be closed), 
-                    '    'else (mdi) reactivate controls
-                    '    If Not pFromOwnScreen Then
-                    '        For Each c As Control In FunctionalityArea.Controls
-                    '            If TypeOf (c) Is BSButton Then
-                    '                c.Enabled = True
-                    '            End If
-                    '        Next
-                    '        FunctionalityArea.Enabled = True
-                    '        bsElementsTreeView.Enabled = True
-                    '        RotorsTabs.Enabled = True
-                    '    End If
-                    '    'AG 10/05/2012
-                    'End If
-
                     If (Not pFromOwnScreen) Then
                         For Each c As Control In FunctionalityArea.Controls
-                            If TypeOf (c) Is BSButton Then
+                            If TypeOf (c) Is BSButton AndAlso c.Enabled = False Then
                                 c.Enabled = True
                             End If
                         Next
@@ -7146,7 +7122,7 @@ Public Class UiWSRotorPositions
                 UiAx00MainMDI.EnableButtonAndMenus(False)
                 If pFromOwnScreen Then
                     For Each c As Control In FunctionalityArea.Controls
-                        If TypeOf (c) Is BSButton Then
+                        If TypeOf (c) Is BSButton AndAlso c.Enabled = True Then
                             c.Enabled = False
                         End If
                     Next
@@ -8814,7 +8790,7 @@ Public Class UiWSRotorPositions
     ''' </remarks>
     Private Sub bsCreateExecutionsButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsAcceptButton.Click
         Dim createExecutionsFlag As Boolean = True
-
+        Debug.WriteLine("CreateExecutionsclick")
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         Dim StartTime As DateTime = Now
         'Dim myLogAcciones As New ApplicationLogManager()
@@ -8885,6 +8861,8 @@ Public Class UiWSRotorPositions
             GlobalBase.CreateLogActivity("IWSROTORPositions CLOSED (final): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) & " - NOTE: High values could mean screen with element NOPOS opened (search for 'Time with NOSPOS warning screen opened')!!", _
                                             "IWSROTORPositions.bsCreateExecutionsButton_Click", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+            Debug.WriteLine("End of CreateExecutionsclick")
+
         End Try
     End Sub
 

@@ -551,7 +551,7 @@ Public Class UiMonitor
                 End If
             End If
 
-            If (Not pRefreshDS Is Nothing) Then Application.DoEvents()
+            If (Not pRefreshDS Is Nothing) Then Invalidate(True) 'Application.DoEvents()
 
             'Dim ElapsedTime As Double = Now.Subtract(StartTime).TotalMilliseconds
             'Console.Text &= String.Format("RefreshCommonArea: {0}{1}", ElapsedTime.ToStringWithDecimals(0), vbCrLf)
@@ -888,7 +888,7 @@ Public Class UiMonitor
             'Update Alarms grid Area
             UpdateAlarmsTab(pRefreshDS)
 
-            Application.DoEvents()
+            'Application.DoEvents()
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".RefreshAlarmsGlobes ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".RefreshAlarmsGlobes", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", MsgParent)
@@ -1001,7 +1001,7 @@ Public Class UiMonitor
                     Me.BsIseMonitor.RefreshFieldsData(AnalyzerController.Instance.Analyzer.ISEAnalyzer.MonitorDataTO)
                     BsISELongTermDeactivated.Visible = (AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEModuleInstalled AndAlso AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsLongTermDeactivation)
 
-                    Me.ISETab.Refresh()
+                    Me.ISETab.Invalidate(True)
 
                     'Debug.Print("iMonitor.BsIseMonitor.RefreshFieldsData: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0)) 'AG 05/06/2012 - time estimation
 
@@ -2006,7 +2006,7 @@ Public Class UiMonitor
         InitializeReactionsTab()
         InitializeISETab()
         InitializeAlarmsTab()
-
+        
         If Not Me.MdiParent Is Nothing Then
             'TR 03/08/2011 -Remove handler before adding.
             RemoveHandler MainMDI.Move, AddressOf bsAlert_Move
@@ -2014,7 +2014,7 @@ Public Class UiMonitor
         End If
 
         ResetBorder()
-        Application.DoEvents()
+        'Application.DoEvents()
 
         SetEnableMainTab(MainTabEnabled, True)
 
@@ -2033,7 +2033,7 @@ Public Class UiMonitor
             bsEndWarmUp.Visible = False 'TR 20/04/2012 -Set button not visible.
         End If
 
-        Application.DoEvents()
+        'Application.DoEvents()
 
         'AG 31/01/2014 - BT #1486 (v211 patch D + v300)
         autoWSCreationTimer.Enabled = False
@@ -2073,7 +2073,7 @@ Public Class UiMonitor
     ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Private Sub MonitorTabs_SelectedPageChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MonitorTabs.SelectedPageChanged
-        Application.DoEvents()
+        'Application.DoEvents()
         UpdateRotorType()
         ChangingTab = False
         ShowActiveAlerts()
@@ -2095,7 +2095,7 @@ Public Class UiMonitor
         If e.PrevPage Is Nothing Then Return
 
         ChangingTab = True
-        Application.DoEvents()
+        'Application.DoEvents()
         HideActiveAlerts()
     End Sub
 
