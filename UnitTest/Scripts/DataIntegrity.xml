@@ -96,7 +96,7 @@
     <Version>2.0</Version>
     <Label>Set BiosystemsID = 1 in CalculatedTests for preloaded tests</Label>
     <Script>
-      IF ((SELECT COUNT(*) FROM Ax00.dbo.tparCalculatedTests TC WHERE TC.BiosystemsID >= 0) = (SELECT COUNT(*) FROM Ax00.dbo.tparCalculatedTests TC WHERE TC.PreloadedCalculatedTest = 1))
+      IF ((SELECT COUNT(*) FROM dbo.tparCalculatedTests TC WHERE TC.BiosystemsID >= 0) = (SELECT COUNT(*) FROM dbo.tparCalculatedTests TC WHERE TC.PreloadedCalculatedTest = 1))
       SELECT 'True'
       ELSE
       SELECT 'False'
@@ -107,7 +107,7 @@
     <Version>2.0</Version>
     <Label>All Reagents are marked as Preloaded Reagent</Label>
     <Script>
-      IF (SELECT COUNT(*) FROM Ax00.dbo.tparReagents WHERE PreloadedReagent = 0 ) = 0
+      IF (SELECT COUNT(*) FROM dbo.tparReagents WHERE PreloadedReagent = 0 ) = 0
       SELECT 'True'
       ELSE
       SELECT 'False'
@@ -220,7 +220,7 @@
     <Version>2.0</Version>
     <Label>The LISView field is informed in tcfgMasterData</Label>
     <Script>
-      IF (SELECT COUNT(*) FROM Ax00.dbo.tcfgMasterData WHERE LISValue IS NULL AND (SubTableID = 'SAMPLE_TYPES' OR SubTableID = 'TEST_UNITS')) >= 1
+      IF (SELECT COUNT(*) FROM dbo.tcfgMasterData WHERE LISValue IS NULL AND (SubTableID = 'SAMPLE_TYPES' OR SubTableID = 'TEST_UNITS')) >= 1
       SELECT 'False'
       ELSE
       SELECT 'True'
@@ -2102,7 +2102,7 @@
     <Version>3.0</Version>
     <Label>ROTORDRAGDROP Allow on pause mode value</Label>
     <Script>
-      IF ((SELECT COUNT(*) FROM Ax00.dbo.tfmwScreenBlockStatus WHERE AppStatus ='RUNNINGPAUSE' AND BlockID = 'ROTORDRAGDROP' AND BlockEnableD = 1)=1)
+      IF ((SELECT COUNT(*) FROM dbo.tfmwScreenBlockStatus WHERE AppStatus ='RUNNINGPAUSE' AND BlockID = 'ROTORDRAGDROP' AND BlockEnableD = 1)=1)
       SELECT 'True'
       ELSE
       SELECT 'False'
@@ -2113,7 +2113,7 @@
     <Version>3.0</Version>
     <Label>CHANGESIZE Allow on pause mode value</Label>
     <Script>
-      IF ((SELECT COUNT(*) FROM Ax00.dbo.tfmwScreenBlockStatus WHERE AppStatus ='RUNNINGPAUSE' AND BlockID = 'CHANGESIZE' AND BlockEnableD = 1)=1)
+      IF ((SELECT COUNT(*) FROM dbo.tfmwScreenBlockStatus WHERE AppStatus ='RUNNINGPAUSE' AND BlockID = 'CHANGESIZE' AND BlockEnableD = 1)=1)
       SELECT 'True'
       ELSE
       SELECT 'False'
@@ -2124,7 +2124,7 @@
     <Version>3.0</Version>
     <Label>DELETE Allow on pause mode value</Label>
     <Script>
-      IF ((SELECT COUNT(*) FROM Ax00.dbo.tfmwScreenBlockStatus WHERE AppStatus ='RUNNINGPAUSE' AND BlockID = 'DELETE' AND BlockEnableD = 1)=1)
+      IF ((SELECT COUNT(*) FROM dbo.tfmwScreenBlockStatus WHERE AppStatus ='RUNNINGPAUSE' AND BlockID = 'DELETE' AND BlockEnableD = 1)=1)
       SELECT 'True'
       ELSE
       SELECT 'False'
