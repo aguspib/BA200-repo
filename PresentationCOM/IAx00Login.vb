@@ -6,6 +6,7 @@ Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.BL.Framework
 Imports System.IO
 Imports System.Drawing 'SG 03/12/10
+Imports System.Threading.Tasks
 Imports System.Windows.Forms 'SG 03/12/10
 Imports Biosystems.Ax00.App
 Imports Biosystems.Ax00.Framework.CrossCutting
@@ -862,9 +863,12 @@ Public Class UiAx00Login
                 ''AG 16/01/2013 v1.0.1
 
                 While RunningPreload
+
                     Application.DoEvents()
                     'Ax00StartUp.RefreshLoadingImage()
-                    System.Threading.Thread.Sleep(100)
+                    'System.Threading.Thread.Sleep(100)
+                    Dim a = Task.Delay(10)
+                    a.Wait()
                 End While
 
             End If

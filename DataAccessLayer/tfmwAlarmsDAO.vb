@@ -2,6 +2,7 @@
 Option Explicit On
 
 Imports System.Data.SqlClient
+Imports System.Text
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 
@@ -159,65 +160,84 @@ Namespace Biosystems.Ax00.DAL.DAO
                         Dim myAlarmsDS As AlarmsDS = DirectCast(resultData.SetDatos, AlarmsDS)
                         Dim myAffectedRecords As Integer = 0
 
-                        Dim cmdText As String = ""
+                        'Dim cmdText As String = ""
+                        Dim SB As New StringBuilder
                         For Each AlarmsRow As AlarmsDS.tfmwAlarmsRow In myAlarmsDS.tfmwAlarms.Rows
 
                             'Translate NAME fields
                             If (Not AlarmsRow.IsNameResourceIDNull) Then
-                                cmdText &= " UPDATE tfmwAlarms SET [Name] = " & vbCrLf
-                                cmdText &= "("
-                                cmdText &= "  SELECT ResourceText AS translatedText " & vbCrLf
-                                cmdText &= "  FROM   tfmwMultiLanguageResources " & vbCrLf
-                                cmdText &= "  WHERE  ResourceID = '" & AlarmsRow.NameResourceID & "' " & vbCrLf
-                                cmdText &= "  AND    LanguageID = '" & pLanguageID & "'" & vbCrLf
-                                cmdText &= ")" & vbCrLf
-                                cmdText &= " WHERE AlarmID = '" & AlarmsRow.AlarmID & "' " & vbCrLf
+                                SB.Append(" UPDATE tfmwAlarms SET [Name] = ")
+                                SB.Append("(")
+                                SB.Append("  SELECT ResourceText AS translatedText ")
+                                SB.Append("  FROM   tfmwMultiLanguageResources ")
+                                SB.Append("  WHERE  ResourceID = '")
+                                SB.Append(AlarmsRow.NameResourceID)
+                                SB.Append("' ")
+                                SB.Append("  AND    LanguageID = '")
+                                SB.Append(pLanguageID)
+                                SB.Append("'"c)
+                                SB.Append(")")
+                                SB.Append(" WHERE AlarmID = '")
+                                SB.Append(AlarmsRow.AlarmID)
+                                SB.Append("' ")
 
                                 'Dim dbCmd As New SqlClient.SqlCommand
                                 'dbCmd.Connection = pDBConnection
                                 'dbCmd.CommandText = cmdText
                                 'myAffectedRecords += dbCmd.ExecuteNonQuery()
-                                cmdText &= vbNewLine
+                                SB.Append(vbNewLine)
                             End If
-                            cmdText &= vbNewLine
+                            'cmdText &= vbNewLine
 
                             'Translate DESCRIPTION fields
                             If (Not AlarmsRow.IsDescResourceIDNull) Then
-                                cmdText &= "UPDATE tfmwAlarms SET Description = " & vbCrLf
-                                cmdText &= "("
-                                cmdText &= "  SELECT ResourceText AS translatedText " & vbCrLf
-                                cmdText &= "  FROM   tfmwMultiLanguageResources " & vbCrLf
-                                cmdText &= "  WHERE  ResourceID = '" & AlarmsRow.DescResourceID & "' " & vbCrLf
-                                cmdText &= "  AND     LanguageID = '" & pLanguageID & "'" & vbCrLf
-                                cmdText &= ")" & vbCrLf
-                                cmdText &= " WHERE AlarmID = '" & AlarmsRow.AlarmID & "' " & vbCrLf
+                                SB.Append("UPDATE tfmwAlarms SET Description = ")
+                                SB.Append("(")
+                                SB.Append("  SELECT ResourceText AS translatedText ")
+                                SB.Append("  FROM   tfmwMultiLanguageResources ")
+                                SB.Append("  WHERE  ResourceID = '")
+                                SB.Append(AlarmsRow.DescResourceID)
+                                SB.Append("' ")
+                                SB.Append("  AND     LanguageID = '")
+                                SB.Append(pLanguageID)
+                                SB.Append("' ")
+                                SB.Append(") ")
+                                SB.Append(" WHERE AlarmID = '")
+                                SB.Append(AlarmsRow.AlarmID)
+                                SB.Append("' ")
 
                                 'Dim dbCmd As New SqlClient.SqlCommand
                                 'dbCmd.Connection = pDBConnection
                                 'dbCmd.CommandText = cmdText
                                 'myAffectedRecords += dbCmd.ExecuteNonQuery()
-                                cmdText &= vbNewLine
+                                'SB.Append(vbNewLine)
                             End If
-                            cmdText &= vbNewLine
+                            SB.Append(vbNewLine)
 
                             'Translate SOLUTION fields
                             If (Not AlarmsRow.IsSolResourceIDNull) Then
-                                cmdText &= "UPDATE tfmwAlarms SET Solution = " & vbCrLf
-                                cmdText &= "("
-                                cmdText &= "  SELECT ResourceText AS translatedText " & vbCrLf
-                                cmdText &= "  FROM   tfmwMultiLanguageResources " & vbCrLf
-                                cmdText &= "  WHERE   ResourceID = '" & AlarmsRow.SolResourceID & "' " & vbCrLf
-                                cmdText &= "  AND     LanguageID = '" & pLanguageID & "'" & vbCrLf
-                                cmdText &= ")" & vbCrLf
-                                cmdText &= " WHERE AlarmID = '" & AlarmsRow.AlarmID & "' " & vbCrLf
+                                SB.Append("UPDATE tfmwAlarms SET Solution = ")
+                                SB.Append("(")
+                                SB.Append("  SELECT ResourceText AS translatedText ")
+                                SB.Append("  FROM   tfmwMultiLanguageResources ")
+                                SB.Append("  WHERE   ResourceID = '")
+                                SB.Append(AlarmsRow.SolResourceID)
+                                SB.Append("' ")
+                                SB.Append("  AND     LanguageID = '")
+                                SB.Append(pLanguageID)
+                                SB.Append("' ")
+                                SB.Append(")")
+                                SB.Append(" WHERE AlarmID = '")
+                                SB.Append(AlarmsRow.AlarmID)
+                                SB.Append("' ")
 
                                 'Dim dbCmd As New SqlClient.SqlCommand
                                 'dbCmd.Connection = pDBConnection
                                 'dbCmd.CommandText = cmdText
                                 'myAffectedRecords += dbCmd.ExecuteNonQuery()
-                                cmdText &= vbNewLine
+                                SB.Append(vbNewLine)
                             End If
-                            cmdText &= vbNewLine
+                            SB.Append(vbNewLine)
 
                             If (myAffectedRecords > 0) Then
                                 resultData.AffectedRecords += 1
@@ -234,7 +254,7 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                         Dim dbCmd As New SqlClient.SqlCommand
                         dbCmd.Connection = pDBConnection
-                        dbCmd.CommandText = cmdText
+                        dbCmd.CommandText = SB.ToString()
                         myAffectedRecords += dbCmd.ExecuteNonQuery()
                     End If
                 End If
