@@ -1770,6 +1770,7 @@ Public Class BSBaseForm
     ''' </summary>
     ''' <param name="pControls"></param>
     ''' <remarks>CREATED BY: TR 12/04/2012 </remarks>
+    <Obsolete("This method is useless")>
     Protected Sub ReleaseUnManageControls(ByVal pControls As Control.ControlCollection)
         Try
             For Each myControl As Control In pControls
@@ -1780,42 +1781,36 @@ Public Class BSBaseForm
                     Select Case myControl.GetType().Name
                         Case "BSButton"
                             If Not IsNothing(DirectCast(myControl, BSButton).Image) Then
-                                'DirectCast(myControl, BSButton).Image.Dispose()
                                 DirectCast(myControl, BSButton).Image = Nothing
                             End If
                             Exit Select
 
                         Case "Button"
                             If Not IsNothing(DirectCast(myControl, Button).Image) Then
-                                'DirectCast(myControl, Button).Image.Dispose()
                                 DirectCast(myControl, Button).Image = Nothing
                             End If
                             Exit Select
 
                         Case "BSRImage"
                             If Not IsNothing(DirectCast(myControl, BSRImage).Image) Then
-                                'DirectCast(myControl, BSRImage).Image.Dispose()
                                 DirectCast(myControl, BSRImage).Image = Nothing
                             End If
                             Exit Select
 
                         Case "BSPictureBox"
                             If Not IsNothing(DirectCast(myControl, BSPictureBox).Image) Then
-                                'DirectCast(myControl, BSPictureBox).Image.Dispose()
                                 DirectCast(myControl, BSPictureBox).Image = Nothing
                             End If
                             Exit Select
 
                         Case "PictureEdit"
                             If Not IsNothing(DirectCast(myControl, PictureEdit).Image) Then
-                                'DirectCast(myControl, PictureEdit).Image.Dispose()
                                 DirectCast(myControl, PictureEdit).Image = Nothing
                             End If
                             Exit Select
 
                         Case "XtraTabPage"
                             If Not IsNothing(DirectCast(myControl, XtraTabPage).Appearance.PageClient.Image) Then
-                                'DirectCast(myControl, XtraTabPage).Appearance.PageClient.Image.Dispose()
                                 DirectCast(myControl, XtraTabPage).Appearance.PageClient.Image = Nothing
                             End If
                             Exit Select
