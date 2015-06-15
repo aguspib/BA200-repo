@@ -1540,6 +1540,42 @@
         </DataRevision>
       </DataRevisions>
     </Release>
+    <Release Version="03.00.09">
+      <CommonRevisions />
+      <DataRevisions>
+        <DataRevision SequenceNumber="1" JiraID="BA-2345">
+          <PrerequisiteScript>
+            IF ((SELECT COUNT(*) FROM tfmwSWParameters WHERE ParameterName = 'DYNAMIC_BL_LIFETIME ') = 0)
+            AND
+              ((SELECT COUNT(*) FROM tcfgAnalyzerSettings WHERE SettingID = 'DYNAMICBLDATETIME') = 0)
+            Select 'True'
+            ELSE
+            Select 'False'
+          </PrerequisiteScript>
+          <IntegrityScript>
+            IF ((SELECT COUNT(*) FROM tfmwSWParameters WHERE ParameterName = 'DYNAMIC_BL_LIFETIME ') = 1)
+            AND
+              ((SELECT COUNT(*) FROM tcfgAnalyzerSettings WHERE SettingID = 'DYNAMICBLDATETIME') = 1)
+            Select 'True'
+            ELSE
+            Select 'False'
+          </IntegrityScript>
+          <DataScript>
+
+            SET IDENTITY_INSERT tfmwSWParameters ON
+            DECLARE @maxParamID INT = (SELECT MAX(ParameterID)+1 FROM tfmwSwParameters)
+
+            INSERT INTO tfmwSWParameters (ParameterID, ParameterName, DependByModel, AnalyzerModel, ValueNumeric, ValueText, Description)
+            VALUES (@maxParamID, 'DYNAMIC_BL_LIFETIME ',1,'A200', 240, NULL, 'dynamic base line lifetime, in minutes')
+            SET IDENTITY_INSERT tfmwSWParameters OFF
+            
+            GO
+            INSERT INTO tcfgAnalyzerSettings (AnalyzerID, SettingID, SettingDataType, CurrentValue)
+            VALUES ('SN0000099999_Ax200','DYNAMICBLDATETIME','DATETIME','')
+          </DataScript>
+        </DataRevision>
+      </DataRevisions>
+    </Release>
     <Release Version="03.01.00">
       <CommonRevisions>
         <CommonRevision SequenceNumber="0" JiraID="BA-2469">
