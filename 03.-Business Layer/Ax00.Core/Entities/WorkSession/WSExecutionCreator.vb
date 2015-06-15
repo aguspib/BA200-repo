@@ -8,8 +8,8 @@ Imports Biosystems.Ax00.DAL.DAO
 Imports Biosystems.Ax00.Global
 Imports System.Threading.Tasks
 Imports Biosystems.Ax00.BL
-Imports Biosystems.Ax00.Core.Entities.Worksession.Contaminations
-Imports Biosystems.Ax00.Core.Entities.Worksession.Contaminations.Interfaces
+Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
+Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Interfaces
 Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Interfaces
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context

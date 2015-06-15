@@ -7,6 +7,7 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.TO
 Imports System.Globalization
+Imports System.Threading.Tasks
 Imports Biosystems.Ax00.PresentationCOM
 Imports PesentationLayer.RotorUtils
 
@@ -217,7 +218,7 @@ Partial Public Class UiMonitor
 
 #Region "Methods"
 
-    Private Sub ChangeControlPositionImage(ByRef pControl As BSRImage, ByVal pImagePath As String, Optional ByVal pTransparentImage As Boolean = False)
+    Private Sub ChangeControlPositionImage(ByVal pControl As BSRImage, ByVal pImagePath As String, Optional ByVal pTransparentImage As Boolean = False)
         Try
             If (pControl.ImagePath <> pImagePath) Then
                 pControl.ImagePath = pImagePath
@@ -329,12 +330,12 @@ Partial Public Class UiMonitor
                     bsTubeSizeComboBox.DataSource = result
                     bsTubeSizeComboBox.DisplayMember = "FixedTubeName"
                     bsTubeSizeComboBox.ValueMember = "TubeCode"
-                    bsTubeSizeComboBox.Refresh()
+                    'bsTubeSizeComboBox.Refresh()
                 Else
                     bsBottleSizeComboBox.DataSource = result
                     bsBottleSizeComboBox.DisplayMember = "FixedTubeName"
                     bsBottleSizeComboBox.ValueMember = "TubeCode"
-                    bsTubeSizeComboBox.Refresh()
+                    'bsTubeSizeComboBox.Refresh()
                 End If
             End If
         Catch ex As Exception
@@ -810,7 +811,7 @@ Partial Public Class UiMonitor
 
                     controlQuery.First.Image = ImageUtilities.ImageFromFile(MyBase.IconsPath & auxIconPath)
                     controlQuery.First.BringToFront()
-                    controlQuery.First.Refresh()
+                    'controlQuery.First.Refresh()
                 Else
                     Select Case PreviousSelect
                         Case "REACPOSR1"
@@ -854,7 +855,7 @@ Partial Public Class UiMonitor
                     If (PreviousSelect <> String.Empty) Then
                         controlQuery.First.Image = ImageUtilities.ImageFromFile(MyBase.IconsPath & auxIconPath)
                         controlQuery.First.BringToFront()
-                        controlQuery.First.Refresh()
+                        'controlQuery.First.Refresh()
                     Else
                         controlQuery.First.Image = Nothing
                     End If
@@ -1624,17 +1625,21 @@ Partial Public Class UiMonitor
     Private Sub SetPosControlBackGround(ByVal pPositionControl As BSRImage, ByVal pStatus As String, ByVal pRotorType As String, _
                                         ByVal pTubeType As String, ByVal pRingNumber As Integer, ByVal pBarCodeStatus As String, _
                                         Optional ByVal pInProcessElement As Boolean = False)
-        Try
-            If (pRotorType = "SAMPLES") Then
-                SetPosControlBackGroundForSAMPLESRotor(pPositionControl, pStatus, pBarCodeStatus)
+        If InvokeRequired Then
+            BeginInvoke(Sub() SetPosControlBackGround(pPositionControl, pStatus, pRotorType, pTubeType, pRingNumber, pBarCodeStatus, pInProcessElement))
+        Else
+            Try
+                If (pRotorType = "SAMPLES") Then
+                    SetPosControlBackGroundForSAMPLESRotor(pPositionControl, pStatus, pBarCodeStatus)
 
-            ElseIf (pRotorType = "REAGENTS") Then
-                SetPosControlBackGroundForREAGENTSRotor(pPositionControl, pStatus, pTubeType, pRingNumber, pBarCodeStatus, pInProcessElement)
-            End If
-        Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SetPosControlBackGroung ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Me.Name & ".SetPosControlBackGroung", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-        End Try
+                ElseIf (pRotorType = "REAGENTS") Then
+                    SetPosControlBackGroundForREAGENTSRotor(pPositionControl, pStatus, pTubeType, pRingNumber, pBarCodeStatus, pInProcessElement)
+                End If
+            Catch ex As Exception
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SetPosControlBackGroung ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+                ShowMessage(Me.Name & ".SetPosControlBackGroung", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+            End Try
+        End If
     End Sub
 
     ''' <summary>
@@ -1881,16 +1886,16 @@ Partial Public Class UiMonitor
 
                     If (pRotorType = "SAMPLES") Then
                         bsSampleCellTextBox.Text = CStr(pCellNumber)
-                        bsSampleCellTextBox.Refresh()
+                        'bsSampleCellTextBox.Refresh()
                         bsSampleDiskNameTextBox.Text = CStr(pRingNumber)
-                        bsSampleDiskNameTextBox.Refresh()
+                        'bsSampleDiskNameTextBox.Refresh()
                         bsSampleStatusTextBox.Text = String.Empty
 
                     ElseIf (pRotorType = "REAGENTS") Then
                         bsReagentsCellTextBox.Text = CStr(pCellNumber)
-                        bsReagentsCellTextBox.Refresh()
+                        'bsReagentsCellTextBox.Refresh()
                         bsReagentsDiskNameTextBox.Text = CStr(pRingNumber)
-                        bsReagentsDiskNameTextBox.Refresh()
+                        'bsReagentsDiskNameTextBox.Refresh()
                         bsReagentsStatusTextBox.Text = String.Empty
                     End If
                 Else
@@ -2008,15 +2013,15 @@ Partial Public Class UiMonitor
                             bsSampleStatusTextBox.Text = GetStatusDescOnCurrentLanguage(currentStatus, barcodeStatus)
 
                             'Refresh controls in Info Area for Samples
-                            bsSampleCellTextBox.Refresh()
-                            bsSampleDiskNameTextBox.Refresh()
-                            bsSampleContentTextBox.Refresh()
-                            bsSampleNumberTextBox.Refresh()
-                            bsSampleIDTextBox.Refresh()
-                            bsSampleTypeTextBox.Refresh()
-                            bsDiluteStatusTextBox.Refresh()
-                            bsSamplesBarcodeTextBox.Refresh()
-                            bsTubeSizeComboBox.Refresh()
+                            'bsSampleCellTextBox.Refresh()
+                            'bsSampleDiskNameTextBox.Refresh()
+                            'bsSampleContentTextBox.Refresh()
+                            'bsSampleNumberTextBox.Refresh()
+                            'bsSampleIDTextBox.Refresh()
+                            'bsSampleTypeTextBox.Refresh()
+                            'bsDiluteStatusTextBox.Refresh()
+                            'bsSamplesBarcodeTextBox.Refresh()
+                            'bsTubeSizeComboBox.Refresh()
 
                         ElseIf String.Equals(pRotorType, "REAGENTS") Then
                             'Get information from PositionInformation table in the returned DataSet and 
@@ -2119,17 +2124,18 @@ Partial Public Class UiMonitor
                             bsReagentsStatusTextBox.Text = GetStatusDescOnCurrentLanguage(currentStatus, barcodeStatus)
 
                             'Refresh controls in Info Area for Samples
-                            bsReagentsCellTextBox.Refresh()
-                            bsReagentsDiskNameTextBox.Refresh()
-                            bsReagentsContentTextBox.Refresh()
-                            bsReagentsNumberTextBox.Refresh()
-                            bsReagentNameTextBox.Refresh()
-                            bsTestNameTextBox.Refresh()
-                            bsReagentsBarCodeTextBox.Refresh()
-                            bsExpirationDateTextBox.Refresh()
-                            bsCurrentVolTextBox.Refresh()
-                            bsTeststLeftTextBox.Refresh()
-                            bsBottleSizeComboBox.Refresh()
+                            'bsReagentsCellTextBox.Refresh()
+                            'bsReagentsDiskNameTextBox.Refresh()
+                            'bsReagentsContentTextBox.Refresh()
+                            'bsReagentsNumberTextBox.Refresh()
+                            'bsReagentNameTextBox.Refresh()
+                            'bsTestNameTextBox.Refresh()
+                            'bsReagentsBarCodeTextBox.Refresh()
+                            'bsExpirationDateTextBox.Refresh()
+                            'bsCurrentVolTextBox.Refresh()
+                            'bsTeststLeftTextBox.Refresh()
+                            'bsBottleSizeComboBox.Refresh()
+
                         End If
                     Else
                         ShowMessage(Me.Name & ".ShowPositionInfoArea", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage, MsgParent)
@@ -2183,7 +2189,7 @@ Partial Public Class UiMonitor
                     CleanInfoArea(False)
 
                     bsWellNrTextBox.Text = CStr(pCellNumber)
-                    bsWellNrTextBox.Refresh()
+                    'bsWellNrTextBox.Refresh()
 
                     bsReacStatusTextBox.Text = String.Empty
                 Else
@@ -2212,7 +2218,7 @@ Partial Public Class UiMonitor
 
                         If (myReactionRotorDetails.ReactionsRotorDetails.Rows.Count > 0) Then
                             bsWellNrTextBox.Text = CStr(pCellNumber)
-                            bsWellNrTextBox.Refresh()
+                            'bsWellNrTextBox.Refresh()
 
                             Dim mySampleClass As String = ""
                             bsSampleClassTextBox.Clear()
@@ -2286,7 +2292,7 @@ Partial Public Class UiMonitor
                             CleanInfoArea(False)
 
                             bsWellNrTextBox.Text = CStr(pCellNumber)
-                            bsWellNrTextBox.Refresh()
+                            'bsWellNrTextBox.Refresh()
                         End If
                     Else
                         ShowMessage(Me.Name & ".ShowPositionInfoArea", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage, MsgParent)
@@ -2436,7 +2442,7 @@ Partial Public Class UiMonitor
                     Dim myBSRImage As BSRImage = CType(lstRotorControl(0), BSRImage)
 
                     If (myIconName <> String.Empty) Then
-                        Me.ChangeControlPositionImage(myBSRImage, MyBase.IconsPath & myIconName)
+                        ChangeControlPositionImage(myBSRImage, MyBase.IconsPath & myIconName)
                         SetPosControlBackGround(myBSRImage, pRotorContenByPosRow.Status, pRotorContenByPosRow.RotorType, pRotorContenByPosRow.TubeType, _
                                                 pRotorContenByPosRow.RingNumber, pRotorContenByPosRow.BarcodeStatus)
                     Else
@@ -2486,7 +2492,7 @@ Partial Public Class UiMonitor
                                             pRotorContenByPosRow.RingNumber, pRotorContenByPosRow.BarcodeStatus, pRotorContenByPosRow.InProcessElement)
 
                 End If
-                Application.DoEvents()
+                'Application.DoEvents() '!!
 
                 myControls = Nothing
                 lstRotorControl = Nothing
@@ -2501,14 +2507,13 @@ Partial Public Class UiMonitor
         Dim result As Boolean = False
         Try
             'Implement LINQ to get the position to update 
-            Dim query As List(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow)
-            query = (From a As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In myRotorContentByPositionDSForm.twksWSRotorContentByPosition _
+            Dim query = (From a As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In myRotorContentByPositionDSForm.twksWSRotorContentByPosition _
                     Where a.RotorType = pRotorContentByPosRow.RotorType _
                   AndAlso a.RingNumber = pRotorContentByPosRow.RingNumber _
                   AndAlso a.CellNumber = pRotorContentByPosRow.CellNumber _
-                   Select a).ToList()
+                   Select a)
 
-            For Each myrow As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In query
+            For Each myrow In query
                 myrow.ItemArray = CType(pRotorContentByPosRow.ItemArray.Clone(), Object())
             Next
             result = True
@@ -2539,7 +2544,7 @@ Partial Public Class UiMonitor
         Try
             If (IsDisposed) Then Return 'IT 03/06/2014 - #1644 No refresh if screen is disposed
 
-            Dim myGlobalDataTO As GlobalDataTO
+            'Dim myGlobalDataTO As GlobalDataTO
             Dim myNotInUseRPDelegate As New WSNotInUseRotorPositionsDelegate()
 
             'Get positions in the specified Rotor Type
@@ -2550,227 +2555,220 @@ Partial Public Class UiMonitor
 
             Dim lstPosInActiveRotor = (From a As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In pWSRotorContentByPositionDS.twksWSRotorContentByPosition _
                                       Where a.RotorType = pRotorType _
-                                     Select a).ToList()
+                                     Select a)
 
             If (pWSRotorContentByPositionDS.twksWSRotorContentByPosition.Rows.Count > 0) Then
-                Dim myRotorPicture As Control
+                'Dim myRotorPicture As Control
                 Dim auxIconPath As String = String.Empty
-                Dim myVirtualRotorPosititionsDS As VirtualRotorPosititionsDS
+                'Dim myVirtualRotorPosititionsDS As VirtualRotorPosititionsDS
                 Dim myWSRequiredElementsDelegate As New WSRequiredElementsDelegate
 
                 'Go through each updated Rotor Position
                 For Each rotorPosition As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In lstPosInActiveRotor
-                    If (UpdateRotorContentByPositionDSForm(rotorPosition)) Then
-                        'Validate if there is a Required Element in the Rotor Position
-                        If (Not rotorPosition.IsElementIDNull) Then
-                            If (rotorPosition.TubeContent = "CALIB") Then
-                                'Set the Calibrator Icon in the Rotor Position
-                                UpdateRotorArea(rotorPosition, CALIB_IconName, SamplesTab)
-
-                            ElseIf (rotorPosition.TubeContent = "TUBE_SPEC_SOL" OrElse rotorPosition.TubeContent = "TUBE_WASH_SOL") Then
-                                'Set the Tube Additional Solution Icon in the Rotor Position
-                                UpdateRotorArea(rotorPosition, ADDSAMPLESOL_IconName, SamplesTab)
-
-                            ElseIf (rotorPosition.TubeContent = "PATIENT") Then
-                                'Validate if the routine is Urgent
-                                'JV 18/12/2013 #1056 INI - Never appears the red bitmap urgent patient
-                                'myGlobalDataTO = myWSRequiredElementsDelegate.GetRequiredPatientSamplesDetails(Nothing, rotorPosition.WorkSessionID, rotorPosition.ElementID, _
-                                '                                                                               rotorPosition.ElementStatus, True)
-                                'If (Not myGlobalDataTO.HasError) Then
-                                '    If (DirectCast(myGlobalDataTO.SetDatos, WSRequiredElementsTreeDS).PatientSamples.Count > 0) Then
-                                '        If (Not DirectCast(myGlobalDataTO.SetDatos, WSRequiredElementsTreeDS).PatientSamples(0).IsPredilutionFactorNull) AndAlso _
-                                '           (DirectCast(myGlobalDataTO.SetDatos, WSRequiredElementsTreeDS).PatientSamples(0).PredilutionFactor > 0) Then
-                                '            UpdateRotorArea(rotorPosition, DILUTIONS_IconName, SamplesTab.Controls)
-                                '        Else
-                                '            If (DirectCast(myGlobalDataTO.SetDatos, WSRequiredElementsTreeDS).PatientSamples(0).StatFlag) Then
-                                '                UpdateRotorArea(rotorPosition, STATS_IconName, SamplesTab.Controls)
-                                '            Else
-                                '                UpdateRotorArea(rotorPosition, ROUTINES_IconName, SamplesTab.Controls)
-                                '            End If
-                                '        End If
-                                '    End If
-                                'End If
-                                myGlobalDataTO = myWSRequiredElementsDelegate.GetRequiredElementData(Nothing, rotorPosition.ElementID)
-                                If (Not myGlobalDataTO.HasError) Then
-                                    If (DirectCast(myGlobalDataTO.SetDatos, WSRequiredElementsDS).twksWSRequiredElements.Rows.Count > 0) Then
-                                        If (Not DirectCast(myGlobalDataTO.SetDatos, WSRequiredElementsDS).twksWSRequiredElements(0).IsPredilutionFactorNull) AndAlso _
-                                           (DirectCast(myGlobalDataTO.SetDatos, WSRequiredElementsDS).twksWSRequiredElements(0).PredilutionFactor > 0) Then
-                                            UpdateRotorArea(rotorPosition, DILUTIONS_IconName, SamplesTab)
-                                        Else
-                                            Dim myWSRequiredElementsByOTDelegate As New WSRequiredElemByOrderTestDelegate
-                                            myGlobalDataTO = myWSRequiredElementsByOTDelegate.ReadOrderTestByElementIDAndSampleClass(Nothing, rotorPosition.ElementID, rotorPosition.TubeContent)
-                                            If (Not myGlobalDataTO.HasError) Then
-                                                Dim myDS As WSRequiredElemByOrderTestDS = DirectCast(myGlobalDataTO.SetDatos, WSRequiredElemByOrderTestDS)
-                                                Dim stat As Integer = (From x As WSRequiredElemByOrderTestDS.twksWSRequiredElemByOrderTestRow In myDS.twksWSRequiredElemByOrderTest _
-                                                                      Where x.StatFlag = True Select x).Count
-                                                If (stat > 0) Then
-                                                    UpdateRotorArea(rotorPosition, STATS_IconName, SamplesTab)
-                                                Else
-                                                    UpdateRotorArea(rotorPosition, ROUTINES_IconName, SamplesTab)
-                                                End If
-                                            End If
-                                        End If
-                                    End If
-                                End If
-                                'JV 18/12/2013 #1056 END
-                            ElseIf String.Equals(rotorPosition.TubeContent, "CTRL") Then
-                                'Set the Calibrator Icon in the Rotor Position
-                                UpdateRotorArea(rotorPosition, CTRL_IconName, SamplesTab)
-
-                            ElseIf String.Equals(rotorPosition.TubeContent, "REAGENT") Then
-                                UpdateRotorArea(rotorPosition, REAGENTS_IconName, ReagentsTab)
-
-                            ElseIf (String.Equals(rotorPosition.TubeContent, "WASH_SOL") OrElse String.Equals(rotorPosition.TubeContent, "SPEC_SOL")) Then
-                                UpdateRotorArea(rotorPosition, ADDSOL_IconName, ReagentsTab)
-                            End If
-
-                            If (rotorPosition.Selected) Then
-                                'Reload the info area with the new information 
-                                mySelectedElementInfo = GetLocalPositionInfo(rotorPosition.RingNumber, rotorPosition.CellNumber, False)
-                                ShowPositionInfoArea(myRotorTypeForm, rotorPosition.RingNumber, rotorPosition.CellNumber)
-                            End If
-                        Else
-                            auxIconPath = ""
-                            myRotorPicture = Nothing
-
-                            If (pRotorType = "SAMPLES") Then
-                                myRotorPicture = Me.SamplesTab
-                            ElseIf (pRotorType = "REAGENTS") Then
-                                myRotorPicture = Me.ReagentsTab
-                            ElseIf (pRotorType = "REACTIONS") Then
-                                myRotorPicture = Me.ReactionsTab
-                            End If
-
-                            If (pRotorType = "SAMPLES") OrElse (pRotorType = "REAGENTS") Then
-                                'If Rotor Position is not FREE but it does not contain a pòsitioned Element, then validate the tube content
-                                If (Not rotorPosition.IsTubeContentNull AndAlso Not rotorPosition.TubeContent = String.Empty) Then
-                                    'TR 26/01/2010 - If the TubeContent is Patient it is needed to validate if it's a dilution
-                                    If (rotorPosition.TubeContent = "PATIENT") Then
-                                        'Get the information for Not in use elements
-                                        myGlobalDataTO = myNotInUseRPDelegate.GetPositionContent(Nothing, ActiveAnalyzer, rotorPosition.RotorType, _
-                                                                                                 rotorPosition.RingNumber, rotorPosition.CellNumber, ActiveWorkSession)
-                                        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                                            myVirtualRotorPosititionsDS = DirectCast(myGlobalDataTO.SetDatos, VirtualRotorPosititionsDS)
-
-                                            If (myVirtualRotorPosititionsDS.tparVirtualRotorPosititions.Rows.Count > 0) Then
-                                                'Validate if there is a Predilution Sample
-                                                If (Not myVirtualRotorPosititionsDS.tparVirtualRotorPosititions(0).IsPredilutionFactorNull AndAlso _
-                                                    myVirtualRotorPosititionsDS.tparVirtualRotorPosititions(0).PredilutionFactor > 0) Then
-                                                    auxIconPath = DILUTIONS_IconName
-                                                Else
-                                                    '...then it's a full Patient Sample
-                                                    auxIconPath = ROUTINES_IconName
-                                                End If
-                                            End If
-                                        Else
-                                            'Error getting the content of the Rotor Position, show it
-                                            ShowMessage(Me.Name, myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage, MsgParent)
-                                        End If
-                                    Else
-                                        'Get the needed Icon when the TubeContent is not a Patient Sample
-                                        auxIconPath = GetIconNameByTubeContent(rotorPosition.TubeContent, rotorPosition.TubeType, rotorPosition.RingNumber, _
-                                                                               rotorPosition.InProcessElement)
-                                    End If
-
-                                    'Update the rotor area with the new icon path          
-                                    UpdateRotorArea(rotorPosition, auxIconPath, myRotorPicture)
-                                Else
-                                    'Position is empty...icon is also empty, clean the cell
-                                    UpdateRotorArea(rotorPosition, auxIconPath, myRotorPicture)
-                                End If
-
-                                If (rotorPosition.Selected) Then
-                                    'Reload the info area with the new information 
-                                    mySelectedElementInfo = GetLocalPositionInfo(rotorPosition.RingNumber, rotorPosition.CellNumber, False)
-                                    ShowPositionInfoArea(myRotorTypeForm, rotorPosition.RingNumber, rotorPosition.CellNumber)
-                                End If
-                            Else
-                                'Process for REACTIONS Rotor
-                                If (rotorPosition.Selected) Then
-                                    Select Case (rotorPosition.TubeContent)
-                                        Case "W"   'Washing
-                                            PreviousSelect = "REACPOSWASH"
-                                            auxIconPath = REACPOSWASHS_IconName
-
-                                        Case "E"   'Not in use
-                                            If (rotorPosition.ElementStatus = "R") Then
-                                                PreviousSelect = "REACPOSNIUS"
-                                                auxIconPath = REACPOSNIUSS_IconName
-                                            ElseIf (rotorPosition.ElementStatus = "X") OrElse (rotorPosition.ElementStatus = "DX") Then 'AG 18/02/2015 BA-2285 - add new status DX (dynamically rejected)
-                                                PreviousSelect = "REACPOSOPTI"
-                                                auxIconPath = REACPOSOPTIS_IconName
-                                            End If
-
-                                        Case "T"   'R1 + Sample + R2
-                                            If (rotorPosition.ElementStatus = "R1") Then
-                                                PreviousSelect = "REACPOSR1"
-                                                auxIconPath = REACPOSR1S_IconName
-                                            ElseIf (rotorPosition.ElementStatus = "S") Then
-                                                PreviousSelect = "REACPOSR1SL"
-                                                auxIconPath = REACPOSR1SLS_IconName
-                                            ElseIf (rotorPosition.ElementStatus = "R2") Then
-                                                PreviousSelect = "REACPOSR1R2"
-                                                auxIconPath = REACPOSR1R2S_IconName
-                                            ElseIf (rotorPosition.ElementStatus = "F") Then
-                                                PreviousSelect = "REACPOSFINI"
-                                                auxIconPath = REACPOSFINIS_IconName
-                                            End If
-
-                                        Case "C"  'Contaminated
-                                            PreviousSelect = "REACPOSCONT"
-                                            auxIconPath = REACPOSCONTS_IconName
-
-                                        Case "P" 'Dilution
-                                            PreviousSelect = "REACPOSDIL"
-                                            auxIconPath = REACPOSDILS_IconName
-                                    End Select
-                                Else
-                                    Select Case (rotorPosition.TubeContent)
-                                        Case "W"   'Washing
-                                            auxIconPath = REACPOSWASH_IconName
-
-                                        Case "E"   'Not in use
-                                            If (rotorPosition.ElementStatus = "R") Then
-                                                auxIconPath = REACPOSNIUS_IconName
-                                            ElseIf (rotorPosition.ElementStatus = "X") OrElse (rotorPosition.ElementStatus = "DX") Then 'AG 18/02/2015 BA-2285 - add new status DX (dynamically rejected)
-                                                auxIconPath = REACPOSOPTI_IconName
-                                            End If
-
-                                        Case "T"   'R1 + Sample + R2
-                                            If (rotorPosition.ElementStatus = "R1") Then
-                                                auxIconPath = REACPOSR1_IconName
-                                            ElseIf (rotorPosition.ElementStatus = "S") Then
-                                                auxIconPath = REACPOSR1SL_IconName
-                                            ElseIf (rotorPosition.ElementStatus = "R2") Then
-                                                auxIconPath = REACPOSR1R2_IconName
-                                            ElseIf (rotorPosition.ElementStatus = "F") Then
-                                                auxIconPath = REACPOSFINI_IconName
-                                            End If
-
-                                        Case "C"  'Contaminated
-                                            auxIconPath = REACPOSCONT_IconName
-
-                                        Case "P" 'Dilution
-                                            auxIconPath = REACPOSDIL_IconName
-                                    End Select
-                                End If
-
-                                UpdateRotorArea(rotorPosition, auxIconPath, myRotorPicture)
-                                If (rotorPosition.Selected) Then
-                                    'Reload the info area with the new information 
-                                    mySelectedElementInfo = GetLocalPositionInfo(rotorPosition.RingNumber, rotorPosition.CellNumber, False)
-                                    ShowPositionInfoReactionsArea(ActiveAnalyzer, rotorPosition.RingNumber, rotorPosition.CellNumber)
-                                End If
-                            End If
-                        End If
-                    End If
+                    parallelizableUpdateRotor(pRotorType, rotorPosition, myWSRequiredElementsDelegate, myNotInUseRPDelegate)
                 Next
+
             End If
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".UpdateRotorTreeViewArea ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".UpdateRotorTreeViewArea", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", MsgParent)
         End Try
 
+    End Sub
+
+    Private Sub parallelizableUpdateRotor(ByVal pRotorType As String, ByVal rotorPosition As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow, ByVal myWSRequiredElementsDelegate As WSRequiredElementsDelegate, ByVal myNotInUseRPDelegate As WSNotInUseRotorPositionsDelegate)
+        Dim myGlobalDataTO As GlobalDataTO
+        Dim myVirtualRotorPosititionsDS As VirtualRotorPosititionsDS
+        Dim auxIconPath As String
+        Dim myRotorPicture As Control
+
+        If (UpdateRotorContentByPositionDSForm(rotorPosition)) Then
+            'Validate if there is a Required Element in the Rotor Position
+            If (Not rotorPosition.IsElementIDNull) Then
+                If (rotorPosition.TubeContent = "CALIB") Then
+                    'Set the Calibrator Icon in the Rotor Position
+                    UpdateRotorArea(rotorPosition, CALIB_IconName, SamplesTab)
+
+                ElseIf (rotorPosition.TubeContent = "TUBE_SPEC_SOL" OrElse rotorPosition.TubeContent = "TUBE_WASH_SOL") Then
+                    'Set the Tube Additional Solution Icon in the Rotor Position
+                    UpdateRotorArea(rotorPosition, ADDSAMPLESOL_IconName, SamplesTab)
+
+                ElseIf (rotorPosition.TubeContent = "PATIENT") Then
+
+                    myGlobalDataTO = myWSRequiredElementsDelegate.GetRequiredElementData(Nothing, rotorPosition.ElementID)
+                    If (Not myGlobalDataTO.HasError) Then
+                        If (DirectCast(myGlobalDataTO.SetDatos, WSRequiredElementsDS).twksWSRequiredElements.Rows.Count > 0) Then
+                            If (Not DirectCast(myGlobalDataTO.SetDatos, WSRequiredElementsDS).twksWSRequiredElements(0).IsPredilutionFactorNull) AndAlso _
+                               (DirectCast(myGlobalDataTO.SetDatos, WSRequiredElementsDS).twksWSRequiredElements(0).PredilutionFactor > 0) Then
+                                UpdateRotorArea(rotorPosition, DILUTIONS_IconName, SamplesTab)
+                            Else
+                                Dim myWSRequiredElementsByOTDelegate As New WSRequiredElemByOrderTestDelegate
+                                myGlobalDataTO = myWSRequiredElementsByOTDelegate.ReadOrderTestByElementIDAndSampleClass(Nothing, rotorPosition.ElementID, rotorPosition.TubeContent)
+                                If (Not myGlobalDataTO.HasError) Then
+                                    Dim myDS As WSRequiredElemByOrderTestDS = DirectCast(myGlobalDataTO.SetDatos, WSRequiredElemByOrderTestDS)
+                                    Dim stat As Integer = (From x As WSRequiredElemByOrderTestDS.twksWSRequiredElemByOrderTestRow In myDS.twksWSRequiredElemByOrderTest _
+                                            Where x.StatFlag = True Select x).Count
+                                    If (stat > 0) Then
+                                        UpdateRotorArea(rotorPosition, STATS_IconName, SamplesTab)
+                                    Else
+                                        UpdateRotorArea(rotorPosition, ROUTINES_IconName, SamplesTab)
+                                    End If
+                                End If
+                            End If
+                        End If
+                    End If
+                    'JV 18/12/2013 #1056 END
+                ElseIf String.Equals(rotorPosition.TubeContent, "CTRL") Then
+                    'Set the Calibrator Icon in the Rotor Position
+                    UpdateRotorArea(rotorPosition, CTRL_IconName, SamplesTab)
+
+                ElseIf String.Equals(rotorPosition.TubeContent, "REAGENT") Then
+                    UpdateRotorArea(rotorPosition, REAGENTS_IconName, ReagentsTab)
+
+                ElseIf (String.Equals(rotorPosition.TubeContent, "WASH_SOL") OrElse String.Equals(rotorPosition.TubeContent, "SPEC_SOL")) Then
+                    UpdateRotorArea(rotorPosition, ADDSOL_IconName, ReagentsTab)
+                End If
+
+                If (rotorPosition.Selected) Then
+                    'Reload the info area with the new information 
+                    mySelectedElementInfo = GetLocalPositionInfo(rotorPosition.RingNumber, rotorPosition.CellNumber, False)
+                    ShowPositionInfoArea(myRotorTypeForm, rotorPosition.RingNumber, rotorPosition.CellNumber)
+                End If
+            Else
+                auxIconPath = ""
+                myRotorPicture = Nothing
+
+                If (pRotorType = "SAMPLES") Then
+                    myRotorPicture = Me.SamplesTab
+                ElseIf (pRotorType = "REAGENTS") Then
+                    myRotorPicture = Me.ReagentsTab
+                ElseIf (pRotorType = "REACTIONS") Then
+                    myRotorPicture = Me.ReactionsTab
+                End If
+
+                If (pRotorType = "SAMPLES") OrElse (pRotorType = "REAGENTS") Then
+                    'If Rotor Position is not FREE but it does not contain a pòsitioned Element, then validate the tube content
+                    If (Not rotorPosition.IsTubeContentNull AndAlso Not rotorPosition.TubeContent = String.Empty) Then
+                        'TR 26/01/2010 - If the TubeContent is Patient it is needed to validate if it's a dilution
+                        If (rotorPosition.TubeContent = "PATIENT") Then
+                            'Get the information for Not in use elements
+                            myGlobalDataTO = myNotInUseRPDelegate.GetPositionContent(Nothing, ActiveAnalyzer, rotorPosition.RotorType, _
+                                                                                     rotorPosition.RingNumber, rotorPosition.CellNumber, ActiveWorkSession)
+                            If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                                myVirtualRotorPosititionsDS = DirectCast(myGlobalDataTO.SetDatos, VirtualRotorPosititionsDS)
+
+                                If (myVirtualRotorPosititionsDS.tparVirtualRotorPosititions.Rows.Count > 0) Then
+                                    'Validate if there is a Predilution Sample
+                                    If (Not myVirtualRotorPosititionsDS.tparVirtualRotorPosititions(0).IsPredilutionFactorNull AndAlso _
+                                        myVirtualRotorPosititionsDS.tparVirtualRotorPosititions(0).PredilutionFactor > 0) Then
+                                        auxIconPath = DILUTIONS_IconName
+                                    Else
+                                        '...then it's a full Patient Sample
+                                        auxIconPath = ROUTINES_IconName
+                                    End If
+                                End If
+                            Else
+                                'Error getting the content of the Rotor Position, show it
+                                ShowMessage(Me.Name, myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage, MsgParent)
+                            End If
+                        Else
+                            'Get the needed Icon when the TubeContent is not a Patient Sample
+                            auxIconPath = GetIconNameByTubeContent(rotorPosition.TubeContent, rotorPosition.TubeType, rotorPosition.RingNumber, _
+                                                                   rotorPosition.InProcessElement)
+                        End If
+
+                        'Update the rotor area with the new icon path          
+                        UpdateRotorArea(rotorPosition, auxIconPath, myRotorPicture)
+                    Else
+                        'Position is empty...icon is also empty, clean the cell
+                        UpdateRotorArea(rotorPosition, auxIconPath, myRotorPicture)
+                    End If
+
+                    If (rotorPosition.Selected) Then
+                        'Reload the info area with the new information 
+                        mySelectedElementInfo = GetLocalPositionInfo(rotorPosition.RingNumber, rotorPosition.CellNumber, False)
+                        ShowPositionInfoArea(myRotorTypeForm, rotorPosition.RingNumber, rotorPosition.CellNumber)
+                    End If
+                Else
+                    'Process for REACTIONS Rotor
+                    If (rotorPosition.Selected) Then
+                        Select Case (rotorPosition.TubeContent)
+                            Case "W"   'Washing
+                                PreviousSelect = "REACPOSWASH"
+                                auxIconPath = REACPOSWASHS_IconName
+
+                            Case "E"   'Not in use
+                                If (rotorPosition.ElementStatus = "R") Then
+                                    PreviousSelect = "REACPOSNIUS"
+                                    auxIconPath = REACPOSNIUSS_IconName
+                                ElseIf (rotorPosition.ElementStatus = "X") OrElse (rotorPosition.ElementStatus = "DX") Then 'AG 18/02/2015 BA-2285 - add new status DX (dynamically rejected)
+                                    PreviousSelect = "REACPOSOPTI"
+                                    auxIconPath = REACPOSOPTIS_IconName
+                                End If
+
+                            Case "T"   'R1 + Sample + R2
+                                If (rotorPosition.ElementStatus = "R1") Then
+                                    PreviousSelect = "REACPOSR1"
+                                    auxIconPath = REACPOSR1S_IconName
+                                ElseIf (rotorPosition.ElementStatus = "S") Then
+                                    PreviousSelect = "REACPOSR1SL"
+                                    auxIconPath = REACPOSR1SLS_IconName
+                                ElseIf (rotorPosition.ElementStatus = "R2") Then
+                                    PreviousSelect = "REACPOSR1R2"
+                                    auxIconPath = REACPOSR1R2S_IconName
+                                ElseIf (rotorPosition.ElementStatus = "F") Then
+                                    PreviousSelect = "REACPOSFINI"
+                                    auxIconPath = REACPOSFINIS_IconName
+                                End If
+
+                            Case "C"  'Contaminated
+                                PreviousSelect = "REACPOSCONT"
+                                auxIconPath = REACPOSCONTS_IconName
+
+                            Case "P" 'Dilution
+                                PreviousSelect = "REACPOSDIL"
+                                auxIconPath = REACPOSDILS_IconName
+                        End Select
+                    Else
+                        Select Case (rotorPosition.TubeContent)
+                            Case "W"   'Washing
+                                auxIconPath = REACPOSWASH_IconName
+
+                            Case "E"   'Not in use
+                                If (rotorPosition.ElementStatus = "R") Then
+                                    auxIconPath = REACPOSNIUS_IconName
+                                ElseIf (rotorPosition.ElementStatus = "X") OrElse (rotorPosition.ElementStatus = "DX") Then 'AG 18/02/2015 BA-2285 - add new status DX (dynamically rejected)
+                                    auxIconPath = REACPOSOPTI_IconName
+                                End If
+
+                            Case "T"   'R1 + Sample + R2
+                                If (rotorPosition.ElementStatus = "R1") Then
+                                    auxIconPath = REACPOSR1_IconName
+                                ElseIf (rotorPosition.ElementStatus = "S") Then
+                                    auxIconPath = REACPOSR1SL_IconName
+                                ElseIf (rotorPosition.ElementStatus = "R2") Then
+                                    auxIconPath = REACPOSR1R2_IconName
+                                ElseIf (rotorPosition.ElementStatus = "F") Then
+                                    auxIconPath = REACPOSFINI_IconName
+                                End If
+
+                            Case "C"  'Contaminated
+                                auxIconPath = REACPOSCONT_IconName
+
+                            Case "P" 'Dilution
+                                auxIconPath = REACPOSDIL_IconName
+                        End Select
+                    End If
+
+                    UpdateRotorArea(rotorPosition, auxIconPath, myRotorPicture)
+                    If (rotorPosition.Selected) Then
+                        'Reload the info area with the new information 
+                        mySelectedElementInfo = GetLocalPositionInfo(rotorPosition.RingNumber, rotorPosition.CellNumber, False)
+                        ShowPositionInfoReactionsArea(ActiveAnalyzer, rotorPosition.RingNumber, rotorPosition.CellNumber)
+                    End If
+                End If
+            End If
+        End If
     End Sub
 
     ''' <summary>
@@ -3150,7 +3148,7 @@ Partial Public Class UiMonitor
 
                         controlQuery.First.Image = ImageUtilities.ImageFromFile(MyBase.IconsPath & auxIconPath)
                         controlQuery.First.BringToFront()
-                        controlQuery.First.Refresh()
+                        'controlQuery.First.Refresh()
 
                     Else
 
@@ -3198,7 +3196,7 @@ Partial Public Class UiMonitor
                         If PreviousSelect <> "" Then
                             controlQuery.First.Image = ImageUtilities.ImageFromFile(MyBase.IconsPath & auxIconPath)
                             controlQuery.First.BringToFront()
-                            controlQuery.First.Refresh()
+                            'controlQuery.First.Refresh()
                         Else
                             controlQuery.First.Image = Nothing
                         End If

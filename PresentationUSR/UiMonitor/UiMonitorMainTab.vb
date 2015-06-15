@@ -10,6 +10,7 @@ Imports Biosystems.Ax00.Controls.UserControls
 Imports Biosystems.Ax00.Global
 Imports DevExpress.XtraEditors.Controls
 Imports System.IO
+Imports System.Threading.Tasks
 Imports Biosystems.Ax00.App
 Imports Biosystems.Ax00.Global.AlarmEnumerates
 
@@ -75,10 +76,10 @@ Partial Public Class UiMonitor
                             CType(ChildForm, bsAlert).Hide()
                         End If
 
-                        Application.DoEvents()
+                        'Application.DoEvents()
                     End If
                 Next
-
+                Invalidate(True)
                 'AG 20/07/2012
                 If (AnalyzerController.IsAnalyzerInstantiated) AndAlso (Not AnalyzerController.Instance.Analyzer.Connected OrElse _
                    (Not AnalyzerController.Instance.Analyzer.Alarms Is Nothing AndAlso AnalyzerController.Instance.Analyzer.Alarms.Contains(AlarmEnumerates.Alarms.COMMS_ERR))) Then
@@ -117,7 +118,7 @@ Partial Public Class UiMonitor
                 End If
             Next
 
-            Application.DoEvents()
+            'Application.DoEvents()
         End If
     End Sub
 
@@ -130,7 +131,7 @@ Partial Public Class UiMonitor
                 End If
             Next
 
-            Application.DoEvents()
+            'Application.DoEvents()
         End If
     End Sub
 
@@ -164,7 +165,9 @@ Partial Public Class UiMonitor
             Dim appendFlag As Boolean = False
 
             While MainMDI.LoadingGlobes
-                System.Threading.Thread.Sleep(1)
+                'System.Threading.Thread.Sleep(1)
+                Dim T = Task.Delay(2)
+                T.Wait()
                 Application.DoEvents()
             End While
             'TR 25/09/2013 -#memory declare outside the for.
@@ -214,7 +217,7 @@ Partial Public Class UiMonitor
                 Alert.RefreshDescription()
 
                 Alert.Active = (Alert.Description.Length > 0)
-                Application.DoEvents()
+                'Application.DoEvents()
             Next
 
             ShowActiveAlerts()
@@ -248,7 +251,8 @@ Partial Public Class UiMonitor
         CoverReagentsPicture.Visible = Not (pAlarms.Contains(AlarmEnumerates.Alarms.FRIDGE_COVER_WARN) OrElse _
                                       pAlarms.Contains(AlarmEnumerates.Alarms.FRIDGE_COVER_ERR))
 
-        Application.DoEvents()
+        'Application.DoEvents()
+        Invalidate(True)
 
     End Sub
 
