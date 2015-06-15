@@ -1754,9 +1754,9 @@ Public Class BSBaseForm
             'Release them in their own FormClosed event
             'ToDo: Get the Common project name from a value, not from a static string
             'If in the future the common project name is changed, the comparison will lost it validity.
-            If Me.ProductName <> "PresentationCOM" Then
-                ReleaseUnManageControls(Me.Controls)
-            End If
+            'If Me.ProductName <> "PresentationCOM" Then
+            '    ReleaseUnManageControls(Me.Controls)
+            'End If
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BSBaseForm_FormClosed", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
