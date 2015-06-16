@@ -919,7 +919,7 @@ Partial Public Class tparContaminationsDAO
                 dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                 If (Not dbConnection Is Nothing) Then
                     Dim cmdText As String = " SELECT C.*, R.PreloadedReagent, R.ReagentName AS ContaminatorName, R1.ReagentName AS ContaminatedName " & vbCrLf & _
-                                            " FROM Ax00.dbo.tparContaminations C, Ax00.dbo.tparReagents R, Ax00TEM.dbo.tparReagents R1 " & vbCrLf & _
+                                            " FROM dbo.tparContaminations C, " & GlobalBase.DatabaseName & ".dbo.tparReagents R, Ax00TEM.dbo.tparReagents R1 " & vbCrLf & _
                                             " WHERE R.ReagentName = N'" & pContaminatorReagtName.Replace("'", "''") & "'" & vbCrLf & _
                                             " AND R1.ReagentName  = N'" & pContaminatedReagName.Replace("'", "''") & "'" & vbCrLf & _
                                             " AND R.ReagentID     = C.ReagentContaminatorID " & vbCrLf & _
@@ -985,7 +985,7 @@ Partial Public Class tparContaminationsDAO
                 dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                 If (Not dbConnection Is Nothing) Then
                     Dim cmdText As String = " SELECT C.*, T.TestID, T.TestName " & vbCrLf & _
-                                            " FROM   Ax00.dbo.tparContaminations C INNER JOIN tparTests T ON T.TestID = C.TestContaminaCuvetteID " & vbCrLf & _
+                                            " FROM   dbo.tparContaminations C INNER JOIN tparTests T ON T.TestID = C.TestContaminaCuvetteID " & vbCrLf & _
                                             " WHERE T.TestName = N'" & pTestName.Replace("'", "''") & "'" & vbCrLf
 
                     Dim contaminationsDataDS As New ContaminationsDS
