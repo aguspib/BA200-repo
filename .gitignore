@@ -198,3 +198,5 @@ InstallFramework/DownloadFramework.xml
 Tools/
 ./PresentationCOM/Update/Task/TaskList.xml
 
+PresentationCOM/Update/Task/TaskListDecrypted.xml
+PresentationCOM/Update/Task/TaskList.xml
