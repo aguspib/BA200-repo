@@ -5,6 +5,7 @@ Imports System.ServiceProcess
 Imports Biosystems.Ax00.Global
 Imports Microsoft.SqlServer.Management.Smo
 Imports Microsoft.SqlServer.Management.Smo.Wmi
+Imports System.Data.SqlClient
 
 Namespace Biosystems.Ax00.DAL
 
@@ -459,12 +460,21 @@ Namespace Biosystems.Ax00.DAL
                                               ByRef returnedError As Exception, _
                                               Optional ByVal pTransactionCommand As String = "") As Boolean
 
+            Return ExecuteBooleanScript(server.ConnectionContext.SqlConnectionObject, dataBaseName, sqlScripts, returnedError, pTransactionCommand)
+
+        End Function
+
+        Public Shared Function ExecuteBooleanScript(ByVal connection As SqlConnection, ByVal dataBaseName As String, _
+                                              ByVal sqlScripts As String, _
+                                              ByRef returnedError As Exception, _
+                                              Optional ByVal pTransactionCommand As String = "") As Boolean
+
             Dim result As Boolean = False
 
             Try
 
                 Dim dbCmd As New SqlClient.SqlCommand
-                dbCmd.Connection = server.ConnectionContext.SqlConnectionObject
+                dbCmd.Connection = connection
                 dbCmd.Connection.ChangeDatabase(dataBaseName)
                 dbCmd.CommandText = sqlScripts
 
