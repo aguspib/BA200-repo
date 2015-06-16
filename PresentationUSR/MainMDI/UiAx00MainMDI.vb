@@ -9352,7 +9352,7 @@ Partial Public Class UiAx00MainMDI
             End If
 
             Dim bf As BSBaseForm = CType(sender, BSBaseForm)
-            ReleaseUnManageControls(bf.Controls)
+            'ReleaseUnManageControls(bf.Controls)
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LanguageConfig_Closed ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -9407,10 +9407,10 @@ Partial Public Class UiAx00MainMDI
             End If
 
             Dim bf As BSBaseForm = CType(sender, BSBaseForm)
-            ReleaseUnManageControls(bf.Controls)
+            'ReleaseUnManageControls(bf.Controls)
 
             If TypeOf sender Is UiISEUtilities Then
-                MyClass.SetActionButtonsEnableProperty(True)
+                SetActionButtonsEnableProperty(True)
             End If
 
         Catch ex As Exception

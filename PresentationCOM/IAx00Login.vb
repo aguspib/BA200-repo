@@ -519,9 +519,9 @@ Public Class UiAx00Login
                     Close()
 
                     'RH 16/04/2012
-                    If (Not IsUserChange) Then
-                        ReleaseUnManageControls(Me.Controls)
-                    End If
+                    'If (Not IsUserChange) Then
+                    '    ReleaseUnManageControls(Me.Controls)
+                    'End If
                 End If
             End If
 
