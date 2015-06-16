@@ -790,24 +790,25 @@ Public Class UiSATReportLoad
                     'Validate if belong to the current version
                     Dim myRestorePoint As String = DirList(i).Substring(DirList(i).LastIndexOf("\") + 1)
 
-
                     If myRestorePoint.Contains(Application.ProductVersion) Then
                         'Insert
-                        bsSATDirListBox.Items.Add(myRestorePoint.Replace(myZipExtension, String.Empty))
+                        bsSATDirListBox.Items.Add(myRestorePoint)
 
                     ElseIf myRestorePoint.Contains(GlobalBase.UpdateVersionRestorePointName) Then 'Validate the endvesion files
                         TemporalFileVersion = myRestorePoint.Replace(GlobalBase.UpdateVersionRestorePointName, "")
-                        TemporalFileVersion = TemporalFileVersion.Replace(".SAT", "").Trim()
+                        'TemporalFileVersion = TemporalFileVersion.Replace(".SAT", "").Trim()
+                        TemporalFileVersion = Path.GetFileNameWithoutExtension(TemporalFileVersion)
                         TemporalFileVersion = TemporalFileVersion.Replace(CChar("."), "")
                         If IsNumeric(TemporalFileVersion) Then
                             If CInt(TemporalFileVersion) <= myInstalledAppVersion Then
-                                bsSATDirListBox.Items.Add(myRestorePoint.Replace(myZipExtension, String.Empty))
+                                bsSATDirListBox.Items.Add(myRestorePoint)
                             End If
                         End If
                         ' XB 17/06/2013 - Also v1.0 restore points are displayed
                     ElseIf myRestorePoint.Length = 33 Then
                         'Insert
-                        bsSATDirListBox.Items.Add(myRestorePoint.Replace(myZipExtension, String.Empty))
+                        'bsSATDirListBox.Items.Add(myRestorePoint.Replace(myZipExtension, String.Empty))
+                        bsSATDirListBox.Items.Add(myRestorePoint)
                         ' XB 17/06/2013 
                     End If
 
