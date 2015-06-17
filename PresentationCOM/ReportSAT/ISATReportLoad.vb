@@ -11,12 +11,78 @@ Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Global.AlarmEnumerates
 Imports Biosystems.Ax00.PresentationCOM
 Imports Biosystems.Ax00.Global.TO
-Imports LIS.Biosystems.Ax00.LISCommunications   ' XB 07/05/2013
+'Imports LIS.Biosystems.Ax00.LISCommunications   ' XB 07/05/2013
 Imports Biosystems.Ax00.App
 Imports Biosystems.Ax00.Framework.CrossCutting
+Imports System.Windows.Forms
+Imports System.Drawing
+Imports System.Threading.Tasks
+
+
+Class DummyMainMDI
+    Implements IMainMDI
+
+    Public WriteOnly Property CurrentLanguage() As String Implements IMainMDI.CurrentLanguage
+        Set(ByVal value As String)
+         
+        End Set
+    End Property
+
+
+
+    Public Property ErrorStatusLabelDisplayStyle() As ToolStripItemDisplayStyle Implements IMainMDI.ErrorStatusLabelDisplayStyle
+        Get
+            Return Nothing
+        End Get
+        Set(ByVal value As ToolStripItemDisplayStyle)
+
+        End Set
+    End Property
+
+    Public Property ErrorStatusLabelText() As String Implements IMainMDI.ErrorStatusLabelText
+        Get
+            Return String.Empty
+        End Get
+        Set(ByVal value As String)
+
+        End Set
+    End Property
+
+    Public Sub InitializeMarqueeProgreesBar() Implements IMainMDI.InitializeMarqueeProgreesBar
+
+    End Sub
+
+    Public Sub StopMarqueeProgressBar() Implements IMainMDI.StopMarqueeProgressBar
+
+    End Sub
+
+    Public Sub ReleaseLIS() Implements IMainMDI.ReleaseLIS
+
+    End Sub
+
+    Public Sub InitializeAnalyzerAndWorkSession(ByVal pStartingApplication As Boolean) Implements IMainMDI.InitializeAnalyzerAndWorkSession
+
+    End Sub
+
+    Public Sub EnableButtonAndMenus(ByVal pEnabled As Boolean, Optional ByVal pForceValue As Boolean = False) Implements IMainMDI.EnableButtonAndMenus
+
+    End Sub
+
+    Public Sub SetActionButtonsEnableProperty(ByVal pEnable As Boolean) Implements IMainMDI.SetActionButtonsEnableProperty
+
+    End Sub
+
+    Public Sub OpenMonitorForm(ByRef FormToClose As Form, Optional ByVal pAutomaticProcessFlag As Boolean = False) Implements IMainMDI.OpenMonitorForm
+
+    End Sub
+
+End Class
 
 Public Class UiSATReportLoad
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
+
+    Public Property MainMDI As IMainMDI = New DummyMainMDI
+
 
 #Region "Properties"
 
@@ -68,8 +134,6 @@ Public Class UiSATReportLoad
 
     Private CurrentLanguage As String
     'Private mdiAnalyzerCopy As AnalyzerManager '#REFACTORING
-
-    Private mdiESWrapperCopy As ESWrapper   ' XB 07/05/2013
 
 #End Region
 
@@ -211,11 +275,11 @@ Public Class UiSATReportLoad
                         SATThread.Start()
 
                         While Me.CreatingRestorePoint 'RH 16/11/2010
-                            UiAx00MainMDI.InitializeMarqueeProgreesBar()
+                            MainMDI.InitializeMarqueeProgreesBar()
                             Application.DoEvents()
                             Threading.Thread.Sleep(100)
                         End While
-                        UiAx00MainMDI.StopMarqueeProgressBar()
+                        MainMDI.StopMarqueeProgressBar()
 
                         SATThread.Join()
 
@@ -252,12 +316,13 @@ Public Class UiSATReportLoad
 
                             RestoreThread.Start()
 
+                            MainMDI.InitializeMarqueeProgreesBar()
                             While Me.RestoringDB 'RH 16/11/2010
-                                UiAx00MainMDI.InitializeMarqueeProgreesBar()
                                 Application.DoEvents()
-                                Threading.Thread.Sleep(100)
+                                Dim waiter = Task.Delay(100)
+                                waiter.Wait()
                             End While
-                            UiAx00MainMDI.StopMarqueeProgressBar()
+                            MainMDI.StopMarqueeProgressBar()
 
                             RestoreThread.Join()
 
@@ -275,11 +340,11 @@ Public Class UiSATReportLoad
                                     UpdateThread.Start()
 
                                     While Me.UpdatingDB 'RH 16/11/2010
-                                        UiAx00MainMDI.InitializeMarqueeProgreesBar()
+                                        MainMDI.InitializeMarqueeProgreesBar()
                                         Application.DoEvents()
                                         Threading.Thread.Sleep(100)
                                     End While
-                                    UiAx00MainMDI.StopMarqueeProgressBar()
+                                    MainMDI.StopMarqueeProgressBar()
 
                                     UpdateThread.Join()
 
@@ -301,7 +366,7 @@ Public Class UiSATReportLoad
                                 myGlobal = templateList.DeleteNonExistingReportTemplates(Nothing)
                                 'AG 11/06/2014 #1661
 
-                                UiAx00MainMDI.InitializeAnalyzerAndWorkSession(False) 'AG 24/11/2010
+                                MainMDI.InitializeAnalyzerAndWorkSession(False) 'AG 24/11/2010
                             End If
                         Else
                             If Me.RestorePointMode Then
@@ -335,6 +400,10 @@ Public Class UiSATReportLoad
 
         Return myGlobal
     End Function
+
+
+
+    'Function 
 
     'RH 31/05/2011
     Public Shared Sub DeleteDirectory(ByVal target_dir As String)
@@ -416,21 +485,21 @@ Public Class UiSATReportLoad
             Dim debugLogger As DebugLogger = New DebugLogger()
 
             If RestorePointMode Then
-                DebugLogger.AddLog(" --------------------------------------------", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
-                DebugLogger.AddLog(" UPDATE VERSION - RESTORE POINT PROCESS (INI)", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+                debugLogger.AddLog(" --------------------------------------------", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+                debugLogger.AddLog(" UPDATE VERSION - RESTORE POINT PROCESS (INI)", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
             Else
-                DebugLogger.AddLog(" --------------------------------------------", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
-                DebugLogger.AddLog(" UPDATE VERSION - SATREPORT PROCESS (INI)", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+                debugLogger.AddLog(" --------------------------------------------", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+                debugLogger.AddLog(" UPDATE VERSION - SATREPORT PROCESS (INI)", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
             End If
 
             myGlobalDataTO = UpdaterController.Instance.InstallUpdateProcess(DAOBase.DBServer, DAOBase.CurrentDB, DAOBase.DBLogin, DAOBase.DBPassword, True) 'BA-2471: IT 08/05/2015
 
             If RestorePointMode Then
-                DebugLogger.AddLog(" UPDATE VERSION - RESTORE POINT PROCESS (END)", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
-                DebugLogger.AddLog(" --------------------------------------------", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+                debugLogger.AddLog(" UPDATE VERSION - RESTORE POINT PROCESS (END)", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+                debugLogger.AddLog(" --------------------------------------------", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
             Else
-                DebugLogger.AddLog(" UPDATE VERSION - SATREPORT PROCESS (END)", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
-                DebugLogger.AddLog(" --------------------------------------------", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+                debugLogger.AddLog(" UPDATE VERSION - SATREPORT PROCESS (END)", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
+                debugLogger.AddLog(" --------------------------------------------", GlobalBase.UpdateVersionDatabaseProcessLogFileName)
             End If
 
 
@@ -673,8 +742,8 @@ Public Class UiSATReportLoad
                     'DL 02/07/2012. End 
 
                     ' XBC 04/07/2012
-                    UiAx00MainMDI.ErrorStatusLabel.DisplayStyle = ToolStripItemDisplayStyle.ImageAndText
-                    UiAx00MainMDI.ErrorStatusLabel.Text = GetMessageText(GlobalEnumerates.Messages.LOADRSAT_NOTALLOWED.ToString)
+                    MainMDI.ErrorStatusLabelDisplayStyle = ToolStripItemDisplayStyle.ImageAndText
+                    MainMDI.ErrorStatusLabelText = GetMessageText(GlobalEnumerates.Messages.LOADRSAT_NOTALLOWED.ToString)
                     ' XBC 04/07/2012
                 End If
             End If
@@ -689,10 +758,6 @@ Public Class UiSATReportLoad
 #End Region
 
 #Region "Events"
-
-    Private Sub UiSATReportLoad_Click(sender As Object, e As EventArgs) Handles Me.Click
-
-    End Sub
 
     ''' <summary>
     ''' When the screen ESC key is pressed, the screen is closed
@@ -733,10 +798,7 @@ Public Class UiSATReportLoad
             Me.Location = New Point(myLocation.X + CInt((mySize.Width - Me.Width) / 2), myLocation.Y + CInt((mySize.Height - Me.Height) / 2) - 60)
             'END DL 28/07/2011
 
-            '  XB 07/05/2013
-            If Not AppDomain.CurrentDomain.GetData("GlobalLISManager") Is Nothing Then
-                mdiESWrapperCopy = CType(AppDomain.CurrentDomain.GetData("GlobalLISManager"), ESWrapper) ' Use the same ESWrapper as the MDI
-            End If
+            
             '  XB 07/05/2013
 
             PrepareButtons()
@@ -942,13 +1004,13 @@ Public Class UiSATReportLoad
             bsCancelButton.Enabled = False
             bsBrowseButton.Enabled = False
             'IAx00MainMDI.EnableMenusBar(False)
-            UiAx00MainMDI.EnableButtonAndMenus(False) 'TR 04/10/2011 -Implement new method.
+            MainMDI.EnableButtonAndMenus(False) 'TR 04/10/2011 -Implement new method.
             'Dim myZipExtension As String = ConfigurationManager.AppSettings("ZIPExtension").ToString
 
             'TR 25/01/2011 -Replace by corresponding value on global base.
             Dim myZipExtension As String = GlobalBase.ZIPExtension
 
-            UiAx00MainMDI.SetActionButtonsEnableProperty(False) 'AG 12/07/2011 - Disable all vertical action buttons bar
+            MainMDI.SetActionButtonsEnableProperty(False) 'AG 12/07/2011 - Disable all vertical action buttons bar
 
             Dim myGlobal As GlobalDataTO
 
@@ -1056,14 +1118,9 @@ Public Class UiSATReportLoad
 
                 ' XB 07/05/2013
                 Cursor = Cursors.WaitCursor
-                If Not (mdiESWrapperCopy.Status.ToUpperInvariant = LISStatus.released.ToString.ToUpperInvariant) Then
-                    'Release the LIS manager object
-                    UiAx00MainMDI.InvokeReleaseLIS(False)
-                    UiAx00MainMDI.InvokeReleaseFromConfigSettings = True
-                Else
-                    ' Re-create Channel with new change settings
-                    UiAx00MainMDI.InvokeCreateLISChannel()
-                End If
+
+                MainMDI.ReleaseLIS()
+
                 Cursor = Cursors.Default
                 ' XB 07/05/2013
             End If
@@ -1083,12 +1140,9 @@ Public Class UiSATReportLoad
 
                 'RH 07/02/2012 Insert a REPORTSAT_LOADED_WARN alarm in DB
                 Dim myWSAnalyzerAlarmDS As New WSAnalyzerAlarmsDS
-
-
-
                 myWSAnalyzerAlarmDS.twksWSAnalyzerAlarms.AddtwksWSAnalyzerAlarmsRow( _
-                        Alarms.REPORTSATLOADED_WARN.ToString(), UiAx00MainMDI.ActiveAnalyzer, _
-                        DateTime.Now, 1, UiAx00MainMDI.ActiveWorkSession, Nothing, True, Nothing) 'AG 24/07/2012 - This alarm is created with status TRUE not false as before 'False, DateTime.Now)
+                        Alarms.REPORTSATLOADED_WARN.ToString(), AnalyzerController.Instance.Analyzer.ActiveAnalyzer, _
+                        DateTime.Now, 1, AnalyzerController.Instance.Analyzer.ActiveWorkSession, Nothing, True, Nothing) 'AG 24/07/2012 - This alarm is created with status TRUE not false as before 'False, DateTime.Now)
 
                 Dim myWSAlarmDelegate As New WSAnalyzerAlarmsDelegate
                 myGlobal = myWSAlarmDelegate.Create(Nothing, myWSAnalyzerAlarmDS) 'AG 24/07/2012 - keep using Create, do not use Save, it is not necessary
@@ -1103,7 +1157,7 @@ Public Class UiSATReportLoad
 
             'RH 07/02/2012
             'Open the WS Monitor form and close this one
-            UiAx00MainMDI.OpenMonitorForm(Me)
+            MainMDI.OpenMonitorForm(Me)
 
             '' XBC 26/06/2012
             'IAx00MainMDI.Connect()
@@ -1115,9 +1169,9 @@ Public Class UiSATReportLoad
 
         Finally
             Cursor = Cursors.Default
-            UiAx00MainMDI.SetActionButtonsEnableProperty(True) 'AG 12/07/2011 - Enable vertical action buttons bar
+            MainMDI.SetActionButtonsEnableProperty(True) 'AG 12/07/2011 - Enable vertical action buttons bar
             'IAx00MainMDI.EnableMenusBar(True) 'TR 02/08/2011
-            UiAx00MainMDI.EnableButtonAndMenus(True) 'TR 04/10/2011 -Implement new method.
+            MainMDI.EnableButtonAndMenus(True) 'TR 04/10/2011 -Implement new method.
 
             ' XBC 04/07/2012 - Indicate Load Rsat END on Application LOG.
             GlobalBase.CreateLogActivity("LOAD RSAT END - Start Time: " & StartTime.ToLongTimeString, Name & ".bsOKButton_Click", _
@@ -1168,7 +1222,7 @@ Public Class UiSATReportLoad
                     MultilanguageResourcesDelegate.SetCurrentLanguage(newLanguageID)
 
                     'Set the new language to the MDI form to reload menus in new language.
-                    UiAx00MainMDI.CurrentLanguage = newLanguageID
+                    MainMDI.CurrentLanguage = newLanguageID
                 End If
 
             End If
@@ -1201,7 +1255,7 @@ Public Class UiSATReportLoad
             Else
                 'Normal button click
                 'Open the WS Monitor form and close this one
-                UiAx00MainMDI.OpenMonitorForm(Me)
+                MainMDI.OpenMonitorForm(Me)
             End If
 
         Catch ex As Exception

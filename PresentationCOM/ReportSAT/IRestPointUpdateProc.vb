@@ -147,12 +147,13 @@ Public Class UiRestPointUpdateProc
     ''' SAT Report's version and Application's version
     ''' </summary>
     ''' <param name="pVersionComparison">Result of the version comparison</param>
+    ''' <param name="pUnzippedSATFolder">Path of the Unzipped Report SAT Files</param>
     ''' <returns></returns>
     ''' <remarks>
     ''' Created by:  SG 08/10/2010
     ''' Modified by: IT 08/05/2015 - BA-2471
     ''' </remarks>
-    Private Function ManageVersionComparison(ByVal pVersionComparison As GlobalEnumerates.SATReportVersionComparison) As GlobalDataTO
+    Private Function ManageVersionComparison(ByVal pVersionComparison As GlobalEnumerates.SATReportVersionComparison, ByVal pUnzippedSATFolder As String) As GlobalDataTO
         Dim myGlobal As New GlobalDataTO
         'Dim myUtil As New Utilities.
         Dim tempFolder As String = ""
@@ -218,25 +219,9 @@ Public Class UiRestPointUpdateProc
                         End If
                     End If
 
-                    'extract temporaly
-                    'RH 12/11/2010 tempFolder can not be so long. RestoreDB will throw an exception.
-                    'So, we need a tempFolder like "C:\tempFolder"
-                    'tempFolder = Directory.GetParent(RestorePointPath).FullName & "\temp"
-                    myGlobal = SATReportUtilities.GetTempFolder() 'BA-2471: IT 08/05/2015
-
-                    If Not myGlobal.HasError AndAlso Not myGlobal Is Nothing Then
-                        tempFolder = CStr(myGlobal.SetDatos)
-                    Else
-                        ShowMessage(Me.Name & ".ManageVersionComparison", GlobalEnumerates.Messages.SAT_DB_RESTORE_ERROR.ToString())
-                        Exit Select
-                    End If
-                    'RH 12/11/2010 tempFolder
-
-                    myGlobal = Utilities.ExtractFromZip(RestorePointPath, tempFolder)
-
                     If Not myGlobal.HasError AndAlso Not myGlobal Is Nothing Then
                         'search for the .bak file
-                        Dim myFiles As String() = Directory.GetFiles(tempFolder, "*.bak")
+                        Dim myFiles As String() = Directory.GetFiles(pUnzippedSATFolder, "*.bak")
                         If myFiles.Length > 0 Then
                             Me.RestoreDBFilePath = myFiles(0)
                             Dim RestoreThread As New Threading.Thread(AddressOf RestoreDataBase)
@@ -491,7 +476,7 @@ Public Class UiRestPointUpdateProc
     ''' </remarks>
     Private Function LoadSATReport(ByVal pFilePath As String) As GlobalDataTO
         Dim myGlobal As New GlobalDataTO
-
+        Dim SATTempFolderPath As String = ""
         Try
             'Dim myUtil As New Utilities.
             'Dim mySATUtil As New SATReportUtilities
@@ -502,44 +487,102 @@ Public Class UiRestPointUpdateProc
             If Not myGlobal.HasError And Not myGlobal Is Nothing Then
                 myAppVersion = CStr(myGlobal.SetDatos)
 
-                'obtain the SAT version
-                Dim mySATVersion As String
-
-                myGlobal = SATReportUtilities.GetSATReportVersionAndModel(pFilePath) 'BA-2471: IT 08/05/2015
+                'Extract Data and get extracted folder path
+                myGlobal = SATReportUtilities.ExtractZipDataInTempFolder(pFilePath)
                 If Not myGlobal.HasError And Not myGlobal Is Nothing Then
-                    mySATVersion = CStr(myGlobal.SetDatos)
+                    SATTempFolderPath = myGlobal.SetDatos.ToString
+                End If
 
-                    Dim myComparisonResult As New GlobalEnumerates.SATReportVersionComparison
-                    myGlobal = SATReportUtilities.CompareSATandAPPversions(myAppVersion, mySATVersion) 'BA-2471: IT 08/05/2015
+                myGlobal = SATReportUtilities.GetSATReportVersionAndModel(SATTempFolderPath) 'BA-2471: IT 08/05/2015
+                If Not myGlobal.HasError And Not myGlobal Is Nothing Then
+                    'obtain the SAT Version and Model
+                    Dim mySATVersion As String
+                    Dim mySATInfo As String()
+                    Dim mySATModel As String = String.Empty
+                    myGlobal = SATReportUtilities.GetSATReportVersionAndModel(SATTempFolderPath)
+
                     If Not myGlobal.HasError And Not myGlobal Is Nothing Then
-                        myComparisonResult = CType(myGlobal.SetDatos, GlobalEnumerates.SATReportVersionComparison)
-                        Me.RestorePointPath = pFilePath
+                        mySATInfo = CStr(myGlobal.SetDatos).Split(System.Convert.ToChar(vbCr))
+                        If mySATInfo.Count > 0 Then
+                            mySATVersion = mySATInfo(0).Trim
 
-                        'AG 25/10/2011 - Stop ANSINF
-                        '#REFACTORING
-                        If (AnalyzerController.IsAnalyzerInstantiated) Then
-                            If AnalyzerController.Instance.Analyzer.Connected AndAlso AnalyzerController.Instance.Analyzer.AnalyzerStatus <> GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
-                                myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STP) 'Stop ANSINF
+                            If (AnalyzerController.IsAnalyzerInstantiated) Then
+                                If mySATInfo.Count > 1 Then
+                                    mySATModel = mySATInfo(1).Trim
+                                    Select Case AnalyzerController.Instance.Analyzer.Model
+                                        Case AnalyzerModelEnum.A400.ToString
+                                            'Check If SAT Model is A200
+                                            If mySATModel = AnalyzerModelEnum.A200.ToString Then
+                                                'Incompatible Model, Not continue, diferent Models
+                                                myGlobal.HasError = True
+                                                myGlobal.ErrorCode = GlobalEnumerates.Messages._NONE.ToString
+                                                'Todo: Dynamic Translate message acording to lenguage
+                                                myGlobal.ErrorMessage = "Report SAT file Model (" & mySATModel & ") different than current Model (" & AnalyzerController.Instance.Analyzer.Model & ")"
+
+                                                GlobalBase.CreateLogActivity(myGlobal.ErrorMessage, Me.Name & " LoadSATReport ", EventLogEntryType.Warning, GetApplicationInfoSession().ActivateSystemLog)
+
+                                                Exit Try
+                                            End If
+                                        Case AnalyzerModelEnum.A200.ToString
+                                            If mySATModel <> AnalyzerController.Instance.Analyzer.Model Then
+                                                'Incompatible Model, Not continue, diferent Models
+                                                myGlobal.HasError = True
+                                                myGlobal.ErrorCode = GlobalEnumerates.Messages.SAT_LOAD_REPORT_ERROR.ToString
+                                                'Todo: Dynamic Translate message acording to lenguage
+                                                myGlobal.ErrorMessage = "Report SAT file Model (" & mySATModel & ") different than current Model (" & AnalyzerController.Instance.Analyzer.Model & ")"
+
+                                                GlobalBase.CreateLogActivity(myGlobal.ErrorMessage, Me.Name & " LoadSATReport ", EventLogEntryType.Warning, GetApplicationInfoSession().ActivateSystemLog)
+
+                                                Exit Try
+                                            End If
+                                    End Select
+                                Else 'Model Name Info not in Version.txt file
+                                    If AnalyzerController.Instance.Analyzer.Model <> AnalyzerModelEnum.A400.ToString Then
+                                        'Incompatible Model, Not continue, diferent Models
+                                        myGlobal.HasError = True
+                                        myGlobal.ErrorCode = GlobalEnumerates.Messages.SAT_LOAD_REPORT_ERROR.ToString
+                                        'Todo: Dynamic Translate message acording to lenguage
+                                        myGlobal.ErrorMessage = "Report SAT file Model (" & AnalyzerModelEnum.A400.ToString & ") different than current Model (" & AnalyzerController.Instance.Analyzer.Model & ")"
+
+                                        GlobalBase.CreateLogActivity(myGlobal.ErrorMessage, Me.Name & " LoadSATReport ", EventLogEntryType.Warning, GetApplicationInfoSession().ActivateSystemLog)
+
+                                        Exit Try
+                                    End If
+                                End If
+                            Else   'Analyzer Not Instantiate
+                                'Todo: AC: Where to Get Model?
+
                             End If
-                        End If
-                        'AG 25/10/2011
 
-                        If Not myGlobal.HasError Then
-                            myGlobal = Me.ManageVersionComparison(myComparisonResult)
-                        End If
-
-                        'AG 25/10/2011 - Start ANSINF
-                        If (Not myGlobal.HasError) AndAlso (AnalyzerController.IsAnalyzerInstantiated) Then
-                            If AnalyzerController.Instance.Analyzer.Connected AndAlso AnalyzerController.Instance.Analyzer.AnalyzerStatus <> GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
-                                myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STR) 'Start ANSINF
+                            'AG 25/10/2011 - Stop ANSINF
+                            '#REFACTORING
+                            If (AnalyzerController.IsAnalyzerInstantiated) Then
+                                If AnalyzerController.Instance.Analyzer.Connected AndAlso AnalyzerController.Instance.Analyzer.AnalyzerStatus <> GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
+                                    myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STP) 'Stop ANSINF
+                                End If
+                            End If
+                            'AG 25/10/2011
+                            Dim myComparisonResult As New GlobalEnumerates.SATReportVersionComparison
+                            myGlobal = SATReportUtilities.CompareSATandAPPversions(myAppVersion, mySATVersion) 'BA-2471: IT 08/05/2015
+                            If Not myGlobal.HasError Then
+                                myGlobal = Me.ManageVersionComparison(myComparisonResult, SATTempFolderPath)
                             End If
 
+                            'AG 25/10/2011 - Start ANSINF
+                            If (Not myGlobal.HasError) AndAlso (AnalyzerController.IsAnalyzerInstantiated) Then
+                                If AnalyzerController.Instance.Analyzer.Connected AndAlso AnalyzerController.Instance.Analyzer.AnalyzerStatus <> GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
+                                    myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STR) 'Start ANSINF
+                                End If
+
+                            End If
+                            'AG 25/10/2011
+
                         End If
-                        'AG 25/10/2011
 
                     End If
                 End If
             End If
+
 
         Catch ex As Exception
             myGlobal.HasError = True
@@ -690,12 +733,40 @@ Public Class UiRestPointUpdateProc
 
                 'TR 14/06/2013 -Get the installed application current version.
                 Dim myAppVersion As String = Application.ProductVersion
-                Dim DirList As String() = Directory.GetFiles(myRestoreDataPath, "*" & myAppVersion & myZipExtension)
+                'Dim DirList As String() = Directory.GetFiles(myRestoreDataPath, "*" & myAppVersion & myZipExtension)
+                Dim DirList As String() = Directory.GetFiles(myRestoreDataPath, "*" & myZipExtension).Union(Directory.GetFiles(myRestoreDataPath, "*." & AnalyzerModelEnum.A400.ToString).Union(Directory.GetFiles(myRestoreDataPath, "*." & AnalyzerModelEnum.A200.ToString))).ToArray()
+
                 'TR 14/06/2013 -END.
 
+                Dim myInstalledAppVersion As Integer = CInt(Application.ProductVersion.Replace(CChar("."), ""))
+                Dim TemporalFileVersion As String = String.Empty
                 For i As Integer = 0 To DirList.Count - 1
+                    'Validate if belong to the current version
                     Dim myRestorePoint As String = DirList(i).Substring(DirList(i).LastIndexOf("\") + 1)
-                    bsSATDirListBox.Items.Add(myRestorePoint.Replace(myZipExtension, String.Empty))
+
+                    If myRestorePoint.Contains(Application.ProductVersion) Then
+                        'Insert
+                        bsSATDirListBox.Items.Add(myRestorePoint)
+
+                    ElseIf myRestorePoint.Contains(GlobalBase.UpdateVersionRestorePointName) Then 'Validate the endvesion files
+                        TemporalFileVersion = myRestorePoint.Replace(GlobalBase.UpdateVersionRestorePointName, "")
+                        'TemporalFileVersion = TemporalFileVersion.Replace(".SAT", "").Trim()
+                        TemporalFileVersion = Path.GetFileNameWithoutExtension(TemporalFileVersion)
+                        TemporalFileVersion = TemporalFileVersion.Replace(CChar("."), "")
+                        If IsNumeric(TemporalFileVersion) Then
+                            If CInt(TemporalFileVersion) <= myInstalledAppVersion Then
+                                bsSATDirListBox.Items.Add(myRestorePoint)
+                            End If
+                        End If
+                        ' XB 17/06/2013 - Also v1.0 restore points are displayed
+                    ElseIf myRestorePoint.Length = 33 Then
+                        'Insert
+                        'bsSATDirListBox.Items.Add(myRestorePoint.Replace(myZipExtension, String.Empty))
+                        bsSATDirListBox.Items.Add(myRestorePoint)
+                        ' XB 17/06/2013 
+                    End If
+
+                    TemporalFileVersion = ""
                 Next
             End If
 
@@ -759,9 +830,10 @@ Public Class UiRestPointUpdateProc
                 .InitialDirectory = GetSATReportDirectory()
                 'PG 11/01/2011
                 '.Filter = "SAT Report files|*" & zipExtension & "|All files|*.*"
-                .Filter = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SATReport_File", CurrentLanguage) & "|*" & zipExtension & "|" & myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SATReport_FilesAll", CurrentLanguage) & "|*.*"
+                .Filter = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SATReport_File", CurrentLanguage) & " (*." & AnalyzerController.Instance.Analyzer.Model & ")|*." & AnalyzerController.Instance.Analyzer.Model _
+                          & "|" & myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SATReport_FilesAll", CurrentLanguage) & " (*.*)|*.*"
                 .FilterIndex = 0
-                .DefaultExt = zipExtension
+                .DefaultExt = "." & AnalyzerController.Instance.Analyzer.Model
                 .CheckFileExists = True
                 .CheckPathExists = True
                 .Multiselect = False
@@ -862,7 +934,7 @@ Public Class UiRestPointUpdateProc
                     myRestoreDataPath = "\RestorePoints\"
                 End If
 
-                Dim myRestoringFile As String = Application.StartupPath & "\" & myRestoreDataPath & Me.bsSATDirListBox.SelectedItem.ToString & myZipExtension
+                Dim myRestoringFile As String = Application.StartupPath & "\" & myRestoreDataPath & Me.bsSATDirListBox.SelectedItem.ToString
 
                 myGlobal = LoadSATReport(myRestoringFile)
                 'END AG 16/11/2010
