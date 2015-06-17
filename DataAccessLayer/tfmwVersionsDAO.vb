@@ -179,8 +179,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 Else
 
                     If (String.IsNullOrEmpty(pDBSoftware)) _
-                        And ((String.IsNullOrEmpty(pDBCommonRevisionNumber)) OrElse (pDBCommonRevisionNumber = "0")) _
-                        And ((String.IsNullOrEmpty(pDBDataRevisionNumber)) OrElse (pDBDataRevisionNumber = "0")) Then
+                        And ((String.IsNullOrEmpty(pDBCommonRevisionNumber)) OrElse (Not IsDBVersionRevisable(pDBConnection))) _
+                        And ((String.IsNullOrEmpty(pDBDataRevisionNumber)) OrElse (Not IsDBVersionRevisable(pDBConnection))) Then
                         Return resultData
                     End If
 
@@ -189,19 +189,20 @@ Namespace Biosystems.Ax00.DAL.DAO
                     cmdText &= " SET "
 
                     If Not String.IsNullOrEmpty(pDBSoftware) Then
-                        cmdText &= " DBSoftware = N'" & pDBSoftware & "'" & vbCrLf
+                        cmdText &= " DBSoftware = N'" & pDBSoftware & "',"
                     End If
 
                     'cmdText &= " DBRevisionDate = N'" & pDBRevisionDate & "'" & vbCrLf 'yyyy-MM-dd'
 
-                    If ((Not String.IsNullOrEmpty(pDBCommonRevisionNumber)) AndAlso (pDBCommonRevisionNumber <> "0")) Then
-                        cmdText &= " DBCommonRevisionNumber = N'" & pDBCommonRevisionNumber & "'" & vbCrLf
+                    If (Not String.IsNullOrEmpty(pDBCommonRevisionNumber) And IsDBVersionRevisable(pDBConnection)) Then
+                        cmdText &= " DBCommonRevisionNumber = N'" & pDBCommonRevisionNumber & "',"
                     End If
 
-                    If ((Not String.IsNullOrEmpty(pDBDataRevisionNumber)) AndAlso (pDBDataRevisionNumber <> "0")) Then
-                        cmdText &= " DBDataRevisionNumber = N'" & pDBDataRevisionNumber & "'" & vbCrLf
+                    If (Not String.IsNullOrEmpty(pDBDataRevisionNumber) And IsDBVersionRevisable(pDBConnection)) Then
+                        cmdText &= " DBDataRevisionNumber = N'" & pDBDataRevisionNumber & "'"
                     End If
 
+                    cmdText = cmdText.TrimEnd(","c)
                     cmdText &= " WHERE PackageID = '" & pPackageID & "'" & vbCrLf
 
                     Dim dbCmd As New SqlClient.SqlCommand
@@ -222,6 +223,38 @@ Namespace Biosystems.Ax00.DAL.DAO
             End Try
             Return resultData
         End Function
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Private Function IsDBVersionRevisable(ByVal pDBConnection As SqlClient.SqlConnection) As Boolean
+
+            Dim script As String
+            Dim ex As New Exception
+            Dim result As Boolean = False
+
+            Try
+
+                script = " IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tfmwVersions' AND sc.name = 'DBCommonRevisionNumber') = 1" & _
+                         " AND (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tfmwVersions' AND sc.name = 'DBDataRevisionNumber') = 1 " & _
+                         " Select 'True' " & _
+                         " ELSE " & _
+                         " Select 'False' "
+
+                result = DBManager.ExecuteBooleanScript(pDBConnection, GlobalBase.DatabaseName, script, ex)
+
+            Catch ex
+                GlobalBase.CreateLogActivity(ex)
+                Return False
+            End Try
+
+            Return result
+
+        End Function
+
 
 #End Region
 
