@@ -89,6 +89,8 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
 
         Sub RunScripts(results As ExecutionResults, ByVal dataBaseName As String, ByRef server As Server, ByVal packageId As String)
 
+            UpdateDatabaseVersion(results, dataBaseName, server, packageId)
+
             For Each revision In CommonRevisions
                 revision.Run(results, server, dataBaseName, packageId)
 
@@ -105,9 +107,7 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
                 End If
             Next
 
-            If results.Success Then
-                UpdateDatabaseVersion(results, dataBaseName, server, packageId)
-            Else
+            If Not results.Success Then
                 results.LastErrorRelease = Me
             End If
 
@@ -149,7 +149,7 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
             Dim myVersionsDelegate As New VersionsDelegate
 
             ' update the new Database version. pass the server connection contex because we are inside a transaction that can affect the table.
-            myVersionsDelegate.SaveDBSoftwareVersion(pServer.ConnectionContext.SqlConnectionObject(), packageId, Version, String.Empty, String.Empty)
+            myVersionsDelegate.SaveDBSoftwareVersion(pServer.ConnectionContext.SqlConnectionObject(), packageId, Version, "0", "0")
 
         End Sub
 

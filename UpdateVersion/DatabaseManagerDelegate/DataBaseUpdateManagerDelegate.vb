@@ -45,8 +45,6 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 Debug.Print("INICIO-->" & initialTimeUpdate.TimeOfDay.ToString()) 'Print the time
                 GlobalBase.CreateLogActivity("InstallUpdateProcess" & ".Updateprocess - Database found", "Installation validation", _
                                                                                                    EventLogEntryType.Information, False)
-                If String.IsNullOrEmpty(pModel) Then pModel = GetAnalyzerModel()
-
                 ValidateDatabaseName(pServerName, pDataBaseName, DBLogin, DBPassword)
 
                 If Not DataBaseManagerDelegate.DataBaseExist(pServerName, pDataBaseName, DBLogin, DBPassword) Then 'BA-2471: IT 08/05/2015
@@ -54,6 +52,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 End If
 
                 If (Not myGlobalDataTO.HasError) Then
+                    If String.IsNullOrEmpty(pModel) Then pModel = GetAnalyzerModel()
                     myGlobalDataTO = UpdateProcessApplication(pServerName, pDataBaseName, DBLogin, DBPassword, pLoadingRSAT, pModel)
                 End If
 
