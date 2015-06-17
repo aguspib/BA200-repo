@@ -19,72 +19,15 @@ Imports System.Drawing
 Imports System.Threading.Tasks
 
 
-Class DummyMainMDI
-    Implements IMainMDI
-
-    Public WriteOnly Property CurrentLanguage() As String Implements IMainMDI.CurrentLanguage
-        Set(ByVal value As String)
-         
-        End Set
-    End Property
-
-
-
-    Public Property ErrorStatusLabelDisplayStyle() As ToolStripItemDisplayStyle Implements IMainMDI.ErrorStatusLabelDisplayStyle
-        Get
-            Return Nothing
-        End Get
-        Set(ByVal value As ToolStripItemDisplayStyle)
-
-        End Set
-    End Property
-
-    Public Property ErrorStatusLabelText() As String Implements IMainMDI.ErrorStatusLabelText
-        Get
-            Return String.Empty
-        End Get
-        Set(ByVal value As String)
-
-        End Set
-    End Property
-
-    Public Sub InitializeMarqueeProgreesBar() Implements IMainMDI.InitializeMarqueeProgreesBar
-
-    End Sub
-
-    Public Sub StopMarqueeProgressBar() Implements IMainMDI.StopMarqueeProgressBar
-
-    End Sub
-
-    Public Sub ReleaseLIS() Implements IMainMDI.ReleaseLIS
-
-    End Sub
-
-    Public Sub InitializeAnalyzerAndWorkSession(ByVal pStartingApplication As Boolean) Implements IMainMDI.InitializeAnalyzerAndWorkSession
-
-    End Sub
-
-    Public Sub EnableButtonAndMenus(ByVal pEnabled As Boolean, Optional ByVal pForceValue As Boolean = False) Implements IMainMDI.EnableButtonAndMenus
-
-    End Sub
-
-    Public Sub SetActionButtonsEnableProperty(ByVal pEnable As Boolean) Implements IMainMDI.SetActionButtonsEnableProperty
-
-    End Sub
-
-    Public Sub OpenMonitorForm(ByRef FormToClose As Form, Optional ByVal pAutomaticProcessFlag As Boolean = False) Implements IMainMDI.OpenMonitorForm
-
-    End Sub
-
-End Class
-
 Public Class UiSATReportLoad
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
-    Public Property MainMDI As IMainMDI = New DummyMainMDI
+
 
 
 #Region "Properties"
+
+    Public Property MainMDI As IMainMDI = New DummyMainMDI
 
     Public Property RestorePointMode() As Boolean
         Get
@@ -789,16 +732,20 @@ Public Class UiSATReportLoad
     '''               IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Private Sub LoadSATReportData_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        Dim myLocation As Point
+        Dim mySize As Size
         Try
+            If Not Me.Parent Is Nothing Then
+                'DL 28/07/2011
+                myLocation = Me.Parent.Location
+                mySize = Me.Parent.Size
 
-            'DL 28/07/2011
-            Dim myLocation As Point = Me.Parent.Location
-            Dim mySize As Size = Me.Parent.Size
+                Me.Location = New Point(myLocation.X + CInt((mySize.Width - Me.Width) / 2), myLocation.Y + CInt((mySize.Height - Me.Height) / 2) - 60)
+                'END DL 28/07/2011
+            End If
 
-            Me.Location = New Point(myLocation.X + CInt((mySize.Width - Me.Width) / 2), myLocation.Y + CInt((mySize.Height - Me.Height) / 2) - 60)
-            'END DL 28/07/2011
 
-            
+
             '  XB 07/05/2013
 
             PrepareButtons()
@@ -849,7 +796,15 @@ Public Class UiSATReportLoad
                 Dim myInstalledAppVersion As Integer = CInt(Application.ProductVersion.Replace(CChar("."), ""))
 
                 If Not Directory.Exists(myRestoreDataPath) Then Directory.CreateDirectory(myRestoreDataPath)
-                Dim DirList As String() = Directory.GetFiles(myRestoreDataPath, "*" & myZipExtension).Union(Directory.GetFiles(myRestoreDataPath, "*." & AnalyzerController.Instance.Analyzer.Model)).ToArray()
+
+                Dim DirList As String()
+
+                If AnalyzerController.Instance Is Nothing OrElse String.IsNullOrEmpty(AnalyzerController.Instance.Analyzer.Model) Then
+                    DirList = Directory.GetFiles(myRestoreDataPath, "*" & myZipExtension).Union(Directory.GetFiles(myRestoreDataPath, "*.*")).ToArray()
+                Else
+                    DirList = Directory.GetFiles(myRestoreDataPath, "*" & myZipExtension).Union(Directory.GetFiles(myRestoreDataPath, "*." & AnalyzerController.Instance.Analyzer.Model)).ToArray()
+                End If
+
 
                 Dim TemporalFileVersion As String = String.Empty
                 For i As Integer = 0 To DirList.Count - 1
@@ -907,12 +862,17 @@ Public Class UiSATReportLoad
             Dim pos As WINDOWPOS = DirectCast(Runtime.InteropServices.Marshal.PtrToStructure(m.LParam, _
                                                                                              GetType(WINDOWPOS)),  _
                                                                                              WINDOWPOS)
-            Dim myLocation As Point = Me.Parent.Location
-            Dim mySize As Size = Me.Parent.Size
+            Dim myLocation As Point
+            Dim mySize As Size
 
-            pos.x = myLocation.X + CInt((mySize.Width - Me.Width) / 2)
-            pos.y = myLocation.Y + CInt((mySize.Height - Me.Height) / 2) - 60
-            Runtime.InteropServices.Marshal.StructureToPtr(pos, m.LParam, True)
+            If Not Me.Parent Is Nothing Then
+                myLocation = Me.Parent.Location
+                mySize = Me.Parent.Size
+                pos.x = myLocation.X + CInt((mySize.Width - Me.Width) / 2)
+                pos.y = myLocation.Y + CInt((mySize.Height - Me.Height) / 2) - 60
+                Runtime.InteropServices.Marshal.StructureToPtr(pos, m.LParam, True)
+            End If
+
         End If
 
         MyBase.WndProc(m)

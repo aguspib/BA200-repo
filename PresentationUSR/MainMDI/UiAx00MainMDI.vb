@@ -196,6 +196,7 @@ Partial Public Class UiAx00MainMDI
 
 #Region "Fields"
 
+    Shared UiSATReportForm As Biosystems.Ax00.PresentationCOM.UiSATReportLoad = New Biosystems.Ax00.PresentationCOM.UiSATReportLoad
 
     'TR 21/05/2012 Variable used to indicate if the user has pause the worksession.
     Private UserPauseWSAttribute As Boolean = False
@@ -2215,13 +2216,18 @@ Partial Public Class UiAx00MainMDI
     ''' <remarks></remarks>
     Private Sub LoadSATReportToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles LoadSATReportToolStripMenuItem.Click
         Try
-            UiSATReportLoad.RestorePointMode = False
-            OpenMDIChildForm(UiSATReportLoad)
+            UiSATReportForm.RestorePointMode = False
+
+            UiSATReportForm.MainMDI = Me
+
+            OpenMDIChildForm(UiSATReportForm)
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadSATReportToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".LoadSATReportToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
+
+
 
     ''' <summary>
     ''' Open the Restore Previous Data screen
@@ -2231,8 +2237,9 @@ Partial Public Class UiAx00MainMDI
     ''' <remarks></remarks>
     Private Sub RestorePreviousDataToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RestorePreviousDataToolStripMenuItem.Click
         Try
-            UiSATReportLoad.RestorePointMode = True
-            OpenMDIChildForm(UiSATReportLoad)
+            UiSATReportForm.RestorePointMode = True
+            OpenMDIChildForm(UiSATReportForm)
+
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".RestorePreviousDataToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".RestorePreviousDataToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
