@@ -24,7 +24,7 @@ Namespace Biosystems.Ax00.Core.Services
 #Region "Properties"
 
         Public Property OnServiceStatusChange As Action(Of IServiceStatusCallback) Implements IAsyncService.OnServiceStatusChange
-        Public Property Status As ServiceStatusEnum Implements IAsyncService.Status
+        Public Overridable Property Status As ServiceStatusEnum Implements IAsyncService.Status
             Get
                 Return _status
             End Get
