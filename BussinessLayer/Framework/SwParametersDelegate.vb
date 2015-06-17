@@ -300,7 +300,7 @@ Namespace Biosystems.Ax00.BL
                 'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex)
             Finally
-                If connection IsNot Nothing AndAlso pDBConnection Is Nothing Then connection.SetDatos.Close()
+                If connection IsNot Nothing AndAlso pDBConnection Is Nothing Then CloseConnection(connection)
             End Try
             Return resultData
         End Function

@@ -1174,27 +1174,32 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim alarmsDelg As New WSAnalyzerAlarmsDelegate
             Dim wsAlarmsDs = New WSAnalyzerAlarmsDS
 
-            Dim typedGlobal = GetSafeOpenDBConnection(Nothing)
-
-            Dim dbConnection = typedGlobal.SetDatos
-            If (Not dbConnection Is Nothing) Then
-                _myGlobal = _alarmsDelg.GetByAlarmID(Nothing, alarmName, Nothing, Nothing, _analyzerManager.ActiveAnalyzer(), "")
-                If Not _myGlobal.HasError AndAlso Not _myGlobal.SetDatos Is Nothing Then
-                    Dim temporalDs = DirectCast(_myGlobal.SetDatos, WSAnalyzerAlarmsDS)
-                    If (temporalDs.twksWSAnalyzerAlarms.Rows.Count > 0) Then
-                        For Each alarmToUpdate As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In temporalDs.twksWSAnalyzerAlarms.Rows
-                            If alarmToUpdate.AlarmStatus Then
-                                alarmToUpdate.AlarmStatus = False
-                                alarmToUpdate.OKDateTime = Date.Now
-                            End If
-                        Next
-                        _myGlobal = _alarmsDelg.Update(Nothing, temporalDs)
+            Dim connection = GetSafeOpenDBConnection()
+            Try
+                'Dim dbConnection = connection.SetDatos
+                If (connection IsNot Nothing AndAlso connection.SetDatos IsNot Nothing) Then
+                    _myGlobal = _alarmsDelg.GetByAlarmID(Nothing, alarmName, Nothing, Nothing, _analyzerManager.ActiveAnalyzer(), "")
+                    If Not _myGlobal.HasError AndAlso Not _myGlobal.SetDatos Is Nothing Then
+                        Dim temporalDs = DirectCast(_myGlobal.SetDatos, WSAnalyzerAlarmsDS)
+                        If (temporalDs.twksWSAnalyzerAlarms.Rows.Count > 0) Then
+                            For Each alarmToUpdate As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In temporalDs.twksWSAnalyzerAlarms.Rows
+                                If alarmToUpdate.AlarmStatus Then
+                                    alarmToUpdate.AlarmStatus = False
+                                    alarmToUpdate.OKDateTime = Date.Now
+                                End If
+                            Next
+                            _myGlobal = _alarmsDelg.Update(Nothing, temporalDs)
+                        End If
                     End If
-                End If
 
-                wsAlarmsDs.AcceptChanges()
-                alarmsDelg.Save(dbConnection, wsAlarmsDs, alarmsDefintionTableDS)
-            End If
+                    wsAlarmsDs.AcceptChanges()
+                    alarmsDelg.Save(connection.SetDatos, wsAlarmsDs, alarmsDefintionTableDS)
+                End If
+            Catch
+                Throw
+            Finally
+                CloseConnection(connection)
+            End Try
         End Sub
 
         Public Sub AddNewAlarmState(ByVal alarmName As String)

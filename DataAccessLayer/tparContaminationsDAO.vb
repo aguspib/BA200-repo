@@ -248,7 +248,7 @@ Partial Public Class tparContaminationsDAO
             <ThreadStatic> Static InternalDictionary As New Dictionary(Of Integer, EnumerableRowCollection(Of ContaminationsDS.tparContaminationsRow))
 
             If contaminationsDataDS Is Nothing Then
-                Dim connection = GetSafeOpenDBConnection(Nothing)
+                Dim connection = GetSafeOpenDBConnection()
                 dbConnection = connection.SetDatos
                 If dbConnection Is Nothing Then
 
