@@ -952,7 +952,7 @@ Namespace Biosystems.Ax00.Core.Services
             Dim myAnalyzerSettingsRow As AnalyzerSettingsDS.tcfgAnalyzerSettingsRow
 
             Try
-                'DYNAMICBLDATETIME Setting
+                'BLDATETIME Setting
                 myAnalyzerSettingsRow = myAnalyzerSettingsDs.tcfgAnalyzerSettings.NewtcfgAnalyzerSettingsRow
                 With myAnalyzerSettingsRow
                     .AnalyzerID = _analyzer.ActiveAnalyzer
