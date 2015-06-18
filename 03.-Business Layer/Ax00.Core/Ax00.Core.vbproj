@@ -103,6 +103,7 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Entities\BaseLineEntity.vb" />
     <Compile Include="Entities\Enums\AnalyzerModelEnum.vb" />
     <Compile Include="Entities\BA200AnalyzerEntity.vb" />
     <Compile Include="Entities\BA400AnalyzerEntity.vb" />
@@ -128,6 +129,7 @@
     <Compile Include="Entities\WorkSession\Sorting\WSExecutionsSorter.vb" />
     <Compile Include="Services\AsyncService.vb" />
     <Compile Include="Services\Enums\BaseLineStepsEnum.vb" />
+    <Compile Include="Services\Interfaces\IBaseLine.vb" />
     <Compile Include="Services\Interfaces\IBaseLineService.vb" />
     <Compile Include="Services\Interfaces\IRotorChangeService.vb" />
     <Compile Include="Services\Interfaces\IWarmUpService.vb" />
