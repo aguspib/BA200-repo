@@ -27,8 +27,6 @@ Imports Biosystems.Ax00.Framework.CrossCutting
 Partial Public Class UiAx00MainMDI
     Implements IMainMDI
 
-
-
 #Region "Declarations"
 
     'AG 28/07/2010
@@ -196,7 +194,21 @@ Partial Public Class UiAx00MainMDI
 
 #Region "Fields"
 
-    Shared UiSATReportForm As Biosystems.Ax00.PresentationCOM.UiSATReportLoad = New Biosystems.Ax00.PresentationCOM.UiSATReportLoad
+    ''' <summary>
+    ''' Gets SATReportLoad form, if it is not created or is disposed (closed), then it creates a new one
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    ReadOnly Property UiSATReportForm As Biosystems.Ax00.PresentationCOM.UiSATReportLoad
+        Get
+            Static tempUiSATReportLoad As UiSATReportLoad
+
+            If tempUiSATReportLoad Is Nothing OrElse tempUiSATReportLoad.IsDisposed Then tempUiSATReportLoad = New UiSATReportLoad
+            Return tempUiSATReportLoad
+
+        End Get
+    End Property
 
     'TR 21/05/2012 Variable used to indicate if the user has pause the worksession.
     Private UserPauseWSAttribute As Boolean = False
@@ -629,7 +641,6 @@ Partial Public Class UiAx00MainMDI
 
     End Sub
 
-
     Private Sub WithShutToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles WithShutToolStripMenuItem.Click
 
         'If AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING Then  'dl 04/06/2012
@@ -643,7 +654,6 @@ Partial Public Class UiAx00MainMDI
         'End If
 
     End Sub
-
 
 
     Private Sub IAx00MainMDI_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
@@ -2238,6 +2248,9 @@ Partial Public Class UiAx00MainMDI
     Private Sub RestorePreviousDataToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RestorePreviousDataToolStripMenuItem.Click
         Try
             UiSATReportForm.RestorePointMode = True
+
+            UiSATReportForm.MainMDI = Me
+
             OpenMDIChildForm(UiSATReportForm)
 
         Catch ex As Exception
@@ -5027,6 +5040,15 @@ Partial Public Class UiAx00MainMDI
         End Try
 
         EnableButtonAndMenus(True)
+    End Sub
+
+    ''' <summary>
+    ''' Close Form
+    ''' </summary>
+    ''' <param name="FormToClose"></param>
+    ''' <remarks>The Form is not closed from this method on this class, it only exists because we need to implement the Interface IMainMDI</remarks>
+    Public Sub CloseForm(FormToClose As Biosystems.Ax00.PresentationCOM.BSBaseForm) Implements IMainMDI.CloseForm
+        'The Form is not closed from this method
     End Sub
 
 #End Region

@@ -27,7 +27,7 @@ Public Class UiSATReportLoad
 
 #Region "Properties"
 
-    Public Property MainMDI As IMainMDI = New DummyMainMDI
+    Public Property MainMDI As IMainMDI = New EmptyMainMDI
 
     Public Property RestorePointMode() As Boolean
         Get
@@ -214,17 +214,13 @@ Public Class UiSATReportLoad
                         Me.CreatingRestorePoint = True
                         ScreenWorkingProcess = True 'AG 08/11/2012 - inform this flag because the MDI requires it
                         Application.DoEvents() 'RH 16/11/2010
-
                         SATThread.Start()
 
-                        While Me.CreatingRestorePoint 'RH 16/11/2010
-                            MainMDI.InitializeMarqueeProgreesBar()
-                            Application.DoEvents()
-                            Threading.Thread.Sleep(100)
-                        End While
-                        MainMDI.StopMarqueeProgressBar()
+                        MarqueeProgressBarShowingPregoress(Me.CreatingRestorePoint)
 
                         SATThread.Join()
+
+
 
                         If Not SATReportCreated Then
                             Application.DoEvents()
@@ -258,14 +254,14 @@ Public Class UiSATReportLoad
                             Application.DoEvents() 'RH 16/11/2010
 
                             RestoreThread.Start()
-
-                            MainMDI.InitializeMarqueeProgreesBar()
-                            While Me.RestoringDB 'RH 16/11/2010
-                                Application.DoEvents()
-                                Dim waiter = Task.Delay(100)
-                                waiter.Wait()
-                            End While
-                            MainMDI.StopMarqueeProgressBar()
+                            MarqueeProgressBarShowingPregoress(Me.RestoringDB)
+                            'MainMDI.InitializeMarqueeProgreesBar()
+                            'While Me.RestoringDB 'RH 16/11/2010
+                            '    Application.DoEvents()
+                            '    Dim waiter = Task.Delay(100)
+                            '    waiter.Wait()
+                            'End While
+                            'MainMDI.StopMarqueeProgressBar()
 
                             RestoreThread.Join()
 
@@ -281,13 +277,13 @@ Public Class UiSATReportLoad
                                     ScreenWorkingProcess = True 'AG 08/11/2012 - inform this flag because the MDI requires it
 
                                     UpdateThread.Start()
-
-                                    While Me.UpdatingDB 'RH 16/11/2010
-                                        MainMDI.InitializeMarqueeProgreesBar()
-                                        Application.DoEvents()
-                                        Threading.Thread.Sleep(100)
-                                    End While
-                                    MainMDI.StopMarqueeProgressBar()
+                                    MarqueeProgressBarShowingPregoress(Me.UpdatingDB)
+                                    'While Me.UpdatingDB 'RH 16/11/2010
+                                    '    MainMDI.InitializeMarqueeProgreesBar()
+                                    '    Application.DoEvents()
+                                    '    Threading.Thread.Sleep(100)
+                                    'End While
+                                    'MainMDI.StopMarqueeProgressBar()
 
                                     UpdateThread.Join()
 
@@ -344,7 +340,17 @@ Public Class UiSATReportLoad
         Return myGlobal
     End Function
 
+    Private Sub MarqueeProgressBarShowingPregoress(ByRef FinishFlag As Boolean)
 
+        MainMDI.InitializeMarqueeProgreesBar()
+        While FinishFlag
+            Application.DoEvents()
+            Dim waiter = Task.Delay(100)
+            waiter.Wait()
+        End While
+        MainMDI.StopMarqueeProgressBar()
+
+    End Sub
 
     'Function 
 
@@ -554,16 +560,24 @@ Public Class UiSATReportLoad
                     Dim mySATVersion As String
                     Dim mySATInfo As String()
                     Dim mySATModel As String = String.Empty
+                    Dim mySWModel As String = String.Empty
                     myGlobal = SATReportUtilities.GetSATReportVersionAndModel(SATTempFolderPath)
 
                     If Not myGlobal.HasError And Not myGlobal Is Nothing Then
                         mySATInfo = CStr(myGlobal.SetDatos).Split(System.Convert.ToChar(vbCr))
                         If mySATInfo.Count > 0 Then
                             mySATVersion = mySATInfo(0).Trim
+                            'If AnalyzerController.Instance.Analyzer is not already created, we find Model Sw on Database 
+                            If AnalyzerController.Instance Is Nothing OrElse AnalyzerController.Instance.Analyzer Is Nothing OrElse String.IsNullOrEmpty(AnalyzerController.Instance.Analyzer.Model) Then
+                                mySWModel = Biosystems.Ax00.BL.UpdateVersion.DataBaseUpdateManagerDelegate.GetAnalyzerModel()
+                            Else
+                                mySWModel = AnalyzerController.Instance.Analyzer.Model
+                            End If
+
                             If mySATInfo.Count > 1 Then
                                 mySATModel = mySATInfo(1).Trim
 
-                                Select Case AnalyzerController.Instance.Analyzer.Model
+                                Select Case mySWModel
                                     Case AnalyzerModelEnum.A400.ToString
                                         'Check If SAT Model is A200
                                         If mySATModel = AnalyzerModelEnum.A200.ToString Then
@@ -571,32 +585,34 @@ Public Class UiSATReportLoad
                                             myGlobal.HasError = True
                                             myGlobal.ErrorCode = GlobalEnumerates.Messages._NONE.ToString
                                             'Todo: Dynamic Translate message acording to lenguage
-                                            myGlobal.ErrorMessage = "Report SAT file Model (" & mySATModel & ") different than current Model (" & AnalyzerController.Instance.Analyzer.Model & ")"
+                                            myGlobal.ErrorMessage = "Report SAT file Model (" & mySATModel & ") different than current Model (" & mySWModel & ")"
 
                                             GlobalBase.CreateLogActivity(myGlobal.ErrorMessage, Me.Name & " LoadSATReport ", EventLogEntryType.Warning, GetApplicationInfoSession().ActivateSystemLog)
 
                                             Exit Try
                                         End If
-                                    Case AnalyzerModelEnum.A200.ToString
-                                        If mySATModel <> AnalyzerController.Instance.Analyzer.Model Then
+                                    Case mySWModel
+                                        If mySATModel <> mySWModel Then
                                             'Incompatible Model, Not continue, diferent Models
                                             myGlobal.HasError = True
                                             myGlobal.ErrorCode = GlobalEnumerates.Messages.SAT_LOAD_REPORT_ERROR.ToString
                                             'Todo: Dynamic Translate message acording to lenguage
-                                            myGlobal.ErrorMessage = "Report SAT file Model (" & mySATModel & ") different than current Model (" & AnalyzerController.Instance.Analyzer.Model & ")"
+                                            myGlobal.ErrorMessage = "Report SAT file Model (" & mySATModel & ") different than current Model (" & mySWModel & ")"
 
                                             GlobalBase.CreateLogActivity(myGlobal.ErrorMessage, Me.Name & " LoadSATReport ", EventLogEntryType.Warning, GetApplicationInfoSession().ActivateSystemLog)
 
                                             Exit Try
                                         End If
+                                    Case Else
+                                        'If we don't know SW Model (unlikely because always we have a database to find it: normal DB or backup restored DB on software init) we bypass the SAT Model Check
                                 End Select
                             Else
-                                If AnalyzerController.Instance.Analyzer.Model <> AnalyzerModelEnum.A400.ToString Then
+                                If mySWModel <> AnalyzerModelEnum.A400.ToString Then
                                     'Incompatible Model, Not continue, diferent Models
                                     myGlobal.HasError = True
                                     myGlobal.ErrorCode = GlobalEnumerates.Messages.SAT_LOAD_REPORT_ERROR.ToString
                                     'Todo: Dynamic Translate message acording to lenguage
-                                    myGlobal.ErrorMessage = "Report SAT file Model (" & AnalyzerModelEnum.A400.ToString & ") different than current Model (" & AnalyzerController.Instance.Analyzer.Model & ")"
+                                    myGlobal.ErrorMessage = "Report SAT file Model (" & AnalyzerModelEnum.A400.ToString & ") different than current Model (" & mySWModel & ")"
 
                                     GlobalBase.CreateLogActivity(myGlobal.ErrorMessage, Me.Name & " LoadSATReport ", EventLogEntryType.Warning, GetApplicationInfoSession().ActivateSystemLog)
 
@@ -799,7 +815,7 @@ Public Class UiSATReportLoad
 
                 Dim DirList As String()
 
-                If AnalyzerController.Instance Is Nothing OrElse String.IsNullOrEmpty(AnalyzerController.Instance.Analyzer.Model) Then
+                If AnalyzerController.Instance.Analyzer Is Nothing OrElse String.IsNullOrEmpty(AnalyzerController.Instance.Analyzer.Model) Then
                     DirList = Directory.GetFiles(myRestoreDataPath, "*" & myZipExtension).Union(Directory.GetFiles(myRestoreDataPath, "*.*")).ToArray()
                 Else
                     DirList = Directory.GetFiles(myRestoreDataPath, "*" & myZipExtension).Union(Directory.GetFiles(myRestoreDataPath, "*." & AnalyzerController.Instance.Analyzer.Model)).ToArray()
@@ -1100,9 +1116,19 @@ Public Class UiSATReportLoad
 
                 'RH 07/02/2012 Insert a REPORTSAT_LOADED_WARN alarm in DB
                 Dim myWSAnalyzerAlarmDS As New WSAnalyzerAlarmsDS
+                Dim myActiveAnalyzerModel As String = String.Empty
+                Dim myActiveWorkSession As String = String.Empty
+
+                If AnalyzerController.Instance Is Nothing OrElse AnalyzerController.Instance.Analyzer Is Nothing OrElse String.IsNullOrEmpty(AnalyzerController.Instance.Analyzer.Model) Then
+                    myActiveAnalyzerModel = Biosystems.Ax00.BL.UpdateVersion.DataBaseUpdateManagerDelegate.GetAnalyzerModel()
+                Else
+                    myActiveAnalyzerModel = AnalyzerController.Instance.Analyzer.Model
+                    myActiveWorkSession = AnalyzerController.Instance.Analyzer.ActiveWorkSession
+                End If
+
                 myWSAnalyzerAlarmDS.twksWSAnalyzerAlarms.AddtwksWSAnalyzerAlarmsRow( _
-                        Alarms.REPORTSATLOADED_WARN.ToString(), AnalyzerController.Instance.Analyzer.ActiveAnalyzer, _
-                        DateTime.Now, 1, AnalyzerController.Instance.Analyzer.ActiveWorkSession, Nothing, True, Nothing) 'AG 24/07/2012 - This alarm is created with status TRUE not false as before 'False, DateTime.Now)
+                        Alarms.REPORTSATLOADED_WARN.ToString(), myActiveAnalyzerModel, _
+                        DateTime.Now, 1, myActiveWorkSession, Nothing, True, Nothing) 'AG 24/07/2012 - This alarm is created with status TRUE not false as before 'False, DateTime.Now)
 
                 Dim myWSAlarmDelegate As New WSAnalyzerAlarmsDelegate
                 myGlobal = myWSAlarmDelegate.Create(Nothing, myWSAnalyzerAlarmDS) 'AG 24/07/2012 - keep using Create, do not use Save, it is not necessary
@@ -1111,7 +1137,7 @@ Public Class UiSATReportLoad
 
             'SGM 03/05/2012
             '#REFACTORING
-            If AnalyzerController.Instance.Analyzer.ISEAnalyzer IsNot Nothing Then
+            If AnalyzerController.Instance IsNot Nothing AndAlso AnalyzerController.Instance.Analyzer IsNot Nothing AndAlso AnalyzerController.Instance.Analyzer.ISEAnalyzer IsNot Nothing Then
                 AnalyzerController.Instance.Analyzer.ISEAnalyzer.RefreshAllDatabaseInformation()
             End If
 
@@ -1136,7 +1162,7 @@ Public Class UiSATReportLoad
             ' XBC 04/07/2012 - Indicate Load Rsat END on Application LOG.
             GlobalBase.CreateLogActivity("LOAD RSAT END - Start Time: " & StartTime.ToLongTimeString, Name & ".bsOKButton_Click", _
                                        EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
-
+            'MainMDI.CloseForm(Me)
         End Try
     End Sub
 

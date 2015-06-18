@@ -1757,6 +1757,10 @@
       <Project>{24D4D868-1885-4710-A105-9095FE79A2FB}</Project>
       <Name>BSControls</Name>
     </ProjectReference>
+    <ProjectReference Include="..\UpdateVersion\UpdateVersion.vbproj">
+      <Project>{fbbae46c-213f-4ca1-ad81-b088480494ea}</Project>
+      <Name>UpdateVersion</Name>
+    </ProjectReference>
     <ProjectReference Include="..\WorkSession\WorkSession.vbproj">
       <Project>{A883608A-3D41-4339-9C2F-FEEA18BEFB68}</Project>
       <Name>WorkSession</Name>

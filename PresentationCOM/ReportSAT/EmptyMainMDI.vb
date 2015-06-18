@@ -1,6 +1,6 @@
 ﻿Imports System.Windows.Forms
 
-Public Class DummyMainMDI
+Public Class EmptyMainMDI
     Implements IMainMDI
 
     Public WriteOnly Property CurrentLanguage() As String Implements IMainMDI.CurrentLanguage
@@ -55,6 +55,12 @@ Public Class DummyMainMDI
 
     Public Sub OpenMonitorForm(ByRef FormToClose As Form, Optional ByVal pAutomaticProcessFlag As Boolean = False) Implements IMainMDI.OpenMonitorForm
 
+    End Sub
+
+    Public Sub CloseForm(FormToClose As Biosystems.Ax00.PresentationCOM.BSBaseForm) Implements IMainMDI.CloseForm
+        If FormToClose IsNot Nothing Then
+            FormToClose.Close()
+        End If
     End Sub
 
 End Class
