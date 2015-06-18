@@ -54,6 +54,16 @@ Namespace Biosystems.Ax00.Core.Services
             End Set
         End Property
 
+
+        Public Overrides Property Status As ServiceStatusEnum
+            Get
+                Return MyBase.Status
+            End Get
+            Set(value As ServiceStatusEnum)
+                MyBase.Status = value
+                If Status = ServiceStatusEnum.EndSuccess Then UpdateAnalyzerSettings()
+            End Set
+        End Property
 #End Region
 
 #Region "Attributes"
@@ -162,7 +172,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' <returns></returns>
         ''' <remarks></remarks>
         Public Function RecoverProcess() As Boolean Implements IBaseLineService.RecoverProcess
-            Try                
+            Try
                 _isInRecovering = True
                 '_analyzer.CurrentInstructionAction = InstructionActions.None 'AG 04/02/2015 BA-2246 (informed in the event of USB disconnection AnalyzerManager.ProcessUSBCableDisconnection)
                 InitializeRecover()
@@ -226,6 +236,9 @@ Namespace Biosystems.Ax00.Core.Services
                 Now < expirationTime
         End Function
 
+
+
+
 #End Region
 
 #Region "Private methods"
@@ -235,7 +248,7 @@ Namespace Biosystems.Ax00.Core.Services
             _forceEmptyAndFinalize = False
             _staticBaseLineFinished = False
             _dynamicBaseLineValid = False
-            _analyzer.ResetFLIGHT
+            _analyzer.ResetFLIGHT()
             _analyzer.DynamicBaselineInitializationFailures = 0
             _analyzer.CurrentInstructionAction = InstructionActions.None
             _alreadyFinalized = False
@@ -924,6 +937,38 @@ Namespace Biosystems.Ax00.Core.Services
             Else
                 ExecuteDynamicBaseLineEmptyStep()
             End If
+
+        End Sub
+
+        ''' <summary>
+        ''' Set DynamicBLDatetime setting in the DB, last datetime when the baselineservice was end sucessfully.
+        ''' Function called from status property always when we set  BaselineService.status = ServiceStatusEnum.EndSuccess. 
+        ''' </summary>
+        ''' <remarks>Created by MR: BA 2601 - 16/06/2015</remarks>
+        ''' 
+        Private Sub UpdateAnalyzerSettings()
+            Dim myGlobal As GlobalDataTO = Nothing
+            Dim myAnalyzerSettingsDs As New AnalyzerSettingsDS
+            Dim myAnalyzerSettingsRow As AnalyzerSettingsDS.tcfgAnalyzerSettingsRow
+
+            Try
+                'BLDATETIME Setting
+                myAnalyzerSettingsRow = myAnalyzerSettingsDs.tcfgAnalyzerSettings.NewtcfgAnalyzerSettingsRow
+                With myAnalyzerSettingsRow
+                    .AnalyzerID = _analyzer.ActiveAnalyzer
+                    .SettingID = AnalyzerSettingsEnum.DYNAMICBLDATETIME.ToString()
+                    .CurrentValue = Now.ToString(Globalization.CultureInfo.InvariantCulture)
+                End With
+                myAnalyzerSettingsDs.tcfgAnalyzerSettings.Rows.Add(myAnalyzerSettingsRow)
+
+                Dim myAnalyzerSettings As New AnalyzerSettingsDelegate
+                myGlobal = myAnalyzerSettings.Save(Nothing, _analyzer.ActiveAnalyzer, myAnalyzerSettingsDs, Nothing)
+                myAnalyzerSettings = Nothing
+            Catch ex As Exception
+                Throw ex
+            Finally
+                myAnalyzerSettingsDs = Nothing
+            End Try
 
         End Sub
 
