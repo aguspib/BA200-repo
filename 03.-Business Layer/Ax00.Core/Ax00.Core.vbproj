@@ -103,7 +103,7 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Entities\BaseLineEntity.vb" />
+    <Compile Include="Entities\BaseLineEntityExpiration.vb" />
     <Compile Include="Entities\Enums\AnalyzerModelEnum.vb" />
     <Compile Include="Entities\BA200AnalyzerEntity.vb" />
     <Compile Include="Entities\BA400AnalyzerEntity.vb" />
