@@ -997,7 +997,7 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                 If DataTableCache Is Nothing Then
                     DataTableCache = New DataTable
-                    connection = GetSafeOpenDBConnection(Nothing)
+                    connection = GetSafeOpenDBConnection()
                     If (connection.SetDatos Is Nothing) Then
                         Return ""
                     Else
@@ -1050,74 +1050,6 @@ Namespace Biosystems.Ax00.DAL.DAO
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-        Public Shared Function GetPredilutionModeForTest2(pTestID As Integer, pSampleType As String) As String
-
-
-
-
-
-            If pSampleType = String.Empty Then Return ""
-            Dim Query = String.Format("SELECT Top(1) b.predilutionmode " &
-                                        "FROM {2}.[dbo].[tparTestReagents] a, {2}.[dbo].[tpartestsamples] b " &
-                                          "where a.TestID = b.TestID and a.ReagentID = {0} and b.SampleType = '{1}'", pTestID, pSampleType, GlobalBase.DatabaseName) 'IT 11/06/2015 - BA-2613
-
-            Dim resultData As New GlobalDataTO
-            Dim connection = GetSafeOpenDBConnection(Nothing)
-            Try
-                If (connection.SetDatos Is Nothing) Then
-                    resultData.HasError = True
-                    resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
-                Else
-
-                    Dim dbCmd As New SqlClient.SqlCommand
-                    dbCmd.Connection = connection.SetDatos
-                    dbCmd.CommandText = Query
-                    Dim da As New SqlDataAdapter(dbCmd)
-                    Dim DT As New DataTable
-                    da.Fill(DT)
-
-                    If DT IsNot Nothing AndAlso DT.Rows.Count > 0 Then
-                        Dim result = TryCast(DT.Rows(0).Item(0), String) & ""
-                        Return result
-                    Else
-                        Return ""
-                    End If
-                End If
-
-            Catch ex As Exception
-                GlobalBase.CreateLogActivity(ex) '.Message, "tparTestSamplesDAO.UpdateNumOfControls", EventLogEntryType.Error, False)
-                Throw
-                'resultData.HasError = True
-                'resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
-                'resultData.ErrorMessage = ex.Message
-
-                'Dim myLogAcciones As New ApplicationLogManager()
-                'GlobalBase.CreateLogActivity(ex.Message, "tparTestSamplesDAO.UpdateNumOfControls", EventLogEntryType.Error, False)
-            Finally
-                If connection.SetDatos IsNot Nothing Then
-                    Try
-                        connection.SetDatos.Close()
-                    Catch : End Try
-                End If
-            End Try
-
-            Return ""
-
-
-        End Function
 #End Region
 
 #Region "Other Methods"
