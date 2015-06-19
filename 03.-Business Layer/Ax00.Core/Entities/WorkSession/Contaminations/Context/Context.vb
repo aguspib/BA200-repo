@@ -57,9 +57,9 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
                     If Steps(curStep) Is Nothing OrElse Steps(curStep)(curDispensing) Is Nothing Then Continue For
                     Dim dispensingToAsk = Steps(curStep)(curDispensing)
                     Dim responseFromDispense = dispensingToAsk.RequiredActionForDispensing(dispensing, curStep, curDispensing)
-                    If curStep = -1 AndAlso Steps(curStep)(1).R1ReagentID = 69 Then
-                        Dim a = 1
-                    End If
+                    'If curStep = -1 AndAlso Steps(curStep)(1).R1ReagentID = 69 Then
+                    '    Dim a = 1
+                    'End If
                     Select Case responseFromDispense.Action
 
                         Case IContaminationsAction.RequiredAction.Wash

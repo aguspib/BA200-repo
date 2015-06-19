@@ -33,7 +33,7 @@
 
         Function IsIndexValid(index As Integer) As Boolean
             Dim realIndex = ConvertToZeroBasedIndex(index)
-            Return realIndex < _internalList.Count And realIndex > 0
+            Return realIndex < _internalList.Count And realIndex >= 0
         End Function
 
         ''' <summary>
