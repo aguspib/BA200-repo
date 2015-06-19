@@ -1408,9 +1408,8 @@ Partial Public Class UiAx00MainMDI
                                         Dim myGlobal As GlobalDataTO
 
                                         'Dim myAnalyzerSettingsDelegate As New AnalyzerSettingsDelegate
-                                        myGlobal = myAnalyzerSettingsDelegate.GetAnalyzerSetting(Nothing, _
-                                                               AnalyzerIDAttribute, _
-                                                               GlobalEnumerates.AnalyzerSettingsEnum.WUPSTARTDATETIME.ToString())
+                                        myGlobal = myAnalyzerSettingsDelegate.GetAnalyzerSetting(AnalyzerIDAttribute, _
+                                                               GlobalEnumerates.AnalyzerSettingsEnum.WUPSTARTDATETIME).GetCompatibleGlobalDataTO()
 
                                         If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                                             myAnalyzerSettingsDS = DirectCast(myGlobal.SetDatos, AnalyzerSettingsDS)
@@ -2206,7 +2205,7 @@ Partial Public Class UiAx00MainMDI
             Dim barcodeSampleDisabled As Boolean
             Dim myAnalyzerSettingsDS As New AnalyzerSettingsDS
 
-            resultData = myAnalyzerSettings.GetAnalyzerSetting(Nothing, AnalyzerIDAttribute, GlobalEnumerates.AnalyzerSettingsEnum.REAGENT_BARCODE_DISABLED.ToString)
+            resultData = myAnalyzerSettings.GetAnalyzerSetting(AnalyzerIDAttribute, GlobalEnumerates.AnalyzerSettingsEnum.REAGENT_BARCODE_DISABLED).GetCompatibleGlobalDataTO()
             If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                 myAnalyzerSettingsDS = CType(resultData.SetDatos, AnalyzerSettingsDS)
                 If myAnalyzerSettingsDS.tcfgAnalyzerSettings.Rows.Count > 0 Then
@@ -2214,7 +2213,7 @@ Partial Public Class UiAx00MainMDI
                 End If
             End If
 
-            resultData = myAnalyzerSettingsDelegate.GetAnalyzerSetting(Nothing, AnalyzerIDAttribute, GlobalEnumerates.AnalyzerSettingsEnum.SAMPLE_BARCODE_DISABLED.ToString())
+            resultData = myAnalyzerSettingsDelegate.GetAnalyzerSetting(AnalyzerIDAttribute, GlobalEnumerates.AnalyzerSettingsEnum.SAMPLE_BARCODE_DISABLED).GetCompatibleGlobalDataTO()
             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                 myAnalyzerSettingsDS = CType(resultData.SetDatos, AnalyzerSettingsDS)
 

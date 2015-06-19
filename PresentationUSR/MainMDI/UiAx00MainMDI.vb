@@ -2605,9 +2605,8 @@ Partial Public Class UiAx00MainMDI
             Dim myDate As String = ""
             Dim WUPFullTime As Single
 
-            resultData = myAnalyzerSettingsDelegate.GetAnalyzerSetting(Nothing, _
-                                                                       AnalyzerIDAttribute, _
-                                                                       GlobalEnumerates.AnalyzerSettingsEnum.WUPSTARTDATETIME.ToString())
+            resultData = myAnalyzerSettingsDelegate.GetAnalyzerSetting(AnalyzerIDAttribute, _
+                                                                       GlobalEnumerates.AnalyzerSettingsEnum.WUPSTARTDATETIME).GetCompatibleGlobalDataTO()
 
             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                 myAnalyzerSettingsDS = DirectCast(resultData.SetDatos, AnalyzerSettingsDS)
@@ -2646,9 +2645,7 @@ Partial Public Class UiAx00MainMDI
                 End If
 
                 'Dim myAnalyzerSettings As New AnalyzerSettingsDelegate
-                resultData = myAnalyzerSettingsDelegate.GetAnalyzerSetting(Nothing, _
-                                                                           AnalyzerIDAttribute, _
-                                                                           GlobalEnumerates.AnalyzerSettingsEnum.WUPCOMPLETEFLAG.ToString())
+                resultData = myAnalyzerSettingsDelegate.GetAnalyzerSetting(AnalyzerIDAttribute, GlobalEnumerates.AnalyzerSettingsEnum.WUPCOMPLETEFLAG).GetCompatibleGlobalDataTO()
 
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     myAnalyzerSettingsDS = DirectCast(resultData.SetDatos, AnalyzerSettingsDS)
@@ -7085,7 +7082,7 @@ Partial Public Class UiAx00MainMDI
                 barcodeBeforeStart = CType(resultData.SetDatos, Boolean)
             End If
 
-            resultData = myAnalyzerSettings.GetAnalyzerSetting(Nothing, AnalyzerIDAttribute, GlobalEnumerates.AnalyzerSettingsEnum.REAGENT_BARCODE_DISABLED.ToString)
+            resultData = myAnalyzerSettings.GetAnalyzerSetting(AnalyzerIDAttribute, GlobalEnumerates.AnalyzerSettingsEnum.REAGENT_BARCODE_DISABLED).GetCompatibleGlobalDataTO()
             If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                 myAnalyzerSettingsDS = CType(resultData.SetDatos, AnalyzerSettingsDS)
                 If myAnalyzerSettingsDS.tcfgAnalyzerSettings.Rows.Count > 0 Then
@@ -7093,7 +7090,7 @@ Partial Public Class UiAx00MainMDI
                 End If
             End If
 
-            resultData = myAnalyzerSettingsDelegate.GetAnalyzerSetting(Nothing, AnalyzerIDAttribute, GlobalEnumerates.AnalyzerSettingsEnum.SAMPLE_BARCODE_DISABLED.ToString())
+            resultData = myAnalyzerSettingsDelegate.GetAnalyzerSetting(AnalyzerIDAttribute, GlobalEnumerates.AnalyzerSettingsEnum.SAMPLE_BARCODE_DISABLED).GetCompatibleGlobalDataTO()
             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                 myAnalyzerSettingsDS = CType(resultData.SetDatos, AnalyzerSettingsDS)
 

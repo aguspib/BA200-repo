@@ -2042,7 +2042,7 @@ Public Class UiConfigLIS
             Dim resultData As New GlobalDataTO
 
             Dim myAnalyzersDelegate As New AnalyzerSettingsDelegate
-            resultData = myAnalyzersDelegate.GetAnalyzerSetting(Nothing, UiAx00MainMDI.ActiveAnalyzer, AnalyzerSettingsEnum.SAMPLE_BARCODE_DISABLED.ToString)
+            resultData = myAnalyzersDelegate.GetAnalyzerSetting(UiAx00MainMDI.ActiveAnalyzer, AnalyzerSettingsEnum.SAMPLE_BARCODE_DISABLED).GetCompatibleGlobalDataTO()
             If Not resultData.HasError AndAlso resultData.SetDatos IsNot Nothing Then
                 Dim myAnalyzerSettingsDS As AnalyzerSettingsDS = CType(resultData.SetDatos, AnalyzerSettingsDS)
                 If myAnalyzerSettingsDS IsNot Nothing AndAlso myAnalyzerSettingsDS.tcfgAnalyzerSettings.Rows.Count > 0 Then

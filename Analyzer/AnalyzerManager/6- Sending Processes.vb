@@ -72,7 +72,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     'AG 24/10/2011 - When connection auto then portnameattribute = "", else portnameattribute = configured port name
                     Dim myAnalyzerSettingsDelegate As New AnalyzerSettingsDelegate
                     Dim myAnalyzerSettingsDS As New AnalyzerSettingsDS
-                    myGlobal = myAnalyzerSettingsDelegate.GetAnalyzerSetting(Nothing, AnalyzerIDAttribute, GlobalEnumerates.AnalyzerSettingsEnum.COMM_AUTO.ToString())
+                    myGlobal = myAnalyzerSettingsDelegate.GetAnalyzerSetting(AnalyzerIDAttribute, GlobalEnumerates.AnalyzerSettingsEnum.COMM_AUTO).GetCompatibleGlobalDataTO()
                     If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                         myAnalyzerSettingsDS = DirectCast(myGlobal.SetDatos, AnalyzerSettingsDS)
 
@@ -81,7 +81,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 PortNameAttribute = ""
                                 BaudsAttribute = ""
                             Else 'Manual port connect configured
-                                myGlobal = myAnalyzerSettingsDelegate.GetAnalyzerSetting(Nothing, AnalyzerIDAttribute, GlobalEnumerates.AnalyzerSettingsEnum.COMM_PORT.ToString())
+                                myGlobal = myAnalyzerSettingsDelegate.GetAnalyzerSetting(AnalyzerIDAttribute, GlobalEnumerates.AnalyzerSettingsEnum.COMM_PORT).GetCompatibleGlobalDataTO()
                                 If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                                     myAnalyzerSettingsDS = DirectCast(myGlobal.SetDatos, AnalyzerSettingsDS)
                                 End If

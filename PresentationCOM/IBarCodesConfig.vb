@@ -629,7 +629,7 @@ Public Class UiBarCodesConfig
             Dim myAnalyzerSettingsDS As New AnalyzerSettingsDS
             Dim myAnalyzerSettingsDelegate As New AnalyzerSettingsDelegate
 
-            resultData = myAnalyzerSettingsDelegate.GetAnalyzerSetting(Nothing, AnalyzerIDAttribute, GlobalEnumerates.AnalyzerSettingsEnum.REAGENT_BARCODE_DISABLED.ToString())
+            resultData = myAnalyzerSettingsDelegate.GetAnalyzerSetting(AnalyzerIDAttribute, GlobalEnumerates.AnalyzerSettingsEnum.REAGENT_BARCODE_DISABLED).GetCompatibleGlobalDataTO()
             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                 myAnalyzerSettingsDS = DirectCast(resultData.SetDatos, AnalyzerSettingsDS)
 
@@ -647,7 +647,7 @@ Public Class UiBarCodesConfig
             End If
 
             If (valuesOK) Then
-                resultData = myAnalyzerSettingsDelegate.GetAnalyzerSetting(Nothing, AnalyzerIDAttribute, GlobalEnumerates.AnalyzerSettingsEnum.SAMPLE_BARCODE_DISABLED.ToString())
+                resultData = myAnalyzerSettingsDelegate.GetAnalyzerSetting(AnalyzerIDAttribute, GlobalEnumerates.AnalyzerSettingsEnum.SAMPLE_BARCODE_DISABLED).GetCompatibleGlobalDataTO()
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     myAnalyzerSettingsDS = DirectCast(resultData.SetDatos, AnalyzerSettingsDS)
 

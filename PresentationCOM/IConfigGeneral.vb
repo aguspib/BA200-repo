@@ -508,7 +508,7 @@ Public Class UiConfigGeneral
             Dim myAnalyzerSettingsDelegate As New AnalyzerSettingsDelegate
             Dim myAnalyzerSettingsDS As New AnalyzerSettingsDS
 
-            resultData = myAnalyzerSettingsDelegate.GetAnalyzerSetting(Nothing, AnalyzerIDAttribute, AnalyzerSettingsEnum.COMM_PORT.ToString())
+            resultData = myAnalyzerSettingsDelegate.GetAnalyzerSetting(AnalyzerIDAttribute, AnalyzerSettingsEnum.COMM_PORT).GetCompatibleGlobalDataTO()
             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                 myAnalyzerSettingsDS = DirectCast(resultData.SetDatos, AnalyzerSettingsDS)
 
@@ -525,7 +525,7 @@ Public Class UiConfigGeneral
             End If
 
             If (Not resultData.HasError) Then
-                resultData = myAnalyzerSettingsDelegate.GetAnalyzerSetting(Nothing, AnalyzerIDAttribute, AnalyzerSettingsEnum.COMM_AUTO.ToString())
+                resultData = myAnalyzerSettingsDelegate.GetAnalyzerSetting(AnalyzerIDAttribute, AnalyzerSettingsEnum.COMM_AUTO).GetCompatibleGlobalDataTO()
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     myAnalyzerSettingsDS = DirectCast(resultData.SetDatos, AnalyzerSettingsDS)
 
@@ -544,7 +544,7 @@ Public Class UiConfigGeneral
             End If
 
             If (Not resultData.HasError) Then
-                resultData = myAnalyzerSettingsDelegate.GetAnalyzerSetting(Nothing, AnalyzerIDAttribute, AnalyzerSettingsEnum.COMM_SPEED.ToString())
+                resultData = myAnalyzerSettingsDelegate.GetAnalyzerSetting(AnalyzerIDAttribute, AnalyzerSettingsEnum.COMM_SPEED).GetCompatibleGlobalDataTO()
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     myAnalyzerSettingsDS = DirectCast(resultData.SetDatos, AnalyzerSettingsDS)
 
@@ -562,7 +562,7 @@ Public Class UiConfigGeneral
             End If
 
             If (Not resultData.HasError) Then
-                resultData = myAnalyzerSettingsDelegate.GetAnalyzerSetting(Nothing, AnalyzerIDAttribute, AnalyzerSettingsEnum.WATER_TANK.ToString())
+                resultData = myAnalyzerSettingsDelegate.GetAnalyzerSetting(AnalyzerIDAttribute, AnalyzerSettingsEnum.WATER_TANK).GetCompatibleGlobalDataTO()
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     myAnalyzerSettingsDS = DirectCast(resultData.SetDatos, AnalyzerSettingsDS)
 
@@ -581,7 +581,7 @@ Public Class UiConfigGeneral
             entryValueForExternalTankWaterCheck = bsExtWaterTankRadioButton.Checked 'AG 23/11/2011 - Remember the initial value
 
             If (Not resultData.HasError) Then
-                resultData = myAnalyzerSettingsDelegate.GetAnalyzerSetting(Nothing, AnalyzerIDAttribute, AnalyzerSettingsEnum.ALARM_DISABLED.ToString())
+                resultData = myAnalyzerSettingsDelegate.GetAnalyzerSetting(AnalyzerIDAttribute, AnalyzerSettingsEnum.ALARM_DISABLED).GetCompatibleGlobalDataTO()
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     myAnalyzerSettingsDS = DirectCast(resultData.SetDatos, AnalyzerSettingsDS)
 
@@ -600,7 +600,7 @@ Public Class UiConfigGeneral
 
             'SGM 24/02/2012 get the currently stored Port for manual connection
             If (Not resultData.HasError) Then
-                resultData = myAnalyzerSettingsDelegate.GetAnalyzerSetting(Nothing, AnalyzerIDAttribute, AnalyzerSettingsEnum.COMM_PORT.ToString())
+                resultData = myAnalyzerSettingsDelegate.GetAnalyzerSetting(AnalyzerIDAttribute, AnalyzerSettingsEnum.COMM_PORT).GetCompatibleGlobalDataTO()
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     myAnalyzerSettingsDS = DirectCast(resultData.SetDatos, AnalyzerSettingsDS)
 

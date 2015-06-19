@@ -1,4 +1,5 @@
 ﻿
+Imports System.Data.SqlClient
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.DAL.DAO
@@ -72,7 +73,9 @@ Namespace Biosystems.Ax00.BL
         ''' <remarks>
         ''' Created by: DL 21/07/2011
         ''' </remarks>
+        <Obsolete("Use typed version instead")>
         Public Function GetAnalyzerSetting(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pSettingID As String) As GlobalDataTO
+
             Dim resultData As New GlobalDataTO
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -98,6 +101,30 @@ Namespace Biosystems.Ax00.BL
             End Try
             Return resultData
         End Function
+
+        Public Function GetAnalyzerSetting(ByVal pAnalyzerID As String, ByVal pSettingID As GlobalEnumerates.AnalyzerSettingsEnum) As TypedGlobalDataTo(Of AnalyzerSettingsDS)
+            Dim connection As TypedGlobalDataTo(Of SqlConnection) = Nothing
+            Try
+                connection = GetSafeOpenDBConnection()
+                If (Not connection Is Nothing AndAlso Not connection.SetDatos Is Nothing) Then
+                    Dim myAnalyzerSettingsDAO As New tcfgAnalyzerSettingsDAO
+                    Dim resultData = myAnalyzerSettingsDAO.Read(connection.SetDatos, pAnalyzerID, pSettingID.ToString)
+                    Return New TypedGlobalDataTo(Of AnalyzerSettingsDS)() With {.SetDatos = TryCast(resultData.SetDatos, AnalyzerSettingsDS), .HasError = resultData.HasError}
+                Else
+                    Return New TypedGlobalDataTo(Of AnalyzerSettingsDS)() With {.HasError = True}
+                End If
+            Catch ex As Exception
+                Dim resultData = New TypedGlobalDataTo(Of AnalyzerSettingsDS)
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+                GlobalBase.CreateLogActivity(ex) '.Message, "AnalyzerSettingsDelegate.GetAnalyzerSetting", EventLogEntryType.Error, False)
+                Return resultData
+            Finally
+                CloseConnection(connection)
+            End Try
+        End Function
+
 
         ''' <summary>
         ''' Save values of Analyzer Communication Settings and Session Settings
