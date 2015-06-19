@@ -1380,6 +1380,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         resultData = myAnalyzerSettingsDelegate.ReadAll(dbConnection, AnalyzerIDAttribute)
                         If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                             myDS = CType(resultData.SetDatos, AnalyzerSettingsDS)
+
                             If myDS.tcfgAnalyzerSettings.Rows.Count = 0 Then
                                 'If not exists: Read the MasterData settings and create for AnalyzerIdAttribute
                                 resultData = myAnalyzerSettingsDelegate.ReadAll(dbConnection, "MasterData")
@@ -1398,6 +1399,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 End If
 
                             End If
+                            _myAnalyzerSettingsDs = myDS
                         End If
 
 

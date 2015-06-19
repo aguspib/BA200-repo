@@ -137,7 +137,10 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Property CanManageRetryAlarm As Boolean
         Property StartingRunningFirstTime As Boolean
         ReadOnly Property WashingIDRequired As Boolean
-
+        Property AnalyzerSettings As AnalyzerSettingsDS
+        Property AnalyzerSwParameters As ParametersDS
+        'Property AnalyzerSettings As AnalyzerSettingsDS.tcfgAnalyzerSettingsDataTable
+        'Property AnalyzerSwParameters As ParametersDS.tfmwSwParametersDataTable
 #End Region
 
 #Region "Events definition & methods"
@@ -153,6 +156,7 @@ Namespace Biosystems.Ax00.Core.Interfaces
 
         Event ReceivedStatusInformationEventHandler() 'BA-2143
         Event ProcessFlagEventHandler(ByVal pFlagCode As AnalyzerManagerFlags) 'BA-2143
+
 
         'EVENT WRAPPERS
         Sub ConnectionDoneReceptionEvent()

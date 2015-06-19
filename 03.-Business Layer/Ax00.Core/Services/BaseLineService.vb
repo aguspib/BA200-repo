@@ -956,7 +956,7 @@ Namespace Biosystems.Ax00.Core.Services
                 myAnalyzerSettingsRow = myAnalyzerSettingsDs.tcfgAnalyzerSettings.NewtcfgAnalyzerSettingsRow
                 With myAnalyzerSettingsRow
                     .AnalyzerID = _analyzer.ActiveAnalyzer
-                    .SettingID = AnalyzerSettingsEnum.DYNAMICBLDATETIME.ToString()
+                    .SettingID = AnalyzerSettingsEnum.BL_DATETIME.ToString()
                     .CurrentValue = Now.ToString(Globalization.CultureInfo.InvariantCulture)
                 End With
                 myAnalyzerSettingsDs.tcfgAnalyzerSettings.Rows.Add(myAnalyzerSettingsRow)
