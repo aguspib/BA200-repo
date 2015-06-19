@@ -295,7 +295,7 @@ Public Class UiAx00Login
     Private Function CallRestorePointScreen() As DialogResult
         Dim myResult As DialogResult
         Try
-            Dim myIRestPointUpdateProc As New UiRestPointUpdateProc
+            Dim myIRestPointUpdateProc As New UiSATReportLoad
             myIRestPointUpdateProc.AllowDrop = False 'TR 08/07/2013 -Set the allow Drop to false to avoid exception (bugTracking 1232)
             myIRestPointUpdateProc.RestorePointMode = True
             myResult = myIRestPointUpdateProc.ShowDialog()

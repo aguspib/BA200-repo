@@ -2007,7 +2007,7 @@ Partial Class UiPhotometryAdjustments
         SwiftPlotDiagram2.AxisY.VisibleInPanesSerializable = "-1"
         SwiftPlotDiagram2.AxisY.VisualRange.Auto = False
         SwiftPlotDiagram2.AxisY.VisualRange.AutoSideMargins = False
-        SwiftPlotDiagram2.AxisY.VisualRange.MaxValueSerializable = "9.8"
+        SwiftPlotDiagram2.AxisY.VisualRange.MaxValueSerializable = "8.3"
         SwiftPlotDiagram2.AxisY.VisualRange.MinValueSerializable = "0"
         SwiftPlotDiagram2.AxisY.VisualRange.SideMarginsValue = 0.0R
         SwiftPlotDiagram2.AxisY.WholeRange.AutoSideMargins = True
@@ -2412,7 +2412,7 @@ Partial Class UiPhotometryAdjustments
         'CurrentOperationTimer
         '
         '
-        'IPhotometryAdjustments
+        'UiPhotometryAdjustments
         '
         Me.AcceptButton = Me.BsExitButton
         Me.Appearance.BackColor = System.Drawing.Color.Gainsboro

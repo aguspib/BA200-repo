@@ -25,6 +25,7 @@ Imports Biosystems.Ax00.App.PresentationLayerListener.Requests
 Imports Biosystems.Ax00.Framework.CrossCutting
 
 Partial Public Class UiAx00MainMDI
+    Implements IMainMDI
 
 #Region "Declarations"
 
@@ -193,6 +194,21 @@ Partial Public Class UiAx00MainMDI
 
 #Region "Fields"
 
+    ''' <summary>
+    ''' Gets SATReportLoad form, if it is not created or is disposed (closed), then it creates a new one
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    ReadOnly Property UiSATReportForm As Biosystems.Ax00.PresentationCOM.UiSATReportLoad
+        Get
+            Static tempUiSATReportLoad As UiSATReportLoad
+
+            If tempUiSATReportLoad Is Nothing OrElse tempUiSATReportLoad.IsDisposed Then tempUiSATReportLoad = New UiSATReportLoad
+            Return tempUiSATReportLoad
+
+        End Get
+    End Property
 
     'TR 21/05/2012 Variable used to indicate if the user has pause the worksession.
     Private UserPauseWSAttribute As Boolean = False
@@ -230,7 +246,7 @@ Partial Public Class UiAx00MainMDI
 
 #Region "LIS declarations & fields"
 
-    Private WithEvents MDILISManager As ESWrapper 'AG 25/02/2013
+    Public WithEvents MDILISManager As ESWrapper 'AG 25/02/2013
 
     Public ProcessingLISManagerObject As Boolean = False
     ' AG 25/03/2013 - TRUE: Indicates the LIS manager is not available, FALSE: Indicates available. Used when MDI is loading and when MDI is closing
@@ -358,7 +374,7 @@ Partial Public Class UiAx00MainMDI
         End Get
     End Property
 
-    Public WriteOnly Property CurrentLanguage() As String
+    Public WriteOnly Property CurrentLanguage() As String Implements IMainMDI.CurrentLanguage
         Set(ByVal value As String)
             If Not String.Equals(CurrentLanguageAttribute, value) Then
                 CurrentLanguageAttribute = value
@@ -559,7 +575,25 @@ Partial Public Class UiAx00MainMDI
         End Set
     End Property
 
+    Public Property ErrorStatusLabelDisplayStyle() As ToolStripItemDisplayStyle Implements IMainMDI.ErrorStatusLabelDisplayStyle
+        Get
+            Return ErrorStatusLabel.DisplayStyle
+        End Get
+        Set(ByVal value As ToolStripItemDisplayStyle)
+            ErrorStatusLabel.DisplayStyle = value
+        End Set
+    End Property
 
+
+    Public Property ErrorStatusLabelText() As String Implements IMainMDI.ErrorStatusLabelText
+        Get
+            Return ErrorStatusLabel.Text
+        End Get
+        Set(ByVal value As String)
+            ErrorStatusLabel.Text = value
+        End Set
+    End Property
+    
 
 #End Region
 
@@ -607,7 +641,6 @@ Partial Public Class UiAx00MainMDI
 
     End Sub
 
-
     Private Sub WithShutToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles WithShutToolStripMenuItem.Click
 
         'If AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING Then  'dl 04/06/2012
@@ -621,7 +654,6 @@ Partial Public Class UiAx00MainMDI
         'End If
 
     End Sub
-
 
 
     Private Sub IAx00MainMDI_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
@@ -2194,13 +2226,18 @@ Partial Public Class UiAx00MainMDI
     ''' <remarks></remarks>
     Private Sub LoadSATReportToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles LoadSATReportToolStripMenuItem.Click
         Try
-            UiSATReportLoad.RestorePointMode = False
-            OpenMDIChildForm(UiSATReportLoad)
+            UiSATReportForm.RestorePointMode = False
+
+            UiSATReportForm.MainMDI = Me
+
+            OpenMDIChildForm(UiSATReportForm)
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadSATReportToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".LoadSATReportToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
+
+
 
     ''' <summary>
     ''' Open the Restore Previous Data screen
@@ -2210,8 +2247,12 @@ Partial Public Class UiAx00MainMDI
     ''' <remarks></remarks>
     Private Sub RestorePreviousDataToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RestorePreviousDataToolStripMenuItem.Click
         Try
-            UiSATReportLoad.RestorePointMode = True
-            OpenMDIChildForm(UiSATReportLoad)
+            UiSATReportForm.RestorePointMode = True
+
+            UiSATReportForm.MainMDI = Me
+
+            OpenMDIChildForm(UiSATReportForm)
+
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".RestorePreviousDataToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".RestorePreviousDataToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -5001,6 +5042,15 @@ Partial Public Class UiAx00MainMDI
         EnableButtonAndMenus(True)
     End Sub
 
+    ''' <summary>
+    ''' Close Form
+    ''' </summary>
+    ''' <param name="FormToClose"></param>
+    ''' <remarks>The Form is not closed from this method on this class, it only exists because we need to implement the Interface IMainMDI</remarks>
+    Public Sub CloseForm(FormToClose As Biosystems.Ax00.PresentationCOM.BSBaseForm) Implements IMainMDI.CloseForm
+        'The Form is not closed from this method
+    End Sub
+
 #End Region
 
 #Region "Private methods"
@@ -7486,7 +7536,7 @@ Partial Public Class UiAx00MainMDI
     '''              AG 15/07/2013 - Add pForceValue parameter
     '''              IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
-    Public Sub EnableButtonAndMenus(ByVal pEnabled As Boolean, Optional ByVal pForceValue As Boolean = False)
+    Public Sub EnableButtonAndMenus(ByVal pEnabled As Boolean, Optional ByVal pForceValue As Boolean = False) Implements IMainMDI.EnableButtonAndMenus
         Try
             ''SA 07/09/2012
             'If processingConnect Then pEnabled = False
@@ -8027,7 +8077,7 @@ Partial Public Class UiAx00MainMDI
     '''                                           NEWAddWorkSession is TRUE, call new version of function AddWorkSession
     '''              XB 27/05/2014 - BT #1638 ==> ISE_NEW_TEST_LOCKED msg is anulled
     ''' </remarks>
-    Public Sub OpenMonitorForm(ByRef FormToClose As Form, Optional ByVal pAutomaticProcessFlag As Boolean = False)
+    Public Sub OpenMonitorForm(ByRef FormToClose As Form, Optional ByVal pAutomaticProcessFlag As Boolean = False) Implements IMainMDI.OpenMonitorForm
         Try
             'TRAZA DE APERTURA DE FORMULARIO
             If Not FormToClose Is Nothing Then
@@ -8329,7 +8379,7 @@ Partial Public Class UiAx00MainMDI
     ''' AG 25/10/2011 - add parameter pStartingApplication for differentiate when the application is started and when a reportsat or restore point is loaded
     ''' IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
-    Public Sub InitializeAnalyzerAndWorkSession(ByVal pStartingApplication As Boolean)
+    Public Sub InitializeAnalyzerAndWorkSession(ByVal pStartingApplication As Boolean) Implements IMainMDI.InitializeAnalyzerAndWorkSession
         Try
             ''Get the current application Language to set the correspondent attribute and prepare all menu options
             ''Dim currentLanguageGlobal As New GlobalBase
@@ -8414,7 +8464,8 @@ Partial Public Class UiAx00MainMDI
     ''' <remarks>
     ''' Created by DL 14/03/2011
     ''' </remarks>
-    Public Sub InitializeMarqueeProgreesBar()
+    Public Sub InitializeMarqueeProgreesBar() Implements IMainMDI.InitializeMarqueeProgreesBar
+
 
         If Not ProgressBar.Visible Then
             ProgressBar.Visible = True
@@ -8429,7 +8480,9 @@ Partial Public Class UiAx00MainMDI
     End Sub
 
 
-    Public Sub StopMarqueeProgressBar()
+    Public Sub StopMarqueeProgressBar() Implements IMainMDI.StopMarqueeProgressBar
+
+
         ProgressBar.Visible = False
         ProgressBar.Properties.Stopped = True
         'ProgressBar.Refresh()
@@ -8445,7 +8498,7 @@ Partial Public Class UiAx00MainMDI
     ''' Created by:  AG 01/06/2010 
     ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
-    Public Sub SetActionButtonsEnableProperty(ByVal pEnable As Boolean)
+    Public Sub SetActionButtonsEnableProperty(ByVal pEnable As Boolean) Implements IMainMDI.SetActionButtonsEnableProperty
         Try
 
             If pEnable Then
@@ -9322,6 +9375,7 @@ Partial Public Class UiAx00MainMDI
         End Try
         Return toReturnValue
     End Function
+
 
 #End Region
 
@@ -10307,6 +10361,20 @@ Partial Public Class UiAx00MainMDI
             ShowMessage(Name & ".ProcessAutomaticOrdersDownload ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
+
+
+    Public Sub ReleaseLIS() Implements IMainMDI.ReleaseLIS
+
+        If Not (MDILISManager.Status.ToUpperInvariant = LISStatus.released.ToString.ToUpperInvariant) Then
+            'Release the LIS manager object
+            InvokeReleaseLIS(False)
+            InvokeReleaseFromConfigSettings = True
+        Else
+            ' Re-create Channel with new change settings
+            InvokeCreateLISChannel()
+        End If
+    End Sub
+    
 
 #End Region
 
@@ -11576,5 +11644,6 @@ Partial Public Class UiAx00MainMDI
         Next
         Return Nothing
     End Function
+
 
 End Class

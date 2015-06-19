@@ -146,7 +146,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' </summary>
         ''' <returns> String with the active Analyzer Model name on the Database</returns>
         ''' <remarks>Created by:  AC 11/06/2015 ==> BA-2594 </remarks>
-        Private Function GetAnalyzerModel() As String
+        Public Shared Function GetAnalyzerModel() As String
             Dim Model As String = ""
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -168,7 +168,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                         End If
                     End If
                 End If
-              
+
             Catch ex As Exception
                 GlobalBase.CreateLogActivity(ex)
                 Throw

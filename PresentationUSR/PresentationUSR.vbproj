@@ -515,12 +515,6 @@
     <Compile Include="TestForms\Form_XBC.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ISATReportLoad.designer.vb">
-      <DependentUpon>ISATReportLoad.vb</DependentUpon>
-    </Compile>
-    <Compile Include="ISATReportLoad.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="IProgCalculatedTest.Designer.vb">
       <DependentUpon>IProgCalculatedTest.vb</DependentUpon>
     </Compile>
@@ -847,10 +841,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="TestForms\Form_XBC.resx">
       <DependentUpon>Form_XBC.vb</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ISATReportLoad.resx">
-      <DependentUpon>ISATReportLoad.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="IProgCalculatedTest.resx">
