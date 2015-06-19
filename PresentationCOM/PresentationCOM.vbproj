@@ -168,7 +168,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppComLayer.vb" />
-    <Compile Include="ReportSAT\DummyMainMDI.vb" />
+    <Compile Include="ReportSAT\EmptyMainMDI.vb" />
     <Compile Include="ReportSAT\IMainMDI.vb" />
     <Compile Include="ReportSAT\ISATReportLoad.designer.vb">
       <DependentUpon>ISATReportLoad.vb</DependentUpon>
