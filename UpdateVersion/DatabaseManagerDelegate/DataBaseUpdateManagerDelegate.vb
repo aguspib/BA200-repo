@@ -795,7 +795,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                             update = True
                         ElseIf (myDbVersion > appDataBaseVersion) Then
                             'This case is an error because CUSTOMER DB Version is greather than FACTORY DB Version
-                            'Throw New Exception(GlobalEnumerates.Messages.INVALID_DATABASE_VERSION.ToString())
+                            Throw New Exception(GlobalEnumerates.Messages.INVALID_DATABASE_VERSION.ToString())
                         End If
                     End If
                 End If
