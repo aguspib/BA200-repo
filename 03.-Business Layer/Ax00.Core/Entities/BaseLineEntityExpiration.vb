@@ -33,14 +33,14 @@ Public Class BaseLineEntityExpiration
 
 
 
-            Dim AnalyzerID2 As String = ""
-            resultData = myAnalyzerSettingsDs.GetAnalyzerSetting(Nothing, _
-                                                                       _analyzer.ActiveAnalyzer.ToString(), _
-                                                                       GlobalEnumerates.AnalyzerSettingsEnum.DYNAMIC_BL_LIFETIME.ToString())
-            Dim dtr As ParametersDS.tfmwSwParametersRow() = CType(_analyzer.AnalyzerSwParameters.tfmwSwParameters.Select("ParameterName= '" & GlobalEnumerates.AnalyzerSettingsEnum.BL_DATETIME.ToString() & "' "), ParametersDS.tfmwSwParametersRow())
-            If dtr.Length > 1 Then
+            'Dim AnalyzerID2 As String = ""
+            'resultData = myAnalyzerSettingsDs.GetAnalyzerSetting(Nothing, _
+            '                                                           _analyzer.ActiveAnalyzer.ToString(), _
+            '                                                           GlobalEnumerates.AnalyzerSettingsEnum.DYNAMIC_BL_LIFETIME.ToString())
+            'Dim dtr As ParametersDS.tfmwSwParametersRow() = CType(_analyzer.AnalyzerSwParameters.tfmwSwParameters.Select("ParameterName= '" & GlobalEnumerates.AnalyzerSettingsEnum.BL_DATETIME.ToString() & "' "), ParametersDS.tfmwSwParametersRow())
+            'If dtr.Length > 1 Then
 
-            End If
+            'End If
             ' Dim dtR As DataRow = _analyzer.ActiveAnalyzer
 
             'If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
