@@ -123,6 +123,12 @@ Namespace Biosystems.Ax00.Core.Entities
         'This flag is required because if reconnect in running sometimes firmware sends 2 STATUS instruction, depends on the cycle machine moment where the connection is received
         Private runningConnectionPollSnSent As Boolean = False
         Private startingRunningFirstTimeAttr As Boolean = False
+
+
+        'MR BA-2601 18/06/2015
+        Private _myAnalyzerSettingsDs As New AnalyzerSettingsDS
+        Private _myParametersDS As New ParametersDS
+
 #End Region
 
 #Region "Attributes definition"
@@ -1525,6 +1531,44 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
+
+        'Public Property AnalyzerSettings As AnalyzerSettingsDS.tcfgAnalyzerSettingsDataTable Implements IAnalyzerManager.AnalyzerSettings
+        '    Get
+        '        Return _myAnalyzerSettingsDs.tcfgAnalyzerSettings
+        '    End Get
+        '    Set(value As AnalyzerSettingsDS.tcfgAnalyzerSettingsDataTable)
+        '        _myAnalyzerSettingsDs.tcfgAnalyzerSettings = value
+        '    End Set
+        'End Property
+
+        'Public Property AnalyzerSwParameters As ParametersDS.tfmwSwParametersDataTable Implements IAnalyzerManager.AnalyzerSwParameters
+        '    Get
+        '        Return _myParametersDS.tfmwSwParameters
+        '    End Get
+        '    Set(value As ParametersDS.tfmwSwParametersDataTable)
+        '        _myParametersDS.tfmwSwParameters = value
+        '    End Set
+        'End Property
+
+
+        Public Property AnalyzerSettings As AnalyzerSettingsDS Implements IAnalyzerManager.AnalyzerSettings
+            Get
+                Return _myAnalyzerSettingsDs
+            End Get
+            Set(value As AnalyzerSettingsDS)
+                _myAnalyzerSettingsDs = value
+            End Set
+        End Property
+
+        Public Property AnalyzerSwParameters As ParametersDS Implements IAnalyzerManager.AnalyzerSwParameters
+            Get
+                Return _myParametersDS
+            End Get
+            Set(value As ParametersDS)
+                _myParametersDS = value
+            End Set
+        End Property
+
 #End Region
 
 #Region "Events definition & methods"
@@ -2172,6 +2216,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         Dim myGlobal = mySwParameterDelegate.ReadByAnalyzerModel(dbConnection, myAnalyzerModel)
                         If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                             Dim myParamDs = CType(myGlobal.SetDatos, ParametersDS)
+                            _myParametersDS = myParamDs
 
                             Dim myQRes = (From a As ParametersDS.tfmwSwParametersRow In myParamDs.tfmwSwParameters _
                                       Where a.ParameterName = SwParameters.CONTAMIN_REAGENT_PERSIS.ToString Select a).ToList
@@ -2242,8 +2287,6 @@ Namespace Biosystems.Ax00.Core.Entities
                         If (Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing) Then
                             myClassFieldLimitsDS = DirectCast(myGlobal.SetDatos, FieldLimitsDS)
                         End If
-
-
                     End If
                 End If
 
