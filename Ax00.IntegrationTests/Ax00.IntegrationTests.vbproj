@@ -131,6 +131,10 @@
       <Project>{5d65020c-c2d7-4ac3-b557-223fc290e526}</Project>
       <Name>Global</Name>
     </ProjectReference>
+    <ProjectReference Include="..\BussinessLayer\ConfigurationSetup\ConfigurationSetup.vbproj">
+      <Project>{bc01c1bd-2a93-4002-b74f-7bcf9793309d}</Project>
+      <Name>ConfigurationSetup</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Calculations\Calculations.vbproj">
       <Project>{053cffd3-17b1-4a95-af8c-ff4b6de08809}</Project>
       <Name>Calculations</Name>

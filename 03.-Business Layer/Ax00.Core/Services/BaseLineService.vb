@@ -16,13 +16,13 @@ Namespace Biosystems.Ax00.Core.Services
         Implements IBaseLineService
 
 #Region "Constructors"
-        Sub New(analyzer As IAnalyzerManager)
-            MyBase.New(analyzer)
+        Sub New(analyzer As IAnalyzerManager, myFlagsDelg As IAnalyzerManagerFlagsDelegate)
+            MyBase.New(analyzer, myFlagsDelg)
             _currentStep = BaseLineStepsEnum.NotStarted
         End Sub
 
-        Sub New(analyzer As IAnalyzerManager, ByVal pauseWhenReadErrors As Boolean)
-            Me.New(analyzer)
+        Sub New(analyzer As IAnalyzerManager, ByVal pauseWhenReadErrors As Boolean, myFlagsDelg As IAnalyzerManagerFlagsDelegate)
+            Me.New(analyzer, myFlagsDelg)
             _pauseWhenReadErrors = pauseWhenReadErrors
         End Sub
 

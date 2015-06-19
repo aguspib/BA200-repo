@@ -1,4 +1,5 @@
-﻿Imports Biosystems.Ax00.Core.Interfaces
+﻿Imports Biosystems.Ax00.BL
+Imports Biosystems.Ax00.Core.Interfaces
 Imports NUnit.Framework
 Imports Biosystems.Ax00.Core.Services
 Imports Biosystems.Ax00.Global.GlobalEnumerates
@@ -16,7 +17,7 @@ Namespace Biosystems.Ax00.Core.Services.Tests
         ''' </summary>
         <Test()> Public Sub StartService_DefaultStartupMode_StatusRunningOK()
             Dim analyzerManager = Mock.Create(Of IAnalyzerManager)()
-            Dim sut = New WarmUpService(analyzerManager)
+            Dim sut = New WarmUpService(analyzerManager, Mock.Create(Of IAnalyzerManagerFlagsDelegate))
 
             'scenario
             analyzerManager.Connected = True
@@ -46,6 +47,9 @@ Namespace Biosystems.Ax00.Core.Services.Tests
         <Test()> Public Sub RecoverProcessTest()
             Assert.Inconclusive("TODO")
         End Sub
+
+
+
     End Class
 
 

@@ -1,4 +1,5 @@
-﻿Imports Biosystems.Ax00.Core.Interfaces
+﻿Imports Biosystems.Ax00.BL
+Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Core.Services
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Global.AlarmEnumerates
@@ -21,7 +22,7 @@ Namespace Biosystems.Ax00.Core.Services.Tests
             analyzerManager.Connected = True
             analyzerManager.AnalyzerStatus = AnalyzerManagerStatus.STANDBY
 
-            Dim baseLineService = New BaseLineService(analyzerManager)
+            Dim baseLineService = New BaseLineService(analyzerManager, Mock.Create(Of IAnalyzerManagerFlagsDelegate))
             Dim output = baseLineService.StartService()
 
             'result
@@ -47,7 +48,7 @@ Namespace Biosystems.Ax00.Core.Services.Tests
             analyzerManager.AnalyzerStatus = AnalyzerManagerStatus.STANDBY
             analyzerManager.Alarms.Add(Alarms.BASELINE_INIT_ERR)
 
-            Dim baseLineService = New BaseLineService(analyzerManager)
+            Dim baseLineService = New BaseLineService(analyzerManager, Mock.Create(Of IAnalyzerManagerFlagsDelegate))
             Dim output = baseLineService.StartService()
 
             'result
@@ -67,7 +68,7 @@ Namespace Biosystems.Ax00.Core.Services.Tests
             analyzerManager.Connected = False
             analyzerManager.AnalyzerStatus = AnalyzerManagerStatus.STANDBY
 
-            Dim baseLineService = New BaseLineService(analyzerManager)
+            Dim baseLineService = New BaseLineService(analyzerManager, Mock.Create(Of IAnalyzerManagerFlagsDelegate))
             Dim output = baseLineService.StartService()
 
             'result
@@ -85,7 +86,7 @@ Namespace Biosystems.Ax00.Core.Services.Tests
             analyzerManager.Connected = True
             analyzerManager.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING
 
-            Dim baseLineService = New BaseLineService(analyzerManager)
+            Dim baseLineService = New BaseLineService(analyzerManager, Mock.Create(Of IAnalyzerManagerFlagsDelegate))
             Dim output = baseLineService.StartService()
 
             'result
@@ -103,7 +104,7 @@ Namespace Biosystems.Ax00.Core.Services.Tests
             analyzerManager.Connected = True
             analyzerManager.AnalyzerStatus = AnalyzerManagerStatus.STANDBY
 
-            Dim baseLineService = New BaseLineService(analyzerManager)
+            Dim baseLineService = New BaseLineService(analyzerManager, Mock.Create(Of IAnalyzerManagerFlagsDelegate))
 
             'result
             Assert.AreEqual(baseLineService.CurrentStep(), BaseLineStepsEnum.NotStarted)

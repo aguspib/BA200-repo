@@ -10,7 +10,8 @@ Namespace Biosystems.Ax00.Core.Services
     Public MustInherit Class AsyncService
         Implements IAsyncService
 
-        Sub New(analyzer As IAnalyzerManager)
+        Sub New(analyzer As IAnalyzerManager, myFlagsDelg As IAnalyzerManagerFlagsDelegate)
+            _myFlagsDelg = myFlagsDelg
             _analyzer = analyzer
         End Sub
 
@@ -18,6 +19,7 @@ Namespace Biosystems.Ax00.Core.Services
 
         Protected WithEvents _analyzer As IAnalyzerManager
         Protected _status As ServiceStatusEnum = ServiceStatusEnum.NotYetStarted
+        Private _myFlagsDelg As IAnalyzerManagerFlagsDelegate
 
 #End Region
 
@@ -68,6 +70,10 @@ Namespace Biosystems.Ax00.Core.Services
 
 #End Region
 
+#Region "Dependency injection for UT"
+
+#End Region
+
 #Region "Public Methods"
 
         Public MustOverride Function StartService() As Boolean Implements IAsyncService.StartService
@@ -81,8 +87,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' <remarks></remarks>
         Public Sub UpdateFlags(ByVal flagsDs As AnalyzerManagerFlagsDS) Implements IAsyncService.UpdateFlags
             If flagsDs.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
-                Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
-                myFlagsDelg.Update(Nothing, flagsDs)
+                _myFlagsDelg.Update(Nothing, flagsDs)
             End If
         End Sub
 

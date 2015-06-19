@@ -2,6 +2,7 @@
 Imports Biosystems.Ax00.Core.Services
 Imports Biosystems.Ax00.App.PresentationLayerListener
 Imports Biosystems.Ax00.App.PresentationLayerListener.Requests
+Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Core.Entities.Enums
 Imports Biosystems.Ax00.Core.Services.Interfaces
 
@@ -101,7 +102,7 @@ Namespace Biosystems.Ax00.App
             Try
 
                 If (_warmUpServices Is Nothing) Then
-                    _warmUpServices = New WarmUpService(Analyzer)
+                    _warmUpServices = New WarmUpService(Analyzer, New AnalyzerManagerFlagsDelegate)
                 End If
                 _warmUpServices.ReuseContentsForBaseLineCallback = reuseRotorContentsForFlight 'reuseRotorContentsForFlight
                 If (Not isInRecovering) Then
@@ -182,7 +183,7 @@ Namespace Biosystems.Ax00.App
         Public Function ChangeRotorStartProcess() As Boolean
             Try
                 If (_rotorChangeServices Is Nothing) Then
-                    _rotorChangeServices = New RotorChangeService(Analyzer, _warmUpServices)
+                    _rotorChangeServices = New RotorChangeService(Analyzer, _warmUpServices, New AnalyzerManagerFlagsDelegate)
                 End If
 
                 Return _rotorChangeServices.StartService()
@@ -203,7 +204,7 @@ Namespace Biosystems.Ax00.App
         Public Function ChangeRotorContinueProcess(ByVal isInRecovering As Boolean) As Boolean
             Try
                 If (_rotorChangeServices Is Nothing) Then
-                    _rotorChangeServices = New RotorChangeService(Analyzer, _warmUpServices)
+                    _rotorChangeServices = New RotorChangeService(Analyzer, _warmUpServices, New AnalyzerManagerFlagsDelegate)
                 End If
 
                 If (Not isInRecovering) Then
@@ -226,7 +227,7 @@ Namespace Biosystems.Ax00.App
         Public Sub ChangeRotorRepeatDynamicBaseLineReadStep()
             Try
                 If (_rotorChangeServices Is Nothing) Then
-                    _rotorChangeServices = New RotorChangeService(Analyzer, _warmUpServices)
+                    _rotorChangeServices = New RotorChangeService(Analyzer, _warmUpServices, New AnalyzerManagerFlagsDelegate)
                 End If
 
                 _rotorChangeServices.RepeatDynamicBaseLineReadStep()
@@ -245,7 +246,7 @@ Namespace Biosystems.Ax00.App
         Public Sub ChangeRotorFinalizeProcess()
             Try
                 If (_rotorChangeServices Is Nothing) Then
-                    _rotorChangeServices = New RotorChangeService(Analyzer, _warmUpServices)
+                    _rotorChangeServices = New RotorChangeService(Analyzer, _warmUpServices, New AnalyzerManagerFlagsDelegate)
                 End If
 
                 _rotorChangeServices.EmptyAndFinalizeProcess()

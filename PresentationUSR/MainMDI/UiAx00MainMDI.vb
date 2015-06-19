@@ -7274,6 +7274,7 @@ Partial Public Class UiAx00MainMDI
                 SetAutomateProcessStatusValue(LISautomateProcessSteps.notStarted)
                 OpenMonitorForm(Nothing) 'AG 25/07/2013
                 'AG 24/07/2013
+
             Else
 
                 If Not String.Equals(processingBeforeRunning, "2") Then

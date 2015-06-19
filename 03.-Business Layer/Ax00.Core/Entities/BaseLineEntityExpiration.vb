@@ -33,9 +33,8 @@ Public Class BaseLineEntityExpiration
         Try
 
             Dim AnalyzerID As String = ""
-            resultData = myAnalyzerSettingsDelegate.GetAnalyzerSetting(Nothing, _
-                                                                       AnalyzerID, _
-                                                                       GlobalEnumerates.AnalyzerSettingsEnum.DYNAMICBLDATETIME.ToString())
+            resultData = myAnalyzerSettingsDelegate.GetAnalyzerSetting(AnalyzerID, _
+                                                                       GlobalEnumerates.AnalyzerSettingsEnum.DYNAMICBLDATETIME).GetCompatibleGlobalDataTO()
 
             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                 myAnalyzerSettingsDs = DirectCast(resultData.SetDatos, AnalyzerSettingsDS)
