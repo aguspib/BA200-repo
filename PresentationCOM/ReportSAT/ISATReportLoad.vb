@@ -920,7 +920,7 @@ Public Class UiSATReportLoad
                 '.Filter = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SATReport_File", CurrentLanguage) & "|*" & zipExtension & "|" & myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SATReport_FilesAll", CurrentLanguage) & "|*.*"
                 'Take Model extensio or All files
                 .Filter = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SATReport_File", CurrentLanguage) & " (*." & AnalyzerController.Instance.Analyzer.Model & ")|*." & AnalyzerController.Instance.Analyzer.Model _
-                          & "|" & myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SATReport_FilesAll", CurrentLanguage) & " (*.*)|*.*"
+                          & "|" & myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_AllFiles", CurrentLanguage) & " (*.*)|*.*"
                 .FilterIndex = 0
                 .DefaultExt = "." & AnalyzerController.Instance.Analyzer.Model
                 .CheckFileExists = True
