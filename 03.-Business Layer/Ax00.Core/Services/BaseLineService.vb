@@ -952,24 +952,45 @@ Namespace Biosystems.Ax00.Core.Services
             Dim myAnalyzerSettingsRow As AnalyzerSettingsDS.tcfgAnalyzerSettingsRow
 
             Try
+                Dim currentNow = Now
+
                 'BLDATETIME Setting
                 myAnalyzerSettingsRow = myAnalyzerSettingsDs.tcfgAnalyzerSettings.NewtcfgAnalyzerSettingsRow
                 With myAnalyzerSettingsRow
                     .AnalyzerID = _analyzer.ActiveAnalyzer
                     .SettingID = AnalyzerSettingsEnum.BL_DATETIME.ToString()
-                    .CurrentValue = Now.ToString(Globalization.CultureInfo.InvariantCulture)
+
+                    .CurrentValue = currentNow.ToString(Globalization.CultureInfo.InvariantCulture)
                 End With
                 myAnalyzerSettingsDs.tcfgAnalyzerSettings.Rows.Add(myAnalyzerSettingsRow)
 
                 Dim myAnalyzerSettings As New AnalyzerSettingsDelegate
+                UpdateAnalyzerSettingsDsCache(currentNow)
                 myGlobal = myAnalyzerSettings.Save(Nothing, _analyzer.ActiveAnalyzer, myAnalyzerSettingsDs, Nothing)
-                myAnalyzerSettings = Nothing
+
             Catch ex As Exception
                 Throw ex
-            Finally
-                myAnalyzerSettingsDs = Nothing
             End Try
 
+        End Sub
+
+        ''' <summary>
+        ''' Function to update the datetime in our dataset in cache of Analyzer object to avoid go to the DB to refresh the dates.
+        ''' </summary>
+        ''' <param name="newBLDate">Datetime of last baseline process.</param>
+        ''' <remarks></remarks>
+        Private Sub UpdateAnalyzerSettingsDsCache(newBLDate As DateTime)
+
+            Dim dtrAnalyzerSettings = (From a As AnalyzerSettingsDS.tcfgAnalyzerSettingsRow In _analyzer.AnalyzerSettings.tcfgAnalyzerSettings
+                                           Where a.SettingID = GlobalEnumerates.AnalyzerSettingsEnum.BL_DATETIME.ToString()).First()
+
+            If dtrAnalyzerSettings IsNot Nothing Then
+
+                If Not dtrAnalyzerSettings.IsCurrentValueNull() Then
+                    dtrAnalyzerSettings.CurrentValue = newBLDate.ToString(Globalization.CultureInfo.InvariantCulture)
+                    _analyzer.AnalyzerSettings.AcceptChanges()
+                End If
+            End If
         End Sub
 
 #End Region

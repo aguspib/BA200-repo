@@ -18,10 +18,10 @@ Module PreBuildBatch
                 Throw New Exception("There was an error generating the TaskList file.")
             End If
 
-            Dim appDirect = AppDomain.CurrentDomain.BaseDirectory()
-            Dim piStart = New ProcessStartInfo(appDirect + "CommAx00.exe", " /REGSERVER")
-            piStart.CreateNoWindow = True
-            Process.Start(piStart)
+            'Dim appDirect = AppDomain.CurrentDomain.BaseDirectory()
+            'Dim piStart = New ProcessStartInfo(appDirect + "CommAx00.exe", " /REGSERVER")
+            'piStart.CreateNoWindow = True
+            'Process.Start(piStart)
 
         Catch ex As Exception
             MessageBox.Show(ex.Message, "Important Message")

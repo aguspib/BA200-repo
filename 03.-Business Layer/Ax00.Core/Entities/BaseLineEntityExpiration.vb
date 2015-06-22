@@ -1,4 +1,5 @@
-﻿Imports Biosystems.Ax00.Global
+﻿Imports System.Diagnostics.Eventing.Reader
+Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Core.Entities
 Imports Biosystems.Ax00.BL
@@ -18,72 +19,52 @@ Public Class BaseLineEntityExpiration
 
     Public ReadOnly Property IsBlExpired As Boolean Implements IBaseLineExpiration.IsBlExpired
         Get
-            IsBlExpired = getBLParameter()
+            Try
+                IsBlExpired = GetBlParameter()
+            Catch e As Exception
+                CreateLogActivity(e)
+                Return True
+            End Try
         End Get
     End Property
 
-    Public Function getBLParameter() As Boolean
-        Dim resultData As GlobalDataTO = Nothing
-        Dim myAnalyzerSettingsDs As New AnalyzerSettingsDelegate
-        'Dim myDate As String = ""
-        'Dim dtStartDate As Date
-        Dim result As Boolean = False
-        Try
+    ''' <summary>
+    ''' Function called from IsBlExpired get property, this function check if the BaseLine need to be recalculated.
+    ''' </summary>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Private Function GetBlParameter() As Boolean
+        Dim result = False
+        Dim mins As Integer = -1
+        Dim datelastBl As Date
+        Dim datelastBLstr As String = String.Empty
+
+            Dim dtrSwParam = (From a As ParametersDS.tfmwSwParametersRow In _analyzer.AnalyzerSwParameters.tfmwSwParameters
+                              Where a.ParameterName = GlobalEnumerates.SwParameters.BL_LIFETIME.ToString()).First()
+
+            If dtrSwParam IsNot Nothing Then mins = CInt(dtrSwParam.ValueNumeric)
+
+            Dim dtrAnalyzerSettings = (From a As AnalyzerSettingsDS.tcfgAnalyzerSettingsRow In _analyzer.AnalyzerSettings.tcfgAnalyzerSettings
+                                       Where a.SettingID = GlobalEnumerates.AnalyzerSettingsEnum.BL_DATETIME.ToString()).First()
 
 
+            If dtrAnalyzerSettings IsNot Nothing Then
 
+                If Not dtrAnalyzerSettings.IsCurrentValueNull() Then
+                    datelastBLstr = CStr(dtrAnalyzerSettings.CurrentValue)
+                End If
 
-            'Dim AnalyzerID2 As String = ""
-            'resultData = myAnalyzerSettingsDs.GetAnalyzerSetting(Nothing, _
-            '                                                           _analyzer.ActiveAnalyzer.ToString(), _
-            '                                                           GlobalEnumerates.AnalyzerSettingsEnum.DYNAMIC_BL_LIFETIME.ToString())
-            'Dim dtr As ParametersDS.tfmwSwParametersRow() = CType(_analyzer.AnalyzerSwParameters.tfmwSwParameters.Select("ParameterName= '" & GlobalEnumerates.AnalyzerSettingsEnum.BL_DATETIME.ToString() & "' "), ParametersDS.tfmwSwParametersRow())
-            'If dtr.Length > 1 Then
-
-            'End If
-            ' Dim dtR As DataRow = _analyzer.ActiveAnalyzer
-
-            'If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-            '    myAnalyzerSettingsDs = DirectCast(resultData.SetDatos, AnalyzerSettingsDS)
-
-            '    If (myAnalyzerSettingsDs.tcfgAnalyzerSettings.Rows.Count = 1) Then
-            '        myDate = myAnalyzerSettingsDs.tcfgAnalyzerSettings.First.CurrentValue
-            '    End If
-
-            '    If String.Equals(myDate.Trim, String.Empty) Then
-            '        'Is Empty for this analyzer, create new BL. 
-            '        result = True
-            '    Else
-            '        dtStartDate = DateTime.Parse(myAnalyzerSettingsDs.tcfgAnalyzerSettings.First.CurrentValue, CultureInfo.InvariantCulture)
-
-            '        ' Read W-Up full time configuration
-            '        resultData = SwParametersDelegate.ReadNumValueByParameterName(_analyzer, GlobalEnumerates.SwParameters.WUPFULLTIME.ToString, _analyzer.a)
-
-            '        If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-            '            'Dim myParametersDS As New ParametersDS
-            '            Dim myParametersDS As ParametersDS
-
-            '            myParametersDS = CType(resultData.SetDatos, ParametersDS)
-            '            'Dim myList As New List(Of ParametersDS.tfmwSwParametersRow)
-            '            Dim myList As List(Of ParametersDS.tfmwSwParametersRow)
-
-            '            myList = (From a As ParametersDS.tfmwSwParametersRow In myParametersDS.tfmwSwParameters _
-            '                      Where String.Equals(a.ParameterName, GlobalEnumerates.SwParameters.WUPFULLTIME.ToString) _
-            '                      Select a).ToList
-
-            '            If myList.Count > 0 Then WUPFullTime = myList(0).ValueNumeric
-            '        End If
-            'End If
-
-        Catch ex As Exception
-            Throw ex
-        Finally
-            'myAnalyzerSettingsDs = Nothing
-        End Try
+                If datelastBLstr.Equals(String.Empty) Then
+                    result = True
+                Else
+                    datelastBl = DateTime.Parse(dtrAnalyzerSettings.CurrentValue, CultureInfo.InvariantCulture)
+                    If DateDiff(DateInterval.Minute, datelastBl, Now) > mins Then
+                        result = True
+                    End If
+                End If
+            End If
         Return result
     End Function
-
-
 
     'Public Sub CreationAlarm(ByRef alarm As AlarmEnumerates.Alarms) Implements IBaseLine.CreationAlarm
     '    Dim myGlobal As New GlobalDataTO
@@ -104,13 +85,5 @@ Public Class BaseLineEntityExpiration
     '        Throw ex
     '    End Try
     'End Sub
-
-
-
-
-
-
-
-
 
 End Class
