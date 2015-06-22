@@ -591,7 +591,7 @@ Public Class UiSATReportLoad
 
                                             Exit Try
                                         End If
-                                    Case mySWModel
+                                    Case AnalyzerModelEnum.A200.ToString
                                         If mySATModel <> mySWModel Then
                                             'Incompatible Model, Not continue, diferent Models
                                             myGlobal.HasError = True
@@ -673,7 +673,6 @@ Public Class UiSATReportLoad
 
         Return myGlobal
     End Function
-
 
     ''' <summary>
     ''' Check if the OK button can be enabled or not depending the instrument conection and status
