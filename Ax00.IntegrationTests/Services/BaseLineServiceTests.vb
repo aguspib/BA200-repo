@@ -7,6 +7,10 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
 Imports NUnit.Framework
 Imports Telerik.JustMock
+Imports Telerik.JustMock.Helpers
+Imports System.Data
+Imports System.Globalization
+Imports Biosystems.Ax00.Types.AnalyzerSettingsDS
 
 Namespace Biosystems.Ax00.Core.Services.Tests
 
@@ -43,23 +47,43 @@ Namespace Biosystems.Ax00.Core.Services.Tests
             'We finish the washing process
             Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.Washing) = "END"
 
+            'We perform the Static Base Line Step:
             Analyzer.ThrowStatusEvent()
             NUnit.Framework.Assert.AreEqual(BLService.CurrentStep, BaseLineStepsEnum.StaticBaseLine)
-
             Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine) = "END"
 
+            'We perform the Dynamic Base Line Fill Step:
             Analyzer.ThrowStatusEvent()
             NUnit.Framework.Assert.AreEqual(BLService.CurrentStep, BaseLineStepsEnum.DynamicBaseLineFill)
 
-            _mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill) = "END"
+            'We mmake our Analyzer manager mock finish filling the mocked rotor:
+            Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill) = "END"
+
+            'We do the dynamic baseline read
+            Analyzer.ThrowStatusEvent()
+            NUnit.Framework.Assert.AreEqual(BLService.CurrentStep, BaseLineStepsEnum.DynamicBaseLineRead)
+            Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read) = "END"
 
             Analyzer.ThrowStatusEvent()
-            NUnit.Framework.Assert.AreEqual(BLService.CurrentStep, BaseLineStepsEnum.DynamicBaseLineFill)
-
+            NUnit.Framework.Assert.AreEqual(BLService.CurrentStep, BaseLineStepsEnum.DynamicBaseLineEmpty)
+            Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty) = "END"
 
             Analyzer.ThrowStatusEvent()
-            NUnit.Framework.Assert.AreEqual(BLService.CurrentStep, BaseLineStepsEnum.DynamicBaseLineFill)
+            NUnit.Framework.Assert.AreEqual(BLService.CurrentStep, BaseLineStepsEnum.Finalize)
 
+
+            Const DateTimePrecission As Integer = 10 'in seconds
+            'newBLDate.ToString(Globalization.CultureInfo.InvariantCulture)
+            Dim setting = (From A In Analyzer.AnalyzerSettings.tcfgAnalyzerSettings Where A.AnalyzerID = Analyzer.ActiveAnalyzer And A.SettingID = GlobalEnumerates.AnalyzerSettingsEnum.BL_DATETIME.ToString()).First()
+
+            Dim mydate As DateTime = Now
+            If DateTime.TryParse(setting.CurrentValue, CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, mydate) Then
+                If mydate < Now.AddSeconds(-DateTimePrecission) OrElse mydate > Now.AddSeconds(DateTimePrecission) Then
+                    NUnit.Framework.Assert.Fail(String.Format("Baseline date was not properly calcaulted, or process took more than {0} seconds.", DateTimePrecission))
+                End If
+            End If
+
+            NUnit.Framework.Assert.Pass("Test passed as expected!")
         End Sub
 
         Shared BLService As BaseLineService
@@ -71,7 +95,11 @@ Namespace Biosystems.Ax00.Core.Services.Tests
 
             'Initialize Base line service:
             BLService = New BaseLineService(Analyzer, Mock.Create(Of IAnalyzerManagerFlagsDelegate))
+
+            'Dependency injection of mocks:
             BLService.ReactRotorCRUD = Mock.Create(Of IAnalyzerSettingCRUD(Of AnalyzerReactionsRotorDS))()
+            BLService.AnalyzerSettingsSaver = AddressOf SaverMock
+
 
             'Initialize and set Analyzer settings:
             Analyzer.Connected = True
@@ -91,6 +119,11 @@ Namespace Biosystems.Ax00.Core.Services.Tests
                 Returns(New GlobalDataTO With {.HasError = False})
 
         End Sub
+
+        Public Shared Function SaverMock(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String,
+                                         ByVal pAnalyzerSettings As AnalyzerSettingsDS, ByVal pSessionSettings As UserSettingDS) As GlobalDataTO
+            Return New GlobalDataTO With {.HasError = False}
+        End Function
 
         Private ReadOnly Property Analyzer As ISuperAnalyzer
             Get
@@ -139,14 +172,29 @@ Namespace Biosystems.Ax00.Core.Services.Tests
                     Mock.Arrange(Function() _analyzer.BaseLineTypeForCalculations()).Returns(GlobalEnumerates.BaseLineType.DYNAMIC)
 
 
-
-                    'This is the SessionFlag property setter mock:
-                    Mock.Arrange(Sub() _analyzer.SessionFlag(Arg.IsAny(Of GlobalEnumerates.AnalyzerManagerFlags)) = Arg.Matches(Of String)(Function(param As String) True)).DoInstead(
+                    Mock.Arrange(Sub() _analyzer.SessionFlag(Arg.IsAny(Of GlobalEnumerates.AnalyzerManagerFlags)) = Arg.AnyString).DoInstead(
                         Sub(param As GlobalEnumerates.AnalyzerManagerFlags, value As String)
                             _mySessionFlags(param.ToString) = value
                         End Sub)
 
+                    Mock.Arrange(Function() _analyzer.ActiveAnalyzer).Returns("BA35-01234567890")
 
+                    'AnalyzerSettingsDS
+                    Static settings As AnalyzerSettingsDS
+                    If settings Is Nothing Then
+                        settings = New AnalyzerSettingsDS
+
+                        Dim row As AnalyzerSettingsDS.tcfgAnalyzerSettingsRow = settings.tcfgAnalyzerSettings.NewRow
+                        row.AnalyzerID = _analyzer.ActiveAnalyzer
+                        row.SettingID = GlobalEnumerates.AnalyzerSettingsEnum.BL_DATETIME.ToString()
+                        row.CurrentValue = Now.ToString
+                        settings.tcfgAnalyzerSettings.Rows.Add(row)
+                        Mock.Arrange(Function() _analyzer.AnalyzerSettings).Returns(
+                            Function() As AnalyzerSettingsDS
+                                Return settings
+                            End Function)
+
+                    End If
 
 
                 End If

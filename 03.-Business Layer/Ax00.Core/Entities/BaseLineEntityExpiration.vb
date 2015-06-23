@@ -47,7 +47,6 @@ Public Class BaseLineEntityExpiration
             Dim dtrAnalyzerSettings = (From a As AnalyzerSettingsDS.tcfgAnalyzerSettingsRow In _analyzer.AnalyzerSettings.tcfgAnalyzerSettings
                                        Where a.SettingID = GlobalEnumerates.AnalyzerSettingsEnum.BL_DATETIME.ToString()).First()
 
-
             If dtrAnalyzerSettings IsNot Nothing Then
 
                 If Not dtrAnalyzerSettings.IsCurrentValueNull() Then
@@ -65,7 +64,5 @@ Public Class BaseLineEntityExpiration
             End If
         Return result
     End Function
-
-
 
 End Class

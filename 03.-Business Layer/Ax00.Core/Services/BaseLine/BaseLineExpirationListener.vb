@@ -1,4 +1,5 @@
 ﻿Imports System.ComponentModel
+Imports System.Threading
 Imports System.Timers
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Core.Entities
@@ -20,7 +21,7 @@ Namespace Biosystems.Ax00.Core.Services.BaseLine
             Dim T As New Threading.Thread(AddressOf Listening)
             T.IsBackground = True
             T.Start()
-
+            T.Priority = ThreadPriority.Lowest
         End Sub
 
 

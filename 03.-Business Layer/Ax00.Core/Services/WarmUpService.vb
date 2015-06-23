@@ -443,8 +443,7 @@ Namespace Biosystems.Ax00.Core.Services
             End With
             myAnalyzerSettingsDs.tcfgAnalyzerSettings.Rows.Add(myAnalyzerSettingsRow)
 
-            Dim myAnalyzerSettings As New AnalyzerSettingsDelegate
-            myGlobalDataTo = myAnalyzerSettings.Save(Nothing, _analyzer.ActiveAnalyzer, myAnalyzerSettingsDs, Nothing)
+            myGlobalDataTo = AnalyzerSettingsDelegate.Save(Nothing, _analyzer.ActiveAnalyzer, myAnalyzerSettingsDs, Nothing)
 
             wupManeuversFinishFlag = True
 
@@ -553,8 +552,7 @@ Namespace Biosystems.Ax00.Core.Services
                     End With
                     myAnalyzerSettingsDs.tcfgAnalyzerSettings.Rows.Add(myAnalyzerSettingsRow)
 
-                    Dim myAnalyzerSettings As New AnalyzerSettingsDelegate
-                    myGlobal = myAnalyzerSettings.Save(Nothing, _analyzer.ActiveAnalyzer, myAnalyzerSettingsDs, Nothing)
+                    myGlobal = AnalyzerSettingsDelegate.Save(Nothing, _analyzer.ActiveAnalyzer, myAnalyzerSettingsDs, Nothing)
 
                 End If
 

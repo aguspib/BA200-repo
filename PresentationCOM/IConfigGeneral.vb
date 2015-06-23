@@ -1168,9 +1168,8 @@ Public Class UiConfigGeneral
             End If
 
             Dim resultData As New GlobalDataTO
-            Dim myAnalyzerSettings As New AnalyzerSettingsDelegate
 
-            resultData = myAnalyzerSettings.Save(Nothing, AnalyzerIDAttribute, myAnalyzerSettingsDS, sessionSettings)
+            resultData = AnalyzerSettingsDelegate.Save(Nothing, AnalyzerIDAttribute, myAnalyzerSettingsDS, sessionSettings)
             'resultData = myAnalyzersDelegate.SaveUserSettings(Nothing, commConfigData, sessionSettings)
 
             'TR 28/10/2011 -Validate if the sound is on then Desactivate. if the value for bsAlarmSoundDisabledCheckbox has change for false to true.

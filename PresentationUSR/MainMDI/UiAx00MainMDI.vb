@@ -6607,8 +6607,7 @@ Partial Public Class UiAx00MainMDI
                 End With
                 myAnalyzerSettingsDS.tcfgAnalyzerSettings.Rows.Add(myAnalyzerSettingsRow)
 
-                Dim myAnalyzerSettings As New AnalyzerSettingsDelegate
-                myGlobal = myAnalyzerSettings.Save(Nothing, AnalyzerIDAttribute, myAnalyzerSettingsDS, Nothing)
+                myGlobal = AnalyzerSettingsDelegate.Save(Nothing, AnalyzerIDAttribute, myAnalyzerSettingsDS, Nothing)
 
             End If
 
@@ -8656,8 +8655,7 @@ Partial Public Class UiAx00MainMDI
                 End With
                 myAnalyzerSettingsDS.tcfgAnalyzerSettings.Rows.Add(myAnalyzerSettingsRow)
 
-                Dim myAnalyzerSettings As New AnalyzerSettingsDelegate
-                resultData = myAnalyzerSettings.Save(Nothing, AnalyzerIDAttribute, myAnalyzerSettingsDS, Nothing)
+                resultData = AnalyzerSettingsDelegate.Save(Nothing, AnalyzerIDAttribute, myAnalyzerSettingsDS, Nothing)
 
                 If Not resultData.HasError Then
                     'Update UI
@@ -8702,8 +8700,7 @@ Partial Public Class UiAx00MainMDI
                 End With
                 myAnalyzerSettingsDS.tcfgAnalyzerSettings.Rows.Add(myAnalyzerSettingsRow)
 
-                Dim myAnalyzerSettings As New AnalyzerSettingsDelegate
-                resultData = myAnalyzerSettings.Save(Nothing, AnalyzerIDAttribute, myAnalyzerSettingsDS, Nothing)
+                resultData = AnalyzerSettingsDelegate.Save(Nothing, AnalyzerIDAttribute, myAnalyzerSettingsDS, Nothing)
 
                 If Not resultData.HasError Then
                     'Update UI

@@ -329,7 +329,8 @@ Namespace Biosystems.Ax00.Core.Services
                      BaseLineStepsEnum.DynamicBaseLineFill,
                      BaseLineStepsEnum.DynamicBaseLineEmpty,
                      BaseLineStepsEnum.CheckPreviousAlarms,
-                     BaseLineStepsEnum.DynamicBaseLineRead
+                     BaseLineStepsEnum.DynamicBaseLineRead,
+                     BaseLineStepsEnum.Finalize
 
                     ValidateProcess()
             End Select
@@ -621,6 +622,10 @@ Namespace Biosystems.Ax00.Core.Services
         Public ReactRotorStatusSerializer As IReactionsRotorStatusSerializer
         Public BaselineValuesDeleter As IWSBLinesDelegateValuesDeleter
 
+
+        'Public Shared Function Save(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pAnalyzerSettings As AnalyzerSettingsDS, ByVal pSessionSettings As UserSettingDS) As GlobalDataTO
+        Public AnalyzerSettingsSaver As Func(Of SqlClient.SqlConnection, String, AnalyzerSettingsDS, UserSettingDS, GlobalDataTO)
+
         Private Sub SetAllInjectedDependencies()
 
             If ReactRotorCRUD Is Nothing Then
@@ -628,6 +633,7 @@ Namespace Biosystems.Ax00.Core.Services
                 ReactRotorCRUD = instance
                 ReactRotorStatusSerializer = instance
                 BaselineValuesDeleter = New WSBLinesDelegate
+                AnalyzerSettingsSaver = AddressOf AnalyzerSettingsDelegate.Save
             End If
 
         End Sub
@@ -963,26 +969,21 @@ Namespace Biosystems.Ax00.Core.Services
             Dim myAnalyzerSettingsDs As New AnalyzerSettingsDS
             Dim myAnalyzerSettingsRow As AnalyzerSettingsDS.tcfgAnalyzerSettingsRow
 
-            Try
-                Dim currentNow = Now
+            Dim currentNow = Now
 
-                'BLDATETIME Setting
-                myAnalyzerSettingsRow = myAnalyzerSettingsDs.tcfgAnalyzerSettings.NewtcfgAnalyzerSettingsRow
-                With myAnalyzerSettingsRow
-                    .AnalyzerID = _analyzer.ActiveAnalyzer
-                    .SettingID = AnalyzerSettingsEnum.BL_DATETIME.ToString()
+            'BLDATETIME Setting
+            myAnalyzerSettingsRow = myAnalyzerSettingsDs.tcfgAnalyzerSettings.NewtcfgAnalyzerSettingsRow
+            With myAnalyzerSettingsRow
+                .AnalyzerID = _analyzer.ActiveAnalyzer
+                .SettingID = AnalyzerSettingsEnum.BL_DATETIME.ToString()
 
-                    .CurrentValue = currentNow.ToString(Globalization.CultureInfo.InvariantCulture)
-                End With
-                myAnalyzerSettingsDs.tcfgAnalyzerSettings.Rows.Add(myAnalyzerSettingsRow)
+                .CurrentValue = currentNow.ToString(Globalization.CultureInfo.InvariantCulture)
+            End With
+            myAnalyzerSettingsDs.tcfgAnalyzerSettings.Rows.Add(myAnalyzerSettingsRow)
 
-                Dim myAnalyzerSettings As New AnalyzerSettingsDelegate
-                UpdateAnalyzerSettingsDsCache(currentNow)
-                myGlobal = myAnalyzerSettings.Save(Nothing, _analyzer.ActiveAnalyzer, myAnalyzerSettingsDs, Nothing)
+            UpdateAnalyzerSettingsDsCache(currentNow)
+            myGlobal = AnalyzerSettingsSaver(Nothing, _analyzer.ActiveAnalyzer, myAnalyzerSettingsDs, Nothing) 'AnalyzerSettingsDelegate.Save(Nothing, _analyzer.ActiveAnalyzer, myAnalyzerSettingsDs, Nothing)
 
-            Catch ex As Exception
-                Throw ex
-            End Try
 
         End Sub
 
