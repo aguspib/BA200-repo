@@ -128,6 +128,7 @@
     <Compile Include="Entities\WorkSession\WSExecutionCreator.vb" />
     <Compile Include="Entities\WorkSession\Sorting\WSExecutionsSorter.vb" />
     <Compile Include="Services\AsyncService.vb" />
+    <Compile Include="Services\BaseLine\BaseLineExpirationListener.vb" />
     <Compile Include="Services\Enums\BaseLineStepsEnum.vb" />
     <Compile Include="Services\Interfaces\IBaseLine.vb" />
     <Compile Include="Services\Interfaces\IBaseLineService.vb" />
