@@ -5,6 +5,7 @@ Imports Biosystems.Ax00.Core.Entities.WorkSession
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specifications
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Interfaces
+Imports Biosystems.Ax00.Core.Services.BaseLine
 
 Namespace Biosystems.Ax00.Core.Entities
 
@@ -15,6 +16,9 @@ Namespace Biosystems.Ax00.Core.Entities
             MyBase.New(assemblyName, analyzerModel, baseLine)
             WSExecutionCreator.Instance.ContaminationsSpecification = New BA400ContaminationsSpecification(Me)
             _currentAnalyzer = Me
+
+            Dim aux = New BaseLineListener(Me)
+
         End Sub
 
 #Region "Overridden methods"
