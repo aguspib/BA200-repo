@@ -139,9 +139,6 @@ Namespace Biosystems.Ax00.Core.Interfaces
         ReadOnly Property WashingIDRequired As Boolean
         Property AnalyzerSettings As AnalyzerSettingsDS
         Property AnalyzerSwParameters As ParametersDS
-        Property Bl_listener As BaseLineListener
-        'Property AnalyzerSettings As AnalyzerSettingsDS.tcfgAnalyzerSettingsDataTable
-        'Property AnalyzerSwParameters As ParametersDS.tfmwSwParametersDataTable
 #End Region
 
 #Region "Events definition & methods"

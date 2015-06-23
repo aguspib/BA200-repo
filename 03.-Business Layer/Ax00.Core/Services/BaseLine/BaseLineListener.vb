@@ -28,6 +28,12 @@ Public Class BaseLineListener
         AddHandler _timerlistener.Elapsed, AddressOf OnTimedEvent_listener
 
 
+
+
+
+
+
+
     End Sub
 
 #Region "Background Worker and Timer events"
@@ -40,6 +46,7 @@ Public Class BaseLineListener
     ''' <remarks></remarks>
     Private Sub Bkw_ISE_CMD_DoWork(ByVal sender As Object, ByVal e As DoWorkEventArgs) Handles _myBkwBL_CMD.DoWork
         Try
+
             _timerlistener.Interval = 600000
             _timerlistener.Enabled = True
 
