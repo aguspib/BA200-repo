@@ -591,7 +591,7 @@ Public Class UiSATReportLoad
 
                                             Exit Try
                                         End If
-                                    Case mySWModel
+                                    Case AnalyzerModelEnum.A200.ToString
                                         If mySATModel <> mySWModel Then
                                             'Incompatible Model, Not continue, diferent Models
                                             myGlobal.HasError = True
@@ -673,7 +673,6 @@ Public Class UiSATReportLoad
 
         Return myGlobal
     End Function
-
 
     ''' <summary>
     ''' Check if the OK button can be enabled or not depending the instrument conection and status
@@ -921,7 +920,7 @@ Public Class UiSATReportLoad
                 '.Filter = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SATReport_File", CurrentLanguage) & "|*" & zipExtension & "|" & myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SATReport_FilesAll", CurrentLanguage) & "|*.*"
                 'Take Model extensio or All files
                 .Filter = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SATReport_File", CurrentLanguage) & " (*." & AnalyzerController.Instance.Analyzer.Model & ")|*." & AnalyzerController.Instance.Analyzer.Model _
-                          & "|" & myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SATReport_FilesAll", CurrentLanguage) & " (*.*)|*.*"
+                          & "|" & myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_AllFiles", CurrentLanguage) & " (*.*)|*.*"
                 .FilterIndex = 0
                 .DefaultExt = "." & AnalyzerController.Instance.Analyzer.Model
                 .CheckFileExists = True
