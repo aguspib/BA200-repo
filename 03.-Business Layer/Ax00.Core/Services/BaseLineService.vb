@@ -986,9 +986,7 @@ Namespace Biosystems.Ax00.Core.Services
                 UpdateAnalyzerSettingsDsCache(currentNow)
 				myGlobal = AnalyzerSettingsSaver(Nothing, _analyzer.ActiveAnalyzer, myAnalyzerSettingsDs, Nothing) 'AnalyzerSettingsDelegate.Save(Nothing, _analyzer.ActiveAnalyzer, myAnalyzerSettingsDs, Nothing)
                 deleteAlarmBlExpired()
-            Catch ex As Exception
-                Throw ex
-            End Try
+
             
         End Sub
 

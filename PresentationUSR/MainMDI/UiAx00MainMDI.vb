@@ -3098,7 +3098,7 @@ Partial Public Class UiAx00MainMDI
             Dim currentAlarms = New AnalyzerAlarms(AnalyzerManager.GetCurrentAnalyzerManager())
 
             If currentAlarms.ExistsActiveAlarm(AlarmEnumerates.Alarms.BL_EXPIRED.ToString()) Then
-                Dim blService As New BaseLineService(AnalyzerManager.GetCurrentAnalyzerManager())
+                Dim blService As New BaseLineService(AnalyzerManager.GetCurrentAnalyzerManager(), New AnalyzerManagerFlagsDelegate)
                 blService.StartService()
                 blService.OnServiceStatusChange = Sub(callback As IServiceStatusCallback)
                                                       If callback.Sender.Status = ServiceStatusEnum.EndSuccess Then
