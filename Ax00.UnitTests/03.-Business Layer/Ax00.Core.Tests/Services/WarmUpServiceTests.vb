@@ -36,17 +36,17 @@ Namespace Biosystems.Ax00.Core.Services.Tests
             Assert.IsTrue(result)
         End Sub
 
-        <Test()> Public Sub PauseServiceTest()
-            Assert.Inconclusive("TODO")
-        End Sub
+        '<Test()> Public Sub PauseServiceTest()
+        '    Assert.Inconclusive("TODO")
+        'End Sub
 
-        <Test()> Public Sub RestartServiceTest()
-            Assert.Inconclusive("TODO")
-        End Sub
+        '<Test()> Public Sub RestartServiceTest()
+        '    Assert.Inconclusive("TODO")
+        'End Sub
 
-        <Test()> Public Sub RecoverProcessTest()
-            Assert.Inconclusive("TODO")
-        End Sub
+        '<Test()> Public Sub RecoverProcessTest()
+        '    Assert.Inconclusive("TODO")
+        'End Sub
 
 
 

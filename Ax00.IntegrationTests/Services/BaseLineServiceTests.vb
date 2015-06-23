@@ -16,8 +16,15 @@ Namespace Biosystems.Ax00.Core.Services.Tests
 
     <TestFixture()> Public Class BaseLineServiceTests
 
+#Region "Attributes"
+        Private BLService As BaseLineService
+        Private _mySessionFlags As New Dictionary(Of String, String)
+        Const AnalyzerIDAttribute As String = "VA001-MOCKMODEL"
+#End Region
+
+
         <Test()>
-        Sub IntegrationTestHappyPath()
+        Public Sub IntegrationTestHappyPath()
             CreateScenario()
 
             Dim result = BLService.StartService
@@ -29,7 +36,7 @@ Namespace Biosystems.Ax00.Core.Services.Tests
             NUnit.Framework.Assert.AreEqual(BLService.Status, ServiceStatusEnum.Running)
 
             'We throw a Status instruction event, so the service updates its flags
-            Analyzer.ThrowStatusEvent()
+            AnalyzerMock.ThrowStatusEvent()
 
 
             'When the service gets the first Status alarm, it needs to update its status to check previous alarms
@@ -37,44 +44,44 @@ Namespace Biosystems.Ax00.Core.Services.Tests
             'No alarms in this test
 
             'When we have checked the previous alarms, the service needs to be on status "Conditional washing"
-            Analyzer.ThrowStatusEvent()
+            AnalyzerMock.ThrowStatusEvent()
             NUnit.Framework.Assert.AreEqual(BLService.CurrentStep, BaseLineStepsEnum.ConditioningWashing)
 
             'We're in the middle of a washing process. it should still return a Washing status, as it hasn't finished!
-            Analyzer.ThrowStatusEvent()
+            AnalyzerMock.ThrowStatusEvent()
             NUnit.Framework.Assert.AreEqual(BLService.CurrentStep, BaseLineStepsEnum.ConditioningWashing)
 
             'We finish the washing process
-            Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.Washing) = "END"
+            AnalyzerMock.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.Washing) = "END"
 
             'We perform the Static Base Line Step:
-            Analyzer.ThrowStatusEvent()
+            AnalyzerMock.ThrowStatusEvent()
             NUnit.Framework.Assert.AreEqual(BLService.CurrentStep, BaseLineStepsEnum.StaticBaseLine)
-            Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine) = "END"
+            AnalyzerMock.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine) = "END"
 
             'We perform the Dynamic Base Line Fill Step:
-            Analyzer.ThrowStatusEvent()
+            AnalyzerMock.ThrowStatusEvent()
             NUnit.Framework.Assert.AreEqual(BLService.CurrentStep, BaseLineStepsEnum.DynamicBaseLineFill)
 
             'We mmake our Analyzer manager mock finish filling the mocked rotor:
-            Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill) = "END"
+            AnalyzerMock.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill) = "END"
 
             'We do the dynamic baseline read
-            Analyzer.ThrowStatusEvent()
+            AnalyzerMock.ThrowStatusEvent()
             NUnit.Framework.Assert.AreEqual(BLService.CurrentStep, BaseLineStepsEnum.DynamicBaseLineRead)
-            Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read) = "END"
+            AnalyzerMock.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read) = "END"
 
-            Analyzer.ThrowStatusEvent()
+            AnalyzerMock.ThrowStatusEvent()
             NUnit.Framework.Assert.AreEqual(BLService.CurrentStep, BaseLineStepsEnum.DynamicBaseLineEmpty)
-            Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty) = "END"
+            AnalyzerMock.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty) = "END"
 
-            Analyzer.ThrowStatusEvent()
+            AnalyzerMock.ThrowStatusEvent()
             NUnit.Framework.Assert.AreEqual(BLService.CurrentStep, BaseLineStepsEnum.Finalize)
 
 
             Const DateTimePrecission As Integer = 10 'in seconds
             'newBLDate.ToString(Globalization.CultureInfo.InvariantCulture)
-            Dim setting = (From A In Analyzer.AnalyzerSettings.tcfgAnalyzerSettings Where A.AnalyzerID = Analyzer.ActiveAnalyzer And A.SettingID = GlobalEnumerates.AnalyzerSettingsEnum.BL_DATETIME.ToString()).First()
+            Dim setting = (From A In AnalyzerMock.AnalyzerSettings.tcfgAnalyzerSettings Where A.AnalyzerID = AnalyzerMock.ActiveAnalyzer And A.SettingID = GlobalEnumerates.AnalyzerSettingsEnum.BL_DATETIME.ToString()).First()
 
             Dim mydate As DateTime = Now
             If DateTime.TryParse(setting.CurrentValue, CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, mydate) Then
@@ -86,37 +93,35 @@ Namespace Biosystems.Ax00.Core.Services.Tests
             NUnit.Framework.Assert.Pass("Test passed as expected!")
         End Sub
 
-        Shared BLService As BaseLineService
-
         Private Sub CreateScenario()
 
-
             StatusParameters.IsActive = False
+            InstantiateBLService()
+
+        End Sub
+
+        Private Sub InstantiateBLService()
 
             'Initialize Base line service:
-            BLService = New BaseLineService(Analyzer, Mock.Create(Of IAnalyzerManagerFlagsDelegate))
+            BLService = New BaseLineService(AnalyzerMock, Mock.Create(Of IAnalyzerManagerFlagsDelegate))
 
             'Dependency injection of mocks:
+
+            'Creation mocks to be injected:
+            Dim rotorStatusSerializer = Mock.Create(Of IReactionsRotorStatusSerializer)()
+            Mock.Arrange(Function() rotorStatusSerializer.ChangeRotorPerformed(Arg.IsAny(Of SqlConnection), Arg.AnyString)).
+                Returns(New GlobalDataTO With {.HasError = False})
+
+
+            Dim blDeleter = Mock.Create(Of IWSBLinesDelegateValuesDeleter)()
+            Mock.Arrange(Function() blDeleter.DeleteBLinesValues(Arg.IsAny(Of SqlConnection), Arg.AnyString, Arg.AnyString, Arg.AnyString, Arg.AnyString)).
+                Returns(New GlobalDataTO With {.HasError = False})
+
+            'Injection:
+            BLService.ReactRotorStatusSerializer = rotorStatusSerializer
+            BLService.BaselineValuesDeleter = blDeleter
             BLService.ReactRotorCRUD = Mock.Create(Of IAnalyzerSettingCRUD(Of AnalyzerReactionsRotorDS))()
             BLService.AnalyzerSettingsSaver = AddressOf SaverMock
-
-
-            'Initialize and set Analyzer settings:
-            Analyzer.Connected = True
-            Analyzer.ThrowStatusEvent()
-
-            'Initialize injected dependencies:
-            Dim RotorStatusSerializer = Mock.Create(Of IReactionsRotorStatusSerializer)()
-            Dim BLDeleter = Mock.Create(Of IWSBLinesDelegateValuesDeleter)()
-            BLService.ReactRotorStatusSerializer = RotorStatusSerializer
-            BLService.BaselineValuesDeleter = BLDeleter
-
-            Mock.Arrange(Function() RotorStatusSerializer.ChangeRotorPerformed(Arg.IsAny(Of SqlConnection), Arg.AnyString)).
-                Returns(New GlobalDataTO With {.HasError = False})
-
-            'BaselineValuesDeleter
-            Mock.Arrange(Function() BLDeleter.DeleteBLinesValues(Arg.IsAny(Of SqlConnection), Arg.AnyString, Arg.AnyString, Arg.AnyString, Arg.AnyString)).
-                Returns(New GlobalDataTO With {.HasError = False})
 
         End Sub
 
@@ -125,7 +130,7 @@ Namespace Biosystems.Ax00.Core.Services.Tests
             Return New GlobalDataTO With {.HasError = False}
         End Function
 
-        Private ReadOnly Property Analyzer As ISuperAnalyzer
+        Private ReadOnly Property AnalyzerMock As ISuperAnalyzer
             Get
                 Static _analyzer As ISuperAnalyzer = Nothing
                 If _analyzer Is Nothing Then
@@ -134,7 +139,7 @@ Namespace Biosystems.Ax00.Core.Services.Tests
                     'We add a method to send Status events:
                     Mock.Arrange(Sub() _analyzer.ThrowStatusEvent()).Raises(Sub() AddHandler _analyzer.ReceivedStatusInformationEventHandler, Nothing)
 
-                    'We add a method to make a mock of the UpdateSessionFlags. We'll use an internal dictionary
+                    'We add a method to make a mock of the UpdateSessionFlags. We'll use an internal dictionary instead of a real database.
                     Mock.Arrange(Sub() _analyzer.UpdateSessionFlags(Arg.AnyObject, Arg.IsAny(Of GlobalEnumerates.AnalyzerManagerFlags), Arg.AnyString)).DoInstead(
                         Sub(ByRef pFlagsDS As AnalyzerManagerFlagsDS, pFlagCode As GlobalEnumerates.AnalyzerManagerFlags, pNewValue As String)
                             UpdateSessionFlagsMock(pFlagsDS, pFlagCode, pNewValue)
@@ -177,7 +182,7 @@ Namespace Biosystems.Ax00.Core.Services.Tests
                             _mySessionFlags(param.ToString) = value
                         End Sub)
 
-                    Mock.Arrange(Function() _analyzer.ActiveAnalyzer).Returns("BA35-01234567890")
+                    Mock.Arrange(Function() _analyzer.ActiveAnalyzer).Returns(AnalyzerIDAttribute)
 
                     'AnalyzerSettingsDS
                     Static settings As AnalyzerSettingsDS
@@ -196,14 +201,12 @@ Namespace Biosystems.Ax00.Core.Services.Tests
 
                     End If
 
-
+                    _analyzer.Connected = True
+                    _analyzer.ThrowStatusEvent()
                 End If
                 Return _analyzer
             End Get
         End Property
-
-        Private _mySessionFlags As New Dictionary(Of String, String)
-        Const AnalyzerIDAttribute As String = "BA350-123456789000"
 
         Private Sub UpdateSessionFlagsMock(ByVal pFlagsDS As AnalyzerManagerFlagsDS, ByVal pFlagCode As GlobalEnumerates.AnalyzerManagerFlags, ByVal pNewValue As String)
             'Update dictionary flags variables
@@ -235,18 +238,17 @@ Namespace Biosystems.Ax00.Core.Services.Tests
                     _mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.Washing) = "END"
                 Case GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT
                     _mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill) = "END"
-                    Analyzer.CurrentInstructionAction = GlobalEnumerates.InstructionActions.None
+                    AnalyzerMock.CurrentInstructionAction = GlobalEnumerates.InstructionActions.None
             End Select
             Return New GlobalDataTO With {.HasError = False}
         End Function
 
     End Class
 
-
+    'This interface is required in order to be able to simulate events being thrown by the mocked analyzerManager
     Public Interface ISuperAnalyzer
         Inherits IAnalyzerManager
         Sub ThrowStatusEvent()
-
     End Interface
 
 End Namespace
