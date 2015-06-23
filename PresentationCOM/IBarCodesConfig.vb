@@ -178,8 +178,7 @@ Public Class UiBarCodesConfig
                     End With
                     myAnalyzerSettingsDS.tcfgAnalyzerSettings.Rows.Add(myAnalyzerSettingsRow)
 
-                    Dim myAnalyzerSettings As New AnalyzerSettingsDelegate
-                    resultData = myAnalyzerSettings.Save(Nothing, AnalyzerIDAttribute, myAnalyzerSettingsDS, Nothing)
+                    resultData = AnalyzerSettingsDelegate.Save(Nothing, AnalyzerIDAttribute, myAnalyzerSettingsDS, Nothing)
                 Else
                     'Error updating User Settings values
                     ShowMessage(Me.Name & ".AcceptSelection", resultData.ErrorCode, resultData.ErrorMessage, Me)
@@ -629,7 +628,7 @@ Public Class UiBarCodesConfig
             Dim myAnalyzerSettingsDS As New AnalyzerSettingsDS
             Dim myAnalyzerSettingsDelegate As New AnalyzerSettingsDelegate
 
-            resultData = myAnalyzerSettingsDelegate.GetAnalyzerSetting(Nothing, AnalyzerIDAttribute, GlobalEnumerates.AnalyzerSettingsEnum.REAGENT_BARCODE_DISABLED.ToString())
+            resultData = myAnalyzerSettingsDelegate.GetAnalyzerSetting(AnalyzerIDAttribute, GlobalEnumerates.AnalyzerSettingsEnum.REAGENT_BARCODE_DISABLED).GetCompatibleGlobalDataTO()
             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                 myAnalyzerSettingsDS = DirectCast(resultData.SetDatos, AnalyzerSettingsDS)
 
@@ -647,7 +646,7 @@ Public Class UiBarCodesConfig
             End If
 
             If (valuesOK) Then
-                resultData = myAnalyzerSettingsDelegate.GetAnalyzerSetting(Nothing, AnalyzerIDAttribute, GlobalEnumerates.AnalyzerSettingsEnum.SAMPLE_BARCODE_DISABLED.ToString())
+                resultData = myAnalyzerSettingsDelegate.GetAnalyzerSetting(AnalyzerIDAttribute, GlobalEnumerates.AnalyzerSettingsEnum.SAMPLE_BARCODE_DISABLED).GetCompatibleGlobalDataTO()
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     myAnalyzerSettingsDS = DirectCast(resultData.SetDatos, AnalyzerSettingsDS)
 

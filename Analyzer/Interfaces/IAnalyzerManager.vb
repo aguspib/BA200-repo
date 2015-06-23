@@ -232,7 +232,7 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Sub ClearLastExportedResults()
         Function ExistSomeAlarmThatRequiresStopWS() As Boolean
         Function ProcessDynamicBaseLine(ByVal pDBConnection As SqlConnection, ByVal pWorkSessionID As String, ByVal pInitialWell As Integer) As GlobalDataTO
-        Sub UpdateSessionFlags(ByRef pFlagsDS As AnalyzerManagerFlagsDS, ByVal pFlagCode As AnalyzerManagerFlags, ByVal pNewValue As String)
+        Sub UpdateSessionFlags(ByVal pFlagsDS As AnalyzerManagerFlagsDS, ByVal pFlagCode As AnalyzerManagerFlags, ByVal pNewValue As String)
         Sub ResetBaseLineFailuresCounters()
         Sub SetAnalyzerNotReady()
         Function UpdateSensorValuesAttribute(ByVal pSensor As AnalyzerSensors, ByVal pNewValue As Single, ByVal pUIEventForChangesFlag As Boolean) As Boolean

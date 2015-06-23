@@ -22,12 +22,12 @@ Namespace Biosystems.Ax00.Core.Services
 
 #Region "Constructors"
 
-        Public Sub New(analyzer As IAnalyzerManager)
-            Me.New(analyzer, New BaseLineService(analyzer))
+        Public Sub New(analyzer As IAnalyzerManager, myFlagsDelg As IAnalyzerManagerFlagsDelegate)
+            Me.New(analyzer, New BaseLineService(analyzer, myFlagsDelg), myFlagsDelg)
         End Sub
 
-        Public Sub New(analyzer As IAnalyzerManager, baseLineService As IBaseLineService)
-            MyBase.New(analyzer)
+        Public Sub New(analyzer As IAnalyzerManager, baseLineService As IBaseLineService, myFlagsDelg As IAnalyzerManagerFlagsDelegate)
+            MyBase.New(analyzer, myFlagsDelg)
             _baseLineService = baseLineService
             _baseLineService.OnServiceStatusChange = AddressOf BaseLineStatusChanged
         End Sub
@@ -443,8 +443,7 @@ Namespace Biosystems.Ax00.Core.Services
             End With
             myAnalyzerSettingsDs.tcfgAnalyzerSettings.Rows.Add(myAnalyzerSettingsRow)
 
-            Dim myAnalyzerSettings As New AnalyzerSettingsDelegate
-            myGlobalDataTo = myAnalyzerSettings.Save(Nothing, _analyzer.ActiveAnalyzer, myAnalyzerSettingsDs, Nothing)
+            myGlobalDataTo = AnalyzerSettingsDelegate.Save(Nothing, _analyzer.ActiveAnalyzer, myAnalyzerSettingsDs, Nothing)
 
             wupManeuversFinishFlag = True
 
@@ -553,8 +552,7 @@ Namespace Biosystems.Ax00.Core.Services
                     End With
                     myAnalyzerSettingsDs.tcfgAnalyzerSettings.Rows.Add(myAnalyzerSettingsRow)
 
-                    Dim myAnalyzerSettings As New AnalyzerSettingsDelegate
-                    myGlobal = myAnalyzerSettings.Save(Nothing, _analyzer.ActiveAnalyzer, myAnalyzerSettingsDs, Nothing)
+                    myGlobal = AnalyzerSettingsDelegate.Save(Nothing, _analyzer.ActiveAnalyzer, myAnalyzerSettingsDs, Nothing)
 
                 End If
 

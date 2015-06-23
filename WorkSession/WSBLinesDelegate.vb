@@ -10,7 +10,10 @@ Imports Biosystems.Ax00.Global
 Namespace Biosystems.Ax00.BL
 
     'AG 14/05/2010 - change name WSBaseLinesDelegate for WSBLinesDelegate
+
     Public Class WSBLinesDelegate
+        Implements IWSBLinesDelegateCRUD(Of BaseLinesDS)
+        Implements IWSBLinesDelegateValuesDeleter
 
 #Region "CRUD"
         ''' <summary>
@@ -22,7 +25,7 @@ Namespace Biosystems.Ax00.BL
         ''' <remarks>
         ''' Created by: GDS 21/05/2010
         ''' </remarks>
-        Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pBaseLinesDS As BaseLinesDS) As GlobalDataTO
+        Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pBaseLinesDS As BaseLinesDS) As GlobalDataTO Implements IWSBLinesDelegateCRUD(Of BaseLinesDS).Create
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -135,29 +138,24 @@ Namespace Biosystems.Ax00.BL
         ''' AG 29/10/2014 BA-2057 parameter pWellUsed, pType
         ''' </remarks>
         Public Function Read(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
-                             ByVal pBaseLineID As Integer, ByVal pWellUsed As Integer, ByVal pType As String) As GlobalDataTO
-            Dim resultData As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
-
+                             ByVal pBaseLineID As Integer, ByVal pWellUsed As Integer, ByVal pType As String) As TypedGlobalDataTo(Of BaseLinesDS) Implements IWSBLinesDelegateCRUD(Of BaseLinesDS).Read
+            Dim resultData As TypedGlobalDataTo(Of BaseLinesDS) = Nothing
+            Dim connection As TypedGlobalDataTo(Of SqlConnection) = Nothing
             Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        Dim mytwksWSBaseLines As New twksWSBLinesDAO
-                        resultData = mytwksWSBaseLines.Read(pDBConnection, pAnalyzerID, pWorkSessionID, pBaseLineID, pWellUsed, pType)
-                    End If
+                connection = GetSafeOpenDBConnection(pDBConnection)
+                If (connection IsNot Nothing AndAlso connection.SetDatos IsNot Nothing) Then
+                    Dim mytwksWSBaseLines As New twksWSBLinesDAO
+                    Dim result = mytwksWSBaseLines.Read(connection.SetDatos, pAnalyzerID, pWorkSessionID, pBaseLineID, pWellUsed, pType)
+                    resultData.SetDatos = TryCast(result.SetDatos, BaseLinesDS)
+                    resultData.HasError = result.HasError
                 End If
             Catch ex As Exception
-                resultData = New GlobalDataTO()
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
-
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "WSBLinesDelegate.GetByWaveLength", EventLogEntryType.Error, False)
+                CreateLogActivity(ex)
             Finally
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+                If (pDBConnection Is Nothing) Then CloseConnection(connection)
             End Try
             Return resultData
         End Function
@@ -172,7 +170,7 @@ Namespace Biosystems.Ax00.BL
         ''' <remarks>
         ''' Created by: GDS 21/05/2010
         ''' </remarks>
-        Public Function Update(ByVal pDBConnection As SqlConnection, ByVal pBaseLinesDS As BaseLinesDS) As GlobalDataTO
+        Public Function Update(ByVal pDBConnection As SqlConnection, ByVal pBaseLinesDS As BaseLinesDS) As GlobalDataTO Implements IWSBLinesDelegateCRUD(Of BaseLinesDS).Update
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -209,6 +207,12 @@ Namespace Biosystems.Ax00.BL
             End Try
             Return resultData
         End Function
+
+        Public Function Delete(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
+                     ByVal pBaseLineID As Integer, ByVal pWellUsed As Integer, ByVal pType As String) As TypedGlobalDataTo(Of BaseLinesDS) Implements IWSBLinesDelegateCRUD(Of BaseLinesDS).Delete
+            Return New TypedGlobalDataTo(Of BaseLinesDS)() With {.HasError = True, .ErrorMessage = "Not implemented"}
+        End Function
+
 
 #End Region
 
@@ -465,7 +469,7 @@ Namespace Biosystems.Ax00.BL
         ''' AG 15/01/2015 BA-2212 skip the process for delete not used baseline records when pBaseLineTypeForCalculation = DYNAMIC and parameter RDI_CUMULATE_ALL_BASELINES = 1
         ''' </remarks>
         Public Function DeleteBLinesValues(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, _
-                                           ByVal pWorkSessionID As String, ByVal pType As String, ByVal pBaseLineTypeForCalculation As String) As GlobalDataTO
+                                           ByVal pWorkSessionID As String, ByVal pType As String, ByVal pBaseLineTypeForCalculation As String) As GlobalDataTO Implements IWSBLinesDelegateValuesDeleter.DeleteBLinesValues
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -734,4 +738,10 @@ Namespace Biosystems.Ax00.BL
 #End Region
 
     End Class
+
+    Public Interface IWSBLinesDelegateValuesDeleter
+        Function DeleteBLinesValues(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, _
+                                           ByVal pWorkSessionID As String, ByVal pType As String, ByVal pBaseLineTypeForCalculation As String) As GlobalDataTO
+    End Interface
+
 End Namespace

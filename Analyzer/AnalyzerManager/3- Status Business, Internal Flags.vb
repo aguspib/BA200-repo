@@ -1648,7 +1648,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>AG 01/03/2011 - Tested PENDING
         ''' Modified by: IT 19/12/2014 - BA-2143 (Accessibility Level)
         ''' </remarks>
-        Public Sub UpdateSessionFlags(ByRef pFlagsDS As AnalyzerManagerFlagsDS, ByVal pFlagCode As AnalyzerManagerFlags, ByVal pNewValue As String) Implements IAnalyzerManager.UpdateSessionFlags
+        Public Sub UpdateSessionFlags(ByVal pFlagsDS As AnalyzerManagerFlagsDS, ByVal pFlagCode As AnalyzerManagerFlags, ByVal pNewValue As String) Implements IAnalyzerManager.UpdateSessionFlags
             Try
                 'Update dictionary flags variables
                 mySessionFlags(pFlagCode.ToString) = pNewValue

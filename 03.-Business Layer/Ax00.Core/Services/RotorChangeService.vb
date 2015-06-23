@@ -22,16 +22,16 @@ Namespace Biosystems.Ax00.Core.Services
         Implements IRotorChangeService
 
 #Region "Constructors"
-        Public Sub New(analyzer As IAnalyzerManager)
-            Me.New(analyzer, Nothing)
+        Public Sub New(analyzer As IAnalyzerManager, myFlagsDelg As IAnalyzerManagerFlagsDelegate)
+            Me.New(analyzer, Nothing, myFlagsDelg)
         End Sub
 
-        Public Sub New(analyzer As IAnalyzerManager, warmUpService As IWarmUpService)
-            Me.New(analyzer, warmUpService, New BaseLineService(analyzer, True))
+        Public Sub New(analyzer As IAnalyzerManager, warmUpService As IWarmUpService, myFlaDelg As IAnalyzerManagerFlagsDelegate)
+            Me.New(analyzer, warmUpService, New BaseLineService(analyzer, True, myFlaDelg), myFlaDelg)
         End Sub
 
-        Public Sub New(analyzer As IAnalyzerManager, warmUpService As IWarmUpService, baseLineService As IBaseLineService)
-            MyBase.New(analyzer)
+        Public Sub New(analyzer As IAnalyzerManager, warmUpService As IWarmUpService, baseLineService As IBaseLineService, myFlagsDelg As IAnalyzerManagerFlagsDelegate)
+            MyBase.New(analyzer, myFlagsDelg)
             _baseLineService = baseLineService
             _warmUpService = warmUpService
             _baseLineService.OnServiceStatusChange = AddressOf BaseLineStatusChanged

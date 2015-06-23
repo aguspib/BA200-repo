@@ -7313,7 +7313,7 @@ Public Class UiWSSampleRequest
                     Dim analyzerSettings As New AnalyzerSettingsDelegate
 
                     Dim sampleBarcodeReaderOFF As Boolean = False
-                    resultData = analyzerSettings.GetAnalyzerSetting(Nothing, AnalyzerIDAttribute, GlobalEnumerates.AnalyzerSettingsEnum.SAMPLE_BARCODE_DISABLED.ToString)
+                    resultData = analyzerSettings.GetAnalyzerSetting(AnalyzerIDAttribute, GlobalEnumerates.AnalyzerSettingsEnum.SAMPLE_BARCODE_DISABLED).GetCompatibleGlobalDataTO()
                     If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                         Dim myDataSet As AnalyzerSettingsDS = DirectCast(resultData.SetDatos, AnalyzerSettingsDS)
 

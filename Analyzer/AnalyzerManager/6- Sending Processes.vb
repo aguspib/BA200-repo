@@ -72,7 +72,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     'AG 24/10/2011 - When connection auto then portnameattribute = "", else portnameattribute = configured port name
                     Dim myAnalyzerSettingsDelegate As New AnalyzerSettingsDelegate
                     Dim myAnalyzerSettingsDS As New AnalyzerSettingsDS
-                    myGlobal = myAnalyzerSettingsDelegate.GetAnalyzerSetting(Nothing, AnalyzerIDAttribute, GlobalEnumerates.AnalyzerSettingsEnum.COMM_AUTO.ToString())
+                    myGlobal = myAnalyzerSettingsDelegate.GetAnalyzerSetting(AnalyzerIDAttribute, GlobalEnumerates.AnalyzerSettingsEnum.COMM_AUTO).GetCompatibleGlobalDataTO()
                     If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                         myAnalyzerSettingsDS = DirectCast(myGlobal.SetDatos, AnalyzerSettingsDS)
 
@@ -81,7 +81,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 PortNameAttribute = ""
                                 BaudsAttribute = ""
                             Else 'Manual port connect configured
-                                myGlobal = myAnalyzerSettingsDelegate.GetAnalyzerSetting(Nothing, AnalyzerIDAttribute, GlobalEnumerates.AnalyzerSettingsEnum.COMM_PORT.ToString())
+                                myGlobal = myAnalyzerSettingsDelegate.GetAnalyzerSetting(AnalyzerIDAttribute, GlobalEnumerates.AnalyzerSettingsEnum.COMM_PORT).GetCompatibleGlobalDataTO()
                                 If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                                     myAnalyzerSettingsDS = DirectCast(myGlobal.SetDatos, AnalyzerSettingsDS)
                                 End If
@@ -1744,7 +1744,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             '    - If the type is STATIC then next ID = current+1
                             '    - Else: If already exists for well, led then nextId = current+1
                             If currBaseLineID > 0 AndAlso pType = BaseLineType.DYNAMIC.ToString Then
-                                resultData = myDelegate.Read(dbConnection, pAnalyzerID, pWorkSessionID, currBaseLineID, pLed, "")
+                                resultData = myDelegate.Read(dbConnection, pAnalyzerID, pWorkSessionID, currBaseLineID, pLed, "").GetCompatibleGlobalDataTO()
                                 If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                                     Dim auxDS As New BaseLinesDS
                                     auxDS = DirectCast(resultData.SetDatos, BaseLinesDS)

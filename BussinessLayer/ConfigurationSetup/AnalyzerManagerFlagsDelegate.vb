@@ -9,6 +9,7 @@ Imports Biosystems.Ax00.DAL
 Namespace Biosystems.Ax00.BL
 
     Public Class AnalyzerManagerFlagsDelegate
+        Implements IAnalyzerManagerFlagsDelegate
 
         ''' <summary>
         ''' 
@@ -19,7 +20,7 @@ Namespace Biosystems.Ax00.BL
         ''' <returns></returns>
         ''' <remarks>AG 25/02/2011 - Tested pending</remarks>
         Public Function Read(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-                             ByVal pFlagID As String) As GlobalDataTO
+                             ByVal pFlagID As String) As GlobalDataTO Implements IAnalyzerManagerFlagsDelegate.Read
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
 
@@ -55,7 +56,7 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pAnalyzerID"></param>
         ''' <returns></returns>
         ''' <remarks>AG 25/02/2011 - Tested OK</remarks>
-        Public Function ReadByAnalyzerID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String) As GlobalDataTO
+        Public Function ReadByAnalyzerID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String) As GlobalDataTO Implements IAnalyzerManagerFlagsDelegate.ReadByAnalyzerID
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
             Try
@@ -101,7 +102,7 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pAnalyzerFlagsDS"></param>
         ''' <returns></returns>
         ''' <remarks>AG 25/02/2011 - Testing OK</remarks>
-        Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerFlagsDS As AnalyzerManagerFlagsDS) As GlobalDataTO
+        Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerFlagsDS As AnalyzerManagerFlagsDS) As GlobalDataTO Implements IAnalyzerManagerFlagsDelegate.Create
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
             Try
@@ -145,7 +146,7 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pAnalyzerFlagsDS"></param>
         ''' <returns></returns>
         ''' <remarks>AG 25/02/2011 - Testing pending</remarks>
-        Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerFlagsDS As AnalyzerManagerFlagsDS) As GlobalDataTO
+        Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerFlagsDS As AnalyzerManagerFlagsDS) As GlobalDataTO Implements IAnalyzerManagerFlagsDelegate.Update
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
             Try
@@ -193,7 +194,7 @@ Namespace Biosystems.Ax00.BL
         ''' <returns></returns>
         ''' <remarks>AG 25/02/2011 - Testing pending</remarks>
         Public Function UpdateFlag(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-                                   ByVal pFlagID As String, ByVal pNewValue As String) As GlobalDataTO
+                                   ByVal pFlagID As String, ByVal pNewValue As String) As GlobalDataTO Implements IAnalyzerManagerFlagsDelegate.UpdateFlag
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
             Try
@@ -238,7 +239,7 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pLeaveConnectFlag" ></param>
         ''' <returns></returns>
         ''' <remarks>Modified AG 21/06/2012 - add optional parameter pLeaveConnectFlag</remarks>
-        Public Function ResetFlags(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, Optional ByVal pLeaveConnectFlag As Boolean = True) As GlobalDataTO
+        Public Function ResetFlags(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, Optional ByVal pLeaveConnectFlag As Boolean = True) As GlobalDataTO Implements IAnalyzerManagerFlagsDelegate.ResetFlags
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -289,7 +290,7 @@ Namespace Biosystems.Ax00.BL
         ''' <returns></returns>
         ''' <remarks>AG 09/03/2012</remarks>
         Public Function ReadByStatus(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pValue As String, _
-                                     ByVal pReadWithSameValue As Boolean) As GlobalDataTO
+                                     ByVal pReadWithSameValue As Boolean) As GlobalDataTO Implements IAnalyzerManagerFlagsDelegate.ReadByStatus
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -328,7 +329,7 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pAnalyzerID"></param>
         ''' <returns></returns>
         ''' <remarks>Created by XB 03/05/2013</remarks>
-        Public Function Delete(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String) As GlobalDataTO
+        Public Function Delete(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String) As GlobalDataTO Implements IAnalyzerManagerFlagsDelegate.Delete
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
             Try

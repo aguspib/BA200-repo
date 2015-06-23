@@ -1443,9 +1443,8 @@ Public Class UiConfigLIS
 
                 'Save value of all Settings
                 Dim resultData As New GlobalDataTO
-                Dim myAnalyzerSettings As New AnalyzerSettingsDelegate
 
-                resultData = myAnalyzerSettings.Save(Nothing, AnalyzerIDAttribute, Nothing, sessionSettings)
+                resultData = AnalyzerSettingsDelegate.Save(Nothing, AnalyzerIDAttribute, Nothing, sessionSettings)
                 If (Not resultData.HasError) Then
                     'BT #1349 ==> Value to assign to Main MDI Property autoWSCreationWithLISMode will depend also on value of setting LIS_ENABLE_COMMS
                     UiAx00MainMDI.autoWSCreationWithLISMode = (BsAutoQueryStartCheckbox.Checked AndAlso BsLISCommsEnabledCheckbox.Checked)
@@ -2042,7 +2041,7 @@ Public Class UiConfigLIS
             Dim resultData As New GlobalDataTO
 
             Dim myAnalyzersDelegate As New AnalyzerSettingsDelegate
-            resultData = myAnalyzersDelegate.GetAnalyzerSetting(Nothing, UiAx00MainMDI.ActiveAnalyzer, AnalyzerSettingsEnum.SAMPLE_BARCODE_DISABLED.ToString)
+            resultData = myAnalyzersDelegate.GetAnalyzerSetting(UiAx00MainMDI.ActiveAnalyzer, AnalyzerSettingsEnum.SAMPLE_BARCODE_DISABLED).GetCompatibleGlobalDataTO()
             If Not resultData.HasError AndAlso resultData.SetDatos IsNot Nothing Then
                 Dim myAnalyzerSettingsDS As AnalyzerSettingsDS = CType(resultData.SetDatos, AnalyzerSettingsDS)
                 If myAnalyzerSettingsDS IsNot Nothing AndAlso myAnalyzerSettingsDS.tcfgAnalyzerSettings.Rows.Count > 0 Then

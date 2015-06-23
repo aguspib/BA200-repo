@@ -27,7 +27,7 @@ Namespace Biosystems.Ax00.Core.Services.BaseLine
             T.IsBackground = True
             T.Priority = ThreadPriority.Lowest
             T.Start()
-
+            T.Priority = ThreadPriority.Lowest
         End Sub
 
 #Region "Events"

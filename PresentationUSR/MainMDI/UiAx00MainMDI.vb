@@ -2607,9 +2607,8 @@ Partial Public Class UiAx00MainMDI
             Dim myDate As String = ""
             Dim WUPFullTime As Single
 
-            resultData = myAnalyzerSettingsDelegate.GetAnalyzerSetting(Nothing, _
-                                                                       AnalyzerIDAttribute, _
-                                                                       GlobalEnumerates.AnalyzerSettingsEnum.WUPSTARTDATETIME.ToString())
+            resultData = myAnalyzerSettingsDelegate.GetAnalyzerSetting(AnalyzerIDAttribute, _
+                                                                       GlobalEnumerates.AnalyzerSettingsEnum.WUPSTARTDATETIME).GetCompatibleGlobalDataTO()
 
             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                 myAnalyzerSettingsDS = DirectCast(resultData.SetDatos, AnalyzerSettingsDS)
@@ -2648,9 +2647,7 @@ Partial Public Class UiAx00MainMDI
                 End If
 
                 'Dim myAnalyzerSettings As New AnalyzerSettingsDelegate
-                resultData = myAnalyzerSettingsDelegate.GetAnalyzerSetting(Nothing, _
-                                                                           AnalyzerIDAttribute, _
-                                                                           GlobalEnumerates.AnalyzerSettingsEnum.WUPCOMPLETEFLAG.ToString())
+                resultData = myAnalyzerSettingsDelegate.GetAnalyzerSetting(AnalyzerIDAttribute, GlobalEnumerates.AnalyzerSettingsEnum.WUPCOMPLETEFLAG).GetCompatibleGlobalDataTO()
 
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     myAnalyzerSettingsDS = DirectCast(resultData.SetDatos, AnalyzerSettingsDS)
@@ -6636,8 +6633,7 @@ Partial Public Class UiAx00MainMDI
                 End With
                 myAnalyzerSettingsDS.tcfgAnalyzerSettings.Rows.Add(myAnalyzerSettingsRow)
 
-                Dim myAnalyzerSettings As New AnalyzerSettingsDelegate
-                myGlobal = myAnalyzerSettings.Save(Nothing, AnalyzerIDAttribute, myAnalyzerSettingsDS, Nothing)
+                myGlobal = AnalyzerSettingsDelegate.Save(Nothing, AnalyzerIDAttribute, myAnalyzerSettingsDS, Nothing)
 
             End If
 
@@ -7111,7 +7107,7 @@ Partial Public Class UiAx00MainMDI
                 barcodeBeforeStart = CType(resultData.SetDatos, Boolean)
             End If
 
-            resultData = myAnalyzerSettings.GetAnalyzerSetting(Nothing, AnalyzerIDAttribute, GlobalEnumerates.AnalyzerSettingsEnum.REAGENT_BARCODE_DISABLED.ToString)
+            resultData = myAnalyzerSettings.GetAnalyzerSetting(AnalyzerIDAttribute, GlobalEnumerates.AnalyzerSettingsEnum.REAGENT_BARCODE_DISABLED).GetCompatibleGlobalDataTO()
             If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                 myAnalyzerSettingsDS = CType(resultData.SetDatos, AnalyzerSettingsDS)
                 If myAnalyzerSettingsDS.tcfgAnalyzerSettings.Rows.Count > 0 Then
@@ -7119,7 +7115,7 @@ Partial Public Class UiAx00MainMDI
                 End If
             End If
 
-            resultData = myAnalyzerSettingsDelegate.GetAnalyzerSetting(Nothing, AnalyzerIDAttribute, GlobalEnumerates.AnalyzerSettingsEnum.SAMPLE_BARCODE_DISABLED.ToString())
+            resultData = myAnalyzerSettingsDelegate.GetAnalyzerSetting(AnalyzerIDAttribute, GlobalEnumerates.AnalyzerSettingsEnum.SAMPLE_BARCODE_DISABLED).GetCompatibleGlobalDataTO()
             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                 myAnalyzerSettingsDS = CType(resultData.SetDatos, AnalyzerSettingsDS)
 
@@ -7303,6 +7299,7 @@ Partial Public Class UiAx00MainMDI
                 SetAutomateProcessStatusValue(LISautomateProcessSteps.notStarted)
                 OpenMonitorForm(Nothing) 'AG 25/07/2013
                 'AG 24/07/2013
+
             Else
 
                 If Not String.Equals(processingBeforeRunning, "2") Then
@@ -8684,8 +8681,7 @@ Partial Public Class UiAx00MainMDI
                 End With
                 myAnalyzerSettingsDS.tcfgAnalyzerSettings.Rows.Add(myAnalyzerSettingsRow)
 
-                Dim myAnalyzerSettings As New AnalyzerSettingsDelegate
-                resultData = myAnalyzerSettings.Save(Nothing, AnalyzerIDAttribute, myAnalyzerSettingsDS, Nothing)
+                resultData = AnalyzerSettingsDelegate.Save(Nothing, AnalyzerIDAttribute, myAnalyzerSettingsDS, Nothing)
 
                 If Not resultData.HasError Then
                     'Update UI
@@ -8730,8 +8726,7 @@ Partial Public Class UiAx00MainMDI
                 End With
                 myAnalyzerSettingsDS.tcfgAnalyzerSettings.Rows.Add(myAnalyzerSettingsRow)
 
-                Dim myAnalyzerSettings As New AnalyzerSettingsDelegate
-                resultData = myAnalyzerSettings.Save(Nothing, AnalyzerIDAttribute, myAnalyzerSettingsDS, Nothing)
+                resultData = AnalyzerSettingsDelegate.Save(Nothing, AnalyzerIDAttribute, myAnalyzerSettingsDS, Nothing)
 
                 If Not resultData.HasError Then
                     'Update UI

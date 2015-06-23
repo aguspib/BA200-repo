@@ -3567,12 +3567,12 @@ Namespace Biosystems.Ax00.Core.Entities
                                 Else
                                     'BARCODE_BEFORE_START_WS active
                                     '1st) If Reagents Barcode is active -> send a request for full Reagents Rotor scanning
-                                    Dim barcodeDisabled As Boolean = ReadBarCodeRotorSettingEnabled(dbConnection, AnalyzerSettingsEnum.REAGENT_BARCODE_DISABLED.ToString)
+                                    Dim barcodeDisabled As Boolean = ReadBarCodeRotorSettingEnabled(dbConnection, AnalyzerSettingsEnum.REAGENT_BARCODE_DISABLED)
                                     If (Not barcodeDisabled) Then
                                         BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActionsEnum.REAGENTS_REQUEST_BEFORE_RUNNING
                                     Else
                                         '2nd) If Samples Barcode is active -> send a request for full Samples Rotor scanning
-                                        barcodeDisabled = ReadBarCodeRotorSettingEnabled(dbConnection, AnalyzerSettingsEnum.SAMPLE_BARCODE_DISABLED.ToString)
+                                        barcodeDisabled = ReadBarCodeRotorSettingEnabled(dbConnection, AnalyzerSettingsEnum.SAMPLE_BARCODE_DISABLED)
                                         If (Not barcodeDisabled) Then
                                             BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActionsEnum.SAMPLES_REQUEST_BEFORE_RUNNING
                                         Else
@@ -3586,7 +3586,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             'After receive Reagents Barcode results, evaluate if Samples Barcode is active
                             'If Samples Barcode is active -> send a request for full Samples Rotor scanning
                             readBarCodeBeforeRunningPerformedFlag = True
-                            Dim samplesBarcodeDisabled As Boolean = ReadBarCodeRotorSettingEnabled(dbConnection, AnalyzerSettingsEnum.SAMPLE_BARCODE_DISABLED.ToString)
+                            Dim samplesBarcodeDisabled As Boolean = ReadBarCodeRotorSettingEnabled(dbConnection, AnalyzerSettingsEnum.SAMPLE_BARCODE_DISABLED)
                             If (Not samplesBarcodeDisabled) Then
                                 BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActionsEnum.SAMPLES_REQUEST_BEFORE_RUNNING
                             Else

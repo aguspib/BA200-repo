@@ -979,7 +979,7 @@ Public Class UiWSRotorPositions
             Dim analyzerSettings As New AnalyzerSettingsDelegate
 
             '** Get Barcode Status for Samples Rotor
-            resultData = analyzerSettings.GetAnalyzerSetting(Nothing, AnalyzerIDAttribute, GlobalEnumerates.AnalyzerSettingsEnum.SAMPLE_BARCODE_DISABLED.ToString)
+            resultData = analyzerSettings.GetAnalyzerSetting(AnalyzerIDAttribute, GlobalEnumerates.AnalyzerSettingsEnum.SAMPLE_BARCODE_DISABLED).GetCompatibleGlobalDataTO()
             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                 Dim myDataSet As AnalyzerSettingsDS = DirectCast(resultData.SetDatos, AnalyzerSettingsDS)
                 If (myDataSet.tcfgAnalyzerSettings.Rows.Count > 0) Then
@@ -988,7 +988,7 @@ Public Class UiWSRotorPositions
             End If
 
             '** Get Barcode Status for Reagents Rotor
-            resultData = analyzerSettings.GetAnalyzerSetting(Nothing, AnalyzerIDAttribute, GlobalEnumerates.AnalyzerSettingsEnum.REAGENT_BARCODE_DISABLED.ToString)
+            resultData = analyzerSettings.GetAnalyzerSetting(AnalyzerIDAttribute, GlobalEnumerates.AnalyzerSettingsEnum.REAGENT_BARCODE_DISABLED).GetCompatibleGlobalDataTO()
             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                 Dim myDataSet As AnalyzerSettingsDS = DirectCast(resultData.SetDatos, AnalyzerSettingsDS)
                 If (myDataSet.tcfgAnalyzerSettings.Rows.Count > 0) Then

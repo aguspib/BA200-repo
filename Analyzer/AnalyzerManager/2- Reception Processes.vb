@@ -1847,8 +1847,7 @@ Namespace Biosystems.Ax00.Core.Entities
             End With
             myAnalyzerSettingsDS.tcfgAnalyzerSettings.Rows.Add(myAnalyzerSettingsRow)
 
-            Dim myAnalyzerSettings As New AnalyzerSettingsDelegate
-            myGlobalDataTO = myAnalyzerSettings.Save(Nothing, AnalyzerIDAttribute, myAnalyzerSettingsDS, Nothing)
+            myGlobalDataTO = AnalyzerSettingsDelegate.Save(Nothing, AnalyzerIDAttribute, myAnalyzerSettingsDS, Nothing)
 
             wupManeuversFinishFlag = True
 
@@ -3474,7 +3473,7 @@ Namespace Biosystems.Ax00.Core.Entities
         End Sub
 
 
-        Private Function ReadBarCodeRotorSettingEnabled(ByVal pDBConnection As SqlConnection, ByVal pSetting As String) As Boolean
+        Private Function ReadBarCodeRotorSettingEnabled(ByVal pDBConnection As SqlConnection, ByVal pSetting As AnalyzerSettingsEnum) As Boolean
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlConnection = Nothing
             Dim returnedFlag As Boolean = False
@@ -3487,7 +3486,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         'If reagents barcode enabled send read FULL barcode reagents rotor
                         Dim anSettingsDelg As New AnalyzerSettingsDelegate
-                        resultData = anSettingsDelg.GetAnalyzerSetting(dbConnection, AnalyzerIDAttribute, pSetting)
+                        resultData = anSettingsDelg.GetAnalyzerSetting(AnalyzerIDAttribute, pSetting).GetCompatibleGlobalDataTO
                         If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then '(1)
                             Dim myAnSettingsDS As New AnalyzerSettingsDS
                             myAnSettingsDS = DirectCast(resultData.SetDatos, AnalyzerSettingsDS)

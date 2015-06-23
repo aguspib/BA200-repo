@@ -1,6 +1,7 @@
 ﻿Option Strict On
 Option Explicit On
 
+Imports System.Data.SqlClient
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.DAL.DAO
@@ -8,9 +9,9 @@ Imports Biosystems.Ax00.DAL
 
 Namespace Biosystems.Ax00.BL
 
-
     Public Class AnalyzerReactionsRotorDelegate
-
+        Implements IAnalyzerSettingCRUD(Of AnalyzerReactionsRotorDS)
+        Implements IReactionsRotorStatusSerializer
 
 #Region "C R U D"
 
@@ -21,25 +22,21 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pAnalyzerID"></param>
         ''' <returns></returns>
         ''' <remarks>AG 18/05/2011</remarks>
-        Public Function Read(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String) As GlobalDataTO
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+        Public Function Read(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String) As TypedGlobalDataTo(Of AnalyzerReactionsRotorDS) Implements IAnalyzerSettingCRUD(Of AnalyzerReactionsRotorDS).Read
+
+            Dim resultData As New TypedGlobalDataTo(Of AnalyzerReactionsRotorDS)
+            Dim connection As TypedGlobalDataTo(Of SqlConnection) = Nothing
 
             Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-                If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-
-                    If (Not dbConnection Is Nothing) Then
-                        If Not pAnalyzerID Is Nothing Then
-                            If pAnalyzerID <> "" Then
-                                Dim myDAO As New tcfgAnalyzerReactionsRotorDAO
-                                resultData = myDAO.Read(dbConnection, pAnalyzerID)
-                            Else
-                                resultData.SetDatos = Nothing
-                            End If
+                connection = DAOBase.GetSafeOpenDBConnection(pDBConnection)
+                If (connection IsNot Nothing AndAlso connection.SetDatos IsNot Nothing) Then
+                    If Not pAnalyzerID Is Nothing Then
+                        If pAnalyzerID <> "" Then
+                            Dim myDAO As New tcfgAnalyzerReactionsRotorDAO
+                            resultData = myDAO.Read(connection.SetDatos, pAnalyzerID)
+                        Else
+                            resultData.SetDatos = Nothing
                         End If
-
                     End If
                 End If
             Catch ex As Exception
@@ -47,11 +44,10 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerReactionsRotorDelegate.Read", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex)
 
             Finally
-                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
+                If (pDBConnection Is Nothing) Then CloseConnection(connection)
             End Try
             Return resultData
         End Function
@@ -64,7 +60,7 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pEntryDS"></param>
         ''' <returns></returns>
         ''' <remarks>AG 18/05/2011</remarks>
-        Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pEntryDS As AnalyzerReactionsRotorDS) As GlobalDataTO
+        Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pEntryDS As AnalyzerReactionsRotorDS) As GlobalDataTO Implements IAnalyzerSettingCRUD(Of AnalyzerReactionsRotorDS).Create
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
             Try
@@ -113,7 +109,7 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pEntryDS"></param>
         ''' <returns></returns>
         ''' <remarks>AG 18/05/2011</remarks>
-        Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pEntryDS As AnalyzerReactionsRotorDS) As GlobalDataTO
+        Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pEntryDS As AnalyzerReactionsRotorDS) As GlobalDataTO Implements IAnalyzerSettingCRUD(Of AnalyzerReactionsRotorDS).Update
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
             Try
@@ -162,7 +158,7 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pAnalyzerID "></param>
         ''' <returns></returns>
         ''' <remarks>AG 18/05/2011</remarks>
-        Public Function Delete(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String) As GlobalDataTO
+        Public Function Delete(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String) As GlobalDataTO Implements IAnalyzerSettingCRUD(Of AnalyzerReactionsRotorDS).Delete
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
             Try
@@ -216,7 +212,7 @@ Namespace Biosystems.Ax00.BL
         ''' <returns>GlobalDataTo (SetDatos as String)</returns>
         ''' <remarks>AG 18/05/2011</remarks>
         Public Function ChangeReactionsRotorRecommended(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-                                                        ByVal pAnalyzerModel As String) As GlobalDataTO
+                                                        ByVal pAnalyzerModel As String) As GlobalDataTO Implements IReactionsRotorStatusSerializer.ChangeReactionsRotorRecommended
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
             Dim messageID As String = ""
@@ -230,18 +226,14 @@ Namespace Biosystems.Ax00.BL
                         If Not pAnalyzerID Is Nothing Then
                             If pAnalyzerID <> "" Then
                                 Dim myDAO As New tcfgAnalyzerReactionsRotorDAO
-                                resultData = myDAO.Read(dbConnection, pAnalyzerID)
+                                resultData = myDAO.Read(dbConnection, pAnalyzerID).GetCompatibleGlobalDataTO
 
                                 If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                                     Dim myDS As New AnalyzerReactionsRotorDS
                                     myDS = CType(resultData.SetDatos, AnalyzerReactionsRotorDS)
 
                                     If myDS.tcfgAnalyzerReactionsRotor.Rows.Count > 0 Then
-                                        Dim showMessageFlag As Boolean = False
-
-                                        If myDS.tcfgAnalyzerReactionsRotor(0).BLParametersRejected Then
-                                            showMessageFlag = True
-                                        End If
+                                        Dim showMessageFlag = myDS.tcfgAnalyzerReactionsRotor(0).BLParametersRejected
 
                                         If Not showMessageFlag Then
 
@@ -316,7 +308,7 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pAnalyzerID"></param>
         ''' <returns></returns>
         ''' <remarks>AG 30/06/2011</remarks>
-        Public Function ChangeRotorPerformed(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String) As GlobalDataTO
+        Public Function ChangeRotorPerformed(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String) As GlobalDataTO Implements IReactionsRotorStatusSerializer.ChangeRotorPerformed
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
             Try
@@ -378,4 +370,10 @@ Namespace Biosystems.Ax00.BL
 
 
     End Class
+
+    Public Interface IReactionsRotorStatusSerializer
+        Function ChangeReactionsRotorRecommended(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pAnalyzerModel As String) As GlobalDataTO
+        Function ChangeRotorPerformed(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String) As GlobalDataTO
+    End Interface
+
 End Namespace

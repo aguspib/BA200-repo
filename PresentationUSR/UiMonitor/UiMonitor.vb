@@ -1763,9 +1763,8 @@ Public Class UiMonitor
         Dim resultData As GlobalDataTO = Nothing
         Dim myAnalyzerSettingsDelegate As New AnalyzerSettingsDelegate
 
-        resultData = myAnalyzerSettingsDelegate.GetAnalyzerSetting(Nothing, _
-                                                                   AnalyzerIDField, _
-                                                                   GlobalEnumerates.AnalyzerSettingsEnum.WUPSTARTDATETIME.ToString())
+        resultData = myAnalyzerSettingsDelegate.GetAnalyzerSetting(AnalyzerIDField, _
+                                                                   GlobalEnumerates.AnalyzerSettingsEnum.WUPSTARTDATETIME).GetCompatibleGlobalDataTO()
 
         If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
             Dim myAnalyzerSettingsDS As New AnalyzerSettingsDS
@@ -1790,9 +1789,8 @@ Public Class UiMonitor
 
                 Dim completeWupProcessFlag As Boolean = False 'AG 12/09/2011
                 Dim myAnalyzerSettings As New AnalyzerSettingsDelegate
-                resultData = myAnalyzerSettingsDelegate.GetAnalyzerSetting(Nothing, _
-                                                                           AnalyzerIDField, _
-                                                                           GlobalEnumerates.AnalyzerSettingsEnum.WUPCOMPLETEFLAG.ToString())
+                resultData = myAnalyzerSettingsDelegate.GetAnalyzerSetting(AnalyzerIDField, _
+                                                                           GlobalEnumerates.AnalyzerSettingsEnum.WUPCOMPLETEFLAG).GetCompatibleGlobalDataTO()
 
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     myAnalyzerSettingsDS = DirectCast(resultData.SetDatos, AnalyzerSettingsDS)

@@ -34,7 +34,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If (Not dbConnection Is Nothing) Then
                         'Search on tcfgAnalyzerSettings where setting id = ALARM_DISABLED
                         Dim myAnalyzerSettingDelegate As New AnalyzerSettingsDelegate
-                        myGlobalDataTo = myAnalyzerSettingDelegate.GetAnalyzerSetting(pdbConnection, AnalyzerIDAttribute, AnalyzerSettingsEnum.ALARM_DISABLED.ToString())
+                        myGlobalDataTo = myAnalyzerSettingDelegate.GetAnalyzerSetting(AnalyzerIDAttribute, AnalyzerSettingsEnum.ALARM_DISABLED).GetCompatibleGlobalDataTO
 
                         If Not myGlobalDataTo.HasError Then
                             Dim myAnalyzerSettingsDS As AnalyzerSettingsDS = DirectCast(myGlobalDataTo.SetDatos, AnalyzerSettingsDS)

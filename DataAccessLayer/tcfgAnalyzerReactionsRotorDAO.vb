@@ -7,8 +7,7 @@ Imports Biosystems.Ax00.Global
 Namespace Biosystems.Ax00.DAL.DAO
 
     Public Class tcfgAnalyzerReactionsRotorDAO
-          
-
+        Implements IAnalyzerSettingCRUD(Of AnalyzerReactionsRotorDS)
 
 #Region "C+R+U+D"
 
@@ -19,47 +18,43 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pAnalyzerID"></param>
         ''' <returns></returns>
         ''' <remarks>AG 17/05/2011 - </remarks>
-        Public Function Read(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String) As GlobalDataTO
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
-
+        Public Function Read(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String) As TypedGlobalDataTo(Of AnalyzerReactionsRotorDS) Implements IAnalyzerSettingCRUD(Of AnalyzerReactionsRotorDS).Read
+            'Dim resultData As New GlobalDataTO
+            'Dim dbConnection As New SqlClient.SqlConnection
+            Dim connection = DAOBase.GetSafeOpenDBConnection(pDBConnection)
             Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-                If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
 
-                    If (Not dbConnection Is Nothing) Then
-                        Dim cmdText As String = ""
-                        cmdText = " SELECT AnalyzerID, InstallDate, BLParametersRejected, WellsRejectedNumber " & vbCrLf & _
-                                  " FROM   tcfgAnalyzerReactionsRotor " & vbCrLf & _
-                                  " WHERE  AnalyzerID = '" & pAnalyzerID & "'"
+                If (connection IsNot Nothing AndAlso connection.SetDatos IsNot Nothing) Then
+                    Dim cmdText As String = ""
+                    cmdText = " SELECT AnalyzerID, InstallDate, BLParametersRejected, WellsRejectedNumber " & vbCrLf & _
+                              " FROM   tcfgAnalyzerReactionsRotor " & vbCrLf & _
+                              " WHERE  AnalyzerID = '" & pAnalyzerID & "'"
 
-                        Dim dbCmd As New SqlClient.SqlCommand
-                        dbCmd.Connection = dbConnection
-                        dbCmd.CommandText = cmdText
+                    Dim dbCmd As New SqlClient.SqlCommand
+                    dbCmd.Connection = connection.SetDatos
+                    dbCmd.CommandText = cmdText
 
-                        'Fill the DataSet to return 
-                        Dim myDS As New AnalyzerReactionsRotorDS
-                        Dim dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-                        dbDataAdapter.Fill(myDS.tcfgAnalyzerReactionsRotor)
+                    'Fill the DataSet to return 
+                    Dim myDS As New AnalyzerReactionsRotorDS
+                    Dim dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                    dbDataAdapter.Fill(myDS.tcfgAnalyzerReactionsRotor)
 
-                        resultData.SetDatos = myDS
-                        resultData.HasError = False
-
-                    End If
+                    Return New TypedGlobalDataTo(Of AnalyzerReactionsRotorDS)() With {.SetDatos = myDS, .HasError = False}
+                Else
+                    Return New TypedGlobalDataTo(Of AnalyzerReactionsRotorDS)() With {.HasError = True}
                 End If
             Catch ex As Exception
+                Dim resultdata = New TypedGlobalDataTo(Of AnalyzerReactionsRotorDS)
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
                 'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "tcfgAnalyzerReactionsRotorDAO.Read", EventLogEntryType.Error, False)
-
+                GlobalBase.CreateLogActivity(ex)
+                Return resultdata
             Finally
-                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
+                If (pDBConnection Is Nothing) Then CloseConnection(connection)
             End Try
-            Return resultData
         End Function
 
 
@@ -70,7 +65,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pEntryDS"></param>
         ''' <returns></returns>
         ''' <remarks>AG 17/05/2011 created</remarks>
-        Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pEntryDS As AnalyzerReactionsRotorDS) As GlobalDataTO
+        Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pEntryDS As AnalyzerReactionsRotorDS) As GlobalDataTO Implements IAnalyzerSettingCRUD(Of AnalyzerReactionsRotorDS).Create
             Dim myGlobalDataTO As New GlobalDataTO
 
             Try
@@ -120,7 +115,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pEntryDS"></param>
         ''' <returns></returns>
         ''' <remarks>AG 17/05/2011</remarks>
-        Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pEntryDS As AnalyzerReactionsRotorDS) As GlobalDataTO
+        Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pEntryDS As AnalyzerReactionsRotorDS) As GlobalDataTO Implements IAnalyzerSettingCRUD(Of AnalyzerReactionsRotorDS).Update
             Dim myGlobalDataTO As New GlobalDataTO
 
             Try
@@ -182,7 +177,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pAnalyzerID" ></param>
         ''' <returns></returns>
         ''' <remarks>AG 17/05/2011 - tested pending</remarks>
-        Public Function Delete(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String) As GlobalDataTO
+        Public Function Delete(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String) As GlobalDataTO Implements IAnalyzerSettingCRUD(Of AnalyzerReactionsRotorDS).Delete
             Dim myGlobalDataTO As New GlobalDataTO
 
             Try

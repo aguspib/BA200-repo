@@ -626,9 +626,8 @@ Partial Public Class UiAx00MainMDI
                         'Dim myAnalyzerSettingsDS As New AnalyzerSettingsDS
                         Dim myAnalyzerSettingsDS As AnalyzerSettingsDS
                         'Dim myAnalyzerSettingsDelegate As New AnalyzerSettingsDelegate
-                        myGlobal = myAnalyzerSettingsDelegate.GetAnalyzerSetting(Nothing, _
-                                               AnalyzerIDAttribute, _
-                                               GlobalEnumerates.AnalyzerSettingsEnum.WUPSTARTDATETIME.ToString())
+                        myGlobal = myAnalyzerSettingsDelegate.GetAnalyzerSetting(AnalyzerIDAttribute, _
+                                               GlobalEnumerates.AnalyzerSettingsEnum.WUPSTARTDATETIME).GetCompatibleGlobalDataTO()
 
                         If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                             myAnalyzerSettingsDS = DirectCast(myGlobal.SetDatos, AnalyzerSettingsDS)
@@ -655,9 +654,8 @@ Partial Public Class UiAx00MainMDI
                         'AG 14/03/2012- If not finished, not paused, not in process and analyzer ready maybe it has been aborted by freeze
                         If Not WarmUpFinished AndAlso Not warmUpPaused AndAlso myAx00Ready AndAlso _
                            AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "" Then
-                            myGlobal = myAnalyzerSettingsDelegate.GetAnalyzerSetting(Nothing, _
-                                       AnalyzerIDAttribute, _
-                                       GlobalEnumerates.AnalyzerSettingsEnum.WUPCOMPLETEFLAG.ToString())
+                            myGlobal = myAnalyzerSettingsDelegate.GetAnalyzerSetting(AnalyzerIDAttribute, _
+                                       GlobalEnumerates.AnalyzerSettingsEnum.WUPCOMPLETEFLAG).GetCompatibleGlobalDataTO()
 
                             If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                                 myAnalyzerSettingsDS = DirectCast(myGlobal.SetDatos, AnalyzerSettingsDS)
@@ -923,7 +921,7 @@ Partial Public Class UiAx00MainMDI
                                 If bcButtonStatus Then
                                     'A part from Analyzer status check if barcode reader is enabled
                                     If String.Compare(CurrentMdiChild.CurrentRotorType, "SAMPLES", False) = 0 Then
-                                        resultData = analyzerSettings.GetAnalyzerSetting(Nothing, AnalyzerIDAttribute, GlobalEnumerates.AnalyzerSettingsEnum.SAMPLE_BARCODE_DISABLED.ToString)
+                                        resultData = analyzerSettings.GetAnalyzerSetting(AnalyzerIDAttribute, GlobalEnumerates.AnalyzerSettingsEnum.SAMPLE_BARCODE_DISABLED).GetCompatibleGlobalDataTO()
                                         If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                                             Dim myDataSet As New AnalyzerSettingsDS
                                             myDataSet = CType(resultData.SetDatos, AnalyzerSettingsDS)
@@ -933,7 +931,7 @@ Partial Public Class UiAx00MainMDI
                                         End If
 
                                     Else
-                                        resultData = analyzerSettings.GetAnalyzerSetting(Nothing, AnalyzerIDAttribute, GlobalEnumerates.AnalyzerSettingsEnum.REAGENT_BARCODE_DISABLED.ToString)
+                                        resultData = analyzerSettings.GetAnalyzerSetting(AnalyzerIDAttribute, GlobalEnumerates.AnalyzerSettingsEnum.REAGENT_BARCODE_DISABLED).GetCompatibleGlobalDataTO()
                                         If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                                             Dim myDataSet As New AnalyzerSettingsDS
                                             myDataSet = CType(resultData.SetDatos, AnalyzerSettingsDS)
@@ -963,7 +961,7 @@ Partial Public Class UiAx00MainMDI
                             If Not CurrentMdiChild.bsScanningButton Is Nothing AndAlso CurrentMdiChild.bsScanningButton.Enabled <> bcButtonStatus Then
                                 If bcButtonStatus Then
                                     'A part from Analyzer status check if barcode reader is enabled
-                                    resultData = analyzerSettings.GetAnalyzerSetting(Nothing, AnalyzerIDAttribute, GlobalEnumerates.AnalyzerSettingsEnum.SAMPLE_BARCODE_DISABLED.ToString)
+                                    resultData = analyzerSettings.GetAnalyzerSetting(AnalyzerIDAttribute, GlobalEnumerates.AnalyzerSettingsEnum.SAMPLE_BARCODE_DISABLED).GetCompatibleGlobalDataTO()
                                     If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                                         Dim myDataSet As New AnalyzerSettingsDS
                                         myDataSet = CType(resultData.SetDatos, AnalyzerSettingsDS)
