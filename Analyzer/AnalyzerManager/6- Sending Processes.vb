@@ -1112,6 +1112,9 @@ Namespace Biosystems.Ax00.Core.Entities
                                 'End deletion rows process...
 
                                 resLinq = Nothing 'AG 02/08/2012 release memory
+
+                                'log consumption
+                                StatisticsUpkeepDelegate.LogExecutionReagenConsum(myExecDS.searchNext(0).ExecutionID, AnalyzerManager.GetCurrentAnalyzerManager().ActiveAnalyzer)
                             End If '(6)
                         End If '(3)
                     End If '(2)

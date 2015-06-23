@@ -120,7 +120,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="UpdateVersion\Task\TaskList_BA200.xml" />
+    <Content Include="UpdateVersion\Task\TaskList_BA200.xml">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

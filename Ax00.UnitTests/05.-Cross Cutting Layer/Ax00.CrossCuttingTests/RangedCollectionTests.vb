@@ -7,7 +7,7 @@ Namespace Biosystems.Ax00.CC.Tests
 
     <TestFixture()>
     Public Class RangedCollectionTests
-        Const max = 10, min = 10
+        Const max = 10, min = -10
 
         <Test()>
         Public Sub IntegersConstructorTest()
@@ -109,7 +109,24 @@ Namespace Biosystems.Ax00.CC.Tests
 
         End Sub
 
+        <Test()>
+        Public Sub IsIndexValidTest()
+            Dim list = New RangedCollection(Of String)(min, max)
+            list.AllowOutOfRange = False
+            For i = 0 To 100
+                list.Append("Hola!")
+            Next
+            Assert.AreEqual(list.IsIndexValid(min), True)
+            Assert.AreEqual(list.IsIndexValid(max), True)
+            For i = min - 2 To max + 2
+                If i < min Or i > max Then
+                    Assert.AreEqual(list.IsIndexValid(i), False)
+                Else
+                    Assert.AreEqual(list.IsIndexValid(i), True)
+                End If
 
+            Next
+        End Sub
     End Class
 
 
