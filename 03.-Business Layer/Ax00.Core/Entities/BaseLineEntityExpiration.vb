@@ -66,24 +66,6 @@ Public Class BaseLineEntityExpiration
         Return result
     End Function
 
-    'Public Sub CreationAlarm(ByRef alarm As AlarmEnumerates.Alarms) Implements IBaseLine.CreationAlarm
-    '    Dim myGlobal As New GlobalDataTO
-    '    Dim myAlarmList As New List(Of AlarmEnumerates.Alarms)
-    '    Dim myAlarmStatusList As New List(Of Boolean)
 
-    '    Try
-    '        myAlarmList.Add(alarm)
-    '        myAlarmStatusList.Add(True)
-
-    '        If myAlarmList.Count > 0 Then
-
-    '            Dim currentAlarms = New AnalyzerAlarms(Analyzer)
-    '            myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
-
-    '        End If
-    '    Catch ex As Exception
-    '        Throw ex
-    '    End Try
-    'End Sub
 
 End Class
