@@ -128,6 +128,10 @@
       <Project>{bd816d19-6903-4603-8a75-a14c099d4eb2}</Project>
       <Name>Analyzer</Name>
     </ProjectReference>
+    <ProjectReference Include="..\bax00framework\AX00Types\AX00Types.vbproj">
+      <Project>{19114cc5-ba39-4d35-89fa-41d9efb7a931}</Project>
+      <Name>AX00Types</Name>
+    </ProjectReference>
     <ProjectReference Include="..\bax00framework\Global\Global.vbproj">
       <Project>{5d65020c-c2d7-4ac3-b557-223fc290e526}</Project>
       <Name>Global</Name>
