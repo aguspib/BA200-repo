@@ -18,7 +18,7 @@ Namespace Biosystems.Ax00.Core.Entities
             WSExecutionCreator.Instance.ContaminationsSpecification = New BA200ContaminationsSpecification(Me)
             _currentAnalyzer = Me
 
-            Dim aux = New BaseLineExpirationListener(Me)
+            Dim BL_expListener = New BaseLineExpirationListener(Me)
 
         End Sub
 

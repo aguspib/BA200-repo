@@ -9,6 +9,7 @@ Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Global.AlarmEnumerates
 Imports Biosystems.Ax00.Core.Services.Enums
 Imports Biosystems.Ax00.Core.Services.Interfaces
+Imports Biosystems.Ax00.Core.Entities
 
 Namespace Biosystems.Ax00.Core.Services
     Public Class BaseLineService
@@ -967,7 +968,7 @@ Namespace Biosystems.Ax00.Core.Services
                 Dim myAnalyzerSettings As New AnalyzerSettingsDelegate
                 UpdateAnalyzerSettingsDsCache(currentNow)
                 myGlobal = myAnalyzerSettings.Save(Nothing, _analyzer.ActiveAnalyzer, myAnalyzerSettingsDs, Nothing)
-
+                deleteAlarmBlExpired()
             Catch ex As Exception
                 Throw ex
             End Try
@@ -991,6 +992,25 @@ Namespace Biosystems.Ax00.Core.Services
                     _analyzer.AnalyzerSettings.AcceptChanges()
                 End If
             End If
+        End Sub
+
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <remarks></remarks>
+        Private Sub deleteAlarmBlExpired()
+            Dim myGlobal As New GlobalDataTO
+            Dim myAlarmList As New List(Of AlarmEnumerates.Alarms)
+            Dim myAlarmStatusList As New List(Of Boolean)
+            Dim status As Boolean
+
+            Dim currentAlarms = New AnalyzerAlarms(_analyzer)
+
+            myAlarmList.Add(AlarmEnumerates.Alarms.BL_EXPIRED)
+            myAlarmStatusList.Add(status)
+            If currentAlarms.ExistsActiveAlarm(AlarmEnumerates.Alarms.BL_EXPIRED.ToString()) Then myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
+
         End Sub
 
 #End Region
