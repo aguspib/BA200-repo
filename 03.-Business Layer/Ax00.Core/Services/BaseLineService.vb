@@ -19,11 +19,13 @@ Namespace Biosystems.Ax00.Core.Services
         Sub New(analyzer As IAnalyzerManager, myFlagsDelg As IAnalyzerManagerFlagsDelegate)
             MyBase.New(analyzer, myFlagsDelg)
             _currentStep = BaseLineStepsEnum.NotStarted
+            SetAllInjectedDependencies()
         End Sub
 
         Sub New(analyzer As IAnalyzerManager, ByVal pauseWhenReadErrors As Boolean, myFlagsDelg As IAnalyzerManagerFlagsDelegate)
             Me.New(analyzer, myFlagsDelg)
             _pauseWhenReadErrors = pauseWhenReadErrors
+            SetAllInjectedDependencies()
         End Sub
 
 #End Region
@@ -79,8 +81,6 @@ Namespace Biosystems.Ax00.Core.Services
         Private _pauseWhenReadErrors As Boolean = False
 
 #End Region
-
-
 
 #Region "Event Handlers"
 
@@ -354,8 +354,6 @@ Namespace Biosystems.Ax00.Core.Services
 
                 ElseIf Status = ServiceStatusEnum.Paused Then
 
-                    'If (_analyzer.SessionFlag(AnalyzerManagerFlags.NewRotor) <> "INI") Then
-
                     If (_analyzer.SessionFlag(AnalyzerManagerFlags.Washing) = "CANCELED") Then
                         nextStep = BaseLineStepsEnum.ConditioningWashing
 
@@ -372,7 +370,7 @@ Namespace Biosystems.Ax00.Core.Services
                         nextStep = BaseLineStepsEnum.DynamicBaseLineEmpty
 
                     End If
-                    'End If
+
                 End If
 
             End If
@@ -593,13 +591,12 @@ Namespace Biosystems.Ax00.Core.Services
             'User execute the change reaction rotor when start instrument OK: Sw instructions NRotor + Alight
 
             'Delete the current reactions rotor status (configuration) and crete a new one
-            Dim cfgAnReactionsRotor As New AnalyzerReactionsRotorDelegate
-            Dim resultData As GlobalDataTO = cfgAnReactionsRotor.ChangeRotorPerformed(Nothing, _analyzer.ActiveAnalyzer)
+            Dim resultData As GlobalDataTO = ReactRotorStatusSerializer.ChangeRotorPerformed(Nothing, _analyzer.ActiveAnalyzer)
 
             'Before send ALIGHT process ... delete the all ALIGHT/FLIGHT results
             If Not resultData.HasError Then
-                Dim aLightDelg As New WSBLinesDelegate
-                resultData = aLightDelg.DeleteBLinesValues(Nothing, _analyzer.ActiveAnalyzer, _analyzer.ActiveWorkSession, "", _analyzer.BaseLineTypeForCalculations.ToString) 'AG 15/01/2015 BA-2212 inform new parameter BaseLineTypeForCalculations)
+
+                resultData = BaselineValuesDeleter.DeleteBLinesValues(Nothing, _analyzer.ActiveAnalyzer, _analyzer.ActiveWorkSession, "", _analyzer.BaseLineTypeForCalculations.ToString) 'AG 15/01/2015 BA-2212 inform new parameter BaseLineTypeForCalculations)
                 If Not resultData.HasError Then
                     'Once the conditioning is finished the Sw send an ALIGHT instruction 
                     _analyzer.ResetBaseLineFailuresCounters() 'AG 27/11/2014 BA-2066
@@ -617,6 +614,21 @@ Namespace Biosystems.Ax00.Core.Services
 
             'Update analyzer session flags into DataBase
             UpdateFlags(myAnalyzerFlagsDs)
+
+        End Sub
+
+        Public ReactRotorCRUD As IAnalyzerSettingCRUD(Of AnalyzerReactionsRotorDS)
+        Public ReactRotorStatusSerializer As IReactionsRotorStatusSerializer
+        Public BaselineValuesDeleter As IWSBLinesDelegateValuesDeleter
+
+        Private Sub SetAllInjectedDependencies()
+
+            If ReactRotorCRUD Is Nothing Then
+                Dim instance = New AnalyzerReactionsRotorDelegate
+                ReactRotorCRUD = instance
+                ReactRotorStatusSerializer = instance
+                BaselineValuesDeleter = New WSBLinesDelegate
+            End If
 
         End Sub
 
@@ -956,7 +968,7 @@ Namespace Biosystems.Ax00.Core.Services
                 myAnalyzerSettingsRow = myAnalyzerSettingsDs.tcfgAnalyzerSettings.NewtcfgAnalyzerSettingsRow
                 With myAnalyzerSettingsRow
                     .AnalyzerID = _analyzer.ActiveAnalyzer
-                    .SettingID = AnalyzerSettingsEnum.DYNAMICBLDATETIME.ToString()
+                    .SettingID = AnalyzerSettingsEnum.BL_DATETIME.ToString()
                     .CurrentValue = Now.ToString(Globalization.CultureInfo.InvariantCulture)
                 End With
                 myAnalyzerSettingsDs.tcfgAnalyzerSettings.Rows.Add(myAnalyzerSettingsRow)

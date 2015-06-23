@@ -54,6 +54,7 @@
       <HintPath>..\bax00framework\Third Party\Test Libraries\NUnit.2.6.2\lib\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -127,6 +128,10 @@
       <Project>{bd816d19-6903-4603-8a75-a14c099d4eb2}</Project>
       <Name>Analyzer</Name>
     </ProjectReference>
+    <ProjectReference Include="..\bax00framework\AX00Types\AX00Types.vbproj">
+      <Project>{19114cc5-ba39-4d35-89fa-41d9efb7a931}</Project>
+      <Name>AX00Types</Name>
+    </ProjectReference>
     <ProjectReference Include="..\bax00framework\Global\Global.vbproj">
       <Project>{5d65020c-c2d7-4ac3-b557-223fc290e526}</Project>
       <Name>Global</Name>
@@ -138,6 +143,14 @@
     <ProjectReference Include="..\Calculations\Calculations.vbproj">
       <Project>{053cffd3-17b1-4a95-af8c-ff4b6de08809}</Project>
       <Name>Calculations</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DataAccessLayer\DataAccessLayer.vbproj">
+      <Project>{51863cf3-a3e9-4e41-8924-c69704796fb9}</Project>
+      <Name>DataAccessLayer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WorkSession\WorkSession.vbproj">
+      <Project>{a883608a-3d41-4339-9c2f-feea18befb68}</Project>
+      <Name>WorkSession</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

@@ -1741,7 +1741,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             '    - If the type is STATIC then next ID = current+1
                             '    - Else: If already exists for well, led then nextId = current+1
                             If currBaseLineID > 0 AndAlso pType = BaseLineType.DYNAMIC.ToString Then
-                                resultData = myDelegate.Read(dbConnection, pAnalyzerID, pWorkSessionID, currBaseLineID, pLed, "")
+                                resultData = myDelegate.Read(dbConnection, pAnalyzerID, pWorkSessionID, currBaseLineID, pLed, "").GetCompatibleGlobalDataTO()
                                 If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                                     Dim auxDS As New BaseLinesDS
                                     auxDS = DirectCast(resultData.SetDatos, BaseLinesDS)

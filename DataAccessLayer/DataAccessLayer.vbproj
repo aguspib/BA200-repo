@@ -158,6 +158,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BarCodesDAO.vb" />
+    <Compile Include="CRUD interfaces\IWSBLinesDelegateCRUD.vb" />
     <Compile Include="History\thisAdjustBaseLinesDAO.vb" />
     <Compile Include="History\thisAnalyzerWorkSessionsDAO.vb" />
     <Compile Include="History\thisCalibratorsDAO.vb" />
@@ -172,6 +173,7 @@
     <Compile Include="History\thisWSOrderTestsDAO.vb" />
     <Compile Include="History\thisWSReadingsDAO.vb" />
     <Compile Include="History\thisWSResultsDAO.vb" />
+    <Compile Include="CRUD interfaces\IAnalyzerSettingCRUD.vb" />
     <Compile Include="Integrity\IntegrityDAO.vb" />
     <Compile Include="tcfgGridColsConfigurationDAO.vb" />
     <Compile Include="tcfgReportsTestsSortingDAO.vb" />

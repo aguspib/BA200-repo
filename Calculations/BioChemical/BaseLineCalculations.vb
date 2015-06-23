@@ -1761,7 +1761,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         Dim myDS As New AnalyzerReactionsRotorDS
                         Dim row As AnalyzerReactionsRotorDS.tcfgAnalyzerReactionsRotorRow
 
-                        resultData = myAnReactRotorDelg.Read(dbConnection, myAnalyzerID)
+                        resultData = myAnReactRotorDelg.Read(dbConnection, myAnalyzerID).GetCompatibleGlobalDataTO
                         If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                             myDS = CType(resultData.SetDatos, AnalyzerReactionsRotorDS)
                             If myDS.tcfgAnalyzerReactionsRotor.Rows.Count > 0 Then createFlag = False
