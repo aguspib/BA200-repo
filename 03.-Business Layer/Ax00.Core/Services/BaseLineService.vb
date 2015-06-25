@@ -440,8 +440,10 @@ Namespace Biosystems.Ax00.Core.Services
 
                     End If
             End Select
-            If nextStep <> BaseLineStepsEnum.None Then
+            Static lastdone As BaseLineStepsEnum = BaseLineStepsEnum.None
+            If nextStep <> BaseLineStepsEnum.None AndAlso lastdone <> nextStep Then
                 Debug.WriteLine("Currently doing: " & nextStep.ToString)
+                lastdone = nextStep
             End If
             Return nextStep
         End Function
