@@ -10,6 +10,7 @@ Imports Telerik.JustMock
 Imports Telerik.JustMock.Helpers
 Imports System.Data
 Imports System.Globalization
+Imports Biosystems.Ax00.Core.Entities
 Imports Biosystems.Ax00.Types.AnalyzerSettingsDS
 
 Namespace Biosystems.Ax00.Core.Services.Tests
@@ -122,7 +123,7 @@ Namespace Biosystems.Ax00.Core.Services.Tests
             BLService.BaselineValuesDeleter = blDeleter
             BLService.ReactRotorCRUD = Mock.Create(Of IAnalyzerSettingCRUD(Of AnalyzerReactionsRotorDS))()
             BLService.AnalyzerSettingsSaver = AddressOf SaverMock
-
+            BLService.AnalyzerAlarmsManager = Mock.Create(Of IAnalyzerAlarms)()
         End Sub
 
         Public Shared Function SaverMock(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String,
