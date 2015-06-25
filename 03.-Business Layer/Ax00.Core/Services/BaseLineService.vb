@@ -622,6 +622,7 @@ Namespace Biosystems.Ax00.Core.Services
         Public ReactRotorCRUD As IAnalyzerSettingCRUD(Of AnalyzerReactionsRotorDS)
         Public ReactRotorStatusSerializer As IReactionsRotorStatusSerializer
         Public BaselineValuesDeleter As IWSBLinesDelegateValuesDeleter
+        Public AnalyzerAlarmsManager As IAnalyzerAlarms
 
 
         'Public Shared Function Save(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pAnalyzerSettings As AnalyzerSettingsDS, ByVal pSessionSettings As UserSettingDS) As GlobalDataTO
@@ -635,6 +636,7 @@ Namespace Biosystems.Ax00.Core.Services
                 ReactRotorStatusSerializer = instance
                 BaselineValuesDeleter = New WSBLinesDelegate
                 AnalyzerSettingsSaver = AddressOf AnalyzerSettingsDelegate.Save
+                AnalyzerAlarmsManager = New AnalyzerAlarms(_analyzer)
             End If
 
         End Sub
@@ -982,10 +984,9 @@ Namespace Biosystems.Ax00.Core.Services
             End With
             myAnalyzerSettingsDs.tcfgAnalyzerSettings.Rows.Add(myAnalyzerSettingsRow)
 
-                Dim myAnalyzerSettings As New AnalyzerSettingsDelegate
-                UpdateAnalyzerSettingsDsCache(currentNow)
-				myGlobal = AnalyzerSettingsSaver(Nothing, _analyzer.ActiveAnalyzer, myAnalyzerSettingsDs, Nothing) 'AnalyzerSettingsDelegate.Save(Nothing, _analyzer.ActiveAnalyzer, myAnalyzerSettingsDs, Nothing)
-                deleteAlarmBlExpired()
+            UpdateAnalyzerSettingsDsCache(currentNow)
+            myGlobal = AnalyzerSettingsSaver(Nothing, _analyzer.ActiveAnalyzer, myAnalyzerSettingsDs, Nothing)
+            deleteAlarmBlExpired()
 
             
         End Sub
@@ -1009,23 +1010,18 @@ Namespace Biosystems.Ax00.Core.Services
             End If
         End Sub
 
-
         ''' <summary>
-        ''' 
+        ''' Function to delete the Base Line over date from alarms of the analyzer, once this one is solved.
         ''' </summary>
         ''' <remarks></remarks>
         Private Sub deleteAlarmBlExpired()
             Dim myGlobal As New GlobalDataTO
             Dim myAlarmList As New List(Of AlarmEnumerates.Alarms)
             Dim myAlarmStatusList As New List(Of Boolean)
-            Dim status As Boolean
-
-            Dim currentAlarms = New AnalyzerAlarms(_analyzer)
 
             myAlarmList.Add(AlarmEnumerates.Alarms.BL_EXPIRED)
-            myAlarmStatusList.Add(status)
-            If currentAlarms.ExistsActiveAlarm(AlarmEnumerates.Alarms.BL_EXPIRED.ToString()) Then myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
-
+            myAlarmStatusList.Add(False)
+            If AnalyzerAlarmsManager.ExistsActiveAlarm(AlarmEnumerates.Alarms.BL_EXPIRED.ToString()) Then myGlobal = AnalyzerAlarmsManager.Manage(myAlarmList, myAlarmStatusList)
         End Sub
 
 #End Region
