@@ -93,9 +93,10 @@ Namespace Logger.Tests
                 bulkCounter += 1
             End While
 
-            Debug.WriteLine("Waiting for 5 minutes")
-            Dim t = Task.Delay(1000 * 60 * 5)
-            t.Wait()
+            While messageLog.QueuedItems > 0
+                Dim t = Task.Delay(1000)
+                t.Wait()
+            End While
             Debug.WriteLine("done, checking correctness...")
 
             Assert.IsTrue(File.Exists(Path.GetFullPath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) & "\BioSystemsDev\" & messageLog.FolderName & "BulkTest_Preparation_" & Date.Now.ToString("yyyy_MM") & ".csv")))
