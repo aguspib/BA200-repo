@@ -206,6 +206,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by SG 25/02/11</remarks>
+        <Obsolete("This method is deprecated!! Not in USE!")>
         Protected Friend Function SendQueueForREADINGSENSORS() As GlobalDataTO
             Dim myResultData As New GlobalDataTO
             Dim myFwScript1 As New FwScriptQueueItem
