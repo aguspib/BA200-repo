@@ -26,59 +26,60 @@ Namespace Biosystems.Ax00.Core.Services.Tests
 
         <Test()>
         Public Sub IntegrationTestHappyPath()
+            Debug.WriteLine("Creating test scenario")
             CreateScenario()
+            NUnit.Framework.Assert.AreEqual(BLService.Status, ServiceStatusEnum.NotYetStarted, "Service provided wrong start status. It should be NotYetStarted")
 
+            Debug.WriteLine("Starting baseline service")
             Dim result = BLService.StartService
+            NUnit.Framework.Assert.IsTrue(result, "Service was unable to start, or provided wrong start result. Expected TRUE")
+
+            NUnit.Framework.Assert.AreEqual(BLService.Status, ServiceStatusEnum.Running, "Service status should be Running")
 
             'result needs to be true if the service has been started
-            NUnit.Framework.Assert.IsTrue(result)
-
-            'service status needs to be set to running if it's listening and alive
-            NUnit.Framework.Assert.AreEqual(BLService.Status, ServiceStatusEnum.Running)
 
             'We throw a Status instruction event, so the service updates its flags
             AnalyzerMock.ThrowStatusEvent()
 
 
             'When the service gets the first Status alarm, it needs to update its status to check previous alarms
-            NUnit.Framework.Assert.AreEqual(BLService.CurrentStep, BaseLineStepsEnum.CheckPreviousAlarms)
+            NUnit.Framework.Assert.AreEqual(BLService.CurrentStep, BaseLineStepsEnum.CheckPreviousAlarms, "Service should be checking previous 551 and 560 alarms")
             'No alarms in this test
 
             'When we have checked the previous alarms, the service needs to be on status "Conditional washing"
             AnalyzerMock.ThrowStatusEvent()
-            NUnit.Framework.Assert.AreEqual(BLService.CurrentStep, BaseLineStepsEnum.ConditioningWashing)
+            NUnit.Framework.Assert.AreEqual(BLService.CurrentStep, BaseLineStepsEnum.ConditioningWashing, "Service should be doing a conditional washing")
 
             'We're in the middle of a washing process. it should still return a Washing status, as it hasn't finished!
             AnalyzerMock.ThrowStatusEvent()
-            NUnit.Framework.Assert.AreEqual(BLService.CurrentStep, BaseLineStepsEnum.ConditioningWashing)
+            NUnit.Framework.Assert.AreEqual(BLService.CurrentStep, BaseLineStepsEnum.ConditioningWashing, "Service should be doing a conditional washing")
 
             'We finish the washing process
             AnalyzerMock.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.Washing) = "END"
 
             'We perform the Static Base Line Step:
             AnalyzerMock.ThrowStatusEvent()
-            NUnit.Framework.Assert.AreEqual(BLService.CurrentStep, BaseLineStepsEnum.StaticBaseLine)
+            NUnit.Framework.Assert.AreEqual(BLService.CurrentStep, BaseLineStepsEnum.StaticBaseLine, "Service should be doing the Static baseline process")
             AnalyzerMock.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine) = "END"
 
             'We perform the Dynamic Base Line Fill Step:
             AnalyzerMock.ThrowStatusEvent()
-            NUnit.Framework.Assert.AreEqual(BLService.CurrentStep, BaseLineStepsEnum.DynamicBaseLineFill)
+            NUnit.Framework.Assert.AreEqual(BLService.CurrentStep, BaseLineStepsEnum.DynamicBaseLineFill, "Service should be filling the rotor for the dynamic baseline")
 
             'We mmake our Analyzer manager mock finish filling the mocked rotor:
             AnalyzerMock.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill) = "END"
 
             'We do the dynamic baseline read
             AnalyzerMock.ThrowStatusEvent()
-            NUnit.Framework.Assert.AreEqual(BLService.CurrentStep, BaseLineStepsEnum.DynamicBaseLineRead)
+            NUnit.Framework.Assert.AreEqual(BLService.CurrentStep, BaseLineStepsEnum.DynamicBaseLineRead, "Service should be reading the rotor as part of the Dynamic Baseline")
             AnalyzerMock.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read) = "END"
 
             AnalyzerMock.ThrowStatusEvent()
-            NUnit.Framework.Assert.AreEqual(BLService.CurrentStep, BaseLineStepsEnum.DynamicBaseLineEmpty)
+            NUnit.Framework.Assert.AreEqual(BLService.CurrentStep, BaseLineStepsEnum.DynamicBaseLineEmpty, "Service should be emptying the rotor as part of the Dynamic Baseline")
             AnalyzerMock.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty) = "END"
 
             AnalyzerMock.ThrowStatusEvent()
-            NUnit.Framework.Assert.AreEqual(BLService.CurrentStep, BaseLineStepsEnum.Finalize)
-
+            NUnit.Framework.Assert.AreEqual(BLService.CurrentStep, BaseLineStepsEnum.Finalize, "Service should be finalized at this step")
 
             Const DateTimePrecission As Integer = 10 'in seconds
             'newBLDate.ToString(Globalization.CultureInfo.InvariantCulture)
@@ -90,8 +91,11 @@ Namespace Biosystems.Ax00.Core.Services.Tests
                     NUnit.Framework.Assert.Fail(String.Format("Baseline date was not properly calcaulted, or process took more than {0} seconds.", DateTimePrecission))
                 End If
             End If
+            Debug.WriteLine("Baseline creation time properly set")
 
-            NUnit.Framework.Assert.Pass("Test passed as expected!")
+            NUnit.Framework.Assert.AreEqual(BLService.Status, ServiceStatusEnum.EndSuccess, "Service should be returning an EndSuccess at this stage")
+            Debug.WriteLine("All tested.")
+            NUnit.Framework.Assert.Pass("BLService status: " & BLService.Status.ToString)
         End Sub
 
         Private Sub CreateScenario()
