@@ -294,8 +294,7 @@ Namespace Biosystems.Ax00.Core.Interfaces
 
 
         Sub ResetFLIGHT()
-
-
+        Sub Createandthroweventuirefresh()
 
 #End Region
 

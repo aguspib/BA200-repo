@@ -1054,6 +1054,9 @@ Namespace Biosystems.Ax00.Core.Entities
             End If
         End Sub
 
+
+
+
 #Region "Aux Functions"
         ''' <summary>
         ''' Activate the Analyzer Alarm Sound if prosuce alarm require sound.

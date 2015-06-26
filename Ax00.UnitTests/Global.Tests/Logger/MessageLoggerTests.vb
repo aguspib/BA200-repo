@@ -85,27 +85,42 @@ Namespace Logger.Tests
         ''' Test the creation of the file, add 25000 lines in the same file
         ''' </summary>
         <Test()> Public Sub MessageLogger_AddLog_BulkWriteLines()
+
             Dim messageLog As New MessageLogger("LogConsum", "AnalyzerSN;TestName;SampleClass;SampleType;VR1(uL);BarcodeR1;VR2(uL);BarcodeR2", "BulkTest_Preparation", MessageLogger.LogFrequency.Monthly)
-            Dim bulkCounter = 0
 
-            While bulkCounter < 25000
-                messageLog.AddLog("Ax00_000000;Patient" & bulkCounter.ToString & ";CALIB;SER;;;;")
-                bulkCounter += 1
-            End While
+            Dim filePath = Path.GetFullPath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) & "\BioSystemsDev\" & messageLog.FolderName & "BulkTest_Preparation_" & Date.Now.ToString("yyyy_MM") & ".csv")
+            If IO.File.Exists(filePath) Then
+                Try
+                    File.Delete(filePath)
+                Catch : End Try
+            End If
 
+
+            'Dim bulkCounter = 0
+
+            'While bulkCounter < 25000
+            '    messageLog.AddLog("Ax00_000000;Patient" & bulkCounter.ToString & ";CALIB;SER;;;;")
+            '    bulkCounter += 1
+            'End While
+
+            Parallel.For(0, 25000, Sub(x As Integer)
+                                       messageLog.AddLog("Ax00_000000;Patient" & x.ToString & ";CALIB;SER;;;;")
+                                   End Sub)
+
+
+            Dim time = Now
             While messageLog.QueuedItems > 0
                 Dim t = Task.Delay(1000)
                 t.Wait()
             End While
-            Debug.WriteLine("done, checking correctness...")
+            Debug.WriteLine("done, checking correctness.  It took  " & (Now - time).ToString())
 
-            Assert.IsTrue(File.Exists(Path.GetFullPath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) & "\BioSystemsDev\" & messageLog.FolderName & "BulkTest_Preparation_" & Date.Now.ToString("yyyy_MM") & ".csv")))
-            Assert.AreEqual(25001, File.ReadAllLines(Path.GetFullPath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) & "\BioSystemsDev\" & messageLog.FolderName & "BulkTest_Preparation_" & Date.Now.ToString("yyyy_MM") & ".csv")).Length)
+            Assert.IsTrue(File.Exists(filePath))
+            Assert.AreEqual(25001, File.ReadAllLines(filePath).Length)
 
             'Cleaning
-            File.Delete(Path.GetFullPath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) & "\BioSystemsDev\" & messageLog.FolderName & "BulkTest_Preparation_" & Date.Now.ToString("yyyy_MM") & ".csv"))
-            Assert.IsFalse(File.Exists(Path.GetFullPath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) & "\BioSystemsDev\" & messageLog.FolderName & "BulkTest_Preparation_" & Date.Now.ToString("yyyy_MM") & ".csv")))
-
+            File.Delete(filePath)
+            Assert.IsFalse(IO.File.Exists(filePath))
         End Sub
     End Class
 
