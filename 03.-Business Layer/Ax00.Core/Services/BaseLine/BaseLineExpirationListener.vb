@@ -13,7 +13,7 @@ Namespace Biosystems.Ax00.Core.Services.BaseLine
         Private Shared _analyzer As IAnalyzerManager
         Private _analyzerAlarmsManager As IAnalyzerAlarms
 
-        Private Enum TypeActionAlarm
+        Public Enum TypeActionAlarm
             Creation
             Delete
         End Enum
@@ -25,11 +25,10 @@ Namespace Biosystems.Ax00.Core.Services.BaseLine
             BaseLineExpirationListener._analyzer = analyzer
             _analyzerAlarmsManager = New AnalyzerAlarms(AnalyzerManager.GetCurrentAnalyzerManager())
 
-            Dim T As New Threading.Thread(AddressOf Listening)
-            T.IsBackground = True
-            T.Priority = ThreadPriority.Lowest
-            T.Start()
-            T.Priority = ThreadPriority.Lowest
+            'Dim T As New Threading.Thread(AddressOf Listening)
+            'T.IsBackground = True
+            'T.Priority = ThreadPriority.Lowest
+            'T.Start()
         End Sub
 
 #Region "Events"
@@ -44,7 +43,7 @@ Namespace Biosystems.Ax00.Core.Services.BaseLine
             While True
                 '10 minuts
                 'Dim a = Task.Delay(10 * 60 * 1000)
-                Dim a = Task.Delay(2 * 60 * 1000)
+                Dim a = Task.Delay(1 * 60 * 1000)
                 a.Wait()
 
                 If baseLineExpirationobj.IsBlExpired Then
@@ -66,14 +65,14 @@ Namespace Biosystems.Ax00.Core.Services.BaseLine
         ''' </summary>
         ''' <param name="alarm"></param>
         ''' <remarks></remarks>
-        Private Sub ActionAlarm(ByVal typeAction As TypeActionAlarm, ByRef alarm As AlarmEnumerates.Alarms)
+        Public Sub ActionAlarm(ByVal typeAction As TypeActionAlarm, ByRef alarm As AlarmEnumerates.Alarms)
             Dim myGlobal As New GlobalDataTO
             Dim myAlarmList As New List(Of AlarmEnumerates.Alarms)
             Dim myAlarmStatusList As New List(Of Boolean)
             Dim status As Boolean
             Try
 
-              
+
                 myAlarmList.Add(alarm)
 
                 Select Case typeAction
@@ -81,19 +80,13 @@ Namespace Biosystems.Ax00.Core.Services.BaseLine
                         status = True
                         myAlarmStatusList.Add(status)
                         If Not _analyzerAlarmsManager.ExistsActiveAlarm(alarm.ToString()) Then myGlobal = _analyzerAlarmsManager.Manage(myAlarmList, myAlarmStatusList)
-
                     Case TypeActionAlarm.Delete
                         status = False
                         myAlarmStatusList.Add(status)
                         If _analyzerAlarmsManager.ExistsActiveAlarm(alarm.ToString()) Then myGlobal = _analyzerAlarmsManager.Manage(myAlarmList, myAlarmStatusList)
-
-                        '_analyzer.Alarms.Add(AlarmEnumerates.Alarms.BL_EXPIRED)
-                        'If _analyzer.Alarms.Contains(AlarmEnumerates.Alarms.BL_EXPIRED) Then
-                        '_analyzer.Alarms.Remove(AlarmEnumerates.Alarms.BL_EXPIRED)
-                        'End If
-
                 End Select
 
+                _analyzer.Createandthroweventuirefresh()
             Catch ex As Exception
                 Throw ex
             End Try

@@ -341,4 +341,11 @@ Public Class Ax00MainForm
     Private Sub MITestButtonClick(sender As Object, e As EventArgs) Handles MITestProcess.Click
         LinkLayer.SimulateDataReception("A200;STATUS;R2B2:15;R2B1:11;")
     End Sub
+
+    Private Sub Btn_Meritxell_Click(sender As Object, e As EventArgs) Handles Btn_Meritxell.Click
+
+        Dim mr_form As New Form_MR
+        mr_form.ShowDialog()
+
+    End Sub
 End Class

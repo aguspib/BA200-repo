@@ -200,6 +200,12 @@
   <ItemGroup>
     <Compile Include="ApplicationEvents.vb" />
     <Compile Include="RotorUtils\ReagentExpirationParsing.vb" />
+    <Compile Include="TestForms\Form_MR.Designer.vb">
+      <DependentUpon>Form_MR.vb</DependentUpon>
+    </Compile>
+    <Compile Include="TestForms\Form_MR.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="UiConfigLIS.Designer.vb">
       <DependentUpon>UiConfigLIS.vb</DependentUpon>
     </Compile>
@@ -693,6 +699,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="TestForms\Form_MR.resx">
+      <DependentUpon>Form_MR.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UiConfigLIS.resx">
       <DependentUpon>UiConfigLIS.vb</DependentUpon>
     </EmbeddedResource>
