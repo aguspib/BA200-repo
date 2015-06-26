@@ -6435,6 +6435,8 @@ Partial Public Class UiAx00MainMDI
             myAlarms.Add(Alarms.REACT_TEMP_WARN)
             myAlarms.Add(Alarms.REACT_TEMP_SYS_ERR) 'AG 21/05/2012
 
+            myAlarms.Add(Alarms.BL_EXPIRED) 'MR 25/06/2015
+
             ReactionsRotorAlert = New bsAlert(Me, 605, 335 + ParentMDITopHeight, 175, 110, "Reactions Rotor", False)
             ReactionsRotorAlert.Tag = myAlarms
             AlertList.Add(ReactionsRotorAlert)

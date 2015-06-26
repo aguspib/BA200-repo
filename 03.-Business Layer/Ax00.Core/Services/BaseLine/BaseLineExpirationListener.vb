@@ -11,6 +11,7 @@ Namespace Biosystems.Ax00.Core.Services.BaseLine
 #Region "Definitions"
 
         Private Shared _analyzer As IAnalyzerManager
+        Private _analyzerAlarmsManager As IAnalyzerAlarms
 
         Private Enum TypeActionAlarm
             Creation
@@ -22,6 +23,7 @@ Namespace Biosystems.Ax00.Core.Services.BaseLine
         Public Sub New(analyzer As IAnalyzerManager)
 
             BaseLineExpirationListener._analyzer = analyzer
+            _analyzerAlarmsManager = New AnalyzerAlarms(AnalyzerManager.GetCurrentAnalyzerManager())
 
             Dim T As New Threading.Thread(AddressOf Listening)
             T.IsBackground = True
@@ -71,20 +73,19 @@ Namespace Biosystems.Ax00.Core.Services.BaseLine
             Dim status As Boolean
             Try
 
-                Dim currentAlarms = New AnalyzerAlarms(AnalyzerManager.GetCurrentAnalyzerManager())
-
+              
                 myAlarmList.Add(alarm)
 
                 Select Case typeAction
                     Case TypeActionAlarm.Creation
                         status = True
                         myAlarmStatusList.Add(status)
-                        If Not currentAlarms.ExistsActiveAlarm(alarm.ToString()) Then myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
+                        If Not _analyzerAlarmsManager.ExistsActiveAlarm(alarm.ToString()) Then myGlobal = _analyzerAlarmsManager.Manage(myAlarmList, myAlarmStatusList)
 
                     Case TypeActionAlarm.Delete
                         status = False
                         myAlarmStatusList.Add(status)
-                        If currentAlarms.ExistsActiveAlarm(alarm.ToString()) Then myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
+                        If _analyzerAlarmsManager.ExistsActiveAlarm(alarm.ToString()) Then myGlobal = _analyzerAlarmsManager.Manage(myAlarmList, myAlarmStatusList)
 
                         '_analyzer.Alarms.Add(AlarmEnumerates.Alarms.BL_EXPIRED)
                         'If _analyzer.Alarms.Contains(AlarmEnumerates.Alarms.BL_EXPIRED) Then
