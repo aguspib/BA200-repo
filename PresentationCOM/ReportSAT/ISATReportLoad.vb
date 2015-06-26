@@ -583,9 +583,8 @@ Public Class UiSATReportLoad
                                         If mySATModel = AnalyzerModelEnum.A200.ToString Then
                                             'Incompatible Model, Not continue, diferent Models
                                             myGlobal.HasError = True
-                                            myGlobal.ErrorCode = GlobalEnumerates.Messages._NONE.ToString
-                                            'Todo: Dynamic Translate message acording to lenguage
-                                            myGlobal.ErrorMessage = "Report SAT file Model (" & mySATModel & ") different than current Model (" & mySWModel & ")"
+                                            myGlobal.ErrorCode = GlobalEnumerates.Messages.SAT_LOAD_MODEL_DIFFERENT.ToString                                 
+                                            myGlobal.ErrorMessage = mySWModel
 
                                             GlobalBase.CreateLogActivity(myGlobal.ErrorMessage, Me.Name & " LoadSATReport ", EventLogEntryType.Warning, GetApplicationInfoSession().ActivateSystemLog)
 
@@ -595,9 +594,8 @@ Public Class UiSATReportLoad
                                         If mySATModel <> mySWModel Then
                                             'Incompatible Model, Not continue, diferent Models
                                             myGlobal.HasError = True
-                                            myGlobal.ErrorCode = GlobalEnumerates.Messages.SAT_LOAD_REPORT_ERROR.ToString
-                                            'Todo: Dynamic Translate message acording to lenguage
-                                            myGlobal.ErrorMessage = "Report SAT file Model (" & mySATModel & ") different than current Model (" & mySWModel & ")"
+                                            myGlobal.ErrorCode = GlobalEnumerates.Messages.SAT_LOAD_MODEL_DIFFERENT.ToString
+                                            myGlobal.ErrorMessage = mySWModel
 
                                             GlobalBase.CreateLogActivity(myGlobal.ErrorMessage, Me.Name & " LoadSATReport ", EventLogEntryType.Warning, GetApplicationInfoSession().ActivateSystemLog)
 
@@ -610,10 +608,8 @@ Public Class UiSATReportLoad
                                 If mySWModel <> AnalyzerModelEnum.A400.ToString Then
                                     'Incompatible Model, Not continue, diferent Models
                                     myGlobal.HasError = True
-                                    myGlobal.ErrorCode = GlobalEnumerates.Messages.SAT_LOAD_REPORT_ERROR.ToString
-                                    'Todo: Dynamic Translate message acording to lenguage
-                                    myGlobal.ErrorMessage = "Report SAT file Model (" & AnalyzerModelEnum.A400.ToString & ") different than current Model (" & mySWModel & ")"
-
+                                    myGlobal.ErrorCode = GlobalEnumerates.Messages.SAT_LOAD_MODEL_DIFFERENT.ToString
+                                    myGlobal.ErrorMessage = mySWModel
                                     GlobalBase.CreateLogActivity(myGlobal.ErrorMessage, Me.Name & " LoadSATReport ", EventLogEntryType.Warning, GetApplicationInfoSession().ActivateSystemLog)
 
                                     Exit Try
