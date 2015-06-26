@@ -85,7 +85,17 @@ Namespace Logger.Tests
         ''' Test the creation of the file, add 25000 lines in the same file
         ''' </summary>
         <Test()> Public Sub MessageLogger_AddLog_BulkWriteLines()
+
             Dim messageLog As New MessageLogger("LogConsum", "AnalyzerSN;TestName;SampleClass;SampleType;VR1(uL);BarcodeR1;VR2(uL);BarcodeR2", "BulkTest_Preparation", MessageLogger.LogFrequency.Monthly)
+
+            Dim filePath = Path.GetFullPath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) & "\BioSystemsDev\" & messageLog.FolderName & "BulkTest_Preparation_" & Date.Now.ToString("yyyy_MM") & ".csv")
+            If IO.File.Exists(filePath) Then
+                Try
+                    File.Delete(filePath)
+                Catch : End Try
+            End If
+
+
             Dim bulkCounter = 0
 
             While bulkCounter < 25000
@@ -99,12 +109,12 @@ Namespace Logger.Tests
             End While
             Debug.WriteLine("done, checking correctness...")
 
-            Assert.IsTrue(File.Exists(Path.GetFullPath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) & "\BioSystemsDev\" & messageLog.FolderName & "BulkTest_Preparation_" & Date.Now.ToString("yyyy_MM") & ".csv")))
-            Assert.AreEqual(25001, File.ReadAllLines(Path.GetFullPath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) & "\BioSystemsDev\" & messageLog.FolderName & "BulkTest_Preparation_" & Date.Now.ToString("yyyy_MM") & ".csv")).Length)
+            Assert.IsTrue(File.Exists(filePath))
+            Assert.AreEqual(25001, File.ReadAllLines(filePath).Length)
 
             'Cleaning
-            File.Delete(Path.GetFullPath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) & "\BioSystemsDev\" & messageLog.FolderName & "BulkTest_Preparation_" & Date.Now.ToString("yyyy_MM") & ".csv"))
-            Assert.IsFalse(File.Exists(Path.GetFullPath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) & "\BioSystemsDev\" & messageLog.FolderName & "BulkTest_Preparation_" & Date.Now.ToString("yyyy_MM") & ".csv")))
+            File.Delete(filePath)
+            Assert.IsFalse(IO.File.Exists(filePath))
 
         End Sub
     End Class
