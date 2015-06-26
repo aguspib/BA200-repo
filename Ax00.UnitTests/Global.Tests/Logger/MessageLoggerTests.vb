@@ -96,18 +96,24 @@ Namespace Logger.Tests
             End If
 
 
-            Dim bulkCounter = 0
+            'Dim bulkCounter = 0
 
-            While bulkCounter < 25000
-                messageLog.AddLog("Ax00_000000;Patient" & bulkCounter.ToString & ";CALIB;SER;;;;")
-                bulkCounter += 1
-            End While
+            'While bulkCounter < 25000
+            '    messageLog.AddLog("Ax00_000000;Patient" & bulkCounter.ToString & ";CALIB;SER;;;;")
+            '    bulkCounter += 1
+            'End While
 
+            Parallel.For(0, 25000, Sub(x As Integer)
+                                       messageLog.AddLog("Ax00_000000;Patient" & x.ToString & ";CALIB;SER;;;;")
+                                   End Sub)
+
+
+            Dim time = Now
             While messageLog.QueuedItems > 0
                 Dim t = Task.Delay(1000)
                 t.Wait()
             End While
-            Debug.WriteLine("done, checking correctness...")
+            Debug.WriteLine("done, checking correctness.  It took  " & (Now - time).ToString())
 
             Assert.IsTrue(File.Exists(filePath))
             Assert.AreEqual(25001, File.ReadAllLines(filePath).Length)
@@ -115,7 +121,6 @@ Namespace Logger.Tests
             'Cleaning
             File.Delete(filePath)
             Assert.IsFalse(IO.File.Exists(filePath))
-
         End Sub
     End Class
 
