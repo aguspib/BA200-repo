@@ -22,6 +22,8 @@ Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Core.Entities
 Imports Biosystems.Ax00.Core.Services
 Imports Biosystems.Ax00.App.PresentationLayerListener.Requests
+Imports Biosystems.Ax00.Core.Services.Enums
+Imports Biosystems.Ax00.Core.Services.Interfaces
 Imports Biosystems.Ax00.Framework.CrossCutting
 
 Partial Public Class UiAx00MainMDI
@@ -593,7 +595,7 @@ Partial Public Class UiAx00MainMDI
             ErrorStatusLabel.Text = value
         End Set
     End Property
-    
+
 
 #End Region
 
@@ -3092,20 +3094,44 @@ Partial Public Class UiAx00MainMDI
     ''' <remarks>JV + AG revision 18/10/2013 New Button Play/Pause/Continue event task # 1341</remarks>
     Private Sub bsTSMultiFunctionSessionButton_Click(sender As Object, e As EventArgs) Handles bsTSMultiFunctionSessionButton.Click
         Try
-            ''Dim myLogAcciones As New ApplicationLogManager()
-            If showSTARTWSiconFlag Then
-                GlobalBase.CreateLogActivity("Btn Start WS", Me.Name & ".bsTSMultiFunctionSessionButton_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
-                PlaySessionActions()
-            ElseIf showPAUSEWSiconFlag Then
-                GlobalBase.CreateLogActivity("Btn Pause WS", Me.Name & ".bsTSMultiFunctionSessionButton_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
 
-                PauseSessionActions()
+            Dim currentAlarms = New AnalyzerAlarms(AnalyzerManager.GetCurrentAnalyzerManager())
+
+            If currentAlarms.ExistsActiveAlarm(AlarmEnumerates.Alarms.BL_EXPIRED.ToString()) Then
+                Dim blService As New BaseLineService(AnalyzerManager.GetCurrentAnalyzerManager(), New AnalyzerManagerFlagsDelegate)
+                blService.StartService()
+                blService.OnServiceStatusChange = Sub(callback As IServiceStatusCallback)
+                                                      If callback.Sender.Status = ServiceStatusEnum.EndSuccess Then
+                                                          StartWorkSession()
+                                                      End If
+                                                  End Sub
+            Else
+                StartWorkSession()
             End If
+
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSMultiFunctionSessionButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsTSMultiFunctionSessionButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks></remarks>
+    Private Sub StartWorkSession()
+        ''Dim myLogAcciones As New ApplicationLogManager()
+        If showSTARTWSiconFlag Then
+            GlobalBase.CreateLogActivity("Btn Start WS", Me.Name & ".bsTSMultiFunctionSessionButton_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
+            PlaySessionActions()
+        ElseIf showPAUSEWSiconFlag Then
+            GlobalBase.CreateLogActivity("Btn Pause WS", Me.Name & ".bsTSMultiFunctionSessionButton_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
+
+            PauseSessionActions()
+        End If
+    End Sub
+
+
 
     ''' <summary>
     ''' 
@@ -6409,6 +6435,8 @@ Partial Public Class UiAx00MainMDI
             myAlarms.Add(Alarms.REACT_TEMP_WARN)
             myAlarms.Add(Alarms.REACT_TEMP_SYS_ERR) 'AG 21/05/2012
 
+            myAlarms.Add(Alarms.BL_EXPIRED) 'MR 25/06/2015
+
             ReactionsRotorAlert = New bsAlert(Me, 605, 335 + ParentMDITopHeight, 175, 110, "Reactions Rotor", False)
             ReactionsRotorAlert.Tag = myAlarms
             AlertList.Add(ReactionsRotorAlert)
@@ -6607,8 +6635,7 @@ Partial Public Class UiAx00MainMDI
                 End With
                 myAnalyzerSettingsDS.tcfgAnalyzerSettings.Rows.Add(myAnalyzerSettingsRow)
 
-                Dim myAnalyzerSettings As New AnalyzerSettingsDelegate
-                myGlobal = myAnalyzerSettings.Save(Nothing, AnalyzerIDAttribute, myAnalyzerSettingsDS, Nothing)
+                myGlobal = AnalyzerSettingsDelegate.Save(Nothing, AnalyzerIDAttribute, myAnalyzerSettingsDS, Nothing)
 
             End If
 
@@ -8656,8 +8683,7 @@ Partial Public Class UiAx00MainMDI
                 End With
                 myAnalyzerSettingsDS.tcfgAnalyzerSettings.Rows.Add(myAnalyzerSettingsRow)
 
-                Dim myAnalyzerSettings As New AnalyzerSettingsDelegate
-                resultData = myAnalyzerSettings.Save(Nothing, AnalyzerIDAttribute, myAnalyzerSettingsDS, Nothing)
+                resultData = AnalyzerSettingsDelegate.Save(Nothing, AnalyzerIDAttribute, myAnalyzerSettingsDS, Nothing)
 
                 If Not resultData.HasError Then
                     'Update UI
@@ -8702,8 +8728,7 @@ Partial Public Class UiAx00MainMDI
                 End With
                 myAnalyzerSettingsDS.tcfgAnalyzerSettings.Rows.Add(myAnalyzerSettingsRow)
 
-                Dim myAnalyzerSettings As New AnalyzerSettingsDelegate
-                resultData = myAnalyzerSettings.Save(Nothing, AnalyzerIDAttribute, myAnalyzerSettingsDS, Nothing)
+                resultData = AnalyzerSettingsDelegate.Save(Nothing, AnalyzerIDAttribute, myAnalyzerSettingsDS, Nothing)
 
                 If Not resultData.HasError Then
                     'Update UI

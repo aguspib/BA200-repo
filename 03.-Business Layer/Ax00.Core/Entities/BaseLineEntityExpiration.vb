@@ -16,7 +16,6 @@ Public Class BaseLineEntityExpiration
         Me._analyzer = analyzer
     End Sub
 
-
     Public ReadOnly Property IsBlExpired As Boolean Implements IBaseLineExpiration.IsBlExpired
         Get
             Try
@@ -47,7 +46,6 @@ Public Class BaseLineEntityExpiration
             Dim dtrAnalyzerSettings = (From a As AnalyzerSettingsDS.tcfgAnalyzerSettingsRow In _analyzer.AnalyzerSettings.tcfgAnalyzerSettings
                                        Where a.SettingID = GlobalEnumerates.AnalyzerSettingsEnum.BL_DATETIME.ToString()).First()
 
-
             If dtrAnalyzerSettings IsNot Nothing Then
 
                 If Not dtrAnalyzerSettings.IsCurrentValueNull() Then
@@ -61,11 +59,12 @@ Public Class BaseLineEntityExpiration
                     If DateDiff(DateInterval.Minute, datelastBl, Now) > mins Then
                         result = True
                     End If
-                End If
             End If
+        Else
+            'Analyzer can't loaded the default parameters, means are nothing.
+            result = True
+        End If
         Return result
     End Function
-
-
 
 End Class

@@ -15,6 +15,7 @@ Namespace Biosystems.Ax00.Core.Entities
     ''' </summary>
     ''' <remarks>Created By AC</remarks>
     Public Class AnalyzerAlarms
+        Implements IAnalyzerAlarms
 
         Private ReadOnly _analyzerManager As IAnalyzerManager
         Private _myGlobal As New GlobalDataTO
@@ -74,7 +75,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </code>
         Public Function Manage(ByVal pAlarmIdList As List(Of Alarms), _
                                       ByVal pAlarmStatusList As List(Of Boolean), _
-                                      Optional ByVal pAdditionalInfoList As List(Of String) = Nothing) As GlobalDataTO
+                                      Optional ByVal pAdditionalInfoList As List(Of String) = Nothing) As GlobalDataTO Implements IAnalyzerAlarms.Manage
             Try
                 Dim index As Integer = 0
                 Dim myAnalyzerFlagsDs As New AnalyzerManagerFlagsDS
@@ -1170,7 +1171,7 @@ Namespace Biosystems.Ax00.Core.Entities
 #End Region
 
 #Region "Manage Status Alarms and Simple Alarms"
-        Public Sub RemoveAlarmState(ByVal alarmName As String)
+        Public Sub RemoveAlarmState(ByVal alarmName As String) Implements IAnalyzerAlarms.RemoveAlarmState
             Dim alarmsDelg As New WSAnalyzerAlarmsDelegate
             Dim wsAlarmsDs = New WSAnalyzerAlarmsDS
 
@@ -1202,7 +1203,7 @@ Namespace Biosystems.Ax00.Core.Entities
             End Try
         End Sub
 
-        Public Sub AddNewAlarmState(ByVal alarmName As String)
+        Public Sub AddNewAlarmState(ByVal alarmName As String) Implements IAnalyzerAlarms.AddNewAlarmState
             Dim wsAlarmsDs = New WSAnalyzerAlarmsDS
             If Not ExistsActiveAlarm(alarmName) Then
                 Dim alarmRow = wsAlarmsDs.twksWSAnalyzerAlarms.NewtwksWSAnalyzerAlarmsRow
@@ -1251,7 +1252,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="activeAlarm"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function ExistsActiveAlarm(ByVal activeAlarm As String) As Boolean
+        Public Function ExistsActiveAlarm(ByVal activeAlarm As String) As Boolean Implements IAnalyzerAlarms.ExistsActiveAlarm
             _myGlobal = _alarmsDelg.GetByAlarmID(Nothing, activeAlarm)
             If Not _myGlobal.HasError AndAlso Not _myGlobal.SetDatos Is Nothing Then
                 Dim temporalDs = DirectCast(_myGlobal.SetDatos, WSAnalyzerAlarmsDS)

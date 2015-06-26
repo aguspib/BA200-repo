@@ -1847,8 +1847,7 @@ Namespace Biosystems.Ax00.Core.Entities
             End With
             myAnalyzerSettingsDS.tcfgAnalyzerSettings.Rows.Add(myAnalyzerSettingsRow)
 
-            Dim myAnalyzerSettings As New AnalyzerSettingsDelegate
-            myGlobalDataTO = myAnalyzerSettings.Save(Nothing, AnalyzerIDAttribute, myAnalyzerSettingsDS, Nothing)
+            myGlobalDataTO = AnalyzerSettingsDelegate.Save(Nothing, AnalyzerIDAttribute, myAnalyzerSettingsDS, Nothing)
 
             wupManeuversFinishFlag = True
 

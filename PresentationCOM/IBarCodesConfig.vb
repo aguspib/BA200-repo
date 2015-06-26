@@ -178,8 +178,7 @@ Public Class UiBarCodesConfig
                     End With
                     myAnalyzerSettingsDS.tcfgAnalyzerSettings.Rows.Add(myAnalyzerSettingsRow)
 
-                    Dim myAnalyzerSettings As New AnalyzerSettingsDelegate
-                    resultData = myAnalyzerSettings.Save(Nothing, AnalyzerIDAttribute, myAnalyzerSettingsDS, Nothing)
+                    resultData = AnalyzerSettingsDelegate.Save(Nothing, AnalyzerIDAttribute, myAnalyzerSettingsDS, Nothing)
                 Else
                     'Error updating User Settings values
                     ShowMessage(Me.Name & ".AcceptSelection", resultData.ErrorCode, resultData.ErrorMessage, Me)

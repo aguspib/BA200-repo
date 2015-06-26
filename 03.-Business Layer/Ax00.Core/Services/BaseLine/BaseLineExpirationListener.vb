@@ -1,4 +1,5 @@
 ﻿Imports System.ComponentModel
+Imports System.Threading
 Imports System.Timers
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Core.Entities
@@ -10,37 +11,46 @@ Namespace Biosystems.Ax00.Core.Services.BaseLine
 #Region "Definitions"
 
         Private Shared _analyzer As IAnalyzerManager
+        Private _analyzerAlarmsManager As IAnalyzerAlarms
+
+        Private Enum TypeActionAlarm
+            Creation
+            Delete
+        End Enum
 
 #End Region
 
         Public Sub New(analyzer As IAnalyzerManager)
 
             BaseLineExpirationListener._analyzer = analyzer
+            _analyzerAlarmsManager = New AnalyzerAlarms(AnalyzerManager.GetCurrentAnalyzerManager())
 
             Dim T As New Threading.Thread(AddressOf Listening)
             T.IsBackground = True
+            T.Priority = ThreadPriority.Lowest
             T.Start()
-
+            T.Priority = ThreadPriority.Lowest
         End Sub
-
 
 #Region "Events"
 
         ''' <summary>
-        ''' 
+        ''' Function that check every ten minuts if BaseLine is expired or not. and create or delete and Alarm to inform the user.
         ''' </summary>
         ''' <remarks></remarks>
         Private Sub Listening()
             Dim baseLineExpirationobj As New BaseLineEntityExpiration(_analyzer)
 
             While True
-                Dim a = Task.Delay(10 * 60 * 1000)
+                '10 minuts
+                'Dim a = Task.Delay(10 * 60 * 1000)
+                Dim a = Task.Delay(2 * 60 * 1000)
                 a.Wait()
 
                 If baseLineExpirationobj.IsBlExpired Then
-                    CreationAlarm(AlarmEnumerates.Alarms.BL_EXPIRED)
+                    ActionAlarm(TypeActionAlarm.Creation, AlarmEnumerates.Alarms.BL_EXPIRED)
                 Else
-                    DeleteAlarm(AlarmEnumerates.Alarms.BL_EXPIRED)
+                    ActionAlarm(TypeActionAlarm.Delete, AlarmEnumerates.Alarms.BL_EXPIRED)
                 End If
 
             End While
@@ -49,56 +59,46 @@ Namespace Biosystems.Ax00.Core.Services.BaseLine
 
 #End Region
 
-#Region "Alarms Functions"
+#Region "Alarm Method"
+
         ''' <summary>
-        ''' Function to create a  new alarm when the baseline is expired.
+        ''' Method to create or delete an alarm dependiong if the baseline is expired or not.
         ''' </summary>
         ''' <param name="alarm"></param>
         ''' <remarks></remarks>
-        Private Sub CreationAlarm(ByRef alarm As AlarmEnumerates.Alarms)
+        Private Sub ActionAlarm(ByVal typeAction As TypeActionAlarm, ByRef alarm As AlarmEnumerates.Alarms)
             Dim myGlobal As New GlobalDataTO
             Dim myAlarmList As New List(Of AlarmEnumerates.Alarms)
             Dim myAlarmStatusList As New List(Of Boolean)
-
+            Dim status As Boolean
             Try
+
+              
                 myAlarmList.Add(alarm)
-                myAlarmStatusList.Add(True)
 
-                If myAlarmList.Count > 0 Then
+                Select Case typeAction
+                    Case TypeActionAlarm.Creation
+                        status = True
+                        myAlarmStatusList.Add(status)
+                        If Not _analyzerAlarmsManager.ExistsActiveAlarm(alarm.ToString()) Then myGlobal = _analyzerAlarmsManager.Manage(myAlarmList, myAlarmStatusList)
 
-                    Dim currentAlarms = New AnalyzerAlarms(AnalyzerManager.GetCurrentAnalyzerManager())
-                    myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
+                    Case TypeActionAlarm.Delete
+                        status = False
+                        myAlarmStatusList.Add(status)
+                        If _analyzerAlarmsManager.ExistsActiveAlarm(alarm.ToString()) Then myGlobal = _analyzerAlarmsManager.Manage(myAlarmList, myAlarmStatusList)
 
-                End If
+                        '_analyzer.Alarms.Add(AlarmEnumerates.Alarms.BL_EXPIRED)
+                        'If _analyzer.Alarms.Contains(AlarmEnumerates.Alarms.BL_EXPIRED) Then
+                        '_analyzer.Alarms.Remove(AlarmEnumerates.Alarms.BL_EXPIRED)
+                        'End If
+
+                End Select
+
             Catch ex As Exception
                 Throw ex
             End Try
         End Sub
 
-        ''' <summary>
-        ''' Function to delete the alarm of baseline is expired.
-        ''' </summary>
-        ''' <param name="alarm"></param>
-        ''' <remarks></remarks>
-        Private Sub DeleteAlarm(ByRef alarm As AlarmEnumerates.Alarms)
-            Dim myGlobal As New GlobalDataTO
-            Dim myAlarmList As New List(Of AlarmEnumerates.Alarms)
-            Dim myAlarmStatusList As New List(Of Boolean)
-
-            Try
-                myAlarmList.Add(alarm)
-                myAlarmStatusList.Add(False)
-
-                If myAlarmList.Count > 0 Then
-
-                    Dim currentAlarms = New AnalyzerAlarms(AnalyzerManager.GetCurrentAnalyzerManager())
-                    myGlobal = currentAlarms.Manage(myAlarmList, myAlarmStatusList)
-
-                End If
-            Catch ex As Exception
-                Throw ex
-            End Try
-        End Sub
 #End Region
 
     End Class

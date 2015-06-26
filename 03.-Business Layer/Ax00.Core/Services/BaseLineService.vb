@@ -9,6 +9,7 @@ Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Global.AlarmEnumerates
 Imports Biosystems.Ax00.Core.Services.Enums
 Imports Biosystems.Ax00.Core.Services.Interfaces
+Imports Biosystems.Ax00.Core.Entities
 
 Namespace Biosystems.Ax00.Core.Services
     Public Class BaseLineService
@@ -329,7 +330,8 @@ Namespace Biosystems.Ax00.Core.Services
                      BaseLineStepsEnum.DynamicBaseLineFill,
                      BaseLineStepsEnum.DynamicBaseLineEmpty,
                      BaseLineStepsEnum.CheckPreviousAlarms,
-                     BaseLineStepsEnum.DynamicBaseLineRead
+                     BaseLineStepsEnum.DynamicBaseLineRead,
+                     BaseLineStepsEnum.Finalize
 
                     ValidateProcess()
             End Select
@@ -438,8 +440,10 @@ Namespace Biosystems.Ax00.Core.Services
 
                     End If
             End Select
-            If nextStep <> BaseLineStepsEnum.None Then
+            Static lastdone As BaseLineStepsEnum = BaseLineStepsEnum.None
+            If nextStep <> BaseLineStepsEnum.None AndAlso lastdone <> nextStep Then
                 Debug.WriteLine("Currently doing: " & nextStep.ToString)
+                lastdone = nextStep
             End If
             Return nextStep
         End Function
@@ -620,6 +624,11 @@ Namespace Biosystems.Ax00.Core.Services
         Public ReactRotorCRUD As IAnalyzerSettingCRUD(Of AnalyzerReactionsRotorDS)
         Public ReactRotorStatusSerializer As IReactionsRotorStatusSerializer
         Public BaselineValuesDeleter As IWSBLinesDelegateValuesDeleter
+        Public AnalyzerAlarmsManager As IAnalyzerAlarms
+
+
+        'Public Shared Function Save(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pAnalyzerSettings As AnalyzerSettingsDS, ByVal pSessionSettings As UserSettingDS) As GlobalDataTO
+        Public AnalyzerSettingsSaver As Func(Of SqlClient.SqlConnection, String, AnalyzerSettingsDS, UserSettingDS, GlobalDataTO)
 
         Private Sub SetAllInjectedDependencies()
 
@@ -628,6 +637,8 @@ Namespace Biosystems.Ax00.Core.Services
                 ReactRotorCRUD = instance
                 ReactRotorStatusSerializer = instance
                 BaselineValuesDeleter = New WSBLinesDelegate
+                AnalyzerSettingsSaver = AddressOf AnalyzerSettingsDelegate.Save
+                AnalyzerAlarmsManager = New AnalyzerAlarms(_analyzer)
             End If
 
         End Sub
@@ -963,27 +974,23 @@ Namespace Biosystems.Ax00.Core.Services
             Dim myAnalyzerSettingsDs As New AnalyzerSettingsDS
             Dim myAnalyzerSettingsRow As AnalyzerSettingsDS.tcfgAnalyzerSettingsRow
 
-            Try
-                Dim currentNow = Now
+            Dim currentNow = Now
 
-                'BLDATETIME Setting
-                myAnalyzerSettingsRow = myAnalyzerSettingsDs.tcfgAnalyzerSettings.NewtcfgAnalyzerSettingsRow
-                With myAnalyzerSettingsRow
-                    .AnalyzerID = _analyzer.ActiveAnalyzer
-                    .SettingID = AnalyzerSettingsEnum.BL_DATETIME.ToString()
+            'BLDATETIME Setting
+            myAnalyzerSettingsRow = myAnalyzerSettingsDs.tcfgAnalyzerSettings.NewtcfgAnalyzerSettingsRow
+            With myAnalyzerSettingsRow
+                .AnalyzerID = _analyzer.ActiveAnalyzer
+                .SettingID = AnalyzerSettingsEnum.BL_DATETIME.ToString()
 
-                    .CurrentValue = currentNow.ToString(Globalization.CultureInfo.InvariantCulture)
-                End With
-                myAnalyzerSettingsDs.tcfgAnalyzerSettings.Rows.Add(myAnalyzerSettingsRow)
+                .CurrentValue = currentNow.ToString(Globalization.CultureInfo.InvariantCulture)
+            End With
+            myAnalyzerSettingsDs.tcfgAnalyzerSettings.Rows.Add(myAnalyzerSettingsRow)
 
-                Dim myAnalyzerSettings As New AnalyzerSettingsDelegate
-                UpdateAnalyzerSettingsDsCache(currentNow)
-                myGlobal = myAnalyzerSettings.Save(Nothing, _analyzer.ActiveAnalyzer, myAnalyzerSettingsDs, Nothing)
+            UpdateAnalyzerSettingsDsCache(currentNow)
+            myGlobal = AnalyzerSettingsSaver(Nothing, _analyzer.ActiveAnalyzer, myAnalyzerSettingsDs, Nothing)
+            deleteAlarmBlExpired()
 
-            Catch ex As Exception
-                Throw ex
-            End Try
-
+            
         End Sub
 
         ''' <summary>
@@ -1003,6 +1010,20 @@ Namespace Biosystems.Ax00.Core.Services
                     _analyzer.AnalyzerSettings.AcceptChanges()
                 End If
             End If
+        End Sub
+
+        ''' <summary>
+        ''' Function to delete the Base Line over date from alarms of the analyzer, once this one is solved.
+        ''' </summary>
+        ''' <remarks></remarks>
+        Private Sub deleteAlarmBlExpired()
+            Dim myGlobal As New GlobalDataTO
+            Dim myAlarmList As New List(Of AlarmEnumerates.Alarms)
+            Dim myAlarmStatusList As New List(Of Boolean)
+
+            myAlarmList.Add(AlarmEnumerates.Alarms.BL_EXPIRED)
+            myAlarmStatusList.Add(False)
+            If AnalyzerAlarmsManager.ExistsActiveAlarm(AlarmEnumerates.Alarms.BL_EXPIRED.ToString()) Then myGlobal = AnalyzerAlarmsManager.Manage(myAlarmList, myAlarmStatusList)
         End Sub
 
 #End Region

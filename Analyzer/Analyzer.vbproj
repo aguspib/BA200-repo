@@ -146,6 +146,7 @@
     <Compile Include="AnalyzerManager\Actions\AnalyzerManager.SendEvents.vb" />
     <Compile Include="AnalyzerManager\Actions\AnalyzerThreadEventManagement.vb" />
     <Compile Include="AnalyzerManager\Actions\AnalyzerAlarms.vb" />
+    <Compile Include="Interfaces\IAnalyzerAlarms.vb" />
     <Compile Include="AnalyzerManager\Actions\ProcessArmStatusRecived.vb" />
     <Compile Include="AnalyzerManager\Actions\ProcessStatusReceived.vb" />
     <Compile Include="AnalyzerManager\AnalyzerEntity.vb" />
