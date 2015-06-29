@@ -13,17 +13,19 @@ Public Class Form_MR
     Private Sub Btn_create_refresh_Click(sender As Object, e As EventArgs) Handles Btn_create_refresh.Click
 
 
-        bsExpired.ActionAlarm(BaseLineExpirationListener.TypeActionAlarm.Creation, AlarmEnumerates.Alarms.BL_EXPIRED)
+        _analyzerAlarmsManager.ActionAlarm(0, AlarmEnumerates.Alarms.BL_EXPIRED)
     End Sub
 
     Private Sub BsDelete_refresh_Click(sender As Object, e As EventArgs) Handles BsDelete_refresh.Click
-        bsExpired.ActionAlarm(BaseLineExpirationListener.TypeActionAlarm.Delete, AlarmEnumerates.Alarms.BL_EXPIRED)
+        _analyzerAlarmsManager.ActionAlarm(1, AlarmEnumerates.Alarms.BL_EXPIRED)
+
     End Sub
 
     Private Sub Form_MR_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
         _analyzer = AnalyzerManager.GetCurrentAnalyzerManager()
         bsExpired = New BaseLineExpirationListener(_analyzer)
+        _analyzerAlarmsManager = New AnalyzerAlarms(AnalyzerManager.GetCurrentAnalyzerManager())
 
     End Sub
 End Class

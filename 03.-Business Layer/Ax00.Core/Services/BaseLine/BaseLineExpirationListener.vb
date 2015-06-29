@@ -12,12 +12,6 @@ Namespace Biosystems.Ax00.Core.Services.BaseLine
 
         Private Shared _analyzer As IAnalyzerManager
         Private _analyzerAlarmsManager As IAnalyzerAlarms
-
-        Public Enum TypeActionAlarm
-            Creation
-            Delete
-        End Enum
-
 #End Region
 
         Public Sub New(analyzer As IAnalyzerManager)
@@ -47,9 +41,9 @@ Namespace Biosystems.Ax00.Core.Services.BaseLine
                 a.Wait()
 
                 If baseLineExpirationobj.IsBlExpired Then
-                    ActionAlarm(TypeActionAlarm.Creation, AlarmEnumerates.Alarms.BL_EXPIRED)
+                    _analyzerAlarmsManager.ActionAlarm(0, AlarmEnumerates.Alarms.BL_EXPIRED)
                 Else
-                    ActionAlarm(TypeActionAlarm.Delete, AlarmEnumerates.Alarms.BL_EXPIRED)
+                    _analyzerAlarmsManager.ActionAlarm(1, AlarmEnumerates.Alarms.BL_EXPIRED)
                 End If
 
             End While
@@ -60,37 +54,37 @@ Namespace Biosystems.Ax00.Core.Services.BaseLine
 
 #Region "Alarm Method"
 
-        ''' <summary>
-        ''' Method to create or delete an alarm dependiong if the baseline is expired or not.
-        ''' </summary>
-        ''' <param name="alarm"></param>
-        ''' <remarks></remarks>
-        Public Sub ActionAlarm(ByVal typeAction As TypeActionAlarm, ByRef alarm As AlarmEnumerates.Alarms)
-            Dim myGlobal As New GlobalDataTO
-            Dim myAlarmList As New List(Of AlarmEnumerates.Alarms)
-            Dim myAlarmStatusList As New List(Of Boolean)
-            Dim status As Boolean
-            Try
+        ' ''' <summary>
+        ' ''' Method to create or delete an alarm dependiong if the baseline is expired or not.
+        ' ''' </summary>
+        ' ''' <param name="alarm"></param>
+        ' ''' <remarks></remarks>
+        'Public Sub ActionAlarm(ByVal typeAction As TypeActionAlarm, ByRef alarm As AlarmEnumerates.Alarms)
+        '    Dim myGlobal As New GlobalDataTO
+        '    Dim myAlarmList As New List(Of AlarmEnumerates.Alarms)
+        '    Dim myAlarmStatusList As New List(Of Boolean)
+        '    Dim status As Boolean
+        '    Try
 
 
-                myAlarmList.Add(alarm)
+        '        myAlarmList.Add(alarm)
 
-                Select Case typeAction
-                    Case TypeActionAlarm.Creation
-                        status = True
-                        myAlarmStatusList.Add(status)
-                        If Not _analyzerAlarmsManager.ExistsActiveAlarm(alarm.ToString()) Then myGlobal = _analyzerAlarmsManager.Manage(myAlarmList, myAlarmStatusList)
-                    Case TypeActionAlarm.Delete
-                        status = False
-                        myAlarmStatusList.Add(status)
-                        If _analyzerAlarmsManager.ExistsActiveAlarm(alarm.ToString()) Then myGlobal = _analyzerAlarmsManager.Manage(myAlarmList, myAlarmStatusList)
-                End Select
+        '        Select Case typeAction
+        '            Case TypeActionAlarm.Creation
+        '                status = True
+        '                myAlarmStatusList.Add(status)
+        '                If Not _analyzerAlarmsManager.ExistsActiveAlarm(alarm.ToString()) Then myGlobal = _analyzerAlarmsManager.Manage(myAlarmList, myAlarmStatusList)
+        '            Case TypeActionAlarm.Delete
+        '                status = False
+        '                myAlarmStatusList.Add(status)
+        '                If _analyzerAlarmsManager.ExistsActiveAlarm(alarm.ToString()) Then myGlobal = _analyzerAlarmsManager.Manage(myAlarmList, myAlarmStatusList)
+        '        End Select
 
-                _analyzer.Createandthroweventuirefresh()
-            Catch ex As Exception
-                Throw ex
-            End Try
-        End Sub
+        '        _analyzer.CreateAndThrowEventUiRefresh()
+        '    Catch ex As Exception
+        '        Throw ex
+        '    End Try
+        'End Sub
 
 #End Region
 

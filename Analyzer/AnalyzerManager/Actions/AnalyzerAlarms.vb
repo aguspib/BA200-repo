@@ -1263,6 +1263,40 @@ Namespace Biosystems.Ax00.Core.Entities
             End If
             Return False
         End Function
+
+        ''' <summary>
+        ''' Method to create or delete an alarm , sending the action we wanna do and the alarm.
+        ''' </summary>
+        ''' <param name="typeAction">0 = to create a new alarm.
+        '''                          1 = to delete the alarm.</param>
+        ''' <param name="alarm">  type of AlarmEnumerates.Alarms </param>
+        ''' <remarks></remarks>
+        Public Sub ActionAlarm(ByVal typeAction As Byte, ByRef alarm As AlarmEnumerates.Alarms) Implements IAnalyzerAlarms.ActionAlarm
+            Dim myGlobal As New GlobalDataTO
+            Dim myAlarmList As New List(Of AlarmEnumerates.Alarms)
+            Dim myAlarmStatusList As New List(Of Boolean)
+            Dim status As Boolean
+
+            Try
+                myAlarmList.Add(alarm)
+
+                Select Case typeAction
+                    Case 0
+                        status = True
+                        myAlarmStatusList.Add(status)
+                        If Not ExistsActiveAlarm(alarm.ToString()) Then myGlobal = Manage(myAlarmList, myAlarmStatusList)
+                    Case 1
+                        status = False
+                        myAlarmStatusList.Add(status)
+                        If ExistsActiveAlarm(alarm.ToString()) Then myGlobal = Manage(myAlarmList, myAlarmStatusList)
+                End Select
+
+                _analyzerManager.CreateAndThrowEventUiRefresh()
+            Catch ex As Exception
+                Throw
+            End Try
+        End Sub
+
 #End Region
 
     End Class
