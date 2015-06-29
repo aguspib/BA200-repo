@@ -2,6 +2,8 @@
 Imports Biosystems.Ax00.Core.Entities
 Imports Biosystems.Ax00.Core.Services.BaseLine
 Imports Biosystems.Ax00.Global
+Imports Biosystems.Ax00.Core.Services
+Imports Biosystems.Ax00.BL
 
 Public Class Form_MR
 
@@ -26,6 +28,13 @@ Public Class Form_MR
         _analyzer = AnalyzerManager.GetCurrentAnalyzerManager()
         bsExpired = New BaseLineExpirationListener(_analyzer)
         _analyzerAlarmsManager = New AnalyzerAlarms(AnalyzerManager.GetCurrentAnalyzerManager())
+
+    End Sub
+
+    Private Sub BsBtnUpdteBLexpirationdate_Click(sender As Object, e As EventArgs) Handles BsBtnUpdteBLexpirationdate.Click
+
+        Dim blService As New BaseLineService(AnalyzerManager.GetCurrentAnalyzerManager(), New AnalyzerManagerFlagsDelegate)
+        blService.UpdateAnalyzerSettings()
 
     End Sub
 End Class

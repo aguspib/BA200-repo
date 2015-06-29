@@ -969,7 +969,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' </summary>
         ''' <remarks>Created by MR: BA 2601 - 16/06/2015</remarks>
         ''' 
-        Private Sub UpdateAnalyzerSettings()
+        Public Sub UpdateAnalyzerSettings()
             Dim myGlobal As GlobalDataTO = Nothing
             Dim myAnalyzerSettingsDs As New AnalyzerSettingsDS
             Dim myAnalyzerSettingsRow As AnalyzerSettingsDS.tcfgAnalyzerSettingsRow
@@ -990,7 +990,7 @@ Namespace Biosystems.Ax00.Core.Services
             myGlobal = AnalyzerSettingsSaver(Nothing, _analyzer.ActiveAnalyzer, myAnalyzerSettingsDs, Nothing)
             deleteAlarmBlExpired()
 
-            
+
         End Sub
 
         ''' <summary>

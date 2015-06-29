@@ -1284,10 +1284,12 @@ Namespace Biosystems.Ax00.Core.Entities
                     Case 0
                         status = True
                         myAlarmStatusList.Add(status)
+                        _analyzerManager.PrepareLocalAlarmList(alarm, status, myAlarmList, myAlarmStatusList)
                         If Not ExistsActiveAlarm(alarm.ToString()) Then myGlobal = Manage(myAlarmList, myAlarmStatusList)
                     Case 1
                         status = False
                         myAlarmStatusList.Add(status)
+                        _analyzerManager.PrepareLocalAlarmList(alarm, status, myAlarmList, myAlarmStatusList)
                         If ExistsActiveAlarm(alarm.ToString()) Then myGlobal = Manage(myAlarmList, myAlarmStatusList)
                 End Select
 

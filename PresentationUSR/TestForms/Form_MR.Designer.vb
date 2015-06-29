@@ -25,6 +25,7 @@ Partial Class Form_MR
         Me.QcResultsCalculationDS1 = New Biosystems.Ax00.Types.QCResultsCalculationDS()
         Me.Btn_create_refresh = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.BsDelete_refresh = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.BsBtnUpdteBLexpirationdate = New Biosystems.Ax00.Controls.UserControls.BSButton()
         CType(Me.QcResultsCalculationDS1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -53,11 +54,22 @@ Partial Class Form_MR
         Me.BsDelete_refresh.Text = "Delete_alarm"
         Me.BsDelete_refresh.UseVisualStyleBackColor = True
         '
+        'BsBtnUpdteBLexpirationdate
+        '
+        Me.BsBtnUpdteBLexpirationdate.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
+        Me.BsBtnUpdteBLexpirationdate.Location = New System.Drawing.Point(260, 24)
+        Me.BsBtnUpdteBLexpirationdate.Name = "BsBtnUpdteBLexpirationdate"
+        Me.BsBtnUpdteBLexpirationdate.Size = New System.Drawing.Size(142, 38)
+        Me.BsBtnUpdteBLexpirationdate.TabIndex = 30
+        Me.BsBtnUpdteBLexpirationdate.Text = "Update datetime BL_Expired"
+        Me.BsBtnUpdteBLexpirationdate.UseVisualStyleBackColor = True
+        '
         'Form_MR
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(727, 262)
+        Me.Controls.Add(Me.BsBtnUpdteBLexpirationdate)
         Me.Controls.Add(Me.BsDelete_refresh)
         Me.Controls.Add(Me.Btn_create_refresh)
         Me.Name = "Form_MR"
@@ -69,4 +81,5 @@ Partial Class Form_MR
     Friend WithEvents QcResultsCalculationDS1 As Biosystems.Ax00.Types.QCResultsCalculationDS
     Friend WithEvents Btn_create_refresh As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents BsDelete_refresh As Biosystems.Ax00.Controls.UserControls.BSButton
+    Friend WithEvents BsBtnUpdteBLexpirationdate As Biosystems.Ax00.Controls.UserControls.BSButton
 End Class

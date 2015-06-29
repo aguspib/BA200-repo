@@ -37,7 +37,7 @@ Namespace Biosystems.Ax00.Core.Services.BaseLine
             While True
                 '10 minuts
                 'Dim a = Task.Delay(10 * 60 * 1000)
-                Dim a = Task.Delay(1 * 60 * 1000)
+                Dim a = Task.Delay(2 * 60 * 1000)
                 a.Wait()
 
                 If baseLineExpirationobj.IsBlExpired Then
