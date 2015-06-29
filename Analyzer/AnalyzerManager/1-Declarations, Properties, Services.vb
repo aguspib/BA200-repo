@@ -3015,6 +3015,19 @@ Namespace Biosystems.Ax00.Core.Entities
             Return myGlobal
         End Function
 
+
+
+
+        Public Sub Createandthroweventuirefresh() Implements IAnalyzerManager.Createandthroweventuirefresh
+            If myUI_RefreshEvent.Count = 0 Then
+                ClearRefreshDataSets(True, False)
+            Else
+                If eventDataPendingToTriggerFlag Then
+                    RaiseEvent ReceptionEvent(InstructionReceivedAttribute, True, myUI_RefreshEvent, myUI_RefreshDS, True)
+                End If
+            End If
+        End Sub
+
         ''' <summary>
         ''' Remove any instruction from the queue
         ''' </summary>

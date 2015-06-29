@@ -3095,19 +3095,19 @@ Partial Public Class UiAx00MainMDI
     Private Sub bsTSMultiFunctionSessionButton_Click(sender As Object, e As EventArgs) Handles bsTSMultiFunctionSessionButton.Click
         Try
 
-            Dim currentAlarms = New AnalyzerAlarms(AnalyzerManager.GetCurrentAnalyzerManager())
+            'Dim currentAlarms = New AnalyzerAlarms(AnalyzerManager.GetCurrentAnalyzerManager())
 
-            If currentAlarms.ExistsActiveAlarm(AlarmEnumerates.Alarms.BL_EXPIRED.ToString()) Then
-                Dim blService As New BaseLineService(AnalyzerManager.GetCurrentAnalyzerManager(), New AnalyzerManagerFlagsDelegate)
-                blService.StartService()
-                blService.OnServiceStatusChange = Sub(callback As IServiceStatusCallback)
-                                                      If callback.Sender.Status = ServiceStatusEnum.EndSuccess Then
-                                                          StartWorkSession()
-                                                      End If
-                                                  End Sub
-            Else
-                StartWorkSession()
-            End If
+            'If currentAlarms.ExistsActiveAlarm(AlarmEnumerates.Alarms.BL_EXPIRED.ToString()) Then
+            '    Dim blService As New BaseLineService(AnalyzerManager.GetCurrentAnalyzerManager(), New AnalyzerManagerFlagsDelegate)
+            '    blService.StartService()
+            '    blService.OnServiceStatusChange = Sub(callback As IServiceStatusCallback)
+            '                                          If callback.Sender.Status = ServiceStatusEnum.EndSuccess Then
+            '                                              StartWorkSession()
+            '                                          End If
+            '                                      End Sub
+            'Else
+            StartWorkSession()
+            'End If
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSMultiFunctionSessionButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
