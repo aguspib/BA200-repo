@@ -374,6 +374,9 @@ Namespace Biosystems.Ax00.Core.Entities
                         'Initialize the ISE information master data
                         InitializeISEInformation(Nothing)
 
+                        'Function to recuperate the warning alarm BL_Expired from database, if we are starting the same analyzer.
+                        InitializeNewAlarmType(AnalyzerIDAttribute)
+
                         'SGM 22/03/2012 Init ISEManager instance as disconnected mode
                         'it will be replaced by a new instance when Adjustments received
                         'REFACTORING
@@ -2302,7 +2305,27 @@ Namespace Biosystems.Ax00.Core.Entities
             Return resultData
         End Function
 
+        Private Sub InitializeNewAlarmType(ByVal AnalyzerID As String)
+            Dim connection As TypedGlobalDataTo(Of SqlConnection) = Nothing
+            Dim alarmsDelg As New WSAnalyzerAlarmsDelegate
 
+
+            Try
+   
+                Dim _myGlobal = alarmsDelg.GetByAlarmID(Nothing, AlarmEnumerates.Alarms.BL_EXPIRED.ToString(), , , AnalyzerID)
+                If Not _myGlobal.HasError AndAlso Not _myGlobal.SetDatos Is Nothing Then
+                    Dim temporalDs = DirectCast(_myGlobal.SetDatos, WSAnalyzerAlarmsDS)
+                    If (temporalDs.twksWSAnalyzerAlarms.Rows.Count > 0) Then
+
+                    End If
+                End If
+
+            Catch
+                Throw
+            Finally
+                CloseConnection(connection)
+            End Try
+        End Sub
 #End Region
 
 #Region "Public Methods"
