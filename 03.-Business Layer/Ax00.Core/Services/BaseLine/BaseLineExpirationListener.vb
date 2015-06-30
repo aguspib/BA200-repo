@@ -19,10 +19,10 @@ Namespace Biosystems.Ax00.Core.Services.BaseLine
             BaseLineExpirationListener._analyzer = analyzer
             _analyzerAlarmsManager = New AnalyzerAlarms(AnalyzerManager.GetCurrentAnalyzerManager())
 
-            'Dim T As New Threading.Thread(AddressOf Listening)
-            'T.IsBackground = True
-            'T.Priority = ThreadPriority.Lowest
-            'T.Start()
+            Dim T As New Threading.Thread(AddressOf Listening)
+            T.IsBackground = True
+            T.Priority = ThreadPriority.Lowest
+            T.Start()
         End Sub
 
 #Region "Events"

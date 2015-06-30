@@ -2311,12 +2311,16 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
             Try
-   
+
                 Dim _myGlobal = alarmsDelg.GetByAlarmID(Nothing, AlarmEnumerates.Alarms.BL_EXPIRED.ToString(), , , AnalyzerID)
                 If Not _myGlobal.HasError AndAlso Not _myGlobal.SetDatos Is Nothing Then
                     Dim temporalDs = DirectCast(_myGlobal.SetDatos, WSAnalyzerAlarmsDS)
                     If (temporalDs.twksWSAnalyzerAlarms.Rows.Count > 0) Then
-
+                        For Each alarmToRecuperate As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In temporalDs.twksWSAnalyzerAlarms.Rows
+                            If alarmToRecuperate.AlarmStatus Then
+                                If Not myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.BL_EXPIRED) Then myAlarmListAttribute.Add(AlarmEnumerates.Alarms.BL_EXPIRED)
+                            End If
+                        Next
                     End If
                 End If
 
