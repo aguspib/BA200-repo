@@ -14,5 +14,11 @@
     <Setting Name="TaskListDecrypted" Type="System.String" Scope="User">
       <Value Profile="(Default)">PresentationCOM\Update\Task\TaskListDecrypted.xml</Value>
     </Setting>
+    <Setting Name="FactoryFwScriptsDataEncrypted" Type="System.String" Scope="User">
+      <Value Profile="(Default)">PresentationSRV\FwScripts\Factory\FactoryFwScriptsData.xml</Value>
+    </Setting>
+    <Setting Name="FactoryFwScriptsDataDecrypted" Type="System.String" Scope="User">
+      <Value Profile="(Default)">PresentationSRV\FwScripts\Factory\FactoryFwScriptsDataDecrypted_BA200.xml</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

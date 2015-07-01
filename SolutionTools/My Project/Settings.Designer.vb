@@ -102,6 +102,30 @@ Namespace My
                 Me("TaskListDecrypted") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("PresentationSRV\FwScripts\Factory\FactoryFwScriptsData.xml")>  _
+        Public Property FactoryFwScriptsDataEncrypted() As String
+            Get
+                Return CType(Me("FactoryFwScriptsDataEncrypted"),String)
+            End Get
+            Set
+                Me("FactoryFwScriptsDataEncrypted") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("PresentationSRV\FwScripts\Factory\FactoryFwScriptsDataDecrypted_BA200.xml")>  _
+        Public Property FactoryFwScriptsDataDecrypted() As String
+            Get
+                Return CType(Me("FactoryFwScriptsDataDecrypted"),String)
+            End Get
+            Set
+                Me("FactoryFwScriptsDataDecrypted") = value
+            End Set
+        End Property
     End Class
 End Namespace
 

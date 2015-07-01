@@ -18,6 +18,10 @@ Module PreBuildBatch
                 Throw New Exception("There was an error generating the TaskList file.")
             End If
 
+            If Not GenerateEncryptedFactoryFwScripts() Then
+                Throw New Exception("There was an error generating the FwFactoryScriptsData file.")
+            End If
+
             'Dim appDirect = AppDomain.CurrentDomain.BaseDirectory()
             'Dim piStart = New ProcessStartInfo(appDirect + "CommAx00.exe", " /REGSERVER")
             'piStart.CreateNoWindow = True
@@ -103,6 +107,34 @@ Module PreBuildBatch
         End If
 
         Return True
+
+    End Function
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Private Function GenerateEncryptedFactoryFwScripts() As Boolean
+
+        Try
+
+            Dim decryptedFactoryFwScriptsData As String
+            Dim encryptedFactoryFwScriptsData As String
+
+            Dim appDirect = AppDomain.CurrentDomain.BaseDirectory()
+            Dim appPath = Application.ExecutablePath
+
+            decryptedFactoryFwScriptsData = appDirect.Replace("Tools\", My.Settings.FactoryFwScriptsDataDecrypted)
+            encryptedFactoryFwScriptsData = appDirect.Replace("Tools\", My.Settings.FactoryFwScriptsDataEncrypted)
+
+            EncryptFile(decryptedFactoryFwScriptsData, encryptedFactoryFwScriptsData)
+
+            Return True
+
+        Catch ex As Exception
+            Return False
+        End Try
 
     End Function
 
