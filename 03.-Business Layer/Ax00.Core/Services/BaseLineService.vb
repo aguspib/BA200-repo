@@ -1019,7 +1019,7 @@ Namespace Biosystems.Ax00.Core.Services
         Private Sub deleteAlarmBlExpired()
 
             Dim _analyzerAlarmsManager = New AnalyzerAlarms(AnalyzerManager.GetCurrentAnalyzerManager())
-            _analyzerAlarmsManager.ActionAlarm(1, AlarmEnumerates.Alarms.BL_EXPIRED)
+            _analyzerAlarmsManager.ActionAlarm(1, AlarmEnumerates.Alarms.BASELINE_EXPIRED)
 
         End Sub
 

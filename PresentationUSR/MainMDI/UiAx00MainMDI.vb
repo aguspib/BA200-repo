@@ -3097,7 +3097,7 @@ Partial Public Class UiAx00MainMDI
 
             'Dim currentAlarms = New AnalyzerAlarms(AnalyzerManager.GetCurrentAnalyzerManager())
 
-            'If currentAlarms.ExistsActiveAlarm(AlarmEnumerates.Alarms.BL_EXPIRED.ToString()) Then
+            'If currentAlarms.ExistsActiveAlarm(AlarmEnumerates.Alarms.BASELINE_EXPIRED.ToString()) Then
             '    Dim blService As New BaseLineService(AnalyzerManager.GetCurrentAnalyzerManager(), New AnalyzerManagerFlagsDelegate)
             '    blService.StartService()
             '    blService.OnServiceStatusChange = Sub(callback As IServiceStatusCallback)
@@ -6435,7 +6435,7 @@ Partial Public Class UiAx00MainMDI
             myAlarms.Add(Alarms.REACT_TEMP_WARN)
             myAlarms.Add(Alarms.REACT_TEMP_SYS_ERR) 'AG 21/05/2012
 
-            myAlarms.Add(Alarms.BL_EXPIRED) 'MR 25/06/2015
+            myAlarms.Add(Alarms.BASELINE_EXPIRED) 'MR 25/06/2015
 
             ReactionsRotorAlert = New bsAlert(Me, 605, 335 + ParentMDITopHeight, 175, 110, "Reactions Rotor", False)
             ReactionsRotorAlert.Tag = myAlarms

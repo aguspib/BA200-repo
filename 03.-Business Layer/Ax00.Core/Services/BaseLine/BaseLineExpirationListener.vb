@@ -41,9 +41,9 @@ Namespace Biosystems.Ax00.Core.Services.BaseLine
                 a.Wait()
 
                 If baseLineExpirationobj.IsBlExpired Then
-                    _analyzerAlarmsManager.ActionAlarm(0, AlarmEnumerates.Alarms.BL_EXPIRED)
+                    _analyzerAlarmsManager.ActionAlarm(0, AlarmEnumerates.Alarms.BASELINE_EXPIRED)
                 Else
-                    _analyzerAlarmsManager.ActionAlarm(1, AlarmEnumerates.Alarms.BL_EXPIRED)
+                    _analyzerAlarmsManager.ActionAlarm(1, AlarmEnumerates.Alarms.BASELINE_EXPIRED)
                 End If
 
             End While
