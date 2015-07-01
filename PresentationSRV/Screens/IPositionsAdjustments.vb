@@ -1887,6 +1887,7 @@ Public Class UiPositionsAdjustments
                     If myScreenDelegate.NoneInstructionToSend Then
                         ' Send FwScripts
                         myGlobal = myFwScriptDelegate.StartFwScriptQueue
+                        Dim x As String = myFwScriptDelegate.CurrentFwScriptsQueue.Aggregate("", Function(current, o) current + (o.FwScriptID & ";"))
                         If Me.SelectedPage <> ADJUSTMENT_PAGES.OPTIC_CENTERING Then Me.Cursor = Cursors.WaitCursor
                     Else
                         PrepareArea()
