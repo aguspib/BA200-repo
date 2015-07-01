@@ -544,6 +544,7 @@
     <Content Include="FwScripts\Factory\FactoryFwScriptsData.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="FwScripts\Factory\FactoryFwScriptsDataDecrypted_BA200.xml" />
     <Content Include="FwScripts\Factory\FactoryFwScriptsData_2012_10_11.xml">
     </Content>
     <Content Include="FwScripts\Factory\FactoryFwScriptsData_2012_05_02.xml">

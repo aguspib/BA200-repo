@@ -1278,7 +1278,7 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim status As Boolean
 
             Try
-                myAlarmList.Add(alarm)
+                'myAlarmList.Add(alarm)
 
                 Select Case typeAction
                     Case 0

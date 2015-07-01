@@ -1017,13 +1017,10 @@ Namespace Biosystems.Ax00.Core.Services
         ''' </summary>
         ''' <remarks></remarks>
         Private Sub deleteAlarmBlExpired()
-            Dim myGlobal As New GlobalDataTO
-            Dim myAlarmList As New List(Of AlarmEnumerates.Alarms)
-            Dim myAlarmStatusList As New List(Of Boolean)
 
-            myAlarmList.Add(AlarmEnumerates.Alarms.BL_EXPIRED)
-            myAlarmStatusList.Add(False)
-            If AnalyzerAlarmsManager.ExistsActiveAlarm(AlarmEnumerates.Alarms.BL_EXPIRED.ToString()) Then myGlobal = AnalyzerAlarmsManager.Manage(myAlarmList, myAlarmStatusList)
+            Dim _analyzerAlarmsManager = New AnalyzerAlarms(AnalyzerManager.GetCurrentAnalyzerManager())
+            _analyzerAlarmsManager.ActionAlarm(1, AlarmEnumerates.Alarms.BL_EXPIRED)
+
         End Sub
 
 #End Region
