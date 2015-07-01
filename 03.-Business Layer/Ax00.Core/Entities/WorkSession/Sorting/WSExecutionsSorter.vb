@@ -533,7 +533,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Sorting
                       wse.SampleClass = sampleClass AndAlso
                       wse.ElementID = ID AndAlso
                       wse.ExecutionType = "PREP_STD" _
-                Select wse)
+                Select wse Order By wse.ReadingCycle Descending)
             Return standardExecutionTypeOrderTests
         End Function
 
@@ -548,7 +548,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Sorting
                       wse.SampleType = sampleType AndAlso
                       wse.ElementID = ID AndAlso
                       wse.ExecutionType = "PREP_STD" _
-                Select wse)
+                Select wse Order By wse.ReadingCycle Descending)
             Return standardExecutionTypeOrderTests
         End Function
 
@@ -562,7 +562,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Sorting
                       wse.SampleClass = sampleClass AndAlso
                       wse.SampleType = sampleType AndAlso
                       wse.ElementID = ID _
-                Select wse Order By wse.ExecutionType)
+                Select wse Order By wse.ExecutionType, wse.ReadingCycle Descending)
             Return allTestTypeOrderTests
         End Function
 

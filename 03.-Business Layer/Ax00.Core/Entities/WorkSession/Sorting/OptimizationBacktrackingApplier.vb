@@ -140,6 +140,8 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Sorting
         ''' <remarks></remarks>
         Private foundSolution As Boolean = False
 
+        Private Property _ContaminationNumber As Integer = 0
+
         ''' <summary>
         ''' Backtracking recursive algorithm 
         ''' </summary>
@@ -151,6 +153,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Sorting
             _callStackNestingLevel += 1
 
             Dim LastKnownNOTSolution As ExecutionsDS.twksWSExecutionsRow = Nothing
+            Dim auxContNumber As Integer
 
             For i As Integer = 0 To Tests.Count - 1
                 Dim elem = Tests(i)
@@ -159,6 +162,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Sorting
                     Continue For
                 End If
 
+                auxContNumber = _ContaminationNumber
                 If IsViable(solutionSet, elem) Then
 
                     Dim auxTests = Tests.ToList()
@@ -177,13 +181,14 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Sorting
                     If foundSolution Then
                         Exit For
                     Else
+                        _ContaminationNumber = auxContNumber
                         solutionSet.RemoveAt(solutionSet.Count - 1)
                         LastKnownNOTSolution = elem
 
                     End If
 
                 Else
-
+                    _ContaminationNumber = auxContNumber
                     LastKnownNOTSolution = elem
                     Continue For
                 End If
@@ -331,11 +336,11 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Sorting
 
             Dim washingsList = result.InvolvedWashes
 
-            Dim contam = washingsList.Count
+            _ContaminationNumber += washingsList.Count
 
-            Return contam
+            Return _ContaminationNumber
 
-
+            'Return WSExecutionCreator.Instance.GetContaminationNumber(calculateInRunning, PreviousReagentID, pExecutions)
         End Function
     End Class
 End Namespace
