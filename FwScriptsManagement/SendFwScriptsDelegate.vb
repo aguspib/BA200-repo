@@ -302,7 +302,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
                 IsWaitingForResponse = True
 
-
+                Debug.Print("ESTOY ENVIANDO EL SCRIPT >> " & pFwScriptQueueItem.FwScriptID.ToString)
                 myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.COMMAND, _
                                                          True, _
                                                          Nothing, _
