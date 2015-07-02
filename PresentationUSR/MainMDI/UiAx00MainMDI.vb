@@ -3094,20 +3094,17 @@ Partial Public Class UiAx00MainMDI
     ''' <remarks>JV + AG revision 18/10/2013 New Button Play/Pause/Continue event task # 1341</remarks>
     Private Sub bsTSMultiFunctionSessionButton_Click(sender As Object, e As EventArgs) Handles bsTSMultiFunctionSessionButton.Click
         Try
+            Dim _analyzerAlarmsManager = New AnalyzerAlarms(AnalyzerManager.GetCurrentAnalyzerManager())
+            Dim makeStart As Boolean = True
+            If _analyzerAlarmsManager.ExistsActiveAlarm(AlarmEnumerates.Alarms.BASELINE_EXPIRED.ToString()) Then
+                Dim blService As New BaseLineService(AnalyzerManager.GetCurrentAnalyzerManager(), New AnalyzerManagerFlagsDelegate)
+                blService.StartService()
+                blService.OnServiceStatusChange = Sub(callback As IServiceStatusCallback)
+                                                      makeStart = (callback.Sender.Status = ServiceStatusEnum.EndSuccess)
+                                                  End Sub
+            End If
 
-            'Dim currentAlarms = New AnalyzerAlarms(AnalyzerManager.GetCurrentAnalyzerManager())
-
-            'If currentAlarms.ExistsActiveAlarm(AlarmEnumerates.Alarms.BASELINE_EXPIRED.ToString()) Then
-            '    Dim blService As New BaseLineService(AnalyzerManager.GetCurrentAnalyzerManager(), New AnalyzerManagerFlagsDelegate)
-            '    blService.StartService()
-            '    blService.OnServiceStatusChange = Sub(callback As IServiceStatusCallback)
-            '                                          If callback.Sender.Status = ServiceStatusEnum.EndSuccess Then
-            '                                              StartWorkSession()
-            '                                          End If
-            '                                      End Sub
-            'Else
-            StartWorkSession()
-            'End If
+            If makeStart Then StartWorkSession()
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSMultiFunctionSessionButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -5237,6 +5234,9 @@ Partial Public Class UiAx00MainMDI
                     recoveryResultsWarnFlag = False 'AG 28/11/2013 - BT #1397
                     AnalyzerController.Instance.Analyzer.ResetWorkSession() 'AG 18/01/2011 - Clear DS with reagents sent to the analyzer
 
+                    
+
+
                     ' DL 13/05/2011
                     'Const fileZip As String = "PreviousLog.zip"
                     'Dim sourcePath As String = Application.StartupPath & GlobalBase.XmlLogFilePath
@@ -6263,6 +6263,8 @@ Partial Public Class UiAx00MainMDI
                     AutoConnectFailsTitle = myTitle
                 End If
 
+
+
                 'AG 23/11/2011 - The endsound is sent as a part of the connect process, after send the config instruction
                 ''TR 28/10/2011 -Send the stop Ringing.
                 'If AnalyzerController.Instance.Analyzer.Connected Then
@@ -6274,6 +6276,10 @@ Partial Public Class UiAx00MainMDI
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".Connect ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".Connect ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         Finally
+            If (AnalyzerController.Instance.Analyzer.Connected) Then
+                AnalyzerController.Instance.Analyzer.startListenerExpiration()
+            End If
+
             'AG 28/07/2010 - Close AutoConnect Thread
             If (Not AutoConnectProcess) Then
                 'RH 27/05/2011 Make this assignment run in the Main Thread
