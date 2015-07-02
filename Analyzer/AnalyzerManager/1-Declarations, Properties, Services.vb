@@ -2501,6 +2501,11 @@ Namespace Biosystems.Ax00.Core.Entities
                 If Not BaseLine Is Nothing Then
                     BaseLine.ResetWS()
                 End If
+
+                If Alarms.Contains(AlarmEnumerates.Alarms.BASELINE_EXPIRED) Then
+                    Alarms.Remove(AlarmEnumerates.Alarms.BASELINE_EXPIRED)
+                End If
+
                 WorkSessionIDAttribute = ""
                 futureRequestNextWell = 0
 
@@ -4361,6 +4366,10 @@ Namespace Biosystems.Ax00.Core.Entities
 
         Public Sub ResetFLIGHT() Implements IAnalyzerManager.ResetFLIGHT
             validFLIGHTAttribute = False            
+        End Sub
+
+        Public Overridable Sub startListenerExpiration() Implements IAnalyzerManager.startListenerExpiration
+
         End Sub
 #End Region
 

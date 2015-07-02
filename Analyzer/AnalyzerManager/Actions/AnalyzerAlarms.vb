@@ -1283,14 +1283,22 @@ Namespace Biosystems.Ax00.Core.Entities
                 Select Case typeAction
                     Case 0
                         status = True
-                        myAlarmStatusList.Add(status)
-                        _analyzerManager.PrepareLocalAlarmList(alarm, status, myAlarmList, myAlarmStatusList)
-                        If Not ExistsActiveAlarm(alarm.ToString()) Then myGlobal = Manage(myAlarmList, myAlarmStatusList)
+                        If Not ExistsActiveAlarm(alarm.ToString()) Then
+                            _analyzerManager.PrepareLocalAlarmList(alarm, status, myAlarmList, myAlarmStatusList)
+                            If myAlarmList.Count = 0 And myAlarmStatusList.Count = 0 Then
+                                myAlarmList.Add(alarm)
+                                myAlarmStatusList.Add(status)
+                            End If
+                            myGlobal = Manage(myAlarmList, myAlarmStatusList)
+                        End If
                     Case 1
                         status = False
-                        myAlarmStatusList.Add(status)
-                        _analyzerManager.PrepareLocalAlarmList(alarm, status, myAlarmList, myAlarmStatusList)
-                        If ExistsActiveAlarm(alarm.ToString()) Then myGlobal = Manage(myAlarmList, myAlarmStatusList)
+                        'myAlarmStatusList.Add(status)
+                        If ExistsActiveAlarm(alarm.ToString()) Then
+                            _analyzerManager.PrepareLocalAlarmList(alarm, status, myAlarmList, myAlarmStatusList)
+                            myGlobal = Manage(myAlarmList, myAlarmStatusList)
+                        End If
+
                 End Select
 
                 _analyzerManager.CreateAndThrowEventUiRefresh()
