@@ -146,6 +146,7 @@ Namespace Biosystems.Ax00.BL
                 If (connection IsNot Nothing AndAlso connection.SetDatos IsNot Nothing) Then
                     Dim mytwksWSBaseLines As New twksWSBLinesDAO
                     Dim result = mytwksWSBaseLines.Read(connection.SetDatos, pAnalyzerID, pWorkSessionID, pBaseLineID, pWellUsed, pType)
+                    resultData = New TypedGlobalDataTo(Of BaseLinesDS)
                     resultData.SetDatos = TryCast(result.SetDatos, BaseLinesDS)
                     resultData.HasError = result.HasError
                 End If
