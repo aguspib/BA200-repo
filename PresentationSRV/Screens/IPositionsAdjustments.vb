@@ -5070,7 +5070,7 @@ Public Class UiPositionsAdjustments
                     Me.SampleLimitZFine = CSng(Me.myScreenDelegate.SampleSecurityFly)
                 End If
             End If
-            If Not Me.BsGridReagent1 Is Nothing Then
+            If Not Me.BsGridReagent1 Is Nothing AndAlso Not (AnalyzerController.Instance.Analyzer.Model = AnalyzerModelEnum.A200.ToString()) Then
                 If Me.BsGridReagent1.RowsCount > 0 Then
                     ' Fill parking values into Delegate parameters
                     Me.myScreenDelegate.Reagent1ArmParkH = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_PARK.ToString, GlobalEnumerates.AXIS.POLAR).Value
@@ -5079,7 +5079,7 @@ Public Class UiPositionsAdjustments
                     Me.Reagent1LimitZFine = CSng(Me.myScreenDelegate.Reagent1SecurityFly)
                 End If
             End If
-            If Not Me.BsGridReagent2 Is Nothing Then
+            If Not Me.BsGridReagent2 Is Nothing AndAlso Not (AnalyzerController.Instance.Analyzer.Model = AnalyzerModelEnum.A200.ToString()) Then
                 If Me.BsGridReagent2.RowsCount > 0 Then
                     ' Fill parking values into Delegate parameters
                     Me.myScreenDelegate.Reagent2ArmParkH = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_PARK.ToString, GlobalEnumerates.AXIS.POLAR).Value
@@ -5097,7 +5097,7 @@ Public Class UiPositionsAdjustments
                     Me.Mixer1LimitZFine = CSng(Me.myScreenDelegate.Mixer1SecurityFly)
                 End If
             End If
-            If Not Me.BsGridMixer2 Is Nothing Then
+            If Not Me.BsGridMixer2 Is Nothing AndAlso Not (AnalyzerController.Instance.Analyzer.Model = AnalyzerModelEnum.A200.ToString()) Then
                 If Me.BsGridMixer2.RowsCount > 0 Then
                     ' Fill parking values into Delegate parameters
                     Me.myScreenDelegate.Mixer2ArmParkH = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER2_ARM_PARK.ToString, GlobalEnumerates.AXIS.POLAR).Value
@@ -7745,7 +7745,7 @@ Public Class UiPositionsAdjustments
     Private Sub HideTabsForBa200Model()
 
         If (AnalyzerController.Instance.Analyzer.Model = AnalyzerModelEnum.A200.ToString()) Then
-            BsTabArmsControl.TabPages.Remove(TabReagent1)
+            BsTabArmsControl.TabPages.Remove(TabReagent1)            
             BsTabArmsControl.TabPages.Remove(TabReagent2)
             BsTabArmsControl.TabPages.Remove(TabMixer2)
         End If
