@@ -1,6 +1,8 @@
 ﻿Option Explicit On
 Option Strict On
 
+Imports System.IO
+Imports System.Threading
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.TO
@@ -10,6 +12,7 @@ Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Controls.UserControls
 Imports DevExpress.XtraCharts
 Imports Biosystems.Ax00.App
+Imports DevExpress.Utils
 
 Public Class UiPositionsAdjustments
     Inherits BSAdjustmentBaseForm
@@ -17,7 +20,6 @@ Public Class UiPositionsAdjustments
 
 #Region "Declarations"
 
-    Private hiddenPages As New List(Of TabPage)
     'Screen's business delegate
     Private WithEvents myScreenDelegate As PositionsAdjustmentDelegate
 
@@ -129,14 +131,6 @@ Public Class UiPositionsAdjustments
 
     End Structure
 
-    ' Movements
-    'Private DirectMovPolar As Single
-    'Private DirectMovZ As Single
-    'Private DirectMovRotor As Single
-    'Private StepMovPolar As Single
-    'Private StepMovZ As Single
-    'Private StepMovRotor As Single
-
     ' Homes
     Private HomePolar As Single
     Private HomeZ As Single
@@ -226,10 +220,10 @@ Public Class UiPositionsAdjustments
             If value Then
                 WashingStationValidated = False
                 BsGridSample.SetAllRowDataInvalidated()
-                Me.BsGridReagent1.SetAllRowDataInvalidated()
-                Me.BsGridReagent2.SetAllRowDataInvalidated()
-                Me.BsGridMixer1.SetAllRowDataInvalidated()
-                Me.BsGridMixer2.SetAllRowDataInvalidated()
+                BsGridReagent1.SetAllRowDataInvalidated()
+                BsGridReagent2.SetAllRowDataInvalidated()
+                BsGridMixer1.SetAllRowDataInvalidated()
+                BsGridMixer2.SetAllRowDataInvalidated()
                 AllArmsPositionsValidated = False
             End If
             OpticCenteringModifiedAttr = value
@@ -473,7 +467,7 @@ Public Class UiPositionsAdjustments
                                 'MyBase.DisplaySimulationMessage("Pending Homes in progress...")
 
                                 Me.Cursor = Cursors.WaitCursor
-                                System.Threading.Thread.Sleep(SimulationProcessTime)
+                                Thread.Sleep(SimulationProcessTime)
                                 MyBase.myServiceMDI.Focus()
                                 Me.Cursor = Cursors.Default
 
@@ -556,7 +550,7 @@ Public Class UiPositionsAdjustments
                                 'MyBase.DisplaySimulationMessage("Pending Homes in progress...")
 
                                 Me.Cursor = Cursors.WaitCursor
-                                System.Threading.Thread.Sleep(SimulationProcessTime)
+                                Thread.Sleep(SimulationProcessTime)
                                 MyBase.myServiceMDI.Focus()
                                 Me.Cursor = Cursors.Default
 
@@ -624,7 +618,7 @@ Public Class UiPositionsAdjustments
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ScreenReceptionLastFwScriptEvent ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".ScreenReceptionLastFwScriptEvent", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, myGlobal.ErrorMessage, Me)
+            MyBase.ShowMessage(Me.Name & ".ScreenReceptionLastFwScriptEvent", Messages.SYSTEM_ERROR.ToString, myGlobal.ErrorMessage, Me)
         End Try
 
         Return True
@@ -641,7 +635,7 @@ Public Class UiPositionsAdjustments
     ''' <param name="pRefreshEventType"></param>
     ''' <param name="pRefreshDS"></param>
     ''' <remarks>Created by XBC 05/12/2011</remarks>
-    Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As Biosystems.Ax00.Types.UIRefreshDS)
+    Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of UI_RefreshEvents), ByVal pRefreshDS As UIRefreshDS)
         'Dim myGlobal As New GlobalDataTO
         Try
             myScreenDelegate.RefreshDelegate(pRefreshEventType, pRefreshDS)
@@ -654,7 +648,7 @@ Public Class UiPositionsAdjustments
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".RefreshScreen ", EventLogEntryType.Error, _
                                                                     GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".RefreshScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            MyBase.ShowMessage(Me.Name & ".RefreshScreen", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
@@ -806,22 +800,22 @@ Public Class UiPositionsAdjustments
             If Not myResultData.HasError Then
                 myResultData = MyClass.PrepareArmTab(Me.BsGridSample)
             End If
-            If Not myResultData.HasError Then
+            If Not myResultData.HasError AndAlso Not IsBa200() Then
                 myResultData = MyClass.PrepareArmTab(Me.BsGridReagent1)
             End If
-            If Not myResultData.HasError Then
+            If Not myResultData.HasError AndAlso Not IsBa200() Then
                 myResultData = MyClass.PrepareArmTab(Me.BsGridReagent2)
             End If
             If Not myResultData.HasError Then
                 myResultData = MyClass.PrepareArmTab(Me.BsGridMixer1)
             End If
-            If Not myResultData.HasError Then
+            If Not myResultData.HasError AndAlso Not IsBa200() Then
                 myResultData = MyClass.PrepareArmTab(Me.BsGridMixer2)
             End If
 
         Catch ex As Exception
             myResultData.HasError = True
-            myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+            myResultData.ErrorCode = Messages.SYSTEM_ERROR.ToString
             myResultData.ErrorMessage = ex.Message
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTabsArms ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareTabsArms ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
@@ -1396,12 +1390,12 @@ Public Class UiPositionsAdjustments
             End If
 
             Dim myNewImage As Image
-            If System.IO.File.Exists(iconPath & auxIconName) Then
+            If File.Exists(iconPath & auxIconName) Then
 
                 Dim myImage As Image
                 myImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
-                myGlobal = Utilities.ResizeImage(myImage, New Size(24, 24))
+                myGlobal = ResizeImage(myImage, New Size(24, 24))
                 If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                     myNewImage = CType(myGlobal.SetDatos, Bitmap)
                 Else
@@ -1591,7 +1585,7 @@ Public Class UiPositionsAdjustments
                 AbsorbanceChart.Series(0).ArgumentDataMember = "Argument"
                 AbsorbanceChart.Series(0).ValueScaleType = ScaleType.Numerical
                 AbsorbanceChart.Series(0).ValueDataMembers.AddRange(New String() {"Value"})
-                CType(AbsorbanceChart.Series(0).View, LineSeriesView).MarkerVisibility = DevExpress.Utils.DefaultBoolean.True
+                CType(AbsorbanceChart.Series(0).View, LineSeriesView).MarkerVisibility = DefaultBoolean.True
 
 
                 ' Generate a data table and bind the ENCODER serie to it.
@@ -1602,7 +1596,7 @@ Public Class UiPositionsAdjustments
                 AbsorbanceChart.Series(1).ArgumentDataMember = "Argument"
                 AbsorbanceChart.Series(1).ValueScaleType = ScaleType.Numerical
                 AbsorbanceChart.Series(1).ValueDataMembers.AddRange(New String() {"Value"})
-                CType(AbsorbanceChart.Series(1).View, LineSeriesView).MarkerVisibility = DevExpress.Utils.DefaultBoolean.True
+                CType(AbsorbanceChart.Series(1).View, LineSeriesView).MarkerVisibility = DefaultBoolean.True
 
                 MyClass.CalculateDistances()
                 ' XBC 02/01/2012 - Add Encoder functionality
@@ -1610,7 +1604,7 @@ Public Class UiPositionsAdjustments
             End If
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Name & ".GetScreenLabels", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            MyBase.ShowMessage(Name & ".GetScreenLabels", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
@@ -1687,7 +1681,7 @@ Public Class UiPositionsAdjustments
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Name & ".CalculateDistances", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Name & ".CalculateDistances", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            MyBase.ShowMessage(Name & ".CalculateDistances", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
@@ -1728,7 +1722,7 @@ Public Class UiPositionsAdjustments
         Catch ex As Exception
             Return Nothing
             GlobalBase.CreateLogActivity(ex.Message, Name & ".CreateChartDataCounts", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Name & ".CreateChartDataCounts", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            MyBase.ShowMessage(Name & ".CreateChartDataCounts", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Function
 
@@ -1785,7 +1779,7 @@ Public Class UiPositionsAdjustments
         Catch ex As Exception
             Return Nothing
             GlobalBase.CreateLogActivity(ex.Message, Name & ".CreateChartDataEncoder", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Name & ".CreateChartDataEncoder", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            MyBase.ShowMessage(Name & ".CreateChartDataEncoder", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Function
 
@@ -1809,7 +1803,7 @@ Public Class UiPositionsAdjustments
             CType(AbsorbanceChart.Diagram, XYDiagram).AxisX.VisualRange.MaxValue = myMax
 
             'ADDITIONAL CONFIGURATION BECAUSE OF BEHAVIOUR CHANGES IN NEW LIBRARY VERSION
-            AbsorbanceChart.CrosshairEnabled = DevExpress.Utils.DefaultBoolean.False
+            AbsorbanceChart.CrosshairEnabled = DefaultBoolean.False
             AbsorbanceChart.RuntimeHitTesting = True
             CType(AbsorbanceChart.Diagram, XYDiagram).AxisY.VisualRange.SideMarginsValue = 0
             CType(AbsorbanceChart.Diagram, XYDiagram).AxisY.VisualRange.SideMarginsValue = 0
@@ -1859,7 +1853,7 @@ Public Class UiPositionsAdjustments
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Name & ".InitializeChart", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Name & ".InitializeChart", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            MyBase.ShowMessage(Name & ".InitializeChart", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
@@ -1955,7 +1949,7 @@ Public Class UiPositionsAdjustments
 
 
                         Dim dialogResultToReturn As DialogResult
-                        dialogResultToReturn = MyBase.ShowMessage(GetMessageText(GlobalEnumerates.Messages.SRV_ADJUSTMENTS_TESTS.ToString), Messages.SRV_OPTIC_ADJUSTMENT_ENTER.ToString)
+                        dialogResultToReturn = MyBase.ShowMessage(GetMessageText(Messages.SRV_ADJUSTMENTS_TESTS.ToString), Messages.SRV_OPTIC_ADJUSTMENT_ENTER.ToString)
 
                     End If
 
@@ -2294,7 +2288,7 @@ Public Class UiPositionsAdjustments
 
             'SGM 29/02/2012
             If Me.WaitForScriptsExitingScreen Then
-                If Not MyBase.SimulationMode Then System.Threading.Thread.Sleep(2000)
+                If Not MyBase.SimulationMode Then Thread.Sleep(2000)
                 Me.FinishExitScreen()
             End If
 
@@ -2381,15 +2375,15 @@ Public Class UiPositionsAdjustments
                 Me.ProgressBar1.Maximum = 5
                 Me.ProgressBar1.Value = 0
                 Me.ProgressBar1.Visible = True
-                System.Threading.Thread.Sleep(SimulationProcessTime)
+                Thread.Sleep(SimulationProcessTime)
                 Me.ProgressBar1.Value = 1
-                System.Threading.Thread.Sleep(SimulationProcessTime)
+                Thread.Sleep(SimulationProcessTime)
                 Me.ProgressBar1.Value = 2
-                System.Threading.Thread.Sleep(SimulationProcessTime)
+                Thread.Sleep(SimulationProcessTime)
                 Me.ProgressBar1.Value = 3
-                System.Threading.Thread.Sleep(SimulationProcessTime)
+                Thread.Sleep(SimulationProcessTime)
                 Me.ProgressBar1.Value = 4
-                System.Threading.Thread.Sleep(SimulationProcessTime)
+                Thread.Sleep(SimulationProcessTime)
                 Me.ProgressBar1.Value = 5
                 Me.ProgressBar1.Visible = False
 
@@ -2732,7 +2726,7 @@ Public Class UiPositionsAdjustments
                             If firstAvailableParam > -1 Then
                                 ' First available element is activated By default
                                 Dim send As Object = Nothing
-                                Dim myCellEventArgs As System.Windows.Forms.DataGridViewCellEventArgs = New System.Windows.Forms.DataGridViewCellEventArgs(firstAvailableParam + 3, SelectedRow)
+                                Dim myCellEventArgs As DataGridViewCellEventArgs = New DataGridViewCellEventArgs(firstAvailableParam + 3, SelectedRow)
                                 Me.BsGridSample.CellClick(send, myCellEventArgs)
                             End If
 
@@ -2759,7 +2753,7 @@ Public Class UiPositionsAdjustments
                             If firstAvailableParam > -1 Then
                                 ' First available element is activated By default
                                 Dim send As Object = Nothing
-                                Dim myCellEventArgs As System.Windows.Forms.DataGridViewCellEventArgs = New System.Windows.Forms.DataGridViewCellEventArgs(firstAvailableParam + 3, SelectedRow)
+                                Dim myCellEventArgs As DataGridViewCellEventArgs = New DataGridViewCellEventArgs(firstAvailableParam + 3, SelectedRow)
                                 Me.BsGridReagent1.CellClick(send, myCellEventArgs)
                             End If
 
@@ -2787,7 +2781,7 @@ Public Class UiPositionsAdjustments
                             If firstAvailableParam > -1 Then
                                 ' First available element is activated By default
                                 Dim send As Object = Nothing
-                                Dim myCellEventArgs As System.Windows.Forms.DataGridViewCellEventArgs = New System.Windows.Forms.DataGridViewCellEventArgs(firstAvailableParam + 3, SelectedRow)
+                                Dim myCellEventArgs As DataGridViewCellEventArgs = New DataGridViewCellEventArgs(firstAvailableParam + 3, SelectedRow)
                                 Me.BsGridReagent2.CellClick(send, myCellEventArgs)
                             End If
 
@@ -2814,7 +2808,7 @@ Public Class UiPositionsAdjustments
                             If firstAvailableParam > -1 Then
                                 ' First available element is activated By default
                                 Dim send As Object = Nothing
-                                Dim myCellEventArgs As System.Windows.Forms.DataGridViewCellEventArgs = New System.Windows.Forms.DataGridViewCellEventArgs(firstAvailableParam + 3, SelectedRow)
+                                Dim myCellEventArgs As DataGridViewCellEventArgs = New DataGridViewCellEventArgs(firstAvailableParam + 3, SelectedRow)
                                 Me.BsGridMixer1.CellClick(send, myCellEventArgs)
                             End If
 
@@ -2841,7 +2835,7 @@ Public Class UiPositionsAdjustments
                             If firstAvailableParam > -1 Then
                                 ' First available element is activated By default
                                 Dim send As Object = Nothing
-                                Dim myCellEventArgs As System.Windows.Forms.DataGridViewCellEventArgs = New System.Windows.Forms.DataGridViewCellEventArgs(firstAvailableParam + 3, SelectedRow)
+                                Dim myCellEventArgs As DataGridViewCellEventArgs = New DataGridViewCellEventArgs(firstAvailableParam + 3, SelectedRow)
                                 Me.BsGridMixer2.CellClick(send, myCellEventArgs)
                             End If
 
@@ -3160,23 +3154,23 @@ Public Class UiPositionsAdjustments
                     Select Case Me.SelectedArmTab
                         Case ADJUSTMENT_ARMS.SAMPLE
                             Dim send As Object = Nothing
-                            Dim myCellEventArgs As System.Windows.Forms.DataGridViewCellEventArgs = New System.Windows.Forms.DataGridViewCellEventArgs(selectedColumn + 3, SelectedRow)
+                            Dim myCellEventArgs As DataGridViewCellEventArgs = New DataGridViewCellEventArgs(selectedColumn + 3, SelectedRow)
                             Me.BsGridSample.CellClick(send, myCellEventArgs)
                         Case ADJUSTMENT_ARMS.REAGENT1
                             Dim send As Object = Nothing
-                            Dim myCellEventArgs As System.Windows.Forms.DataGridViewCellEventArgs = New System.Windows.Forms.DataGridViewCellEventArgs(selectedColumn + 3, SelectedRow)
+                            Dim myCellEventArgs As DataGridViewCellEventArgs = New DataGridViewCellEventArgs(selectedColumn + 3, SelectedRow)
                             Me.BsGridReagent1.CellClick(send, myCellEventArgs)
                         Case ADJUSTMENT_ARMS.REAGENT2
                             Dim send As Object = Nothing
-                            Dim myCellEventArgs As System.Windows.Forms.DataGridViewCellEventArgs = New System.Windows.Forms.DataGridViewCellEventArgs(selectedColumn + 3, SelectedRow)
+                            Dim myCellEventArgs As DataGridViewCellEventArgs = New DataGridViewCellEventArgs(selectedColumn + 3, SelectedRow)
                             Me.BsGridReagent2.CellClick(send, myCellEventArgs)
                         Case ADJUSTMENT_ARMS.MIXER1
                             Dim send As Object = Nothing
-                            Dim myCellEventArgs As System.Windows.Forms.DataGridViewCellEventArgs = New System.Windows.Forms.DataGridViewCellEventArgs(selectedColumn + 3, SelectedRow)
+                            Dim myCellEventArgs As DataGridViewCellEventArgs = New DataGridViewCellEventArgs(selectedColumn + 3, SelectedRow)
                             Me.BsGridMixer1.CellClick(send, myCellEventArgs)
                         Case ADJUSTMENT_ARMS.MIXER2
                             Dim send As Object = Nothing
-                            Dim myCellEventArgs As System.Windows.Forms.DataGridViewCellEventArgs = New System.Windows.Forms.DataGridViewCellEventArgs(selectedColumn + 3, SelectedRow)
+                            Dim myCellEventArgs As DataGridViewCellEventArgs = New DataGridViewCellEventArgs(selectedColumn + 3, SelectedRow)
                             Me.BsGridMixer2.CellClick(send, myCellEventArgs)
                     End Select
 
@@ -3290,7 +3284,7 @@ Public Class UiPositionsAdjustments
                     ''MyBase.DisplaySimulationMessage("Saving adjustments...")
                     'Me.PrepareArea()
 
-                    System.Threading.Thread.Sleep(SimulationProcessTime)
+                    Thread.Sleep(SimulationProcessTime)
                     MyBase.myServiceMDI.Focus()
                     Me.Cursor = Cursors.Default
 
@@ -3340,7 +3334,7 @@ Public Class UiPositionsAdjustments
                 If MyBase.SimulationMode Then
                     ' simulating
                     Me.Cursor = Cursors.WaitCursor
-                    System.Threading.Thread.Sleep(SimulationProcessTime)
+                    Thread.Sleep(SimulationProcessTime)
                     MyBase.CurrentMode = ADJUSTMENT_MODES.FINE_OPTICAL_CENTERING_DONE
                     MyBase.myServiceMDI.Focus()
                     Me.Cursor = Cursors.Default
@@ -3382,7 +3376,7 @@ Public Class UiPositionsAdjustments
                         ' simulating
                         'MyBase.DisplaySimulationMessage("Saving...")
                         Me.Cursor = Cursors.WaitCursor
-                        System.Threading.Thread.Sleep(SimulationProcessTime)
+                        Thread.Sleep(SimulationProcessTime)
                         MyBase.myServiceMDI.Focus()
                         Me.Cursor = Cursors.Default
                         myScreenDelegate.LoadAdjDone = True
@@ -3983,9 +3977,9 @@ Public Class UiPositionsAdjustments
             'End If
 
             auxIconName = GetIconName("ACCEPTF")
-            If System.IO.File.Exists(iconPath & auxIconName) Then
+            If File.Exists(iconPath & auxIconName) Then
                 Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-                myImage = CType(Utilities.ResizeImage(myImage, New Size(16, 16)).SetDatos, Image)
+                myImage = CType(ResizeImage(myImage, New Size(16, 16)).SetDatos, Image)
                 Me.BsGridSample.OkImage = myImage
                 Me.BsGridReagent1.OkImage = myImage
                 Me.BsGridReagent2.OkImage = myImage
@@ -4077,7 +4071,7 @@ Public Class UiPositionsAdjustments
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".PrepareButtons", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            MyBase.ShowMessage(Me.Name & ".PrepareButtons", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
@@ -4101,7 +4095,7 @@ Public Class UiPositionsAdjustments
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & " GetControlsLimits ", EventLogEntryType.Error, _
                                                             GetApplicationInfoSession().ActivateSystemLog)
             'Show error message
-            MyBase.ShowMessage(Me.Name & " GetControlsLimits ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
+            MyBase.ShowMessage(Me.Name & " GetControlsLimits ", Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobalDataTO
     End Function
@@ -4150,9 +4144,9 @@ Public Class UiPositionsAdjustments
                         Me.BsLEDCurrentTrackBar.Minimum = Me.LedCurrentMin
                         Me.BsLEDCurrentTrackBar.Maximum = Me.LedCurrentMax
                         Me.BsLEDCurrentTrackBar.SmallChange = 1
-                        Me.BsLEDCurrentTrackBar.LargeChange = GlobalBase.OpticalCenteringStepLed
+                        Me.BsLEDCurrentTrackBar.LargeChange = OpticalCenteringStepLed
 
-                        Me.LEDCurrent = GlobalBase.OpticalCenteringCurrentLed
+                        Me.LEDCurrent = OpticalCenteringCurrentLed
                         Me.BsLEDCurrentTrackBar.Value = Me.LEDCurrent
 
                     Else
@@ -4558,7 +4552,7 @@ Public Class UiPositionsAdjustments
 
         Catch ex As Exception
             myResultData.HasError = True
-            myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+            myResultData.ErrorCode = Messages.SYSTEM_ERROR.ToString
             myResultData.ErrorMessage = ex.Message
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PreparePage ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PreparePage ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
@@ -4601,12 +4595,12 @@ Public Class UiPositionsAdjustments
                 If Me.ChangedValue Or pForceToSend Then
 
                     'show warning in case of the change referes to Optic centering adjustment
-                    Dim dialogResultToReturn As DialogResult = Windows.Forms.DialogResult.Yes
+                    Dim dialogResultToReturn As DialogResult = DialogResult.Yes
                     If Me.SelectedPage = ADJUSTMENT_PAGES.OPTIC_CENTERING Then
-                        dialogResultToReturn = MyBase.ShowMessage(GetMessageText(GlobalEnumerates.Messages.SRV_ADJUSTMENTS_TESTS.ToString), Messages.SRV_OPTIC_ADJUSTMENT_SAVE.ToString)
+                        dialogResultToReturn = MyBase.ShowMessage(GetMessageText(Messages.SRV_ADJUSTMENTS_TESTS.ToString), Messages.SRV_OPTIC_ADJUSTMENT_SAVE.ToString)
                     End If
 
-                    If dialogResultToReturn <> Windows.Forms.DialogResult.Yes Then
+                    If dialogResultToReturn <> DialogResult.Yes Then
 
                         Me.ChangedValue = False
                         Me.PrepareLoadedMode()
@@ -4711,7 +4705,7 @@ Public Class UiPositionsAdjustments
                                         ' simulating
                                         'MyBase.DisplaySimulationMessage("Saving...")
                                         Me.Cursor = Cursors.WaitCursor
-                                        System.Threading.Thread.Sleep(SimulationProcessTime)
+                                        Thread.Sleep(SimulationProcessTime)
                                         MyBase.myServiceMDI.Focus()
                                         Me.Cursor = Cursors.Default
                                         'myScreenDelegate.LoadAdjDone = True
@@ -4815,7 +4809,7 @@ Public Class UiPositionsAdjustments
 
                     If Me.SelectedPage = ADJUSTMENT_PAGES.ARM_POSITIONS Then
                         If Me.WaitForScriptsExitingScreen Then
-                            If Not MyBase.SimulationMode Then System.Threading.Thread.Sleep(2000)
+                            If Not MyBase.SimulationMode Then Thread.Sleep(2000)
                             Me.FinishExitScreen()
                         End If
                     End If
@@ -4866,184 +4860,16 @@ Public Class UiPositionsAdjustments
 
             Select Case SelectedArmTab
                 Case ADJUSTMENT_ARMS.SAMPLE
-                    Me.HomePolar = 0
-                    Me.HomeZ = 0
-                    Me.HomeRotor = 0
+                    LoadAdjustmentsForSampleArmTab()
                 Case ADJUSTMENT_ARMS.REAGENT1
-                    Me.HomePolar = 0
-                    Me.HomeZ = 0
-                    Me.HomeRotor = 0
+                    LoadAdjustmentsForReagent1ArmTab()
                 Case ADJUSTMENT_ARMS.REAGENT2
-                    Me.HomePolar = 0
-                    Me.HomeZ = 0
-                    Me.HomeRotor = 0
+                    LoadAdjustmentsForReagent2ArmTab()
                 Case ADJUSTMENT_ARMS.MIXER1
-                    Me.HomePolar = 0
-                    Me.HomeZ = 0
-                    Me.HomeRotor = 0
+                    LoadAdjustmentsForMixer1ArmTab()
                 Case ADJUSTMENT_ARMS.MIXER2
-                    Me.HomePolar = 0
-                    Me.HomeZ = 0
-                    Me.HomeRotor = 0
+                    LoadAdjustmentsForMixer2ArmTab()
             End Select
-
-            If Not Me.BsGridSample Is Nothing Then
-                If Me.BsGridSample.RowsCount > 0 Then
-
-                    '' DISP1
-                    Me.BsGridSample.ParameterCellValue(0, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_DISP1.ToString, GlobalEnumerates.AXIS.POLAR).Value
-                    Me.BsGridSample.ParameterCellValue(0, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_DISP1.ToString, GlobalEnumerates.AXIS.Z).Value
-                    Me.BsGridSample.ParameterCellValue(0, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_DISP1.ToString, GlobalEnumerates.AXIS.ROTOR).Value
-                    '' DISP2
-                    Me.BsGridSample.ParameterCellValue(1, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_DISP2.ToString, GlobalEnumerates.AXIS.POLAR).Value
-                    Me.BsGridSample.ParameterCellValue(1, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_DISP2.ToString, GlobalEnumerates.AXIS.Z).Value
-                    Me.BsGridSample.ParameterCellValue(1, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_DISP2.ToString, GlobalEnumerates.AXIS.ROTOR).Value
-                    '' Z REFERENCE
-                    Me.BsGridSample.ParameterCellValue(2, POLAR_COLUMN) = myScreenDelegate.SampleArmPolarZREF.ToString ' ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_ZREF.ToString, GlobalEnumerates.AXIS.POLAR).Value
-                    Me.BsGridSample.ParameterCellValue(2, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_ZREF.ToString, GlobalEnumerates.AXIS.Z).Value
-                    Me.BsGridSample.ParameterCellValue(2, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_ZREF.ToString, GlobalEnumerates.AXIS.ROTOR).Value
-                    '' WASHING
-                    Me.BsGridSample.ParameterCellValue(3, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_WASH.ToString, GlobalEnumerates.AXIS.POLAR).Value
-                    Me.BsGridSample.ParameterCellValue(3, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_WASH.ToString, GlobalEnumerates.AXIS.Z).Value
-                    Me.BsGridSample.ParameterCellValue(3, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_WASH.ToString, GlobalEnumerates.AXIS.ROTOR).Value
-                    '' SAMPLE RING1 PEDIATRIC
-                    Me.BsGridSample.ParameterCellValue(4, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1.ToString, GlobalEnumerates.AXIS.POLAR).Value
-                    Me.BsGridSample.ParameterCellValue(4, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1.ToString, GlobalEnumerates.AXIS.Z).Value
-                    Me.BsGridSample.ParameterCellValue(4, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1.ToString, GlobalEnumerates.AXIS.ROTOR).Value
-                    '' SAMPLE RING2 PEDIATRIC
-                    Me.BsGridSample.ParameterCellValue(5, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING2.ToString, GlobalEnumerates.AXIS.POLAR).Value
-                    Me.BsGridSample.ParameterCellValue(5, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING2.ToString, GlobalEnumerates.AXIS.Z).Value
-                    Me.BsGridSample.ParameterCellValue(5, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING2.ToString, GlobalEnumerates.AXIS.ROTOR).Value
-                    '' SAMPLE RING3 PEDIATRIC
-                    Me.BsGridSample.ParameterCellValue(6, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING3.ToString, GlobalEnumerates.AXIS.POLAR).Value
-                    Me.BsGridSample.ParameterCellValue(6, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING3.ToString, GlobalEnumerates.AXIS.Z).Value
-                    Me.BsGridSample.ParameterCellValue(6, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING3.ToString, GlobalEnumerates.AXIS.ROTOR).Value
-
-
-                    'SGM 29/02/2012
-                    'Polar and Rotor values taken from Ring1
-                    '' Z TUBE 
-                    Me.BsGridSample.ParameterCellValue(7, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1.ToString, GlobalEnumerates.AXIS.POLAR).Value
-                    Me.BsGridSample.ParameterCellValue(7, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_ZTUBE1.ToString, GlobalEnumerates.AXIS.Z).Value
-                    Me.BsGridSample.ParameterCellValue(7, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1.ToString, GlobalEnumerates.AXIS.ROTOR).Value
-                    'when saving write to Z of Tube1, Tube2 and Tube3
-                    'end SGM 29/02/2012
-
-                    '' ISE
-                    Me.BsGridSample.ParameterCellValue(8, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_ISE.ToString, GlobalEnumerates.AXIS.POLAR).Value
-                    Me.BsGridSample.ParameterCellValue(8, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_ISE.ToString, GlobalEnumerates.AXIS.Z).Value
-                    Me.BsGridSample.ParameterCellValue(8, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_ISE.ToString, GlobalEnumerates.AXIS.ROTOR).Value
-                    '' PARKING
-                    Me.BsGridSample.ParameterCellValue(9, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_PARK.ToString, GlobalEnumerates.AXIS.POLAR).Value
-                    Me.BsGridSample.ParameterCellValue(9, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_PARK.ToString, GlobalEnumerates.AXIS.Z).Value
-                    Me.BsGridSample.ParameterCellValue(9, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_PARK.ToString, GlobalEnumerates.AXIS.ROTOR).Value
-
-                End If
-            End If
-            If Not Me.BsGridReagent1 Is Nothing Then
-                If Me.BsGridReagent1.RowsCount > 0 Then
-                    '' DISP1
-                    Me.BsGridReagent1.ParameterCellValue(0, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_DISP1.ToString, GlobalEnumerates.AXIS.POLAR).Value
-                    Me.BsGridReagent1.ParameterCellValue(0, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_DISP1.ToString, GlobalEnumerates.AXIS.Z).Value
-                    Me.BsGridReagent1.ParameterCellValue(0, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_DISP1.ToString, GlobalEnumerates.AXIS.ROTOR).Value
-                    '' Z REFERENCE
-                    Me.BsGridReagent1.ParameterCellValue(1, POLAR_COLUMN) = myScreenDelegate.Reagent1ArmPolarZREF.ToString ' ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_ZREF.ToString, GlobalEnumerates.AXIS.POLAR).Value
-                    Me.BsGridReagent1.ParameterCellValue(1, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_ZREF.ToString, GlobalEnumerates.AXIS.Z).Value
-                    Me.BsGridReagent1.ParameterCellValue(1, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_ZREF.ToString, GlobalEnumerates.AXIS.ROTOR).Value
-                    '' WASHING
-                    Me.BsGridReagent1.ParameterCellValue(2, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_WASH.ToString, GlobalEnumerates.AXIS.POLAR).Value
-                    Me.BsGridReagent1.ParameterCellValue(2, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_WASH.ToString, GlobalEnumerates.AXIS.Z).Value
-                    Me.BsGridReagent1.ParameterCellValue(2, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_WASH.ToString, GlobalEnumerates.AXIS.ROTOR).Value
-                    '' REAGENT1
-                    Me.BsGridReagent1.ParameterCellValue(3, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1.ToString, GlobalEnumerates.AXIS.POLAR).Value
-                    Me.BsGridReagent1.ParameterCellValue(3, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1.ToString, GlobalEnumerates.AXIS.Z).Value
-                    Me.BsGridReagent1.ParameterCellValue(3, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1.ToString, GlobalEnumerates.AXIS.ROTOR).Value
-                    '' REAGENT2
-                    Me.BsGridReagent1.ParameterCellValue(4, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_RING2.ToString, GlobalEnumerates.AXIS.POLAR).Value
-                    Me.BsGridReagent1.ParameterCellValue(4, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_RING2.ToString, GlobalEnumerates.AXIS.Z).Value
-                    Me.BsGridReagent1.ParameterCellValue(4, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_RING2.ToString, GlobalEnumerates.AXIS.ROTOR).Value
-                    '' PARKING
-                    Me.BsGridReagent1.ParameterCellValue(5, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_PARK.ToString, GlobalEnumerates.AXIS.POLAR).Value
-                    Me.BsGridReagent1.ParameterCellValue(5, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_PARK.ToString, GlobalEnumerates.AXIS.Z).Value
-                    Me.BsGridReagent1.ParameterCellValue(5, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_PARK.ToString, GlobalEnumerates.AXIS.ROTOR).Value
-                End If
-            End If
-            If Not Me.BsGridReagent2 Is Nothing Then
-                If Me.BsGridReagent2.RowsCount > 0 Then
-                    '' DISP1
-                    BsGridReagent2.ParameterCellValue(0, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_DISP1.ToString, GlobalEnumerates.AXIS.POLAR).Value
-                    BsGridReagent2.ParameterCellValue(0, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_DISP1.ToString, GlobalEnumerates.AXIS.Z).Value
-                    BsGridReagent2.ParameterCellValue(0, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_DISP1.ToString, GlobalEnumerates.AXIS.ROTOR).Value
-                    '' Z REFERENCE
-                    BsGridReagent2.ParameterCellValue(1, POLAR_COLUMN) = myScreenDelegate.Reagent2ArmPolarZREF.ToString ' ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_ZREF.ToString, GlobalEnumerates.AXIS.POLAR).Value
-                    BsGridReagent2.ParameterCellValue(1, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_ZREF.ToString, GlobalEnumerates.AXIS.Z).Value
-                    BsGridReagent2.ParameterCellValue(1, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_ZREF.ToString, GlobalEnumerates.AXIS.ROTOR).Value
-                    '' WASHING
-                    BsGridReagent2.ParameterCellValue(2, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_WASH.ToString, GlobalEnumerates.AXIS.POLAR).Value
-                    BsGridReagent2.ParameterCellValue(2, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_WASH.ToString, GlobalEnumerates.AXIS.Z).Value
-                    BsGridReagent2.ParameterCellValue(2, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_WASH.ToString, GlobalEnumerates.AXIS.ROTOR).Value
-                    '' REAGENT1
-                    BsGridReagent2.ParameterCellValue(3, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_RING1.ToString, GlobalEnumerates.AXIS.POLAR).Value
-                    BsGridReagent2.ParameterCellValue(3, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_RING1.ToString, GlobalEnumerates.AXIS.Z).Value
-                    Me.BsGridReagent2.ParameterCellValue(3, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_RING1.ToString, GlobalEnumerates.AXIS.ROTOR).Value
-                    '' REAGENT2
-                    Me.BsGridReagent2.ParameterCellValue(4, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_RING2.ToString, GlobalEnumerates.AXIS.POLAR).Value
-                    Me.BsGridReagent2.ParameterCellValue(4, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_RING2.ToString, GlobalEnumerates.AXIS.Z).Value
-                    Me.BsGridReagent2.ParameterCellValue(4, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_RING2.ToString, GlobalEnumerates.AXIS.ROTOR).Value
-                    '' PARKING
-                    Me.BsGridReagent2.ParameterCellValue(5, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_PARK.ToString, GlobalEnumerates.AXIS.POLAR).Value
-                    Me.BsGridReagent2.ParameterCellValue(5, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_PARK.ToString, GlobalEnumerates.AXIS.Z).Value
-                    Me.BsGridReagent2.ParameterCellValue(5, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_PARK.ToString, GlobalEnumerates.AXIS.ROTOR).Value
-                End If
-            End If
-            If Not Me.BsGridMixer1 Is Nothing Then
-                If Me.BsGridMixer1.RowsCount > 0 Then
-                    '' DISP1
-                    Me.BsGridMixer1.ParameterCellValue(0, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER1_ARM_DISP1.ToString, GlobalEnumerates.AXIS.POLAR).Value
-                    Me.BsGridMixer1.ParameterCellValue(0, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER1_ARM_DISP1.ToString, GlobalEnumerates.AXIS.Z).Value
-                    Me.BsGridMixer1.ParameterCellValue(0, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER1_ARM_DISP1.ToString, GlobalEnumerates.AXIS.ROTOR).Value
-                    '' Z REFERENCE
-                    Me.BsGridMixer1.ParameterCellValue(1, POLAR_COLUMN) = myScreenDelegate.Mixer1ArmPolarZREF.ToString ' ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER1_ARM_ZREF.ToString, GlobalEnumerates.AXIS.POLAR).Value
-                    Me.BsGridMixer1.ParameterCellValue(1, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER1_ARM_ZREF.ToString, GlobalEnumerates.AXIS.Z).Value
-                    Me.BsGridMixer1.ParameterCellValue(1, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER1_ARM_ZREF.ToString, GlobalEnumerates.AXIS.ROTOR).Value
-                    '' WASHING
-                    Me.BsGridMixer1.ParameterCellValue(2, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER1_ARM_WASH.ToString, GlobalEnumerates.AXIS.POLAR).Value
-                    Me.BsGridMixer1.ParameterCellValue(2, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER1_ARM_WASH.ToString, GlobalEnumerates.AXIS.Z).Value
-                    Me.BsGridMixer1.ParameterCellValue(2, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER1_ARM_WASH.ToString, GlobalEnumerates.AXIS.ROTOR).Value
-                    '' PARKING
-                    Me.BsGridMixer1.ParameterCellValue(3, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER1_ARM_PARK.ToString, GlobalEnumerates.AXIS.POLAR).Value
-                    Me.BsGridMixer1.ParameterCellValue(3, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER1_ARM_PARK.ToString, GlobalEnumerates.AXIS.Z).Value
-                    Me.BsGridMixer1.ParameterCellValue(3, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER1_ARM_PARK.ToString, GlobalEnumerates.AXIS.ROTOR).Value
-                End If
-            End If
-            ''    Me.HomeZ = 50
-            ''    Me.HomeRotor = 50
-            If Not Me.BsGridMixer2 Is Nothing Then
-                If Me.BsGridMixer2.RowsCount > 0 Then
-                    'For i As Integer = 0 To Me.BsGridMixer2.RowsCount - 1
-                    '    Me.BsGridMixer2.ParameterCellValue(i, POLAR_COLUMN) = ReadGlobalAdjustmentData(Me.SelectedAdjustment.ToString, GlobalEnumerates.AXIS.POLAR).Value
-                    '    Me.BsGridMixer2.ParameterCellValue(i, Z_COLUMN) = ReadGlobalAdjustmentData(Me.SelectedAdjustment.ToString, GlobalEnumerates.AXIS.Z).Value
-                    '    Me.BsGridMixer2.ParameterCellValue(i, ROTOR_COLUMN) = ReadGlobalAdjustmentData(Me.SelectedAdjustment.ToString, GlobalEnumerates.AXIS.ROTOR).Value
-                    'Next
-                    '' DISP1
-                    Me.BsGridMixer2.ParameterCellValue(0, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER2_ARM_DISP1.ToString, GlobalEnumerates.AXIS.POLAR).Value
-                    Me.BsGridMixer2.ParameterCellValue(0, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER2_ARM_DISP1.ToString, GlobalEnumerates.AXIS.Z).Value
-                    Me.BsGridMixer2.ParameterCellValue(0, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER2_ARM_DISP1.ToString, GlobalEnumerates.AXIS.ROTOR).Value
-                    '' Z REFERENCE
-                    Me.BsGridMixer2.ParameterCellValue(1, POLAR_COLUMN) = myScreenDelegate.Mixer2ArmPolarZREF.ToString ' ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER2_ARM_ZREF.ToString, GlobalEnumerates.AXIS.POLAR).Value
-                    Me.BsGridMixer2.ParameterCellValue(1, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER2_ARM_ZREF.ToString, GlobalEnumerates.AXIS.Z).Value
-                    Me.BsGridMixer2.ParameterCellValue(1, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER2_ARM_ZREF.ToString, GlobalEnumerates.AXIS.ROTOR).Value
-                    '' WASHING
-                    Me.BsGridMixer2.ParameterCellValue(2, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER2_ARM_WASH.ToString, GlobalEnumerates.AXIS.POLAR).Value
-                    Me.BsGridMixer2.ParameterCellValue(2, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER2_ARM_WASH.ToString, GlobalEnumerates.AXIS.Z).Value
-                    Me.BsGridMixer2.ParameterCellValue(2, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER2_ARM_WASH.ToString, GlobalEnumerates.AXIS.ROTOR).Value
-                    '' PARKING
-                    Me.BsGridMixer2.ParameterCellValue(3, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER2_ARM_PARK.ToString, GlobalEnumerates.AXIS.POLAR).Value
-                    Me.BsGridMixer2.ParameterCellValue(3, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER2_ARM_PARK.ToString, GlobalEnumerates.AXIS.Z).Value
-                    Me.BsGridMixer2.ParameterCellValue(3, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER2_ARM_PARK.ToString, GlobalEnumerates.AXIS.ROTOR).Value
-                End If
-            End If
-            'End Select
 
             Me.FillAdjustmentValuesintoDelegate()
 
@@ -5051,6 +4877,206 @@ Public Class UiPositionsAdjustments
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".FillAdjustmentValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".FillAdjustmentValues ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
+    End Sub
+
+    Private Sub LoadAdjustmentsForMixer2ArmTab()
+
+        Me.HomePolar = 0
+        Me.HomeZ = 0
+        Me.HomeRotor = 0
+        If Not Me.BsGridMixer2 Is Nothing AndAlso Not IsBa200() Then
+            If Me.BsGridMixer2.RowsCount > 0 Then
+                '' DISP1
+                Me.BsGridMixer2.ParameterCellValue(0, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER2_ARM_DISP1.ToString, GlobalEnumerates.AXIS.POLAR).Value
+                Me.BsGridMixer2.ParameterCellValue(0, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER2_ARM_DISP1.ToString, GlobalEnumerates.AXIS.Z).Value
+                Me.BsGridMixer2.ParameterCellValue(0, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER2_ARM_DISP1.ToString, GlobalEnumerates.AXIS.ROTOR).Value
+                '' Z REFERENCE
+                Me.BsGridMixer2.ParameterCellValue(1, POLAR_COLUMN) = myScreenDelegate.Mixer2ArmPolarZREF.ToString ' ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER2_ARM_ZREF.ToString, GlobalEnumerates.AXIS.POLAR).Value
+                Me.BsGridMixer2.ParameterCellValue(1, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER2_ARM_ZREF.ToString, GlobalEnumerates.AXIS.Z).Value
+                Me.BsGridMixer2.ParameterCellValue(1, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER2_ARM_ZREF.ToString, GlobalEnumerates.AXIS.ROTOR).Value
+                '' WASHING
+                Me.BsGridMixer2.ParameterCellValue(2, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER2_ARM_WASH.ToString, GlobalEnumerates.AXIS.POLAR).Value
+                Me.BsGridMixer2.ParameterCellValue(2, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER2_ARM_WASH.ToString, GlobalEnumerates.AXIS.Z).Value
+                Me.BsGridMixer2.ParameterCellValue(2, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER2_ARM_WASH.ToString, GlobalEnumerates.AXIS.ROTOR).Value
+                '' PARKING
+                Me.BsGridMixer2.ParameterCellValue(3, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER2_ARM_PARK.ToString, GlobalEnumerates.AXIS.POLAR).Value
+                Me.BsGridMixer2.ParameterCellValue(3, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER2_ARM_PARK.ToString, GlobalEnumerates.AXIS.Z).Value
+                Me.BsGridMixer2.ParameterCellValue(3, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER2_ARM_PARK.ToString, GlobalEnumerates.AXIS.ROTOR).Value
+            End If
+        End If
+    End Sub
+
+    Private Sub LoadAdjustmentsForMixer1ArmTab()
+
+        Me.HomePolar = 0
+        Me.HomeZ = 0
+        Me.HomeRotor = 0
+        If Not Me.BsGridMixer1 Is Nothing Then
+            If Me.BsGridMixer1.RowsCount > 0 Then
+                '' DISP1
+                Me.BsGridMixer1.ParameterCellValue(0, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER1_ARM_DISP1.ToString, GlobalEnumerates.AXIS.POLAR).Value
+                Me.BsGridMixer1.ParameterCellValue(0, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER1_ARM_DISP1.ToString, GlobalEnumerates.AXIS.Z).Value
+                Me.BsGridMixer1.ParameterCellValue(0, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER1_ARM_DISP1.ToString, GlobalEnumerates.AXIS.ROTOR).Value
+                '' Z REFERENCE
+                Me.BsGridMixer1.ParameterCellValue(1, POLAR_COLUMN) = myScreenDelegate.Mixer1ArmPolarZREF.ToString ' ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER1_ARM_ZREF.ToString, GlobalEnumerates.AXIS.POLAR).Value
+                Me.BsGridMixer1.ParameterCellValue(1, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER1_ARM_ZREF.ToString, GlobalEnumerates.AXIS.Z).Value
+                Me.BsGridMixer1.ParameterCellValue(1, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER1_ARM_ZREF.ToString, GlobalEnumerates.AXIS.ROTOR).Value
+                '' WASHING
+                Me.BsGridMixer1.ParameterCellValue(2, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER1_ARM_WASH.ToString, GlobalEnumerates.AXIS.POLAR).Value
+                Me.BsGridMixer1.ParameterCellValue(2, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER1_ARM_WASH.ToString, GlobalEnumerates.AXIS.Z).Value
+                Me.BsGridMixer1.ParameterCellValue(2, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER1_ARM_WASH.ToString, GlobalEnumerates.AXIS.ROTOR).Value
+                '' PARKING
+                Me.BsGridMixer1.ParameterCellValue(3, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER1_ARM_PARK.ToString, GlobalEnumerates.AXIS.POLAR).Value
+                Me.BsGridMixer1.ParameterCellValue(3, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER1_ARM_PARK.ToString, GlobalEnumerates.AXIS.Z).Value
+                Me.BsGridMixer1.ParameterCellValue(3, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER1_ARM_PARK.ToString, GlobalEnumerates.AXIS.ROTOR).Value
+            End If
+        End If
+    End Sub
+
+    Private Sub LoadAdjustmentsForReagent2ArmTab()
+
+        Me.HomePolar = 0
+        Me.HomeZ = 0
+        Me.HomeRotor = 0
+        If Not Me.BsGridReagent2 Is Nothing Then
+            If Me.BsGridReagent2.RowsCount > 0 Then
+                '' DISP1
+                BsGridReagent2.ParameterCellValue(0, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_DISP1.ToString, GlobalEnumerates.AXIS.POLAR).Value
+                BsGridReagent2.ParameterCellValue(0, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_DISP1.ToString, GlobalEnumerates.AXIS.Z).Value
+                BsGridReagent2.ParameterCellValue(0, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_DISP1.ToString, GlobalEnumerates.AXIS.ROTOR).Value
+                '' Z REFERENCE
+                BsGridReagent2.ParameterCellValue(1, POLAR_COLUMN) = myScreenDelegate.Reagent2ArmPolarZREF.ToString ' ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_ZREF.ToString, GlobalEnumerates.AXIS.POLAR).Value
+                BsGridReagent2.ParameterCellValue(1, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_ZREF.ToString, GlobalEnumerates.AXIS.Z).Value
+                BsGridReagent2.ParameterCellValue(1, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_ZREF.ToString, GlobalEnumerates.AXIS.ROTOR).Value
+                '' WASHING
+                BsGridReagent2.ParameterCellValue(2, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_WASH.ToString, GlobalEnumerates.AXIS.POLAR).Value
+                BsGridReagent2.ParameterCellValue(2, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_WASH.ToString, GlobalEnumerates.AXIS.Z).Value
+                BsGridReagent2.ParameterCellValue(2, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_WASH.ToString, GlobalEnumerates.AXIS.ROTOR).Value
+                '' REAGENT1
+                BsGridReagent2.ParameterCellValue(3, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_RING1.ToString, GlobalEnumerates.AXIS.POLAR).Value
+                BsGridReagent2.ParameterCellValue(3, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_RING1.ToString, GlobalEnumerates.AXIS.Z).Value
+                Me.BsGridReagent2.ParameterCellValue(3, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_RING1.ToString, GlobalEnumerates.AXIS.ROTOR).Value
+                '' REAGENT2
+                Me.BsGridReagent2.ParameterCellValue(4, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_RING2.ToString, GlobalEnumerates.AXIS.POLAR).Value
+                Me.BsGridReagent2.ParameterCellValue(4, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_RING2.ToString, GlobalEnumerates.AXIS.Z).Value
+                Me.BsGridReagent2.ParameterCellValue(4, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_RING2.ToString, GlobalEnumerates.AXIS.ROTOR).Value
+                '' PARKING
+                Me.BsGridReagent2.ParameterCellValue(5, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_PARK.ToString, GlobalEnumerates.AXIS.POLAR).Value
+                Me.BsGridReagent2.ParameterCellValue(5, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_PARK.ToString, GlobalEnumerates.AXIS.Z).Value
+                Me.BsGridReagent2.ParameterCellValue(5, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_PARK.ToString, GlobalEnumerates.AXIS.ROTOR).Value
+            End If
+        End If
+    End Sub
+
+    Private Sub LoadAdjustmentsForReagent1ArmTab()
+
+        Me.HomePolar = 0
+        Me.HomeZ = 0
+        Me.HomeRotor = 0
+        If Not Me.BsGridReagent1 Is Nothing Then
+            If Me.BsGridReagent1.RowsCount > 0 Then
+                '' DISP1
+                Me.BsGridReagent1.ParameterCellValue(0, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_DISP1.ToString, GlobalEnumerates.AXIS.POLAR).Value
+                Me.BsGridReagent1.ParameterCellValue(0, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_DISP1.ToString, GlobalEnumerates.AXIS.Z).Value
+                Me.BsGridReagent1.ParameterCellValue(0, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_DISP1.ToString, GlobalEnumerates.AXIS.ROTOR).Value
+                '' Z REFERENCE
+                Me.BsGridReagent1.ParameterCellValue(1, POLAR_COLUMN) = myScreenDelegate.Reagent1ArmPolarZREF.ToString ' ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_ZREF.ToString, GlobalEnumerates.AXIS.POLAR).Value
+                Me.BsGridReagent1.ParameterCellValue(1, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_ZREF.ToString, GlobalEnumerates.AXIS.Z).Value
+                Me.BsGridReagent1.ParameterCellValue(1, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_ZREF.ToString, GlobalEnumerates.AXIS.ROTOR).Value
+                '' WASHING
+                Me.BsGridReagent1.ParameterCellValue(2, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_WASH.ToString, GlobalEnumerates.AXIS.POLAR).Value
+                Me.BsGridReagent1.ParameterCellValue(2, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_WASH.ToString, GlobalEnumerates.AXIS.Z).Value
+                Me.BsGridReagent1.ParameterCellValue(2, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_WASH.ToString, GlobalEnumerates.AXIS.ROTOR).Value
+                '' REAGENT1
+                Me.BsGridReagent1.ParameterCellValue(3, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1.ToString, GlobalEnumerates.AXIS.POLAR).Value
+                Me.BsGridReagent1.ParameterCellValue(3, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1.ToString, GlobalEnumerates.AXIS.Z).Value
+                Me.BsGridReagent1.ParameterCellValue(3, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1.ToString, GlobalEnumerates.AXIS.ROTOR).Value
+                '' REAGENT2
+                Me.BsGridReagent1.ParameterCellValue(4, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_RING2.ToString, GlobalEnumerates.AXIS.POLAR).Value
+                Me.BsGridReagent1.ParameterCellValue(4, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_RING2.ToString, GlobalEnumerates.AXIS.Z).Value
+                Me.BsGridReagent1.ParameterCellValue(4, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_RING2.ToString, GlobalEnumerates.AXIS.ROTOR).Value
+                '' PARKING
+                Me.BsGridReagent1.ParameterCellValue(5, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_PARK.ToString, GlobalEnumerates.AXIS.POLAR).Value
+                Me.BsGridReagent1.ParameterCellValue(5, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_PARK.ToString, GlobalEnumerates.AXIS.Z).Value
+                Me.BsGridReagent1.ParameterCellValue(5, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_PARK.ToString, GlobalEnumerates.AXIS.ROTOR).Value
+            End If
+        End If
+    End Sub
+
+    Private Sub LoadAdjustmentsForSampleArmTab()
+
+        Me.HomePolar = 0
+        Me.HomeZ = 0
+        Me.HomeRotor = 0
+
+        If Not Me.BsGridSample Is Nothing Then
+            If Me.BsGridSample.RowsCount > 0 Then
+                Dim position As Integer = 0
+                '' DISP1
+                Me.BsGridSample.ParameterCellValue(position, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_DISP1.ToString, GlobalEnumerates.AXIS.POLAR).Value
+                Me.BsGridSample.ParameterCellValue(position, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_DISP1.ToString, GlobalEnumerates.AXIS.Z).Value
+                Me.BsGridSample.ParameterCellValue(position, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_DISP1.ToString, GlobalEnumerates.AXIS.ROTOR).Value
+                position += 1
+                '' DISP2
+                Me.BsGridSample.ParameterCellValue(position, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_DISP2.ToString, GlobalEnumerates.AXIS.POLAR).Value
+                Me.BsGridSample.ParameterCellValue(position, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_DISP2.ToString, GlobalEnumerates.AXIS.Z).Value
+                Me.BsGridSample.ParameterCellValue(position, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_DISP2.ToString, GlobalEnumerates.AXIS.ROTOR).Value
+                position += 1
+                '' Z REFERENCE
+                Me.BsGridSample.ParameterCellValue(position, POLAR_COLUMN) = myScreenDelegate.SampleArmPolarZREF.ToString
+                Me.BsGridSample.ParameterCellValue(position, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_ZREF.ToString, GlobalEnumerates.AXIS.Z).Value
+                Me.BsGridSample.ParameterCellValue(position, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_ZREF.ToString, GlobalEnumerates.AXIS.ROTOR).Value
+                position += 1
+                '' WASHING
+                Me.BsGridSample.ParameterCellValue(position, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_WASH.ToString, GlobalEnumerates.AXIS.POLAR).Value
+                Me.BsGridSample.ParameterCellValue(position, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_WASH.ToString, GlobalEnumerates.AXIS.Z).Value
+                Me.BsGridSample.ParameterCellValue(position, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_WASH.ToString, GlobalEnumerates.AXIS.ROTOR).Value
+                position += 1
+                '' SAMPLE RING1 PEDIATRIC
+                Me.BsGridSample.ParameterCellValue(position, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1.ToString, GlobalEnumerates.AXIS.POLAR).Value
+                Me.BsGridSample.ParameterCellValue(position, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1.ToString, GlobalEnumerates.AXIS.Z).Value
+                Me.BsGridSample.ParameterCellValue(position, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1.ToString, GlobalEnumerates.AXIS.ROTOR).Value
+                position += 1
+                '' SAMPLE RING2 PEDIATRIC
+                Me.BsGridSample.ParameterCellValue(position, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING2.ToString, GlobalEnumerates.AXIS.POLAR).Value
+                Me.BsGridSample.ParameterCellValue(position, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING2.ToString, GlobalEnumerates.AXIS.Z).Value
+                Me.BsGridSample.ParameterCellValue(position, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING2.ToString, GlobalEnumerates.AXIS.ROTOR).Value
+                position += 1
+                If Not IsBa200() Then
+                    '' SAMPLE RING3 PEDIATRIC
+                    Me.BsGridSample.ParameterCellValue(position, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING3.ToString, GlobalEnumerates.AXIS.POLAR).Value
+                    Me.BsGridSample.ParameterCellValue(position, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING3.ToString, GlobalEnumerates.AXIS.Z).Value
+                    Me.BsGridSample.ParameterCellValue(position, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING3.ToString, GlobalEnumerates.AXIS.ROTOR).Value
+                    position += 1
+                End If
+                '' Z TUBE Polar and Rotor values taken from Ring1 when saving write to Z of Tube1, Tube2 and Tube3
+                Me.BsGridSample.ParameterCellValue(position, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1.ToString, GlobalEnumerates.AXIS.POLAR).Value
+                Me.BsGridSample.ParameterCellValue(position, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_ZTUBE1.ToString, GlobalEnumerates.AXIS.Z).Value
+                Me.BsGridSample.ParameterCellValue(position, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1.ToString, GlobalEnumerates.AXIS.ROTOR).Value
+                position += 1
+                '' ISE
+                Me.BsGridSample.ParameterCellValue(position, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_ISE.ToString, GlobalEnumerates.AXIS.POLAR).Value
+                Me.BsGridSample.ParameterCellValue(position, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_ISE.ToString, GlobalEnumerates.AXIS.Z).Value
+                Me.BsGridSample.ParameterCellValue(position, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_ISE.ToString, GlobalEnumerates.AXIS.ROTOR).Value
+                position += 1
+                '' PARKING
+                Me.BsGridSample.ParameterCellValue(position, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_PARK.ToString, GlobalEnumerates.AXIS.POLAR).Value
+                Me.BsGridSample.ParameterCellValue(position, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_PARK.ToString, GlobalEnumerates.AXIS.Z).Value
+                Me.BsGridSample.ParameterCellValue(position, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_PARK.ToString, GlobalEnumerates.AXIS.ROTOR).Value
+                position += 1
+                If IsBa200() Then
+                    '' REAGENT RING1 PEDIATRIC
+                    Me.BsGridSample.ParameterCellValue(position, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1.ToString, GlobalEnumerates.AXIS.POLAR).Value
+                    Me.BsGridSample.ParameterCellValue(position, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1R.ToString, GlobalEnumerates.AXIS.Z).Value
+                    Me.BsGridSample.ParameterCellValue(position, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1.ToString, GlobalEnumerates.AXIS.ROTOR).Value
+                    position += 1
+                    '' REAGENT RING2 PEDIATRIC
+                    Me.BsGridSample.ParameterCellValue(position, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING2.ToString, GlobalEnumerates.AXIS.POLAR).Value
+                    Me.BsGridSample.ParameterCellValue(position, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING2R.ToString, GlobalEnumerates.AXIS.Z).Value
+                    Me.BsGridSample.ParameterCellValue(position, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING2.ToString, GlobalEnumerates.AXIS.ROTOR).Value
+                End If
+            End If
+        End If
     End Sub
 
     ''' <summary>
@@ -5238,7 +5264,7 @@ Public Class UiPositionsAdjustments
 
         Catch ex As Exception
             myGlobal.HasError = True
-            myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+            myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeHomes ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".InitializeHomes", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
@@ -5753,13 +5779,13 @@ Public Class UiPositionsAdjustments
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Name & ".GetScreenTooltip ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Name & ".GetScreenTooltip ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            MyBase.ShowMessage(Name & ".GetScreenTooltip ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
     Private Sub ExitScreen()
         'Dim myGlobal As New GlobalDataTO
-        Dim dialogResultToReturn As DialogResult = Windows.Forms.DialogResult.No
+        Dim dialogResultToReturn As DialogResult = DialogResult.No
         Try
             If MyBase.CurrentMode = ADJUSTMENT_MODES.ERROR_MODE Then
                 Me.Close()
@@ -5778,7 +5804,7 @@ Public Class UiPositionsAdjustments
             If ChangesToSave Then
                 dialogResultToReturn = MyBase.ShowMessage("", Messages.SRV_DISCARD_CHANGES.ToString)
 
-                If dialogResultToReturn = Windows.Forms.DialogResult.Yes Then
+                If dialogResultToReturn = DialogResult.Yes Then
 
                     Me.BsGridSample.HideAllIconsOk()
                     Me.BsGridReagent1.HideAllIconsOk()
@@ -5808,7 +5834,7 @@ Public Class UiPositionsAdjustments
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ExitScreen", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".ExitScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            MyBase.ShowMessage(Me.Name & ".ExitScreen", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
@@ -5818,13 +5844,13 @@ Public Class UiPositionsAdjustments
     ''' <remarks>Created by XBC 07/12/2011</remarks>
     Private Sub FinishExitScreen()
         Dim myGlobal As New GlobalDataTO
-        Dim dialogResultToReturn As DialogResult = Windows.Forms.DialogResult.No
+        Dim dialogResultToReturn As DialogResult = DialogResult.No
         Try
             Dim ExitScreen As Boolean = False
 
             If Not WashingStationValidated Or Not AllArmsPositionsValidated Then
                 dialogResultToReturn = MyBase.ShowMessage(GetMessageText(Messages.SRV_ADJUSTMENTS_TESTS.ToString), Messages.SRV_CHANGE_MANDATORY.ToString)
-                If dialogResultToReturn = Windows.Forms.DialogResult.Yes Then
+                If dialogResultToReturn = DialogResult.Yes Then
                     GlobalBase.CreateLogActivity("Leaving screen without complete Adjustment decided by user...", Me.Name & ".ExitScreen", EventLogEntryType.Information, False)
                     ExitScreen = True
                     myGlobal = myScreenDelegate.ReportExitWithOutFinishAdjustment()
@@ -5866,7 +5892,7 @@ Public Class UiPositionsAdjustments
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".FinishExitScreen", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".FinishExitScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            MyBase.ShowMessage(Me.Name & ".FinishExitScreen", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
@@ -5891,7 +5917,7 @@ Public Class UiPositionsAdjustments
                         ' simulating
                         'MyBase.DisplaySimulationMessage("Doing Specified Test...")
                         Me.Cursor = Cursors.WaitCursor
-                        System.Threading.Thread.Sleep(SimulationProcessTime)
+                        Thread.Sleep(SimulationProcessTime)
                         MyBase.myServiceMDI.Focus()
                         Me.Cursor = Cursors.Default
                         MyBase.CurrentMode = ADJUSTMENT_MODES.PARKED
@@ -5912,7 +5938,7 @@ Public Class UiPositionsAdjustments
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SendWASH_STATION_CTRL", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".SendWASH_STATION_CTRL", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            MyBase.ShowMessage(Me.Name & ".SendWASH_STATION_CTRL", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
@@ -5936,7 +5962,7 @@ Public Class UiPositionsAdjustments
             Next
         Catch ex As Exception
             myGlobal.HasError = True
-            myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+            myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".UpdateSpecificAdjustmentsDS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".UpdateSpecificAdjustmentsDS", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
@@ -5965,7 +5991,7 @@ Public Class UiPositionsAdjustments
             Next
         Catch ex As Exception
             myGlobal.HasError = True
-            myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+            myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".UpdateLocalSavedSpecificAdjustmentsDS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".UpdateLocalSavedSpecificAdjustmentsDS", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
@@ -6024,7 +6050,7 @@ Public Class UiPositionsAdjustments
 
         Catch ex As Exception
             myGlobal.HasError = True
-            myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+            myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".UpdateLocalSavedAdjustmentsDS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".UpdateLocalSavedAdjustmentsDS ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
@@ -6512,7 +6538,7 @@ Public Class UiPositionsAdjustments
 
         Catch ex As Exception
             myGlobal.HasError = True
-            myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+            myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SetAdditionalAdjustments ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".SetAdditionalAdjustments ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
@@ -7499,10 +7525,10 @@ Public Class UiPositionsAdjustments
 
         Catch ex As Exception
             myGlobal.HasError = True
-            myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+            myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
             GlobalBase.CreateLogActivity(ex.Message, Name & ".SimulateAbsorbanceData", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Name & ".SimulateAbsorbanceData", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            MyBase.ShowMessage(Name & ".SimulateAbsorbanceData", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
         Return myGlobal
@@ -7520,7 +7546,7 @@ Public Class UiPositionsAdjustments
             PrepareArea()
 
             Me.Cursor = Cursors.WaitCursor
-            System.Threading.Thread.Sleep(SimulationProcessTime)
+            Thread.Sleep(SimulationProcessTime)
             MyBase.myServiceMDI.Focus()
             Me.Cursor = Cursors.Default
 
@@ -7533,7 +7559,7 @@ Public Class UiPositionsAdjustments
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Name & ".SimulateStepPositioning", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Name & ".SimulateStepPositioning", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            MyBase.ShowMessage(Name & ".SimulateStepPositioning", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
@@ -7548,7 +7574,7 @@ Public Class UiPositionsAdjustments
             PrepareArea()
 
             Me.Cursor = Cursors.WaitCursor
-            System.Threading.Thread.Sleep(SimulationProcessTime)
+            Thread.Sleep(SimulationProcessTime)
             MyBase.myServiceMDI.Focus()
             Me.Cursor = Cursors.Default
 
@@ -7561,7 +7587,7 @@ Public Class UiPositionsAdjustments
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Name & ".SimulateAbsPositioning", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Name & ".SimulateAbsPositioning", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            MyBase.ShowMessage(Name & ".SimulateAbsPositioning", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
@@ -7576,7 +7602,7 @@ Public Class UiPositionsAdjustments
             PrepareArea()
 
             Me.Cursor = Cursors.WaitCursor
-            System.Threading.Thread.Sleep(SimulationProcessTime)
+            Thread.Sleep(SimulationProcessTime)
             MyBase.myServiceMDI.Focus()
             Me.Cursor = Cursors.Default
 
@@ -7589,7 +7615,7 @@ Public Class UiPositionsAdjustments
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Name & ".SimulateHOMEPositioning", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Name & ".SimulateHOMEPositioning", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            MyBase.ShowMessage(Name & ".SimulateHOMEPositioning", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
@@ -7633,10 +7659,10 @@ Public Class UiPositionsAdjustments
 
         Catch ex As Exception
             myGlobal.HasError = True
-            myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+            myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
             GlobalBase.CreateLogActivity(ex.Message, Name & ".SimulateEncoderData", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Name & ".SimulateEncoderData", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            MyBase.ShowMessage(Name & ".SimulateEncoderData", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobal
     End Function
@@ -7653,7 +7679,7 @@ Public Class UiPositionsAdjustments
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     ''' <remarks>Created by XBC 12/09/2011</remarks>
-    Private Sub IPositionsAdjustments_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
+    Private Sub IPositionsAdjustments_FormClosing(ByVal sender As Object, ByVal e As FormClosingEventArgs) Handles Me.FormClosing
 
         Try
 
@@ -7681,7 +7707,7 @@ Public Class UiPositionsAdjustments
 
     End Sub
 
-    Private Sub PositionsAdjustments_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+    Private Sub PositionsAdjustments_Load(ByVal sender As Object, ByVal e As EventArgs) Handles Me.Load
         Dim myGlobal As New GlobalDataTO
         Try
 
@@ -7742,17 +7768,8 @@ Public Class UiPositionsAdjustments
         End Try
     End Sub
 
-    Private Sub HideTabsForBa200Model()
-
-        If (AnalyzerController.Instance.Analyzer.Model = AnalyzerModelEnum.A200.ToString()) Then
-            BsTabArmsControl.TabPages.Remove(TabReagent1)            
-            BsTabArmsControl.TabPages.Remove(TabReagent2)
-            BsTabArmsControl.TabPages.Remove(TabMixer2)
-        End If
-    End Sub
-
     'SGM 08/03/11
-    Private Sub PositionsAdjustments_Shown(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Shown
+    Private Sub PositionsAdjustments_Shown(ByVal sender As Object, ByVal e As EventArgs) Handles MyBase.Shown
         Dim myGlobal As New GlobalDataTO
         Try
             ' Check communications with Instrument
@@ -7780,7 +7797,7 @@ Public Class UiPositionsAdjustments
                         'MyBase.DisplaySimulationMessage("Reading Adjustments from Instrument...")
 
                         Me.Cursor = Cursors.WaitCursor
-                        System.Threading.Thread.Sleep(SimulationProcessTime)
+                        Thread.Sleep(SimulationProcessTime)
                         MyBase.myServiceMDI.Focus()
                         Me.Cursor = Cursors.Default
 
@@ -7795,7 +7812,7 @@ Public Class UiPositionsAdjustments
                     Else
                         'SendFwScript(Me.CurrentMode)
                         If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
-                            myGlobal = myScreenDelegate.SendREAD_ADJUSTMENTS(GlobalEnumerates.Ax00Adjustsments.ALL)
+                            myGlobal = myScreenDelegate.SendREAD_ADJUSTMENTS(Ax00Adjustsments.ALL)
                         End If
                     End If
 
@@ -7825,14 +7842,14 @@ Public Class UiPositionsAdjustments
         End Try
     End Sub
 
-    Private Sub BsTabArmsControl_Selecting(ByVal sender As Object, ByVal e As System.Windows.Forms.TabControlCancelEventArgs) Handles BsTabArmsControl.Selecting
+    Private Sub BsTabArmsControl_Selecting(ByVal sender As Object, ByVal e As TabControlCancelEventArgs) Handles BsTabArmsControl.Selecting
         Try
 
             'check if changes before changing arm tab
             If MyClass.IsLocallySaved Then
                 Dim dialogResultToReturn As DialogResult = MyBase.ShowMessage("", Messages.SRV_DISCARD_CHANGES.ToString)
 
-                If dialogResultToReturn = Windows.Forms.DialogResult.No Then
+                If dialogResultToReturn = DialogResult.No Then
 
                     Me.ManageTabArms = False
                 Else
@@ -7895,7 +7912,7 @@ Public Class UiPositionsAdjustments
     ''' Creation ?
     ''' AG 01/10/2014 - BA-1953 - also reset REACTIONS_HOME_ROTOR because it is the script used during this adjustment
     ''' </remarks>
-    Private Sub BsTabPagesControl_Deselecting(ByVal sender As Object, ByVal e As System.Windows.Forms.TabControlCancelEventArgs) Handles BsTabPagesControl.Deselecting
+    Private Sub BsTabPagesControl_Deselecting(ByVal sender As Object, ByVal e As TabControlCancelEventArgs) Handles BsTabPagesControl.Deselecting
 
         Dim myGlobal As New GlobalDataTO
 
@@ -7923,7 +7940,7 @@ Public Class UiPositionsAdjustments
         End Try
     End Sub
 
-    Private Sub BsTabPagesControl_Selected(ByVal sender As Object, ByVal e As System.Windows.Forms.TabControlEventArgs) Handles BsTabPagesControl.Selected
+    Private Sub BsTabPagesControl_Selected(ByVal sender As Object, ByVal e As TabControlEventArgs) Handles BsTabPagesControl.Selected
         Try
 
             Application.DoEvents()
@@ -7949,7 +7966,7 @@ Public Class UiPositionsAdjustments
         End Try
     End Sub
 
-    Private Sub BsTabPagesControl_Selecting(ByVal sender As Object, ByVal e As System.Windows.Forms.TabControlCancelEventArgs) Handles BsTabPagesControl.Selecting
+    Private Sub BsTabPagesControl_Selecting(ByVal sender As Object, ByVal e As TabControlCancelEventArgs) Handles BsTabPagesControl.Selecting
         Dim dialogResultToReturn As DialogResult
         Try
 
@@ -7958,7 +7975,7 @@ Public Class UiPositionsAdjustments
                 If MyClass.IsLocallySaved Then
                     dialogResultToReturn = MyBase.ShowMessage("", Messages.SRV_DISCARD_CHANGES.ToString)
 
-                    If dialogResultToReturn = Windows.Forms.DialogResult.No Then
+                    If dialogResultToReturn = DialogResult.No Then
                         Me.ManageTabPages = False
                     Else
 
@@ -7987,7 +8004,7 @@ Public Class UiPositionsAdjustments
 
             If BsTabPagesControl.SelectedTab Is TabOpticCentering Then
 
-                dialogResultToReturn = MyBase.ShowMessage(GetMessageText(GlobalEnumerates.Messages.SRV_ADJUSTMENTS_TESTS.ToString), Messages.SRV_OPTIC_ADJUSTMENT_ENTER.ToString)
+                dialogResultToReturn = MyBase.ShowMessage(GetMessageText(Messages.SRV_ADJUSTMENTS_TESTS.ToString), Messages.SRV_OPTIC_ADJUSTMENT_ENTER.ToString)
 
                 'history of arms pending history adjustments and tests
                 Me.ReportHistory(Nothing, Nothing, True)
@@ -8029,7 +8046,7 @@ Public Class UiPositionsAdjustments
         End Try
     End Sub
 
-    Private Sub BsCloseButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsExitButton.Click
+    Private Sub BsCloseButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsExitButton.Click
         Try
             Me.ExitScreen()
 
@@ -8045,24 +8062,21 @@ Public Class UiPositionsAdjustments
     ''' <remarks>
     ''' Created by XBC 07/06/2011
     ''' </remarks>
-    Private Sub ConfigUsers_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+    Private Sub ConfigUsers_KeyDown(ByVal sender As Object, ByVal e As KeyEventArgs) Handles Me.KeyDown
         Try
             If (e.KeyCode = Keys.Escape) Then
-                'If (Me.BsExitButton.Enabled) Then
-                '    Me.ExitScreen()
-                'End If
 
                 'RH 04/07/2011 Escape key should do exactly the same operations as bsExitButton_Click()
                 BsExitButton.PerformClick()
             End If
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".KeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            MyBase.ShowMessage(Me.Name & ".KeyDown", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
     'SG 24/01/11
-    Private Sub BsSaveButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsSaveButton.Click
+    Private Sub BsSaveButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsSaveButton.Click
         Try
             MyClass.IsLocallySavedAttr = False
             Me.SaveAdjustment(True)
@@ -8165,6 +8179,12 @@ Public Class UiPositionsAdjustments
 
                         Case "RING2"
                             myAdjustment = ADJUSTMENT_GROUPS.SAMPLES_ARM_RING2
+
+                        Case "RING1R"
+                            myAdjustment = ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1R
+
+                        Case "RING2R"
+                            myAdjustment = ADJUSTMENT_GROUPS.SAMPLES_ARM_RING2R
 
                         Case "RING3"
                             myAdjustment = ADJUSTMENT_GROUPS.SAMPLES_ARM_RING3
@@ -8278,9 +8298,9 @@ Public Class UiPositionsAdjustments
                 InitializeEditedValue()
                 With EditedValue
 
-                    Dim myPolar As New UiPositionsAdjustments.AdjustmentRowData
-                    Dim myZ As New UiPositionsAdjustments.AdjustmentRowData
-                    Dim myRotor As New UiPositionsAdjustments.AdjustmentRowData
+                    Dim myPolar As New AdjustmentRowData
+                    Dim myZ As New AdjustmentRowData
+                    Dim myRotor As New AdjustmentRowData
 
                     Select Case SelectedArmTab
                         Case ADJUSTMENT_ARMS.SAMPLE
@@ -8527,7 +8547,7 @@ Public Class UiPositionsAdjustments
                         ' simulating
                         'MyBase.DisplaySimulationMessage("Doing Specified Test...")
                         Me.Cursor = Cursors.WaitCursor
-                        System.Threading.Thread.Sleep(SimulationProcessTime)
+                        Thread.Sleep(SimulationProcessTime)
                         MyBase.myServiceMDI.Focus()
                         Me.Cursor = Cursors.Default
                         MyBase.CurrentMode = ADJUSTMENT_MODES.ADJUST_PREPARED
@@ -8570,7 +8590,7 @@ Public Class UiPositionsAdjustments
                             ' simulating
                             'MyBase.DisplaySimulationMessage("Exiting Test...")
                             Me.Cursor = Cursors.WaitCursor
-                            System.Threading.Thread.Sleep(SimulationProcessTime)
+                            Thread.Sleep(SimulationProcessTime)
                             MyBase.myServiceMDI.Focus()
                             Me.Cursor = Cursors.Default
                             MyBase.CurrentMode = ADJUSTMENT_MODES.TEST_EXITED
@@ -8843,7 +8863,7 @@ Public Class UiPositionsAdjustments
                             ' simulating
                             'MyBase.DisplaySimulationMessage("Doing specified Test...")
                             Me.Cursor = Cursors.WaitCursor
-                            System.Threading.Thread.Sleep(SimulationProcessTime)
+                            Thread.Sleep(SimulationProcessTime)
                             MyBase.myServiceMDI.Focus()
                             Me.Cursor = Cursors.Default
                             MyBase.CurrentMode = ADJUSTMENT_MODES.TESTED
@@ -8874,7 +8894,7 @@ Public Class UiPositionsAdjustments
     ''' Created by SGM
     ''' AG 01/10/2014 - BA-1953 new photometry adjustment maneuver (use REAGENTS_HOME_ROTOR + REAGENTS_ABS_ROTOR (with parameter = current value of GFWR1) instead of REACTIONS_ROTOR_HOME_WELL1)
     ''' </remarks>
-    Private Sub BsAdjustButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsOpticAdjustButton.Click, _
+    Private Sub BsAdjustButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsOpticAdjustButton.Click, _
                                                                                                         BsWSAdjustButton.Click
         Dim myGlobal As New GlobalDataTO
         Try
@@ -8891,29 +8911,21 @@ Public Class UiPositionsAdjustments
                         Case ADJUSTMENT_PAGES.OPTIC_CENTERING
 
                             'AG 01/10/2014 - BA-1953 - also reset REACTIONS_HOME_ROTOR because it is the script used during this adjustment
-                            '' XBC 12/11/2012 - Always reset preliminary GLF home before start Optic Centering
-                            'myGlobal = myScreenDelegate.ResetSpecifiedPreliminaryHomes(MyBase.myServiceMDI.ActiveAnalyzer, FwSCRIPTS_IDS.REACTIONS_ROTOR_HOME_WELL1.ToString)
                             Dim preliminaryHomesToResetList As New List(Of String)
                             preliminaryHomesToResetList.Add(FwSCRIPTS_IDS.REACTIONS_ROTOR_HOME_WELL1.ToString)
                             preliminaryHomesToResetList.Add(FwSCRIPTS_IDS.REACTIONS_HOME_ROTOR.ToString)
                             myGlobal = myScreenDelegate.ResetSpecifiedPreliminaryHomes(MyBase.myServiceMDI.ActiveAnalyzer, preliminaryHomesToResetList)
-                            'AG 01/10/2014 - BA-1953
 
                             If myGlobal.HasError Then
                                 PrepareErrorMode()
                                 Exit Try
                             End If
-                            ' XBC 12/11/2012
 
-                            ' XBC 21/05/2012
                             Me.IsCenteringOptic = True
 
                             .AdjustmentID = ADJUSTMENT_GROUPS.PHOTOMETRY
                             .AxisID = GlobalEnumerates.AXIS.ROTOR
                             myScreenDelegate.LEDIntensity = Me.LEDCurrent
-                            'myScreenDelegate.WaveLength = me.WaveLength
-                            'myScreenDelegate.NumWells = me.WellsToRead
-                            'myScreenDelegate.StepsbyWell = me.StepsByWell
                             myScreenDelegate.AbsorbanceScanDone = False
                             myScreenDelegate.AbsorbanceScanReadings = 0
                             myScreenDelegate.ReadedCounts = New List(Of OpticCenterDataTO)
@@ -8933,7 +8945,7 @@ Public Class UiPositionsAdjustments
                             .AdjustmentID = ADJUSTMENT_GROUPS.WASHING_STATION
                             .AxisID = GlobalEnumerates.AXIS.Z
 
-                            Dim myZ As New UiPositionsAdjustments.AdjustmentRowData
+                            Dim myZ As New AdjustmentRowData
                             myZ = ReadGlobalAdjustmentData(.AdjustmentID.ToString, GlobalEnumerates.AXIS.Z, True)
                             If myZ.CanSave And myZ.Value.Length = 0 Then
                                 myGlobal.HasError = True
@@ -8966,16 +8978,14 @@ Public Class UiPositionsAdjustments
 
                             If Not Me.AllHomesAreDone Then
                                 MyBase.DisplayMessage(Messages.SRV_HOMES_IN_PROGRESS.ToString)
-                                'MyBase.DisplaySimulationMessage("Pending Homes in progress...")
 
                                 Me.Cursor = Cursors.WaitCursor
-                                System.Threading.Thread.Sleep(SimulationProcessTime)
+                                Thread.Sleep(SimulationProcessTime)
                                 MyBase.myServiceMDI.Focus()
                                 Me.Cursor = Cursors.Default
 
                                 Me.AllHomesAreDone = True
                                 MyBase.DisplayMessage(Messages.SRV_HOMES_FINISHED.ToString)
-                                'MyBase.DisplaySimulationMessage("Pending Homes successfully completed")
                                 MyBase.myBaseScreenDelegate.SetPreliminaryHomesAsDone(SelectedAdjustmentGroup)
 
                                 MyBase.myServiceMDI.Focus()
@@ -9106,7 +9116,7 @@ Public Class UiPositionsAdjustments
         End Try
     End Sub
 
-    Private Sub BsCancelButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsOpticCancelButton.Click, _
+    Private Sub BsCancelButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsOpticCancelButton.Click, _
                                                                                                             BsWSCancelButton.Click, _
                                                                                                             BsArmsCancelButton.Click
         Try
@@ -9126,10 +9136,10 @@ Public Class UiPositionsAdjustments
             End If
 
             If AreChangesToSave Then
-                Dim dialogResultToReturn As DialogResult = Windows.Forms.DialogResult.No
+                Dim dialogResultToReturn As DialogResult = DialogResult.No
                 dialogResultToReturn = MyBase.ShowMessage("", Messages.SRV_DISCARD_CHANGES.ToString)
 
-                If dialogResultToReturn = Windows.Forms.DialogResult.Yes Then
+                If dialogResultToReturn = DialogResult.Yes Then
 
                     Me.BsGridSample.HideAllIconsOk()
                     Me.BsGridReagent1.HideAllIconsOk()
@@ -9154,7 +9164,7 @@ Public Class UiPositionsAdjustments
         End Try
     End Sub
 
-    Private Sub BsArmsOkButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsArmsOkButton.Click
+    Private Sub BsArmsOkButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsArmsOkButton.Click
         Try
             MyClass.IsLocallySavedAttr = True
             MyClass.SaveAdjustment()
@@ -9164,7 +9174,7 @@ Public Class UiPositionsAdjustments
         End Try
     End Sub
 
-    Private Sub BsMixButtons_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsStirrer1Button.Click, BsStirrer2Button.Click
+    Private Sub BsMixButtons_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsStirrer1Button.Click, BsStirrer2Button.Click
         Try
             'Dim myButton As BSButton = CType(sender, BSButton)
 
@@ -9175,7 +9185,7 @@ Public Class UiPositionsAdjustments
                 If MyBase.SimulationMode Then
                     MyBase.CurrentMode = ADJUSTMENT_MODES.STIRRER_TEST
                     Me.PrepareArea()
-                    System.Threading.Thread.Sleep(MyBase.SimulationProcessTime)
+                    Thread.Sleep(MyBase.SimulationProcessTime)
                     MyBase.CurrentMode = ADJUSTMENT_MODES.STIRRER_TESTING
 
                     Select Case Me.SelectedArmTab
@@ -9205,7 +9215,7 @@ Public Class UiPositionsAdjustments
 
                 If MyBase.SimulationMode Then
                     'MyBase.DisplaySimulationMessage("Stop Testing mixer...")
-                    System.Threading.Thread.Sleep(MyBase.SimulationProcessTime)
+                    Thread.Sleep(MyBase.SimulationProcessTime)
 
                     ' XBC 13/10/2011
                     Me.PrepareStirrerTestedMode()
@@ -9248,7 +9258,7 @@ Public Class UiPositionsAdjustments
         End Try
     End Sub
 
-    Private Sub BsUpDownWSButton1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsUpDownWSButton1.Click
+    Private Sub BsUpDownWSButton1_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsUpDownWSButton1.Click
         Try
             Me.SendWASH_STATION_CTRL()
 
@@ -9258,7 +9268,7 @@ Public Class UiPositionsAdjustments
         End Try
     End Sub
 
-    Private Sub BsUpDownWSButton2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsUpDownWSButton2.Click
+    Private Sub BsUpDownWSButton2_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsUpDownWSButton2.Click
         Try
             Me.SendWASH_STATION_CTRL()
 
@@ -9268,7 +9278,7 @@ Public Class UiPositionsAdjustments
         End Try
     End Sub
 
-    Private Sub BsUpDownWSButton3_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsUpDownWSButton3.Click
+    Private Sub BsUpDownWSButton3_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsUpDownWSButton3.Click
         Try
             Me.SendWASH_STATION_CTRL()
 
@@ -9284,7 +9294,7 @@ Public Class UiPositionsAdjustments
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     ''' <remarks>Created by XBC 30/11/2011</remarks>
-    Private Sub BsStopButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsOpticStopButton.Click
+    Private Sub BsStopButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsOpticStopButton.Click
         'Dim myGlobal As New GlobalDataTO
         Try
             Select Case Me.SelectedPage
@@ -9302,7 +9312,7 @@ Public Class UiPositionsAdjustments
         End Try
     End Sub
 
-    Private Sub BsStopButton_MouseHover(ByVal sender As Object, ByVal e As System.EventArgs) Handles BsOpticStopButton.MouseHover
+    Private Sub BsStopButton_MouseHover(ByVal sender As Object, ByVal e As EventArgs) Handles BsOpticStopButton.MouseHover
         Me.Cursor = Cursors.Default
     End Sub
 
@@ -9313,11 +9323,11 @@ Public Class UiPositionsAdjustments
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     ''' <remarks>Created by XBC 30/11/2011</remarks>
-    Private Sub BsStopButton_MouseMove(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles BsOpticStopButton.MouseMove
+    Private Sub BsStopButton_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles BsOpticStopButton.MouseMove
         Me.Cursor = Cursors.Default
     End Sub
 
-    Private Sub AbsorbanceChart_Paint(ByVal sender As System.Object, ByVal e As System.Windows.Forms.PaintEventArgs) Handles AbsorbanceChart.Paint
+    Private Sub AbsorbanceChart_Paint(ByVal sender As Object, ByVal e As PaintEventArgs) Handles AbsorbanceChart.Paint
         Try
 
         Catch ex As Exception
@@ -9326,7 +9336,7 @@ Public Class UiPositionsAdjustments
         End Try
     End Sub
 
-    Private Sub AbsorbanceChart_CustomPaint(ByVal sender As System.Object, ByVal e As DevExpress.XtraCharts.CustomPaintEventArgs) Handles AbsorbanceChart.CustomPaint
+    Private Sub AbsorbanceChart_CustomPaint(ByVal sender As Object, ByVal e As CustomPaintEventArgs) Handles AbsorbanceChart.CustomPaint
         Try
 
         Catch ex As Exception
@@ -9335,7 +9345,7 @@ Public Class UiPositionsAdjustments
         End Try
     End Sub
 
-    Private Sub AbsorbanceChart_Zoom(ByVal sender As System.Object, ByVal e As DevExpress.XtraCharts.ChartZoomEventArgs) Handles AbsorbanceChart.Zoom
+    Private Sub AbsorbanceChart_Zoom(ByVal sender As Object, ByVal e As ChartZoomEventArgs) Handles AbsorbanceChart.Zoom
         Try
 
         Catch ex As Exception
@@ -9376,7 +9386,7 @@ Public Class UiPositionsAdjustments
                         Dim values As String = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NumberCounts", currentLanguage) & ": " & point.Values(0).ToString()
 
                         ' Show the tooltip.
-                        ToolTipController1.ShowHint(argument & Constants.vbLf & values, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_SeriesPointData", currentLanguage))
+                        ToolTipController1.ShowHint(argument & vbLf & values, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_SeriesPointData", currentLanguage))
                     End If
                 Else
                     ' Hide the tooltip.
@@ -9453,7 +9463,7 @@ Public Class UiPositionsAdjustments
         End Try
     End Sub
 
-    Private Sub BsAdjustControl_VisibleChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsAdjustPolar.VisibleChanged, _
+    Private Sub BsAdjustControl_VisibleChanged(ByVal sender As Object, ByVal e As EventArgs) Handles BsAdjustPolar.VisibleChanged, _
                                                                                                                BsAdjustZ.VisibleChanged, _
                                                                                                                BsAdjustRotor.VisibleChanged
         Try
@@ -9486,7 +9496,7 @@ Public Class UiPositionsAdjustments
 
 #Region "XPS Info Events"
 
-    Private Sub BsXPSViewer_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles BsInfoOptXPSViewer.Load, _
+    Private Sub BsXPSViewer_Load(ByVal sender As Object, ByVal e As EventArgs) Handles BsInfoOptXPSViewer.Load, _
                                                                                             BsInfoWsXPSViewer.Load, _
                                                                                             BsInfoArmsXPSViewer.Load
         Try
@@ -9509,7 +9519,7 @@ Public Class UiPositionsAdjustments
 
 #Region "event handler overloads"
     ' SET ABSOLUTE POINT
-    Private Sub BsAdjustOptic_SetABSPointReleased(ByVal sender As System.Object, ByVal Value As System.Single) Handles BsAdjustOptic.AbsoluteSetPointReleased
+    Private Sub BsAdjustOptic_SetABSPointReleased(ByVal sender As Object, ByVal Value As Single) Handles BsAdjustOptic.AbsoluteSetPointReleased
         Try
             ' XBC 04/01/2012 
             'EditedValue.AxisID = GlobalEnumerates.AXIS.ROTOR
@@ -9531,7 +9541,7 @@ Public Class UiPositionsAdjustments
             MyBase.ShowMessage(Me.Name & ".BsAdjustOptic_SetABSPointReleased ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
-    Private Sub BsAdjustWashing_SetABSPointReleased(ByVal sender As System.Object, ByVal Value As System.Single) Handles BsAdjustWashing.AbsoluteSetPointReleased
+    Private Sub BsAdjustWashing_SetABSPointReleased(ByVal sender As Object, ByVal Value As Single) Handles BsAdjustWashing.AbsoluteSetPointReleased
         Try
             EditedValue.AxisID = GlobalEnumerates.AXIS.Z
             EditedValue.NewZValue = Value
@@ -9552,7 +9562,7 @@ Public Class UiPositionsAdjustments
             MyBase.ShowMessage(Me.Name & ".BsAdjustWashing_SetABSPointReleased ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
-    Private Sub BsAdjustPolar_SetABSPointReleased(ByVal sender As System.Object, ByVal Value As System.Single) Handles BsAdjustPolar.AbsoluteSetPointReleased
+    Private Sub BsAdjustPolar_SetABSPointReleased(ByVal sender As Object, ByVal Value As Single) Handles BsAdjustPolar.AbsoluteSetPointReleased
         Try
             EditedValue.AxisID = GlobalEnumerates.AXIS.POLAR
             EditedValue.NewPolarValue = Value
@@ -9574,7 +9584,7 @@ Public Class UiPositionsAdjustments
             MyBase.ShowMessage(Me.Name & ".BsAdjustPolar_SetABSPointReleased ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
-    Private Sub BsAdjustZ_SetABSPointReleased(ByVal sender As System.Object, ByVal Value As System.Single) Handles BsAdjustZ.AbsoluteSetPointReleased
+    Private Sub BsAdjustZ_SetABSPointReleased(ByVal sender As Object, ByVal Value As Single) Handles BsAdjustZ.AbsoluteSetPointReleased
         Try
             EditedValue.AxisID = GlobalEnumerates.AXIS.Z
             EditedValue.NewZValue = Value
@@ -9596,7 +9606,7 @@ Public Class UiPositionsAdjustments
             MyBase.ShowMessage(Me.Name & ".BsAdjustZ_SetABSPointReleased ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
-    Private Sub BsAdjustRotor_SetABSPointReleased(ByVal sender As System.Object, ByVal Value As System.Single) Handles BsAdjustRotor.AbsoluteSetPointReleased
+    Private Sub BsAdjustRotor_SetABSPointReleased(ByVal sender As Object, ByVal Value As Single) Handles BsAdjustRotor.AbsoluteSetPointReleased
         Try
             EditedValue.AxisID = GlobalEnumerates.AXIS.ROTOR
             EditedValue.NewRotorValue = Value
@@ -9620,7 +9630,7 @@ Public Class UiPositionsAdjustments
     End Sub
 
     ' SET RELATIVE POINT
-    Private Sub BsAdjustOptic_SetRELPointReleased(ByVal sender As System.Object, ByVal Value As System.Single) Handles BsAdjustOptic.RelativeSetPointReleased
+    Private Sub BsAdjustOptic_SetRELPointReleased(ByVal sender As Object, ByVal Value As Single) Handles BsAdjustOptic.RelativeSetPointReleased
         Try
             ' XBC 29/10/2012
             'If MyBase.CurrentMode = ADJUSTMENT_MODES.ADJUSTING Then Exit Sub 'SGM 01/10/2012
@@ -9658,7 +9668,7 @@ Public Class UiPositionsAdjustments
             MyBase.ShowMessage(Me.Name & ".BsAdjustOptic_SetRELPointReleased ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
-    Private Sub BsAdjustWashing_SetRELPointReleased(ByVal sender As System.Object, ByVal Value As System.Single) Handles BsAdjustWashing.RelativeSetPointReleased
+    Private Sub BsAdjustWashing_SetRELPointReleased(ByVal sender As Object, ByVal Value As Single) Handles BsAdjustWashing.RelativeSetPointReleased
         Try
             EditedValue.AxisID = GlobalEnumerates.AXIS.Z
             EditedValue.stepValue = Value
@@ -9681,7 +9691,7 @@ Public Class UiPositionsAdjustments
             MyBase.ShowMessage(Me.Name & ".BsAdjustWashing_SetRELPointReleased ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
-    Private Sub BsAdjustPolar_SetRELPointReleased(ByVal sender As System.Object, ByVal Value As System.Single) Handles BsAdjustPolar.RelativeSetPointReleased
+    Private Sub BsAdjustPolar_SetRELPointReleased(ByVal sender As Object, ByVal Value As Single) Handles BsAdjustPolar.RelativeSetPointReleased
         Try
             EditedValue.AxisID = GlobalEnumerates.AXIS.POLAR
             EditedValue.stepValue = Value
@@ -9704,7 +9714,7 @@ Public Class UiPositionsAdjustments
             MyBase.ShowMessage(Me.Name & ".BsAdjustPolar_SetRELPointReleased ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
-    Private Sub BsAdjustZ_SetRELPointReleased(ByVal sender As System.Object, ByVal Value As System.Single) Handles BsAdjustZ.RelativeSetPointReleased
+    Private Sub BsAdjustZ_SetRELPointReleased(ByVal sender As Object, ByVal Value As Single) Handles BsAdjustZ.RelativeSetPointReleased
         Try
             EditedValue.AxisID = GlobalEnumerates.AXIS.Z
             EditedValue.stepValue = Value
@@ -9727,7 +9737,7 @@ Public Class UiPositionsAdjustments
             MyBase.ShowMessage(Me.Name & ".BsAdjustZ_SetRELPointReleased ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
-    Private Sub BsAdjustRotor_SetRELPointReleased(ByVal sender As System.Object, ByVal Value As System.Single) Handles BsAdjustRotor.RelativeSetPointReleased
+    Private Sub BsAdjustRotor_SetRELPointReleased(ByVal sender As Object, ByVal Value As Single) Handles BsAdjustRotor.RelativeSetPointReleased
         Try
             EditedValue.AxisID = GlobalEnumerates.AXIS.ROTOR
             EditedValue.stepValue = Value
@@ -9752,7 +9762,7 @@ Public Class UiPositionsAdjustments
     End Sub
 
     ' HOMES
-    Private Sub BsAdjustOptic_HomeRequestReleased(ByVal sender As System.Object) Handles BsAdjustOptic.HomeRequestReleased
+    Private Sub BsAdjustOptic_HomeRequestReleased(ByVal sender As Object) Handles BsAdjustOptic.HomeRequestReleased
         Try
             'EditedValue.AxisID = GlobalEnumerates.AXIS.ROTOR
             'EditedValue.NewRotorValue = 0
@@ -9775,7 +9785,7 @@ Public Class UiPositionsAdjustments
             MyBase.ShowMessage(Me.Name & ".BsAdjustOptic_HomeRequestReleased ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
-    Private Sub BsAdjustWashing_HomeRequestReleased(ByVal sender As System.Object) Handles BsAdjustWashing.HomeRequestReleased
+    Private Sub BsAdjustWashing_HomeRequestReleased(ByVal sender As Object) Handles BsAdjustWashing.HomeRequestReleased
         Try
             EditedValue.AxisID = GlobalEnumerates.AXIS.Z
             EditedValue.NewZValue = Me.HomeZ
@@ -9798,7 +9808,7 @@ Public Class UiPositionsAdjustments
             MyBase.ShowMessage(Me.Name & ".BsAdjustWashing_HomeRequestReleased ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
-    Private Sub BsAdjustPolar_HomeRequestReleased(ByVal sender As System.Object) Handles BsAdjustPolar.HomeRequestReleased
+    Private Sub BsAdjustPolar_HomeRequestReleased(ByVal sender As Object) Handles BsAdjustPolar.HomeRequestReleased
         Try
             EditedValue.AxisID = GlobalEnumerates.AXIS.POLAR
             EditedValue.NewPolarValue = Me.HomePolar
@@ -9822,7 +9832,7 @@ Public Class UiPositionsAdjustments
             MyBase.ShowMessage(Me.Name & ".BsAdjustPolar_HomeRequestReleased ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
-    Private Sub BsAdjustZ_HomeRequestReleased(ByVal sender As System.Object) Handles BsAdjustZ.HomeRequestReleased
+    Private Sub BsAdjustZ_HomeRequestReleased(ByVal sender As Object) Handles BsAdjustZ.HomeRequestReleased
         Try
             EditedValue.AxisID = GlobalEnumerates.AXIS.Z
             EditedValue.NewZValue = Me.HomeZ
@@ -9846,7 +9856,7 @@ Public Class UiPositionsAdjustments
             MyBase.ShowMessage(Me.Name & ".BsAdjustZ_HomeRequestReleased ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
-    Private Sub BsAdjustRotor_HomeRequestReleased(ByVal sender As System.Object) Handles BsAdjustRotor.HomeRequestReleased
+    Private Sub BsAdjustRotor_HomeRequestReleased(ByVal sender As Object) Handles BsAdjustRotor.HomeRequestReleased
         Try
             EditedValue.AxisID = GlobalEnumerates.AXIS.ROTOR
             EditedValue.NewRotorValue = Me.HomeRotor
@@ -9981,7 +9991,7 @@ Public Class UiPositionsAdjustments
 
 
             Dim send As Object = Nothing
-            Dim myCellEventArgs As System.Windows.Forms.DataGridViewCellEventArgs = New System.Windows.Forms.DataGridViewCellEventArgs(POLAR_COLUMN + 3, SelectedRow)
+            Dim myCellEventArgs As DataGridViewCellEventArgs = New DataGridViewCellEventArgs(POLAR_COLUMN + 3, SelectedRow)
             If Not FocusedFromGrid Then
                 Select Case SelectedArmTab
                     Case ADJUSTMENT_ARMS.SAMPLE
@@ -10044,7 +10054,7 @@ Public Class UiPositionsAdjustments
         Try
 
             Dim send As Object = Nothing
-            Dim myCellEventArgs As System.Windows.Forms.DataGridViewCellEventArgs = New System.Windows.Forms.DataGridViewCellEventArgs(Z_COLUMN + 3, SelectedRow)
+            Dim myCellEventArgs As DataGridViewCellEventArgs = New DataGridViewCellEventArgs(Z_COLUMN + 3, SelectedRow)
             If Not FocusedFromGrid Then
                 Select Case SelectedArmTab
                     Case ADJUSTMENT_ARMS.SAMPLE
@@ -10074,7 +10084,7 @@ Public Class UiPositionsAdjustments
         Try
 
             Dim send As Object = Nothing
-            Dim myCellEventArgs As System.Windows.Forms.DataGridViewCellEventArgs = New System.Windows.Forms.DataGridViewCellEventArgs(ROTOR_COLUMN + 3, SelectedRow)
+            Dim myCellEventArgs As DataGridViewCellEventArgs = New DataGridViewCellEventArgs(ROTOR_COLUMN + 3, SelectedRow)
             If Not FocusedFromGrid Then
                 Select Case SelectedArmTab
                     Case ADJUSTMENT_ARMS.SAMPLE
@@ -10103,7 +10113,7 @@ Public Class UiPositionsAdjustments
 
 
 #Region "LED Current"
-    Private Sub LEDCurrentTrackBar_ValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsLEDCurrentTrackBar.ValueChanged
+    Private Sub LEDCurrentTrackBar_ValueChanged(ByVal sender As Object, ByVal e As EventArgs) Handles BsLEDCurrentTrackBar.ValueChanged
         Try
             Me.LEDCurrent = Me.BsLEDCurrentTrackBar.Value
         Catch ex As Exception
@@ -10112,7 +10122,7 @@ Public Class UiPositionsAdjustments
         End Try
     End Sub
 
-    Private Sub BsPlusMinusLabel_EnabledChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles BsPlusLabel.EnabledChanged, BsMinusLabel.EnabledChanged
+    Private Sub BsPlusMinusLabel_EnabledChanged(ByVal sender As Object, ByVal e As EventArgs) Handles BsPlusLabel.EnabledChanged, BsMinusLabel.EnabledChanged
         Try
 
             If Not BsLEDCurrentTrackBar.Enabled Then
@@ -10130,7 +10140,7 @@ Public Class UiPositionsAdjustments
         End Try
     End Sub
 
-    Private Sub BsPlusMinusLabels_MouseEnter(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsMinusLabel.MouseEnter, BsPlusLabel.MouseEnter
+    Private Sub BsPlusMinusLabels_MouseEnter(ByVal sender As Object, ByVal e As EventArgs) Handles BsMinusLabel.MouseEnter, BsPlusLabel.MouseEnter
         Try
             If BsLEDCurrentTrackBar.Enabled Then
                 Dim myLabel As Label = CType(sender, Label)
@@ -10151,7 +10161,7 @@ Public Class UiPositionsAdjustments
         End Try
     End Sub
 
-    Private Sub BsPlusMinusLabels_MouseLeave(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsMinusLabel.MouseLeave, BsPlusLabel.MouseLeave
+    Private Sub BsPlusMinusLabels_MouseLeave(ByVal sender As Object, ByVal e As EventArgs) Handles BsMinusLabel.MouseLeave, BsPlusLabel.MouseLeave
         Try
             If BsLEDCurrentTrackBar.Enabled Then
                 Dim myLabel As Label = CType(sender, Label)
@@ -10172,7 +10182,7 @@ Public Class UiPositionsAdjustments
         End Try
     End Sub
 
-    Private Sub BsMinusLabel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsMinusLabel.Click
+    Private Sub BsMinusLabel_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsMinusLabel.Click
         Try
             If BsLEDCurrentTrackBar.Enabled And BsLEDCurrentTrackBar.Value > 0 Then
                 If BsLEDCurrentTrackBar.Value - BsLEDCurrentTrackBar.LargeChange >= BsLEDCurrentTrackBar.Minimum Then
@@ -10187,7 +10197,7 @@ Public Class UiPositionsAdjustments
         End Try
     End Sub
 
-    Private Sub BsPlusLabel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsPlusLabel.Click
+    Private Sub BsPlusLabel_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsPlusLabel.Click
         Try
             If BsLEDCurrentTrackBar.Enabled And BsLEDCurrentTrackBar.Value > 0 Then
                 If BsLEDCurrentTrackBar.Value + BsLEDCurrentTrackBar.LargeChange <= BsLEDCurrentTrackBar.Maximum Then
@@ -10205,112 +10215,19 @@ Public Class UiPositionsAdjustments
 
 #End Region
 
-#Region "TO DELETE"
-    '' XBC 02/01/2012 - PROVES 
-    'Private intprova As Integer
+#Region "New functionallity for Ba200"
+    Private Sub HideTabsForBa200Model()
 
-    ''Private Sub BsButton2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
-    ''    DisplayIndicators()
-    ''End Sub
+        If (IsBa200()) Then
+            BsTabArmsControl.TabPages.Remove(TabReagent1)
+            BsTabArmsControl.TabPages.Remove(TabReagent2)
+            BsTabArmsControl.TabPages.Remove(TabMixer2)
+        End If
+    End Sub
 
-    'Private Sub DisplayIndicators()
-    '    If intprova = 0 Then
-    '        AddIndicator(AbsorbanceChart.Series(0), FibonacciIndicatorKind.FibonacciArcs)
-    '    ElseIf intprova = 1 Then
-    '        AddIndicator(AbsorbanceChart.Series(0), FibonacciIndicatorKind.FibonacciFans)
-    '    ElseIf intprova = 2 Then
-    '        AddIndicator(AbsorbanceChart.Series(0), FibonacciIndicatorKind.FibonacciRetracement)
-    '    Else
-    '        intprova = 0
-    '        AddIndicator(AbsorbanceChart.Series(0), FibonacciIndicatorKind.FibonacciArcs)
-    '    End If
-    '    intprova += 1
-
-    'End Sub
-
-    'Private Sub AddIndicator(ByVal ser As Series, ByVal kind As FibonacciIndicatorKind)
-    '    ' Get a collection of indicators.
-    '    Dim indicators As IndicatorCollection = (CType(ser.View, SplineSeriesView)).Indicators
-
-    '    ' Clear it.
-    '    indicators.Clear()
-
-    '    For i As Integer = 0 To WellCenters.Count - 1
-
-    '        If kind = FibonacciIndicatorKind.FibonacciRetracement Then
-    '            ' Add trendline
-    '            ' Create and customize a trendline, 
-    '            Dim trendline1 As New TrendLine("A Trend")
-    '            trendline1.Point1.Argument = WellCenters(i)
-    '            trendline1.Point1.ValueLevel = ValueLevel.High
-    '            trendline1.Point2.Argument = EncoderTransitions(i)
-    '            trendline1.Point2.ValueLevel = ValueLevel.High
-    '            trendline1.ExtrapolateToInfinity = False
-    '            trendline1.Color = Color.Red
-    '            trendline1.LineStyle.DashStyle = DashStyle.Dash
-
-    '            indicators.Add(trendline1)
-    '        Else
-    '            '' Add a new indicator to it.
-    '            'indicators.Add(CreateIndicator(kind, _
-    '            '                               WellCenters(i), _
-    '            '                               EncoderTransitions(i), _
-    '            '                               ValueLevel.High))
-    '        End If
-
-    '    Next
-    'End Sub
-
-    'Private Function CreateIndicator(ByVal kind As FibonacciIndicatorKind, ByVal arg1 As Single, ByVal arg2 As Single, ByVal level As ValueLevel) As FibonacciIndicator
-    '    ' Create the Fibonacci Indicator of the specified kind.
-    '    Dim fi As New FibonacciIndicator(kind)
-
-    '    ' Specify its start and end points.
-    '    fi.Point1.Argument = arg1
-    '    fi.Point1.ValueLevel = level
-    '    fi.Point2.Argument = arg2
-    '    fi.Point2.ValueLevel = level
-
-    '    ' Select the name.
-    '    Select Case fi.Kind
-    '        Case FibonacciIndicatorKind.FibonacciArcs
-    '            fi.Name = "Arcs"
-    '            Exit Select
-    '        Case FibonacciIndicatorKind.FibonacciFans
-    '            fi.Name = "Fans"
-    '            Exit Select
-    '        Case FibonacciIndicatorKind.FibonacciRetracement
-    '            fi.Name = "Retracement"
-    '            Exit Select
-    '    End Select
-
-    '    ' Make all its levels visible.
-    '    'fi.ShowLevel23_6 = True
-    '    'fi.ShowLevel76_4 = True
-    '    fi.ShowLevel0 = True
-    '    'fi.ShowLevel100 = True
-    '    'fi.ShowAdditionalLevels = True
-
-    '    ' Customize its appearance.
-    '    fi.BaseLevelColor = Color.Green
-    '    fi.BaseLevelLineStyle.DashStyle = DashStyle.Solid
-
-    '    Return fi
-    'End Function
-
-    'Private Sub CheckBox1_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckBox1.CheckedChanged
-    '    If CheckBox1.Checked Then
-    '        intprova = 2
-    '    Else
-    '        intprova = 0
-    '    End If
-    '    DisplayIndicators()
-    'End Sub
-    '' XBC 02/01/2012 - PROVES 
-
-    'Private Sub BsSaveButton_EnabledChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles BsSaveButton.EnabledChanged
-
-    'End Sub
+    Private Function IsBa200() As Boolean
+        Return AnalyzerController.Instance.Analyzer.Model = AnalyzerModelEnum.A200.ToString()
+    End Function
 #End Region
 
 
