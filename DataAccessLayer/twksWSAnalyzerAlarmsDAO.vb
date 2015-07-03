@@ -8,7 +8,7 @@ Imports Biosystems.Ax00.Global
 Namespace Biosystems.Ax00.DAL.DAO
 
     Public Class twksWSAnalyzersAlarmsDAO
-          
+
 
 #Region "CRUD Methods"
         ''' <summary>
@@ -23,57 +23,61 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              AG 23/07/2012 - Added field OKDateTime
         ''' </remarks>
         Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerAlarmsDS As WSAnalyzerAlarmsDS) As GlobalDataTO
-            Dim myGlobalDataTO As New GlobalDataTO
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim myGlobalDataTO As GlobalDataTO = Nothing
+
             Try
-                If (pDBConnection Is Nothing) Then
-                    myGlobalDataTO.HasError = True
-                    myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
-                Else
-                    Dim cmdText As String = ""
-                    Dim values As String = ""
-                    Dim keys As String = "(AlarmID, AnalyzerID, AlarmDateTime, AlarmItem, WorkSessionID, AlarmStatus, OKDateTime, AdditionalInfo)"
+                myGlobalDataTO = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = ""
+                        Dim values As String = ""
+                        Dim keys As String = "(AlarmID, AnalyzerID, AlarmDateTime, AlarmItem, WorkSessionID, AlarmStatus, OKDateTime, AdditionalInfo)"
 
-                    For Each AnalyzerAlarmRow As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In pAnalyzerAlarmsDS.twksWSAnalyzerAlarms.Rows
-                        values = ""
-                        values = "'" & AnalyzerAlarmRow.AlarmID.Trim & "', "
-                        values &= "'" & AnalyzerAlarmRow.AnalyzerID.Trim & "', "
-                        values &= "'" & AnalyzerAlarmRow.AlarmDateTime.ToString("yyyyMMdd HH:mm:ss") & "', "
-                        values &= AnalyzerAlarmRow.AlarmItem.ToString & ", "
+                        For Each AnalyzerAlarmRow As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In pAnalyzerAlarmsDS.twksWSAnalyzerAlarms.Rows
+                            values = ""
+                            values = "'" & AnalyzerAlarmRow.AlarmID.Trim & "', "
+                            values &= "'" & AnalyzerAlarmRow.AnalyzerID.Trim & "', "
+                            values &= "'" & AnalyzerAlarmRow.AlarmDateTime.ToString("yyyyMMdd HH:mm:ss") & "', "
+                            values &= AnalyzerAlarmRow.AlarmItem.ToString & ", "
 
-                        If (AnalyzerAlarmRow.IsWorkSessionIDNull) Then
-                            values &= " NULL, "
-                        Else
-                            values &= "'" & AnalyzerAlarmRow.WorkSessionID.Trim & "', "
-                        End If
+                            If (AnalyzerAlarmRow.IsWorkSessionIDNull) Then
+                                values &= " NULL, "
+                            Else
+                                values &= "'" & AnalyzerAlarmRow.WorkSessionID.Trim & "', "
+                            End If
 
-                        If (AnalyzerAlarmRow.IsAlarmStatusNull) Then
-                            values &= " 1, " 'Default value for field AlarmStatus is True
-                        Else
-                            values &= " " & CStr(IIf(AnalyzerAlarmRow.AlarmStatus, 1, 0)) & ", "
-                        End If
+                            If (AnalyzerAlarmRow.IsAlarmStatusNull) Then
+                                values &= " 1, " 'Default value for field AlarmStatus is True
+                            Else
+                                values &= " " & CStr(IIf(AnalyzerAlarmRow.AlarmStatus, 1, 0)) & ", "
+                            End If
 
-                        If (AnalyzerAlarmRow.IsOKDateTimeNull) Then
-                            values &= " NULL, "
-                        ElseIf (Not AnalyzerAlarmRow.IsAlarmStatusNull AndAlso AnalyzerAlarmRow.AlarmStatus) Then
-                            values &= " NULL, "
-                        Else
-                            values &= " '" & AnalyzerAlarmRow.OKDateTime.ToString("yyyyMMdd HH:mm:ss") & "', "
-                        End If
+                            If (AnalyzerAlarmRow.IsOKDateTimeNull) Then
+                                values &= " NULL, "
+                            ElseIf (Not AnalyzerAlarmRow.IsAlarmStatusNull AndAlso AnalyzerAlarmRow.AlarmStatus) Then
+                                values &= " NULL, "
+                            Else
+                                values &= " '" & AnalyzerAlarmRow.OKDateTime.ToString("yyyyMMdd HH:mm:ss") & "', "
+                            End If
 
-                        If (AnalyzerAlarmRow.IsAdditionalInfoNull) Then
-                            values &= "NULL"
-                        Else
-                            values &= "'" & AnalyzerAlarmRow.AdditionalInfo.Trim & "'"
-                        End If
+                            If (AnalyzerAlarmRow.IsAdditionalInfoNull) Then
+                                values &= "NULL"
+                            Else
+                                values &= "'" & AnalyzerAlarmRow.AdditionalInfo.Trim & "'"
+                            End If
 
-                        cmdText &= "INSERT INTO twksWSAnalyzerAlarms  " & keys & " VALUES (" & values & ") " & vbNewLine
-                    Next
+                            cmdText &= "INSERT INTO twksWSAnalyzerAlarms  " & keys & " VALUES (" & values & ") " & vbNewLine
+                        Next
 
-                    Using dbCmd As New SqlCommand(cmdText, pDBConnection)
-                        myGlobalDataTO.AffectedRecords = dbCmd.ExecuteNonQuery()
-                        myGlobalDataTO.HasError = False
-                    End Using
+                        Using dbCmd As New SqlCommand(cmdText, dbConnection)
+                            myGlobalDataTO.AffectedRecords = dbCmd.ExecuteNonQuery()
+                            myGlobalDataTO.HasError = False
+                        End Using
+                    End If
                 End If
+
             Catch ex As Exception
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
@@ -81,6 +85,8 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                 'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSAnalyzersAlarmsDAO.Create", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return myGlobalDataTO
         End Function
@@ -95,52 +101,56 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' Created by:  AG 23/07/2012
         ''' </remarks>
         Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerAlarmsDS As WSAnalyzerAlarmsDS) As GlobalDataTO
-            Dim myGlobalDataTO As New GlobalDataTO
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim myGlobalDataTO As GlobalDataTO = Nothing
+
             Try
-                If (pDBConnection Is Nothing) Then
-                    myGlobalDataTO.HasError = True
-                    myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
-                Else
-                    Dim cmdText As String = ""
-                    For Each AnalyzerAlarmRow As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In pAnalyzerAlarmsDS.twksWSAnalyzerAlarms.Rows
-                        cmdText &= " UPDATE twksWSAnalyzerAlarms SET "
+                myGlobalDataTO = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = ""
+                        For Each AnalyzerAlarmRow As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In pAnalyzerAlarmsDS.twksWSAnalyzerAlarms.Rows
+                            cmdText &= " UPDATE twksWSAnalyzerAlarms SET "
 
-                        If (AnalyzerAlarmRow.IsWorkSessionIDNull) Then
-                            cmdText &= " WorkSessionID = NULL, "
-                        Else
-                            cmdText &= " WorkSessionID = '" & AnalyzerAlarmRow.WorkSessionID.Trim & "', "
-                        End If
+                            If (AnalyzerAlarmRow.IsWorkSessionIDNull) Then
+                                cmdText &= " WorkSessionID = NULL, "
+                            Else
+                                cmdText &= " WorkSessionID = '" & AnalyzerAlarmRow.WorkSessionID.Trim & "', "
+                            End If
 
-                        If (AnalyzerAlarmRow.IsAlarmStatusNull) Then
-                            cmdText &= " AlarmStatus = 1, " 'Default value for this field is TRUE
-                        Else
-                            cmdText &= " AlarmStatus = " & CStr(IIf(AnalyzerAlarmRow.AlarmStatus, 1, 0)) & ", "
-                        End If
+                            If (AnalyzerAlarmRow.IsAlarmStatusNull) Then
+                                cmdText &= " AlarmStatus = 1, " 'Default value for this field is TRUE
+                            Else
+                                cmdText &= " AlarmStatus = " & CStr(IIf(AnalyzerAlarmRow.AlarmStatus, 1, 0)) & ", "
+                            End If
 
-                        If (AnalyzerAlarmRow.IsOKDateTimeNull) Then
-                            cmdText &= " OKDateTime = NULL, "
-                        Else
-                            cmdText &= " OKDateTime = '" & AnalyzerAlarmRow.OKDateTime.ToString("yyyyMMdd HH:mm:ss") & "', "
-                        End If
+                            If (AnalyzerAlarmRow.IsOKDateTimeNull) Then
+                                cmdText &= " OKDateTime = NULL, "
+                            Else
+                                cmdText &= " OKDateTime = '" & AnalyzerAlarmRow.OKDateTime.ToString("yyyyMMdd HH:mm:ss") & "', "
+                            End If
 
-                        If (AnalyzerAlarmRow.IsAdditionalInfoNull) Then
-                            cmdText &= " AdditionalInfo = NULL "
-                        Else
-                            cmdText &= " AdditionalInfo = '" & AnalyzerAlarmRow.AdditionalInfo & "' "
-                        End If
+                            If (AnalyzerAlarmRow.IsAdditionalInfoNull) Then
+                                cmdText &= " AdditionalInfo = NULL "
+                            Else
+                                cmdText &= " AdditionalInfo = '" & AnalyzerAlarmRow.AdditionalInfo & "' "
+                            End If
 
-                        'Where (primary key)
-                        cmdText &= " WHERE AlarmID = '" & AnalyzerAlarmRow.AlarmID.Trim & "' "
-                        cmdText &= " AND   AnalyzerID = '" & AnalyzerAlarmRow.AnalyzerID.Trim & "' "
-                        cmdText &= " AND   AlarmDateTime = '" & AnalyzerAlarmRow.AlarmDateTime.ToString("yyyyMMdd HH:mm:ss") & "' "
-                        cmdText &= vbNewLine
-                    Next
+                            'Where (primary key)
+                            cmdText &= " WHERE AlarmID = '" & AnalyzerAlarmRow.AlarmID.Trim & "' "
+                            cmdText &= " AND   AnalyzerID = '" & AnalyzerAlarmRow.AnalyzerID.Trim & "' "
+                            cmdText &= " AND   AlarmDateTime = '" & AnalyzerAlarmRow.AlarmDateTime.ToString("yyyyMMdd HH:mm:ss") & "' "
+                            cmdText &= vbNewLine
+                        Next
 
-                    Using dbCmd As New SqlCommand(cmdText, pDBConnection)
-                        myGlobalDataTO.AffectedRecords = dbCmd.ExecuteNonQuery()
-                        myGlobalDataTO.HasError = False
-                    End Using
+                        Using dbCmd As New SqlCommand(cmdText, dbConnection)
+                            myGlobalDataTO.AffectedRecords = dbCmd.ExecuteNonQuery()
+                            myGlobalDataTO.HasError = False
+                        End Using
+                    End If
                 End If
+
             Catch ex As Exception
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString

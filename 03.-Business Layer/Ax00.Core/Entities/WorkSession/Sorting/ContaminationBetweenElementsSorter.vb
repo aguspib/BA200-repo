@@ -37,7 +37,7 @@ Public Class ContaminationBetweenElementsSorter
         'body:
 
         Dim context As New Context(ContaminationsSpecification)
-        context.FillEmptyContext()
+        context.FillEmptyContextSteps()
 
         For i As Integer = 1 To ContaminationsSpecification.HighContaminationPersistence
             Dim listIndex = pPreviousReagentID.Count - i

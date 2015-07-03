@@ -131,6 +131,9 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Sorting
         ''' <returns></returns>
         ''' <remarks></remarks>
         Public Overrides Function GetContaminationNumber(ByVal pContaminationsDS As ContaminationsDS, ByVal orderTests As List(Of ExecutionsDS.twksWSExecutionsRow)) As Integer
+            If PreviousReagentID IsNot Nothing Then
+                Dim a = 0
+            End If
             Return WSExecutionCreator.Instance.GetContaminationNumber(calculateInRunning, PreviousReagentID, orderTests)
         End Function
 
@@ -322,13 +325,12 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Sorting
                                 context.Steps(newIndex)(dispenseNum) = runningContext.Steps(stepIndex)(dispenseNum)
                             End If
 
-
                         Next
                     End If
 
                 Next
             Else
-                context.FillContentsFromReagentsIDInStatic(Me.PreviousReagentID, _callStackNestingLevel)
+                If Me.PreviousReagentID IsNot Nothing AndAlso Me.PreviousReagentID.Any Then context.FillContentsFromReagentsIDInStatic(Me.PreviousReagentID, _callStackNestingLevel)
             End If
 
 
