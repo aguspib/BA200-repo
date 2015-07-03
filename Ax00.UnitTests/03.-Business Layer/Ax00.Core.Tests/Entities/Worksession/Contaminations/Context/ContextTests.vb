@@ -37,7 +37,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Tests
         Public Sub FillEmptyContextTest()
             CreateSpecification()
             Dim cont = New Context(WSExecutionCreator.Instance.ContaminationsSpecification)
-            cont.FillEmptyContext()
+            cont.FillEmptyContextSteps()
             For i = cont.Steps.Range.Minimum To cont.Steps.Range.Maximum
                 For j = 1 To WSExecutionCreator.Instance.ContaminationsSpecification.DispensesPerStep
                     If cont.Steps(i) Is Nothing Then
@@ -47,6 +47,38 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Tests
                     End If
                 Next
             Next
+        End Sub
+
+        <Test()>
+        Public Sub FillContextWithPreviousIDList()
+            CreateSpecification()
+
+            Dim lista As New List(Of Integer)
+            For i As Integer = 0 To 100
+                lista.Add(i)
+            Next
+
+
+            Dim cont = New Context(WSExecutionCreator.Instance.ContaminationsSpecification)
+            cont.FillEmptyContextSteps()
+            cont.FillContentsFromReagentsIDInStatic(lista, 0)
+            Assert.AreEqual(cont.Steps(-2)(1).R1ReagentID, 99)
+            Assert.AreEqual(cont.Steps(-1)(1).R1ReagentID, 100)
+
+            cont = New Context(WSExecutionCreator.Instance.ContaminationsSpecification)
+            cont.FillEmptyContextSteps()
+            cont.FillContentsFromReagentsIDInStatic(lista, 1)
+            Assert.AreEqual(cont.Steps(-2)(1).R1ReagentID, 100)
+            Assert.AreEqual(cont.Steps(-1)(1).R1ReagentID, 0)
+
+            cont = New Context(WSExecutionCreator.Instance.ContaminationsSpecification)
+            cont.FillEmptyContextSteps()
+            cont.FillContentsFromReagentsIDInStatic(lista, 2)
+            Assert.AreEqual(cont.Steps(-2)(1).R1ReagentID, 0)
+            Assert.AreEqual(cont.Steps(-1)(1).R1ReagentID, 0)
+
+
+
         End Sub
 
         ''' <summary>
