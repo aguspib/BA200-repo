@@ -10,7 +10,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
     Public Class BA200AnalyzerEntity
         Inherits AnalyzerManager
-
+        Private BL_expListener As BaseLineExpirationListener
 
         Public Sub New(assemblyName As String, analyzerModel As String, baseLine As IBaseLineEntity)
             MyBase.New(assemblyName, analyzerModel, baseLine)
@@ -18,9 +18,19 @@ Namespace Biosystems.Ax00.Core.Entities
             WSExecutionCreator.Instance.ContaminationsSpecification = New BA200ContaminationsSpecification(Me)
             _currentAnalyzer = Me
 
-            Dim BL_expListener = New BaseLineExpirationListener(Me)
+            BL_expListener = New BaseLineExpirationListener(Me)
 
         End Sub
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <remarks></remarks>
+        Public Overrides Sub startListenerExpiration()
+            MyBase.startListenerExpiration()
+            BL_expListener.startToListening()
+        End Sub
+
 
 #Region "Overridden methods"
 
@@ -53,6 +63,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 Return True
             End Get
         End Property
+
+
 
     End Class
 

@@ -374,6 +374,9 @@ Namespace Biosystems.Ax00.Core.Entities
                         'Initialize the ISE information master data
                         InitializeISEInformation(Nothing)
 
+                        'Function to recuperate the warning alarm BL_Expired from database, if we are starting the same analyzer.
+                        InitializeNewAlarmType(AnalyzerIDAttribute)
+
                         'SGM 22/03/2012 Init ISEManager instance as disconnected mode
                         'it will be replaced by a new instance when Adjustments received
                         'REFACTORING
@@ -2302,7 +2305,31 @@ Namespace Biosystems.Ax00.Core.Entities
             Return resultData
         End Function
 
+        Private Sub InitializeNewAlarmType(ByVal AnalyzerID As String)
+            Dim connection As TypedGlobalDataTo(Of SqlConnection) = Nothing
+            Dim alarmsDelg As New WSAnalyzerAlarmsDelegate
 
+
+            Try
+
+                Dim _myGlobal = alarmsDelg.GetByAlarmID(Nothing, AlarmEnumerates.Alarms.BASELINE_EXPIRED.ToString(), , , AnalyzerID)
+                If Not _myGlobal.HasError AndAlso Not _myGlobal.SetDatos Is Nothing Then
+                    Dim temporalDs = DirectCast(_myGlobal.SetDatos, WSAnalyzerAlarmsDS)
+                    If (temporalDs.twksWSAnalyzerAlarms.Rows.Count > 0) Then
+                        For Each alarmToRecuperate As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In temporalDs.twksWSAnalyzerAlarms.Rows
+                            If alarmToRecuperate.AlarmStatus Then
+                                If Not myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.BASELINE_EXPIRED) Then myAlarmListAttribute.Add(AlarmEnumerates.Alarms.BASELINE_EXPIRED)
+                            End If
+                        Next
+                    End If
+                End If
+
+            Catch
+                Throw
+            Finally
+                CloseConnection(connection)
+            End Try
+        End Sub
 #End Region
 
 #Region "Public Methods"
@@ -2474,6 +2501,11 @@ Namespace Biosystems.Ax00.Core.Entities
                 If Not BaseLine Is Nothing Then
                     BaseLine.ResetWS()
                 End If
+
+                If Alarms.Contains(AlarmEnumerates.Alarms.BASELINE_EXPIRED) Then
+                    Alarms.Remove(AlarmEnumerates.Alarms.BASELINE_EXPIRED)
+                End If
+
                 WorkSessionIDAttribute = ""
                 futureRequestNextWell = 0
 
@@ -4334,6 +4366,10 @@ Namespace Biosystems.Ax00.Core.Entities
 
         Public Sub ResetFLIGHT() Implements IAnalyzerManager.ResetFLIGHT
             validFLIGHTAttribute = False            
+        End Sub
+
+        Public Overridable Sub startListenerExpiration() Implements IAnalyzerManager.startListenerExpiration
+
         End Sub
 #End Region
 

@@ -1560,144 +1560,6 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Return myResultData
         End Function
 
-        '''' <summary>
-        '''' Constructs the Adjustment structure data for read values from Instrument
-        '''' </summary>
-        '''' <returns>GlobalDataTO containing the configured structure of Fw Adjustments</returns>
-        '''' <remarks>Created by : XBC 12/01/2011</remarks>
-        'Public Function CreateFwAdjustmentsData() As GlobalDataTO
-        '    Dim myResultData As New GlobalDataTO
-        '    Try
-        '        Dim myPosition As New PositionTO
-        '        Dim myFwAdjustmentsData As New FwAdjustmentsDataTO
-        '        Dim myPreloadedMasterDataDS As New PreloadedMasterDataDS
-
-        '        'SGX
-        '        ' OPTIC CENTERING
-        '        'myResultData = ReadPositionsValues(PreloadedMasterDataEnum.SRV_PHOTOMETRY)
-        '        'If (Not myResultData.HasError And Not myResultData.SetDatos Is Nothing) Then
-        '        '    myPreloadedMasterDataDS = DirectCast(myResultData.SetDatos, PreloadedMasterDataDS)
-        '        '    For i As Integer = 0 To myPreloadedMasterDataDS.tfmwPreloadedMasterData.Rows.Count - 1
-        '        myPosition = New PositionTO
-        '        myPosition.Id = ""
-        '        myPosition.Polar = ""
-        '        myPosition.Z = ""
-        '        myPosition.Rotor = ""
-        '        myFwAdjustmentsData.OpticCentering.PositionArm.Add(myPosition)
-        '        '    Next
-        '        'End If
-
-        '        ' WASHING STATION
-        '        'myResultData = ReadPositionsValues(PreloadedMasterDataEnum.SRV_WASHING_STATION)
-        '        'If (Not myResultData.HasError And Not myResultData.SetDatos Is Nothing) Then
-        '        '    myPreloadedMasterDataDS = DirectCast(myResultData.SetDatos, PreloadedMasterDataDS)
-        '        '    For i As Integer = 0 To myPreloadedMasterDataDS.tfmwPreloadedMasterData.Rows.Count - 1
-        '        myPosition = New PositionTO
-        '        myPosition.Id = ""
-        '        myPosition.Polar = ""
-        '        myPosition.Z = ""
-        '        myPosition.Rotor = ""
-        '        myFwAdjustmentsData.WashingStation.PositionArm.Add(myPosition)
-        '        '    Next
-        '        'End If
-
-
-
-
-        '        ' SAMPLE ARM
-        '        If Not myResultData.HasError Then
-        '            myResultData = ReadPositionsValues(PreloadedMasterDataEnum.SRV_SAMPLE_POSITIONS)
-        '            If (Not myResultData.HasError And Not myResultData.SetDatos Is Nothing) Then
-        '                myPreloadedMasterDataDS = DirectCast(myResultData.SetDatos, PreloadedMasterDataDS)
-        '                For i As Integer = 0 To myPreloadedMasterDataDS.tfmwPreloadedMasterData.Rows.Count - 1
-        '                    myPosition = New PositionTO
-        '                    myPosition.Id = myPreloadedMasterDataDS.tfmwPreloadedMasterData(i).ItemID
-        '                    myPosition.Polar = ""
-        '                    myPosition.Z = ""
-        '                    myPosition.Rotor = ""
-        '                    myFwAdjustmentsData.SampleArm.PositionArm.Add(myPosition)
-        '                Next
-        '            End If
-        '        End If
-
-        '        ' REAGENT1 ARM
-        '        If Not myResultData.HasError Then
-        '            myResultData = ReadPositionsValues(PreloadedMasterDataEnum.SRV_REAG_POSITIONS)
-        '            If (Not myResultData.HasError And Not myResultData.SetDatos Is Nothing) Then
-        '                myPreloadedMasterDataDS = DirectCast(myResultData.SetDatos, PreloadedMasterDataDS)
-        '                For i As Integer = 0 To myPreloadedMasterDataDS.tfmwPreloadedMasterData.Rows.Count - 1
-        '                    myPosition = New PositionTO
-        '                    myPosition.Id = myPreloadedMasterDataDS.tfmwPreloadedMasterData(i).ItemID
-        '                    myPosition.Polar = ""
-        '                    myPosition.Z = ""
-        '                    myPosition.Rotor = ""
-        '                    myFwAdjustmentsData.Reagent1Arm.PositionArm.Add(myPosition)
-        '                Next
-        '            End If
-        '        End If
-
-        '        ' REAGENT2 ARM
-        '        If Not myResultData.HasError Then
-        '            myResultData = ReadPositionsValues(PreloadedMasterDataEnum.SRV_REAG_POSITIONS)
-        '            If (Not myResultData.HasError And Not myResultData.SetDatos Is Nothing) Then
-        '                myPreloadedMasterDataDS = DirectCast(myResultData.SetDatos, PreloadedMasterDataDS)
-        '                For i As Integer = 0 To myPreloadedMasterDataDS.tfmwPreloadedMasterData.Rows.Count - 1
-        '                    myPosition = New PositionTO
-        '                    myPosition.Id = myPreloadedMasterDataDS.tfmwPreloadedMasterData(i).ItemID
-        '                    myPosition.Polar = ""
-        '                    myPosition.Z = ""
-        '                    myPosition.Rotor = ""
-        '                    myFwAdjustmentsData.Reagent2Arm.PositionArm.Add(myPosition)
-        '                Next
-        '            End If
-        '        End If
-
-        '        ' MIXER1 ARM
-        '        If Not myResultData.HasError Then
-        '            myResultData = ReadPositionsValues(PreloadedMasterDataEnum.SRV_MIXER_POSITIONS)
-        '            If (Not myResultData.HasError And Not myResultData.SetDatos Is Nothing) Then
-        '                myPreloadedMasterDataDS = DirectCast(myResultData.SetDatos, PreloadedMasterDataDS)
-        '                For i As Integer = 0 To myPreloadedMasterDataDS.tfmwPreloadedMasterData.Rows.Count - 1
-        '                    myPosition = New PositionTO
-        '                    myPosition.Id = myPreloadedMasterDataDS.tfmwPreloadedMasterData(i).ItemID
-        '                    myPosition.Polar = ""
-        '                    myPosition.Z = ""
-        '                    myPosition.Rotor = ""
-        '                    myFwAdjustmentsData.Mixer1Arm.PositionArm.Add(myPosition)
-        '                Next
-        '            End If
-        '        End If
-
-        '        ' MIXER2 ARM
-        '        If Not myResultData.HasError Then
-        '            myResultData = ReadPositionsValues(PreloadedMasterDataEnum.SRV_MIXER_POSITIONS)
-        '            If (Not myResultData.HasError And Not myResultData.SetDatos Is Nothing) Then
-        '                myPreloadedMasterDataDS = DirectCast(myResultData.SetDatos, PreloadedMasterDataDS)
-        '                For i As Integer = 0 To myPreloadedMasterDataDS.tfmwPreloadedMasterData.Rows.Count - 1
-        '                    myPosition = New PositionTO
-        '                    myPosition.Id = myPreloadedMasterDataDS.tfmwPreloadedMasterData(i).ItemID
-        '                    myPosition.Polar = ""
-        '                    myPosition.Z = ""
-        '                    myPosition.Rotor = ""
-        '                    myFwAdjustmentsData.Mixer2Arm.PositionArm.Add(myPosition)
-        '                Next
-        '            End If
-        '        End If
-
-        '        If Not myResultData.HasError Then
-        '            myResultData.SetDatos = myFwAdjustmentsData
-        '        End If
-        '    Catch ex As Exception
-        '        myResultData.HasError = True
-        '        myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-        '        myResultData.ErrorMessage = ex.Message
-
-        '        'Dim myLogAcciones As New ApplicationLogManager()
-        '        GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.CreateFwAdjustmentsData", EventLogEntryType.Error, False)
-        '    End Try
-        '    Return myResultData
-        'End Function
-
         ''' <summary>
         ''' Load Adjustments High Level Instruction to move Washing Station
         ''' </summary>
@@ -1849,8 +1711,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Dim myFwScript2 As New FwScriptQueueItem
 
             Try
-                MyClass.HomesDoneAttr = False
-                MyClass.WSAdjustPreparedAttr = False
+                HomesDoneAttr = False
+                WSAdjustPreparedAttr = False
 
                 If myFwScriptDelegate.CurrentFwScriptsQueue IsNot Nothing Then
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
@@ -1860,218 +1722,17 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 'sg 25/1/11
                 'get the pending Homes  
                 Dim myHomes As New tadjPreliminaryHomesDAO
-                Dim myHomesDS As SRVPreliminaryHomesDS
                 myResultData = myHomes.GetPreliminaryHomesByAdjID(Nothing, AnalyzerId, pAdjustment.ToString)
                 If myResultData IsNot Nothing AndAlso Not myResultData.HasError Then
-                    myHomesDS = CType(myResultData.SetDatos, SRVPreliminaryHomesDS)
-
-                    Dim myPendingHomesList As List(Of SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow) = _
-                                    (From a As SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow In myHomesDS.srv_tadjPreliminaryHomes _
-                                    Where a.Done = False Select a).ToList
-
-                    For Each H As SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow In myPendingHomesList
-                        Dim myFwScript As New FwScriptQueueItem
-                        myListFwScript.Add(myFwScript)
-                    Next
-
-                    Dim i As Integer = 0
-                    For Each H As SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow In myPendingHomesList
-                        'GET EACH PENDING HOME'S FWSCRIPT FROM FWSCRIPT DATA AND ADD TO THE FWSCRIPT QUEUE
-                        If i = myListFwScript.Count - 1 Then
-                            'Last index
-                            With myListFwScript(i)
-                                .FwScriptID = H.RequiredHomeID.ToString
-                                .EvaluateType = EVALUATE_TYPES.NUM_VALUE
-                                .EvaluateValue = 1
-                                .NextOnResultOK = myFwScript0   ' XBC 28/03/2012 - Add previous movement to security fly position
-                                .NextOnResultNG = Nothing
-                                .NextOnTimeOut = myFwScript0   ' XBC 28/03/2012 - Add previous movement to security fly position
-                                .NextOnError = Nothing
-                                .ParamList = Nothing
-
-                                ' XBC 28/03/2012 - Add previous movement to security fly position
-                                If pAdjustment = ADJUSTMENT_GROUPS.WASHING_STATION Then
-                                    .NextOnResultOK = Nothing
-                                    .NextOnTimeOut = Nothing
-                                End If
-                                ' XBC 28/03/2012 - Add previous movement to security fly position
-                            End With
-                        Else
-                            With myListFwScript(i)
-                                .FwScriptID = H.RequiredHomeID.ToString
-                                .EvaluateType = EVALUATE_TYPES.NUM_VALUE
-                                .EvaluateValue = 1
-                                .NextOnResultOK = myListFwScript(i + 1)
-                                .NextOnResultNG = Nothing
-                                .NextOnTimeOut = myListFwScript(i + 1)
-                                .NextOnError = Nothing
-                                .ParamList = Nothing
-                            End With
-                        End If
-                        i += 1
-                    Next
-
+                    GetPreliminaryHomeScripts(pAdjustment, myResultData, myListFwScript, myFwScript0)
                 End If
 
                 Select Case pAdjustment
                     Case ADJUSTMENT_GROUPS.PHOTOMETRY
-
-                        ' XBC 04/01/2012 - Add Encoder functionality
-
-                        '' Place Rotor align with first well
-                        '' Absolute positioning of the Reactions Rotor to last adjustment position as origen well
-
-                        '' XBC 23/09/2011 - Now Is no need because with previous instruction REACTIONS_ROTOR_HOME_WELL1 well 1 is already placed
-                        ''With myFwScript1
-                        ''    .FwScriptID = FwSCRIPTS_IDS.PLACE_WELL1_GLF.ToString
-                        ''    .EvaluateType = EVALUATE_TYPES.NUM_VALUE
-                        ''    .EvaluateValue = 1
-                        ''    .NextOnResultOK = Nothing
-                        ''    .NextOnResultNG = Nothing
-                        ''    .NextOnTimeOut = Nothing
-                        ''    .NextOnError = Nothing
-                        ''    .ParamList = Nothing
-                        ''End With
-                        '' XBC 23/09/2011
-
-                        ''add to the queue list
-                        'If myListFwScript.Count > 0 Then
-
-                        '    ' XBC 23/09/2011 - setting the last instruction ...
-                        '    With myListFwScript(myListFwScript.Count - 1)
-                        '        .NextOnResultOK = Nothing
-                        '        .NextOnResultNG = Nothing
-                        '        .NextOnTimeOut = Nothing
-                        '        .NextOnError = Nothing
-                        '    End With
-                        '    ' XBC 23/09/2011
-
-                        '    For i As Integer = 0 To myListFwScript.Count - 1
-                        '        If i = 0 Then
-                        '            ' First Script
-                        '            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myListFwScript(i), True)
-                        '        Else
-                        '            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myListFwScript(i), False)
-                        '        End If
-                        '    Next
-                        '    ' XBC 23/09/2011
-                        '    'If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, False)
-                        '    ' XBC 23/09/2011
-                        'Else
-                        '    ' XBC 23/09/2011
-                        '    'If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, True)
-                        '    MyClass.HomesDoneAttr = True
-                        '    MyClass.NoneInstructionToSend = False
-                        '    ' XBC 23/09/2011
-                        'End If
-
-                        ' XBC 28/03/2012 - Add previous movement to security fly position
-                        '' Relative movement to make back lap
-                        'With myFwScript0
-                        '    .FwScriptID = FwSCRIPTS_IDS.REACTIONS_REL_ROTOR_2SECONDS.ToString
-                        '    .EvaluateType = EVALUATE_TYPES.NUM_VALUE
-                        '    .EvaluateValue = 1
-                        '    .NextOnResultOK = myFwScript1
-                        '    .NextOnResultNG = Nothing
-                        '    .NextOnTimeOut = myFwScript1
-                        '    .NextOnError = Nothing
-                        '    ' expects 1 param
-                        '    .ParamList = New List(Of String)
-                        '    .ParamList.Add("-9600")
-                        'End With
-
-                        'AG 01/10/2014 - BA-1953 'After home move abs to the current value of adjustment GFWR1
-                        With myFwScript0
-                            .FwScriptID = FwSCRIPTS_IDS.REACTIONS_ABS_ROTOR.ToString   ' REACTIONS_REL_ROTOR
-                            .EvaluateType = EVALUATE_TYPES.NUM_VALUE
-                            .EvaluateValue = 1
-                            .NextOnResultOK = myFwScript1
-                            .NextOnResultNG = Nothing
-                            .NextOnTimeOut = myFwScript1
-                            .NextOnError = Nothing
-                            ' expects 1 param
-                            .ParamList = New List(Of String)
-                            .ParamList.Add(Me.pValueAdjustAttr)
-                        End With
-
-                        'With myFwScript0
-                        'AG 01/10/2014 - BA-1953
-
-                        ' Relative movement to place close the wall between 5-6
-                        With myFwScript1
-                            .FwScriptID = FwSCRIPTS_IDS.REACTIONS_REL_ROTOR_2SECONDS.ToString   ' REACTIONS_REL_ROTOR
-                            .EvaluateType = EVALUATE_TYPES.NUM_VALUE
-                            .EvaluateValue = 1
-                            .NextOnResultOK = Nothing
-                            .NextOnResultNG = Nothing
-                            .NextOnTimeOut = Nothing
-                            .NextOnError = Nothing
-                            ' expects 1 param
-                            .ParamList = New List(Of String)
-                            .ParamList.Add("360")
-                        End With
-
-                        If myListFwScript.Count > 0 Then
-                            For i As Integer = 0 To myListFwScript.Count - 1
-                                If i = 0 Then
-                                    ' First Script
-                                    If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myListFwScript(i), True)
-                                Else
-                                    If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myListFwScript(i), False)
-                                End If
-                            Next
-                            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript0, False)
-                            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, False) 'AG 01/10/2014 - BA-1953
-                        Else
-                            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript0, True)
-                            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, False) 'AG 01/10/2014 - BA-1953
-                        End If
-
-                        ' XBC 04/01/2012 - Add Encoder functionality
-
-
-                        ' XBC 09/05/2012
-                        myFwScriptDelegate.INFOManagementEnabled = False
+                        myResultData = GetPhotometryScripts(myResultData, myListFwScript, myFwScript0, myFwScript1)
 
                     Case ADJUSTMENT_GROUPS.WASHING_STATION
-
-                        ' XBC 18/04/2012 - Z aproximation is anuled
-                        '' Mov ABS Polar
-                        '' Absolute positioning of the washing station to last adjustment position
-                        'myMovAproxZ = CSng(Me.pArmABSMovZAttr) + Me.pWashingStationOffsetAttr
-                        'With myFwScript0
-                        '    .FwScriptID = FwSCRIPTS_IDS.WASHING_STATION_ABS_Z.ToString
-                        '    .EvaluateType = EVALUATE_TYPES.NUM_VALUE
-                        '    .EvaluateValue = 1
-                        '    .NextOnResultOK = Nothing
-                        '    .NextOnResultNG = Nothing
-                        '    .NextOnTimeOut = Nothing
-                        '    .NextOnError = Nothing
-                        '    ' expects 1 param
-                        '    .ParamList = New List(Of String)
-                        '    .ParamList.Add(myMovAproxZ.ToString)
-                        'End With
-                        ' XBC 18/04/2012 - Z aproximation is anuled
-
-                        'add to the queue list
-                        If myListFwScript.Count > 0 Then
-                            For i As Integer = 0 To myListFwScript.Count - 1
-                                If i = 0 Then
-                                    ' First Script
-                                    If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myListFwScript(i), True)
-                                Else
-                                    If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myListFwScript(i), False)
-                                End If
-                            Next
-                            'If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript0, False) ' XBC 18/04/2012 - Z aproximation is anuled
-                        Else
-                            ' XBC 18/04/2012 - Z aproximation is anuled
-                            'If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript0, True)  
-                            MyClass.NoneInstructionToSend = False
-                            MyClass.WSAdjustPreparedAttr = True
-                            ' XBC 18/04/2012 - Z aproximation is anuled
-                        End If
-
+                        myResultData = GetWashingStationScripts(myResultData, myListFwScript)
 
                     Case ADJUSTMENT_GROUPS.SAMPLES_ARM_DISP1, _
                          ADJUSTMENT_GROUPS.SAMPLES_ARM_DISP2, _
@@ -2079,273 +1740,14 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                          ADJUSTMENT_GROUPS.REAGENT2_ARM_DISP1, _
                          ADJUSTMENT_GROUPS.MIXER1_ARM_DISP1, _
                          ADJUSTMENT_GROUPS.MIXER2_ARM_DISP1
-
-
-
-                        ' XBC 28/03/2012 - Add previous movement to security fly position
-                        With myFwScript0
-                            .EvaluateType = EVALUATE_TYPES.NUM_VALUE
-                            .EvaluateValue = 1
-                            .NextOnResultOK = myFwScript1
-                            .NextOnResultNG = Nothing
-                            .NextOnTimeOut = myFwScript1
-                            .NextOnError = Nothing
-
-                            Select Case pAdjustment
-                                Case ADJUSTMENT_GROUPS.SAMPLES_ARM_DISP1, _
-                                     ADJUSTMENT_GROUPS.SAMPLES_ARM_DISP2
-                                    ' sample arm Move Z to security fly
-                                    .FwScriptID = FwSCRIPTS_IDS.SAMPLE_ARM_ABS_Z.ToString
-                                    ' expects 1 param
-                                    .ParamList = New List(Of String)
-                                    .ParamList.Add(Me.pSampleSecurityFlyAttr)
-
-                                Case ADJUSTMENT_GROUPS.REAGENT1_ARM_DISP1
-                                    ' reagent1 arm Move Z to security fly
-                                    .FwScriptID = FwSCRIPTS_IDS.REAGENT1_ARM_ABS_Z.ToString
-                                    ' expects 1 param
-                                    .ParamList = New List(Of String)
-                                    .ParamList.Add(Me.pReagent1SecurityFlyAttr)
-
-                                Case ADJUSTMENT_GROUPS.REAGENT2_ARM_DISP1
-                                    ' reagent2 arm Move Z to security fly
-                                    .FwScriptID = FwSCRIPTS_IDS.REAGENT2_ARM_ABS_Z.ToString
-                                    ' expects 1 param
-                                    .ParamList = New List(Of String)
-                                    .ParamList.Add(Me.pReagent2SecurityFlyAttr)
-
-                                Case ADJUSTMENT_GROUPS.MIXER1_ARM_DISP1
-                                    ' mixer1 arm Move Z to security fly
-                                    .FwScriptID = FwSCRIPTS_IDS.MIXER1_ARM_ABS_Z.ToString
-                                    ' expects 1 param
-                                    .ParamList = New List(Of String)
-                                    .ParamList.Add(Me.pMixer1SecurityFlyAttr)
-
-                                Case ADJUSTMENT_GROUPS.MIXER2_ARM_DISP1
-                                    ' mixer2 arm Move Z to security fly
-                                    .FwScriptID = FwSCRIPTS_IDS.MIXER2_ARM_ABS_Z.ToString
-                                    ' expects 1 param
-                                    .ParamList = New List(Of String)
-                                    .ParamList.Add(Me.pMixer2SecurityFlyAttr)
-                            End Select
-
-                        End With
-                        ' XBC 28/03/2012 - Add previous movement to security fly position
-
-
-
-                        ' Mov ABS Polar
-                        ' Absolute positioning of the sample arm axis to last adjustment position
-                        With myFwScript1
-                            Select Case pAdjustment
-                                Case ADJUSTMENT_GROUPS.SAMPLES_ARM_DISP1, _
-                                     ADJUSTMENT_GROUPS.SAMPLES_ARM_DISP2
-                                    .FwScriptID = FwSCRIPTS_IDS.SAMPLE_ARM_DISP.ToString
-                                Case ADJUSTMENT_GROUPS.REAGENT1_ARM_DISP1
-                                    .FwScriptID = FwSCRIPTS_IDS.REAGENT1_ARM_DISP.ToString
-                                Case ADJUSTMENT_GROUPS.REAGENT2_ARM_DISP1
-                                    .FwScriptID = FwSCRIPTS_IDS.REAGENT2_ARM_DISP.ToString
-                                Case ADJUSTMENT_GROUPS.MIXER1_ARM_DISP1
-                                    .FwScriptID = FwSCRIPTS_IDS.MIXER1_ARM_DISP.ToString
-                                Case ADJUSTMENT_GROUPS.MIXER2_ARM_DISP1
-                                    .FwScriptID = FwSCRIPTS_IDS.MIXER2_ARM_DISP.ToString
-                            End Select
-                            .EvaluateType = EVALUATE_TYPES.NUM_VALUE
-                            .EvaluateValue = 1
-                            .NextOnResultOK = Nothing   ' XBC 18/04/2012 - Z aproximation is anuled
-                            .NextOnResultNG = Nothing
-                            .NextOnTimeOut = Nothing    ' XBC 18/04/2012 - Z aproximation is anuled
-                            .NextOnError = Nothing
-                            ' expects 1 param
-                            .ParamList = New List(Of String)
-                            .ParamList.Add(Me.pArmABSMovPolarAttr)
-                        End With
-
-                        ' XBC 18/04/2012 - Z aproximation is anuled
-                        '' Mov ABS Z 
-                        '' Absolute positioning of the Z axis to predefined approaching position
-                        'With myFwScript2
-                        '    Select Case pAdjustment
-                        '        Case ADJUSTMENT_GROUPS.SAMPLES_ARM_DISP1, _
-                        '             ADJUSTMENT_GROUPS.SAMPLES_ARM_DISP2
-                        '            .FwScriptID = FwSCRIPTS_IDS.SAMPLE_ARM_ABS_Z.ToString
-                        '            myMovAproxZ = Me.pSampleArmOffsetAttr   ' CSng(Me.pArmABSMovZAttr) + Me.pSampleArmOffsetAttr
-                        '        Case ADJUSTMENT_GROUPS.REAGENT1_ARM_DISP1
-                        '            .FwScriptID = FwSCRIPTS_IDS.REAGENT1_ARM_ABS_Z.ToString
-                        '            myMovAproxZ = Me.pReagent1ArmOffsetAttr ' CSng(Me.pArmABSMovZAttr) + Me.pReagent1ArmOffsetAttr
-                        '        Case ADJUSTMENT_GROUPS.REAGENT2_ARM_DISP1
-                        '            .FwScriptID = FwSCRIPTS_IDS.REAGENT2_ARM_ABS_Z.ToString
-                        '            myMovAproxZ = Me.pReagent2ArmOffsetAttr ' CSng(Me.pArmABSMovZAttr) + Me.pReagent2ArmOffsetAttr
-                        '        Case ADJUSTMENT_GROUPS.MIXER1_ARM_DISP1
-                        '            .FwScriptID = FwSCRIPTS_IDS.MIXER1_ARM_ABS_Z.ToString
-                        '            myMovAproxZ = Me.pMixer1ArmOffsetAttr   ' CSng(Me.pArmABSMovZAttr) + Me.pMixer1ArmOffsetAttr
-                        '        Case ADJUSTMENT_GROUPS.MIXER2_ARM_DISP1
-                        '            .FwScriptID = FwSCRIPTS_IDS.MIXER2_ARM_ABS_Z.ToString
-                        '            myMovAproxZ = Me.pMixer2ArmOffsetAttr   ' CSng(Me.pArmABSMovZAttr) + Me.pMixer2ArmOffsetAttr
-                        '    End Select
-                        '    .EvaluateType = EVALUATE_TYPES.NUM_VALUE
-                        '    .EvaluateValue = 1
-                        '    .NextOnResultOK = Nothing
-                        '    .NextOnResultNG = Nothing
-                        '    .NextOnTimeOut = Nothing
-                        '    .NextOnError = Nothing
-                        '    ' expects 1 param
-                        '    .ParamList = New List(Of String)
-                        '    .ParamList.Add(myMovAproxZ.ToString)
-                        'End With
-                        ' XBC 18/04/2012 - Z aproximation is anuled
-
-                        'add to the queue list
-                        If myListFwScript.Count > 0 Then
-                            For i As Integer = 0 To myListFwScript.Count - 1
-                                If i = 0 Then
-                                    ' First Script
-                                    If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myListFwScript(i), True)
-                                Else
-                                    If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myListFwScript(i), False)
-                                End If
-                            Next
-                            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript0, False) ' XBC 28/03/2012 - Add previous movement to security fly position
-                            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, False)
-                            'If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript2, False) ' XBC 18/04/2012 - Z aproximation is anuled
-                        Else
-                            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript0, True) ' XBC 28/03/2012 - Add previous movement to security fly position
-                            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, False)
-                            'If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript2, False) ' XBC 18/04/2012 - Z aproximation is anuled
-                        End If
+                        myResultData = GetDispensationArmScripts(pAdjustment, myResultData, myListFwScript, myFwScript0, myFwScript1)
 
                     Case ADJUSTMENT_GROUPS.SAMPLES_ARM_WASH, _
                          ADJUSTMENT_GROUPS.REAGENT1_ARM_WASH, _
                          ADJUSTMENT_GROUPS.REAGENT2_ARM_WASH, _
                          ADJUSTMENT_GROUPS.MIXER1_ARM_WASH, _
                          ADJUSTMENT_GROUPS.MIXER2_ARM_WASH
-
-
-
-                        ' XBC 28/03/2012 - Add previous movement to security fly position
-                        With myFwScript0
-                            .EvaluateType = EVALUATE_TYPES.NUM_VALUE
-                            .EvaluateValue = 1
-                            .NextOnResultOK = myFwScript1
-                            .NextOnResultNG = Nothing
-                            .NextOnTimeOut = myFwScript1
-                            .NextOnError = Nothing
-
-                            Select Case pAdjustment
-                                Case ADJUSTMENT_GROUPS.SAMPLES_ARM_WASH
-                                    ' sample arm Move Z to security fly
-                                    .FwScriptID = FwSCRIPTS_IDS.SAMPLE_ARM_ABS_Z.ToString
-                                    ' expects 1 param
-                                    .ParamList = New List(Of String)
-                                    .ParamList.Add(Me.pSampleSecurityFlyAttr)
-
-                                Case ADJUSTMENT_GROUPS.REAGENT1_ARM_WASH
-                                    ' reagent1 arm Move Z to security fly
-                                    .FwScriptID = FwSCRIPTS_IDS.REAGENT1_ARM_ABS_Z.ToString
-                                    ' expects 1 param
-                                    .ParamList = New List(Of String)
-                                    .ParamList.Add(Me.pReagent1SecurityFlyAttr)
-
-                                Case ADJUSTMENT_GROUPS.REAGENT2_ARM_WASH
-                                    ' reagent2 arm Move Z to security fly
-                                    .FwScriptID = FwSCRIPTS_IDS.REAGENT2_ARM_ABS_Z.ToString
-                                    ' expects 1 param
-                                    .ParamList = New List(Of String)
-                                    .ParamList.Add(Me.pReagent2SecurityFlyAttr)
-
-                                Case ADJUSTMENT_GROUPS.MIXER1_ARM_WASH
-                                    ' mixer1 arm Move Z to security fly
-                                    .FwScriptID = FwSCRIPTS_IDS.MIXER1_ARM_ABS_Z.ToString
-                                    ' expects 1 param
-                                    .ParamList = New List(Of String)
-                                    .ParamList.Add(Me.pMixer1SecurityFlyAttr)
-
-                                Case ADJUSTMENT_GROUPS.MIXER2_ARM_WASH
-                                    ' mixer2 arm Move Z to security fly
-                                    .FwScriptID = FwSCRIPTS_IDS.MIXER2_ARM_ABS_Z.ToString
-                                    ' expects 1 param
-                                    .ParamList = New List(Of String)
-                                    .ParamList.Add(Me.pMixer2SecurityFlyAttr)
-                            End Select
-
-                        End With
-                        ' XBC 28/03/2012 - Add previous movement to security fly position
-
-                        ' XBC 18/04/2012 - Z aproximation is anuled
-                        ' Mov ABS Polar + Mov ABS Z 
-                        ' Absolute positioning of the sample arm axis to last adjustment position
-                        'With myFwScript1
-                        '    Select Case pAdjustment
-                        '        Case ADJUSTMENT_GROUPS.SAMPLES_ARM_WASH
-                        '            .FwScriptID = FwSCRIPTS_IDS.SAMPLE_ARM_ABS_DOWN.ToString
-                        '            myMovAproxZ = Me.pSampleArmOffsetAttr   ' CSng(Me.pArmABSMovZAttr) + Me.pSampleArmOffsetAttr
-                        '        Case ADJUSTMENT_GROUPS.REAGENT1_ARM_WASH
-                        '            .FwScriptID = FwSCRIPTS_IDS.REAGENT1_ARM_ABS_DOWN.ToString
-                        '            myMovAproxZ = Me.pReagent1ArmOffsetAttr ' CSng(Me.pArmABSMovZAttr) + Me.pReagent1ArmOffsetAttr
-                        '        Case ADJUSTMENT_GROUPS.REAGENT2_ARM_WASH
-                        '            .FwScriptID = FwSCRIPTS_IDS.REAGENT2_ARM_ABS_DOWN.ToString
-                        '            myMovAproxZ = Me.pReagent2ArmOffsetAttr ' CSng(Me.pArmABSMovZAttr) + Me.pReagent2ArmOffsetAttr
-                        '        Case ADJUSTMENT_GROUPS.MIXER1_ARM_WASH
-                        '            .FwScriptID = FwSCRIPTS_IDS.MIXER1_ARM_ABS_DOWN.ToString
-                        '            myMovAproxZ = Me.pMixer1ArmOffsetAttr   ' CSng(Me.pArmABSMovZAttr) + Me.pMixer1ArmOffsetAttr
-                        '        Case ADJUSTMENT_GROUPS.MIXER2_ARM_WASH
-                        '            .FwScriptID = FwSCRIPTS_IDS.MIXER2_ARM_ABS_DOWN.ToString
-                        '            myMovAproxZ = Me.pMixer2ArmOffsetAttr   ' CSng(Me.pArmABSMovZAttr) + Me.pMixer2ArmOffsetAttr
-                        '    End Select
-                        '    .EvaluateType = EVALUATE_TYPES.NUM_VALUE
-                        '    .EvaluateValue = 1
-                        '    .NextOnResultOK = Nothing
-                        '    .NextOnResultNG = Nothing
-                        '    .NextOnTimeOut = Nothing
-                        '    .NextOnError = Nothing
-                        '    ' expects 2 params
-                        '    .ParamList = New List(Of String)
-                        '    .ParamList.Add(Me.pArmABSMovPolarAttr)
-                        '    .ParamList.Add(myMovAproxZ.ToString)
-                        'End With
-
-                        ' Absolute positioning of the sample arm axis to last adjustment position
-                        With myFwScript1
-                            Select Case pAdjustment
-                                Case ADJUSTMENT_GROUPS.SAMPLES_ARM_WASH
-                                    .FwScriptID = FwSCRIPTS_IDS.SAMPLE_ARM_DISP.ToString
-                                Case ADJUSTMENT_GROUPS.REAGENT1_ARM_WASH
-                                    .FwScriptID = FwSCRIPTS_IDS.REAGENT1_ARM_DISP.ToString
-                                Case ADJUSTMENT_GROUPS.REAGENT2_ARM_WASH
-                                    .FwScriptID = FwSCRIPTS_IDS.REAGENT2_ARM_DISP.ToString
-                                Case ADJUSTMENT_GROUPS.MIXER1_ARM_WASH
-                                    .FwScriptID = FwSCRIPTS_IDS.MIXER1_ARM_DISP.ToString
-                                Case ADJUSTMENT_GROUPS.MIXER2_ARM_WASH
-                                    .FwScriptID = FwSCRIPTS_IDS.MIXER2_ARM_DISP.ToString
-                            End Select
-                            .EvaluateType = EVALUATE_TYPES.NUM_VALUE
-                            .EvaluateValue = 1
-                            .NextOnResultOK = Nothing
-                            .NextOnResultNG = Nothing
-                            .NextOnTimeOut = Nothing
-                            .NextOnError = Nothing
-                            ' expects 1 param
-                            .ParamList = New List(Of String)
-                            .ParamList.Add(Me.pArmABSMovPolarAttr)
-                        End With
-                        ' XBC 18/04/2012 - Z aproximation is anuled
-
-                        'add to the queue list
-                        If myListFwScript.Count > 0 Then
-                            For i As Integer = 0 To myListFwScript.Count - 1
-                                If i = 0 Then
-                                    ' First Script
-                                    If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myListFwScript(i), True)
-                                Else
-                                    If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myListFwScript(i), False)
-                                End If
-                            Next
-                            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript0, False) ' XBC 28/03/2012 - Add previous movement to security fly position
-                            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, False)
-                        Else
-                            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript0, True) ' XBC 28/03/2012 - Add previous movement to security fly position
-                            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, False)
-                        End If
+                        myResultData = GetWashingArmScripts(pAdjustment, myResultData, myListFwScript, myFwScript0, myFwScript1)
 
                     Case ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1, _
                          ADJUSTMENT_GROUPS.SAMPLES_ARM_RING2, _
@@ -2354,241 +1756,10 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                          ADJUSTMENT_GROUPS.REAGENT1_ARM_RING2, _
                          ADJUSTMENT_GROUPS.REAGENT2_ARM_RING1, _
                          ADJUSTMENT_GROUPS.REAGENT2_ARM_RING2
-
-
-                        ' XBC 28/03/2012 - Add previous movement to security fly position
-                        With myFwScript0
-                            .EvaluateType = EVALUATE_TYPES.NUM_VALUE
-                            .EvaluateValue = 1
-                            .NextOnResultOK = myFwScript1
-                            .NextOnResultNG = Nothing
-                            .NextOnTimeOut = myFwScript1
-                            .NextOnError = Nothing
-
-                            Select Case pAdjustment
-                                Case ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1, _
-                                     ADJUSTMENT_GROUPS.SAMPLES_ARM_RING2, _
-                                     ADJUSTMENT_GROUPS.SAMPLES_ARM_RING3
-                                    ' sample arm Move Z to security fly
-                                    .FwScriptID = FwSCRIPTS_IDS.SAMPLE_ARM_ABS_Z.ToString
-                                    ' expects 1 param
-                                    .ParamList = New List(Of String)
-                                    .ParamList.Add(Me.pSampleSecurityFlyAttr)
-
-                                Case ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1, _
-                                     ADJUSTMENT_GROUPS.REAGENT1_ARM_RING2
-                                    ' reagent1 arm Move Z to security fly
-                                    .FwScriptID = FwSCRIPTS_IDS.REAGENT1_ARM_ABS_Z.ToString
-                                    ' expects 1 param
-                                    .ParamList = New List(Of String)
-                                    .ParamList.Add(Me.pReagent1SecurityFlyAttr)
-
-                                Case ADJUSTMENT_GROUPS.REAGENT2_ARM_RING1, _
-                                     ADJUSTMENT_GROUPS.REAGENT2_ARM_RING2
-                                    ' reagent2 arm Move Z to security fly
-                                    .FwScriptID = FwSCRIPTS_IDS.REAGENT2_ARM_ABS_Z.ToString
-                                    ' expects 1 param
-                                    .ParamList = New List(Of String)
-                                    .ParamList.Add(Me.pReagent2SecurityFlyAttr)
-
-                            End Select
-
-                        End With
-                        ' XBC 28/03/2012 - Add previous movement to security fly position
-
-                        ' Mov ABS Polar
-                        ' Absolute positioning of the sample arm axis to last adjustment position
-                        With myFwScript1
-                            Select Case pAdjustment
-                                Case ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1, _
-                                     ADJUSTMENT_GROUPS.SAMPLES_ARM_RING2, _
-                                     ADJUSTMENT_GROUPS.SAMPLES_ARM_RING3
-                                    .FwScriptID = FwSCRIPTS_IDS.SAMPLE_ARM_ABS_POLAR.ToString
-                                Case ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1, _
-                                     ADJUSTMENT_GROUPS.REAGENT1_ARM_RING2
-                                    .FwScriptID = FwSCRIPTS_IDS.REAGENT1_ARM_ABS_POLAR.ToString
-                                Case ADJUSTMENT_GROUPS.REAGENT2_ARM_RING1, _
-                                     ADJUSTMENT_GROUPS.REAGENT2_ARM_RING2
-                                    .FwScriptID = FwSCRIPTS_IDS.REAGENT2_ARM_ABS_POLAR.ToString
-                            End Select
-                            .EvaluateType = EVALUATE_TYPES.NUM_VALUE
-                            .EvaluateValue = 1
-                            .NextOnResultOK = myFwScript2
-                            .NextOnResultNG = Nothing
-                            .NextOnTimeOut = myFwScript2
-                            .NextOnError = Nothing
-                            ' expects 1 param
-                            .ParamList = New List(Of String)
-                            .ParamList.Add(Me.pArmABSMovPolarAttr)
-                        End With
-
-                        ' Mov REL Reactions Rotor
-                        ' Relative positioning of the reactions rotor to a predefined position (wells) 
-                        With myFwScript2
-                            Select Case pAdjustment
-                                Case ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1, _
-                                     ADJUSTMENT_GROUPS.SAMPLES_ARM_RING2, _
-                                     ADJUSTMENT_GROUPS.SAMPLES_ARM_RING3
-                                    .FwScriptID = FwSCRIPTS_IDS.SAMPLES_ABS_ROTOR.ToString
-                                Case ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1, _
-                                     ADJUSTMENT_GROUPS.REAGENT1_ARM_RING2, _
-                                     ADJUSTMENT_GROUPS.REAGENT2_ARM_RING1, _
-                                     ADJUSTMENT_GROUPS.REAGENT2_ARM_RING2
-                                    .FwScriptID = FwSCRIPTS_IDS.REAGENTS_ABS_ROTOR.ToString
-                            End Select
-                            .EvaluateType = EVALUATE_TYPES.NUM_VALUE
-                            .EvaluateValue = 1
-                            .NextOnResultOK = Nothing   ' XBC 18/04/2012 - Z aproximation is anuled
-                            .NextOnResultNG = Nothing
-                            .NextOnTimeOut = Nothing    ' XBC 18/04/2012 - Z aproximation is anuled
-                            .NextOnError = Nothing
-                            ' expects 1 param
-                            .ParamList = New List(Of String)
-                            .ParamList.Add(Me.pValueRotorABSMovAttr)
-                        End With
-
-                        ' XBC 18/04/2012 - Z aproximation is anuled
-                        ' Mov ABS Z 
-                        '' Absolute positioning of the Z axis to predefined approaching position
-                        'With myFwScript3
-                        '    Select Case pAdjustment
-                        '        Case ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1, _
-                        '             ADJUSTMENT_GROUPS.SAMPLES_ARM_RING2, _
-                        '             ADJUSTMENT_GROUPS.SAMPLES_ARM_RING3
-                        '            .FwScriptID = FwSCRIPTS_IDS.SAMPLE_ARM_ABS_Z.ToString
-                        '            myMovAproxZ = Me.pSampleArmOffsetAttr   ' CSng(Me.pArmABSMovZAttr) + Me.pSampleArmOffsetAttr
-                        '        Case ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1, _
-                        '             ADJUSTMENT_GROUPS.REAGENT1_ARM_RING2
-                        '            .FwScriptID = FwSCRIPTS_IDS.REAGENT1_ARM_ABS_Z.ToString
-                        '            myMovAproxZ = Me.pReagent1ArmOffsetAttr ' CSng(Me.pArmABSMovZAttr) + Me.pReagent1ArmOffsetAttr
-                        '        Case ADJUSTMENT_GROUPS.REAGENT2_ARM_RING1, _
-                        '             ADJUSTMENT_GROUPS.REAGENT2_ARM_RING2
-                        '            .FwScriptID = FwSCRIPTS_IDS.REAGENT2_ARM_ABS_Z.ToString
-                        '            myMovAproxZ = Me.pReagent2ArmOffsetAttr ' CSng(Me.pArmABSMovZAttr) + Me.pReagent2ArmOffsetAttr
-                        '    End Select
-                        '    .EvaluateType = EVALUATE_TYPES.NUM_VALUE
-                        '    .EvaluateValue = 1
-                        '    .NextOnResultOK = Nothing
-                        '    .NextOnResultNG = Nothing
-                        '    .NextOnTimeOut = Nothing
-                        '    .NextOnError = Nothing
-                        '    ' expects 1 param
-                        '    .ParamList = New List(Of String)
-                        '    .ParamList.Add(myMovAproxZ.ToString)
-                        'End With
-                        ' XBC 18/04/2012 - Z aproximation is anuled
-
-                        'add to the queue list
-                        If myListFwScript.Count > 0 Then
-                            For i As Integer = 0 To myListFwScript.Count - 1
-                                If i = 0 Then
-                                    ' First Script
-                                    If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myListFwScript(i), True)
-                                Else
-                                    If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myListFwScript(i), False)
-                                End If
-                            Next
-                            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript0, False) ' XBC 28/03/2012 - Add previous movement to security fly position
-                            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, False)
-                            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript2, False)
-                            'If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript3, False) ' XBC 18/04/2012 - Z aproximation is anuled
-                        Else
-                            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript0, True) ' XBC 28/03/2012 - Add previous movement to security fly position
-                            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, False)
-                            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript2, False)
-                            'If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript3, False) ' XBC 18/04/2012 - Z aproximation is anuled
-                        End If
+                        myResultData = GetRingByArmScripts(pAdjustment, myResultData, myListFwScript, myFwScript0, myFwScript1, myFwScript2)
 
                     Case ADJUSTMENT_GROUPS.SAMPLES_ARM_ZTUBE1
-
-                        ' XBC 28/03/2012 - Add previous movement to security fly position
-                        With myFwScript0
-                            .EvaluateType = EVALUATE_TYPES.NUM_VALUE
-                            .EvaluateValue = 1
-                            .NextOnResultOK = myFwScript1
-                            .NextOnResultNG = Nothing
-                            .NextOnTimeOut = myFwScript1
-                            .NextOnError = Nothing
-                            ' sample arm Move Z to security fly
-                            .FwScriptID = FwSCRIPTS_IDS.SAMPLE_ARM_ABS_Z.ToString
-                            ' expects 1 param
-                            .ParamList = New List(Of String)
-                            .ParamList.Add(Me.pSampleSecurityFlyAttr)
-
-                        End With
-                        ' XBC 28/03/2012 - Add previous movement to security fly position
-
-                        ' Mov ABS Polar
-                        ' Absolute positioning of the sample arm axis to last adjustment position
-                        With myFwScript1
-                            .FwScriptID = FwSCRIPTS_IDS.SAMPLE_ARM_ABS_POLAR.ToString
-                            .EvaluateType = EVALUATE_TYPES.NUM_VALUE
-                            .EvaluateValue = 1
-                            .NextOnResultOK = myFwScript2
-                            .NextOnResultNG = Nothing
-                            .NextOnTimeOut = myFwScript2
-                            .NextOnError = Nothing
-                            ' expects 1 param
-                            .ParamList = New List(Of String)
-                            .ParamList.Add(Me.pArmABSMovPolarAttr)
-                        End With
-
-                        ' Mov REL Reactions Rotor
-                        ' Relative positioning of the reactions rotor to a predefined position (wells) 
-                        With myFwScript2
-                            .FwScriptID = FwSCRIPTS_IDS.SAMPLES_ABS_ROTOR.ToString
-                            '.FwScriptID = FwSCRIPTS_IDS.SAMPLES_ZTUBE_ABS_ROTOR.ToString PENDING TO IMPLEMENT
-                            .EvaluateType = EVALUATE_TYPES.NUM_VALUE
-                            .EvaluateValue = 1
-                            .NextOnResultOK = Nothing   ' XBC 18/04/2012 - Z aproximation is anuled
-                            .NextOnResultNG = Nothing
-                            .NextOnTimeOut = Nothing    ' XBC 18/04/2012 - Z aproximation is anuled
-                            .NextOnError = Nothing
-                            ' expects 1 param
-                            .ParamList = New List(Of String)
-                            .ParamList.Add(Me.pValueRotorABSMovAttr)
-                            '.ParamList.Add(pValueRotorZTubeABSMovAttr) PENDING TO IMPLEMENT
-                        End With
-
-                        ' XBC 18/04/2012 - Z aproximation is anuled
-                        ' Mov ABS Z 
-                        '' Absolute positioning of the Z axis to predefined approaching position
-                        'myMovAproxZ = Me.pSampleArmOffsetAttr  ' CSng(Me.pArmABSMovZAttr) + Me.pSampleArmOffsetAttr
-                        'With myFwScript3
-                        '    .FwScriptID = FwSCRIPTS_IDS.SAMPLE_ARM_ABS_Z.ToString
-                        '    .EvaluateType = EVALUATE_TYPES.NUM_VALUE
-                        '    .EvaluateValue = 1
-                        '    .NextOnResultOK = Nothing
-                        '    .NextOnResultNG = Nothing
-                        '    .NextOnTimeOut = Nothing
-                        '    .NextOnError = Nothing
-                        '    ' expects 1 param
-                        '    .ParamList = New List(Of String)
-                        '    .ParamList.Add(myMovAproxZ.ToString)
-                        'End With
-                        ' XBC 18/04/2012 - Z aproximation is anuled
-
-                        'add to the queue list
-                        If myListFwScript.Count > 0 Then
-                            For i As Integer = 0 To myListFwScript.Count - 1
-                                If i = 0 Then
-                                    ' First Script
-                                    If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myListFwScript(i), True)
-                                Else
-                                    If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myListFwScript(i), False)
-                                End If
-                            Next
-                            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript0, False) ' XBC 28/03/2012 - Add previous movement to security fly position
-                            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, False)
-                            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript2, False)
-                            'If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript3, False) ' XBC 18/04/2012 - Z aproximation is anuled
-                        Else
-                            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript0, True) ' XBC 28/03/2012 - Add previous movement to security fly position
-                            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, False)
-                            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript2, False)
-                            'If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript3, False) ' XBC 18/04/2012 - Z aproximation is anuled
-                        End If
-
+                        myResultData = GetSampleArmZTubeScripts(myResultData, myListFwScript, myFwScript0, myFwScript1, myFwScript2)
 
                     Case ADJUSTMENT_GROUPS.SAMPLES_ARM_ISE, _
                          ADJUSTMENT_GROUPS.SAMPLES_ARM_ZREF, _
@@ -2601,153 +1772,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                          ADJUSTMENT_GROUPS.MIXER1_ARM_PARK, _
                          ADJUSTMENT_GROUPS.MIXER2_ARM_ZREF, _
                          ADJUSTMENT_GROUPS.MIXER2_ARM_PARK
-
-
-                        ' XBC 28/03/2012 - Add previous movement to security fly position
-                        With myFwScript0
-                            .EvaluateType = EVALUATE_TYPES.NUM_VALUE
-                            .EvaluateValue = 1
-                            .NextOnResultOK = myFwScript1
-                            .NextOnResultNG = Nothing
-                            .NextOnTimeOut = myFwScript1
-                            .NextOnError = Nothing
-
-                            Select Case pAdjustment
-                                Case ADJUSTMENT_GROUPS.SAMPLES_ARM_ISE, _
-                                     ADJUSTMENT_GROUPS.SAMPLES_ARM_ZREF, _
-                                     ADJUSTMENT_GROUPS.SAMPLES_ARM_PARK
-                                    ' sample arm Move Z to security fly
-                                    .FwScriptID = FwSCRIPTS_IDS.SAMPLE_ARM_ABS_Z.ToString
-                                    ' expects 1 param
-                                    .ParamList = New List(Of String)
-                                    .ParamList.Add(Me.pSampleSecurityFlyAttr)
-
-                                Case ADJUSTMENT_GROUPS.REAGENT1_ARM_ZREF, _
-                                     ADJUSTMENT_GROUPS.REAGENT1_ARM_PARK
-                                    ' reagent1 arm Move Z to security fly
-                                    .FwScriptID = FwSCRIPTS_IDS.REAGENT1_ARM_ABS_Z.ToString
-                                    ' expects 1 param
-                                    .ParamList = New List(Of String)
-                                    .ParamList.Add(Me.pReagent1SecurityFlyAttr)
-
-                                Case ADJUSTMENT_GROUPS.REAGENT2_ARM_ZREF, _
-                                     ADJUSTMENT_GROUPS.REAGENT2_ARM_PARK
-                                    ' reagent2 arm Move Z to security fly
-                                    .FwScriptID = FwSCRIPTS_IDS.REAGENT2_ARM_ABS_Z.ToString
-                                    ' expects 1 param
-                                    .ParamList = New List(Of String)
-                                    .ParamList.Add(Me.pReagent2SecurityFlyAttr)
-
-                                Case ADJUSTMENT_GROUPS.MIXER1_ARM_ZREF, _
-                                     ADJUSTMENT_GROUPS.MIXER1_ARM_PARK
-                                    ' mixer1 arm Move Z to security fly
-                                    .FwScriptID = FwSCRIPTS_IDS.MIXER1_ARM_ABS_Z.ToString
-                                    ' expects 1 param
-                                    .ParamList = New List(Of String)
-                                    .ParamList.Add(Me.pMixer1SecurityFlyAttr)
-
-                                Case ADJUSTMENT_GROUPS.MIXER2_ARM_ZREF, _
-                                     ADJUSTMENT_GROUPS.MIXER2_ARM_PARK
-                                    ' mixer2 arm Move Z to security fly
-                                    .FwScriptID = FwSCRIPTS_IDS.MIXER2_ARM_ABS_Z.ToString
-                                    ' expects 1 param
-                                    .ParamList = New List(Of String)
-                                    .ParamList.Add(Me.pMixer2SecurityFlyAttr)
-                            End Select
-
-                        End With
-                        ' XBC 28/03/2012 - Add previous movement to security fly position
-
-                        ' XBC 18/04/2012 - Z aproximation is anuled
-                        '' Arm Absolute Pos-Down 
-                        '' Move absolute position the current arm:  predefined approaching position (steps)
-                        'With myFwScript1
-                        '    Select Case pAdjustment
-                        '        Case ADJUSTMENT_GROUPS.SAMPLES_ARM_ISE
-                        '            .FwScriptID = FwSCRIPTS_IDS.SAMPLE_ARM_ABS_DOWN.ToString
-                        '            myMovAproxZ = Me.pSampleArmOffsetAttr   ' CSng(Me.pArmABSMovZAttr) + Me.pSampleArmOffsetAttr
-                        '        Case ADJUSTMENT_GROUPS.SAMPLES_ARM_ZREF, _
-                        '             ADJUSTMENT_GROUPS.SAMPLES_ARM_PARK
-                        '            .FwScriptID = FwSCRIPTS_IDS.SAMPLE_ARM_ABS_DOWN.ToString
-                        '            myMovAproxZ = Me.pSampleArmOffsetAttr   ' CSng(Me.pArmABSMovZAttr) ' + Me.pSampleArmOffsetAttr
-                        '        Case ADJUSTMENT_GROUPS.REAGENT1_ARM_ZREF, _
-                        '             ADJUSTMENT_GROUPS.REAGENT1_ARM_PARK
-                        '            .FwScriptID = FwSCRIPTS_IDS.REAGENT1_ARM_ABS_DOWN.ToString
-                        '            myMovAproxZ = Me.pReagent1ArmOffsetAttr ' CSng(Me.pArmABSMovZAttr) ' + Me.pReagent1ArmOffsetAttr
-                        '        Case ADJUSTMENT_GROUPS.REAGENT2_ARM_ZREF, _
-                        '             ADJUSTMENT_GROUPS.REAGENT2_ARM_PARK
-                        '            .FwScriptID = FwSCRIPTS_IDS.REAGENT2_ARM_ABS_DOWN.ToString
-                        '            myMovAproxZ = Me.pReagent2ArmOffsetAttr ' CSng(Me.pArmABSMovZAttr) ' + Me.pReagent2ArmOffsetAttr
-                        '        Case ADJUSTMENT_GROUPS.MIXER1_ARM_ZREF, _
-                        '             ADJUSTMENT_GROUPS.MIXER1_ARM_PARK
-                        '            .FwScriptID = FwSCRIPTS_IDS.MIXER1_ARM_ABS_DOWN.ToString
-                        '            myMovAproxZ = Me.pMixer1ArmOffsetAttr   ' CSng(Me.pArmABSMovZAttr) ' + Me.pMixer1ArmOffsetAttr
-                        '        Case ADJUSTMENT_GROUPS.MIXER2_ARM_ZREF, _
-                        '             ADJUSTMENT_GROUPS.MIXER2_ARM_PARK
-                        '            .FwScriptID = FwSCRIPTS_IDS.MIXER2_ARM_ABS_DOWN.ToString
-                        '            myMovAproxZ = Me.pMixer2ArmOffsetAttr   ' CSng(Me.pArmABSMovZAttr) ' + Me.pMixer2ArmOffsetAttr
-                        '    End Select
-                        '    .EvaluateType = EVALUATE_TYPES.NUM_VALUE
-                        '    .EvaluateValue = 1
-                        '    .NextOnResultOK = Nothing
-                        '    .NextOnResultNG = Nothing
-                        '    .NextOnTimeOut = Nothing
-                        '    .NextOnError = Nothing
-                        '    ' expects 2 params
-                        '    .ParamList = New List(Of String)
-                        '    .ParamList.Add(Me.pArmABSMovPolarAttr)
-                        '    .ParamList.Add(myMovAproxZ.ToString)
-                        'End With
-
-                        ' Absolute positioning of the sample arm axis to last adjustment position
-                        With myFwScript1
-                            Select Case pAdjustment
-                                Case ADJUSTMENT_GROUPS.SAMPLES_ARM_ISE
-                                    .FwScriptID = FwSCRIPTS_IDS.SAMPLE_ARM_DISP.ToString
-                                Case ADJUSTMENT_GROUPS.SAMPLES_ARM_ZREF, _
-                                     ADJUSTMENT_GROUPS.SAMPLES_ARM_PARK
-                                    .FwScriptID = FwSCRIPTS_IDS.SAMPLE_ARM_DISP.ToString
-                                Case ADJUSTMENT_GROUPS.REAGENT1_ARM_ZREF, _
-                                     ADJUSTMENT_GROUPS.REAGENT1_ARM_PARK
-                                    .FwScriptID = FwSCRIPTS_IDS.REAGENT1_ARM_DISP.ToString
-                                Case ADJUSTMENT_GROUPS.REAGENT2_ARM_ZREF, _
-                                     ADJUSTMENT_GROUPS.REAGENT2_ARM_PARK
-                                    .FwScriptID = FwSCRIPTS_IDS.REAGENT2_ARM_DISP.ToString
-                                Case ADJUSTMENT_GROUPS.MIXER1_ARM_ZREF, _
-                                     ADJUSTMENT_GROUPS.MIXER1_ARM_PARK
-                                    .FwScriptID = FwSCRIPTS_IDS.MIXER1_ARM_DISP.ToString
-                                Case ADJUSTMENT_GROUPS.MIXER2_ARM_ZREF, _
-                                     ADJUSTMENT_GROUPS.MIXER2_ARM_PARK
-                                    .FwScriptID = FwSCRIPTS_IDS.MIXER2_ARM_DISP.ToString
-                            End Select
-                            .EvaluateType = EVALUATE_TYPES.NUM_VALUE
-                            .EvaluateValue = 1
-                            .NextOnResultOK = Nothing
-                            .NextOnResultNG = Nothing
-                            .NextOnTimeOut = Nothing
-                            .NextOnError = Nothing
-                            ' expects 1 param
-                            .ParamList = New List(Of String)
-                            .ParamList.Add(Me.pArmABSMovPolarAttr)
-                        End With
-                        ' XBC 18/04/2012 - Z aproximation is anuled
-
-                        'add to the queue list
-                        If myListFwScript.Count > 0 Then
-                            For i As Integer = 0 To myListFwScript.Count - 1
-                                If i = 0 Then
-                                    ' First Script
-                                    If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myListFwScript(i), True)
-                                Else
-                                    If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myListFwScript(i), False)
-                                End If
-                            Next
-                            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript0, False) ' XBC 28/03/2012 - Add previous movement to security fly position
-                            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, False)
-                        Else
-                            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript0, True) ' XBC 28/03/2012 - Add previous movement to security fly position
-                            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, False)
-                        End If
+                        myResultData = GetArmZrefParkISEScripts(pAdjustment, myResultData, myListFwScript, myFwScript0, myFwScript1)
 
                 End Select
 
@@ -2755,7 +1780,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
             Catch ex As Exception
                 myResultData.HasError = True
-                myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myResultData.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
                 If myFwScriptDelegate.CurrentFwScriptsQueue IsNot Nothing Then
@@ -2765,6 +1790,628 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.SendQueueForADJUST_PREPARING", EventLogEntryType.Error, False)
             End Try
+            Return myResultData
+        End Function
+
+        Private Sub GetPreliminaryHomeScripts(ByVal pAdjustment As ADJUSTMENT_GROUPS, ByVal myResultData As GlobalDataTO, ByVal myListFwScript As List(Of FwScriptQueueItem), ByVal myFwScript0 As FwScriptQueueItem)
+            Dim myHomesDS As SRVPreliminaryHomesDS
+
+            myHomesDS = CType(myResultData.SetDatos, SRVPreliminaryHomesDS)
+
+            Dim myPendingHomesList As List(Of SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow) = _
+                    (From a As SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow In myHomesDS.srv_tadjPreliminaryHomes _
+                    Where a.Done = False Select a).ToList
+
+            For Each H In myPendingHomesList
+                Dim myFwScript As New FwScriptQueueItem
+                myListFwScript.Add(myFwScript)
+            Next
+
+            Dim i As Integer = 0
+            For Each H As SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow In myPendingHomesList
+                'GET EACH PENDING HOME'S FWSCRIPT FROM FWSCRIPT DATA AND ADD TO THE FWSCRIPT QUEUE
+                If i = myListFwScript.Count - 1 Then
+                    'Last index
+                    With myListFwScript(i)
+                        .FwScriptID = H.RequiredHomeID.ToString
+                        .EvaluateType = EVALUATE_TYPES.NUM_VALUE
+                        .EvaluateValue = 1
+                        .NextOnResultOK = myFwScript0   ' XBC 28/03/2012 - Add previous movement to security fly position
+                        .NextOnResultNG = Nothing
+                        .NextOnTimeOut = myFwScript0   ' XBC 28/03/2012 - Add previous movement to security fly position
+                        .NextOnError = Nothing
+                        .ParamList = Nothing
+
+                        ' XBC 28/03/2012 - Add previous movement to security fly position
+                        If pAdjustment = ADJUSTMENT_GROUPS.WASHING_STATION Then
+                            .NextOnResultOK = Nothing
+                            .NextOnTimeOut = Nothing
+                        End If
+                        ' XBC 28/03/2012 - Add previous movement to security fly position
+                    End With
+                Else
+                    With myListFwScript(i)
+                        .FwScriptID = H.RequiredHomeID.ToString
+                        .EvaluateType = EVALUATE_TYPES.NUM_VALUE
+                        .EvaluateValue = 1
+                        .NextOnResultOK = myListFwScript(i + 1)
+                        .NextOnResultNG = Nothing
+                        .NextOnTimeOut = myListFwScript(i + 1)
+                        .NextOnError = Nothing
+                        .ParamList = Nothing
+                    End With
+                End If
+                i += 1
+            Next
+        End Sub
+
+        Private Function GetArmZrefParkISEScripts(ByVal pAdjustment As ADJUSTMENT_GROUPS, ByVal myResultData As GlobalDataTO, ByVal myListFwScript As List(Of FwScriptQueueItem), ByVal myFwScript0 As FwScriptQueueItem, ByVal myFwScript1 As FwScriptQueueItem) As GlobalDataTO
+
+            ' XBC 28/03/2012 - Add previous movement to security fly position
+            With myFwScript0
+                .EvaluateType = EVALUATE_TYPES.NUM_VALUE
+                .EvaluateValue = 1
+                .NextOnResultOK = myFwScript1
+                .NextOnResultNG = Nothing
+                .NextOnTimeOut = myFwScript1
+                .NextOnError = Nothing
+
+                Select Case pAdjustment
+                    Case ADJUSTMENT_GROUPS.SAMPLES_ARM_ISE, _
+                        ADJUSTMENT_GROUPS.SAMPLES_ARM_ZREF, _
+                        ADJUSTMENT_GROUPS.SAMPLES_ARM_PARK
+                        ' sample arm Move Z to security fly
+                        .FwScriptID = FwSCRIPTS_IDS.SAMPLE_ARM_ABS_Z.ToString
+                        ' expects 1 param
+                        .ParamList = New List(Of String)
+                        .ParamList.Add(Me.pSampleSecurityFlyAttr)
+
+                    Case ADJUSTMENT_GROUPS.REAGENT1_ARM_ZREF, _
+                        ADJUSTMENT_GROUPS.REAGENT1_ARM_PARK
+                        ' reagent1 arm Move Z to security fly
+                        .FwScriptID = FwSCRIPTS_IDS.REAGENT1_ARM_ABS_Z.ToString
+                        ' expects 1 param
+                        .ParamList = New List(Of String)
+                        .ParamList.Add(Me.pReagent1SecurityFlyAttr)
+
+                    Case ADJUSTMENT_GROUPS.REAGENT2_ARM_ZREF, _
+                        ADJUSTMENT_GROUPS.REAGENT2_ARM_PARK
+                        ' reagent2 arm Move Z to security fly
+                        .FwScriptID = FwSCRIPTS_IDS.REAGENT2_ARM_ABS_Z.ToString
+                        ' expects 1 param
+                        .ParamList = New List(Of String)
+                        .ParamList.Add(Me.pReagent2SecurityFlyAttr)
+
+                    Case ADJUSTMENT_GROUPS.MIXER1_ARM_ZREF, _
+                        ADJUSTMENT_GROUPS.MIXER1_ARM_PARK
+                        ' mixer1 arm Move Z to security fly
+                        .FwScriptID = FwSCRIPTS_IDS.MIXER1_ARM_ABS_Z.ToString
+                        ' expects 1 param
+                        .ParamList = New List(Of String)
+                        .ParamList.Add(Me.pMixer1SecurityFlyAttr)
+
+                    Case ADJUSTMENT_GROUPS.MIXER2_ARM_ZREF, _
+                        ADJUSTMENT_GROUPS.MIXER2_ARM_PARK
+                        ' mixer2 arm Move Z to security fly
+                        .FwScriptID = FwSCRIPTS_IDS.MIXER2_ARM_ABS_Z.ToString
+                        ' expects 1 param
+                        .ParamList = New List(Of String)
+                        .ParamList.Add(Me.pMixer2SecurityFlyAttr)
+                End Select
+
+            End With
+            ' XBC 28/03/2012 - Add previous movement to security fly position
+
+            ' Absolute positioning of the sample arm axis to last adjustment position
+            With myFwScript1
+                Select Case pAdjustment
+                    Case ADJUSTMENT_GROUPS.SAMPLES_ARM_ISE
+                        .FwScriptID = FwSCRIPTS_IDS.SAMPLE_ARM_DISP.ToString
+                    Case ADJUSTMENT_GROUPS.SAMPLES_ARM_ZREF, _
+                        ADJUSTMENT_GROUPS.SAMPLES_ARM_PARK
+                        .FwScriptID = FwSCRIPTS_IDS.SAMPLE_ARM_DISP.ToString
+                    Case ADJUSTMENT_GROUPS.REAGENT1_ARM_ZREF, _
+                        ADJUSTMENT_GROUPS.REAGENT1_ARM_PARK
+                        .FwScriptID = FwSCRIPTS_IDS.REAGENT1_ARM_DISP.ToString
+                    Case ADJUSTMENT_GROUPS.REAGENT2_ARM_ZREF, _
+                        ADJUSTMENT_GROUPS.REAGENT2_ARM_PARK
+                        .FwScriptID = FwSCRIPTS_IDS.REAGENT2_ARM_DISP.ToString
+                    Case ADJUSTMENT_GROUPS.MIXER1_ARM_ZREF, _
+                        ADJUSTMENT_GROUPS.MIXER1_ARM_PARK
+                        .FwScriptID = FwSCRIPTS_IDS.MIXER1_ARM_DISP.ToString
+                    Case ADJUSTMENT_GROUPS.MIXER2_ARM_ZREF, _
+                        ADJUSTMENT_GROUPS.MIXER2_ARM_PARK
+                        .FwScriptID = FwSCRIPTS_IDS.MIXER2_ARM_DISP.ToString
+                End Select
+                .EvaluateType = EVALUATE_TYPES.NUM_VALUE
+                .EvaluateValue = 1
+                .NextOnResultOK = Nothing
+                .NextOnResultNG = Nothing
+                .NextOnTimeOut = Nothing
+                .NextOnError = Nothing
+                ' expects 1 param
+                .ParamList = New List(Of String)
+                .ParamList.Add(Me.pArmABSMovPolarAttr)
+            End With
+            ' XBC 18/04/2012 - Z aproximation is anuled
+
+            'add to the queue list
+            If myListFwScript.Count > 0 Then
+                For i As Integer = 0 To myListFwScript.Count - 1
+                    If i = 0 Then
+                        ' First Script
+                        If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myListFwScript(i), True)
+                    Else
+                        If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myListFwScript(i), False)
+                    End If
+                Next
+                If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript0, False) ' XBC 28/03/2012 - Add previous movement to security fly position
+                If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, False)
+            Else
+                If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript0, True) ' XBC 28/03/2012 - Add previous movement to security fly position
+                If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, False)
+            End If
+            Return myResultData
+        End Function
+
+        Private Function GetSampleArmZTubeScripts(ByVal myResultData As GlobalDataTO, ByVal myListFwScript As List(Of FwScriptQueueItem), ByVal myFwScript0 As FwScriptQueueItem, ByVal myFwScript1 As FwScriptQueueItem, ByVal myFwScript2 As FwScriptQueueItem) As GlobalDataTO
+
+            ' XBC 28/03/2012 - Add previous movement to security fly position
+            With myFwScript0
+                .EvaluateType = EVALUATE_TYPES.NUM_VALUE
+                .EvaluateValue = 1
+                .NextOnResultOK = myFwScript1
+                .NextOnResultNG = Nothing
+                .NextOnTimeOut = myFwScript1
+                .NextOnError = Nothing
+                ' sample arm Move Z to security fly
+                .FwScriptID = FwSCRIPTS_IDS.SAMPLE_ARM_ABS_Z.ToString
+                ' expects 1 param
+                .ParamList = New List(Of String)
+                .ParamList.Add(Me.pSampleSecurityFlyAttr)
+
+            End With
+            ' XBC 28/03/2012 - Add previous movement to security fly position
+
+            ' Mov ABS Polar
+            ' Absolute positioning of the sample arm axis to last adjustment position
+            With myFwScript1
+                .FwScriptID = FwSCRIPTS_IDS.SAMPLE_ARM_ABS_POLAR.ToString
+                .EvaluateType = EVALUATE_TYPES.NUM_VALUE
+                .EvaluateValue = 1
+                .NextOnResultOK = myFwScript2
+                .NextOnResultNG = Nothing
+                .NextOnTimeOut = myFwScript2
+                .NextOnError = Nothing
+                ' expects 1 param
+                .ParamList = New List(Of String)
+                .ParamList.Add(Me.pArmABSMovPolarAttr)
+            End With
+
+            ' Mov REL Reactions Rotor
+            ' Relative positioning of the reactions rotor to a predefined position (wells) 
+            With myFwScript2
+                .FwScriptID = FwSCRIPTS_IDS.SAMPLES_ABS_ROTOR.ToString
+                .EvaluateType = EVALUATE_TYPES.NUM_VALUE
+                .EvaluateValue = 1
+                .NextOnResultOK = Nothing   ' XBC 18/04/2012 - Z aproximation is anuled
+                .NextOnResultNG = Nothing
+                .NextOnTimeOut = Nothing    ' XBC 18/04/2012 - Z aproximation is anuled
+                .NextOnError = Nothing
+                ' expects 1 param
+                .ParamList = New List(Of String)
+                .ParamList.Add(Me.pValueRotorABSMovAttr)
+            End With
+
+            'add to the queue list
+            If myListFwScript.Count > 0 Then
+                For i As Integer = 0 To myListFwScript.Count - 1
+                    If i = 0 Then
+                        ' First Script
+                        If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myListFwScript(i), True)
+                    Else
+                        If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myListFwScript(i), False)
+                    End If
+                Next
+                If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript0, False) ' XBC 28/03/2012 - Add previous movement to security fly position
+                If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, False)
+                If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript2, False)
+            Else
+                If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript0, True) ' XBC 28/03/2012 - Add previous movement to security fly position
+                If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, False)
+                If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript2, False)
+            End If
+            Return myResultData
+        End Function
+
+        Private Function GetRingByArmScripts(ByVal pAdjustment As ADJUSTMENT_GROUPS, ByVal myResultData As GlobalDataTO, ByVal myListFwScript As List(Of FwScriptQueueItem), ByVal myFwScript0 As FwScriptQueueItem, ByVal myFwScript1 As FwScriptQueueItem, ByVal myFwScript2 As FwScriptQueueItem) As GlobalDataTO
+
+            ' XBC 28/03/2012 - Add previous movement to security fly position
+            With myFwScript0
+                .EvaluateType = EVALUATE_TYPES.NUM_VALUE
+                .EvaluateValue = 1
+                .NextOnResultOK = myFwScript1
+                .NextOnResultNG = Nothing
+                .NextOnTimeOut = myFwScript1
+                .NextOnError = Nothing
+
+                Select Case pAdjustment
+                    Case ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1, _
+                        ADJUSTMENT_GROUPS.SAMPLES_ARM_RING2, _
+                        ADJUSTMENT_GROUPS.SAMPLES_ARM_RING3
+                        ' sample arm Move Z to security fly
+                        .FwScriptID = FwSCRIPTS_IDS.SAMPLE_ARM_ABS_Z.ToString
+                        ' expects 1 param
+                        .ParamList = New List(Of String)
+                        .ParamList.Add(Me.pSampleSecurityFlyAttr)
+
+                    Case ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1, _
+                        ADJUSTMENT_GROUPS.REAGENT1_ARM_RING2
+                        ' reagent1 arm Move Z to security fly
+                        .FwScriptID = FwSCRIPTS_IDS.REAGENT1_ARM_ABS_Z.ToString
+                        ' expects 1 param
+                        .ParamList = New List(Of String)
+                        .ParamList.Add(Me.pReagent1SecurityFlyAttr)
+
+                    Case ADJUSTMENT_GROUPS.REAGENT2_ARM_RING1, _
+                        ADJUSTMENT_GROUPS.REAGENT2_ARM_RING2
+                        ' reagent2 arm Move Z to security fly
+                        .FwScriptID = FwSCRIPTS_IDS.REAGENT2_ARM_ABS_Z.ToString
+                        ' expects 1 param
+                        .ParamList = New List(Of String)
+                        .ParamList.Add(Me.pReagent2SecurityFlyAttr)
+
+                End Select
+
+            End With
+            ' XBC 28/03/2012 - Add previous movement to security fly position
+
+            ' Mov ABS Polar
+            ' Absolute positioning of the sample arm axis to last adjustment position
+            With myFwScript1
+                Select Case pAdjustment
+                    Case ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1, _
+                        ADJUSTMENT_GROUPS.SAMPLES_ARM_RING2, _
+                        ADJUSTMENT_GROUPS.SAMPLES_ARM_RING3
+                        .FwScriptID = FwSCRIPTS_IDS.SAMPLE_ARM_ABS_POLAR.ToString
+                    Case ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1, _
+                        ADJUSTMENT_GROUPS.REAGENT1_ARM_RING2
+                        .FwScriptID = FwSCRIPTS_IDS.REAGENT1_ARM_ABS_POLAR.ToString
+                    Case ADJUSTMENT_GROUPS.REAGENT2_ARM_RING1, _
+                        ADJUSTMENT_GROUPS.REAGENT2_ARM_RING2
+                        .FwScriptID = FwSCRIPTS_IDS.REAGENT2_ARM_ABS_POLAR.ToString
+                End Select
+                .EvaluateType = EVALUATE_TYPES.NUM_VALUE
+                .EvaluateValue = 1
+                .NextOnResultOK = myFwScript2
+                .NextOnResultNG = Nothing
+                .NextOnTimeOut = myFwScript2
+                .NextOnError = Nothing
+                ' expects 1 param
+                .ParamList = New List(Of String)
+                .ParamList.Add(Me.pArmABSMovPolarAttr)
+            End With
+
+            ' Mov REL Reactions Rotor
+            ' Relative positioning of the reactions rotor to a predefined position (wells) 
+            With myFwScript2
+                Select Case pAdjustment
+                    Case ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1, _
+                        ADJUSTMENT_GROUPS.SAMPLES_ARM_RING2, _
+                        ADJUSTMENT_GROUPS.SAMPLES_ARM_RING3
+                        .FwScriptID = FwSCRIPTS_IDS.SAMPLES_ABS_ROTOR.ToString
+                    Case ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1, _
+                        ADJUSTMENT_GROUPS.REAGENT1_ARM_RING2, _
+                        ADJUSTMENT_GROUPS.REAGENT2_ARM_RING1, _
+                        ADJUSTMENT_GROUPS.REAGENT2_ARM_RING2
+                        .FwScriptID = FwSCRIPTS_IDS.REAGENTS_ABS_ROTOR.ToString
+                End Select
+                .EvaluateType = EVALUATE_TYPES.NUM_VALUE
+                .EvaluateValue = 1
+                .NextOnResultOK = Nothing   ' XBC 18/04/2012 - Z aproximation is anuled
+                .NextOnResultNG = Nothing
+                .NextOnTimeOut = Nothing    ' XBC 18/04/2012 - Z aproximation is anuled
+                .NextOnError = Nothing
+                ' expects 1 param
+                .ParamList = New List(Of String)
+                .ParamList.Add(Me.pValueRotorABSMovAttr)
+            End With
+
+            'add to the queue list
+            If myListFwScript.Count > 0 Then
+                For i As Integer = 0 To myListFwScript.Count - 1
+                    If i = 0 Then
+                        ' First Script
+                        If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myListFwScript(i), True)
+                    Else
+                        If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myListFwScript(i), False)
+                    End If
+                Next
+                If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript0, False) ' XBC 28/03/2012 - Add previous movement to security fly position
+                If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, False)
+                If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript2, False)
+            Else
+                If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript0, True) ' XBC 28/03/2012 - Add previous movement to security fly position
+                If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, False)
+                If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript2, False)
+            End If
+            Return myResultData
+        End Function
+
+        Private Function GetWashingArmScripts(ByVal pAdjustment As ADJUSTMENT_GROUPS, ByVal myResultData As GlobalDataTO, ByVal myListFwScript As List(Of FwScriptQueueItem), ByVal myFwScript0 As FwScriptQueueItem, ByVal myFwScript1 As FwScriptQueueItem) As GlobalDataTO
+
+            ' XBC 28/03/2012 - Add previous movement to security fly position
+            With myFwScript0
+                .EvaluateType = EVALUATE_TYPES.NUM_VALUE
+                .EvaluateValue = 1
+                .NextOnResultOK = myFwScript1
+                .NextOnResultNG = Nothing
+                .NextOnTimeOut = myFwScript1
+                .NextOnError = Nothing
+
+                Select Case pAdjustment
+                    Case ADJUSTMENT_GROUPS.SAMPLES_ARM_WASH
+                        ' sample arm Move Z to security fly
+                        .FwScriptID = FwSCRIPTS_IDS.SAMPLE_ARM_ABS_Z.ToString
+                        ' expects 1 param
+                        .ParamList = New List(Of String)
+                        .ParamList.Add(Me.pSampleSecurityFlyAttr)
+
+                    Case ADJUSTMENT_GROUPS.REAGENT1_ARM_WASH
+                        ' reagent1 arm Move Z to security fly
+                        .FwScriptID = FwSCRIPTS_IDS.REAGENT1_ARM_ABS_Z.ToString
+                        ' expects 1 param
+                        .ParamList = New List(Of String)
+                        .ParamList.Add(Me.pReagent1SecurityFlyAttr)
+
+                    Case ADJUSTMENT_GROUPS.REAGENT2_ARM_WASH
+                        ' reagent2 arm Move Z to security fly
+                        .FwScriptID = FwSCRIPTS_IDS.REAGENT2_ARM_ABS_Z.ToString
+                        ' expects 1 param
+                        .ParamList = New List(Of String)
+                        .ParamList.Add(Me.pReagent2SecurityFlyAttr)
+
+                    Case ADJUSTMENT_GROUPS.MIXER1_ARM_WASH
+                        ' mixer1 arm Move Z to security fly
+                        .FwScriptID = FwSCRIPTS_IDS.MIXER1_ARM_ABS_Z.ToString
+                        ' expects 1 param
+                        .ParamList = New List(Of String)
+                        .ParamList.Add(Me.pMixer1SecurityFlyAttr)
+
+                    Case ADJUSTMENT_GROUPS.MIXER2_ARM_WASH
+                        ' mixer2 arm Move Z to security fly
+                        .FwScriptID = FwSCRIPTS_IDS.MIXER2_ARM_ABS_Z.ToString
+                        ' expects 1 param
+                        .ParamList = New List(Of String)
+                        .ParamList.Add(Me.pMixer2SecurityFlyAttr)
+                End Select
+
+            End With
+
+            ' Absolute positioning of the sample arm axis to last adjustment position
+            With myFwScript1
+                Select Case pAdjustment
+                    Case ADJUSTMENT_GROUPS.SAMPLES_ARM_WASH
+                        .FwScriptID = FwSCRIPTS_IDS.SAMPLE_ARM_DISP.ToString
+                    Case ADJUSTMENT_GROUPS.REAGENT1_ARM_WASH
+                        .FwScriptID = FwSCRIPTS_IDS.REAGENT1_ARM_DISP.ToString
+                    Case ADJUSTMENT_GROUPS.REAGENT2_ARM_WASH
+                        .FwScriptID = FwSCRIPTS_IDS.REAGENT2_ARM_DISP.ToString
+                    Case ADJUSTMENT_GROUPS.MIXER1_ARM_WASH
+                        .FwScriptID = FwSCRIPTS_IDS.MIXER1_ARM_DISP.ToString
+                    Case ADJUSTMENT_GROUPS.MIXER2_ARM_WASH
+                        .FwScriptID = FwSCRIPTS_IDS.MIXER2_ARM_DISP.ToString
+                End Select
+                .EvaluateType = EVALUATE_TYPES.NUM_VALUE
+                .EvaluateValue = 1
+                .NextOnResultOK = Nothing
+                .NextOnResultNG = Nothing
+                .NextOnTimeOut = Nothing
+                .NextOnError = Nothing
+                ' expects 1 param
+                .ParamList = New List(Of String)
+                .ParamList.Add(Me.pArmABSMovPolarAttr)
+            End With
+            ' XBC 18/04/2012 - Z aproximation is anuled
+
+            'add to the queue list
+            If myListFwScript.Count > 0 Then
+                For i As Integer = 0 To myListFwScript.Count - 1
+                    If i = 0 Then
+                        ' First Script
+                        If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myListFwScript(i), True)
+                    Else
+                        If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myListFwScript(i), False)
+                    End If
+                Next
+                If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript0, False) ' XBC 28/03/2012 - Add previous movement to security fly position
+                If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, False)
+            Else
+                If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript0, True) ' XBC 28/03/2012 - Add previous movement to security fly position
+                If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, False)
+            End If
+            Return myResultData
+        End Function
+
+        Private Function GetDispensationArmScripts(ByVal pAdjustment As ADJUSTMENT_GROUPS, ByVal myResultData As GlobalDataTO, ByVal myListFwScript As List(Of FwScriptQueueItem), ByVal myFwScript0 As FwScriptQueueItem, ByVal myFwScript1 As FwScriptQueueItem) As GlobalDataTO
+
+            ' XBC 28/03/2012 - Add previous movement to security fly position
+            With myFwScript0
+                .EvaluateType = EVALUATE_TYPES.NUM_VALUE
+                .EvaluateValue = 1
+                .NextOnResultOK = myFwScript1
+                .NextOnResultNG = Nothing
+                .NextOnTimeOut = myFwScript1
+                .NextOnError = Nothing
+
+                Select Case pAdjustment
+                    Case ADJUSTMENT_GROUPS.SAMPLES_ARM_DISP1, _
+                        ADJUSTMENT_GROUPS.SAMPLES_ARM_DISP2
+                        ' sample arm Move Z to security fly
+                        .FwScriptID = FwSCRIPTS_IDS.SAMPLE_ARM_ABS_Z.ToString
+                        ' expects 1 param
+                        .ParamList = New List(Of String)
+                        .ParamList.Add(Me.pSampleSecurityFlyAttr)
+
+                    Case ADJUSTMENT_GROUPS.REAGENT1_ARM_DISP1
+                        ' reagent1 arm Move Z to security fly
+                        .FwScriptID = FwSCRIPTS_IDS.REAGENT1_ARM_ABS_Z.ToString
+                        ' expects 1 param
+                        .ParamList = New List(Of String)
+                        .ParamList.Add(Me.pReagent1SecurityFlyAttr)
+
+                    Case ADJUSTMENT_GROUPS.REAGENT2_ARM_DISP1
+                        ' reagent2 arm Move Z to security fly
+                        .FwScriptID = FwSCRIPTS_IDS.REAGENT2_ARM_ABS_Z.ToString
+                        ' expects 1 param
+                        .ParamList = New List(Of String)
+                        .ParamList.Add(Me.pReagent2SecurityFlyAttr)
+
+                    Case ADJUSTMENT_GROUPS.MIXER1_ARM_DISP1
+                        ' mixer1 arm Move Z to security fly
+                        .FwScriptID = FwSCRIPTS_IDS.MIXER1_ARM_ABS_Z.ToString
+                        ' expects 1 param
+                        .ParamList = New List(Of String)
+                        .ParamList.Add(Me.pMixer1SecurityFlyAttr)
+
+                    Case ADJUSTMENT_GROUPS.MIXER2_ARM_DISP1
+                        ' mixer2 arm Move Z to security fly
+                        .FwScriptID = FwSCRIPTS_IDS.MIXER2_ARM_ABS_Z.ToString
+                        ' expects 1 param
+                        .ParamList = New List(Of String)
+                        .ParamList.Add(Me.pMixer2SecurityFlyAttr)
+                End Select
+
+            End With
+            ' XBC 28/03/2012 - Add previous movement to security fly position
+
+
+
+            ' Mov ABS Polar
+            ' Absolute positioning of the sample arm axis to last adjustment position
+            With myFwScript1
+                Select Case pAdjustment
+                    Case ADJUSTMENT_GROUPS.SAMPLES_ARM_DISP1, _
+                        ADJUSTMENT_GROUPS.SAMPLES_ARM_DISP2
+                        .FwScriptID = FwSCRIPTS_IDS.SAMPLE_ARM_DISP.ToString
+                    Case ADJUSTMENT_GROUPS.REAGENT1_ARM_DISP1
+                        .FwScriptID = FwSCRIPTS_IDS.REAGENT1_ARM_DISP.ToString
+                    Case ADJUSTMENT_GROUPS.REAGENT2_ARM_DISP1
+                        .FwScriptID = FwSCRIPTS_IDS.REAGENT2_ARM_DISP.ToString
+                    Case ADJUSTMENT_GROUPS.MIXER1_ARM_DISP1
+                        .FwScriptID = FwSCRIPTS_IDS.MIXER1_ARM_DISP.ToString
+                    Case ADJUSTMENT_GROUPS.MIXER2_ARM_DISP1
+                        .FwScriptID = FwSCRIPTS_IDS.MIXER2_ARM_DISP.ToString
+                End Select
+                .EvaluateType = EVALUATE_TYPES.NUM_VALUE
+                .EvaluateValue = 1
+                .NextOnResultOK = Nothing   ' XBC 18/04/2012 - Z aproximation is anuled
+                .NextOnResultNG = Nothing
+                .NextOnTimeOut = Nothing    ' XBC 18/04/2012 - Z aproximation is anuled
+                .NextOnError = Nothing
+                ' expects 1 param
+                .ParamList = New List(Of String)
+                .ParamList.Add(Me.pArmABSMovPolarAttr)
+            End With
+
+            'add to the queue list
+            If myListFwScript.Count > 0 Then
+                For i As Integer = 0 To myListFwScript.Count - 1
+                    If i = 0 Then
+                        ' First Script
+                        If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myListFwScript(i), True)
+                    Else
+                        If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myListFwScript(i), False)
+                    End If
+                Next
+                If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript0, False) ' XBC 28/03/2012 - Add previous movement to security fly position
+                If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, False)
+                'If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript2, False) ' XBC 18/04/2012 - Z aproximation is anuled
+            Else
+                If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript0, True) ' XBC 28/03/2012 - Add previous movement to security fly position
+                If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, False)
+                'If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript2, False) ' XBC 18/04/2012 - Z aproximation is anuled
+            End If
+            Return myResultData
+        End Function
+
+        Private Function GetWashingStationScripts(ByVal myResultData As GlobalDataTO, ByVal myListFwScript As List(Of FwScriptQueueItem)) As GlobalDataTO
+
+            'add to the queue list
+            If myListFwScript.Count > 0 Then
+                For i As Integer = 0 To myListFwScript.Count - 1
+                    If i = 0 Then
+                        ' First Script
+                        If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myListFwScript(i), True)
+                    Else
+                        If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myListFwScript(i), False)
+                    End If
+                Next
+                'If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript0, False) ' XBC 18/04/2012 - Z aproximation is anuled
+            Else
+                ' XBC 18/04/2012 - Z aproximation is anuled
+                'If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript0, True)  
+                MyClass.NoneInstructionToSend = False
+                MyClass.WSAdjustPreparedAttr = True
+                ' XBC 18/04/2012 - Z aproximation is anuled
+            End If
+            Return myResultData
+        End Function
+
+        Private Function GetPhotometryScripts(ByVal myResultData As GlobalDataTO, ByVal myListFwScript As List(Of FwScriptQueueItem), ByVal myFwScript0 As FwScriptQueueItem, ByVal myFwScript1 As FwScriptQueueItem) As GlobalDataTO
+
+            'AG 01/10/2014 - BA-1953 'After home move abs to the current value of adjustment GFWR1
+            With myFwScript0
+                .FwScriptID = FwSCRIPTS_IDS.REACTIONS_ABS_ROTOR.ToString   ' REACTIONS_REL_ROTOR
+                .EvaluateType = EVALUATE_TYPES.NUM_VALUE
+                .EvaluateValue = 1
+                .NextOnResultOK = myFwScript1
+                .NextOnResultNG = Nothing
+                .NextOnTimeOut = myFwScript1
+                .NextOnError = Nothing
+                ' expects 1 param
+                .ParamList = New List(Of String)
+                .ParamList.Add(Me.pValueAdjustAttr)
+            End With
+
+            'With myFwScript0
+            'AG 01/10/2014 - BA-1953
+
+            ' Relative movement to place close the wall between 5-6
+            With myFwScript1
+                .FwScriptID = FwSCRIPTS_IDS.REACTIONS_REL_ROTOR_2SECONDS.ToString   ' REACTIONS_REL_ROTOR
+                .EvaluateType = EVALUATE_TYPES.NUM_VALUE
+                .EvaluateValue = 1
+                .NextOnResultOK = Nothing
+                .NextOnResultNG = Nothing
+                .NextOnTimeOut = Nothing
+                .NextOnError = Nothing
+                ' expects 1 param
+                .ParamList = New List(Of String)
+                .ParamList.Add("360")
+            End With
+
+            If myListFwScript.Count > 0 Then
+                For i As Integer = 0 To myListFwScript.Count - 1
+                    If i = 0 Then
+                        ' First Script
+                        If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myListFwScript(i), True)
+                    Else
+                        If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myListFwScript(i), False)
+                    End If
+                Next
+                If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript0, False)
+                If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, False) 'AG 01/10/2014 - BA-1953
+            Else
+                If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript0, True)
+                If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, False) 'AG 01/10/2014 - BA-1953
+            End If
+
+            ' XBC 04/01/2012 - Add Encoder functionality
+
+
+            ' XBC 09/05/2012
+            myFwScriptDelegate.INFOManagementEnabled = False
             Return myResultData
         End Function
 
