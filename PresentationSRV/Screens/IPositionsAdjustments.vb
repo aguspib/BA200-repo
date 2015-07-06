@@ -1610,10 +1610,10 @@ Public Class UiPositionsAdjustments
 
             Return Table
 
-        Catch ex As Exception
-            Return Nothing
+        Catch ex As Exception            
             GlobalBase.CreateLogActivity(ex.Message, Name & ".CreateChartDataCounts", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Name & ".CreateChartDataCounts", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            Return Nothing
         End Try
     End Function
 
