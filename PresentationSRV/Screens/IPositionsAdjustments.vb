@@ -171,7 +171,6 @@ Public Class UiPositionsAdjustments
 
 #Region "Variables"
     Private WizardMode As Boolean
-    'Private ChangedValue As Boolean
     Private ManageTabArms As Boolean
     Private ManageTabPages As Boolean
     ' XBC 07/12/2011
@@ -283,11 +282,9 @@ Public Class UiPositionsAdjustments
     Private Property AllHomesAreDone() As Boolean
         Get
             If myScreenDelegate IsNot Nothing Then
-                Dim myGlobal As New GlobalDataTO
-                myGlobal = myScreenDelegate.GetPendingPreliminaryHomes(Me.SelectedAdjustmentGroup)
+                Dim myGlobal = myScreenDelegate.GetPendingPreliminaryHomes(SelectedAdjustmentGroup)
                 If Not myGlobal.HasError And myGlobal IsNot Nothing Then
-                    Dim myPendingList As New List(Of SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow)
-                    myPendingList = CType(myGlobal.SetDatos, List(Of SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow))
+                    Dim myPendingList = CType(myGlobal.SetDatos, List(Of SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow))
                     AllHomesAreDoneAttr = (myPendingList.Count = 0)
                 Else
                     AllHomesAreDoneAttr = False
@@ -346,7 +343,6 @@ Public Class UiPositionsAdjustments
 
 #Region "Enumerations"
     Private Enum ADJUSTMENT_ARMS
-        NONE
         SAMPLE
         REAGENT1
         REAGENT2
@@ -422,11 +418,8 @@ Public Class UiPositionsAdjustments
             Select Case MyBase.CurrentMode
                 Case ADJUSTMENT_MODES.ADJUSTMENTS_READED
                     If pResponse = RESPONSE_TYPES.OK Then
-
                         MyBase.DisplayMessage(Messages.SRV_ADJUSTMENTS_READED.ToString)
-
                         Application.DoEvents()
-
                         myGlobal = InitializeHomes() 'SGM 04/02/11
                         If Not myGlobal.HasError Then
                             PrepareArea()
@@ -444,7 +437,6 @@ Public Class UiPositionsAdjustments
 
                 Case ADJUSTMENT_MODES.HOME_FINISHED
                     If pResponse = RESPONSE_TYPES.OK Then
-
                         myGlobal = myScreenDelegate.SetPreliminaryHomesAsDone(ADJUSTMENT_GROUPS.INTERNAL_TANKS)
                         If Not myGlobal.HasError Then
                             Me.AllHomesAreDone = True
@@ -462,20 +454,13 @@ Public Class UiPositionsAdjustments
                     If pResponse = RESPONSE_TYPES.OK Then
                         If Not Me.AllHomesAreDone Then
                             If MyBase.SimulationMode Then
-
                                 MyBase.myServiceMDI.Focus()
-                                'MyBase.DisplaySimulationMessage("Pending Homes in progress...")
-
                                 Me.Cursor = Cursors.WaitCursor
                                 Thread.Sleep(SimulationProcessTime)
                                 MyBase.myServiceMDI.Focus()
                                 Me.Cursor = Cursors.Default
-
                                 MyBase.myServiceMDI.Focus()
-                                'MyBase.DisplaySimulationMessage("Pending Homes in completed")
-
                                 Me.AllHomesAreDone = True
-
                             Else
                                 ' homes are done for current adjust
                                 myGlobal = myScreenDelegate.SetPreliminaryHomesAsDone(Me.SelectedAdjustmentGroup)
@@ -485,15 +470,11 @@ Public Class UiPositionsAdjustments
                                     PrepareErrorMode()
                                     Exit Function
                                 End If
-
                             End If
-
                             MyBase.DisplayMessage(Messages.SRV_HOMES_FINISHED.ToString, Messages.SRV_ADJUSTMENTS_READY.ToString)
-
                         Else
                             MyBase.DisplayMessage(Messages.SRV_ADJUSTMENTS_READY.ToString)
                         End If
-
                         PrepareArea()
                     End If
 
@@ -504,14 +485,12 @@ Public Class UiPositionsAdjustments
                         PrepareErrorMode()
                     End If
 
-
                 Case ADJUSTMENT_MODES.ABSORBANCE_PREPARED
                     If pResponse = RESPONSE_TYPES.OK Then
                         PrepareArea()
                     Else
                         PrepareErrorMode()
                     End If
-
 
                 Case ADJUSTMENT_MODES.ADJUSTED
                     If pResponse = RESPONSE_TYPES.OK Then
@@ -537,7 +516,6 @@ Public Class UiPositionsAdjustments
                             End If
 
                         End If
-
                         PrepareArea()
                     End If
 
@@ -545,20 +523,13 @@ Public Class UiPositionsAdjustments
                     If pResponse = RESPONSE_TYPES.OK Then
                         If Not Me.AllHomesAreDone Then
                             If MyBase.SimulationMode Then
-
                                 MyBase.myServiceMDI.Focus()
-                                'MyBase.DisplaySimulationMessage("Pending Homes in progress...")
-
                                 Me.Cursor = Cursors.WaitCursor
                                 Thread.Sleep(SimulationProcessTime)
                                 MyBase.myServiceMDI.Focus()
                                 Me.Cursor = Cursors.Default
-
                                 MyBase.myServiceMDI.Focus()
-                                'MyBase.DisplaySimulationMessage("Pending Homes in completed")
-
                                 Me.AllHomesAreDone = True
-
                             Else
                                 ' homes are done for current adjust
                                 myGlobal = myScreenDelegate.SetPreliminaryHomesAsDone(Me.SelectedAdjustmentGroup)
@@ -568,16 +539,11 @@ Public Class UiPositionsAdjustments
                                     PrepareErrorMode()
                                     Exit Function
                                 End If
-
                             End If
-
                             MyBase.DisplayMessage(Messages.SRV_HOMES_FINISHED.ToString, Messages.SRV_TEST_COMPLETED.ToString)
-
                         Else
                             MyBase.DisplayMessage(Messages.SRV_TEST_COMPLETED.ToString)
                         End If
-
-                        'MyBase.DisplayMessage(Messages.SRV_TEST_COMPLETED.ToString)
                         PrepareArea()
                     End If
 
@@ -615,7 +581,6 @@ Public Class UiPositionsAdjustments
                     PrepareErrorMode()
             End Select
 
-
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ScreenReceptionLastFwScriptEvent ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ScreenReceptionLastFwScriptEvent", Messages.SYSTEM_ERROR.ToString, myGlobal.ErrorMessage, Me)
@@ -639,10 +604,8 @@ Public Class UiPositionsAdjustments
         'Dim myGlobal As New GlobalDataTO
         Try
             myScreenDelegate.RefreshDelegate(pRefreshEventType, pRefreshDS)
-
             'if needed manage the event in the Base Form
             MyBase.OnReceptionLastFwScriptEvent(RESPONSE_TYPES.OK, Nothing)
-
             PrepareArea()
 
         Catch ex As Exception
@@ -671,8 +634,6 @@ Public Class UiPositionsAdjustments
 
             'report results to history 
             Me.ReportHistoryError()
-
-            ' XBC 21/05/2012
             Me.IsCenteringOptic = False
 
         Catch ex As Exception
@@ -706,10 +667,8 @@ Public Class UiPositionsAdjustments
                             Me.BsOpticStopButton.Visible = False
                             Me.IsReadingCountsAbortedByUser = True
 
-                        Case ADJUSTMENT_PAGES.WASHING_STATION
-                            ' No additional treatment to do
-
-                        Case ADJUSTMENT_PAGES.ARM_POSITIONS
+                        Case ADJUSTMENT_PAGES.WASHING_STATION, _
+                            ADJUSTMENT_PAGES.ARM_POSITIONS
                             ' No additional treatment to do
 
                     End Select
@@ -722,19 +681,16 @@ Public Class UiPositionsAdjustments
 
                 Case ADJUSTMENT_MODES.ADJUSTING
 
-                    Select Case Me.SelectedPage
-                        Case ADJUSTMENT_PAGES.OPTIC_CENTERING, ADJUSTMENT_PAGES.WASHING_STATION
-                            Me.BsSaveButton.Enabled = False
-
-                        Case ADJUSTMENT_PAGES.ARM_POSITIONS
+                    Select Case SelectedPage
+                        Case ADJUSTMENT_PAGES.OPTIC_CENTERING, _
+                            ADJUSTMENT_PAGES.WASHING_STATION,
+                            ADJUSTMENT_PAGES.ARM_POSITIONS
                             Me.BsSaveButton.Enabled = False
 
                     End Select
 
-                Case ADJUSTMENT_MODES.ADJUST_EXITING
-                    ' No additional treatment to do
-
-                Case ADJUSTMENT_MODES.TESTING
+                Case ADJUSTMENT_MODES.ADJUST_EXITING, _
+                    ADJUSTMENT_MODES.TESTING
                     ' No additional treatment to do
 
                 Case ADJUSTMENT_MODES.TEST_EXITING
@@ -754,13 +710,10 @@ Public Class UiPositionsAdjustments
                             Me.BsGridMixer2.NameColumnButton2ByRow(Me.SelectedRow) = myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SRV_TEST", currentLanguage)
                     End Select
 
-                Case ADJUSTMENT_MODES.SAVING
-                    ' No additional treatment to do
-
-                Case ADJUSTMENT_MODES.STIRRER_TEST, ADJUSTMENT_MODES.STIRRER_TESTING
-                    ' No additional treatment to do
-
-                Case ADJUSTMENT_MODES.PARKING
+                Case ADJUSTMENT_MODES.SAVING, _
+                    ADJUSTMENT_MODES.STIRRER_TEST, _
+                    ADJUSTMENT_MODES.STIRRER_TESTING, _
+                    ADJUSTMENT_MODES.PARKING
                     ' No additional treatment to do
 
             End Select
@@ -783,10 +736,6 @@ Public Class UiPositionsAdjustments
 #Region "Private Methods"
 
 #Region "Arms Position Private Methods"
-
-
-
-
     ''' <summary>
     ''' Determines the layout of the Arms Positions Grids
     ''' </summary>
@@ -914,54 +863,44 @@ Public Class UiPositionsAdjustments
 
             Select Case SelectedArmTab
                 Case ADJUSTMENT_ARMS.SAMPLE
-                    If Not Me.BsGridSample Is Nothing Then
-                        If Me.BsGridSample.RowsCount > 0 Then
-                            For i As Integer = 0 To Me.BsGridSample.RowsCount - 1
-                                If Me.BsGridSample.EnableButton2(i) <> pValue Then
-                                    ActivateCheckButton(i, pValue)
-                                End If
-                            Next
-                        End If
+                    If Not Me.BsGridSample Is Nothing AndAlso Me.BsGridSample.RowsCount > 0 Then
+                        For i As Integer = 0 To Me.BsGridSample.RowsCount - 1
+                            If Me.BsGridSample.EnableButton2(i) <> pValue Then
+                                ActivateCheckButton(i, pValue)
+                            End If
+                        Next
                     End If
                 Case ADJUSTMENT_ARMS.REAGENT1
-                    If Not Me.BsGridReagent1 Is Nothing Then
-                        If Me.BsGridReagent1.RowsCount > 0 Then
-                            For i As Integer = 0 To Me.BsGridReagent1.RowsCount - 1
-                                If Me.BsGridReagent1.EnableButton2(i) <> pValue Then
-                                    ActivateCheckButton(i, pValue)
-                                End If
-                            Next
-                        End If
+                    If Not Me.BsGridReagent1 Is Nothing AndAlso Me.BsGridReagent1.RowsCount > 0 Then
+                        For i As Integer = 0 To Me.BsGridReagent1.RowsCount - 1
+                            If Me.BsGridReagent1.EnableButton2(i) <> pValue Then
+                                ActivateCheckButton(i, pValue)
+                            End If
+                        Next
                     End If
                 Case ADJUSTMENT_ARMS.REAGENT2
-                    If Not Me.BsGridReagent2 Is Nothing Then
-                        If Me.BsGridReagent2.RowsCount > 0 Then
-                            For i As Integer = 0 To Me.BsGridReagent2.RowsCount - 1
-                                If Me.BsGridReagent2.EnableButton2(i) <> pValue Then
-                                    ActivateCheckButton(i, pValue)
-                                End If
-                            Next
-                        End If
+                    If Not Me.BsGridReagent2 Is Nothing AndAlso Me.BsGridReagent2.RowsCount > 0 Then
+                        For i As Integer = 0 To Me.BsGridReagent2.RowsCount - 1
+                            If Me.BsGridReagent2.EnableButton2(i) <> pValue Then
+                                ActivateCheckButton(i, pValue)
+                            End If
+                        Next
                     End If
                 Case ADJUSTMENT_ARMS.MIXER1
-                    If Not Me.BsGridMixer1 Is Nothing Then
-                        If Me.BsGridMixer1.RowsCount > 0 Then
-                            For i As Integer = 0 To Me.BsGridMixer1.RowsCount - 1
-                                If Me.BsGridMixer1.EnableButton2(i) <> pValue Then
-                                    ActivateCheckButton(i, pValue)
-                                End If
-                            Next
-                        End If
+                    If Not Me.BsGridMixer1 Is Nothing AndAlso Me.BsGridMixer1.RowsCount > 0 Then
+                        For i As Integer = 0 To Me.BsGridMixer1.RowsCount - 1
+                            If Me.BsGridMixer1.EnableButton2(i) <> pValue Then
+                                ActivateCheckButton(i, pValue)
+                            End If
+                        Next
                     End If
                 Case ADJUSTMENT_ARMS.MIXER2
-                    If Not Me.BsGridMixer2 Is Nothing Then
-                        If Me.BsGridMixer2.RowsCount > 0 Then
-                            For i As Integer = 0 To Me.BsGridMixer2.RowsCount - 1
-                                If Me.BsGridMixer2.EnableButton2(i) <> pValue Then
-                                    ActivateCheckButton(i, pValue)
-                                End If
-                            Next
-                        End If
+                    If Not Me.BsGridMixer2 Is Nothing AndAlso Me.BsGridMixer2.RowsCount > 0 Then
+                        For i As Integer = 0 To Me.BsGridMixer2.RowsCount - 1
+                            If Me.BsGridMixer2.EnableButton2(i) <> pValue Then
+                                ActivateCheckButton(i, pValue)
+                            End If
+                        Next
                     End If
             End Select
             'End Select
@@ -1169,10 +1108,6 @@ Public Class UiPositionsAdjustments
                             ' Specified for Z REFERENCE
                             ActivateCheckButton(i, False)
 
-                            'ElseIf i = ZTUBE_SAMPLE_ROW Then
-                            '    ' XBC 13/10/2011 by now Z-Tube is not able to configure by user
-                            '    'ActivateCheckButton(i, False)
-
                         ElseIf i = ISE_SAMPLE_ROW Then
                             ' XBC 28/03/2012
                             If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEModuleInstalled Then '#REFACTORING
@@ -1181,8 +1116,6 @@ Public Class UiPositionsAdjustments
                             Else
                                 ActivateCheckButton(i, True)
                             End If
-                            ' XBC 28/03/2012
-
                         Else
                             ActivateCheckButton(i, True)
                         End If
@@ -1403,7 +1336,6 @@ Public Class UiPositionsAdjustments
                 End If
 
                 pButton.Image = myNewImage
-                'pButton.BackgroundImageLayout = ImageLayout.Center
             End If
 
         Catch ex As Exception
@@ -1493,10 +1425,6 @@ Public Class UiPositionsAdjustments
             MyBase.ActivateMDIMenusButtons(True) 'SGM 28/09/2011
 
             ' XBC 16/11/2011
-            ' XBC 13/10/2011
-            'If Not Me.BsAdjustPolar.Enabled And Not Me.BsAdjustZ.Enabled Then
-            '    Me.PrepareLoadedMode()
-            'End If
             If Not Me.BsAdjustPolar.Enabled And Not Me.BsAdjustZ.Enabled And Not Me.IsWaitingExitTest Then
                 Me.PrepareLoadedMode()
             ElseIf Me.IsWaitingExitTest Then
@@ -1525,41 +1453,9 @@ Public Class UiPositionsAdjustments
     Private Sub DrawAbsorbanceChart()
         Try
             If Me.AbsorbanceData IsNot Nothing AndAlso Me.AbsorbanceData.Count > 0 Then
-
-                ' XBC 02/01/2012 - Add Encoder functionality
-                ' Configure Ranges
-                ' X Axis
-                ' XBC 02/01/2012 - Add Encoder functionality
-                'If MyBase.SimulationMode Then
-                '    CType(Me.AbsorbanceChart.Diagram, SwiftPlotDiagram).AxisY.Range.MinValue = 0
-                '    CType(Me.AbsorbanceChart.Diagram, SwiftPlotDiagram).AxisY.Range.MaxValue = (AbsorbanceData.Max * 100000) + 200000
-                'Else
-                '    CType(Me.AbsorbanceChart.Diagram, SwiftPlotDiagram).AxisY.Range.MinValue = 0
-                '    CType(Me.AbsorbanceChart.Diagram, SwiftPlotDiagram).AxisY.Range.MaxValue = AbsorbanceData.Max + 200000
-                'End If
-
-                'Dim i As Integer = 1
-                'For Each A As Single In AbsorbanceData
-                '    If MyBase.SimulationMode Then
-                '        AbsorbanceChart.Series(0).Points.Add(New SeriesPoint(i, A * 100000))
-                '    Else
-                '        AbsorbanceChart.Series(0).Points.Add(New SeriesPoint(i, A))
-                '    End If
-                '    i = i + 1
-                'Next
-
                 ' Initializations
                 EncoderTransitions = New List(Of Single)
                 CenterDistances = New List(Of Single)
-
-                ''SGM 05/12/2012 - reset wells positions 
-                'WellCenters = New List(Of Single)
-                'WellCenters.Add(40)
-                'WellCenters.Add(120)
-                'WellCenters.Add(200)
-                'WellCenters.Add(280)
-                'WellCenters.Add(360)
-                ''end SGM 05/12/2012
 
                 If MyBase.SimulationMode Then
                     CType(Me.AbsorbanceChart.Diagram, XYDiagram).AxisY.WholeRange.MinValue = 0
@@ -1655,11 +1551,6 @@ Public Class UiPositionsAdjustments
                         Exit For
                     End If
                 Next
-
-                'For i As Integer = 0 To EncoderTransitions.Count - 1
-                '    value = WellCenters(i) - EncoderTransitions(i)
-                '    CenterDistances.Add(value)
-                'Next
 
                 meanValue = CInt(CenterDistances.Average) ' round final average
                 Me.BsEncoderAdjustmentLabel.Text = meanValue.ToString
@@ -9214,32 +9105,11 @@ Public Class UiPositionsAdjustments
                 MyBase.CurrentMode = ADJUSTMENT_MODES.STIRRER_TESTING
 
                 If MyBase.SimulationMode Then
-                    'MyBase.DisplaySimulationMessage("Stop Testing mixer...")
                     Thread.Sleep(MyBase.SimulationProcessTime)
 
                     ' XBC 13/10/2011
                     Me.PrepareStirrerTestedMode()
 
-
-                    'Me.IsStirrerTesting = False
-                    ''MyBase.CurrentMode = ADJUSTMENT_MODES.LOADED
-                    'If Not Me.BsAdjustPolar.Enabled And Not Me.BsAdjustZ.Enabled Then
-                    '    MyBase.CurrentMode = ADJUSTMENT_MODES.LOADED
-                    'Else
-                    '    Me.PrepareStirrerTestedMode()
-                    'End If
-
-                    'Me.PrepareArea()
-                    ''me.CurrentModeWhileMixerTest = ADJUSTMENT_MODES._NONE
-
-                    'Select Case Me.SelectedArmTab
-                    '    Case ADJUSTMENT_ARMS.MIXER1
-                    '        Me.PrepareStirrerButton(Me.BsStirrer1Button)
-                    '    Case ADJUSTMENT_ARMS.MIXER2
-                    '        Me.PrepareStirrerButton(Me.BsStirrer2Button)
-                    'End Select
-
-                    'MyBase.DisplayMessage(Messages.SRV_MIXER_TESTED.ToString)
                 Else
 
                     Select Case Me.SelectedArmTab
@@ -9633,18 +9503,14 @@ Public Class UiPositionsAdjustments
     Private Sub BsAdjustOptic_SetRELPointReleased(ByVal sender As Object, ByVal Value As Single) Handles BsAdjustOptic.RelativeSetPointReleased
         Try
             ' XBC 29/10/2012
-            'If MyBase.CurrentMode = ADJUSTMENT_MODES.ADJUSTING Then Exit Sub 'SGM 01/10/2012
             If MyBase.CurrentMode = ADJUSTMENT_MODES.ADJUSTING Or MyBase.CurrentMode = ADJUSTMENT_MODES.ERROR_MODE Then Exit Sub
-            ' XBC 29/10/2012
 
             EditedValue.AxisID = GlobalEnumerates.AXIS.ROTOR
             EditedValue.stepValue = Value
             EditedValue.NewRotorValue = EditedValue.CurrentRotorValue + Value
 
             ' XBC 13/11/2012 - fix enabling control
-            'SGM 14/03/11
             MoveAbsorbanceChartWells(CInt(Value))
-            ' XBC 13/11/2012
 
             If MyBase.SimulationMode Then
                 Me.SimulateRELPositioning()
@@ -9657,11 +9523,6 @@ Public Class UiPositionsAdjustments
                 MakeAdjustment(MOVEMENT.RELATIVE)
                 MyBase.DisplayMessage(Messages.SRV_STEP_POSITIONING.ToString)
             End If
-
-            ' XBC 13/11/2012 - fix enabling control
-            ''SGM 14/03/11
-            'MoveAbsorbanceChartWells(CInt(Value))
-            ' XBC 13/11/2012
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsAdjustOptic_SetRELPointReleased ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -10037,13 +9898,9 @@ Public Class UiPositionsAdjustments
                     If pEditionMode Then
                         .AdjustButton.Enabled = False
                         .SaveButton.Enabled = False
-                        '.CancelButton.Enabled = False
                     End If
                 End With
             End If
-
-            'BsTabPagesControl.Enabled = Not pEditionMode
-            'myControl.Focus()
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsAdjustControl_OnEditionMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
