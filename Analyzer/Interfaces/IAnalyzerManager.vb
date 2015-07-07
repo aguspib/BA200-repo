@@ -139,6 +139,7 @@ Namespace Biosystems.Ax00.Core.Interfaces
         ReadOnly Property WashingIDRequired As Boolean
         Property AnalyzerSettings As AnalyzerSettingsDS
         Property AnalyzerSwParameters As ParametersDS
+        Property IsBlExpired As Boolean
 #End Region
 
 #Region "Events definition & methods"
@@ -291,10 +292,10 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Function SimpleTranslateErrorCodeToAlarmId(ByVal pDbConnection As SqlConnection, ByVal errorCode As Integer) As Alarms
 
         'Function ContaminationsSpecification() As IAnalyzerContaminationsSpecification
-
-
         Sub ResetFLIGHT()
-        Sub CreateAndThrowEventUiRefresh()
+
+        Sub CreateAndThrowEventUiRefresh(Optional ByVal _uiRefreshEvent As UI_RefreshEvents = UI_RefreshEvents.NONE)
+        Sub PrepareUINewAlarmType(ByVal _alarm As AlarmEnumerates.Alarms)
         Sub startListenerExpiration()
 
 #End Region

@@ -430,7 +430,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             Dim myGlobal = UpdateAdditionalInfoField(Nothing, pAlarmCode.ToString, pAddInfo)
                         End If
 
-                        If (alarmsWithOKTypeFalse.Contains(pAlarmCode.ToString)) Then
+                        If (alarmsWithOkTypeFalse.Contains(pAlarmCode.ToString)) Then
                             'Exception: BASELINE_WELL_WARN (Change Reactions Rotor recommended). It can appear several times in the same WS but the alarm is generated just once
                             If (pAlarmCode <> AlarmEnumerates.Alarms.BASELINE_WELL_WARN) Then
                                 AddLocalActiveAlarmToList(pAlarmCode, pAlarmList, pAlarmStatusList, pAddInfo, pAdditionalInfoList)

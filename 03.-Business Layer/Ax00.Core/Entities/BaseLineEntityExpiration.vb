@@ -15,7 +15,12 @@ Public Class BaseLineEntityExpiration
     Sub New(analyzer As IAnalyzerManager)
         Me._analyzer = analyzer
     End Sub
-
+    ''' <summary>
+    ''' Property that returns if BL is expired.Calculation based on difference of dates.
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
     Public ReadOnly Property IsBlExpired As Boolean Implements IBaseLineExpiration.IsBlExpired
         Get
             Try
@@ -23,6 +28,8 @@ Public Class BaseLineEntityExpiration
             Catch e As Exception
                 CreateLogActivity(e)
                 Return True
+            Finally
+                _analyzer.IsBlExpired = IsBlExpired
             End Try
         End Get
     End Property

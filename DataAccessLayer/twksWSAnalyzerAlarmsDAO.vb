@@ -27,7 +27,7 @@ Namespace Biosystems.Ax00.DAL.DAO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
 
             Try
-                myGlobalDataTO = DAOBase.GetOpenDBConnection(pDBConnection)
+                myGlobalDataTO = DAOBase.GetOpenDBConnection(Nothing)
                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then

@@ -128,6 +128,7 @@ Namespace Biosystems.Ax00.Core.Entities
         'MR BA-2601 18/06/2015
         Private _myAnalyzerSettingsDs As New AnalyzerSettingsDS
         Private _myParametersDS As New ParametersDS
+        Private _myIsBlExpired As Boolean = False
 
 #End Region
 
@@ -1553,6 +1554,7 @@ Namespace Biosystems.Ax00.Core.Entities
         '    End Set
         'End Property
 
+        'MR New Alarm Type
 
         Public Property AnalyzerSettings As AnalyzerSettingsDS Implements IAnalyzerManager.AnalyzerSettings
             Get
@@ -1569,6 +1571,15 @@ Namespace Biosystems.Ax00.Core.Entities
             End Get
             Set(value As ParametersDS)
                 _myParametersDS = value
+            End Set
+        End Property
+
+        Public Property IsBlExpired As Boolean Implements IAnalyzerManager.IsBlExpired
+            Get
+                Return _myIsBlExpired
+            End Get
+            Set(value As Boolean)
+                _myIsBlExpired = value
             End Set
         End Property
 
@@ -2305,10 +2316,14 @@ Namespace Biosystems.Ax00.Core.Entities
             Return resultData
         End Function
 
+        ''' <summary>
+        ''' Function to get from Database if we have the alarm of BaseLine expired created. Function only needed for the inizialization.
+        ''' </summary>
+        ''' <param name="AnalyzerID"></param>
+        ''' <remarks></remarks>
         Private Sub InitializeNewAlarmType(ByVal AnalyzerID As String)
             Dim connection As TypedGlobalDataTo(Of SqlConnection) = Nothing
             Dim alarmsDelg As New WSAnalyzerAlarmsDelegate
-
 
             Try
 
@@ -3047,17 +3062,38 @@ Namespace Biosystems.Ax00.Core.Entities
             Return myGlobal
         End Function
 
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="_uirefresevent"></param>
+        ''' <remarks></remarks>
+        Public Sub Createandthroweventuirefresh(Optional _uirefresevent As UI_RefreshEvents = UI_RefreshEvents.NONE) Implements IAnalyzerManager.CreateAndThrowEventUiRefresh
+            Dim InstructionReceivedAttribute = ""
 
-
-
-        Public Sub Createandthroweventuirefresh() Implements IAnalyzerManager.Createandthroweventuirefresh
             If myUI_RefreshEvent.Count = 0 Then
                 ClearRefreshDataSets(True, False)
             Else
-                If eventDataPendingToTriggerFlag Then
-                    RaiseEvent ReceptionEvent(InstructionReceivedAttribute, True, myUI_RefreshEvent, myUI_RefreshDS, True)
+                If _uirefresevent <> UI_RefreshEvents.NONE Then
+                    If Not myUI_RefreshEvent.Contains(_uirefresevent) Then
+                        myUI_RefreshEvent.Add(_uirefresevent)
+                    End If
+
+                    If _myIsBlExpired Then
+                        PrepareUINewAlarmType(AlarmEnumerates.Alarms.BASELINE_EXPIRED)
+                    End If
                 End If
+
+                'If eventDataPendingToTriggerFlag Then
+
+                'End If
             End If
+
+            RaiseEvent ReceptionEvent(InstructionReceivedAttribute, False, myUI_RefreshEvent, myUI_RefreshDS, True)
+            RaiseEvent ReceptionEvent(InstructionReceivedAttribute, True, myUI_RefreshEvent, myUI_RefreshDS, True)
+        End Sub
+
+        Public Overridable Sub startListenerExpiration() Implements IAnalyzerManager.startListenerExpiration
+
         End Sub
 
         ''' <summary>
@@ -4368,9 +4404,7 @@ Namespace Biosystems.Ax00.Core.Entities
             validFLIGHTAttribute = False            
         End Sub
 
-        Public Overridable Sub startListenerExpiration() Implements IAnalyzerManager.startListenerExpiration
-
-        End Sub
+        
 #End Region
 
     End Class
