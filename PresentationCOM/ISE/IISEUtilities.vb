@@ -3815,7 +3815,7 @@ Public Class UiISEUtilities
                     resultValue = True
                 Else
 
-                    If MyClass.ValidateAnalyzerReadiness Then
+                    If ValidateAnalyzerReadiness() Then
                         Dim myBlockNode As TreeNode = pNode.Parent
                         If myBlockNode IsNot Nothing Then
 
@@ -4881,8 +4881,8 @@ Public Class UiISEUtilities
                             Else
                                 'ISE COMPLEX ACTION
                                 Me.myISEAction = ISECommands.NONE
-                                If MyClass.ValidateISEAction(MyClass.CurrentActionNode) Then
-                                    MyClass.ExecuteISEAction(MyClass.CurrentActionNode)
+                                If ValidateISEAction(MyClass.CurrentActionNode) Then
+                                    ExecuteISEAction(MyClass.CurrentActionNode)
                                 End If
                             End If
                         End If
