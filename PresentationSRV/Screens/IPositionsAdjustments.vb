@@ -4958,12 +4958,12 @@ Public Class UiPositionsAdjustments
                 If IsBa200() Then
                     '' REAGENT RING1 PEDIATRIC
                     Me.BsGridSample.ParameterCellValue(position, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1.ToString, GlobalEnumerates.AXIS.POLAR).Value
-                    Me.BsGridSample.ParameterCellValue(position, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1R.ToString, GlobalEnumerates.AXIS.Z).Value
+                    Me.BsGridSample.ParameterCellValue(position, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1.ToString, GlobalEnumerates.AXIS.Z).Value
                     Me.BsGridSample.ParameterCellValue(position, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1.ToString, GlobalEnumerates.AXIS.ROTOR).Value
                     position += 1
                     '' REAGENT RING2 PEDIATRIC
                     Me.BsGridSample.ParameterCellValue(position, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING2.ToString, GlobalEnumerates.AXIS.POLAR).Value
-                    Me.BsGridSample.ParameterCellValue(position, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING2R.ToString, GlobalEnumerates.AXIS.Z).Value
+                    Me.BsGridSample.ParameterCellValue(position, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_RING2.ToString, GlobalEnumerates.AXIS.Z).Value
                     Me.BsGridSample.ParameterCellValue(position, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING2.ToString, GlobalEnumerates.AXIS.ROTOR).Value
                 End If
             End If
@@ -6015,18 +6015,12 @@ Public Class UiPositionsAdjustments
 
         Try
             Dim myTemporalAdjustmentsDS As New SRVAdjustmentsDS
-            Dim myNewRow As SRVAdjustmentsDS.srv_tfmwAdjustmentsRow
 
             Dim myR1RVValue As String = "0"
-            Dim myR1SVValue As String = "0"
             Dim myR2RVValue As String = "0"
-            Dim myR2SVValue As String = "0"
             Dim myM1RVValue As String = "0"
-            Dim myM1SVValue As String = "0"
             Dim myA1RVValue As String = "0"
-            Dim myA1SVValue As String = "0"
             Dim myA2RVValue As String = "0"
-            Dim myA2SVValue As String = "0"
             Dim myWSEVValue As String = "0"
 
             ' Takes a copy of the dataset of Adjustments
@@ -6036,397 +6030,44 @@ Public Class UiPositionsAdjustments
             End If
 
             If Not myTemporalAdjustmentsDS Is Nothing Then
-
                 For Each R As SRVAdjustmentsDS.srv_tfmwAdjustmentsRow In myTemporalAdjustmentsDS.srv_tfmwAdjustments.Rows
 
-                    ' 
-                    ' REAGENT 1
-                    ' 
-                    If UCase(R.CodeFw.Trim) = Ax00Adjustsments.R1RV.ToString Then
-                        If IsNumeric(R.Value) Then
-                            myR1RVValue = R.Value
+                    If Not IsBa200() Then
+                        ' REAGENT 1
+                        If UCase(R.CodeFw.Trim) = Ax00Adjustsments.R1RV.ToString Then
+                            SetAdditionalAdjustmentsForReagent1(myTemporalAdjustmentsDS, R, myR1RVValue)
                         End If
-                        ' add R1SV offset
-                        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
-                        With myNewRow
-                            .AnalyzerID = R.AnalyzerID
-                            .FwVersion = R.FwVersion
-                            .GroupID = ADJUSTMENT_GROUPS.REAGENT1_ARM_VSEC.ToString
-                            .CodeFw = Ax00Adjustsments.R1SV.ToString
 
-                            ' XB 12/11/2013
-                            '.Value = (CSng(myR1RVValue) + myScreenDelegate.Reagent1SV_ZOffset).ToString
-                            .Value = myScreenDelegate.Reagent1SV_ZOffset.ToString
-
-                            myR1SVValue = .Value
-                            .AxisID = GlobalEnumerates.AXIS.Z.ToString
-                            .CanSave = True
-                            .CanMove = False
-                            .InFile = True
-                        End With
-                        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
-
-                        ' add R1WVR offset
-                        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
-                        With myNewRow
-                            .AnalyzerID = R.AnalyzerID
-                            .FwVersion = R.FwVersion
-                            .GroupID = ADJUSTMENT_GROUPS.REAGENT1_ARM_WASH.ToString
-                            .CodeFw = Ax00Adjustsments.R1WVR.ToString
-                            .Value = (CSng(myR1RVValue) + myScreenDelegate.Reagent1WVR_ZOffset - CSng(myR1SVValue)).ToString
-                            .AxisID = GlobalEnumerates.AXIS.Z.ToString
-                            .CanSave = True
-                            .CanMove = False
-                            .InFile = True
-                        End With
-                        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
-
-                        ' add R1DV offset
-                        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
-                        With myNewRow
-                            .AnalyzerID = R.AnalyzerID
-                            .FwVersion = R.FwVersion
-                            .GroupID = ADJUSTMENT_GROUPS.REAGENT1_ARM_DISP1.ToString
-                            .CodeFw = Ax00Adjustsments.R1DV.ToString
-                            .Value = (CSng(myR1RVValue) + myScreenDelegate.Reagent1DV_ZOffset).ToString
-                            .AxisID = GlobalEnumerates.AXIS.Z.ToString
-                            .CanSave = True
-                            .CanMove = False
-                            .InFile = True
-                        End With
-                        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
-
-                        ' add R1PI offset
-                        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
-                        With myNewRow
-                            .AnalyzerID = R.AnalyzerID
-                            .FwVersion = R.FwVersion
-                            .GroupID = ADJUSTMENT_GROUPS.REAGENT1_ARM_LEVEL.ToString
-                            .CodeFw = Ax00Adjustsments.R1PI.ToString
-                            .Value = (CSng(myR1RVValue) + myScreenDelegate.Reagent1PI_ZOffset).ToString
-                            .AxisID = GlobalEnumerates.AXIS.Z.ToString
-                            .CanSave = True
-                            .CanMove = False
-                            .InFile = True
-                        End With
-                        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
-                    End If
-
-                    ' 
-                    ' REAGENT 2
-                    ' 
-                    If UCase(R.CodeFw.Trim) = Ax00Adjustsments.R2RV.ToString Then
-                        If IsNumeric(R.Value) Then
-                            myR2RVValue = R.Value
+                        ' REAGENT 2
+                        If UCase(R.CodeFw.Trim) = Ax00Adjustsments.R2RV.ToString Then
+                            SetAdditionalAdjustmentsForReagent2(myTemporalAdjustmentsDS, R, myR2RVValue)
                         End If
-                        ' add R2SV offset
-                        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
-                        With myNewRow
-                            .AnalyzerID = R.AnalyzerID
-                            .FwVersion = R.FwVersion
-                            .GroupID = ADJUSTMENT_GROUPS.REAGENT2_ARM_VSEC.ToString
-                            .CodeFw = Ax00Adjustsments.R2SV.ToString
 
-                            ' XB 12/11/2013
-                            '.Value = (CSng(myR2RVValue) + myScreenDelegate.Reagent2SV_ZOffset).ToString
-                            .Value = myScreenDelegate.Reagent2SV_ZOffset.ToString
-
-                            myR2SVValue = .Value
-                            .AxisID = GlobalEnumerates.AXIS.Z.ToString
-                            .CanSave = True
-                            .CanMove = False
-                            .InFile = True
-                        End With
-                        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
-
-                        ' add R2WVR offset
-                        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
-                        With myNewRow
-                            .AnalyzerID = R.AnalyzerID
-                            .FwVersion = R.FwVersion
-                            .GroupID = ADJUSTMENT_GROUPS.REAGENT2_ARM_WASH.ToString
-                            .CodeFw = Ax00Adjustsments.R2WVR.ToString
-                            .Value = (CSng(myR2RVValue) + myScreenDelegate.Reagent2WVR_ZOffset - CSng(myR2SVValue)).ToString
-                            .AxisID = GlobalEnumerates.AXIS.Z.ToString
-                            .CanSave = True
-                            .CanMove = False
-                            .InFile = True
-                        End With
-                        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
-
-                        ' add R2DV offset
-                        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
-                        With myNewRow
-                            .AnalyzerID = R.AnalyzerID
-                            .FwVersion = R.FwVersion
-                            .GroupID = ADJUSTMENT_GROUPS.REAGENT2_ARM_DISP1.ToString
-                            .CodeFw = Ax00Adjustsments.R2DV.ToString
-                            .Value = (CSng(myR2RVValue) + myScreenDelegate.Reagent2DV_ZOffset).ToString
-                            .AxisID = GlobalEnumerates.AXIS.Z.ToString
-                            .CanSave = True
-                            .CanMove = False
-                            .InFile = True
-                        End With
-                        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
-
-                        ' add R2PI offset
-                        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
-                        With myNewRow
-                            .AnalyzerID = R.AnalyzerID
-                            .FwVersion = R.FwVersion
-                            .GroupID = ADJUSTMENT_GROUPS.REAGENT2_ARM_LEVEL.ToString
-                            .CodeFw = Ax00Adjustsments.R2PI.ToString
-                            .Value = (CSng(myR2RVValue) + myScreenDelegate.Reagent2PI_ZOffset).ToString
-                            .AxisID = GlobalEnumerates.AXIS.Z.ToString
-                            .CanSave = True
-                            .CanMove = False
-                            .InFile = True
-                        End With
-                        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
-
-                    End If
-
-                    '
-                    ' SAMPLES 
-                    '
-                    If UCase(R.CodeFw.Trim) = Ax00Adjustsments.M1RV.ToString Then
-                        If IsNumeric(R.Value) Then
-                            myM1RVValue = R.Value
+                        ' SAMPLES 
+                        If UCase(R.CodeFw.Trim) = Ax00Adjustsments.M1RV.ToString Then
+                            SetAdditionalAdjustmentsForSample(myTemporalAdjustmentsDS, R, myM1RVValue)
                         End If
-                        ' add M1RV offset
-                        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
-                        With myNewRow
-                            .AnalyzerID = R.AnalyzerID
-                            .FwVersion = R.FwVersion
-                            .GroupID = ADJUSTMENT_GROUPS.SAMPLES_ARM_VSECWS.ToString
-                            .CodeFw = Ax00Adjustsments.M1SV.ToString
 
-                            ' XB 12/11/2013
-                            '.Value = (CSng(myM1RVValue) + myScreenDelegate.SampleSV_ZOffset).ToString
-                            .Value = myScreenDelegate.SampleSV_ZOffset.ToString
-
-                            myM1SVValue = .Value
-                            .AxisID = GlobalEnumerates.AXIS.Z.ToString
-                            .CanSave = True
-                            .CanMove = False
-                            .InFile = True
-                        End With
-                        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
-
-                        ' add M1WVR offset
-                        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
-                        With myNewRow
-                            .AnalyzerID = R.AnalyzerID
-                            .FwVersion = R.FwVersion
-                            .GroupID = ADJUSTMENT_GROUPS.SAMPLES_ARM_WASH.ToString
-                            .CodeFw = Ax00Adjustsments.M1WVR.ToString
-                            .Value = (CSng(myM1RVValue) + myScreenDelegate.SampleWVR_ZOffset - CSng(myM1SVValue)).ToString
-                            .AxisID = GlobalEnumerates.AXIS.Z.ToString
-                            .CanSave = True
-                            .CanMove = False
-                            .InFile = True
-                        End With
-                        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
-
-                        ' add M1DV1 offset
-                        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
-                        With myNewRow
-                            .AnalyzerID = R.AnalyzerID
-                            .FwVersion = R.FwVersion
-                            .GroupID = ADJUSTMENT_GROUPS.SAMPLES_ARM_DISP1.ToString
-                            .CodeFw = Ax00Adjustsments.M1DV1.ToString
-                            .Value = (CSng(myM1RVValue) + myScreenDelegate.SampleDV1_ZOffset).ToString
-                            .AxisID = GlobalEnumerates.AXIS.Z.ToString
-                            .CanSave = True
-                            .CanMove = False
-                            .InFile = True
-                        End With
-                        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
-
-                        ' add M1PI offset
-                        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
-                        With myNewRow
-                            .AnalyzerID = R.AnalyzerID
-                            .FwVersion = R.FwVersion
-                            .GroupID = ADJUSTMENT_GROUPS.SAMPLES_ARM_LEVEL_DET.ToString
-                            .CodeFw = Ax00Adjustsments.M1PI.ToString
-                            .Value = (CSng(myM1RVValue) + myScreenDelegate.SamplePI_ZOffset).ToString
-                            .AxisID = GlobalEnumerates.AXIS.Z.ToString
-                            .CanSave = True
-                            .CanMove = False
-                            .InFile = True
-                        End With
-                        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
-
-                        ' add M1RPI offset
-                        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
-                        With myNewRow
-                            .AnalyzerID = R.AnalyzerID
-                            .FwVersion = R.FwVersion
-                            .GroupID = ADJUSTMENT_GROUPS.SAMPLES_ARM_LEVEL_DET.ToString
-                            .CodeFw = Ax00Adjustsments.M1RPI.ToString
-                            .Value = (CSng(myM1RVValue) + myScreenDelegate.SampleRPI_ZOffset).ToString
-                            .AxisID = GlobalEnumerates.AXIS.ROTOR.ToString
-                            .CanSave = True
-                            .CanMove = False
-                            .InFile = True
-                        End With
-                        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
-
-                        ' add M1DV2 offset
-                        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
-                        With myNewRow
-                            .AnalyzerID = R.AnalyzerID
-                            .FwVersion = R.FwVersion
-                            .GroupID = ADJUSTMENT_GROUPS.SAMPLES_ARM_DISP2.ToString
-                            .CodeFw = Ax00Adjustsments.M1DV2.ToString
-                            .Value = (CSng(myM1RVValue) + myScreenDelegate.SampleDV2_ZOffset).ToString
-                            .AxisID = GlobalEnumerates.AXIS.Z.ToString
-                            .CanSave = True
-                            .CanMove = False
-                            .InFile = True
-                        End With
-                        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
-
+                        ' MIXER 2
+                        If UCase(R.CodeFw.Trim) = Ax00Adjustsments.A2RV.ToString Then
+                            SetAdditionalAdjustmentsForMixer2(myTemporalAdjustmentsDS, R, myA2RVValue)
+                        End If
+                    Else
+                        If UCase(R.CodeFw.Trim) = Ax00Adjustsments.R1RV.ToString Then
+                            SetAdditionalAdjustmentsForBa200Arm(myTemporalAdjustmentsDS, R, myR1RVValue)
+                        End If
                     End If
-
-                    ' 
                     ' MIXER 1
-                    ' 
                     If UCase(R.CodeFw.Trim) = Ax00Adjustsments.A1RV.ToString Then
-                        If IsNumeric(R.Value) Then
-                            myA1RVValue = R.Value
-                        End If
-                        ' add A1SV offset
-                        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
-                        With myNewRow
-                            .AnalyzerID = R.AnalyzerID
-                            .FwVersion = R.FwVersion
-                            .GroupID = ADJUSTMENT_GROUPS.MIXER1_ARM_VSEC.ToString
-                            .CodeFw = Ax00Adjustsments.A1SV.ToString
-                            .Value = (CSng(myA1RVValue) + myScreenDelegate.Mixer1SV_ZOffset).ToString
-                            myA1SVValue = .Value
-                            .AxisID = GlobalEnumerates.AXIS.Z.ToString
-                            .CanSave = True
-                            .CanMove = False
-                            .InFile = True
-                        End With
-                        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
-
-                        ' add A1WVR offset
-                        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
-                        With myNewRow
-                            .AnalyzerID = R.AnalyzerID
-                            .FwVersion = R.FwVersion
-                            .GroupID = ADJUSTMENT_GROUPS.MIXER1_ARM_WASH.ToString
-                            .CodeFw = Ax00Adjustsments.A1WVR.ToString
-                            .Value = (CSng(myA1RVValue) + myScreenDelegate.Mixer1WVR_ZOffset - CSng(myA1SVValue)).ToString
-                            .AxisID = GlobalEnumerates.AXIS.Z.ToString
-                            .CanSave = True
-                            .CanMove = False
-                            .InFile = True
-                        End With
-                        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
-
-                        ' add A1DV offset
-                        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
-                        With myNewRow
-                            .AnalyzerID = R.AnalyzerID
-                            .FwVersion = R.FwVersion
-                            .GroupID = ADJUSTMENT_GROUPS.MIXER1_ARM_DISP1.ToString
-                            .CodeFw = Ax00Adjustsments.A1DV.ToString
-                            .Value = (CSng(myA1RVValue) + myScreenDelegate.Mixer1DV_ZOffset).ToString
-                            .AxisID = GlobalEnumerates.AXIS.Z.ToString
-                            .CanSave = True
-                            .CanMove = False
-                            .InFile = True
-                        End With
-                        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
-
+                        SetAdditionalAdjustmentsForMixer1(myTemporalAdjustmentsDS, R, myA1RVValue)
                     End If
 
-                    ' 
-                    ' MIXER 2
-                    ' 
-                    If UCase(R.CodeFw.Trim) = Ax00Adjustsments.A2RV.ToString Then
-                        If IsNumeric(R.Value) Then
-                            myA2RVValue = R.Value
-                        End If
-                        ' add A2SV offset
-                        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
-                        With myNewRow
-                            .AnalyzerID = R.AnalyzerID
-                            .FwVersion = R.FwVersion
-                            .GroupID = ADJUSTMENT_GROUPS.MIXER2_ARM_VSEC.ToString
-                            .CodeFw = Ax00Adjustsments.A2SV.ToString
-                            .Value = (CSng(myA2RVValue) + myScreenDelegate.Mixer2SV_ZOffset).ToString
-                            myA2SVValue = .Value
-                            .AxisID = GlobalEnumerates.AXIS.Z.ToString
-                            .CanSave = True
-                            .CanMove = False
-                            .InFile = True
-                        End With
-                        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
-
-                        ' add A2WVR offset
-                        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
-                        With myNewRow
-                            .AnalyzerID = R.AnalyzerID
-                            .FwVersion = R.FwVersion
-                            .GroupID = ADJUSTMENT_GROUPS.MIXER2_ARM_WASH.ToString
-                            .CodeFw = Ax00Adjustsments.A2WVR.ToString
-                            .Value = (CSng(myA2RVValue) + myScreenDelegate.Mixer2WVR_ZOffset - CSng(myA2SVValue)).ToString
-                            .AxisID = GlobalEnumerates.AXIS.Z.ToString
-                            .CanSave = True
-                            .CanMove = False
-                            .InFile = True
-                        End With
-                        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
-
-                        ' add A2DV offset
-                        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
-                        With myNewRow
-                            .AnalyzerID = R.AnalyzerID
-                            .FwVersion = R.FwVersion
-                            .GroupID = ADJUSTMENT_GROUPS.MIXER2_ARM_DISP1.ToString
-                            .CodeFw = Ax00Adjustsments.A2DV.ToString
-                            .Value = (CSng(myA2RVValue) + myScreenDelegate.Mixer2DV_ZOffset).ToString
-                            .AxisID = GlobalEnumerates.AXIS.Z.ToString
-                            .CanSave = True
-                            .CanMove = False
-                            .InFile = True
-                        End With
-                        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
-                    End If
-
-                    ' 
                     ' WASHING STATION
-                    ' 
                     If UCase(R.CodeFw.Trim) = Ax00Adjustsments.WSEV.ToString Then
-                        If IsNumeric(R.Value) Then
-                            myWSEVValue = R.Value
-                        End If
-                        ' add WSRR offset
-                        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
-                        With myNewRow
-                            .AnalyzerID = R.AnalyzerID
-                            .FwVersion = R.FwVersion
-                            .GroupID = ADJUSTMENT_GROUPS.WASHING_STATION.ToString
-                            .CodeFw = Ax00Adjustsments.WSRR.ToString
-                            .Value = (CSng(myWSEVValue) + myScreenDelegate.WashingStationRR_ZOffset).ToString
-                            .AxisID = GlobalEnumerates.AXIS.REL_Z.ToString
-                            .CanSave = True
-                            .CanMove = False
-                            .InFile = True
-                        End With
-                        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
+                        SetAdditionalAdjustmentsForWaqshingStation(myTemporalAdjustmentsDS, R, myWSEVValue)
                     End If
-
-
                 Next
-
             End If
-
         Catch ex As Exception
             myGlobal.HasError = True
             myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
@@ -6436,6 +6077,455 @@ Public Class UiPositionsAdjustments
         End Try
         Return myGlobal
     End Function
+
+    Private Sub SetAdditionalAdjustmentsForWaqshingStation(ByVal myTemporalAdjustmentsDS As SRVAdjustmentsDS, ByVal R As SRVAdjustmentsDS.srv_tfmwAdjustmentsRow, ByVal myWSEVValue As String)
+        Dim myNewRow As SRVAdjustmentsDS.srv_tfmwAdjustmentsRow
+
+        If IsNumeric(R.Value) Then
+            myWSEVValue = R.Value
+        End If
+        ' add WSRR offset
+        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
+        With myNewRow
+            .AnalyzerID = R.AnalyzerID
+            .FwVersion = R.FwVersion
+            .GroupID = ADJUSTMENT_GROUPS.WASHING_STATION.ToString
+            .CodeFw = Ax00Adjustsments.WSRR.ToString
+            .Value = (CSng(myWSEVValue) + myScreenDelegate.WashingStationRR_ZOffset).ToString
+            .AxisID = GlobalEnumerates.AXIS.REL_Z.ToString
+            .CanSave = True
+            .CanMove = False
+            .InFile = True
+        End With
+        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
+    End Sub
+
+    Private Sub SetAdditionalAdjustmentsForMixer2(ByVal myTemporalAdjustmentsDS As SRVAdjustmentsDS, ByVal R As SRVAdjustmentsDS.srv_tfmwAdjustmentsRow, ByVal myA2RVValue As String)
+        Dim myNewRow As SRVAdjustmentsDS.srv_tfmwAdjustmentsRow
+        Dim myA2SVValue As String
+
+        If IsNumeric(R.Value) Then
+            myA2RVValue = R.Value
+        End If
+        ' add A2SV offset
+        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
+        With myNewRow
+            .AnalyzerID = R.AnalyzerID
+            .FwVersion = R.FwVersion
+            .GroupID = ADJUSTMENT_GROUPS.MIXER2_ARM_VSEC.ToString
+            .CodeFw = Ax00Adjustsments.A2SV.ToString
+            .Value = (CSng(myA2RVValue) + myScreenDelegate.Mixer2SV_ZOffset).ToString
+            myA2SVValue = .Value
+            .AxisID = GlobalEnumerates.AXIS.Z.ToString
+            .CanSave = True
+            .CanMove = False
+            .InFile = True
+        End With
+        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
+
+        ' add A2WVR offset
+        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
+        With myNewRow
+            .AnalyzerID = R.AnalyzerID
+            .FwVersion = R.FwVersion
+            .GroupID = ADJUSTMENT_GROUPS.MIXER2_ARM_WASH.ToString
+            .CodeFw = Ax00Adjustsments.A2WVR.ToString
+            .Value = (CSng(myA2RVValue) + myScreenDelegate.Mixer2WVR_ZOffset - CSng(myA2SVValue)).ToString
+            .AxisID = GlobalEnumerates.AXIS.Z.ToString
+            .CanSave = True
+            .CanMove = False
+            .InFile = True
+        End With
+        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
+
+        ' add A2DV offset
+        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
+        With myNewRow
+            .AnalyzerID = R.AnalyzerID
+            .FwVersion = R.FwVersion
+            .GroupID = ADJUSTMENT_GROUPS.MIXER2_ARM_DISP1.ToString
+            .CodeFw = Ax00Adjustsments.A2DV.ToString
+            .Value = (CSng(myA2RVValue) + myScreenDelegate.Mixer2DV_ZOffset).ToString
+            .AxisID = GlobalEnumerates.AXIS.Z.ToString
+            .CanSave = True
+            .CanMove = False
+            .InFile = True
+        End With
+        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
+    End Sub
+
+    Private Sub SetAdditionalAdjustmentsForMixer1(ByVal myTemporalAdjustmentsDS As SRVAdjustmentsDS, ByVal R As SRVAdjustmentsDS.srv_tfmwAdjustmentsRow, ByVal myA1RVValue As String)
+        Dim myNewRow As SRVAdjustmentsDS.srv_tfmwAdjustmentsRow
+        Dim myA1SVValue As String
+
+        If IsNumeric(R.Value) Then
+            myA1RVValue = R.Value
+        End If
+        ' add A1SV offset
+        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
+        With myNewRow
+            .AnalyzerID = R.AnalyzerID
+            .FwVersion = R.FwVersion
+            .GroupID = ADJUSTMENT_GROUPS.MIXER1_ARM_VSEC.ToString
+            .CodeFw = Ax00Adjustsments.A1SV.ToString
+            .Value = (CSng(myA1RVValue) + myScreenDelegate.Mixer1SV_ZOffset).ToString
+            myA1SVValue = .Value
+            .AxisID = GlobalEnumerates.AXIS.Z.ToString
+            .CanSave = True
+            .CanMove = False
+            .InFile = True
+        End With
+        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
+
+        ' add A1WVR offset
+        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
+        With myNewRow
+            .AnalyzerID = R.AnalyzerID
+            .FwVersion = R.FwVersion
+            .GroupID = ADJUSTMENT_GROUPS.MIXER1_ARM_WASH.ToString
+            .CodeFw = Ax00Adjustsments.A1WVR.ToString
+            .Value = (CSng(myA1RVValue) + myScreenDelegate.Mixer1WVR_ZOffset - CSng(myA1SVValue)).ToString
+            .AxisID = GlobalEnumerates.AXIS.Z.ToString
+            .CanSave = True
+            .CanMove = False
+            .InFile = True
+        End With
+        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
+
+        ' add A1DV offset
+        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
+        With myNewRow
+            .AnalyzerID = R.AnalyzerID
+            .FwVersion = R.FwVersion
+            .GroupID = ADJUSTMENT_GROUPS.MIXER1_ARM_DISP1.ToString
+            .CodeFw = Ax00Adjustsments.A1DV.ToString
+            .Value = (CSng(myA1RVValue) + myScreenDelegate.Mixer1DV_ZOffset).ToString
+            .AxisID = GlobalEnumerates.AXIS.Z.ToString
+            .CanSave = True
+            .CanMove = False
+            .InFile = True
+        End With
+        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
+    End Sub
+
+    Private Sub SetAdditionalAdjustmentsForSample(ByVal myTemporalAdjustmentsDS As SRVAdjustmentsDS, ByVal R As SRVAdjustmentsDS.srv_tfmwAdjustmentsRow, ByVal myM1RVValue As String)
+        Dim myNewRow As SRVAdjustmentsDS.srv_tfmwAdjustmentsRow
+        Dim myM1SVValue As String
+
+        If IsNumeric(R.Value) Then
+            myM1RVValue = R.Value
+        End If
+        ' add M1RV offset
+        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
+        With myNewRow
+            .AnalyzerID = R.AnalyzerID
+            .FwVersion = R.FwVersion
+            .GroupID = ADJUSTMENT_GROUPS.SAMPLES_ARM_VSECWS.ToString
+            .CodeFw = Ax00Adjustsments.M1SV.ToString
+
+            ' XB 12/11/2013
+            .Value = myScreenDelegate.SampleSV_ZOffset.ToString
+
+            myM1SVValue = .Value
+            .AxisID = GlobalEnumerates.AXIS.Z.ToString
+            .CanSave = True
+            .CanMove = False
+            .InFile = True
+        End With
+        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
+
+        ' add M1WVR offset
+        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
+        With myNewRow
+            .AnalyzerID = R.AnalyzerID
+            .FwVersion = R.FwVersion
+            .GroupID = ADJUSTMENT_GROUPS.SAMPLES_ARM_WASH.ToString
+            .CodeFw = Ax00Adjustsments.M1WVR.ToString
+            .Value = (CSng(myM1RVValue) + myScreenDelegate.SampleWVR_ZOffset - CSng(myM1SVValue)).ToString
+            .AxisID = GlobalEnumerates.AXIS.Z.ToString
+            .CanSave = True
+            .CanMove = False
+            .InFile = True
+        End With
+        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
+
+        ' add M1DV1 offset
+        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
+        With myNewRow
+            .AnalyzerID = R.AnalyzerID
+            .FwVersion = R.FwVersion
+            .GroupID = ADJUSTMENT_GROUPS.SAMPLES_ARM_DISP1.ToString
+            .CodeFw = Ax00Adjustsments.M1DV1.ToString
+            .Value = (CSng(myM1RVValue) + myScreenDelegate.SampleDV1_ZOffset).ToString
+            .AxisID = GlobalEnumerates.AXIS.Z.ToString
+            .CanSave = True
+            .CanMove = False
+            .InFile = True
+        End With
+        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
+
+        ' add M1PI offset
+        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
+        With myNewRow
+            .AnalyzerID = R.AnalyzerID
+            .FwVersion = R.FwVersion
+            .GroupID = ADJUSTMENT_GROUPS.SAMPLES_ARM_LEVEL_DET.ToString
+            .CodeFw = Ax00Adjustsments.M1PI.ToString
+            .Value = (CSng(myM1RVValue) + myScreenDelegate.SamplePI_ZOffset).ToString
+            .AxisID = GlobalEnumerates.AXIS.Z.ToString
+            .CanSave = True
+            .CanMove = False
+            .InFile = True
+        End With
+        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
+
+        ' add M1RPI offset
+        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
+        With myNewRow
+            .AnalyzerID = R.AnalyzerID
+            .FwVersion = R.FwVersion
+            .GroupID = ADJUSTMENT_GROUPS.SAMPLES_ARM_LEVEL_DET.ToString
+            .CodeFw = Ax00Adjustsments.M1RPI.ToString
+            .Value = (CSng(myM1RVValue) + myScreenDelegate.SampleRPI_ZOffset).ToString
+            .AxisID = GlobalEnumerates.AXIS.ROTOR.ToString
+            .CanSave = True
+            .CanMove = False
+            .InFile = True
+        End With
+        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
+
+        ' add M1DV2 offset
+        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
+        With myNewRow
+            .AnalyzerID = R.AnalyzerID
+            .FwVersion = R.FwVersion
+            .GroupID = ADJUSTMENT_GROUPS.SAMPLES_ARM_DISP2.ToString
+            .CodeFw = Ax00Adjustsments.M1DV2.ToString
+            .Value = (CSng(myM1RVValue) + myScreenDelegate.SampleDV2_ZOffset).ToString
+            .AxisID = GlobalEnumerates.AXIS.Z.ToString
+            .CanSave = True
+            .CanMove = False
+            .InFile = True
+        End With
+        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
+    End Sub
+
+    Private Sub SetAdditionalAdjustmentsForReagent2(ByVal myTemporalAdjustmentsDS As SRVAdjustmentsDS, ByVal R As SRVAdjustmentsDS.srv_tfmwAdjustmentsRow, ByVal myR2RVValue As String)
+        Dim myNewRow As SRVAdjustmentsDS.srv_tfmwAdjustmentsRow
+        Dim myR2SVValue As String
+
+        If IsNumeric(R.Value) Then
+            myR2RVValue = R.Value
+        End If
+        ' add R2SV offset
+        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
+        With myNewRow
+            .AnalyzerID = R.AnalyzerID
+            .FwVersion = R.FwVersion
+            .GroupID = ADJUSTMENT_GROUPS.REAGENT2_ARM_VSEC.ToString
+            .CodeFw = Ax00Adjustsments.R2SV.ToString
+
+            ' XB 12/11/2013
+            .Value = myScreenDelegate.Reagent2SV_ZOffset.ToString
+
+            myR2SVValue = .Value
+            .AxisID = GlobalEnumerates.AXIS.Z.ToString
+            .CanSave = True
+            .CanMove = False
+            .InFile = True
+        End With
+        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
+
+        ' add R2WVR offset
+        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
+        With myNewRow
+            .AnalyzerID = R.AnalyzerID
+            .FwVersion = R.FwVersion
+            .GroupID = ADJUSTMENT_GROUPS.REAGENT2_ARM_WASH.ToString
+            .CodeFw = Ax00Adjustsments.R2WVR.ToString
+            .Value = (CSng(myR2RVValue) + myScreenDelegate.Reagent2WVR_ZOffset - CSng(myR2SVValue)).ToString
+            .AxisID = GlobalEnumerates.AXIS.Z.ToString
+            .CanSave = True
+            .CanMove = False
+            .InFile = True
+        End With
+        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
+
+        ' add R2DV offset
+        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
+        With myNewRow
+            .AnalyzerID = R.AnalyzerID
+            .FwVersion = R.FwVersion
+            .GroupID = ADJUSTMENT_GROUPS.REAGENT2_ARM_DISP1.ToString
+            .CodeFw = Ax00Adjustsments.R2DV.ToString
+            .Value = (CSng(myR2RVValue) + myScreenDelegate.Reagent2DV_ZOffset).ToString
+            .AxisID = GlobalEnumerates.AXIS.Z.ToString
+            .CanSave = True
+            .CanMove = False
+            .InFile = True
+        End With
+        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
+
+        ' add R2PI offset
+        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
+        With myNewRow
+            .AnalyzerID = R.AnalyzerID
+            .FwVersion = R.FwVersion
+            .GroupID = ADJUSTMENT_GROUPS.REAGENT2_ARM_LEVEL.ToString
+            .CodeFw = Ax00Adjustsments.R2PI.ToString
+            .Value = (CSng(myR2RVValue) + myScreenDelegate.Reagent2PI_ZOffset).ToString
+            .AxisID = GlobalEnumerates.AXIS.Z.ToString
+            .CanSave = True
+            .CanMove = False
+            .InFile = True
+        End With
+        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
+    End Sub
+
+    Private Sub SetAdditionalAdjustmentsForReagent1(ByVal myTemporalAdjustmentsDS As SRVAdjustmentsDS, ByVal R As SRVAdjustmentsDS.srv_tfmwAdjustmentsRow, ByVal myR1RVValue As String)
+        Dim myNewRow As SRVAdjustmentsDS.srv_tfmwAdjustmentsRow
+        Dim myR1SVValue As String
+
+        If IsNumeric(R.Value) Then
+            myR1RVValue = R.Value
+        End If
+        ' add R1SV offset
+        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
+        With myNewRow
+            .AnalyzerID = R.AnalyzerID
+            .FwVersion = R.FwVersion
+            .GroupID = ADJUSTMENT_GROUPS.REAGENT1_ARM_VSEC.ToString
+            .CodeFw = Ax00Adjustsments.R1SV.ToString
+
+            ' XB 12/11/2013
+            .Value = myScreenDelegate.Reagent1SV_ZOffset.ToString
+
+            myR1SVValue = .Value
+            .AxisID = GlobalEnumerates.AXIS.Z.ToString
+            .CanSave = True
+            .CanMove = False
+            .InFile = True
+        End With
+        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
+
+        ' add R1WVR offset
+        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
+        With myNewRow
+            .AnalyzerID = R.AnalyzerID
+            .FwVersion = R.FwVersion
+            .GroupID = ADJUSTMENT_GROUPS.REAGENT1_ARM_WASH.ToString
+            .CodeFw = Ax00Adjustsments.R1WVR.ToString
+            .Value = (CSng(myR1RVValue) + myScreenDelegate.Reagent1WVR_ZOffset - CSng(myR1SVValue)).ToString
+            .AxisID = GlobalEnumerates.AXIS.Z.ToString
+            .CanSave = True
+            .CanMove = False
+            .InFile = True
+        End With
+        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
+
+        ' add R1DV offset
+        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
+        With myNewRow
+            .AnalyzerID = R.AnalyzerID
+            .FwVersion = R.FwVersion
+            .GroupID = ADJUSTMENT_GROUPS.REAGENT1_ARM_DISP1.ToString
+            .CodeFw = Ax00Adjustsments.R1DV.ToString
+            .Value = (CSng(myR1RVValue) + myScreenDelegate.Reagent1DV_ZOffset).ToString
+            .AxisID = GlobalEnumerates.AXIS.Z.ToString
+            .CanSave = True
+            .CanMove = False
+            .InFile = True
+        End With
+        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
+
+        ' add R1PI offset
+        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
+        With myNewRow
+            .AnalyzerID = R.AnalyzerID
+            .FwVersion = R.FwVersion
+            .GroupID = ADJUSTMENT_GROUPS.REAGENT1_ARM_LEVEL.ToString
+            .CodeFw = Ax00Adjustsments.R1PI.ToString
+            .Value = (CSng(myR1RVValue) + myScreenDelegate.Reagent1PI_ZOffset).ToString
+            .AxisID = GlobalEnumerates.AXIS.Z.ToString
+            .CanSave = True
+            .CanMove = False
+            .InFile = True
+        End With
+        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
+
+    End Sub
+
+    Private Sub SetAdditionalAdjustmentsForBa200Arm(ByVal myTemporalAdjustmentsDS As SRVAdjustmentsDS, ByVal R As SRVAdjustmentsDS.srv_tfmwAdjustmentsRow, ByVal myR1RVValue As String)
+
+        SetAdditionalAdjustmentsForReagent1(myTemporalAdjustmentsDS, R, myR1RVValue)
+
+        Dim myNewRow As SRVAdjustmentsDS.srv_tfmwAdjustmentsRow
+
+        If IsNumeric(R.Value) Then
+            myR1RVValue = R.Value
+        End If
+
+        ' add R2DV offset
+        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
+        With myNewRow
+            .AnalyzerID = R.AnalyzerID
+            .FwVersion = R.FwVersion
+            .GroupID = ADJUSTMENT_GROUPS.REAGENT2_ARM_DISP1.ToString
+            .CodeFw = Ax00Adjustsments.R2DV.ToString
+            .Value = (CSng(myR1RVValue) + myScreenDelegate.Reagent2DV_ZOffset).ToString
+            .AxisID = GlobalEnumerates.AXIS.Z.ToString
+            .CanSave = True
+            .CanMove = False
+            .InFile = True
+        End With
+        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
+
+        ' add M1PI offset
+        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
+        With myNewRow
+            .AnalyzerID = R.AnalyzerID
+            .FwVersion = R.FwVersion
+            .GroupID = ADJUSTMENT_GROUPS.SAMPLES_ARM_LEVEL_DET.ToString
+            .CodeFw = Ax00Adjustsments.M1PI.ToString
+            .Value = (CSng(myR1RVValue) + myScreenDelegate.SamplePI_ZOffset).ToString
+            .AxisID = GlobalEnumerates.AXIS.Z.ToString
+            .CanSave = True
+            .CanMove = False
+            .InFile = True
+        End With
+        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
+
+        ' add M1RPI offset
+        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
+        With myNewRow
+            .AnalyzerID = R.AnalyzerID
+            .FwVersion = R.FwVersion
+            .GroupID = ADJUSTMENT_GROUPS.SAMPLES_ARM_LEVEL_DET.ToString
+            .CodeFw = Ax00Adjustsments.M1RPI.ToString
+            .Value = (CSng(myR1RVValue) + myScreenDelegate.SampleRPI_ZOffset).ToString
+            .AxisID = GlobalEnumerates.AXIS.ROTOR.ToString
+            .CanSave = True
+            .CanMove = False
+            .InFile = True
+        End With
+        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
+
+        ' add M1DV2 offset
+        myNewRow = myTemporalAdjustmentsDS.srv_tfmwAdjustments.Newsrv_tfmwAdjustmentsRow
+        With myNewRow
+            .AnalyzerID = R.AnalyzerID
+            .FwVersion = R.FwVersion
+            .GroupID = ADJUSTMENT_GROUPS.SAMPLES_ARM_DISP2.ToString
+            .CodeFw = Ax00Adjustsments.M1DV2.ToString
+            .Value = (CSng(myR1RVValue) + myScreenDelegate.SampleDV2_ZOffset).ToString
+            .AxisID = GlobalEnumerates.AXIS.Z.ToString
+            .CanSave = True
+            .CanMove = False
+            .InFile = True
+        End With
+        Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
+        
+    End Sub
 
     ''' <summary>
     ''' Gets the value corresponding to informed Group and Axis from global adjustments dataset
@@ -7724,7 +7814,6 @@ Public Class UiPositionsAdjustments
             If myGlobal.HasError Then
                 PrepareErrorMode()
                 ' XBC 25/10/2011 - message is shown in method ManageReceptionEvent
-                'MyBase.ShowMessage(Me.Name & ".Load", myGlobal.ErrorCode, myGlobal.ErrorMessage, Me)
             End If
 
         Catch ex As Exception
@@ -7812,12 +7901,10 @@ Public Class UiPositionsAdjustments
             If e.TabPage Is TabOpticCentering Then
 
                 'AG 01/10/2014 - BA-1953 - also reset REACTIONS_HOME_ROTOR because it is the script used during this adjustment
-                'myGlobal = myScreenDelegate.ResetSpecifiedPreliminaryHomes(MyBase.myServiceMDI.ActiveAnalyzer, FwSCRIPTS_IDS.REACTIONS_ROTOR_HOME_WELL1.ToString)
                 Dim preliminaryHomesToResetList As New List(Of String)
                 preliminaryHomesToResetList.Add(FwSCRIPTS_IDS.REACTIONS_ROTOR_HOME_WELL1.ToString)
                 preliminaryHomesToResetList.Add(FwSCRIPTS_IDS.REACTIONS_HOME_ROTOR.ToString)
                 myGlobal = myScreenDelegate.ResetSpecifiedPreliminaryHomes(MyBase.myServiceMDI.ActiveAnalyzer, preliminaryHomesToResetList)
-                'AG 01/10/2014 - BA-1953
 
                 If myGlobal.HasError Then
                     PrepareErrorMode()
@@ -7891,8 +7978,6 @@ Public Class UiPositionsAdjustments
                 Exit Sub
             End If
 
-            'MyClass.IsInfoExpanded = False
-
             If BsTabPagesControl.SelectedTab Is TabOpticCentering Then
 
                 dialogResultToReturn = MyBase.ShowMessage(GetMessageText(Messages.SRV_ADJUSTMENTS_TESTS.ToString), Messages.SRV_OPTIC_ADJUSTMENT_ENTER.ToString)
@@ -7913,7 +7998,6 @@ Public Class UiPositionsAdjustments
                 Me.SelectedAdjustmentGroup = ADJUSTMENT_GROUPS.WASHING_STATION
                 Me.BsWSAdjustButton.Visible = True
 
-                'Me.BsWashingTestButton.Enabled = False
                 Me.ReportHistory(Nothing, Nothing, True)
 
 
@@ -7921,7 +8005,6 @@ Public Class UiPositionsAdjustments
                 Me.SelectedPage = ADJUSTMENT_PAGES.ARM_POSITIONS
                 ' Adjustments in this section are done through each tab list of buttons so the generical button is no need
                 Me.SelectedAdjustmentGroup = Me.SetPositionAdjustmentType(Me.SelectedArmTab, Me.SelectedRow)
-                'Me.BsArmsAdjustButton.Visible = False
 
             End If
 
@@ -8072,10 +8155,10 @@ Public Class UiPositionsAdjustments
                             myAdjustment = ADJUSTMENT_GROUPS.SAMPLES_ARM_RING2
 
                         Case "RING1R"
-                            myAdjustment = ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1R
+                            myAdjustment = ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1
 
                         Case "RING2R"
-                            myAdjustment = ADJUSTMENT_GROUPS.SAMPLES_ARM_RING2R
+                            myAdjustment = ADJUSTMENT_GROUPS.REAGENT1_ARM_RING2
 
                         Case "RING3"
                             myAdjustment = ADJUSTMENT_GROUPS.SAMPLES_ARM_RING3
@@ -8206,7 +8289,6 @@ Public Class UiPositionsAdjustments
                                 myRotor = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1.ToString, GlobalEnumerates.AXIS.ROTOR, True)
                                 'PENDING TO DEFINE ROTOR POS NUMBER
                             End If
-                            'end SGM 02/03/2012
 
                             Select Case Me.BsGridSample.IdentValue(pRowIndex).ToString
                                 Case "DISP1"
@@ -8232,7 +8314,6 @@ Public Class UiPositionsAdjustments
                                         myScreenDelegate.pArmABSMovPolar = myPolar.Value
                                         myScreenDelegate.pArmABSMovZ = myZ.Value
                                         myScreenDelegate.pValueRotorABSMov = myRotor.Value
-                                        'myScreenDelegate.pValueRotorZTubeABSMov = myRotor.Value PENDING TO DEFINE ROTOR POS NUMBER
                                     End If
 
                                 Case "WASH", "ISE", "PKG"
@@ -8436,7 +8517,6 @@ Public Class UiPositionsAdjustments
 
                     If MyBase.SimulationMode Then
                         ' simulating
-                        'MyBase.DisplaySimulationMessage("Doing Specified Test...")
                         Me.Cursor = Cursors.WaitCursor
                         Thread.Sleep(SimulationProcessTime)
                         MyBase.myServiceMDI.Focus()
@@ -8575,7 +8655,6 @@ Public Class UiPositionsAdjustments
                                     myRotorValue = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1.ToString, GlobalEnumerates.AXIS.ROTOR).Value
                                     'PENDING TO DEFINE ROTOR POS NUMBER
                                 End If
-                                'end SGM 02/03/2012
 
                                 ' XBC 13/11/2012 - Wash station Z test must add security fly position
                                 If Me.BsGridSample.IdentValue(pRowIndex).ToString = "WASH" Then
@@ -8583,7 +8662,6 @@ Public Class UiPositionsAdjustments
                                     myIntZValue = CInt(myZValue) + CInt(myAdditionalZValue)
                                     myZValue = myIntZValue.ToString
                                 End If
-                                ' XBC 13/11/2012
 
                                 Select Case Me.BsGridSample.IdentValue(pRowIndex).ToString
                                     Case "DISP1", "DISP2", "Z_REF", "WASH", "ISE", "PKG"
@@ -8608,7 +8686,6 @@ Public Class UiPositionsAdjustments
                                             myScreenDelegate.pArmABSMovPolar = myPolarValue
                                             myScreenDelegate.pArmABSMovZ = myZValue
                                             myScreenDelegate.pValueRotorABSMov = myRotorValue
-                                            ' myScreenDelegate.pValueRotorZTubeABSMov = myRotorValue PENDING TO DEFINE ROTOR POS NUMBER
                                         End If
                                 End Select
 
@@ -8625,7 +8702,6 @@ Public Class UiPositionsAdjustments
                                     myIntZValue = CInt(myZValue) + CInt(myAdditionalZValue)
                                     myZValue = myIntZValue.ToString
                                 End If
-                                ' XBC 13/11/2012
 
                                 Select Case Me.BsGridReagent1.IdentValue(pRowIndex).ToString
                                     Case "DISP1", "Z_REF", "WASH", "PKG"
@@ -8658,7 +8734,6 @@ Public Class UiPositionsAdjustments
                                     myIntZValue = CInt(myZValue) + CInt(myAdditionalZValue)
                                     myZValue = myIntZValue.ToString
                                 End If
-                                ' XBC 13/11/2012
 
                                 Select Case Me.BsGridReagent2.IdentValue(pRowIndex).ToString
                                     Case "DISP1", "Z_REF", "WASH", "PKG"
@@ -8683,7 +8758,6 @@ Public Class UiPositionsAdjustments
 
                                 myPolarValue = ReadGlobalAdjustmentData(.AdjustmentID.ToString, GlobalEnumerates.AXIS.POLAR).Value
                                 myZValue = ReadGlobalAdjustmentData(.AdjustmentID.ToString, GlobalEnumerates.AXIS.Z).Value
-                                'myRotorValue = ReadGlobalAdjustmentData(.AdjustmentID.ToString, GlobalEnumerates.AXIS.ROTOR).Value
 
                                 ' XBC 13/11/2012 - Wash station Z test must add security fly position
                                 If Me.BsGridMixer1.IdentValue(pRowIndex).ToString = "WASH" Then
@@ -8691,7 +8765,6 @@ Public Class UiPositionsAdjustments
                                     myIntZValue = CInt(myZValue) + CInt(myAdditionalZValue)
                                     myZValue = myIntZValue.ToString
                                 End If
-                                ' XBC 13/11/2012
 
                                 Select Case Me.BsGridMixer1.IdentValue(pRowIndex).ToString
                                     Case "DISP1", "Z_REF", "WASH", "PKG"
@@ -8708,7 +8781,6 @@ Public Class UiPositionsAdjustments
 
                                 myPolarValue = ReadGlobalAdjustmentData(.AdjustmentID.ToString, GlobalEnumerates.AXIS.POLAR).Value
                                 myZValue = ReadGlobalAdjustmentData(.AdjustmentID.ToString, GlobalEnumerates.AXIS.Z).Value
-                                'myRotorValue = ReadGlobalAdjustmentData(.AdjustmentID.ToString, GlobalEnumerates.AXIS.ROTOR).Value
 
                                 ' XBC 13/11/2012 - Wash station Z test must add security fly position
                                 If Me.BsGridMixer2.IdentValue(pRowIndex).ToString = "WASH" Then
@@ -8716,7 +8788,6 @@ Public Class UiPositionsAdjustments
                                     myIntZValue = CInt(myZValue) + CInt(myAdditionalZValue)
                                     myZValue = myIntZValue.ToString
                                 End If
-                                ' XBC 13/11/2012
 
                                 Select Case Me.BsGridMixer2.IdentValue(pRowIndex).ToString
                                     Case "DISP1", "Z_REF", "WASH", "PKG"
@@ -8752,7 +8823,6 @@ Public Class UiPositionsAdjustments
                     If Not myGlobal.HasError Then
                         If MyBase.SimulationMode Then
                             ' simulating
-                            'MyBase.DisplaySimulationMessage("Doing specified Test...")
                             Me.Cursor = Cursors.WaitCursor
                             Thread.Sleep(SimulationProcessTime)
                             MyBase.myServiceMDI.Focus()
@@ -8789,7 +8859,7 @@ Public Class UiPositionsAdjustments
                                                                                                         BsWSAdjustButton.Click
         Dim myGlobal As New GlobalDataTO
         Try
-            myGlobal = MyBase.PrepareAdjust()
+            myGlobal = PrepareAdjust()
             If myGlobal.HasError Then
                 PrepareErrorMode()
             Else
@@ -8805,7 +8875,7 @@ Public Class UiPositionsAdjustments
                             Dim preliminaryHomesToResetList As New List(Of String)
                             preliminaryHomesToResetList.Add(FwSCRIPTS_IDS.REACTIONS_ROTOR_HOME_WELL1.ToString)
                             preliminaryHomesToResetList.Add(FwSCRIPTS_IDS.REACTIONS_HOME_ROTOR.ToString)
-                            myGlobal = myScreenDelegate.ResetSpecifiedPreliminaryHomes(MyBase.myServiceMDI.ActiveAnalyzer, preliminaryHomesToResetList)
+                            myGlobal = myScreenDelegate.ResetSpecifiedPreliminaryHomes(myServiceMDI.ActiveAnalyzer, preliminaryHomesToResetList)
 
                             If myGlobal.HasError Then
                                 PrepareErrorMode()
@@ -8822,7 +8892,7 @@ Public Class UiPositionsAdjustments
                             myScreenDelegate.ReadedCounts = New List(Of OpticCenterDataTO)
                             myScreenDelegate.pValueAdjust = BsOpticAdjustmentLabel.Text 'AG 01/10/2014 - BA-1953 inform the current value of adjustment GFWR1 (Posición referencia lectura - Pocillo 1)
 
-                            If Not MyBase.SimulationMode Then
+                            If Not SimulationMode Then
                                 Me.ProgressBar1.Maximum = CInt(myScreenDelegate.NumWells * myScreenDelegate.StepsbyWell)
                                 Me.ProgressBar1.Value = 0
                                 Me.ProgressBar1.Visible = True
@@ -8836,8 +8906,8 @@ Public Class UiPositionsAdjustments
                             .AdjustmentID = ADJUSTMENT_GROUPS.WASHING_STATION
                             .AxisID = GlobalEnumerates.AXIS.Z
 
-                            Dim myZ As New AdjustmentRowData
-                            myZ = ReadGlobalAdjustmentData(.AdjustmentID.ToString, GlobalEnumerates.AXIS.Z, True)
+                            Dim myZ = ReadGlobalAdjustmentData(.AdjustmentID.ToString, GlobalEnumerates.AXIS.Z, True)
+
                             If myZ.CanSave And myZ.Value.Length = 0 Then
                                 myGlobal.HasError = True
                             Else
@@ -8858,7 +8928,7 @@ Public Class UiPositionsAdjustments
                                 Me.BsWSAdjustButton.Visible = True
 
                             Case ADJUSTMENT_PAGES.ARM_POSITIONS
-                                'Me.BsArmsAdjustButton.Visible = True
+                                'not applied
 
                         End Select
 
@@ -8868,20 +8938,19 @@ Public Class UiPositionsAdjustments
                         If MyBase.SimulationMode Then
 
                             If Not Me.AllHomesAreDone Then
-                                MyBase.DisplayMessage(Messages.SRV_HOMES_IN_PROGRESS.ToString)
+                                DisplayMessage(Messages.SRV_HOMES_IN_PROGRESS.ToString)
 
                                 Me.Cursor = Cursors.WaitCursor
                                 Thread.Sleep(SimulationProcessTime)
-                                MyBase.myServiceMDI.Focus()
+                                myServiceMDI.Focus()
                                 Me.Cursor = Cursors.Default
 
                                 Me.AllHomesAreDone = True
-                                MyBase.DisplayMessage(Messages.SRV_HOMES_FINISHED.ToString)
-                                MyBase.myBaseScreenDelegate.SetPreliminaryHomesAsDone(SelectedAdjustmentGroup)
+                                DisplayMessage(Messages.SRV_HOMES_FINISHED.ToString)
+                                myBaseScreenDelegate.SetPreliminaryHomesAsDone(SelectedAdjustmentGroup)
 
-                                MyBase.myServiceMDI.Focus()
-                                MyBase.DisplayMessage(Messages.SRV_PREPARE_ADJUSTMENTS.ToString)
-                                'MyBase.DisplaySimulationMessage("Preparing for Adjusting...")
+                                myServiceMDI.Focus()
+                                DisplayMessage(Messages.SRV_PREPARE_ADJUSTMENTS.ToString)
                             End If
 
                         Else
@@ -8889,10 +8958,10 @@ Public Class UiPositionsAdjustments
                             If myGlobal IsNot Nothing AndAlso Not myGlobal.HasError Then
                                 If myGlobal.AffectedRecords > 0 Then
                                     Me.AllHomesAreDone = False
-                                    MyBase.DisplayMessage(Messages.SRV_HOMES_IN_PROGRESS.ToString)
+                                    DisplayMessage(Messages.SRV_HOMES_IN_PROGRESS.ToString)
                                 Else
                                     Me.AllHomesAreDone = True
-                                    MyBase.DisplayMessage(Messages.SRV_PREPARE_ADJUSTMENTS.ToString)
+                                    DisplayMessage(Messages.SRV_PREPARE_ADJUSTMENTS.ToString)
                                 End If
                             End If
                         End If
@@ -8911,14 +8980,6 @@ Public Class UiPositionsAdjustments
 
                     Dim wellCounts As Integer = 0
 
-                    ' XBC 02/01/2012 - Add Encoder functionality
-                    'Dim myDiagram As SwiftPlotDiagram = CType(Me.AbsorbanceChart.Diagram, SwiftPlotDiagram)
-                    'For Each L As ConstantLine In myDiagram.AxisX.ConstantLines
-                    '    If L.Name.Contains("New") Then
-                    '        L.AxisValue = wellCounts
-                    '        wellCounts += myScreenDelegate.StepsbyWell  ' 40
-                    '    End If
-                    'Next
                     Dim myDiagram As XYDiagram = CType(Me.AbsorbanceChart.Diagram, XYDiagram)
                     For Each L As ConstantLine In myDiagram.AxisX.ConstantLines
                         If L.Name.Contains("New") Then
@@ -8926,7 +8987,6 @@ Public Class UiPositionsAdjustments
                             wellCounts += myScreenDelegate.StepsbyWell  ' 80
                         End If
                     Next
-                    ' XBC 02/01/2012 - Add Encoder functionality
                 End If
 
                 If myGlobal.HasError Then
@@ -8949,11 +9009,9 @@ Public Class UiPositionsAdjustments
                     If MyBase.SimulationMode Then
                         Select Case Me.SelectedPage
                             Case ADJUSTMENT_PAGES.OPTIC_CENTERING
-                                'MyBase.DisplaySimulationMessage("Preparing Optic Centering Adjust...")
                                 Me.CurrentMode = ADJUSTMENT_MODES.ADJUST_PREPARED  ' ABSORBANCE_SCANNING
 
                             Case ADJUSTMENT_PAGES.WASHING_STATION
-                                'MyBase.DisplaySimulationMessage(" Preparing Washing Station Centering Adjust...")
                                 MyBase.CurrentMode = ADJUSTMENT_MODES.ADJUST_PREPARED
 
                             Case ADJUSTMENT_PAGES.ARM_POSITIONS
@@ -8962,35 +9020,15 @@ Public Class UiPositionsAdjustments
 
                         Application.DoEvents()
 
-                        Select Case Me.SelectedPage
-                            Case ADJUSTMENT_PAGES.OPTIC_CENTERING
-                                'MessageBox.Show("Optic Centering ready for adjusting", MyBase.GetMessage(Messages.SRV_SIMULATION_MODE.ToString))
-
-                            Case ADJUSTMENT_PAGES.WASHING_STATION
-                                'MyBase.DisplaySimulationMessage("Washing Station ready for adjusting")
-
-                            Case ADJUSTMENT_PAGES.ARM_POSITIONS
-
-                        End Select
-
                         myScreenDelegate.AbsorbanceScanDone = True
 
                         PrepareArea()
 
-                        'MyBase.myScreenLayout.ButtonsPanel.AdjustButton.Enabled = False
-                        'MyBase.myScreenLayout.ButtonsPanel.SaveButton.Enabled = False
-                        'MyBase.myScreenLayout.ButtonsPanel.ExitButton.Enabled = True
-                        'MyBase.myScreenLayout.ButtonsPanel.CancelButton.Enabled = False
-
-                        'If Me.SelectedPage = ADJUSTMENT_PAGES.OPTIC_CENTERING Then
-                        '    MyBase.myScreenLayout.ButtonsPanel.AdjustButton.Enabled = True
-                        'End If
                     Else
 
                         If Me.SelectedPage = ADJUSTMENT_PAGES.WASHING_STATION And Me.CurrentMode <> ADJUSTMENT_MODES.ADJUST_PREPARING Then Exit Sub 'SGM 22/05/2012
                         ' Manage FwScripts must to be sent to adjusting
                         Me.SendFwScript(Me.CurrentMode, EditedValue.AdjustmentID)
-                        'DisableAll()
                     End If
                 End If
 
@@ -8998,10 +9036,6 @@ Public Class UiPositionsAdjustments
 
 
         Catch ex As Exception
-            '' XBC 30/11/2011
-            'Me.BsOpticAdjustButton.Visible = True
-            'Me.BsOpticStopButton.Visible = False
-            '' XBC 30/11/2011
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsAdjustButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsAdjustButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
