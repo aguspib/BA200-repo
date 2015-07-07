@@ -105,7 +105,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
             'We fill all Steps and ContexttStep collections with data:
             Dim maxIndex = executionsList.Count - 1
 
-            FillEmptyContext()
+            FillEmptyContextSteps()
 
             'We update the already filled data:
             For curStep = Steps.Range.Minimum To Steps.Range.Maximum
@@ -124,7 +124,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
         End Sub
 
 
-        Public Sub FillEmptyContext()
+        Public Sub FillEmptyContextSteps()
             For j As Integer = Me.Steps.Range.Minimum To Me.Steps.Range.Maximum ' Each S In Steps
                 If Steps(j) Is Nothing Then Steps(j) = New ContextStep(ContaminationsSpecifications.DispensesPerStep)
                 For i As Integer = 1 To ContaminationsSpecifications.DispensesPerStep
@@ -134,7 +134,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
         End Sub
 
         Public Sub FillContentsFromReagentsIDInStatic(reagentsIDList As List(Of Integer), timeOffset As Integer)
-            FillEmptyContext()
+            FillEmptyContextSteps()
             If reagentsIDList Is Nothing Then Return
             'Dim maxIndex = reagentsIDList.Count - 1
             For i2 As Integer = Me.Steps.Range.Minimum To -1
@@ -144,9 +144,11 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
 
                 If auxIndex < Steps.Range.Minimum Then Continue For
 
-                If reagentsIDList.Count > reagentsIndex Then
-                    If Steps(auxIndex)(1) Is Nothing Then Steps(auxIndex)(1) = Me.ContaminationsSpecifications.CreateDispensing
-                    Steps(auxIndex)(1).R1ReagentID = reagentsIDList(reagentsIndex)
+                If reagentsIDList.Any AndAlso reagentsIDList.Count > reagentsIndex Then
+                    If reagentsIDList.Count > reagentsIndex AndAlso reagentsIndex >= 0 Then
+                        If Steps(auxIndex)(1) Is Nothing Then Steps(auxIndex)(1) = Me.ContaminationsSpecifications.CreateDispensing
+                        Steps(auxIndex)(1).R1ReagentID = reagentsIDList(reagentsIndex)
+                    End If
                 End If
             Next
 
