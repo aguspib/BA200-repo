@@ -144,9 +144,11 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
 
                 If auxIndex < Steps.Range.Minimum Then Continue For
 
-                If reagentsIDList.Count > reagentsIndex Then
-                    If Steps(auxIndex)(1) Is Nothing Then Steps(auxIndex)(1) = Me.ContaminationsSpecifications.CreateDispensing
-                    Steps(auxIndex)(1).R1ReagentID = reagentsIDList(reagentsIndex)
+                If reagentsIDList.Any AndAlso reagentsIDList.Count > reagentsIndex Then
+                    If reagentsIDList.Count > reagentsIndex AndAlso reagentsIndex >= 0 Then
+                        If Steps(auxIndex)(1) Is Nothing Then Steps(auxIndex)(1) = Me.ContaminationsSpecifications.CreateDispensing
+                        Steps(auxIndex)(1).R1ReagentID = reagentsIDList(reagentsIndex)
+                    End If
                 End If
             Next
 

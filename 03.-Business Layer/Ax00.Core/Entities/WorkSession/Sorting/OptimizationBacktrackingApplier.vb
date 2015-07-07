@@ -72,7 +72,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Sorting
                                                   Optional ByVal pPreviousReagentID As List(Of Integer) = Nothing, _
                                                   Optional ByVal pPreviousReagentIDMaxReplicates As List(Of Integer) = Nothing)
 
-            PreviousReagentID = pPreviousReagentID
+            PreviousReagentID = GetPreviousReagentIDWithReplicates(pPreviousReagentID, pPreviousReagentIDMaxReplicates)
             MyBase.ExecuteOptimizationAlgorithm(pContaminationsDS, pExecutions, pHighContaminationPersistance, pPreviousReagentID, pPreviousReagentIDMaxReplicates)
 
             bestResult = (From a In pExecutions Where a.ExecutionStatus = "PENDING" Select a).ToList()
@@ -82,6 +82,48 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Sorting
             sortedOTList = (From a In bestResult Select a.OrderTestID Distinct).ToList
 
         End Sub
+
+        Private Function GetPreviousReagentIDWithReplicates(ByVal pPreviousReagentID As List(Of Integer), ByVal pPreviousReagentIDMaxReplicates As List(Of Integer)) As List(Of Integer)
+
+            'this method gets the previousReagentIdList and adds all actual replicates.
+            'this method, also inserts integers with value 0 where a washing would happen in runtime, so we can calculate
+            'persistence for contaminations accordingly.
+
+            Dim PreviousReagentIDWithReplicates As New List(Of Integer)
+            If calculateInRunning = False AndAlso pPreviousReagentID IsNot Nothing AndAlso pPreviousReagentID.Any Then
+                For i As Integer = 0 To pPreviousReagentID.Count - 1
+
+                    'Check if we need to add a fake "washing" in the list:
+                    '1.- Create a context and set the actual PreviuosReagentIDListWithReplicates
+                    Dim cont = New Context(WSExecutionCreator.Instance.ContaminationsSpecification)
+                    cont.FillContentsFromReagentsIDInStatic(PreviousReagentIDWithReplicates, 0)
+
+                    '2.- check if next ReagentID would require washing when the session is executed later, in running:
+                    Dim disp = WSExecutionCreator.Instance.ContaminationsSpecification.CreateDispensing()
+                    disp.R1ReagentID = pPreviousReagentID(i)
+                    Dim result = cont.ActionRequiredForDispensing(disp)
+                    Select Case result.Action
+                        'Ok, in running, we'll wash here, so we add an additinoal GAP in the replicates list, 
+                        'so we mimic the same behavior in static and solve contaminations between groups accordingly
+                        Case IContaminationsAction.RequiredAction.Wash
+                            If result.InvolvedWashes.Any Then
+                                Dim wash = result.InvolvedWashes.Item(0)
+                                For k = 1 To wash.WashingStrength
+                                    PreviousReagentIDWithReplicates.Add(0)
+                                Next
+                            End If
+                    End Select
+
+                    '3.- We now add all replicates of this specific technique in the final list.
+                    For j = 1 To pPreviousReagentIDMaxReplicates(i)
+                        PreviousReagentIDWithReplicates.Add(pPreviousReagentID(i))
+                    Next
+
+                Next
+            End If
+
+            Return PreviousReagentIDWithReplicates
+        End Function
 
         Private Const InitialCallStackDepth As Integer = -1
 
@@ -108,6 +150,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Sorting
 
                 While (result.Count = 0 AndAlso ContaminLimit < currentContaminationNumber)
                     _callStackNestingLevel = -1
+                    _ContaminationNumber = 0
                     foundSolution = False
                     result = BacktrackingAlgorithm(Tests, solutionSet)
                     If result.Count = 0 Then
@@ -336,13 +379,10 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Sorting
 
             Dim result = context.ActionRequiredForDispensing(context.Steps(0).Dispensing(1))    'Steps(0) is current step (not before, neither after)
 
-            Dim washingsList = result.InvolvedWashes
-
-            _ContaminationNumber += washingsList.Count
+            If result.Action = IContaminationsAction.RequiredAction.Wash Then _ContaminationNumber += 1
 
             Return _ContaminationNumber
 
-            'Return WSExecutionCreator.Instance.GetContaminationNumber(calculateInRunning, PreviousReagentID, pExecutions)
         End Function
     End Class
 End Namespace
