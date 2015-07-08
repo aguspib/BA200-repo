@@ -1085,7 +1085,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     .ParamList.Add(MyClass.ArmSamplesWashingPolar.ToString)
                     .ParamList.Add(MyClass.ArmSamplesWashingZ.ToString)
 
-                    If AnalyzerController.Instance.IsBA200() Then
+                    If Not AnalyzerController.Instance.IsBA200() Then
                         .ParamList.Add(MyClass.ArmReagent1WashingPolar.ToString)
                         .ParamList.Add(MyClass.ArmReagent1WashingZ.ToString)
 
