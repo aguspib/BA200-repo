@@ -56,6 +56,13 @@ Namespace Biosystems.Ax00.App
         ''' </summary>
         Public Shared Property PresentationLayerInterface As IPresentationLayerListener
 
+
+        Public ReadOnly Property IsBA200 As Boolean
+            Get
+                Return Analyzer.Model = AnalyzerModelEnum.A200.ToString()
+            End Get
+        End Property
+
 #End Region
 
 #Region "Public Methods"

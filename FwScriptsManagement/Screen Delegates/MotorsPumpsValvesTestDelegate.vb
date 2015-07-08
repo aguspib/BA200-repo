@@ -1079,23 +1079,20 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     .NextOnResultNG = Nothing
                     .NextOnTimeOut = Nothing
                     .NextOnError = Nothing
-                    'expects 6 params
+                    'expects 6 params on ba400 and 2 params on ba200
                     .ParamList = New List(Of String)
 
                     .ParamList.Add(MyClass.ArmSamplesWashingPolar.ToString)
                     .ParamList.Add(MyClass.ArmSamplesWashingZ.ToString)
 
-                    .ParamList.Add(MyClass.ArmReagent1WashingPolar.ToString)
-                    .ParamList.Add(MyClass.ArmReagent1WashingZ.ToString)
+                    If AnalyzerController.Instance.IsBA200() Then
+                        .ParamList.Add(MyClass.ArmReagent1WashingPolar.ToString)
+                        .ParamList.Add(MyClass.ArmReagent1WashingZ.ToString)
 
-                    .ParamList.Add(MyClass.ArmReagent2WashingPolar.ToString)
-                    .ParamList.Add(MyClass.ArmReagent2WashingZ.ToString)
+                        .ParamList.Add(MyClass.ArmReagent2WashingPolar.ToString)
+                        .ParamList.Add(MyClass.ArmReagent2WashingZ.ToString)
+                    End If
 
-                    '.ParamList.Add(MyClass.ArmMixer1WashingPolar.ToString)
-                    '.ParamList.Add(MyClass.ArmMixer1WashingZ.ToString)
-
-                    '.ParamList.Add(MyClass.ArmMixer2WashingPolar.ToString)
-                    '.ParamList.Add(MyClass.ArmMixer2WashingZ.ToString)
                 End With
 
                 'add to the queue list
@@ -1110,7 +1107,6 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "MotorsTestDelegate.SendQueueForALLARMSTOWASHING", EventLogEntryType.Error, False)
             End Try
             Return myResultData
