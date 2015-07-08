@@ -2084,33 +2084,6 @@ Namespace Biosystems.Ax00.Core.Entities
         End Function
 
         ''' <summary>
-        ''' Function that allow us add new type alarm to DS which one will show everytime we refresh the screen. 
-        ''' </summary>
-        ''' <param name="_alarm"></param>
-        ''' <remarks></remarks>
-        Public Sub PrepareUINewAlarmType(ByVal _alarm As AlarmEnumerates.Alarms) Implements IAnalyzerManager.PrepareUINewAlarmType
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlConnection
-            Try
-                resultData = GetOpenDBConnection(Nothing)
-                If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        'Prepare UIRefresh DS (generate event only when a ReportSAT is loaded or a RestorePoint is restored)
-
-                        Dim AlarmIsCreated = (From a In myUI_RefreshDS.ReceivedAlarms Where a.AlarmID = _alarm.ToString And a.AlarmStatus = True).ToList().Count()
-                        If AlarmIsCreated = 0 Then
-                            resultData = PrepareUIRefreshEvent(dbConnection, UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, _alarm.ToString, True)
-                        End If
-                    End If
-                End If
-
-            Catch ex As Exception
-                GlobalBase.CreateLogActivity(ex)
-            End Try
-        End Sub
-
-        ''' <summary>
         ''' Prepare the data for the UI refreh due a instruction reception
         ''' (Signature n#2)
         ''' NOTE: This method has several signatures
@@ -2428,6 +2401,62 @@ Namespace Biosystems.Ax00.Core.Entities
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ClearRefreshDataSets", EventLogEntryType.Error, False)
             End Try
         End Sub
+
+#Region "NEW ALARM TYPE"
+
+        ''' <summary>
+        ''' Method to refresh UI for new alarm Type.
+        ''' </summary>
+        ''' <param name="_uirefresevent"></param>
+        ''' <remarks></remarks>
+        Public Sub Createandthroweventuirefresh(Optional _uirefresevent As UI_RefreshEvents = UI_RefreshEvents.NONE) Implements IAnalyzerManager.CreateAndThrowEventUiRefresh
+            Dim InstructionReceivedAttribute = ""
+
+            If myUI_RefreshEvent.Count = 0 Then
+                ClearRefreshDataSets(True, False)
+            Else
+                If _uirefresevent <> UI_RefreshEvents.NONE Then
+                    If Not myUI_RefreshEvent.Contains(_uirefresevent) Then
+                        myUI_RefreshEvent.Add(_uirefresevent)
+                    End If
+
+                    If _myIsBlExpired Then
+                        PrepareUINewAlarmType(AlarmEnumerates.Alarms.BASELINE_EXPIRED)
+                    End If
+                End If
+            End If
+
+            RaiseEvent ReceptionEvent(InstructionReceivedAttribute, False, myUI_RefreshEvent, myUI_RefreshDS, True)
+            RaiseEvent ReceptionEvent(InstructionReceivedAttribute, True, myUI_RefreshEvent, myUI_RefreshDS, True)
+        End Sub
+
+        ''' <summary>
+        ''' Function that allow us add new type alarm to DS which one will show every time we refresh the screen. 
+        ''' </summary>
+        ''' <param name="_alarm"></param>
+        ''' <remarks></remarks>
+        Public Sub PrepareUINewAlarmType(ByVal _alarm As AlarmEnumerates.Alarms) Implements IAnalyzerManager.PrepareUINewAlarmType
+            Dim resultData As New GlobalDataTO
+            Dim dbConnection As New SqlConnection
+            Try
+                resultData = GetOpenDBConnection(Nothing)
+                If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+
+                        Dim alarmIsCreated = (From a In myUI_RefreshDS.ReceivedAlarms Where a.AlarmID = _alarm.ToString And a.AlarmStatus = True).ToList().Count()
+                        If alarmIsCreated = 0 Then
+                            resultData = PrepareUIRefreshEvent(dbConnection, UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, _alarm.ToString, True)
+                        End If
+                    End If
+                End If
+
+            Catch ex As Exception
+                GlobalBase.CreateLogActivity(ex)
+            End Try
+        End Sub
+
+#End Region
 
 #End Region
 
