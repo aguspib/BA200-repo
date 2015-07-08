@@ -52,7 +52,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="activeAlarm"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Function ExistsActiveAlarm(ByVal activeAlarm As String) As Boolean
+        Function ExistsActiveAlarm(ByVal activeAlarm As String, Optional ByVal _pAnalyzerID As String = "") As Boolean
 
         ''' <summary>
         ''' Method, that create or delete the alarm and send a  refresh in UserInterface to see the alarm.

@@ -2083,6 +2083,32 @@ Namespace Biosystems.Ax00.Core.Entities
             Return myglobal
         End Function
 
+        ''' <summary>
+        ''' Function that allow us add new type alarm to DS which one will show everytime we refresh the screen. 
+        ''' </summary>
+        ''' <param name="_alarm"></param>
+        ''' <remarks></remarks>
+        Public Sub PrepareUINewAlarmType(ByVal _alarm As AlarmEnumerates.Alarms) Implements IAnalyzerManager.PrepareUINewAlarmType
+            Dim resultData As New GlobalDataTO
+            Dim dbConnection As New SqlConnection
+            Try
+                resultData = GetOpenDBConnection(Nothing)
+                If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        'Prepare UIRefresh DS (generate event only when a ReportSAT is loaded or a RestorePoint is restored)
+
+                        Dim AlarmIsCreated = (From a In myUI_RefreshDS.ReceivedAlarms Where a.AlarmID = _alarm.ToString And a.AlarmStatus = True).ToList().Count()
+                        If AlarmIsCreated = 0 Then
+                            resultData = PrepareUIRefreshEvent(dbConnection, UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, _alarm.ToString, True)
+                        End If
+                    End If
+                End If
+
+            Catch ex As Exception
+                GlobalBase.CreateLogActivity(ex)
+            End Try
+        End Sub
 
         ''' <summary>
         ''' Prepare the data for the UI refreh due a instruction reception
@@ -2208,7 +2234,6 @@ Namespace Biosystems.Ax00.Core.Entities
             Return myglobal
         End Function
 
-
         ''' <summary>
         ''' Prepare the data for the UI refreh due a instruction reception
         ''' (Signature n#3)
@@ -2318,7 +2343,6 @@ Namespace Biosystems.Ax00.Core.Entities
             'If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()'AG 03/07/2012 - Running Cycles lost - Solution!
             Return myglobal
         End Function
-
 
         ''' <summary>
         ''' 

@@ -211,6 +211,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     End If
                     index = index + 1
                 Next
+
                 wsAlarmsDs.AcceptChanges()
 
                 If wsAlarmsDs.twksWSAnalyzerAlarms.Rows.Count > 0 Then
@@ -218,6 +219,10 @@ Namespace Biosystems.Ax00.Core.Entities
                     If Not _myGlobal.HasError AndAlso Not _analyzerManager.Ringing Then
                         SoundActivationByAlarm(methodHasToAddInstructionToQueueFlag)
                     End If
+                End If
+
+                If _analyzerManager.IsBlExpired Then
+                    _analyzerManager.PrepareUINewAlarmType(AlarmEnumerates.Alarms.BASELINE_EXPIRED)
                 End If
 
                 If _analyzerManager.AnalyzerIsFreeze Then
@@ -1054,9 +1059,6 @@ Namespace Biosystems.Ax00.Core.Entities
             End If
         End Sub
 
-
-
-
 #Region "Aux Functions"
         ''' <summary>
         ''' Activate the Analyzer Alarm Sound if prosuce alarm require sound.
@@ -1250,16 +1252,20 @@ Namespace Biosystems.Ax00.Core.Entities
         End Sub
 
         ''' <summary>
-        ''' 
+        ''' Function to check if the alarm we send by parameter exist or not in the database.
         ''' </summary>
         ''' <param name="activeAlarm"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function ExistsActiveAlarm(ByVal activeAlarm As String) As Boolean Implements IAnalyzerAlarms.ExistsActiveAlarm
+        Public Function ExistsActiveAlarm(ByVal activeAlarm As String, Optional ByVal _analyzerID As String = "") As Boolean Implements IAnalyzerAlarms.ExistsActiveAlarm
             _myGlobal = _alarmsDelg.GetByAlarmID(Nothing, activeAlarm)
             If Not _myGlobal.HasError AndAlso Not _myGlobal.SetDatos Is Nothing Then
                 Dim temporalDs = DirectCast(_myGlobal.SetDatos, WSAnalyzerAlarmsDS)
-                Return (From a In temporalDs.twksWSAnalyzerAlarms Where a.AlarmStatus = True).ToList().Count > 0
+                If _analyzerID = String.Empty Then
+                    Return (From a In temporalDs.twksWSAnalyzerAlarms Where a.AlarmStatus = True).ToList().Count > 0
+                Else
+                    Return (From a In temporalDs.twksWSAnalyzerAlarms Where a.AlarmStatus = True And a.AnalyzerID = _analyzerID).ToList().Count > 0
+                End If
             End If
             Return False
         End Function
@@ -1278,12 +1284,11 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim status As Boolean
 
             Try
-                'myAlarmList.Add(alarm)
 
                 Select Case typeAction
                     Case 0
                         status = True
-                        If Not ExistsActiveAlarm(alarm.ToString()) Then
+                        If Not ExistsActiveAlarm(alarm.ToString(), _analyzerManager.ActiveAnalyzer()) Then
                             _analyzerManager.PrepareLocalAlarmList(alarm, status, myAlarmList, myAlarmStatusList)
                             If myAlarmList.Count = 0 And myAlarmStatusList.Count = 0 Then
                                 myAlarmList.Add(alarm)
@@ -1291,17 +1296,16 @@ Namespace Biosystems.Ax00.Core.Entities
                             End If
                             myGlobal = Manage(myAlarmList, myAlarmStatusList)
                         End If
+                        _analyzerManager.CreateAndThrowEventUiRefresh(GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED)
                     Case 1
                         status = False
-                        'myAlarmStatusList.Add(status)
-                        If ExistsActiveAlarm(alarm.ToString()) Then
+                        If ExistsActiveAlarm(alarm.ToString(), _analyzerManager.ActiveAnalyzer()) Then
                             _analyzerManager.PrepareLocalAlarmList(alarm, status, myAlarmList, myAlarmStatusList)
                             myGlobal = Manage(myAlarmList, myAlarmStatusList)
                         End If
-
+                        _analyzerManager.CreateAndThrowEventUiRefresh()
                 End Select
 
-                _analyzerManager.CreateAndThrowEventUiRefresh()
             Catch ex As Exception
                 Throw
             End Try

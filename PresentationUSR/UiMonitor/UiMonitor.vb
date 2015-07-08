@@ -881,6 +881,11 @@ Public Class UiMonitor
 
                 End If
 
+                If AnalyzerController.Instance.Analyzer.IsBlExpired Then
+                    If Not AnalyzerController.Instance.Analyzer.Alarms.Contains(AlarmEnumerates.Alarms.BASELINE_EXPIRED) Then AnalyzerController.Instance.Analyzer.Alarms.Add(AlarmEnumerates.Alarms.BASELINE_EXPIRED)
+                End If
+
+
                 UpdateGlobesInMainTab(AnalyzerController.Instance.Analyzer.Alarms) 'Get the current alarms in analyzer
             End If
             'END Real code
