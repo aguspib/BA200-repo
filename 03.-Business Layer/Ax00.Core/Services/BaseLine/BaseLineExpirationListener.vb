@@ -13,14 +13,14 @@ Namespace Biosystems.Ax00.Core.Services.BaseLine
 
         Private Shared _analyzer As IAnalyzerManager
         Private _analyzerAlarmsManager As IAnalyzerAlarms
-        Private baseLineExpirationobj As BaseLineEntityExpiration
+        Private baseLineExpirationobj As IBaseLineExpiration
 #End Region
-
-        Public Sub New(analyzer As IAnalyzerManager)
+        Public Property TimeDelay As Integer = 1000 * 60 * 2
+        Public Sub New(analyzer As IAnalyzerManager, baseLineExpirationobj As IBaseLineExpiration, analyzerAlarmsManager As IAnalyzerAlarms)
 
             BaseLineExpirationListener._analyzer = analyzer
-            _analyzerAlarmsManager = New AnalyzerAlarms(AnalyzerManager.GetCurrentAnalyzerManager())
-            baseLineExpirationobj = New BaseLineEntityExpiration(_analyzer)
+            _analyzerAlarmsManager = analyzerAlarmsManager
+            Me.baseLineExpirationobj = baseLineExpirationobj
 
         End Sub
 
@@ -49,7 +49,7 @@ Namespace Biosystems.Ax00.Core.Services.BaseLine
             While True
                 '10 minuts
                 'Dim a = Task.Delay(10 * 60 * 1000)
-                Dim a = Task.Delay(2 * 60 * 1000)
+                Dim a = Task.Delay(TimeDelay)
                 a.Wait()
 
                 checkIsExpired()

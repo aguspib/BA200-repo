@@ -3094,9 +3094,10 @@ Partial Public Class UiAx00MainMDI
     ''' <remarks>JV + AG revision 18/10/2013 New Button Play/Pause/Continue event task # 1341</remarks>
     Private Sub bsTSMultiFunctionSessionButton_Click(sender As Object, e As EventArgs) Handles bsTSMultiFunctionSessionButton.Click
         Try
-            Dim _analyzerAlarmsManager = New AnalyzerAlarms(AnalyzerManager.GetCurrentAnalyzerManager())
+            Dim _analyzerManager = AnalyzerManager.GetCurrentAnalyzerManager()
+            Dim _analyzerAlarmsManager = New AnalyzerAlarms(_analyzerManager)
             Dim makeStart As Boolean = True
-            If _analyzerAlarmsManager.ExistsActiveAlarm(AlarmEnumerates.Alarms.BASELINE_EXPIRED.ToString()) Then
+            If _analyzerManager.IsBlExpired Then
                 Dim blService As New BaseLineService(AnalyzerManager.GetCurrentAnalyzerManager(), New AnalyzerManagerFlagsDelegate)
                 blService.StartService()
                 blService.OnServiceStatusChange = Sub(callback As IServiceStatusCallback)

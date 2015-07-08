@@ -30,7 +30,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <param name="analyzerMan"></param>
         ''' <remarks></remarks>
-        Public Sub New(ByRef analyzerMan As IAnalyzerManager)
+        Public Sub New(ByVal analyzerMan As IAnalyzerManager)
             _analyzerManager = analyzerMan
             _alarmsDelg = New WSAnalyzerAlarmsDelegate()
         End Sub
