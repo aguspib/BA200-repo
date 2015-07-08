@@ -6007,6 +6007,7 @@ Public Class UiPositionsAdjustments
 
     End Sub
 
+    'New functionallity for Ba200
     Private Sub SetAdditionalAdjustmentsForBa200Arm(ByVal myTemporalAdjustmentsDS As SRVAdjustmentsDS, ByVal R As SRVAdjustmentsDS.srv_tfmwAdjustmentsRow, ByVal myR1RVValue As String)
 
         SetAdditionalAdjustmentsForReagent1(myTemporalAdjustmentsDS, R, myR1RVValue)
@@ -7609,11 +7610,8 @@ Public Class UiPositionsAdjustments
                         Case "RING2"
                             myAdjustment = ADJUSTMENT_GROUPS.SAMPLES_ARM_RING2
 
-                        Case "RING1R"
+                        Case "REAGENTZ"
                             myAdjustment = ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1
-
-                        Case "RING2R"
-                            myAdjustment = ADJUSTMENT_GROUPS.REAGENT1_ARM_RING2
 
                         Case "RING3"
                             myAdjustment = ADJUSTMENT_GROUPS.SAMPLES_ARM_RING3
