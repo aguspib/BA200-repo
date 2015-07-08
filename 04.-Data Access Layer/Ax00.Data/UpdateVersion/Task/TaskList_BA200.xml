@@ -167,7 +167,7 @@
     </Release>
     <Release Version="03.00.09">
       <DataRevisions>
-        <DataRevision JiraID="BA-2345" SequenceNumber="1">
+        <DataRevision JiraID="BA-2601" SequenceNumber="1">
           <PrerequisiteScript>
             IF ((SELECT COUNT(*) FROM tfmwSWParameters WHERE ParameterName = 'BL_LIFETIME ') = 0)
             AND
