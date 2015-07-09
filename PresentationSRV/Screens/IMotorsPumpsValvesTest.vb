@@ -1651,8 +1651,10 @@ Public Class UiMotorsPumpsValvesTest
     ''' </summary>
     ''' <remarks>Created by SGM 13/05/2011</remarks>
     Private Sub InitializeWSAspiration()
+        Dim ToolTipText As String
+        Dim DefaultToolTipText As String
         Try
-
+            DefaultToolTipText = MyBase.GetHWElementsName("SF1_BX_FOR_TIPS", LanguageID)
 
             'Pumps
             With WsAsp_B6_Pump
@@ -1661,7 +1663,13 @@ Public Class UiMotorsPumpsValvesTest
                 .ActivationState = BsScadaControl.States._OFF
                 .Cursor = Cursors.Hand
                 .Enabled = False
-                .ToolTipText = MyBase.GetHWElementsName(.Identity, LanguageID)
+                Select Case AnalyzerController.Instance.Analyzer.Model
+                    Case AnalyzerModelEnum.A200.ToString
+                        ToolTipText = DefaultToolTipText & " 7,8"
+                    Case Else
+                        ToolTipText = DefaultToolTipText & " 8,9"
+                End Select
+                .ToolTipText = ToolTipText
             End With
             TestableElements.Add(WsAsp_B6_Pump)
 
@@ -1671,7 +1679,13 @@ Public Class UiMotorsPumpsValvesTest
                 .ActivationState = BsScadaControl.States._OFF
                 .Cursor = Cursors.Hand
                 .Enabled = False
-                .ToolTipText = MyBase.GetHWElementsName(.Identity, LanguageID)
+                Select Case AnalyzerController.Instance.Analyzer.Model
+                    Case AnalyzerModelEnum.A200.ToString
+                        ToolTipText = DefaultToolTipText & " 9,10"
+                    Case Else
+                        ToolTipText = DefaultToolTipText & " 10,11"
+                End Select
+                .ToolTipText = ToolTipText
             End With
             TestableElements.Add(WsAsp_B7_Pump)
 
@@ -1681,7 +1695,8 @@ Public Class UiMotorsPumpsValvesTest
                 .ActivationState = BsScadaControl.States._OFF
                 .Cursor = Cursors.Hand
                 .Enabled = False
-                .ToolTipText = MyBase.GetHWElementsName(.Identity, LanguageID)
+                ToolTipText = DefaultToolTipText & " 12"
+                .ToolTipText = ToolTipText
             End With
             TestableElements.Add(WsAsp_B8_Pump)
 
@@ -1691,7 +1706,8 @@ Public Class UiMotorsPumpsValvesTest
                 .ActivationState = BsScadaControl.States._OFF
                 .Cursor = Cursors.Hand
                 .Enabled = False
-                .ToolTipText = MyBase.GetHWElementsName(.Identity, LanguageID)
+                ToolTipText = DefaultToolTipText & " 13"
+                .ToolTipText = ToolTipText
             End With
             TestableElements.Add(WsAsp_B9_Pump)
 
@@ -1701,7 +1717,13 @@ Public Class UiMotorsPumpsValvesTest
                 .ActivationState = BsScadaControl.States._OFF
                 .Cursor = Cursors.Hand
                 .Enabled = False
-                .ToolTipText = MyBase.GetHWElementsName(.Identity, LanguageID)
+                Select Case AnalyzerController.Instance.Analyzer.Model
+                    Case AnalyzerModelEnum.A200.ToString
+                        ToolTipText = DefaultToolTipText & " 6"
+                    Case Else
+                        ToolTipText = DefaultToolTipText & " 7"
+                End Select
+                .ToolTipText = ToolTipText
             End With
             TestableElements.Add(WsAsp_B10_Pump)
 
