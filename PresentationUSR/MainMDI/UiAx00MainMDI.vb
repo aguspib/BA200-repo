@@ -6452,8 +6452,8 @@ Partial Public Class UiAx00MainMDI
             myAlarms.Add(Alarms.WS_TEMP_WARN)
             myAlarms.Add(Alarms.WS_TEMP_SYSTEM_ERR) 'AG 09/01/2012 - this alarm excludes WS_Temp_Warn so it is not necessary change the bsAlert size
             myAlarms.Add(Alarms.WS_COLLISION_ERR)
-
-            WashingStationAlert = New bsAlert(Me, 635, 430 + ParentMDITopHeight, 145, 30, "Washing Station", False)
+            'WashingStationAlert = New bsAlert(Me, 635, 430 + ParentMDITopHeight, 145, 30, "Washing Station", False)
+            WashingStationAlert = New bsAlert(Me, 635, 473 + ParentMDITopHeight, 145, 30, "Washing Station", False)
             WashingStationAlert.Tag = myAlarms
             AlertList.Add(WashingStationAlert)
 
@@ -6463,7 +6463,8 @@ Partial Public Class UiAx00MainMDI
             myAlarms.Add(Alarms.S_DETECT_SYSTEM_ERR)
             myAlarms.Add(Alarms.S_COLLISION_ERR) 'AG 21/05/2012- S_COLLISION_WARN
 
-            SampleArmAlert = New bsAlert(Me, 620, 503 + ParentMDITopHeight, 160, 45, "Samples Arm", False)
+            'SampleArmAlert = New bsAlert(Me, 620, 503 + ParentMDITopHeight, 160, 45, "Samples Arm", False)
+            SampleArmAlert = New bsAlert(Me, 620, 540 + ParentMDITopHeight, 160, 45, "Samples Arm", False)
             SampleArmAlert.Tag = myAlarms
             AlertList.Add(SampleArmAlert)
 
