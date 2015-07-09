@@ -1196,6 +1196,13 @@ Public Class UiMotorsPumpsValvesTest
                     'Needle 11 is for level detection
                     Me.WSAsp_Needle6Label.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Needle", pLanguageID) + " 12"
                     Me.WSAsp_Needle7Label.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Needle", pLanguageID) + " 13"
+                    'Pumps Name are Labeled BxF
+                    Me.WsAsp_B6_Label.Text = "B6F"
+                    Me.WsAsp_B7_Label.Text = "B7F"
+                    Me.WsAsp_B8_Label.Text = "B8F"
+                    Me.WsAsp_B9_Label.Text = "B9F"
+                    Me.WsAsp_B10_Label.Text = "B10F"
+
                 Case Else
                     Me.WSAsp_Needle1Label.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Needle", pLanguageID) + " 7" ' " 1" ' XBC 18/09/2012 - spec change
                     Me.WSAsp_Needle23Label.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Needle", pLanguageID) + " 8,9" '" 2,3" ' XBC 18/09/2012 - spec change
