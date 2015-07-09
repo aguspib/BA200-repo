@@ -333,8 +333,14 @@ Public Class UiBarCodesConfig
             bsReagentsCheckBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Barcodes_Reagents_CBox", LanguageID)
 
             'Labels in SAMPLES BARCODE area
-            bsSamplesLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Barcodes_Samples", LanguageID)
-            bsSamplesCheckBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Barcodes_Samples_CBox", LanguageID)
+            If AnalyzerController.Instance.IsBA200 Then
+                bsSamplesCheckBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Barcodes_BA200_CBox", LanguageID)
+                bsSamplesLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Barcodes_BA200", LanguageID)
+            Else
+                bsSamplesCheckBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Barcodes_Samples_CBox", LanguageID)
+                bsSamplesLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Barcodes_Samples", LanguageID)
+            End If
+
             bsBarcodeTypesGroupBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Barcode_Types", LanguageID)
 
             'bsBarCodeConfiGroupBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Barcode_Config", LanguageID)
