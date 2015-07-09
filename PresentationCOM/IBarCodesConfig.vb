@@ -1143,13 +1143,27 @@ Public Class UiBarCodesConfig
         Try
             'SGM 12/07/2013
             If Not (EditionMode) Then Exit Sub
+            Dim senderCheck = TryCast(sender, Ax00.Controls.UserControls.BSCheckbox)
 
-            If CType(sender, Ax00.Controls.UserControls.BSCheckbox) Is bsSamplesCheckBox Then
+            'DIRTY!!!
+            If AnalyzerController.Instance.Then Then
+                If senderCheck Is bsSamplesCheckBox Then
+                    If senderCheck.Checked <> Me.bsReagentsCheckBox.Checked Then
+                        bsReagentsCheckBox.Checked = senderCheck.Checked
+                    End If
+                Else
+                    If senderCheck.Checked <> Me.bsSamplesCheckBox.Checked Then
+                        bsSamplesCheckBox.Checked = senderCheck.Checked
+                    End If
+                End If
+                '/DIRTY!!!
+
                 MyClass.IsSamplesBarcodeDisabledByUser = bsSamplesCheckBox.Checked
-            End If
-            ChangesMade = True
+                ChangesMade = True
 
-            'If (EditionMode) Then ChangesMade = True
+
+
+                'If (EditionMode) Then ChangesMade = True
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ControlValueChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
