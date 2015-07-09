@@ -1146,7 +1146,7 @@ Public Class UiBarCodesConfig
             Dim senderCheck = TryCast(sender, Ax00.Controls.UserControls.BSCheckbox)
 
             'DIRTY!!!
-            If AnalyzerController.Instance.Then Then
+            If AnalyzerController.Instance.IsBA200 Then
                 If senderCheck Is bsSamplesCheckBox Then
                     If senderCheck.Checked <> Me.bsReagentsCheckBox.Checked Then
                         bsReagentsCheckBox.Checked = senderCheck.Checked
@@ -1156,14 +1156,15 @@ Public Class UiBarCodesConfig
                         bsSamplesCheckBox.Checked = senderCheck.Checked
                     End If
                 End If
-                '/DIRTY!!!
+            End If
+            '/DIRTY!!!
 
-                MyClass.IsSamplesBarcodeDisabledByUser = bsSamplesCheckBox.Checked
-                ChangesMade = True
+            MyClass.IsSamplesBarcodeDisabledByUser = bsSamplesCheckBox.Checked
+            ChangesMade = True
 
 
 
-                'If (EditionMode) Then ChangesMade = True
+            'If (EditionMode) Then ChangesMade = True
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ControlValueChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -1569,6 +1570,11 @@ Public Class UiBarCodesConfig
 
         BarcodeConfigChangesToSend = False ' XBC 14/02/2012
         ResetNotInUseRotorPosition = False
+
+        If AnalyzerController.Instance.IsBA200 Then
+            bsReagentsGroupBox.Visible = False
+            bsSamplesGroupBox.Top = Me.bsReagentsGroupBox.Top
+        End If
 
     End Sub
 
