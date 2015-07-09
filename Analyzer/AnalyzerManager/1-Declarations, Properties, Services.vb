@@ -2479,7 +2479,6 @@ Namespace Biosystems.Ax00.Core.Entities
             Return myReturn
         End Function
 
-
         ''' <summary>
         ''' Get all available ports in PC
         ''' </summary>
@@ -2497,7 +2496,6 @@ Namespace Biosystems.Ax00.Core.Entities
             End Try
             Return myReturn
         End Function
-
 
         ''' <summary>
         ''' When a worksession finish clear the DS with the last reagents prepared
@@ -3063,40 +3061,6 @@ Namespace Biosystems.Ax00.Core.Entities
         End Function
 
         ''' <summary>
-        ''' 
-        ''' </summary>
-        ''' <param name="_uirefresevent"></param>
-        ''' <remarks></remarks>
-        Public Sub Createandthroweventuirefresh(Optional _uirefresevent As UI_RefreshEvents = UI_RefreshEvents.NONE) Implements IAnalyzerManager.CreateAndThrowEventUiRefresh
-            Dim InstructionReceivedAttribute = ""
-
-            If myUI_RefreshEvent.Count = 0 Then
-                ClearRefreshDataSets(True, False)
-            Else
-                If _uirefresevent <> UI_RefreshEvents.NONE Then
-                    If Not myUI_RefreshEvent.Contains(_uirefresevent) Then
-                        myUI_RefreshEvent.Add(_uirefresevent)
-                    End If
-
-                    If _myIsBlExpired Then
-                        PrepareUINewAlarmType(AlarmEnumerates.Alarms.BASELINE_EXPIRED)
-                    End If
-                End If
-
-                'If eventDataPendingToTriggerFlag Then
-
-                'End If
-            End If
-
-            RaiseEvent ReceptionEvent(InstructionReceivedAttribute, False, myUI_RefreshEvent, myUI_RefreshDS, True)
-            RaiseEvent ReceptionEvent(InstructionReceivedAttribute, True, myUI_RefreshEvent, myUI_RefreshDS, True)
-        End Sub
-
-        Public Overridable Sub startListenerExpiration() Implements IAnalyzerManager.startListenerExpiration
-
-        End Sub
-
-        ''' <summary>
         ''' Remove any instruction from the queue
         ''' </summary>
         ''' <remarks>Created by XB 06/11/2013</remarks>
@@ -3408,7 +3372,6 @@ Namespace Biosystems.Ax00.Core.Entities
             Return myGlobal
         End Function
 
-
         ''' <summary>
         ''' USB connection cable has been disconnected and presentation inform this to AnalyzerManager class
         ''' </summary>
@@ -3592,7 +3555,6 @@ Namespace Biosystems.Ax00.Core.Entities
             Return returnValue
 
         End Function
-
 
         ''' <summary>
         ''' Barcode functionality: Before enter RUNNING the analyzer
@@ -3872,7 +3834,6 @@ Namespace Biosystems.Ax00.Core.Entities
             Return resultData
         End Function
 
-
         ''' <summary>
         ''' Return TRUE when some alarm in system fluids (wash solution, high contamination, water or waste) exists
         ''' This method is used for UI buttons activation or not and for processes who automatically send instruction that requires no system fluids alarms
@@ -3907,7 +3868,6 @@ Namespace Biosystems.Ax00.Core.Entities
             End Try
             Return returnValue
         End Function
-
 
         ''' <summary>
         ''' Update corresponding Work Session tables depending of the Analyzer Instrument to which is connected
@@ -4404,8 +4364,19 @@ Namespace Biosystems.Ax00.Core.Entities
             validFLIGHTAttribute = False            
         End Sub
 
-        
+
+
+        ''' <summary>
+        ''' Method empty but necessary to have it in the interface, overrided in BA200AlanyzerEntity.vb class.
+        ''' </summary>
+        ''' <remarks></remarks>
+        Public Overridable Sub startListenerExpiration() Implements IAnalyzerManager.startListenerExpiration
+
+        End Sub
+
 #End Region
+
+
 
     End Class
 

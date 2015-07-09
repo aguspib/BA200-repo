@@ -18,12 +18,12 @@ Namespace Biosystems.Ax00.Core.Entities
             WSExecutionCreator.Instance.ContaminationsSpecification = New BA200ContaminationsSpecification(Me)
             _currentAnalyzer = Me
 
-            BL_expListener = New BaseLineExpirationListener(Me)
+            BL_expListener = New BaseLineExpirationListener(Me, New BaseLineEntityExpiration(_currentAnalyzer), New AnalyzerAlarms(_currentAnalyzer))
 
         End Sub
 
         ''' <summary>
-        ''' 
+        ''' Method that start The expiration listener at the same time we create and instance of one Analyzer and we connect with one instrument
         ''' </summary>
         ''' <remarks></remarks>
         Public Overrides Sub startListenerExpiration()

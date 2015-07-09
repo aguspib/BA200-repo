@@ -1186,13 +1186,25 @@ Public Class UiMotorsPumpsValvesTest
             Me.WsAsp_SwitchContinuousRButton.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ContinuousSwitch", pLanguageID)
             Me.WsAsp_HCLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_HighContaminationTank", pLanguageID)
             Me.WsAsp_LCLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_LowContaminationTank", pLanguageID)
-            Me.WSAsp_Needle1Label.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Needle", pLanguageID) + " 7" ' " 1" ' XBC 18/09/2012 - spec change
-            Me.WSAsp_Needle23Label.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Needle", pLanguageID) + " 8,9" '" 2,3" ' XBC 18/09/2012 - spec change
-            Me.WSAsp_Needle45Label.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Needle", pLanguageID) + " 10,11" ' " 4,5" ' XBC 18/09/2012 - spec change
-            Me.WSAsp_Needle6Label.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Needle", pLanguageID) + " 12" ' " 6" ' XBC 18/09/2012 - spec change
-            Me.WSAsp_Needle7Label.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Needle", pLanguageID) + " 13" ' " 7" ' XBC 18/09/2012 - spec change
 
-            'WS DISPENSATION
+            'Needle Labels numbering of wash station aspiration tab are different depending of Model
+            Select Case AnalyzerController.Instance.Analyzer.Model
+                Case AnalyzerModelEnum.A200.ToString
+                    Me.WSAsp_Needle1Label.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Needle", pLanguageID) + " 6"
+                    Me.WSAsp_Needle23Label.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Needle", pLanguageID) + " 7,8"
+                    Me.WSAsp_Needle45Label.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Needle", pLanguageID) + " 9,10"
+                    'Needle 11 is for level detection
+                    Me.WSAsp_Needle6Label.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Needle", pLanguageID) + " 12"
+                    Me.WSAsp_Needle7Label.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Needle", pLanguageID) + " 13"
+                Case Else
+                    Me.WSAsp_Needle1Label.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Needle", pLanguageID) + " 7" ' " 1" ' XBC 18/09/2012 - spec change
+                    Me.WSAsp_Needle23Label.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Needle", pLanguageID) + " 8,9" '" 2,3" ' XBC 18/09/2012 - spec change
+                    Me.WSAsp_Needle45Label.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Needle", pLanguageID) + " 10,11" ' " 4,5" ' XBC 18/09/2012 - spec change
+                    Me.WSAsp_Needle6Label.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Needle", pLanguageID) + " 12" ' " 6" ' XBC 18/09/2012 - spec change
+                    Me.WSAsp_Needle7Label.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Needle", pLanguageID) + " 13" ' " 7" ' XBC 18/09/2012 - spec change
+            End Select
+
+    'WS DISPENSATION
             Me.BsWSDispensationInfoTitleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_INFO_TITLE", pLanguageID)
             Me.WsDisp_SwitchGroupBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Switch", pLanguageID)
             Me.WsDisp_SwitchSimpleRButton.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_SimpleSwitch", pLanguageID)
@@ -1206,7 +1218,7 @@ Public Class UiMotorsPumpsValvesTest
             Me.WSDisp_Needle5Label.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Needle", pLanguageID) + " 5"
             Me.WSDisp_MotorAdjustControl.RangeTitle = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Range", pLanguageID) & ":"
 
-            'IN OUT
+    'IN OUT
             Me.BsInOutInfoTitleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_INFO_TITLE", pLanguageID)
             Me.InOut_SwitchGroupBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Switch", pLanguageID)
             Me.InOut_SwitchSimpleRButton.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_SimpleSwitch", pLanguageID)
@@ -1217,24 +1229,24 @@ Public Class UiMotorsPumpsValvesTest
             Me.InOut_PW_ExternalTankLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_DistilledWaterExtTank", pLanguageID)
             Me.InOut_ExternalSourceLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_EXTERNAL_SOURCE", pLanguageID)
 
-            'COLLISION
+    'COLLISION
             Me.BsCollisionInfoTitleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_INFO_TITLE", pLanguageID)
             Me.Col_WashingStationLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_WashStation", pLanguageID)
             Me.Col_SamplesLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_SAMPLE", pLanguageID) + " " + myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Needle", pLanguageID)
             Me.Col_Reagent1Label.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Reagent1", pLanguageID) + " " + myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Needle", pLanguageID)
             Me.Col_Reagent2Label.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Reagent2", pLanguageID) + " " + myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Needle", pLanguageID)
 
-            'ENCODER 'PDT
+    'ENCODER 'PDT
             Me.BsEncoderInfoTitleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_INFO_TITLE", pLanguageID)
             Me.Enco_MotorCaptionLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_EncoderTestMotor", pLanguageID)
             Me.Enco_EncoderCaptionLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_EncoderTestEncoder", pLanguageID) + " " + myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Needle", pLanguageID)
 
-            'LBL_SRV_CollisionTest
-            'LBL_SRV_EncoderTest
-            'LBL_SRV_EncoderTestMotor
-            'LBL_SRV_EncoderTestEncoder
+    'LBL_SRV_CollisionTest
+    'LBL_SRV_EncoderTest
+    'LBL_SRV_EncoderTestMotor
+    'LBL_SRV_EncoderTestEncoder
 
-            ' Tooltips
+    ' Tooltips
             GetScreenTooltip(pLanguageID)
 
         Catch ex As Exception
@@ -7254,6 +7266,8 @@ Public Class UiMotorsPumpsValvesTest
         'End If
     End Sub
 
+
+
     ''' <summary>
     ''' 
     ''' </summary>
@@ -8750,5 +8764,5 @@ Public Class UiMotorsPumpsValvesTest
 #End Region
 
 
-    
+
 End Class
