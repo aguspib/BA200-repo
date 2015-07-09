@@ -685,7 +685,7 @@
           <DataScript>
             DELETE FROM [A200].[dbo].[srv_tfmwAdjustments]
             WHERE CodeFw IN ('R2RV','R2H','R2V','R2SV','R2WH','R2WVR','R2DH','R2PH1','R2PH2','R2PV1','R2PV2','R2PI','M1RV','M1H','M1V','M1SV','M1WH','M1WVR','M1DH1','M1DV1','M1PH3','M1PV3p','M1PV3t','A2RV','A2H','A2V','A2SV','A2WH','A2WVR','A2DH','A2DV','RR2P1','RR2P2','RM1P3','GTR2','GTOR2','DR2S','SCOV');
- 
+
             GO
 
             UPDATE [dbo].[srv_tfmwAdjustments] SET GroupId = 'SAMPLES_ARM_ZREF', Value = '4160' WHERE CodeFw = 'R1RV';
@@ -803,21 +803,14 @@
             VALUES ('MasterData','##########','GTISE','37,0','General Equipo - Termos','Consigna Termo Punta General para dispensación en ISE','THERMOS_ISE','SETPOINT',1,1,1);
             INSERT INTO [A200].[dbo].[srv_tfmwAdjustments]([AnalyzerID],[FwVersion],[CodeFw],[Value],[AreaFw],[DescriptionFw],[GroupID],[AxisID],[CanSave],[CanMove],[InFile])
             VALUES ('MasterData','##########','GTOISE','37,0','General Equipo - Termos','Objetivo Termo Punta General para dispensación en ISE','THERMOS_ISE','TARGET',1,1,1);
-            
-            GO
-          
-            INSERT INTO [A200].[dbo].[tfmwPreloadedMasterData]
-            ([SubTableID],[ItemID],[ResourceID],[FixedItemDesc],[MultiLanguageFlag],[Position],[Status])
-            VALUES
-            ('SRV_SAMPLE_POSITIONS','RING2R','GRID_SRV_RING2','Ring2R',1,12,1)
-            
+
             GO
 
             INSERT INTO [A200].[dbo].[tfmwPreloadedMasterData]
             ([SubTableID],[ItemID],[ResourceID],[FixedItemDesc],[MultiLanguageFlag],[Position],[Status])
             VALUES
-            ('SRV_SAMPLE_POSITIONS','RING1R','GRID_SRV_RING1','Ring1R',1,11,1)
-            
+            ('SRV_SAMPLE_POSITIONS','REAGENTZ','GRID_SRV_RING1','ReagentZ',1,11,1)
+
             GO
 
             DELETE [A200].[dbo].[tfmwPreloadedMasterData] where [SubTableID] = 'SRV_SAMPLE_POSITIONS' and ItemID ='RING3'
@@ -833,7 +826,7 @@
             WHERE CodeFw IN ('LCTOPMA','LCTOPMI','LCBOTMA','LCBOTMI','H2OTOPMA','H2OTOPMI','H2OBOTMA','H2OBOTMI','RREG1','RREG2','RREG3','RREG4','RREG5','RREG6','RREG7','RREG8','GTISE','GTOISE')) = 18)
             AND 
             ((SELECT COUNT(1) FROM [A200].[dbo].[tfmwPreloadedMasterData]
-            WHERE [SubTableID] = 'SRV_SAMPLE_POSITIONS' and ([ItemID] = 'RING2R' or [ItemID] = 'RING1R' or [ItemID] = 'RING3')) = 2)
+            WHERE [SubTableID] = 'SRV_SAMPLE_POSITIONS' and ([ItemID] = 'REAGENTZ' or [ItemID] = 'RING3')) = 1)
             Select 'True'
             ELSE
             Select 'False'

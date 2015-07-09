@@ -749,16 +749,16 @@ Public Class UiPositionsAdjustments
             If Not myResultData.HasError Then
                 myResultData = MyClass.PrepareArmTab(Me.BsGridSample)
             End If
-            If Not myResultData.HasError AndAlso Not IsBa200() Then
+            If Not myResultData.HasError AndAlso Not AnalyzerController.Instance.IsBA200() Then
                 myResultData = MyClass.PrepareArmTab(Me.BsGridReagent1)
             End If
-            If Not myResultData.HasError AndAlso Not IsBa200() Then
+            If Not myResultData.HasError AndAlso Not AnalyzerController.Instance.IsBA200() Then
                 myResultData = MyClass.PrepareArmTab(Me.BsGridReagent2)
             End If
             If Not myResultData.HasError Then
                 myResultData = MyClass.PrepareArmTab(Me.BsGridMixer1)
             End If
-            If Not myResultData.HasError AndAlso Not IsBa200() Then
+            If Not myResultData.HasError AndAlso Not AnalyzerController.Instance.IsBA200() Then
                 myResultData = MyClass.PrepareArmTab(Me.BsGridMixer2)
             End If
 
@@ -4379,7 +4379,7 @@ Public Class UiPositionsAdjustments
         Me.HomePolar = 0
         Me.HomeZ = 0
         Me.HomeRotor = 0
-        If Not Me.BsGridMixer2 Is Nothing AndAlso Not IsBa200() Then
+        If Not Me.BsGridMixer2 Is Nothing AndAlso Not AnalyzerController.Instance.IsBA200() Then
             If Me.BsGridMixer2.RowsCount > 0 Then
                 '' DISP1
                 Me.BsGridMixer2.ParameterCellValue(0, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER2_ARM_DISP1.ToString, GlobalEnumerates.AXIS.POLAR).Value
@@ -4537,7 +4537,7 @@ Public Class UiPositionsAdjustments
                 Me.BsGridSample.ParameterCellValue(position, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING2.ToString, GlobalEnumerates.AXIS.Z).Value
                 Me.BsGridSample.ParameterCellValue(position, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING2.ToString, GlobalEnumerates.AXIS.ROTOR).Value
                 position += 1
-                If Not IsBa200() Then
+                If Not AnalyzerController.Instance.IsBA200() Then
                     '' SAMPLE RING3 PEDIATRIC
                     Me.BsGridSample.ParameterCellValue(position, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING3.ToString, GlobalEnumerates.AXIS.POLAR).Value
                     Me.BsGridSample.ParameterCellValue(position, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING3.ToString, GlobalEnumerates.AXIS.Z).Value
@@ -4559,7 +4559,7 @@ Public Class UiPositionsAdjustments
                 Me.BsGridSample.ParameterCellValue(position, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_PARK.ToString, GlobalEnumerates.AXIS.Z).Value
                 Me.BsGridSample.ParameterCellValue(position, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_PARK.ToString, GlobalEnumerates.AXIS.ROTOR).Value
                 position += 1
-                If IsBa200() Then
+                If AnalyzerController.Instance.IsBA200() Then
                     '' REAGENT RING1 PEDIATRIC
                     Me.BsGridSample.ParameterCellValue(position, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1.ToString, GlobalEnumerates.AXIS.POLAR).Value
                     Me.BsGridSample.ParameterCellValue(position, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1.ToString, GlobalEnumerates.AXIS.Z).Value
@@ -5584,7 +5584,7 @@ Public Class UiPositionsAdjustments
             If Not myTemporalAdjustmentsDS Is Nothing Then
                 For Each R As SRVAdjustmentsDS.srv_tfmwAdjustmentsRow In myTemporalAdjustmentsDS.srv_tfmwAdjustments.Rows
 
-                    If Not IsBa200() Then
+                    If Not AnalyzerController.Instance.IsBA200() Then
                         ' REAGENT 1
                         If UCase(R.CodeFw.Trim) = Ax00Adjustsments.R1RV.ToString Then
                             SetAdditionalAdjustmentsForReagent1(myTemporalAdjustmentsDS, R, myR1RVValue)
@@ -9547,16 +9547,14 @@ Public Class UiPositionsAdjustments
 #Region "New functionallity for Ba200"
     Private Sub HideTabsForBa200Model()
 
-        If (IsBa200()) Then
+        If (AnalyzerController.Instance.IsBA200()) Then
             BsTabArmsControl.TabPages.Remove(TabReagent1)
             BsTabArmsControl.TabPages.Remove(TabReagent2)
             BsTabArmsControl.TabPages.Remove(TabMixer2)
         End If
     End Sub
 
-    Private Function IsBa200() As Boolean
-        Return AnalyzerController.Instance.Analyzer.Model = AnalyzerModelEnum.A200.ToString()
-    End Function
+
 #End Region
 
 

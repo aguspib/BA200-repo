@@ -1685,7 +1685,7 @@
           <InstructionID>1</InstructionID>
           <Sequence>1</Sequence>
           <Timer>0</Timer>
-          <Code>BM1.MV.MPV</Code>
+          <Code>BR1.MV.MPV</Code>
           <Params>10000.100000</Params>
           <EnableEdition>true</EnableEdition>
         </InstructionTO>
@@ -1693,7 +1693,7 @@
           <InstructionID>2</InstructionID>
           <Sequence>2</Sequence>
           <Timer>10</Timer>
-          <Code>BM1.MV.MMA</Code>
+          <Code>BR1.MV.MMA</Code>
           <Params>#1@</Params>
           <EnableEdition>false</EnableEdition>
         </InstructionTO>
@@ -1701,7 +1701,7 @@
           <InstructionID>3</InstructionID>
           <Sequence>3</Sequence>
           <Timer>2000</Timer>
-          <Code>BM1.MH.MPV</Code>
+          <Code>BR1.MH.MPV</Code>
           <Params>10000.100000</Params>
           <EnableEdition>true</EnableEdition>
         </InstructionTO>
@@ -1709,7 +1709,7 @@
           <InstructionID>4</InstructionID>
           <Sequence>4</Sequence>
           <Timer>2010</Timer>
-          <Code>BM1.MH.MMA</Code>
+          <Code>BR1.MH.MMA</Code>
           <Params>#2@</Params>
           <EnableEdition>false</EnableEdition>
         </InstructionTO>
@@ -2665,7 +2665,7 @@
           <InstructionID>1</InstructionID>
           <Sequence>1</Sequence>
           <Timer>0</Timer>
-          <Code>BM1.MH.MPV</Code>
+          <Code>BR1.MH.MPV</Code>
           <Params>10000.100000</Params>
           <EnableEdition>true</EnableEdition>
         </InstructionTO>
@@ -2673,93 +2673,29 @@
           <InstructionID>2</InstructionID>
           <Sequence>2</Sequence>
           <Timer>10</Timer>
-          <Code>BM1.MV.MPV</Code>
+          <Code>BR1.MV.MPV</Code>
           <Params>10000.100000</Params>
           <EnableEdition>true</EnableEdition>
         </InstructionTO>
         <InstructionTO>
           <InstructionID>3</InstructionID>
           <Sequence>3</Sequence>
-          <Timer>20</Timer>
-          <Code>BR1.MH.MPV</Code>
-          <Params>10000.100000</Params>
-          <EnableEdition>true</EnableEdition>
-        </InstructionTO>
-        <InstructionTO>
-          <InstructionID>4</InstructionID>
-          <Sequence>4</Sequence>
-          <Timer>30</Timer>
-          <Code>BR1.MV.MPV</Code>
-          <Params>10000.100000</Params>
-          <EnableEdition>true</EnableEdition>
-        </InstructionTO>
-        <InstructionTO>
-          <InstructionID>5</InstructionID>
-          <Sequence>5</Sequence>
-          <Timer>40</Timer>
-          <Code>BR2.MH.MPV</Code>
-          <Params>10000.100000</Params>
-          <EnableEdition>true</EnableEdition>
-        </InstructionTO>
-        <InstructionTO>
-          <InstructionID>6</InstructionID>
-          <Sequence>6</Sequence>
-          <Timer>50</Timer>
-          <Code>BR2.MV.MPV</Code>
-          <Params>10000.100000</Params>
-          <EnableEdition>true</EnableEdition>
-        </InstructionTO>
-        <InstructionTO>
-          <InstructionID>7</InstructionID>
-          <Sequence>7</Sequence>
           <Timer>1000</Timer>
-          <Code>BM1.MH.MMA</Code>
+          <Code>BR1.MH.MMA</Code>
           <Params>#1@</Params>
           <EnableEdition>false</EnableEdition>
         </InstructionTO>
         <InstructionTO>
-          <InstructionID>8</InstructionID>
-          <Sequence>8</Sequence>
-          <Timer>1010</Timer>
-          <Code>BR1.MH.MMA</Code>
-          <Params>#3@</Params>
-          <EnableEdition>false</EnableEdition>
-        </InstructionTO>
-        <InstructionTO>
-          <InstructionID>9</InstructionID>
-          <Sequence>9</Sequence>
-          <Timer>1020</Timer>
-          <Code>BR2.MH.MMA</Code>
-          <Params>#5@</Params>
-          <EnableEdition>false</EnableEdition>
-        </InstructionTO>
-        <InstructionTO>
-          <InstructionID>10</InstructionID>
-          <Sequence>10</Sequence>
+          <InstructionID>4</InstructionID>
+          <Sequence>4</Sequence>
           <Timer>5000</Timer>
-          <Code>BM1.MV.MMA</Code>
+          <Code>BR1.MV.MMA</Code>
           <Params>#2@</Params>
           <EnableEdition>false</EnableEdition>
         </InstructionTO>
         <InstructionTO>
-          <InstructionID>11</InstructionID>
-          <Sequence>11</Sequence>
-          <Timer>5010</Timer>
-          <Code>BR1.MV.MMA</Code>
-          <Params>#4@</Params>
-          <EnableEdition>false</EnableEdition>
-        </InstructionTO>
-        <InstructionTO>
-          <InstructionID>12</InstructionID>
-          <Sequence>12</Sequence>
-          <Timer>5020</Timer>
-          <Code>BR2.MV.MMA</Code>
-          <Params>#6@</Params>
-          <EnableEdition>false</EnableEdition>
-        </InstructionTO>
-        <InstructionTO>
-          <InstructionID>13</InstructionID>
-          <Sequence>13</Sequence>
+          <InstructionID>5</InstructionID>
+          <Sequence>5</Sequence>
           <Timer>8000</Timer>
           <Code>END</Code>
           <Params />
