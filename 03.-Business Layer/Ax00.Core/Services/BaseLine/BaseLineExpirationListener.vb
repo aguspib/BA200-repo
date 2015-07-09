@@ -15,30 +15,34 @@ Namespace Biosystems.Ax00.Core.Services.BaseLine
         Private _analyzerAlarmsManager As IAnalyzerAlarms
         Private baseLineExpirationobj As IBaseLineExpiration
 #End Region
+
+        'Default value = 10 minutes
         Public Property TimeDelay As Integer = 1000 * 60 * 2
+
         Public Sub New(analyzer As IAnalyzerManager, baseLineExpirationobj As IBaseLineExpiration, analyzerAlarmsManager As IAnalyzerAlarms)
 
             BaseLineExpirationListener._analyzer = analyzer
             _analyzerAlarmsManager = analyzerAlarmsManager
             Me.baseLineExpirationobj = baseLineExpirationobj
 
+            'We create a thread when we Initialize the application.
+            Dim T As New Threading.Thread(AddressOf Listening)
+            T.IsBackground = True
+            T.Priority = ThreadPriority.Lowest
+            T.Start()
+
         End Sub
 
 #Region "Events"
 
         ''' <summary>
-        ''' 
+        ''' Function only used when the application is connected with one analyzer.
         ''' </summary>
         ''' <remarks></remarks>
-        Public Sub startToListening()
+        Public Sub StartToListening()
             If _analyzer.Connected Then
                 checkIsExpired()
             End If
-
-            Dim T As New Threading.Thread(AddressOf Listening)
-            T.IsBackground = True
-            T.Priority = ThreadPriority.Lowest
-            T.Start()
         End Sub
 
         ''' <summary>
@@ -46,14 +50,14 @@ Namespace Biosystems.Ax00.Core.Services.BaseLine
         ''' </summary>
         ''' <remarks></remarks>
         Private Sub Listening()
+
             While True
-                '10 minuts
-                'Dim a = Task.Delay(10 * 60 * 1000)
                 Dim a = Task.Delay(TimeDelay)
                 a.Wait()
-
-                checkIsExpired()
-
+                'We only check if is expired if we have connection with one analyzer. 
+                If _analyzer.Connected Then
+                    CheckIsExpired()
+                End If
             End While
         End Sub
 
@@ -65,11 +69,11 @@ Namespace Biosystems.Ax00.Core.Services.BaseLine
         '''          0 to create the alarm.
         '''          1 to delete the alarm. 
         ''' </remarks>
-        Private Sub checkIsExpired()
+        Private Sub CheckIsExpired()
             If baseLineExpirationobj.IsBlExpired Then
-                _analyzerAlarmsManager.ActionAlarm(0, AlarmEnumerates.Alarms.BASELINE_EXPIRED)
+                _analyzerAlarmsManager.ActionAlarm(CBool(0), AlarmEnumerates.Alarms.BASELINE_EXPIRED)
             Else
-                _analyzerAlarmsManager.ActionAlarm(1, AlarmEnumerates.Alarms.BASELINE_EXPIRED)
+                _analyzerAlarmsManager.ActionAlarm(CBool(1), AlarmEnumerates.Alarms.BASELINE_EXPIRED)
             End If
         End Sub
 

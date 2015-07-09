@@ -1196,6 +1196,13 @@ Public Class UiMotorsPumpsValvesTest
                     'Needle 11 is for level detection
                     Me.WSAsp_Needle6Label.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Needle", pLanguageID) + " 12"
                     Me.WSAsp_Needle7Label.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Needle", pLanguageID) + " 13"
+                    'Pumps Name are Labeled BxF
+                    Me.WsAsp_B6_Label.Text = "B6F"
+                    Me.WsAsp_B7_Label.Text = "B7F"
+                    Me.WsAsp_B8_Label.Text = "B8F"
+                    Me.WsAsp_B9_Label.Text = "B9F"
+                    Me.WsAsp_B10_Label.Text = "B10F"
+
                 Case Else
                     Me.WSAsp_Needle1Label.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Needle", pLanguageID) + " 7" ' " 1" ' XBC 18/09/2012 - spec change
                     Me.WSAsp_Needle23Label.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Needle", pLanguageID) + " 8,9" '" 2,3" ' XBC 18/09/2012 - spec change
@@ -1644,8 +1651,10 @@ Public Class UiMotorsPumpsValvesTest
     ''' </summary>
     ''' <remarks>Created by SGM 13/05/2011</remarks>
     Private Sub InitializeWSAspiration()
+        Dim ToolTipText As String
+        Dim DefaultToolTipText As String
         Try
-
+            DefaultToolTipText = MyBase.GetHWElementsName("SF1_BX_FOR_TIPS", LanguageID)
 
             'Pumps
             With WsAsp_B6_Pump
@@ -1654,7 +1663,13 @@ Public Class UiMotorsPumpsValvesTest
                 .ActivationState = BsScadaControl.States._OFF
                 .Cursor = Cursors.Hand
                 .Enabled = False
-                .ToolTipText = MyBase.GetHWElementsName(.Identity, LanguageID)
+                Select Case AnalyzerController.Instance.Analyzer.Model
+                    Case AnalyzerModelEnum.A200.ToString
+                        ToolTipText = DefaultToolTipText & " 7,8"
+                    Case Else
+                        ToolTipText = DefaultToolTipText & " 8,9"
+                End Select
+                .ToolTipText = ToolTipText
             End With
             TestableElements.Add(WsAsp_B6_Pump)
 
@@ -1664,7 +1679,13 @@ Public Class UiMotorsPumpsValvesTest
                 .ActivationState = BsScadaControl.States._OFF
                 .Cursor = Cursors.Hand
                 .Enabled = False
-                .ToolTipText = MyBase.GetHWElementsName(.Identity, LanguageID)
+                Select Case AnalyzerController.Instance.Analyzer.Model
+                    Case AnalyzerModelEnum.A200.ToString
+                        ToolTipText = DefaultToolTipText & " 9,10"
+                    Case Else
+                        ToolTipText = DefaultToolTipText & " 10,11"
+                End Select
+                .ToolTipText = ToolTipText
             End With
             TestableElements.Add(WsAsp_B7_Pump)
 
@@ -1674,7 +1695,8 @@ Public Class UiMotorsPumpsValvesTest
                 .ActivationState = BsScadaControl.States._OFF
                 .Cursor = Cursors.Hand
                 .Enabled = False
-                .ToolTipText = MyBase.GetHWElementsName(.Identity, LanguageID)
+                ToolTipText = DefaultToolTipText & " 12"
+                .ToolTipText = ToolTipText
             End With
             TestableElements.Add(WsAsp_B8_Pump)
 
@@ -1684,7 +1706,8 @@ Public Class UiMotorsPumpsValvesTest
                 .ActivationState = BsScadaControl.States._OFF
                 .Cursor = Cursors.Hand
                 .Enabled = False
-                .ToolTipText = MyBase.GetHWElementsName(.Identity, LanguageID)
+                ToolTipText = DefaultToolTipText & " 13"
+                .ToolTipText = ToolTipText
             End With
             TestableElements.Add(WsAsp_B9_Pump)
 
@@ -1694,7 +1717,13 @@ Public Class UiMotorsPumpsValvesTest
                 .ActivationState = BsScadaControl.States._OFF
                 .Cursor = Cursors.Hand
                 .Enabled = False
-                .ToolTipText = MyBase.GetHWElementsName(.Identity, LanguageID)
+                Select Case AnalyzerController.Instance.Analyzer.Model
+                    Case AnalyzerModelEnum.A200.ToString
+                        ToolTipText = DefaultToolTipText & " 6"
+                    Case Else
+                        ToolTipText = DefaultToolTipText & " 7"
+                End Select
+                .ToolTipText = ToolTipText
             End With
             TestableElements.Add(WsAsp_B10_Pump)
 

@@ -28,7 +28,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks></remarks>
         Public Overrides Sub startListenerExpiration()
             MyBase.startListenerExpiration()
-            BL_expListener.startToListening()
+            BL_expListener.StartToListening()
         End Sub
 
 
