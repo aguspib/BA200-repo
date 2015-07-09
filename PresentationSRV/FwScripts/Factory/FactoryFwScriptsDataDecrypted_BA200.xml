@@ -1033,7 +1033,7 @@
           <InstructionID>1</InstructionID>
           <Sequence>1</Sequence>
           <Timer>0</Timer>
-          <Code>BM1.MH.MMR</Code>
+          <Code>BR1.MH.MMR</Code>
           <Params>#1@</Params>
           <EnableEdition>false</EnableEdition>
         </InstructionTO>
@@ -1061,7 +1061,7 @@
           <InstructionID>1</InstructionID>
           <Sequence>1</Sequence>
           <Timer>0</Timer>
-          <Code>BM1.MV.MMR</Code>
+          <Code>BR1.MV.MMR</Code>
           <Params>#1@</Params>
           <EnableEdition>false</EnableEdition>
         </InstructionTO>
@@ -1306,14 +1306,14 @@
     </FwScriptTO>
     <FwScriptTO>
       <FwScriptID>35</FwScriptID>
-      <ActionID>SAMPLES_REL_ROTOR</ActionID>
+      <ActionID>35</ActionID>
       <Description>Samples Rotor Relative Movement in wells</Description>
       <Instructions>
         <InstructionTO>
           <InstructionID>1</InstructionID>
           <Sequence>1</Sequence>
           <Timer>0</Timer>
-          <Code>RM1.MR.MPV</Code>
+          <Code>RR1.MR.MPV</Code>
           <Params>10000.10000</Params>
           <EnableEdition>true</EnableEdition>
         </InstructionTO>
@@ -1321,7 +1321,7 @@
           <InstructionID>2</InstructionID>
           <Sequence>2</Sequence>
           <Timer>10</Timer>
-          <Code>RM1.MR.MMR</Code>
+          <Code>RR1.MR.MMR</Code>
           <Params>#1@</Params>
           <EnableEdition>false</EnableEdition>
         </InstructionTO>
