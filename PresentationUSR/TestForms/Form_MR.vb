@@ -26,7 +26,7 @@ Public Class Form_MR
     Private Sub Form_MR_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
         _analyzer = AnalyzerManager.GetCurrentAnalyzerManager()
-        bsExpired = New BaseLineExpirationListener(_analyzer)
+        bsExpired = New BaseLineExpirationListener(_analyzer, New BaseLineEntityExpiration(_analyzer), New AnalyzerAlarms(_analyzer))
         _analyzerAlarmsManager = New AnalyzerAlarms(AnalyzerManager.GetCurrentAnalyzerManager())
 
     End Sub

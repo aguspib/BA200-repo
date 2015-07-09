@@ -128,6 +128,7 @@ Namespace Biosystems.Ax00.Core.Entities
         'MR BA-2601 18/06/2015
         Private _myAnalyzerSettingsDs As New AnalyzerSettingsDS
         Private _myParametersDS As New ParametersDS
+        Private _myIsBlExpired As Boolean = False
 
 #End Region
 
@@ -1553,6 +1554,7 @@ Namespace Biosystems.Ax00.Core.Entities
         '    End Set
         'End Property
 
+        'MR New Alarm Type
 
         Public Property AnalyzerSettings As AnalyzerSettingsDS Implements IAnalyzerManager.AnalyzerSettings
             Get
@@ -1569,6 +1571,15 @@ Namespace Biosystems.Ax00.Core.Entities
             End Get
             Set(value As ParametersDS)
                 _myParametersDS = value
+            End Set
+        End Property
+
+        Public Property IsBlExpired As Boolean Implements IAnalyzerManager.IsBlExpired
+            Get
+                Return _myIsBlExpired
+            End Get
+            Set(value As Boolean)
+                _myIsBlExpired = value
             End Set
         End Property
 
@@ -2305,10 +2316,14 @@ Namespace Biosystems.Ax00.Core.Entities
             Return resultData
         End Function
 
+        ''' <summary>
+        ''' Function to get from Database if we have the alarm of BaseLine expired created. Function only needed for the inizialization.
+        ''' </summary>
+        ''' <param name="AnalyzerID"></param>
+        ''' <remarks></remarks>
         Private Sub InitializeNewAlarmType(ByVal AnalyzerID As String)
             Dim connection As TypedGlobalDataTo(Of SqlConnection) = Nothing
             Dim alarmsDelg As New WSAnalyzerAlarmsDelegate
-
 
             Try
 
@@ -2464,7 +2479,6 @@ Namespace Biosystems.Ax00.Core.Entities
             Return myReturn
         End Function
 
-
         ''' <summary>
         ''' Get all available ports in PC
         ''' </summary>
@@ -2482,7 +2496,6 @@ Namespace Biosystems.Ax00.Core.Entities
             End Try
             Return myReturn
         End Function
-
 
         ''' <summary>
         ''' When a worksession finish clear the DS with the last reagents prepared
@@ -3047,19 +3060,6 @@ Namespace Biosystems.Ax00.Core.Entities
             Return myGlobal
         End Function
 
-
-
-
-        Public Sub Createandthroweventuirefresh() Implements IAnalyzerManager.Createandthroweventuirefresh
-            If myUI_RefreshEvent.Count = 0 Then
-                ClearRefreshDataSets(True, False)
-            Else
-                If eventDataPendingToTriggerFlag Then
-                    RaiseEvent ReceptionEvent(InstructionReceivedAttribute, True, myUI_RefreshEvent, myUI_RefreshDS, True)
-                End If
-            End If
-        End Sub
-
         ''' <summary>
         ''' Remove any instruction from the queue
         ''' </summary>
@@ -3372,7 +3372,6 @@ Namespace Biosystems.Ax00.Core.Entities
             Return myGlobal
         End Function
 
-
         ''' <summary>
         ''' USB connection cable has been disconnected and presentation inform this to AnalyzerManager class
         ''' </summary>
@@ -3556,7 +3555,6 @@ Namespace Biosystems.Ax00.Core.Entities
             Return returnValue
 
         End Function
-
 
         ''' <summary>
         ''' Barcode functionality: Before enter RUNNING the analyzer
@@ -3836,7 +3834,6 @@ Namespace Biosystems.Ax00.Core.Entities
             Return resultData
         End Function
 
-
         ''' <summary>
         ''' Return TRUE when some alarm in system fluids (wash solution, high contamination, water or waste) exists
         ''' This method is used for UI buttons activation or not and for processes who automatically send instruction that requires no system fluids alarms
@@ -3871,7 +3868,6 @@ Namespace Biosystems.Ax00.Core.Entities
             End Try
             Return returnValue
         End Function
-
 
         ''' <summary>
         ''' Update corresponding Work Session tables depending of the Analyzer Instrument to which is connected
@@ -4368,10 +4364,19 @@ Namespace Biosystems.Ax00.Core.Entities
             validFLIGHTAttribute = False            
         End Sub
 
+
+
+        ''' <summary>
+        ''' Method empty but necessary to have it in the interface, overrided in BA200AlanyzerEntity.vb class.
+        ''' </summary>
+        ''' <remarks></remarks>
         Public Overridable Sub startListenerExpiration() Implements IAnalyzerManager.startListenerExpiration
 
         End Sub
+
 #End Region
+
+
 
     End Class
 

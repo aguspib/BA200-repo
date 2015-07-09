@@ -167,7 +167,7 @@
     </Release>
     <Release Version="03.00.09">
       <DataRevisions>
-        <DataRevision JiraID="BA-2345" SequenceNumber="1">
+        <DataRevision JiraID="BA-2601" SequenceNumber="1">
           <PrerequisiteScript>
             IF ((SELECT COUNT(*) FROM tfmwSWParameters WHERE ParameterName = 'BL_LIFETIME ') = 0)
             AND
@@ -667,7 +667,172 @@
             Select 'False'
           </IntegrityScript>
         </DataRevision>
-      </DataRevisions>
+        <DataRevision JiraID="BA-2659" SequenceNumber="2">
+          <PrerequisiteScript>
+            IF 
+            ((SELECT COUNT(1) FROM [A200].[dbo].[srv_tfmwAdjustments]
+            WHERE CodeFw IN ('R2RV','R2H','R2V','R2SV','R2WH','R2WVR','R2DH','R2PH1','R2PH2','R2PV1','R2PV2','R2PI','M1RV','M1H','M1V','M1SV','M1WH','M1WVR','M1DH1','M1DV1','M1PH3','M1PV3p','M1PV3t','A2RV','A2H','A2V','A2SV','A2WH','A2WVR','A2DH','A2DV','RR2P1','RR2P2','RM1P3','GTR2','GTOR2','DR2S','SCOV')) > 0)
+            AND
+            ((SELECT COUNT(1) FROM [A200].[dbo].[srv_tfmwAdjustments]
+            WHERE CodeFw IN ('LCTOPMA','LCTOPMI','LCBOTMA','LCBOTMI','H2OTOPMA','H2OTOPMI','H2OBOTMA','H2OBOTMI','RREG1','RREG2','RREG3','RREG4','RREG5','RREG6','RREG7','RREG8','GTISE','GTOISE')) = 0)
+            AND 
+            ((SELECT COUNT(1) FROM [A200].[dbo].[tfmwPreloadedMasterData]
+            WHERE [SubTableID] = 'SRV_SAMPLE_POSITIONS' and ([ItemID] = 'RING2R' or [ItemID] = 'RING1R' or [ItemID] = 'RING3')) = 1)
+            Select 'True'
+            ELSE
+            Select 'False'
+          </PrerequisiteScript>
+          <DataScript>
+            DELETE FROM [A200].[dbo].[srv_tfmwAdjustments]
+            WHERE CodeFw IN ('R2RV','R2H','R2V','R2SV','R2WH','R2WVR','R2DH','R2PH1','R2PH2','R2PV1','R2PV2','R2PI','M1RV','M1H','M1V','M1SV','M1WH','M1WVR','M1DH1','M1DV1','M1PH3','M1PV3p','M1PV3t','A2RV','A2H','A2V','A2SV','A2WH','A2WVR','A2DH','A2DV','RR2P1','RR2P2','RM1P3','GTR2','GTOR2','DR2S','SCOV');
+
+            GO
+
+            UPDATE [dbo].[srv_tfmwAdjustments] SET GroupId = 'SAMPLES_ARM_ZREF', Value = '4160' WHERE CodeFw = 'R1RV';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET GroupId = 'SAMPLES_ARM_PARK', Value = '2150' WHERE CodeFw = 'R1H';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET GroupId = 'SAMPLES_ARM_PARK', Value = '19500' WHERE CodeFw = 'R1V';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET GroupId = 'SAMPLES_ARM_VSEC', Value = '-50' WHERE CodeFw = 'R1SV';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET GroupId = 'SAMPLES_ARM_WASH', Value = '13100' WHERE CodeFw = 'R1WH';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET GroupId = 'SAMPLES_ARM_WASH', Value = '5230' WHERE CodeFw = 'R1WVR';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET GroupId = 'SAMPLES_ARM_DISP1', Value = '17180' WHERE CodeFw = 'R1DH';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET GroupId = 'SAMPLES_ARM_DISP1', Value = '7160' WHERE CodeFw = 'R1DV';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET GroupId = 'SAMPLES_ARM_RING1', Value = '10250', CanSave = 0 WHERE CodeFw = 'R1PH1';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET GroupId = 'SAMPLES_ARM_RING2', Value = '9200' , CanSave = 0 WHERE CodeFw = 'R1PH2';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET GroupId = 'REAGENT1_ARM_RING1', Value = '17200' WHERE CodeFw = 'R1PV1';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET GroupId = 'REAGENT1_ARM_RING2', Value = '17200' WHERE CodeFw = 'R1PV2';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET GroupId = 'SAMPLES_ARM_LEVEL_DET', Value = '4660' WHERE CodeFw = 'R1PI';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET GroupId = 'SAMPLES_ARM_DISP1', Value = '7160' WHERE CodeFw = 'R2DV';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '16720' WHERE CodeFw = 'M1DH2';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '7760' WHERE CodeFw = 'M1DV2';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '-280' WHERE CodeFw = 'M1ISEH';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '18600' WHERE CodeFw = 'M1ISEV';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '10250' WHERE CodeFw = 'M1PH1';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '12600' WHERE CodeFw = 'M1PV1p';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '17000' WHERE CodeFw = 'M1PV1t';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '9200' WHERE CodeFw = 'M1PH2';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '12600' WHERE CodeFw = 'M1PV2p';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '17000' WHERE CodeFw = 'M1PV2t';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '4660' WHERE CodeFw = 'M1PI';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '4160' WHERE CodeFw = 'M1RPI';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '8020' WHERE CodeFw = 'A1RV';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '15' WHERE CodeFw = 'A1H';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '12800' WHERE CodeFw = 'A1V';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '5220' WHERE CodeFw = 'A1SV';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '10790' WHERE CodeFw = 'A1WH';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '5600' WHERE CodeFw = 'A1WVR';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '12805' WHERE CodeFw = 'A1DH';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '11930' WHERE CodeFw = 'A1DV';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET GroupId = 'SAMPLES_ARM_RING1', Value = '9385', CanSave = 0 WHERE CodeFw = 'RR1P1';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET GroupId = 'SAMPLES_ARM_RING2', Value = '10450', CanSave = 0 WHERE CodeFw = 'RR1P2';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '3723' WHERE CodeFw = 'RRCB';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '9385' WHERE CodeFw = 'RM1P1';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '10450' WHERE CodeFw = 'RM1P2';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET GroupId = 'REAGENTS_ROTOR_BC', Value = '3723' WHERE CodeFw = 'RMCB';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '7892' WHERE CodeFw = 'GFWR1';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '28' WHERE CodeFw = 'GFENC';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '-100' WHERE CodeFw = 'WSRV';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '670' WHERE CodeFw = 'WSRR';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '1020' WHERE CodeFw = 'WSSV';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '2170' WHERE CodeFw = 'WSEV';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '37,0' WHERE CodeFw = 'GTR1';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '37,0' WHERE CodeFw = 'GTOR1';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '3,0' WHERE CodeFw = 'GTN1';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '3,0' WHERE CodeFw = 'GTON1';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '38,0' WHERE CodeFw = 'GTGF';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '37,0' WHERE CodeFw = 'GTOGF';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '45,2' WHERE CodeFw = 'GTH1';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '45,0' WHERE CodeFw = 'GTOH1';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '1,0' WHERE CodeFw = 'DM1S';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '2,0' WHERE CodeFw = 'DR1S';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '2209' WHERE CodeFw = 'GWMI';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '2359' WHERE CodeFw = 'GWMA';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '2018' WHERE CodeFw = 'GSMI';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '2220' WHERE CodeFw = 'GSMA';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '365' WHERE CodeFw = 'ILED1';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '365' WHERE CodeFw = 'ILED2';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '365' WHERE CodeFw = 'ILED3';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '365' WHERE CodeFw = 'ILED4';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '365' WHERE CodeFw = 'ILED5';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '365' WHERE CodeFw = 'ILED6';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '365' WHERE CodeFw = 'ILED7';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '365' WHERE CodeFw = 'ILED8';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '365' WHERE CodeFw = 'ILED9';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '365' WHERE CodeFw = 'ILED10';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '365' WHERE CodeFw = 'ILED11';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '42' WHERE CodeFw = 'SEXC';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '1' WHERE CodeFw = 'ISEINS';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '0' WHERE CodeFw = 'MCOV';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '0' WHERE CodeFw = 'RCOV';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '0' WHERE CodeFw = 'PHCOV';
+
+            GO
+
+            INSERT INTO [A200].[dbo].[srv_tfmwAdjustments]([AnalyzerID],[FwVersion],[CodeFw],[Value],[AreaFw],[DescriptionFw],[GroupID],[AxisID],[CanSave],[CanMove],[InFile])
+            VALUES ('MasterData','##########','LCTOPMA','700','Depositos','Varilla corta - Nivel Máximo','WASTE_TANK_TOP_LEVEL','MAX',1,1,1);
+            INSERT INTO [A200].[dbo].[srv_tfmwAdjustments]([AnalyzerID],[FwVersion],[CodeFw],[Value],[AreaFw],[DescriptionFw],[GroupID],[AxisID],[CanSave],[CanMove],[InFile])
+            VALUES ('MasterData','##########','LCTOPMI','700','Depositos','Varilla corta - Nivel Minimo (Opcional)','WASTE_TANK_TOP_LEVEL','MIN',1,1,1);
+            INSERT INTO [A200].[dbo].[srv_tfmwAdjustments]([AnalyzerID],[FwVersion],[CodeFw],[Value],[AreaFw],[DescriptionFw],[GroupID],[AxisID],[CanSave],[CanMove],[InFile])
+            VALUES ('MasterData','##########','LCBOTMA','400','Depositos','Varilla Larga - Nivel Máximo (Opcional - Calculo de % de deposito)','WASTE_TANK_BOTTOM_LEVEL','MAX',1,1,1);
+            INSERT INTO [A200].[dbo].[srv_tfmwAdjustments]([AnalyzerID],[FwVersion],[CodeFw],[Value],[AreaFw],[DescriptionFw],[GroupID],[AxisID],[CanSave],[CanMove],[InFile])
+            VALUES ('MasterData','##########','LCBOTMI','700','Depositos','Varilla Larga - Nivel Mínimo','WASTE_TANK_BOTTOM_LEVEL','MIN',1,1,1);
+            INSERT INTO [A200].[dbo].[srv_tfmwAdjustments]([AnalyzerID],[FwVersion],[CodeFw],[Value],[AreaFw],[DescriptionFw],[GroupID],[AxisID],[CanSave],[CanMove],[InFile])
+            VALUES ('MasterData','##########','H2OTOPMA','700','Depositos','Varilla corta - Nivel Máximo','WATER_TANK_BOTTOM_LEVEL','MAX',1,1,1);
+            INSERT INTO [A200].[dbo].[srv_tfmwAdjustments]([AnalyzerID],[FwVersion],[CodeFw],[Value],[AreaFw],[DescriptionFw],[GroupID],[AxisID],[CanSave],[CanMove],[InFile])
+            VALUES ('MasterData','##########','H2OTOPMI','700','Depositos','Varilla corta - Nivel Minimo (Opcional)','WATER_TANK_BOTTOM_LEVEL','MIN',1,1,1);
+            INSERT INTO [A200].[dbo].[srv_tfmwAdjustments]([AnalyzerID],[FwVersion],[CodeFw],[Value],[AreaFw],[DescriptionFw],[GroupID],[AxisID],[CanSave],[CanMove],[InFile])
+            VALUES ('MasterData','##########','H2OBOTMA','400','Depositos','Varilla Larga - Nivel Máximo (Opcional - Calculo de % de deposito)','WATER_TANK_TOP_LEVEL','MAX',1,1,1);
+            INSERT INTO [A200].[dbo].[srv_tfmwAdjustments]([AnalyzerID],[FwVersion],[CodeFw],[Value],[AreaFw],[DescriptionFw],[GroupID],[AxisID],[CanSave],[CanMove],[InFile])
+            VALUES ('MasterData','##########','H2OBOTMI','700','Depositos','Varilla Larga - Nivel Mínimo','WATER_TANK_TOP_LEVEL','MIN',1,1,1);
+            INSERT INTO [A200].[dbo].[srv_tfmwAdjustments]([AnalyzerID],[FwVersion],[CodeFw],[Value],[AreaFw],[DescriptionFw],[GroupID],[AxisID],[CanSave],[CanMove],[InFile])
+            VALUES ('MasterData','##########','RREG1','0','Rotor Reactivos','Valores para cálculo de la corrección del alabeo del Rotor de Reactivos/Muestra','REAGENTS_ROTOR_EG','',1,1,1);
+            INSERT INTO [A200].[dbo].[srv_tfmwAdjustments]([AnalyzerID],[FwVersion],[CodeFw],[Value],[AreaFw],[DescriptionFw],[GroupID],[AxisID],[CanSave],[CanMove],[InFile])
+            VALUES ('MasterData','##########','RREG2','0','Rotor Reactivos','Valores para cálculo de la corrección del alabeo del Rotor de Reactivos/Muestra','REAGENTS_ROTOR_EG','',1,1,1);
+            INSERT INTO [A200].[dbo].[srv_tfmwAdjustments]([AnalyzerID],[FwVersion],[CodeFw],[Value],[AreaFw],[DescriptionFw],[GroupID],[AxisID],[CanSave],[CanMove],[InFile])
+            VALUES ('MasterData','##########','RREG3','0','Rotor Reactivos','Valores para cálculo de la corrección del alabeo del Rotor de Reactivos/Muestra','REAGENTS_ROTOR_EG','',1,1,1);
+            INSERT INTO [A200].[dbo].[srv_tfmwAdjustments]([AnalyzerID],[FwVersion],[CodeFw],[Value],[AreaFw],[DescriptionFw],[GroupID],[AxisID],[CanSave],[CanMove],[InFile])
+            VALUES ('MasterData','##########','RREG4','0','Rotor Reactivos','Valores para cálculo de la corrección del alabeo del Rotor de Reactivos/Muestra','REAGENTS_ROTOR_EG','',1,1,1);
+            INSERT INTO [A200].[dbo].[srv_tfmwAdjustments]([AnalyzerID],[FwVersion],[CodeFw],[Value],[AreaFw],[DescriptionFw],[GroupID],[AxisID],[CanSave],[CanMove],[InFile])
+            VALUES ('MasterData','##########','RREG5','0','Rotor Reactivos','Valores para cálculo de la corrección del alabeo del Rotor de Reactivos/Muestra','REAGENTS_ROTOR_EG','',1,1,1);
+            INSERT INTO [A200].[dbo].[srv_tfmwAdjustments]([AnalyzerID],[FwVersion],[CodeFw],[Value],[AreaFw],[DescriptionFw],[GroupID],[AxisID],[CanSave],[CanMove],[InFile])
+            VALUES ('MasterData','##########','RREG6','0','Rotor Reactivos','Valores para cálculo de la corrección del alabeo del Rotor de Reactivos/Muestra','REAGENTS_ROTOR_EG','',1,1,1);
+            INSERT INTO [A200].[dbo].[srv_tfmwAdjustments]([AnalyzerID],[FwVersion],[CodeFw],[Value],[AreaFw],[DescriptionFw],[GroupID],[AxisID],[CanSave],[CanMove],[InFile])
+            VALUES ('MasterData','##########','RREG7','0','Rotor Reactivos','Valores para cálculo de la corrección del alabeo del Rotor de Reactivos/Muestra','REAGENTS_ROTOR_EG','',1,1,1);
+            INSERT INTO [A200].[dbo].[srv_tfmwAdjustments]([AnalyzerID],[FwVersion],[CodeFw],[Value],[AreaFw],[DescriptionFw],[GroupID],[AxisID],[CanSave],[CanMove],[InFile])
+            VALUES ('MasterData','##########','RREG8','0','Rotor Reactivos','Valores para cálculo de la corrección del alabeo del Rotor de Reactivos/Muestra','REAGENTS_ROTOR_EG','',1,1,1);
+            INSERT INTO [A200].[dbo].[srv_tfmwAdjustments]([AnalyzerID],[FwVersion],[CodeFw],[Value],[AreaFw],[DescriptionFw],[GroupID],[AxisID],[CanSave],[CanMove],[InFile])
+            VALUES ('MasterData','##########','GTISE','37,0','General Equipo - Termos','Consigna Termo Punta General para dispensación en ISE','THERMOS_ISE','SETPOINT',1,1,1);
+            INSERT INTO [A200].[dbo].[srv_tfmwAdjustments]([AnalyzerID],[FwVersion],[CodeFw],[Value],[AreaFw],[DescriptionFw],[GroupID],[AxisID],[CanSave],[CanMove],[InFile])
+            VALUES ('MasterData','##########','GTOISE','37,0','General Equipo - Termos','Objetivo Termo Punta General para dispensación en ISE','THERMOS_ISE','TARGET',1,1,1);
+
+            GO
+
+            INSERT INTO [A200].[dbo].[tfmwPreloadedMasterData]
+            ([SubTableID],[ItemID],[ResourceID],[FixedItemDesc],[MultiLanguageFlag],[Position],[Status])
+            VALUES
+            ('SRV_SAMPLE_POSITIONS','REAGENTZ','GRID_SRV_RING1','ReagentZ',1,11,1)
+
+            GO
+
+            DELETE [A200].[dbo].[tfmwPreloadedMasterData] where [SubTableID] = 'SRV_SAMPLE_POSITIONS' and ItemID ='RING3'
+
+            GO
+          </DataScript>
+          <IntegrityScript>
+            IF 
+            ((SELECT COUNT(1) FROM [A200].[dbo].[srv_tfmwAdjustments]
+            WHERE CodeFw IN ('R2RV','R2H','R2V','R2SV','R2WH','R2WVR','R2DH','R2PH1','R2PH2','R2PV1','R2PV2','R2PI','M1RV','M1H','M1V','M1SV','M1WH','M1WVR','M1DH1','M1DV1','M1PH3','M1PV3p','M1PV3t','A2RV','A2H','A2V','A2SV','A2WH','A2WVR','A2DH','A2DV','RR2P1','RR2P2','RM1P3','GTR2','GTOR2','DR2S','SCOV')) = 0)
+            AND
+            ((SELECT COUNT(1) FROM [A200].[dbo].[srv_tfmwAdjustments]
+            WHERE CodeFw IN ('LCTOPMA','LCTOPMI','LCBOTMA','LCBOTMI','H2OTOPMA','H2OTOPMI','H2OBOTMA','H2OBOTMI','RREG1','RREG2','RREG3','RREG4','RREG5','RREG6','RREG7','RREG8','GTISE','GTOISE')) = 18)
+            AND 
+            ((SELECT COUNT(1) FROM [A200].[dbo].[tfmwPreloadedMasterData]
+            WHERE [SubTableID] = 'SRV_SAMPLE_POSITIONS' and ([ItemID] = 'REAGENTZ' or [ItemID] = 'RING3')) = 1)
+            Select 'True'
+            ELSE
+            Select 'False'
+          </IntegrityScript> 
+        </DataRevision>
+    </DataRevisions>
     </Release>
     <!-- 
 	  <Release Version="00.00.00">

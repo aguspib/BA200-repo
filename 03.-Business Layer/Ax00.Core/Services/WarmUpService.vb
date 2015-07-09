@@ -250,7 +250,7 @@ Namespace Biosystems.Ax00.Core.Services
                         ExecuteBaseLineStep()
                     End If
 #Else
-                    ExecuteBaseLineStep()
+                                        ExecuteBaseLineStep()
 #End If
 
                 Case WarmUpStepsEnum.Finalize
