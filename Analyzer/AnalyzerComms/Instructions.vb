@@ -2009,6 +2009,28 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                         NumCharsValue = CInt(mySwParameters.tfmwSwParameters(0).ValueNumeric)
                                     End If
                                 End If
+                            ElseIf pBarCodeDS.barCodeRequests(0).RotorType = "SAMPLESANDREAGENTS" Then
+                                NumCharsValue = 0 'Set value = to 0 for the Flexible barcode size.
+                                myGlobalDataTO = myUserSettingsDelegate.ReadBarcodeSettings(Nothing)
+                                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                                    BarCodesUserSettingDS = DirectCast(myGlobalDataTO.SetDatos, UserSettingDS)
+
+                                    Dim linqRes As New List(Of UserSettingDS.tcfgUserSettingsRow)
+
+                                    linqRes = (From a As UserSettingDS.tcfgUserSettingsRow _
+                                               In BarCodesUserSettingDS.tcfgUserSettings _
+                                               Where a.SettingID = GlobalEnumerates.UserSettingsEnum.BARCODE_FULL_TOTAL.ToString() _
+                                               Select a).ToList
+
+                                    If linqRes.Count > 0 Then
+                                        If IsNumeric(linqRes(0).CurrentValue) Then
+                                            'Commented Return allways 0 for the flexible barcode size
+                                            'NumCharsValue = CInt(linqRes(0).CurrentValue) 
+                                        End If
+                                    End If
+                                    linqRes = Nothing 'AG 02/08/2012 - free memory
+                                End If
+
 
                             Else 'SAMPLES
                                 NumCharsValue = 0 'Set value = to 0 for the Flexible barcode size.
@@ -2051,6 +2073,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         Dim myCODEBRInstruction As New List(Of InstructionParameterTO)
                         myCODEBRInstruction = GetInstructionParameter("CODEBR")
                         'Fill all the instruccion.
+                        Const fakeFalse As Integer = 2, fakeTrue As Integer = 1
+                        Dim force20Digits As Boolean = False
                         For Each myInstructionTO As InstructionParameterTO In myCODEBRInstruction
                             Select Case myInstructionTO.ParameterIndex
                                 Case 1 'Analyzer Model and Number.
@@ -2062,6 +2086,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 Case 3 'Code bar reader selector
                                     If pBarCodeDS.barCodeRequests(0).RotorType = "REAGENTS" Then
                                         myInstructionTO.ParameterValue = CStr(GlobalEnumerates.Ax00CodeBarReader.REAGENTS) 'Get the value, not the name
+                                    ElseIf pBarCodeDS.barCodeRequests(0).RotorType = "SAMPLESANDREAGENTS" Then
+                                        myInstructionTO.ParameterValue = CStr(GlobalEnumerates.Ax00CodeBarReader.SAMPLESANDREAGENTS) 'Get the value, not the name
                                     Else
                                         myInstructionTO.ParameterValue = CStr(GlobalEnumerates.Ax00CodeBarReader.SAMPLES) 'Get the value, not the name
                                     End If
@@ -2092,18 +2118,32 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                     If pBarCodeDS.barCodeRequests(0).RotorType = "REAGENTS" Then
                                         ' Espec : Reagents CodeBar Code is fixed to Code128
                                         pBarCodeDS.barCodeRequests(0).Code128 = 1
-                                    Else
-                                        Dim SampleBarCode As Integer = 2
+                                    ElseIf pBarCodeDS.barCodeRequests(0).RotorType = "SAMPLESANDREAGENTS" Then
+                                        Dim SampleBarCode As Integer = fakeFalse
                                         If pBarCodeDS.barCodeRequests(0).Action = 1 Then
                                             myLinqRes = (From a As BarCodesDS.vcfgSamplesBarCodesConfigurationRow In SamplesBarCodesConfigurationDS.vcfgSamplesBarCodesConfiguration _
                                                           Where a.CodeID = GlobalEnumerates.Ax00CodificationsCodeBar.Code128 Select a).ToList
                                             If myLinqRes.Count > 0 AndAlso myLinqRes(0).Status Then
-                                                SampleBarCode = 1
+                                                SampleBarCode = fakeTrue
+                                            End If
+                                        End If
+                                        'pBarCodeDS.barCodeRequests(0).Code128 = SampleBarCode
+                                        If SampleBarCode = fakeFalse Then
+                                            pBarCodeDS.barCodeRequests(0).Code128 = 1
+                                            force20Digits = True
+                                        End If
+                                    Else
+                                        Dim SampleBarCode As Integer = fakeFalse
+                                        If pBarCodeDS.barCodeRequests(0).Action = 1 Then
+                                            myLinqRes = (From a As BarCodesDS.vcfgSamplesBarCodesConfigurationRow In SamplesBarCodesConfigurationDS.vcfgSamplesBarCodesConfiguration _
+                                                          Where a.CodeID = GlobalEnumerates.Ax00CodificationsCodeBar.Code128 Select a).ToList
+                                            If myLinqRes.Count > 0 AndAlso myLinqRes(0).Status Then
+                                                SampleBarCode = fakeTrue
                                             End If
                                         End If
                                         pBarCodeDS.barCodeRequests(0).Code128 = SampleBarCode
                                     End If
-                                    myInstructionTO.ParameterValue = pBarCodeDS.barCodeRequests(0).Code128.ToString
+                                    myInstructionTO.ParameterValue = CStr(fakeTrue)
                                     Exit Select
                                 Case 7 'Number of Chars expected for the Reader C128
                                     If pBarCodeDS.barCodeRequests(0).Action = 1 Then
@@ -2129,7 +2169,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                     Else
                                         pBarCodeDS.barCodeRequests(0).NCode128 = 0
                                     End If
-
+                                    If force20Digits Then pBarCodeDS.barCodeRequests(0).NCode128 = 20
                                     myInstructionTO.ParameterValue = pBarCodeDS.barCodeRequests(0).NCode128.ToString
 
                                     Exit Select
