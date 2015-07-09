@@ -65,9 +65,11 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
         End Function
 
         Shared Function Deserialize(xml As XmlTextReader) As DatabaseUpdatesManager
-
             Dim auxVariable As New DatabaseUpdatesManager()
-            Dim x As New XmlSerializer(auxVariable.GetType)
+            Dim types(0) As Type
+            types(0) = auxVariable.GetType
+            'Dim x As New XmlSerializer(auxVariable.GetType)
+            Dim x As XmlSerializer = XmlSerializer.FromTypes(types)(0)
 
             auxVariable = TryCast(x.Deserialize(xml), DatabaseUpdatesManager)
 

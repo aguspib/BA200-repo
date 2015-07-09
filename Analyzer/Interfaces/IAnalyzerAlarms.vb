@@ -60,6 +60,6 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="typeAction"></param>
         ''' <param name="alarm"></param>
         ''' <remarks></remarks>
-        Sub ActionAlarm(ByVal typeAction As Byte, ByRef alarm As AlarmEnumerates.Alarms)
+        Sub ActionAlarm(ByVal typeAction As Boolean, ByRef alarm As AlarmEnumerates.Alarms)
     end interface
 End NameSpace
