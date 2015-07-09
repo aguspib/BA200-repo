@@ -333,8 +333,14 @@ Public Class UiBarCodesConfig
             bsReagentsCheckBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Barcodes_Reagents_CBox", LanguageID)
 
             'Labels in SAMPLES BARCODE area
-            bsSamplesLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Barcodes_Samples", LanguageID)
-            bsSamplesCheckBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Barcodes_Samples_CBox", LanguageID)
+            If AnalyzerController.Instance.IsBA200 Then
+                bsSamplesCheckBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_RotorPos_ReadBarcode", LanguageID)
+                bsSamplesLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_BARCODE_CONFIG", LanguageID)
+            Else
+                bsSamplesCheckBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Barcodes_Samples_CBox", LanguageID)
+                bsSamplesLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Barcodes_Samples", LanguageID)
+            End If
+
             bsBarcodeTypesGroupBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Barcode_Types", LanguageID)
 
             'bsBarCodeConfiGroupBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Barcode_Config", LanguageID)
@@ -1143,11 +1149,26 @@ Public Class UiBarCodesConfig
         Try
             'SGM 12/07/2013
             If Not (EditionMode) Then Exit Sub
+            Dim senderCheck = TryCast(sender, Ax00.Controls.UserControls.BSCheckbox)
 
-            If CType(sender, Ax00.Controls.UserControls.BSCheckbox) Is bsSamplesCheckBox Then
-                MyClass.IsSamplesBarcodeDisabledByUser = bsSamplesCheckBox.Checked
+            'DIRTY!!!
+            If AnalyzerController.Instance.IsBA200 Then
+                If senderCheck Is bsSamplesCheckBox Then
+                    If senderCheck.Checked <> Me.bsReagentsCheckBox.Checked Then
+                        bsReagentsCheckBox.Checked = senderCheck.Checked
+                    End If
+                Else
+                    If senderCheck.Checked <> Me.bsSamplesCheckBox.Checked Then
+                        bsSamplesCheckBox.Checked = senderCheck.Checked
+                    End If
+                End If
             End If
+            '/DIRTY!!!
+
+            MyClass.IsSamplesBarcodeDisabledByUser = bsSamplesCheckBox.Checked
             ChangesMade = True
+
+
 
             'If (EditionMode) Then ChangesMade = True
 
@@ -1555,6 +1576,11 @@ Public Class UiBarCodesConfig
 
         BarcodeConfigChangesToSend = False ' XBC 14/02/2012
         ResetNotInUseRotorPosition = False
+
+        If AnalyzerController.Instance.IsBA200 Then
+            bsReagentsGroupBox.Visible = False
+            bsSamplesGroupBox.Top = Me.bsReagentsGroupBox.Top
+        End If
 
     End Sub
 

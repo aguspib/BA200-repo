@@ -792,19 +792,21 @@ Public Class UiMonitor
         Try
             'Forces all globe alarms to show up
             'Uncomment just for testing, and comment the after lines.
-            ''BEGIN Simulation
+            'BEGIN Simulation
             'Dim Alarms As New List(Of AlarmEnumerates.Alarms)
 
-            'For Each alarm As AlarmEnumerates.Alarms In [Enum].GetValues(GetType(AlarmEnumerates.Alarms))
-            '    Alarms.Add(alarm) 'All the alarms for simulation
-            'Next
+            ''For Each alarm As AlarmEnumerates.Alarms In [Enum].GetValues(GetType(AlarmEnumerates.Alarms))
+            ''    Alarms.Add(alarm) 'All the alarms for simulation
+            ''Next
+
+            'Alarms.Remove(AlarmEnumerates.Alarms.COMMS_ERR)
 
             ' ''Remove exclusive alarms (Warnings)
             ''Alarms.Remove(AlarmEnumerates.Alarms.WASH_CONTAINER_WARN)
             ''Alarms.Remove(AlarmEnumerates.Alarms.HIGH_CONTAMIN_WARN)
             ''Alarms.Remove(AlarmEnumerates.Alarms.FRIDGE_TEMP_WARN)
             ''Alarms.Remove(AlarmEnumerates.Alarms.FRIDGE_STATUS_WARN)
-            ''Alarms.Remove(AlarmEnumerates.Alarms.METHACRYL_ROTOR_WARN)
+            ' ''Alarms.Remove(AlarmEnumerates.Alarms.METHACRYL_ROTOR_WARN)
             ''Alarms.Remove(AlarmEnumerates.Alarms.CLOT_DETECTION_WARN)
             ''Alarms.Remove(AlarmEnumerates.Alarms.REACT_TEMP_WARN)
 
@@ -813,7 +815,7 @@ Public Class UiMonitor
             ''Alarms.Remove(AlarmEnumerates.Alarms.R1_COLLISION_WARN)
             ''Alarms.Remove(AlarmEnumerates.Alarms.FRIDGE_COVER_WARN)
             ''Alarms.Remove(AlarmEnumerates.Alarms.R2_COLLISION_WARN)
-            ''Alarms.Remove(AlarmEnumerates.Alarms.REACT_COVER_WARN)
+            ' ''Alarms.Remove(AlarmEnumerates.Alarms.REACT_COVER_WARN)
             ''Alarms.Remove(AlarmEnumerates.Alarms.S_COLLISION_WARN)
             ''Alarms.Remove(AlarmEnumerates.Alarms.S_COVER_WARN)
             ''Alarms.Remove(AlarmEnumerates.Alarms.R1_TEMP_WARN)
@@ -823,16 +825,16 @@ Public Class UiMonitor
             ''Alarms.Remove(AlarmEnumerates.Alarms.WASTE_DEPOSIT_ERR)
             ''Alarms.Remove(AlarmEnumerates.Alarms.WS_TEMP_WARN)
 
-            ''Or remove the others exclusive alarms (Errors)
-            'Alarms.Remove(AlarmEnumerates.Alarms.WASH_CONTAINER_ERR)
-            'Alarms.Remove(AlarmEnumerates.Alarms.HIGH_CONTAMIN_ERR)
-            'Alarms.Remove(AlarmEnumerates.Alarms.FRIDGE_TEMP_ERR)
-            'Alarms.Remove(AlarmEnumerates.Alarms.FRIDGE_STATUS_ERR)
-            'Alarms.Remove(AlarmEnumerates.Alarms.BASELINE_INIT_ERR)
-            'Alarms.Remove(AlarmEnumerates.Alarms.CLOT_DETECTION_ERR)
-            'Alarms.Remove(AlarmEnumerates.Alarms.REACT_TEMP_ERR)
+            ' ''Or remove the others exclusive alarms (Errors)
+            ''Alarms.Remove(AlarmEnumerates.Alarms.WASH_CONTAINER_ERR)
+            ''Alarms.Remove(AlarmEnumerates.Alarms.HIGH_CONTAMIN_ERR)
+            ''Alarms.Remove(AlarmEnumerates.Alarms.FRIDGE_TEMP_ERR)
+            ''Alarms.Remove(AlarmEnumerates.Alarms.FRIDGE_STATUS_ERR)
+            ''Alarms.Remove(AlarmEnumerates.Alarms.BASELINE_INIT_ERR)
+            ''Alarms.Remove(AlarmEnumerates.Alarms.CLOT_DETECTION_ERR)
+            ''Alarms.Remove(AlarmEnumerates.Alarms.REACT_TEMP_ERR)
 
-            ''New alarms
+            ' ''New alarms
             ''Alarms.Remove(AlarmEnumerates.Alarms.MAIN_COVER_ERR)
             ''Alarms.Remove(AlarmEnumerates.Alarms.R1_COLLISION_ERR)
             ''Alarms.Remove(AlarmEnumerates.Alarms.FRIDGE_COVER_ERR)
@@ -840,54 +842,102 @@ Public Class UiMonitor
             ''Alarms.Remove(AlarmEnumerates.Alarms.REACT_COVER_ERR)
             ''Alarms.Remove(AlarmEnumerates.Alarms.S_COLLISION_ERR)
             ''Alarms.Remove(AlarmEnumerates.Alarms.S_COVER_ERR)
-            ''Alarms.Remove(AlarmEnumerates.Alarms.R1_TEMP_SYSTEM_ERR)
-            ''Alarms.Remove(AlarmEnumerates.Alarms.R2_TEMP_SYSTEM_ERR)
+            ' ''Alarms.Remove(AlarmEnumerates.Alarms.R1_TEMP_SYSTEM_ERR)
+            ' ''Alarms.Remove(AlarmEnumerates.Alarms.R2_TEMP_SYSTEM_ERR)
             ''Alarms.Remove(AlarmEnumerates.Alarms.CLOT_DETECTION_ERR)
             ''Alarms.Remove(AlarmEnumerates.Alarms.WATER_SYSTEM_ERR)
             ''Alarms.Remove(AlarmEnumerates.Alarms.WASTE_SYSTEM_ERR)
             ''Alarms.Remove(AlarmEnumerates.Alarms.WS_TEMP_SYSTEM_ERR)
 
+            'MR ADD TEST NEW ALARMS 
+            '**********************************************************************
+            ''ResiduesBalanceAlert
+            'Alarms.Add(AlarmEnumerates.Alarms.HIGH_CONTAMIN_ERR)
+            'Alarms.Add(AlarmEnumerates.Alarms.HIGH_CONTAMIN_WARN)
+
+
+            ''Reagents2ArmAlert
+            'Alarms.Add(AlarmEnumerates.Alarms.R2_TEMP_WARN)
+            'Alarms.Add(AlarmEnumerates.Alarms.R2_TEMP_SYSTEM_ERR) 'AG 05/01/2011 - this alarm excludes the R2_Temp_Warm so it is not necessary change the bsAlert size
+            'Alarms.Add(AlarmEnumerates.Alarms.R2_DETECT_SYSTEM_ERR)
+            'Alarms.Add(AlarmEnumerates.Alarms.R2_COLLISION_ERR) 'AG 21/05/2012 - R2_COLLISION_WARN
+
+
+            ''OthersAlert       
+            'Alarms.Add(AlarmEnumerates.Alarms.WATER_DEPOSIT_ERR)
+            'Alarms.Add(AlarmEnumerates.Alarms.WATER_SYSTEM_ERR) 'AG 09/01/2012 - this alarm excludes the WATER_DEPOSIT_ERR so it is not necessary change the bsAlert size
+            'Alarms.Add(AlarmEnumerates.Alarms.WASTE_DEPOSIT_ERR)
+            'Alarms.Add(AlarmEnumerates.Alarms.WASTE_SYSTEM_ERR) 'AG 09/01/2012 - this alarm excludes the WASTE_DEPOSIT_ERR so it is not necessary change the bsAlert size
+            'Alarms.Add(AlarmEnumerates.Alarms.REACT_ROTOR_FAN_WARN)
+            'Alarms.Add(AlarmEnumerates.Alarms.FRIDGE_FAN_WARN)
+
+            ''ReactionsRotorAlert
+            ''Alarms.Add(AlarmEnumerates.Alarms.REACT_COVER_WARN)
+            'Alarms.Add(AlarmEnumerates.Alarms.REACT_COVER_ERR) 'AG 14/03/2012
+            'Alarms.Add(AlarmEnumerates.Alarms.REACT_MISSING_ERR)
+            'Alarms.Add(AlarmEnumerates.Alarms.BASELINE_WELL_WARN)
+            'Alarms.Add(AlarmEnumerates.Alarms.BASELINE_INIT_ERR) 'AG 31/01/2012 - this alarm excludes the METHACRYL_ROTOR_WARN so it is not necessary change the bsAlert size
+            'Alarms.Add(AlarmEnumerates.Alarms.REACT_ENCODER_ERR)
+            'Alarms.Add(AlarmEnumerates.Alarms.REACT_TEMP_ERR)
+            ''Alarms.Add(AlarmEnumerates.Alarms.REACT_TEMP_WARN)
+            'Alarms.Add(AlarmEnumerates.Alarms.REACT_TEMP_SYS_ERR) 'AG 21/05/2012
+            'Alarms.Add(AlarmEnumerates.Alarms.BASELINE_EXPIRED) 'MR 25/06/2015
+
+            ''WashingStationHeaterTempAlert
+            'Alarms.Add(AlarmEnumerates.Alarms.WS_TEMP_WARN)
+            'Alarms.Add(AlarmEnumerates.Alarms.WS_TEMP_SYSTEM_ERR) 'AG 09/01/2012 - this alarm excludes WS_Temp_Warn so it is not necessary change the bsAlert size
+            'Alarms.Add(AlarmEnumerates.Alarms.WS_COLLISION_ERR)
+
+            ''SampleArmAlert
+            'Alarms.Add(AlarmEnumerates.Alarms.S_OBSTRUCTED_ERR) 'AG 12/03/2012
+            'Alarms.Add(AlarmEnumerates.Alarms.S_DETECT_SYSTEM_ERR)
+            'Alarms.Add(AlarmEnumerates.Alarms.S_COLLISION_ERR) 'AG 21/05/2012- S_COLLISION_WARN
+
+            ''SamplesRotorCoverAlert
+            ''Alarms.Add(AlarmEnumerates.Alarms.S_COVER_WARN)
+            'Alarms.Add(AlarmEnumerates.Alarms.S_COVER_ERR) 'AG 14/03/2012
+
             'UpdateGlobesInMainTab(Alarms)
-            ''END Simulation
+            'END Simulation
 
             'Update Main Area
             'Alarms information AREA
             'BEGIN Real code
 
-            ''PENDING TO DECIDE
-            ''SGM 01/10/2012 - In case of Closing NOT TO TREAT GLOBES
+            'PENDING TO DECIDE
+            'SGM 01/10/2012 - In case of Closing NOT TO TREAT GLOBES
             'If MyBase.isClosingFlag Then
             '    GlobalBase.CreateLogActivity("Globes while Is Closing", Me.Name & ".RefreshAlarmsGlobes ", EventLogEntryType.FailureAudit, False)
             '    Exit Sub
             'End If
 
-            If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
+            'If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
 
-            If (AnalyzerController.IsAnalyzerInstantiated) Then
+            'If (AnalyzerController.IsAnalyzerInstantiated) Then
 
-                'AG 21/02/2012- do not use the conditional compilation (we always develop in debug mode .. use the REAL_DEVELOPMENT_MODE (global Setting)
-                'when we want analyzer reportsats and simulate alarms we must change this settings to a value <> 0
-                '#If DEBUG Then
-                '#Else
-                If GlobalConstants.REAL_DEVELOPMENT_MODE > 0 Then
+            '    'AG 21/02/2012- do not use the conditional compilation (we always develop in debug mode .. use the REAL_DEVELOPMENT_MODE (global Setting)
+            '    'when we want analyzer reportsats and simulate alarms we must change this settings to a value <> 0
+            '    '#If DEBUG Then
+            '    '#Else
+            '    If GlobalConstants.REAL_DEVELOPMENT_MODE > 0 Then
 
-                Else
-                    'SGM 11/04/2012
-                    If AnalyzerController.Instance.Analyzer.Alarms.Contains(AlarmEnumerates.Alarms.ISE_OFF_ERR) Or AnalyzerController.Instance.Analyzer.Alarms.Contains(AlarmEnumerates.Alarms.ISE_FAILED_ERR) Then
-                        If AnalyzerController.Instance.Analyzer.Alarms.Contains(AlarmEnumerates.Alarms.ISE_CONNECT_PDT_ERR) Then
-                            AnalyzerController.Instance.Analyzer.Alarms.Remove(AlarmEnumerates.Alarms.ISE_CONNECT_PDT_ERR)
-                        End If
-                    End If
+            '    Else
+            '        'SGM 11/04/2012
+            '        If AnalyzerController.Instance.Analyzer.Alarms.Contains(AlarmEnumerates.Alarms.ISE_OFF_ERR) Or AnalyzerController.Instance.Analyzer.Alarms.Contains(AlarmEnumerates.Alarms.ISE_FAILED_ERR) Then
+            '            If AnalyzerController.Instance.Analyzer.Alarms.Contains(AlarmEnumerates.Alarms.ISE_CONNECT_PDT_ERR) Then
+            '                AnalyzerController.Instance.Analyzer.Alarms.Remove(AlarmEnumerates.Alarms.ISE_CONNECT_PDT_ERR)
+            '            End If
+            '        End If
 
-                End If
+            '    End If
 
-                If AnalyzerController.Instance.Analyzer.IsBlExpired Then
-                    If Not AnalyzerController.Instance.Analyzer.Alarms.Contains(AlarmEnumerates.Alarms.BASELINE_EXPIRED) Then AnalyzerController.Instance.Analyzer.Alarms.Add(AlarmEnumerates.Alarms.BASELINE_EXPIRED)
-                End If
+            '    If AnalyzerController.Instance.Analyzer.IsBlExpired Then
+            '        If Not AnalyzerController.Instance.Analyzer.Alarms.Contains(AlarmEnumerates.Alarms.BASELINE_EXPIRED) Then AnalyzerController.Instance.Analyzer.Alarms.Add(AlarmEnumerates.Alarms.BASELINE_EXPIRED)
+            '    End If
 
 
-                UpdateGlobesInMainTab(AnalyzerController.Instance.Analyzer.Alarms) 'Get the current alarms in analyzer
-            End If
+            '    UpdateGlobesInMainTab(AnalyzerController.Instance.Analyzer.Alarms) 'Get the current alarms in analyzer
+            'End If
             'END Real code
 
             'Update Alarms grid Area

@@ -85,12 +85,14 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Entities\BaseLineEntityExpirationTests.vb" />
     <Compile Include="Entities\Worksession\Contaminations\Context\ContextStepTest.vb" />
     <Compile Include="Entities\Worksession\Contaminations\Context\ContextTests.vb" />
     <Compile Include="Entities\Worksession\Contaminations\LAx00FrameTests.vb" />
     <Compile Include="Entities\Worksession\Specifications\Dispensing\ReagentDispensingTest.vb" />
     <Compile Include="Entities\Worksession\WSExecutionCreatorTest.vb" />
     <Compile Include="Services\BaseLineServiceTests.vb" />
+    <Compile Include="Services\Listener\BaseLineExpirationListenerTest.vb" />
     <Compile Include="Services\RotorChangeServicesTests.vb" />
     <Compile Include="Services\WarmUpServiceTests.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
@@ -157,6 +159,10 @@
     <ProjectReference Include="..\..\..\BussinessLayer\ConfigurationSetup\ConfigurationSetup.vbproj">
       <Project>{bc01c1bd-2a93-4002-b74f-7bcf9793309d}</Project>
       <Name>ConfigurationSetup</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\FwScriptsManagement\FwScriptsManagement.vbproj">
+      <Project>{0E1F721F-3002-4FAB-9300-3DB5B11A4002}</Project>
+      <Name>FwScriptsManagement</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\WorkSession\WorkSession.vbproj">
       <Project>{a883608a-3d41-4339-9c2f-feea18befb68}</Project>
