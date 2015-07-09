@@ -334,7 +334,7 @@ Public Class UiBarCodesConfig
 
             'Labels in SAMPLES BARCODE area
             If AnalyzerController.Instance.IsBA200 Then
-                bsSamplesCheckBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_RotorPos_ReadBarcode", LanguageID)
+                bsSamplesCheckBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_BARCODES_BA200_CBOX", LanguageID)
                 bsSamplesLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_BARCODE_CONFIG", LanguageID)
             Else
                 bsSamplesCheckBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Barcodes_Samples_CBox", LanguageID)
