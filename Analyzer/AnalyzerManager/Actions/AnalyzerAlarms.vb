@@ -1277,7 +1277,7 @@ Namespace Biosystems.Ax00.Core.Entities
         '''                          1 = to delete the alarm.</param>
         ''' <param name="alarm">  type of AlarmEnumerates.Alarms </param>
         ''' <remarks></remarks>
-        Public Sub ActionAlarm(ByVal typeAction As Byte, ByRef alarm As AlarmEnumerates.Alarms) Implements IAnalyzerAlarms.ActionAlarm
+        Public Sub ActionAlarm(ByVal typeAction As Boolean, ByRef alarm As AlarmEnumerates.Alarms) Implements IAnalyzerAlarms.ActionAlarm
             Dim myGlobal As New GlobalDataTO
             Dim myAlarmList As New List(Of AlarmEnumerates.Alarms)
             Dim myAlarmStatusList As New List(Of Boolean)
@@ -1286,18 +1286,14 @@ Namespace Biosystems.Ax00.Core.Entities
             Try
 
                 Select Case typeAction
-                    Case 0
+                    Case CBool(0)
                         status = True
                         If Not ExistsActiveAlarm(alarm.ToString(), _analyzerManager.ActiveAnalyzer()) Then
                             _analyzerManager.PrepareLocalAlarmList(alarm, status, myAlarmList, myAlarmStatusList)
-                            If myAlarmList.Count = 0 And myAlarmStatusList.Count = 0 Then
-                                myAlarmList.Add(alarm)
-                                myAlarmStatusList.Add(status)
-                            End If
                             myGlobal = Manage(myAlarmList, myAlarmStatusList)
                         End If
                         _analyzerManager.CreateAndThrowEventUiRefresh(GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED)
-                    Case 1
+                    Case CBool(1)
                         status = False
                         If ExistsActiveAlarm(alarm.ToString(), _analyzerManager.ActiveAnalyzer()) Then
                             _analyzerManager.PrepareLocalAlarmList(alarm, status, myAlarmList, myAlarmStatusList)

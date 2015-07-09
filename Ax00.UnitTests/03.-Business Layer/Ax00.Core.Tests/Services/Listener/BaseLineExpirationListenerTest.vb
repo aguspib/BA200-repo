@@ -17,11 +17,11 @@ Namespace Biosystems.Ax00.Core.Services.BaseLine.Test
             isBLExpired = True
             Listener.TimeDelay = 1000
 
-            Listener.startToListening()
+            Listener.StartToListening()
             '2.- Check an alarm is requested
 
             '3.- check lasttypeaction
-            NUnit.Framework.Assert.AreEqual(CInt(LastTypeActionAlarm), 0)
+            NUnit.Framework.Assert.AreEqual(LastTypeActionAlarm, CBool(0))
             NUnit.Framework.Assert.AreEqual(lastAlarm, AlarmEnumerates.Alarms.BASELINE_EXPIRED)
 
 
@@ -30,7 +30,7 @@ Namespace Biosystems.Ax00.Core.Services.BaseLine.Test
             a.Wait()
 
             'esperamos....
-            NUnit.Framework.Assert.AreEqual(CInt(LastTypeActionAlarm), 1)
+            NUnit.Framework.Assert.AreEqual(LastTypeActionAlarm, CBool(1))
             NUnit.Framework.Assert.AreEqual(lastAlarm, AlarmEnumerates.Alarms.BASELINE_EXPIRED)
 
             '4.- isBLExpired = true ... esperamos a que chequee otra vez
@@ -40,15 +40,15 @@ Namespace Biosystems.Ax00.Core.Services.BaseLine.Test
         Dim Listener As BaseLineExpirationListener
         Dim isBLExpired As Boolean
 
-        Public LastTypeActionAlarm As Byte, lastAlarm As AlarmEnumerates.Alarms
+        Public LastTypeActionAlarm As Boolean, lastAlarm As AlarmEnumerates.Alarms
 
         Sub CreateScenario()
             Dim analyzer = Mock.Create(Of IAnalyzerManager)()
             Mock.Arrange(Function() analyzer.Connected).Returns(True)
             Dim analyzerAlarms = Mock.Create(Of IAnalyzerAlarms)()
 
-            Mock.Arrange(Sub() analyzerAlarms.ActionAlarm(Arg.AnyByte, Arg.IsAny(Of AlarmEnumerates.Alarms))).DoInstead(
-                Sub(typeAction As Byte, value2 As AlarmEnumerates.Alarms)
+            Mock.Arrange(Sub() analyzerAlarms.ActionAlarm(Arg.AnyBool, Arg.IsAny(Of AlarmEnumerates.Alarms))).DoInstead(
+                Sub(typeAction As Boolean, value2 As AlarmEnumerates.Alarms)
                     LastTypeActionAlarm = typeAction
                     lastAlarm = value2
                 End Sub)
