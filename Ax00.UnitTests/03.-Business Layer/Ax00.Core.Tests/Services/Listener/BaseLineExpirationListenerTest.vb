@@ -21,7 +21,7 @@ Namespace Biosystems.Ax00.Core.Services.BaseLine.Test
             '2.- Check an alarm is requested
 
             '3.- check lasttypeaction
-            NUnit.Framework.Assert.AreEqual(LastTypeActionAlarm, CBool(0))
+            NUnit.Framework.Assert.AreEqual(LastTypeActionAlarm, True)
             NUnit.Framework.Assert.AreEqual(lastAlarm, AlarmEnumerates.Alarms.BASELINE_EXPIRED)
 
 
@@ -30,7 +30,7 @@ Namespace Biosystems.Ax00.Core.Services.BaseLine.Test
             a.Wait()
 
             'esperamos....
-            NUnit.Framework.Assert.AreEqual(LastTypeActionAlarm, CBool(1))
+            NUnit.Framework.Assert.AreEqual(LastTypeActionAlarm, False)
             NUnit.Framework.Assert.AreEqual(lastAlarm, AlarmEnumerates.Alarms.BASELINE_EXPIRED)
 
             '4.- isBLExpired = true ... esperamos a que chequee otra vez
