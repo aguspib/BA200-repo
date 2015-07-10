@@ -811,9 +811,11 @@ Public Class UiMonitor
                     End If
 
                 End If
-
+                'Functionallity forced, we should solve this thing doing different managment of global list of alarms.
                 If AnalyzerController.Instance.Analyzer.IsBlExpired Then
                     If Not AnalyzerController.Instance.Analyzer.Alarms.Contains(AlarmEnumerates.Alarms.BASELINE_EXPIRED) Then AnalyzerController.Instance.Analyzer.Alarms.Add(AlarmEnumerates.Alarms.BASELINE_EXPIRED)
+                Else
+                    If AnalyzerController.Instance.Analyzer.Alarms.Contains(AlarmEnumerates.Alarms.BASELINE_EXPIRED) Then AnalyzerController.Instance.Analyzer.Alarms.Remove(AlarmEnumerates.Alarms.BASELINE_EXPIRED)
                 End If
 #If DEBUG Then
                 'MR 09/07/2015 

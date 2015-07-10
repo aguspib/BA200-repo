@@ -1286,14 +1286,14 @@ Namespace Biosystems.Ax00.Core.Entities
             Try
 
                 Select Case typeAction
-                    Case CBool(0)
+                    Case True
                         status = True
                         If Not ExistsActiveAlarm(alarm.ToString(), _analyzerManager.ActiveAnalyzer()) Then
                             _analyzerManager.PrepareLocalAlarmList(alarm, status, myAlarmList, myAlarmStatusList)
                             myGlobal = Manage(myAlarmList, myAlarmStatusList)
                         End If
                         _analyzerManager.CreateAndThrowEventUiRefresh(GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED)
-                    Case CBool(1)
+                    Case False
                         status = False
                         If ExistsActiveAlarm(alarm.ToString(), _analyzerManager.ActiveAnalyzer()) Then
                             _analyzerManager.PrepareLocalAlarmList(alarm, status, myAlarmList, myAlarmStatusList)

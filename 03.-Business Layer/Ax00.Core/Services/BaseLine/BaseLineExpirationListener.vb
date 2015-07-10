@@ -66,14 +66,14 @@ Namespace Biosystems.Ax00.Core.Services.BaseLine
         ''' and depends if return true or false do some action  
         ''' </summary>
         ''' <remarks> ActionAlarm
-        '''          0 to create the alarm.
-        '''          1 to delete the alarm. 
+        '''          True to create the alarm.
+        '''          False to delete the alarm. 
         ''' </remarks>
         Private Sub CheckIsExpired()
             If baseLineExpirationobj.IsBlExpired Then
-                _analyzerAlarmsManager.ActionAlarm(CBool(0), AlarmEnumerates.Alarms.BASELINE_EXPIRED)
+                _analyzerAlarmsManager.ActionAlarm(True, AlarmEnumerates.Alarms.BASELINE_EXPIRED)
             Else
-                _analyzerAlarmsManager.ActionAlarm(CBool(1), AlarmEnumerates.Alarms.BASELINE_EXPIRED)
+                _analyzerAlarmsManager.ActionAlarm(False, AlarmEnumerates.Alarms.BASELINE_EXPIRED)
             End If
         End Sub
 
