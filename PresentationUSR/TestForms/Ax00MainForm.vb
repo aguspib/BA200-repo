@@ -339,7 +339,12 @@ Public Class Ax00MainForm
 #End Region
 
     Private Sub MITestButtonClick(sender As Object, e As EventArgs) Handles MITestProcess.Click
-        LinkLayer.SimulateDataReception("A200;STATUS;R2B2:15;R2B1:11;")
+
+        Dim a As New Biosystems.Ax00.Data.vWSExecutionsDAO
+        Dim result = a.GetBireactivesContext()
+        a.ClearBireactivesContext()
+        result.AddtwksWSBbireactiveContextRow("123456890", "1234567890", 0, 1, 123, 234)
+        a.SaveBireactivesContext(result)
     End Sub
 
     Private Sub Btn_Meritxell_Click(sender As Object, e As EventArgs) Handles Btn_Meritxell.Click

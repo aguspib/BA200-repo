@@ -1,4 +1,6 @@
 ﻿Imports Biosystems.Ax00.Data.Interfaces
+Imports vWSExecutionsDSTableAdapters
+Imports System.Data.SqlClient
 
 Namespace Biosystems.Ax00.Data
     ''' <summary>
@@ -68,5 +70,34 @@ Namespace Biosystems.Ax00.Data
 
             Return result
         End Function
+
+        Public Function GetBireactivesContext() As vWSExecutionsDS.twksWSBbireactiveContextDataTable
+            Dim result As New vWSExecutionsDS.twksWSBbireactiveContextDataTable
+            Dim aux As New vWSExecutionsDSTableAdapters.twksWSBbireactiveContextTableAdapter
+            aux.Fill(result)
+            Return result
+        End Function
+
+        Public Sub SaveBireactivesContext(value As vWSExecutionsDS.twksWSBbireactiveContextDataTable)
+            Dim aux As New vWSExecutionsDSTableAdapters.twksWSBbireactiveContextTableAdapter
+            aux.Update(value)
+        End Sub
+
+        Public Sub ClearBireactivesContext()
+            Dim aux As New vWSExecutionsDSTableAdapters.twksWSBbireactiveContextTableAdapter
+            Try
+
+                Dim sqlTrunc As String = "TRUNCATE TABLE twksWSBbireactiveContext"
+                aux.Connection.Open()
+                Dim cmd As SqlCommand = New SqlCommand(sqlTrunc, aux.Connection)
+                cmd.ExecuteNonQuery()
+            Catch
+                Throw
+            Finally
+                If aux IsNot Nothing Then aux.Connection.Close()
+            End Try
+        End Sub
+
+
     End Class
 End Namespace

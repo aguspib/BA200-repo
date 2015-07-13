@@ -15,7 +15,7 @@ Namespace Biosystems.Ax00.Core.Entities.Worksession.Contaminations.Interfaces
 
         Property WashingID As Integer
 
-        Property WashingDescription As IWashingDescription
+        ReadOnly Property WashingDescription As IWashingDescription
 
         Property ExecutionID As Integer
 
@@ -44,15 +44,15 @@ Namespace Biosystems.Ax00.Core.Entities.Worksession.Contaminations.Interfaces
 
         Sub FillDispense(analyzerContaminationsSpecification As IAnalyzerContaminationsSpecification, ByVal row As ExecutionsDS.twksWSExecutionsRow)
 
-        Enum KindOfDispensedLiquid
-            Reagent
-            Ise
-            Dummy
-            Washing
-        End Enum
-
     End Interface
 
+    <Serializable>
+    Public Enum KindOfDispensedLiquid
+        Reagent
+        Ise
+        Dummy
+        Washing
+    End Enum
 
 
 End Namespace

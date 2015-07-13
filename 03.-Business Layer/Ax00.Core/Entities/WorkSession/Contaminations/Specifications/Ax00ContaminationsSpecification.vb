@@ -55,7 +55,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
 
 #Region "Runtime Analyzer interaction"
 
-        Public Sub FillContextFromAnayzerData(instruction As String) Implements IAnalyzerContaminationsSpecification.FillContextFromAnayzerData
+        Public Overridable Sub FillContextFromAnayzerData(instruction As String) Implements IAnalyzerContaminationsSpecification.FillContextFromAnayzerData
             Dim analyzerFrame = New LAx00Frame()
             Try
                 analyzerFrame.ParseRawData(instruction)
@@ -64,6 +64,9 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
                     context.FillContentsFromAnalyzer(analyzerFrame)
                     currentContext = context
                     Debug.WriteLine("Context filled in running! " & Mid(instruction, InStr(instruction, "R2B2:")))
+
+
+
                 End If
             Catch ex As Exception
                 Debug.WriteLine("EXCEPTION FILLING CONTEXT " & ex.Message)
