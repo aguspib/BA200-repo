@@ -15,11 +15,11 @@ Public Class Form_MR
     Private Sub Btn_create_refresh_Click(sender As Object, e As EventArgs) Handles Btn_create_refresh.Click
 
 
-        _analyzerAlarmsManager.ActionAlarm(CBool(0), AlarmEnumerates.Alarms.BASELINE_EXPIRED)
+        _analyzerAlarmsManager.ActionAlarm(True, AlarmEnumerates.Alarms.BASELINE_EXPIRED)
     End Sub
 
     Private Sub BsDelete_refresh_Click(sender As Object, e As EventArgs) Handles BsDelete_refresh.Click
-        _analyzerAlarmsManager.ActionAlarm(CBool(1), AlarmEnumerates.Alarms.BASELINE_EXPIRED)
+        _analyzerAlarmsManager.ActionAlarm(False, AlarmEnumerates.Alarms.BASELINE_EXPIRED)
 
     End Sub
 

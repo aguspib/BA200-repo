@@ -4560,15 +4560,11 @@ Public Class UiPositionsAdjustments
                 Me.BsGridSample.ParameterCellValue(position, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_PARK.ToString, GlobalEnumerates.AXIS.ROTOR).Value
                 position += 1
                 If AnalyzerController.Instance.IsBA200() Then
-                    '' REAGENT RING1 PEDIATRIC
+                    '' Z TUBE REAGENT Polar and Rotor values taken from Ring1 when saving write to Z of Tube1 and Tube2
                     Me.BsGridSample.ParameterCellValue(position, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1.ToString, GlobalEnumerates.AXIS.POLAR).Value
                     Me.BsGridSample.ParameterCellValue(position, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1.ToString, GlobalEnumerates.AXIS.Z).Value
                     Me.BsGridSample.ParameterCellValue(position, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1.ToString, GlobalEnumerates.AXIS.ROTOR).Value
                     position += 1
-                    '' REAGENT RING2 PEDIATRIC
-                    Me.BsGridSample.ParameterCellValue(position, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING2.ToString, GlobalEnumerates.AXIS.POLAR).Value
-                    Me.BsGridSample.ParameterCellValue(position, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_RING2.ToString, GlobalEnumerates.AXIS.Z).Value
-                    Me.BsGridSample.ParameterCellValue(position, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING2.ToString, GlobalEnumerates.AXIS.ROTOR).Value
                 End If
             End If
         End If
@@ -4589,9 +4585,16 @@ Public Class UiPositionsAdjustments
                     Me.myScreenDelegate.SampleArmParkV = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_PARK.ToString, GlobalEnumerates.AXIS.Z).Value
                     Me.myScreenDelegate.SampleSecurityFly = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_VSEC.ToString, GlobalEnumerates.AXIS.Z).Value
                     Me.SampleLimitZFine = CSng(Me.myScreenDelegate.SampleSecurityFly)
+
+                    If AnalyzerController.Instance.IsBA200 Then
+                        Me.myScreenDelegate.Reagent1ArmParkH = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_PARK.ToString, GlobalEnumerates.AXIS.POLAR).Value
+                        Me.myScreenDelegate.Reagent1ArmParkV = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_PARK.ToString, GlobalEnumerates.AXIS.Z).Value
+                        Me.myScreenDelegate.Reagent1SecurityFly = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_VSEC.ToString, GlobalEnumerates.AXIS.Z).Value
+                        Me.Reagent1LimitZFine = CSng(Me.myScreenDelegate.Reagent1SecurityFly)
+                    End If
                 End If
             End If
-            If Not Me.BsGridReagent1 Is Nothing AndAlso Not (AnalyzerController.Instance.Analyzer.Model = AnalyzerModelEnum.A200.ToString()) Then
+            If Not Me.BsGridReagent1 Is Nothing AndAlso Not (AnalyzerController.Instance.IsBA200) Then 'AndAlso Not (AnalyzerController.Instance.Analyzer.Model = AnalyzerModelEnum.A200.ToString()) Then
                 If Me.BsGridReagent1.RowsCount > 0 Then
                     ' Fill parking values into Delegate parameters
                     Me.myScreenDelegate.Reagent1ArmParkH = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_PARK.ToString, GlobalEnumerates.AXIS.POLAR).Value
@@ -4600,7 +4603,7 @@ Public Class UiPositionsAdjustments
                     Me.Reagent1LimitZFine = CSng(Me.myScreenDelegate.Reagent1SecurityFly)
                 End If
             End If
-            If Not Me.BsGridReagent2 Is Nothing AndAlso Not (AnalyzerController.Instance.Analyzer.Model = AnalyzerModelEnum.A200.ToString()) Then
+            If Not Me.BsGridReagent2 Is Nothing AndAlso Not (AnalyzerController.Instance.IsBA200) Then
                 If Me.BsGridReagent2.RowsCount > 0 Then
                     ' Fill parking values into Delegate parameters
                     Me.myScreenDelegate.Reagent2ArmParkH = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_PARK.ToString, GlobalEnumerates.AXIS.POLAR).Value
@@ -4618,7 +4621,7 @@ Public Class UiPositionsAdjustments
                     Me.Mixer1LimitZFine = CSng(Me.myScreenDelegate.Mixer1SecurityFly)
                 End If
             End If
-            If Not Me.BsGridMixer2 Is Nothing AndAlso Not (AnalyzerController.Instance.Analyzer.Model = AnalyzerModelEnum.A200.ToString()) Then
+            If Not Me.BsGridMixer2 Is Nothing AndAlso Not (AnalyzerController.Instance.IsBA200) Then
                 If Me.BsGridMixer2.RowsCount > 0 Then
                     ' Fill parking values into Delegate parameters
                     Me.myScreenDelegate.Mixer2ArmParkH = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.MIXER2_ARM_PARK.ToString, GlobalEnumerates.AXIS.POLAR).Value
@@ -6194,6 +6197,10 @@ Public Class UiPositionsAdjustments
                 myAdjustmentsGroups.Add(ADJUSTMENT_GROUPS.SAMPLES_ARM_ZTUBE3.ToString)
             End If
 
+            If AnalyzerController.Instance.IsBA200 AndAlso myAdjustmentID = ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1 Then
+                myAdjustmentsGroups.Add(ADJUSTMENT_GROUPS.SAMPLES_ARM_ZTUBE1.ToString)
+            End If
+
 
             resultData = MyBase.myAdjustmentsDelegate.ReadAdjustmentsByGroupIDs(myAdjustmentsGroups)
             If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
@@ -6237,6 +6244,7 @@ Public Class UiPositionsAdjustments
                     ' XBC 12/09/2011 - By now ZTube 2 & 3 takes the value of ZTube1
                     myAdjustmentsGroups.Add(ADJUSTMENT_GROUPS.SAMPLES_ARM_ZTUBE2.ToString)
                     myAdjustmentsGroups.Add(ADJUSTMENT_GROUPS.SAMPLES_ARM_ZTUBE3.ToString)
+                    'If AnalyzerController.Instance.IsBA200 Then myAdjustmentsGroups.Add(ADJUSTMENT_GROUPS.REAG.ToString)
 
                 Case ADJUSTMENT_ARMS.REAGENT1
                     myAdjustmentsGroups.Add(ADJUSTMENT_GROUPS.REAGENT1_ARM_DISP1.ToString)
@@ -7760,7 +7768,7 @@ Public Class UiPositionsAdjustments
                                         myScreenDelegate.pArmABSMovZ = myZ.Value
                                     End If
 
-                                Case "Z_TUBE"
+                                Case "Z_TUBE", "REAGENTZ"
                                     If (myPolar.CanSave And myPolar.Value.Length = 0) Or (myZ.CanSave And myZ.Value.Length = 0) Then
                                         myGlobal.HasError = True
                                     Else
@@ -8039,6 +8047,7 @@ Public Class UiPositionsAdjustments
                             Case "RING2" : Me.SelectedAdjustmentGroup = ADJUSTMENT_GROUPS.SAMPLES_ARM_RING2
                             Case "RING3" : Me.SelectedAdjustmentGroup = ADJUSTMENT_GROUPS.SAMPLES_ARM_RING3
                             Case "Z_TUBE" : Me.SelectedAdjustmentGroup = ADJUSTMENT_GROUPS.SAMPLES_ARM_ZTUBE1
+                            Case "REAGENTZ" : Me.SelectedAdjustmentGroup = ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1
                             Case "ISE" : Me.SelectedAdjustmentGroup = ADJUSTMENT_GROUPS.SAMPLES_ARM_ISE
                             Case "PKG" : Me.SelectedAdjustmentGroup = ADJUSTMENT_GROUPS.SAMPLES_ARM_PARK
                         End Select
@@ -8108,6 +8117,12 @@ Public Class UiPositionsAdjustments
                                     'PENDING TO DEFINE ROTOR POS NUMBER
                                 End If
 
+                                If AnalyzerController.Instance.IsBA200 AndAlso .AdjustmentID = ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1 Then
+                                    myPolarValue = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1.ToString, GlobalEnumerates.AXIS.POLAR).Value
+                                    myRotorValue = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1.ToString, GlobalEnumerates.AXIS.ROTOR).Value
+                                End If
+
+
                                 ' XBC 13/11/2012 - Wash station Z test must add security fly position
                                 If Me.BsGridSample.IdentValue(pRowIndex).ToString = "WASH" Then
                                     myAdditionalZValue = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_VSEC.ToString, GlobalEnumerates.AXIS.Z).Value
@@ -8131,7 +8146,7 @@ Public Class UiPositionsAdjustments
                                             myScreenDelegate.pArmABSMovZ = myZValue
                                             myScreenDelegate.pValueRotorABSMov = myRotorValue
                                         End If
-                                    Case "Z_TUBE"
+                                    Case "Z_TUBE", "REAGENTZ"
                                         If myPolarValue.Length = 0 Or myZValue.Length = 0 Or myRotorValue.Length = 0 Then
                                             myGlobal.HasError = True
                                         Else
@@ -8139,6 +8154,8 @@ Public Class UiPositionsAdjustments
                                             myScreenDelegate.pArmABSMovZ = myZValue
                                             myScreenDelegate.pValueRotorABSMov = myRotorValue
                                         End If
+
+
                                 End Select
 
                             Case ADJUSTMENT_ARMS.REAGENT1

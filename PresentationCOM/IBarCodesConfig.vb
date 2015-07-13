@@ -214,7 +214,11 @@ Public Class UiBarCodesConfig
                         Dim rowBarCode As AnalyzerManagerDS.barCodeRequestsRow
                         rowBarCode = BarCodeDS.barCodeRequests.NewbarCodeRequestsRow
                         With rowBarCode
-                            .RotorType = "SAMPLES"
+                            If AnalyzerController.Instance.IsBA200 Then
+                                .RotorType = "SAMPLESANDREAGENTS"
+                            Else
+                                .RotorType = "SAMPLES"
+                            End If
                             .Action = GlobalEnumerates.Ax00CodeBarAction.CONFIG
                             .Position = 0
                         End With
