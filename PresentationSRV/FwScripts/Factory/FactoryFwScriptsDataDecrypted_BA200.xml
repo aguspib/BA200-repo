@@ -3931,7 +3931,7 @@
     <FwScriptTO>
       <FwScriptID>1201</FwScriptID>
       <ActionID>SF1_B6_ON</ActionID>
-      <Description>Aspiration Needles 2,3 Pump ON</Description>
+      <Description>Aspiration Needles 7,8 Pump ON</Description>
       <Instructions>
         <InstructionTO>
           <InstructionID>1</InstructionID>
@@ -3959,7 +3959,7 @@
     <FwScriptTO>
       <FwScriptID>1202</FwScriptID>
       <ActionID>SF1_B6_OFF</ActionID>
-      <Description>Aspiration Needles 2,3 Pump OFF</Description>
+      <Description>Aspiration Needles 7,8 Pump OFF</Description>
       <Instructions>
         <InstructionTO>
           <InstructionID>1</InstructionID>
@@ -3987,7 +3987,7 @@
     <FwScriptTO>
       <FwScriptID>1203</FwScriptID>
       <ActionID>SF1_B7_ON</ActionID>
-      <Description>Aspiration Needles 4,5 Pump ON</Description>
+      <Description>Aspiration Needles 9,10 Pump ON</Description>
       <Instructions>
         <InstructionTO>
           <InstructionID>1</InstructionID>
@@ -4015,7 +4015,7 @@
     <FwScriptTO>
       <FwScriptID>1204</FwScriptID>
       <ActionID>SF1_B7_OFF</ActionID>
-      <Description>Aspiration Needles 4,5 Pump OFF</Description>
+      <Description>Aspiration Needles 9,10 Pump OFF</Description>
       <Instructions>
         <InstructionTO>
           <InstructionID>1</InstructionID>
@@ -4043,7 +4043,7 @@
     <FwScriptTO>
       <FwScriptID>1205</FwScriptID>
       <ActionID>SF1_B8_ON</ActionID>
-      <Description>Aspiration Needles 6 Pump ON</Description>
+      <Description>Aspiration Needles 12 Pump ON</Description>
       <Instructions>
         <InstructionTO>
           <InstructionID>1</InstructionID>
@@ -4071,7 +4071,7 @@
     <FwScriptTO>
       <FwScriptID>1206</FwScriptID>
       <ActionID>SF1_B8_OFF</ActionID>
-      <Description>Aspiration Needles 6 Pump OFF</Description>
+      <Description>Aspiration Needles 12 Pump OFF</Description>
       <Instructions>
         <InstructionTO>
           <InstructionID>1</InstructionID>
@@ -4099,7 +4099,7 @@
     <FwScriptTO>
       <FwScriptID>1207</FwScriptID>
       <ActionID>SF1_B9_ON</ActionID>
-      <Description>Aspiration Needles 7 Pump ON</Description>
+      <Description>Aspiration Needles 13 Pump ON</Description>
       <Instructions>
         <InstructionTO>
           <InstructionID>1</InstructionID>
@@ -4127,7 +4127,7 @@
     <FwScriptTO>
       <FwScriptID>1208</FwScriptID>
       <ActionID>SF1_B9_OFF</ActionID>
-      <Description>Aspiration Needles 7 Pump OFF</Description>
+      <Description>Aspiration Needles 13 Pump OFF</Description>
       <Instructions>
         <InstructionTO>
           <InstructionID>1</InstructionID>
@@ -4155,7 +4155,7 @@
     <FwScriptTO>
       <FwScriptID>1209</FwScriptID>
       <ActionID>SF1_B10_ON</ActionID>
-      <Description>Aspiration Needles 1 Pump ON</Description>
+      <Description>Aspiration Needles 6 Pump ON</Description>
       <Instructions>
         <InstructionTO>
           <InstructionID>1</InstructionID>
@@ -4183,7 +4183,7 @@
     <FwScriptTO>
       <FwScriptID>1210</FwScriptID>
       <ActionID>SF1_B10_OFF</ActionID>
-      <Description>Aspiration Needles 1 Pump OFF</Description>
+      <Description>Aspiration Needles 6 Pump OFF</Description>
       <Instructions>
         <InstructionTO>
           <InstructionID>1</InstructionID>
