@@ -2717,7 +2717,7 @@
           <InstructionID>7</InstructionID>
           <Sequence>7</Sequence>
           <Timer>5000</Timer>
-          <Code>BM1.MH.MMA</Code>
+          <Code>BR1.MH.MMA</Code>
           <Params>#3@</Params>
           <EnableEdition>false</EnableEdition>
         </InstructionTO>
@@ -2725,21 +2725,13 @@
           <InstructionID>8</InstructionID>
           <Sequence>8</Sequence>
           <Timer>5010</Timer>
-          <Code>BR1.MH.MMA</Code>
+          <Code>BA1.MH.MMA</Code>
           <Params>#4@</Params>
           <EnableEdition>false</EnableEdition>
         </InstructionTO>
         <InstructionTO>
           <InstructionID>9</InstructionID>
           <Sequence>9</Sequence>
-          <Timer>5020</Timer>
-          <Code>BA1.MH.MMA</Code>
-          <Params>#5@</Params>
-          <EnableEdition>false</EnableEdition>
-        </InstructionTO>
-        <InstructionTO>
-          <InstructionID>10</InstructionID>
-          <Sequence>11</Sequence>
           <Timer>9000</Timer>
           <Code>END</Code>
           <Params />
