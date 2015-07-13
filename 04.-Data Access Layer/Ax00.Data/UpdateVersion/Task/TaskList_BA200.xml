@@ -669,15 +669,15 @@
         </DataRevision>
         <DataRevision JiraID="BA-2659" SequenceNumber="2">
           <PrerequisiteScript>
-            IF 
+            IF
             ((SELECT COUNT(1) FROM [A200].[dbo].[srv_tfmwAdjustments]
             WHERE CodeFw IN ('R2RV','R2H','R2V','R2SV','R2WH','R2WVR','R2DH','R2PH1','R2PH2','R2PV1','R2PV2','R2PI','M1RV','M1H','M1V','M1SV','M1WH','M1WVR','M1DH1','M1DV1','M1PH3','M1PV3p','M1PV3t','A2RV','A2H','A2V','A2SV','A2WH','A2WVR','A2DH','A2DV','RR2P1','RR2P2','RM1P3','GTR2','GTOR2','DR2S','SCOV')) > 0)
             AND
             ((SELECT COUNT(1) FROM [A200].[dbo].[srv_tfmwAdjustments]
             WHERE CodeFw IN ('LCTOPMA','LCTOPMI','LCBOTMA','LCBOTMI','H2OTOPMA','H2OTOPMI','H2OBOTMA','H2OBOTMI','RREG1','RREG2','RREG3','RREG4','RREG5','RREG6','RREG7','RREG8','GTISE','GTOISE')) = 0)
-            AND 
+            AND
             ((SELECT COUNT(1) FROM [A200].[dbo].[tfmwPreloadedMasterData]
-            WHERE [SubTableID] = 'SRV_SAMPLE_POSITIONS' and ([ItemID] = 'RING2R' or [ItemID] = 'RING1R' or [ItemID] = 'RING3')) = 1)
+            WHERE [SubTableID] = 'SRV_SAMPLE_POSITIONS' and ([ItemID] = 'REAGENTZ' or [ItemID] = 'RING3')) = 1)
             Select 'True'
             ELSE
             Select 'False'

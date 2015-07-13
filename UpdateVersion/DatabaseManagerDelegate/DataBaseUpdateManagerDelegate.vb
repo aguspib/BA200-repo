@@ -43,8 +43,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 'GlobalBase.CreateLogActivity("InstallUpdateProcess" & ".Updateprocess -Validating if Data Base exists ", "Installation validation", EventLogEntryType.Information, False)
                 initialTimeUpdate = Now 'Set the start time 
                 Debug.Print("INICIO-->" & initialTimeUpdate.TimeOfDay.ToString()) 'Print the time
-                GlobalBase.CreateLogActivity("InstallUpdateProcess" & ".Updateprocess - Database found", "Installation validation", _
-                                                                                                   EventLogEntryType.Information, False)
+                'GlobalBase.CreateLogActivity("InstallUpdateProcess" & ".Updateprocess - Database found", "Installation validation", EventLogEntryType.Information, False)
                 ValidateDatabaseName(pServerName, pDataBaseName, DBLogin, DBPassword)
 
                 If Not DataBaseManagerDelegate.DataBaseExist(pServerName, pDataBaseName, DBLogin, DBPassword) Then 'BA-2471: IT 08/05/2015
@@ -550,29 +549,32 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' <param name="fromCommonRevisionNumber"></param>
         ''' <param name="fromDataRevisionNumber"></param>
         ''' <returns></returns>
-        ''' <remarks></remarks>
+        ''' <remarks>
+        ''' Modified by: IT 13/07/2015 - BA-2693
+        ''' </remarks>
         Private Function ExecuteDatabaseUpdate(ByVal pDataBaseName As String, ByRef pServer As Server, databaseUpdatesManager As DatabaseUpdatesManager, packageId As String, fromVersion As String, fromCommonRevisionNumber As String, fromDataRevisionNumber As String) As GlobalDataTO
 
             Dim myGlobalDataTo As New GlobalDataTO
             Dim results As New ExecutionResults
 
-            If InitializeDatabase(pDataBaseName, pServer) Then
+            Dim appDataBaseVersion As String = Utilities.FormatToCorrectVersion(GlobalBase.DataBaseVersion)
 
-                Dim appDataBaseVersion As String = Utilities.FormatToCorrectVersion(GlobalBase.DataBaseVersion)
-                Dim updates = databaseUpdatesManager.GenerateUpdatePack(fromVersion, fromCommonRevisionNumber, fromDataRevisionNumber, appDataBaseVersion)
-
-                If updates.Releases.Count > 0 Then
-                    results = updates.RunScripts(pDataBaseName, pServer, packageId)
-
-                    If (Not results.Success) Then
-                        myGlobalDataTo.ErrorCode = GlobalEnumerates.Messages.INVALID_DATABASE_UPDATE.ToString()
-                        myGlobalDataTo.HasError = True
-                    End If
+            If (fromVersion <> appDataBaseVersion) Then
+                Dim initialized = InitializeDatabase(pDataBaseName, pServer)
+                If (Not initialized) Then
+                    myGlobalDataTo.ErrorCode = GlobalEnumerates.Messages.INVALID_DATABASE_UPDATE.ToString()
+                    myGlobalDataTo.HasError = True
                 End If
+            End If
 
-            Else
-                myGlobalDataTo.ErrorCode = GlobalEnumerates.Messages.INVALID_DATABASE_UPDATE.ToString()
-                myGlobalDataTo.HasError = True
+            Dim updates = databaseUpdatesManager.GenerateUpdatePack(fromVersion, fromCommonRevisionNumber, fromDataRevisionNumber, appDataBaseVersion)
+            If updates.Releases.Count > 0 Then
+                results = updates.RunScripts(pDataBaseName, pServer, packageId)
+
+                If (Not results.Success) Then
+                    myGlobalDataTo.ErrorCode = GlobalEnumerates.Messages.INVALID_DATABASE_UPDATE.ToString()
+                    myGlobalDataTo.HasError = True
+                End If
             End If
 
             Return myGlobalDataTo
