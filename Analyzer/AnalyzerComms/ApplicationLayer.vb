@@ -1706,8 +1706,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>
-        ''' Created by SGM 27/01/11
-        ''' Modified by SGM : 24/11/2011 - Get Master data from resources if SimulationMode
+        ''' Created by:  SGM 27/01/2011
+        ''' Modified by: SGM 24/11/2011 - Get Master data from resources if SimulationMode
+        '''              IT  13/07/2015 - BA-2659
         '''</remarks>
         Public Function LoadFwAdjustmentsMasterData(ByVal pAnalyzerID As String, ByVal pSimulationMode As Boolean) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
@@ -1743,7 +1744,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                         Dim myFileAdjustmentsDS As SRVAdjustmentsDS = Nothing
                         Dim myFwAdjustmentsDelegate As New FwAdjustmentsDelegate(myFwAdjustmentsDS)
-                        myGlobal = myFwAdjustmentsDelegate.ConvertReceivedDataToDS(myData, "Simulated Analyzer", "Simulated Firmware")
+                        myGlobal = myFwAdjustmentsDelegate.ConvertReceivedDataToDS(myData, "Simulated Analyzer", "Simulated Firmware", analyzerModelAttribute) 'IT  13/07/2015 - BA-2659
 
                         If myGlobal.SetDatos IsNot Nothing And Not myGlobal.HasError Then
                             myFileAdjustmentsDS = CType(myGlobal.SetDatos, SRVAdjustmentsDS)

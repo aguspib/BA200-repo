@@ -15,10 +15,12 @@ Module PreBuildBatch
         Try
 
             If Not GenerateEncryptedTaskList() Then
+                Console.Error().WriteLine("Error parsing TaskList")
                 Throw New Exception("There was an error generating the TaskList file.")
             End If
 
             If Not GenerateEncryptedFactoryFwScripts() Then
+                Console.Error().WriteLine("Error generating FwFactoryScriptsData")
                 Throw New Exception("There was an error generating the FwFactoryScriptsData file.")
             End If
 
@@ -29,6 +31,7 @@ Module PreBuildBatch
 
         Catch ex As Exception
             MessageBox.Show(ex.Message, "Important Message")
+            Environment.ExitCode = -1
         End Try
 
     End Sub

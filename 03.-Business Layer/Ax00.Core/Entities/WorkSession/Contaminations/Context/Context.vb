@@ -36,9 +36,9 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
             Try
                 Dim anali As AnalyzerManager = TryCast(AnalyzerManager.GetCurrentAnalyzerManager(), AnalyzerManager)
                 If anali.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
-                    If dispensing.KindOfLiquid = IDispensing.KindOfDispensedLiquid.Reagent Then
+                    If dispensing.KindOfLiquid = KindOfDispensedLiquid.Reagent Then
                         Debug.WriteLine("  Asked context for reagent " & dispensing.R1ReagentID & " SC:" & dispensing.SampleClass)
-                    ElseIf dispensing.KindOfLiquid = IDispensing.KindOfDispensedLiquid.Washing Then
+                    ElseIf dispensing.KindOfLiquid = KindOfDispensedLiquid.Washing Then
                         Debug.WriteLine("  Asked context for washing " & dispensing.WashingID & " WS:" & dispensing.WashingDescription.WashingSolutionCode)
                     End If
                 End If
@@ -176,11 +176,11 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
                     Else
                         Dim dispense = Steps(curStep)(curDispense)
                         Select Case dispense.KindOfLiquid
-                            Case IDispensing.KindOfDispensedLiquid.Washing
+                            Case KindOfDispensedLiquid.Washing
                                 SB.Append("W" & Format(dispense.WashingID, "000"))
-                            Case IDispensing.KindOfDispensedLiquid.Reagent
+                            Case KindOfDispensedLiquid.Reagent
                                 SB.Append(" " & Format(dispense.R1ReagentID, "000"))
-                            Case IDispensing.KindOfDispensedLiquid.Dummy
+                            Case KindOfDispensedLiquid.Dummy
                                 SB.Append("Dumy")
                             Case Else
                                 SB.Append(" ?? ")
@@ -263,7 +263,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
 
             Dim value = AnalyzerFrame(parameterName)
             If String.Equals(value, "D", StringComparison.OrdinalIgnoreCase) Then
-                targetDispensing.KindOfLiquid = IDispensing.KindOfDispensedLiquid.Dummy
+                targetDispensing.KindOfLiquid = KindOfDispensedLiquid.Dummy
             ElseIf value.StartsWith("W", StringComparison.OrdinalIgnoreCase) Then
                 targetDispensing.WashingID = CInt(Mid(value, 2))
             Else

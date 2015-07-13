@@ -125,6 +125,7 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
 
             Dim valid = CommonRevisions.Select(Function(x) x.RevisionNumber).Distinct().Count() = CommonRevisions.Count
 
+
             If (valid) Then
                 For Each revision In CommonRevisions
                     valid = revision.Validate()
