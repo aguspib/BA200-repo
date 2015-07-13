@@ -545,6 +545,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     End With
                     BarCodeDS.barCodeRequests.AddbarCodeRequestsRow(rowBarCode)
                     BarCodeDS.AcceptChanges()
+
                     myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.BARCODE_REQUEST, True, Nothing, BarCodeDS)
                     ' XBC 13/02/2012 - CODEBR Configuration instruction
                 Else

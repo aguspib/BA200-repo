@@ -8,6 +8,7 @@ Imports Biosystems.Ax00.FwScriptsManagement
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Controls.UserControls
 Imports Biosystems.Ax00.App
+Imports Biosystems.Ax00.Core.Entities
 
 Public Class UiBarCodeAdjustments
     Inherits PesentationLayer.BSAdjustmentBaseForm
@@ -1575,6 +1576,10 @@ Public Class UiBarCodeAdjustments
                 .Action = GlobalEnumerates.Ax00CodeBarAction.START_TEST_MODE
                 .Position = 0
             End With
+            If AnalyzerController.Instance.IsBA200 Then
+                rowBarCode.RotorType = "SAMPLESANDREAGENTS"
+            End If
+
             BarCodeDS.barCodeRequests.AddbarCodeRequestsRow(rowBarCode)
 
             BarCodeDS.AcceptChanges()
@@ -1611,6 +1616,9 @@ Public Class UiBarCodeAdjustments
                 .Action = GlobalEnumerates.Ax00CodeBarAction.END_TEST_MODE
                 .Position = 0
             End With
+            If AnalyzerController.Instance.IsBA200 Then
+                rowBarCode.RotorType = "SAMPLESANDREAGENTS"
+            End If
             BarCodeDS.barCodeRequests.AddbarCodeRequestsRow(rowBarCode)
 
             BarCodeDS.AcceptChanges()
