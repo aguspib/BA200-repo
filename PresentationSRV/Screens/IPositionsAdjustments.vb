@@ -7740,9 +7740,16 @@ Public Class UiPositionsAdjustments
                     Select Case SelectedArmTab
                         Case ADJUSTMENT_ARMS.SAMPLE
                             .AdjustmentID = SetPositionAdjustmentType(ADJUSTMENT_ARMS.SAMPLE, pRowIndex)
-                            myPolar = ReadGlobalAdjustmentData(.AdjustmentID.ToString, GlobalEnumerates.AXIS.POLAR, True)
+                            If AnalyzerController.Instance.IsBA200 AndAlso .AdjustmentID = ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1 Then
+                                myPolar = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1.ToString, GlobalEnumerates.AXIS.POLAR, True)
+                                myRotor = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1.ToString, GlobalEnumerates.AXIS.ROTOR, True)
+                            Else
+                                myPolar = ReadGlobalAdjustmentData(.AdjustmentID.ToString, GlobalEnumerates.AXIS.POLAR, True)
+                                myRotor = ReadGlobalAdjustmentData(.AdjustmentID.ToString, GlobalEnumerates.AXIS.ROTOR, True)
+                            End If
+
                             myZ = ReadGlobalAdjustmentData(.AdjustmentID.ToString, GlobalEnumerates.AXIS.Z, True)
-                            myRotor = ReadGlobalAdjustmentData(.AdjustmentID.ToString, GlobalEnumerates.AXIS.ROTOR, True)
+
 
                             'SGM 02/03/2012 take the Polar and Rotor from Ring1
                             If .AdjustmentID = ADJUSTMENT_GROUPS.SAMPLES_ARM_ZTUBE1 Then
