@@ -127,7 +127,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     Dim myAdjDS As SRVAdjustmentsDS = CType(myGlobal.SetDatos, SRVAdjustmentsDS)
                     If myAdjDS IsNot Nothing Then
                         Dim myAdjustmentsDelegate As New FwAdjustmentsDelegate(myAdjDS)
-                        myGlobal = myAdjustmentsDelegate.ConvertReceivedDataToDS(myData, MyClass.ActiveAnalyzer, MyClass.ActiveFwVersion)
+                        myGlobal = myAdjustmentsDelegate.ConvertReceivedDataToDS(myData, MyClass.ActiveAnalyzer, MyClass.ActiveFwVersion, myAnalyzerModel) 'IT 13/07/2015 - BA-2659
                     End If
                 End If
 
