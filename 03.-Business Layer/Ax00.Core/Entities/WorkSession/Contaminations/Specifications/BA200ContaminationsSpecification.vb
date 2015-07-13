@@ -4,10 +4,13 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.DAL.DAO
 Imports System.Collections.Concurrent
+Imports System.Windows.Forms
 Imports Biosystems.Ax00.Core.Interfaces
-Imports Biosystems.Ax00.Core.Entities.Worksession.Interfaces
-Imports Biosystems.Ax00.Core.Entities.Worksession.Contaminations.Interfaces
-Imports Biosystems.Ax00.Core.Entities.Worksession.Contaminations.Specifications.Dispensing
+Imports Biosystems.Ax00.Core.Entities.WorkSession.Interfaces
+Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Interfaces
+Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specifications.Dispensing
+Imports Biosystems.Ax00.Data
+
 #End Region
 
 Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specifications
@@ -68,6 +71,93 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
 
             Return testReagentsDataDS
         End Function
+
+        Public Sub FillContextFromAnayzerData(ByVal instruction As String) 'Implements IAnalyzerContaminationsSpecification.FillContextFromAnayzerData
+            MyBase.FillContextFromAnayzerData(instruction)
+            'Handle bireactive long lasting memory
+            HandleBireactives()
+        End Sub
+
+
+        Private lastBireactives As LinkedList(Of IDispensing)
+
+        Private Sub HandleBireactives()
+            If lastBireactives Is Nothing Then
+                LoadLastBireactivesFromDB()
+            End If
+
+            ' ReSharper disable once InconsistentNaming
+            Const R1 As Integer = 1
+            Const BEFOREONE As Integer = -1
+
+            Dim stepToCheck = currentContext.Steps(BEFOREONE)
+            Dim dispenseToCheck As IDispensing = Nothing
+            Dim serializationRequired As Boolean = False
+
+            If stepToCheck IsNot Nothing AndAlso stepToCheck.Dispensing(R1) IsNot Nothing Then
+                dispenseToCheck = stepToCheck.Dispensing(R1)
+            End If
+
+            If dispenseToCheck IsNot Nothing Then
+                Select Case dispenseToCheck.KindOfLiquid
+                    Case KindOfDispensedLiquid.Washing
+                        lastBireactives.AddLast(dispenseToCheck)
+                        serializationRequired = True
+                    Case KindOfDispensedLiquid.Reagent
+                        If GetAnalysisModeForReagent(dispenseToCheck.R1ReagentID) = AnalysisMode.BiReactive Then
+                            lastBireactives.AddLast(dispenseToCheck)
+                            serializationRequired = True
+                        End If
+                End Select
+            End If
+            While lastBireactives.Count > HighContaminationPersistence
+                lastBireactives.RemoveFirst()
+                serializationRequired = True
+            End While
+
+            If serializationRequired Then
+                SerializeLatestBireactives()
+            End If
+            'CurrentRunningContext.ActionRequiredForDispensing()
+        End Sub
+
+        Private Sub LoadLastBireactivesFromDB()
+            Dim dao = New vWSExecutionsDAO
+            Dim serializedData = dao.GetBireactivesContext()
+            lastBireactives = New LinkedList(Of IDispensing)
+            For Each R In serializedData
+                Dim disp = CreateDispensing()
+                disp.ExecutionID = R.ExecutionID
+                disp.KindOfLiquid = CType(R.KindOfLiquid, KindOfDispensedLiquid)
+                Select Case disp.KindOfLiquid
+                    Case KindOfDispensedLiquid.Reagent
+                        disp.R1ReagentID = R.R1ReagentID
+                    Case KindOfDispensedLiquid.Washing
+                        disp.WashingID = R.WashingID
+                End Select
+                lastBireactives.AddLast(disp)
+            Next
+        End Sub
+        Private Sub SerializeLatestBireactives()
+            If lastBireactives Is Nothing Then Return
+
+            Dim dao = New vWSExecutionsDAO
+
+            Dim table As New vWSExecutionsDS.twksWSBbireactiveContextDataTable
+            For Each disp In lastBireactives
+                table.AddtwksWSBbireactiveContextRow(
+                    AnalyzerManager.GetCurrentAnalyzerManager.ActiveWorkSession,
+                    AnalyzerManager.GetCurrentAnalyzerManager.ActiveAnalyzer,
+                    disp.ExecutionID,
+                    CByte(disp.KindOfLiquid),
+                    CShort(disp.R1ReagentID),
+                    disp.WashingID)
+            Next
+
+            dao.ClearBireactivesContext()
+            dao.SaveBireactivesContext(table)
+
+        End Sub
 
     End Class
 End Namespace

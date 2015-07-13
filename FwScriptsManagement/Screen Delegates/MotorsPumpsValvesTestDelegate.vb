@@ -928,19 +928,29 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     'expects 10 params
                     .ParamList = New List(Of String)
 
-                    ' XBC 09/11/2011
-                    .ParamList.Add(MyClass.ArmSamplesSecurityZ.ToString)
-                    .ParamList.Add(MyClass.ArmReagent1SecurityZ.ToString)
-                    .ParamList.Add(MyClass.ArmReagent2SecurityZ.ToString)
-                    .ParamList.Add(MyClass.ArmMixer1SecurityZ.ToString)
-                    .ParamList.Add(MyClass.ArmMixer2SecurityZ.ToString)
 
-                    .ParamList.Add(MyClass.ArmSamplesParkingPolar.ToString)
-                    .ParamList.Add(MyClass.ArmReagent1ParkingPolar.ToString)
-                    .ParamList.Add(MyClass.ArmReagent2ParkingPolar.ToString)
-                    .ParamList.Add(MyClass.ArmMixer1ParkingPolar.ToString)
-                    .ParamList.Add(MyClass.ArmMixer2ParkingPolar.ToString)
-                    ' XBC 09/11/2011
+                    If AnalyzerController.Instance.IsBA200 Then
+                        .ParamList.Add(MyClass.ArmSamplesSecurityZ.ToString)
+                        .ParamList.Add(MyClass.ArmMixer1SecurityZ.ToString)
+
+                        .ParamList.Add(MyClass.ArmSamplesParkingPolar.ToString)
+                        .ParamList.Add(MyClass.ArmMixer1ParkingPolar.ToString)
+                    Else
+                        ' XBC 09/11/2011
+                        .ParamList.Add(MyClass.ArmSamplesSecurityZ.ToString)
+                        .ParamList.Add(MyClass.ArmReagent1SecurityZ.ToString)
+                        .ParamList.Add(MyClass.ArmReagent2SecurityZ.ToString)
+                        .ParamList.Add(MyClass.ArmMixer1SecurityZ.ToString)
+                        .ParamList.Add(MyClass.ArmMixer2SecurityZ.ToString)
+
+                        .ParamList.Add(MyClass.ArmSamplesParkingPolar.ToString)
+                        .ParamList.Add(MyClass.ArmReagent1ParkingPolar.ToString)
+                        .ParamList.Add(MyClass.ArmReagent2ParkingPolar.ToString)
+                        .ParamList.Add(MyClass.ArmMixer1ParkingPolar.ToString)
+                        .ParamList.Add(MyClass.ArmMixer2ParkingPolar.ToString)
+                        ' XBC 09/11/2011
+                    End If
+                   
 
                 End With
 

@@ -544,7 +544,9 @@
     <Content Include="FwScripts\Factory\FactoryFwScriptsData.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="FwScripts\Factory\FactoryFwScriptsDataDecrypted_BA200.xml" />
+    <Content Include="FwScripts\Factory\FactoryFwScriptsDataDecrypted_BA200.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="FwScripts\Factory\FactoryFwScriptsData_2012_10_11.xml">
     </Content>
     <Content Include="FwScripts\Factory\FactoryFwScriptsData_2012_05_02.xml">
@@ -674,32 +676,32 @@
   <ItemGroup>
     <PublishFile Include="Firmware\a25v2v360-rev14.bin">
       <Visible>False</Visible>
+      <PublishState>Include</PublishState>
+      <IncludeHash>True</IncludeHash>
       <Group>
       </Group>
       <TargetPath>
       </TargetPath>
-      <PublishState>Include</PublishState>
-      <IncludeHash>True</IncludeHash>
       <FileType>File</FileType>
     </PublishFile>
     <PublishFile Include="required Libraries\Microsoft.SqlServer.ConnectionInfo.dll">
       <Visible>False</Visible>
+      <PublishState>Include</PublishState>
+      <IncludeHash>True</IncludeHash>
       <Group>
       </Group>
       <TargetPath>
       </TargetPath>
-      <PublishState>Include</PublishState>
-      <IncludeHash>True</IncludeHash>
       <FileType>File</FileType>
     </PublishFile>
     <PublishFile Include="stdole">
       <Visible>False</Visible>
+      <PublishState>Include</PublishState>
+      <IncludeHash>True</IncludeHash>
       <Group>
       </Group>
       <TargetPath>
       </TargetPath>
-      <PublishState>Include</PublishState>
-      <IncludeHash>True</IncludeHash>
       <FileType>Assembly</FileType>
     </PublishFile>
   </ItemGroup>

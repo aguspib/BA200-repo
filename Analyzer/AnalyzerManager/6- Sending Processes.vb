@@ -1346,7 +1346,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <returns></returns>
         ''' <remarks></remarks>
         Private Function SeachContaminationBetweenPreviousAndFirsToSend(ByRef previousReagentIDSentList As List(Of AnalyzerManagerDS.sentPreparationsRow), pContaminationsDS As ContaminationsDS, ReagentRow As ExecutionsDS.twksWSExecutionsRow, pHighContaminationPersitance As Integer) As Boolean
-
+            'RUNNING!
             previousReagentIDSentList = (From a As AnalyzerManagerDS.sentPreparationsRow In mySentPreparationsDS.sentPreparations _
                                      Where a.ExecutionType = "PREP_STD" Select a).ToList
             Debug.Print("SeachContaminationBetweenPreviousAndFirsToSend: " & previousReagentIDSentList.Count)
@@ -1945,6 +1945,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                                    ByRef myWashSolutionType As String, ByRef indexNextToSend As Integer, ByRef nextExecutionAlreadyFound As Boolean, ByVal pContaminationsDS As ContaminationsDS,
                                                    ByVal toSendList As List(Of ExecutionsDS.twksWSExecutionsRow))
             If toSendList.Any Then
+                'RUNNING
                 Dim requiredAction = WSCreator.ContaminationsSpecification.CurrentRunningContext.ActionRequiredForDispensing(toSendList(0))
                 If requiredAction.Action = IContaminationsAction.RequiredAction.Wash Then
 
@@ -2363,6 +2364,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If Not myAnManagerDS.nextPreparation(0).IsExecutionIDNull AndAlso myAnManagerDS.nextPreparation(0).ExecutionID <> GlobalConstants.NO_PENDING_PREPARATION_FOUND Then
                         Dim disp = WSCreator.ContaminationsSpecification.CreateDispensing
                         disp.R1ReagentID = myAnManagerDS.nextPreparation(0).ReagentID
+                        'RUNNING
                         Dim requiredActionBeforeDispensing = WSCreator.ContaminationsSpecification.CurrentRunningContext.ActionRequiredForDispensing(disp)
                         If requiredActionBeforeDispensing.Action = IContaminationsAction.RequiredAction.Wash Then
                             Debug.WriteLine("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")

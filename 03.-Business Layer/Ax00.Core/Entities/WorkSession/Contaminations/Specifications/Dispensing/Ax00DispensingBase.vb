@@ -1,4 +1,5 @@
-﻿Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
+﻿Imports System.Xml.Serialization
+Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Interfaces
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Interfaces
 Imports Biosystems.Ax00.Core.Interfaces
@@ -10,6 +11,7 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Types.ExecutionsDS
 
 Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specifications.Dispensing
+    <Serializable()>
     Public MustInherit Class Ax00DispensingBase
         Implements IDispensing
 
@@ -18,11 +20,13 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
         'This will allow for data mocking in test situations, as we can inject another data source different from our DAL.
         'This is in fact a pointer that is redirected to a mocking factory when we're running a test.
         'On regular application usage, it points to the expected tparContaminationsDAO shared function.
+        <XmlIgnore()>
         Protected GetAllContaminationsForAReagent As  _
             Func(Of Integer, TypedGlobalDataTo(Of EnumerableRowCollection(Of ContaminationsDS.tparContaminationsRow))) =
             AddressOf tparContaminationsDAO.GetAllContaminationsForAReagent
 
         'this is inferred dependency injection that by default points the the corresponding DAO object, but this is redirected on testing.
+        <XmlIgnore()>
         Public WSExecutionsDAO As IvWSExecutionsDAO = New vWSExecutionsDAO()
 
 #End Region
@@ -32,19 +36,19 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
         Public Overridable Function RequiredActionForDispensing(targetDispensing As IDispensing, stepIndex As Integer, dispensingNumber As Integer) As IContaminationsAction Implements IDispensing.RequiredActionForDispensing
 
             Select Case KindOfLiquid
-                Case IDispensing.KindOfDispensedLiquid.Dummy
+                Case KindOfDispensedLiquid.Dummy
 
                     Return New RequiredAction With {.Action = IContaminationsAction.RequiredAction.GoAhead}
 
-                Case IDispensing.KindOfDispensedLiquid.Ise, IDispensing.KindOfDispensedLiquid.Reagent
+                Case KindOfDispensedLiquid.Ise, KindOfDispensedLiquid.Reagent
                     Return ReagentRequiresWashingOrSkip(stepIndex, targetDispensing, dispensingNumber)
 
-                Case IDispensing.KindOfDispensedLiquid.Washing
+                Case KindOfDispensedLiquid.Washing
                     If dispensingNumber = 1 Then
                         Dim contaAction = New RequiredAction
                         contaAction.Action = IContaminationsAction.RequiredAction.RemoveRequiredWashing
                         Dim a = WashingID
-                        Dim WashingSolutionID As String = WashingDescription.WashingSolutionCode
+                        Dim WashingSolutionID As String = _washingDescription.WashingSolutionCode
                         contaAction.InvolvedWash = New WashingDescription(-1, WashingSolutionID)
                         Return contaAction
                     Else
@@ -58,18 +62,21 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
 
         End Function
 
+        <XmlIgnore()>
         Public ReadOnly Property AnalysisMode As Integer Implements IDispensing.AnalysisMode
             Get
                 Return _analysisMode
             End Get
         End Property
 
+        <XmlIgnore()>
         Public ReadOnly Property Contamines As Dictionary(Of Integer, IDispensingContaminationDescription) Implements IDispensing.Contamines
             Get
                 Return _contamines
             End Get
         End Property
 
+        <XmlAttribute>
         Public Property R1ReagentID As Integer Implements IDispensing.R1ReagentID
             Get
                 Return _r1ReagentId
@@ -85,12 +92,14 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
             End Set
         End Property
 
+
+        <XmlIgnore()>
         Public ReadOnly Property ContaminationsSpecification As IAnalyzerContaminationsSpecification
             Get
                 Return WSExecutionCreator.Instance.ContaminationsSpecification
             End Get
         End Property
-
+        <XmlAttribute>
         Public Property ExecutionID As Integer Implements IDispensing.ExecutionID
             Get
                 Return _executionID
@@ -105,20 +114,23 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
                         R1ReagentID = result.ReagentID
                         SampleClass = result.SampleClass
                         Dim predilutionMode = If(result.IsPredilutionModeNull, "", result.PredilutionMode)
-                        _DelayCyclesForDispensing = If(predilutionMode = "INST", WSExecutionCreator.Instance.ContaminationsSpecification.AdditionalPredilutionSteps - 1, 0)
+                        _delayCyclesForDispensing = If(predilutionMode = "INST", WSExecutionCreator.Instance.ContaminationsSpecification.AdditionalPredilutionSteps - 1, 0)
                     End If
                 End If
             End Set
         End Property
 
-        Public Property KindOfLiquid As IDispensing.KindOfDispensedLiquid Implements IDispensing.KindOfLiquid
+        <XmlAttribute>
+        Public Property KindOfLiquid As KindOfDispensedLiquid Implements IDispensing.KindOfLiquid
 
+        <XmlIgnore()>
         Public ReadOnly Property DelayCyclesForDispensing As Integer Implements IDispensing.DelayCyclesForDispensing
             Get
                 Return _delayCyclesForDispensing
             End Get
         End Property
 
+        <XmlAttribute>
         Public Property SampleClass As String Implements IDispensing.SampleClass
 
         Public Overridable Sub FillDispense(analyzerContaminationsSpecification As IAnalyzerContaminationsSpecification, ByVal row As twksWSExecutionsRow) Implements IDispensing.FillDispense
@@ -137,9 +149,9 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
             If row.IsExecutionTypeNull = False Then
                 Select Case row.ExecutionType
                     Case "PREP_STD", "", Nothing
-                        KindOfLiquid = IDispensing.KindOfDispensedLiquid.Reagent
+                        KindOfLiquid = KindOfDispensedLiquid.Reagent
                     Case "PREP_ISE"
-                        KindOfLiquid = IDispensing.KindOfDispensedLiquid.Ise
+                        KindOfLiquid = KindOfDispensedLiquid.Ise
                     Case Else
 #If config = "Debug" Then
                         Throw New Exception("Found preparation with unknown execution type: """ & row.ExecutionType & """. Happy debugging!")
@@ -148,6 +160,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
             End If
         End Sub
 
+        <XmlAttribute>
         Public Overridable Property WashingID As Integer Implements IDispensing.WashingID
             Get
                 Return _washingID
@@ -155,26 +168,32 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
             Set(value As Integer)
                 _washingID = value
                 Try
-                    KindOfLiquid = IDispensing.KindOfDispensedLiquid.Washing
+                    KindOfLiquid = KindOfDispensedLiquid.Washing
                     'Dim myDao = WSExecutionsDAO
                     Dim WashingDS = WSExecutionsDAO.GetWashingSolution(_washingID, WSExecutionCreator.Instance.AnalyzerID, WSExecutionCreator.Instance.WorksesionID)
                     If WashingDS.WashingSolutionSELECT(0).IsSOLUTIONCODENull() OrElse WashingDS.WashingSolutionSELECT(0).SOLUTIONCODE = String.Empty Then
-                        Me.WashingDescription = New WashingDescription(1, Context.WashingDescription.RegularWaterWashingID)
+                        Me._washingDescription = New WashingDescription(1, Context.WashingDescription.RegularWaterWashingID)
 
                     Else
-                        Me.WashingDescription = New WashingDescription(2, WashingDS.WashingSolutionSELECT(0).SOLUTIONCODE)
-                        If Me.WashingDescription.WashingSolutionCode = Context.WashingDescription.RegularWaterWashingID Then
-                            Me.WashingDescription.WashingStrength = 1
+                        Me._washingDescription = New WashingDescription(2, WashingDS.WashingSolutionSELECT(0).SOLUTIONCODE)
+                        If Me._washingDescription.WashingSolutionCode = Context.WashingDescription.RegularWaterWashingID Then
+                            Me._washingDescription.WashingStrength = 1
                         End If
                     End If
-                    Debug.WriteLine("Found washing of kind $$<<" & WashingDescription.WashingSolutionCode & ">>$$ ID= " & WashingID)
+                    Debug.WriteLine("Found washing of kind $$<<" & _washingDescription.WashingSolutionCode & ">>$$ ID= " & WashingID)
                 Catch _exception As Exception
                     GlobalBase.CreateLogActivity(_exception)
                 End Try
             End Set
         End Property
 
-        Public Overridable Property WashingDescription As IWashingDescription Implements IDispensing.WashingDescription
+        Protected _washingDescription As IWashingDescription
+        <XmlIgnore>
+        Public Overridable ReadOnly Property WashingDescription As IWashingDescription Implements IDispensing.WashingDescription
+            Get
+                Return _washingDescription
+            End Get
+        End Property
 
 #End Region
 
@@ -229,14 +248,14 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
         Overrides Function ToString() As String
             Try
                 Select Case KindOfLiquid
-                    Case IDispensing.KindOfDispensedLiquid.Dummy
+                    Case KindOfDispensedLiquid.Dummy
                         Return "Dummy " & Me.GetType.Name
 
-                    Case IDispensing.KindOfDispensedLiquid.Reagent
+                    Case KindOfDispensedLiquid.Reagent
                         Return "Reagent ID:" & R1ReagentID & " SC " & Me.SampleClass & " " & Me.GetType.Name
 
-                    Case IDispensing.KindOfDispensedLiquid.Washing
-                        Return "Washing ID:W" & WashingID & " " & Me.WashingDescription.WashingSolutionCode & " Strength " & Me.WashingDescription.WashingStrength & " " & Me.GetType.Name
+                    Case KindOfDispensedLiquid.Washing
+                        Return "Washing ID:W" & WashingID & " " & Me._washingDescription.WashingSolutionCode & " Strength " & Me._washingDescription.WashingStrength & " " & Me.GetType.Name
 
                     Case Else
                         Return MyBase.ToString()
