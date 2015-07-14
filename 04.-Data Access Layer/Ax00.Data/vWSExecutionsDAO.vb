@@ -98,6 +98,5 @@ Namespace Biosystems.Ax00.Data
             End Try
         End Sub
 
-
     End Class
 End Namespace
