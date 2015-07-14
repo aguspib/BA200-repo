@@ -2016,7 +2016,7 @@
         <InstructionTO>
           <InstructionID>3</InstructionID>
           <Sequence>3</Sequence>
-          <Timer>2000</Timer>
+          <Timer>3000</Timer>
           <Code>BA1.MV.MPV</Code>
           <Params>10000.100000</Params>
           <EnableEdition>true</EnableEdition>
@@ -2024,7 +2024,7 @@
         <InstructionTO>
           <InstructionID>4</InstructionID>
           <Sequence>4</Sequence>
-          <Timer>2010</Timer>
+          <Timer>3010</Timer>
           <Code>BA1.MV.MMA</Code>
           <Params>#2@</Params>
           <EnableEdition>false</EnableEdition>
