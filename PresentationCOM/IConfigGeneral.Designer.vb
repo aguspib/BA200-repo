@@ -323,7 +323,7 @@ Partial Class UiConfigGeneral
         Me.bsClotDetectionCheckbox.BackColor = System.Drawing.Color.Gainsboro
         Me.bsClotDetectionCheckbox.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.bsClotDetectionCheckbox.ForeColor = System.Drawing.Color.Black
-        Me.bsClotDetectionCheckbox.Location = New System.Drawing.Point(20, 142)
+        Me.bsClotDetectionCheckbox.Location = New System.Drawing.Point(20, 58)
         Me.bsClotDetectionCheckbox.Name = "bsClotDetectionCheckbox"
         Me.bsClotDetectionCheckbox.Size = New System.Drawing.Size(112, 17)
         Me.bsClotDetectionCheckbox.TabIndex = 15
@@ -341,6 +341,7 @@ Partial Class UiConfigGeneral
         Me.bsReagentsRotorCvrCheckbox.Size = New System.Drawing.Size(160, 17)
         Me.bsReagentsRotorCvrCheckbox.TabIndex = 14
         Me.bsReagentsRotorCvrCheckbox.Text = "*Reagents Rotor Cover"
+        Me.bsReagentsRotorCvrCheckbox.UseMnemonic = False
         Me.bsReagentsRotorCvrCheckbox.UseVisualStyleBackColor = False
         '
         'bsSamplesRotorCvrCheckbox
@@ -349,7 +350,7 @@ Partial Class UiConfigGeneral
         Me.bsSamplesRotorCvrCheckbox.BackColor = System.Drawing.Color.Gainsboro
         Me.bsSamplesRotorCvrCheckbox.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.bsSamplesRotorCvrCheckbox.ForeColor = System.Drawing.Color.Black
-        Me.bsSamplesRotorCvrCheckbox.Location = New System.Drawing.Point(20, 86)
+        Me.bsSamplesRotorCvrCheckbox.Location = New System.Drawing.Point(20, 142)
         Me.bsSamplesRotorCvrCheckbox.Name = "bsSamplesRotorCvrCheckbox"
         Me.bsSamplesRotorCvrCheckbox.Size = New System.Drawing.Size(156, 17)
         Me.bsSamplesRotorCvrCheckbox.TabIndex = 13
@@ -362,7 +363,7 @@ Partial Class UiConfigGeneral
         Me.bsReactionRotorCvrCheckbox.BackColor = System.Drawing.Color.Gainsboro
         Me.bsReactionRotorCvrCheckbox.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.bsReactionRotorCvrCheckbox.ForeColor = System.Drawing.Color.Black
-        Me.bsReactionRotorCvrCheckbox.Location = New System.Drawing.Point(20, 58)
+        Me.bsReactionRotorCvrCheckbox.Location = New System.Drawing.Point(20, 86)
         Me.bsReactionRotorCvrCheckbox.Name = "bsReactionRotorCvrCheckbox"
         Me.bsReactionRotorCvrCheckbox.Size = New System.Drawing.Size(156, 17)
         Me.bsReactionRotorCvrCheckbox.TabIndex = 12
@@ -659,11 +660,10 @@ Partial Class UiConfigGeneral
         Me.BsBorderedPanel1.Size = New System.Drawing.Size(750, 451)
         Me.BsBorderedPanel1.TabIndex = 22
         '
-        'IConfigGeneral
+        'UiConfigGeneral
         '
         Me.AcceptButton = Me.bsCancelButton
         Me.Appearance.BackColor = System.Drawing.Color.Gainsboro
-        Me.Appearance.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Appearance.ForeColor = System.Drawing.Color.Black
         Me.Appearance.GradientMode = System.Drawing.Drawing2D.LinearGradientMode.ForwardDiagonal
         Me.Appearance.Options.UseBackColor = True
@@ -682,7 +682,7 @@ Partial Class UiConfigGeneral
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IConfigGeneral"
+        Me.Name = "UiConfigGeneral"
         Me.ShowInTaskbar = False
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.Text = " "
