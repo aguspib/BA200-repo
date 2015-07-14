@@ -185,7 +185,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     If Me.CurrentFwScriptsQueue Is Nothing Then
                         createFirst = True
                     Else
-                        If Me.CurrentFwScriptsQueue.Count = 0 Then
+                        If Not Me.CurrentFwScriptsQueue.Any Then
                             createFirst = True
                         End If
                     End If

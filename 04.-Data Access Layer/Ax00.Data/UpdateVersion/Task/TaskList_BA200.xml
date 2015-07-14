@@ -724,10 +724,10 @@
             UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '11930' WHERE CodeFw = 'A1DV';
             UPDATE [dbo].[srv_tfmwAdjustments] SET GroupId = 'SAMPLES_ARM_RING1', Value = '9385', CanSave = 0 WHERE CodeFw = 'RR1P1';
             UPDATE [dbo].[srv_tfmwAdjustments] SET GroupId = 'SAMPLES_ARM_RING2', Value = '10450', CanSave = 0 WHERE CodeFw = 'RR1P2';
-            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '3723' WHERE CodeFw = 'RRCB';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '3723' WHERE CodeFw = 'RMCB';
             UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '9385' WHERE CodeFw = 'RM1P1';
             UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '10450' WHERE CodeFw = 'RM1P2';
-            UPDATE [dbo].[srv_tfmwAdjustments] SET GroupId = 'REAGENTS_ROTOR_BC', Value = '3723' WHERE CodeFw = 'RMCB';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET GroupId = 'SAMPLES_ROTOR_BC', Value = '3723' WHERE CodeFw = 'RRCB';
             UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '7892' WHERE CodeFw = 'GFWR1';
             UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '28' WHERE CodeFw = 'GFENC';
             UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '-100' WHERE CodeFw = 'WSRV';
@@ -956,7 +956,8 @@
             Select 'False'
           </IntegrityScript>
         </DataRevision>
-    </DataRevisions>
+
+      </DataRevisions>
     </Release>
     <!-- 
 	  <Release Version="00.00.00">

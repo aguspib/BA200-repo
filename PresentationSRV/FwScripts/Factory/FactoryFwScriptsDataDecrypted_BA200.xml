@@ -6373,21 +6373,13 @@
           <InstructionID>1</InstructionID>
           <Sequence>1</Sequence>
           <Timer>0</Timer>
-          <Code>RM1.CB.BLN</Code>
+          <Code>RR1.CB.BLN</Code>
           <Params />
           <EnableEdition>true</EnableEdition>
         </InstructionTO>
         <InstructionTO>
           <InstructionID>2</InstructionID>
           <Sequence>2</Sequence>
-          <Timer>10</Timer>
-          <Code>RR1.CB.BLN</Code>
-          <Params />
-          <EnableEdition>true</EnableEdition>
-        </InstructionTO>
-        <InstructionTO>
-          <InstructionID>3</InstructionID>
-          <Sequence>3</Sequence>
           <Timer>1000</Timer>
           <Code>END</Code>
           <Params />

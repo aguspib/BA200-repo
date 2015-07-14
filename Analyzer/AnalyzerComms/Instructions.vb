@@ -2067,12 +2067,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                         End If
 
-
-
-
-                        If pBarCodeDS.barCodeRequests.Any Then
-                            If pBarCodeDS.barCodeRequests(0).RotorType = "SAMPLESANDREAGENTS" Then pBarCodeDS.barCodeRequests(0).NCode128 = 0
-                        End If
                         ' XBC 13/02/2012 
 
                         'Get the instruction on the Instruction list.
