@@ -5131,10 +5131,10 @@ Public Class UiPositionsAdjustments
 
             BsWashingAdjustmentTitle.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_WSSaveValue", pLanguageID) & ":"
 
-            TabSample.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_SampleArm", pLanguageID)
+            TabSample.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, If(AnalyzerController.Instance.IsBA200, "LBL_SRV_SAMPLEREAGENT_ARM", "LBL_SRV_SampleArm"), pLanguageID)
             TabReagent1.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Reagent1Arm", pLanguageID)
             TabReagent2.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Reagent2Arm", pLanguageID)
-            TabMixer1.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Mixer1Arm", pLanguageID)
+            TabMixer1.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, If(AnalyzerController.Instance.IsBA200, "LBL_SRV_STIRRER", "LBL_SRV_Mixer1Arm"), pLanguageID)
             TabMixer2.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Mixer2Arm", pLanguageID)
 
             CType(AbsorbanceChart.Diagram, XYDiagram).AxisY.Title.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Counts", pLanguageID)
