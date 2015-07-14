@@ -751,9 +751,9 @@ Public Class UiPositionsAdjustments
             End If
             If Not myResultData.HasError AndAlso Not AnalyzerController.Instance.IsBA200() Then
                 myResultData = MyClass.PrepareArmTab(Me.BsGridReagent1)
-            End If
-            If Not myResultData.HasError AndAlso Not AnalyzerController.Instance.IsBA200() Then
-                myResultData = MyClass.PrepareArmTab(Me.BsGridReagent2)
+                If Not myResultData.HasError Then
+                    myResultData = MyClass.PrepareArmTab(Me.BsGridReagent2)
+                End If
             End If
             If Not myResultData.HasError Then
                 myResultData = MyClass.PrepareArmTab(Me.BsGridMixer1)
