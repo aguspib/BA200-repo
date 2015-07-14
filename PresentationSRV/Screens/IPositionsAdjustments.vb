@@ -5131,10 +5131,10 @@ Public Class UiPositionsAdjustments
 
             BsWashingAdjustmentTitle.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_WSSaveValue", pLanguageID) & ":"
 
-            TabSample.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_SampleArm", pLanguageID)
+            TabSample.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, If(AnalyzerController.Instance.IsBA200, "LBL_SRV_SAMPLEREAGENT_ARM", "LBL_SRV_SampleArm"), pLanguageID)
             TabReagent1.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Reagent1Arm", pLanguageID)
             TabReagent2.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Reagent2Arm", pLanguageID)
-            TabMixer1.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Mixer1Arm", pLanguageID)
+            TabMixer1.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, If(AnalyzerController.Instance.IsBA200, "LBL_SRV_STIRRER", "LBL_SRV_Mixer1Arm"), pLanguageID)
             TabMixer2.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Mixer2Arm", pLanguageID)
 
             CType(AbsorbanceChart.Diagram, XYDiagram).AxisY.Title.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Counts", pLanguageID)
@@ -7740,9 +7740,16 @@ Public Class UiPositionsAdjustments
                     Select Case SelectedArmTab
                         Case ADJUSTMENT_ARMS.SAMPLE
                             .AdjustmentID = SetPositionAdjustmentType(ADJUSTMENT_ARMS.SAMPLE, pRowIndex)
-                            myPolar = ReadGlobalAdjustmentData(.AdjustmentID.ToString, GlobalEnumerates.AXIS.POLAR, True)
+                            If AnalyzerController.Instance.IsBA200 AndAlso .AdjustmentID = ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1 Then
+                                myPolar = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1.ToString, GlobalEnumerates.AXIS.POLAR, True)
+                                myRotor = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1.ToString, GlobalEnumerates.AXIS.ROTOR, True)
+                            Else
+                                myPolar = ReadGlobalAdjustmentData(.AdjustmentID.ToString, GlobalEnumerates.AXIS.POLAR, True)
+                                myRotor = ReadGlobalAdjustmentData(.AdjustmentID.ToString, GlobalEnumerates.AXIS.ROTOR, True)
+                            End If
+
                             myZ = ReadGlobalAdjustmentData(.AdjustmentID.ToString, GlobalEnumerates.AXIS.Z, True)
-                            myRotor = ReadGlobalAdjustmentData(.AdjustmentID.ToString, GlobalEnumerates.AXIS.ROTOR, True)
+
 
                             'SGM 02/03/2012 take the Polar and Rotor from Ring1
                             If .AdjustmentID = ADJUSTMENT_GROUPS.SAMPLES_ARM_ZTUBE1 Then

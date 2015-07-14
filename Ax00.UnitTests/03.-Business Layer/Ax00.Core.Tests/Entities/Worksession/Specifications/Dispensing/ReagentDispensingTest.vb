@@ -1,4 +1,6 @@
-﻿Imports Biosystems.Ax00.CC
+﻿Imports System.IO
+Imports System.Xml.Serialization
+Imports Biosystems.Ax00.CC
 Imports Biosystems.Ax00.Core.Entities
 Imports Biosystems.Ax00.Core.Entities.WorkSession
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
@@ -150,6 +152,20 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
             result.SetDatos = resultData
             Return result
         End Function
+
+
+        <Test()>
+        Sub BA200DispensingSerialization()
+            Dim disp As New BA200Dispensing
+
+            Dim serializer = New XmlSerializer(disp.GetType)
+            Dim stream As New System.IO.MemoryStream
+            serializer.Serialize(stream, disp)
+            stream.Position = 0
+            Dim reader As New StreamReader(stream)
+            Dim contents = reader.ReadToEnd()
+            MsgBox(contents)
+        End Sub
     End Class
 
 
