@@ -539,13 +539,18 @@ Namespace Biosystems.Ax00.Core.Entities
                     Dim rowBarCode As AnalyzerManagerDS.barCodeRequestsRow
                     rowBarCode = BarCodeDS.barCodeRequests.NewbarCodeRequestsRow
                     With rowBarCode
-                        .RotorType = "SAMPLES"
+                        If AnalyzerManager.GetCurrentAnalyzerManager.Model = AnalyzerModelEnum.A200.ToString() Then
+                            .RotorType = "SAMPLESANDREAGENTS"
+                        Else
+                            .RotorType = "SAMPLES"
+                        End If
+
                         .Action = Ax00CodeBarAction.CONFIG
                         .Position = 0
                     End With
                     BarCodeDS.barCodeRequests.AddbarCodeRequestsRow(rowBarCode)
                     BarCodeDS.AcceptChanges()
-
+                    
                     myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.BARCODE_REQUEST, True, Nothing, BarCodeDS)
                     ' XBC 13/02/2012 - CODEBR Configuration instruction
                 Else
