@@ -2032,6 +2032,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 End If
 
 
+
                             Else 'SAMPLES
                                 NumCharsValue = 0 'Set value = to 0 for the Flexible barcode size.
                                 myGlobalDataTO = myUserSettingsDelegate.ReadBarcodeSettings(Nothing)
@@ -2055,17 +2056,22 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 End If
 
                             End If
+                        End If
+                        ' Get Barcode settings for Samples
+                        If Not myGlobalDataTO.HasError Then
 
-                            ' Get Barcode settings for Samples
-                            If Not myGlobalDataTO.HasError Then
-
-                                myGlobalDataTO = myBarCodesDelegate.GetSamplesBarCodesConfiguration(Nothing)
-                                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                                    SamplesBarCodesConfigurationDS = CType(myGlobalDataTO.SetDatos, BarCodesDS)
-                                End If
-
+                            myGlobalDataTO = myBarCodesDelegate.GetSamplesBarCodesConfiguration(Nothing)
+                            If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                                SamplesBarCodesConfigurationDS = CType(myGlobalDataTO.SetDatos, BarCodesDS)
                             End If
 
+                        End If
+
+
+
+
+                        If pBarCodeDS.barCodeRequests.Any Then
+                            If pBarCodeDS.barCodeRequests(0).RotorType = "SAMPLESANDREAGENTS" Then pBarCodeDS.barCodeRequests(0).NCode128 = 0
                         End If
                         ' XBC 13/02/2012 
 
@@ -2120,13 +2126,13 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                         pBarCodeDS.barCodeRequests(0).Code128 = 1
                                     ElseIf pBarCodeDS.barCodeRequests(0).RotorType = "SAMPLESANDREAGENTS" Then
                                         Dim SampleBarCode As Integer = fakeFalse
-                                        If pBarCodeDS.barCodeRequests(0).Action = 1 Then
-                                            myLinqRes = (From a As BarCodesDS.vcfgSamplesBarCodesConfigurationRow In SamplesBarCodesConfigurationDS.vcfgSamplesBarCodesConfiguration _
-                                                          Where a.CodeID = GlobalEnumerates.Ax00CodificationsCodeBar.Code128 Select a).ToList
-                                            If myLinqRes.Count > 0 AndAlso myLinqRes(0).Status Then
-                                                SampleBarCode = fakeTrue
-                                            End If
+                                        'If pBarCodeDS.barCodeRequests(0).Action = 1 Then
+                                        myLinqRes = (From a As BarCodesDS.vcfgSamplesBarCodesConfigurationRow In SamplesBarCodesConfigurationDS.vcfgSamplesBarCodesConfiguration _
+                                                      Where a.CodeID = GlobalEnumerates.Ax00CodificationsCodeBar.Code128 Select a).ToList
+                                        If myLinqRes.Any AndAlso myLinqRes(0).Status Then
+                                            SampleBarCode = fakeTrue
                                         End If
+                                        'End If
                                         'pBarCodeDS.barCodeRequests(0).Code128 = SampleBarCode
                                         If SampleBarCode = fakeFalse Then
                                             pBarCodeDS.barCodeRequests(0).Code128 = 1
