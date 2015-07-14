@@ -6633,8 +6633,14 @@ Namespace Biosystems.Ax00.BL
                                                         Next
 
                                                     Else
+                                                        'MR 13/07/2015
+                                                        'NEW ERROR
+                                                        'Choose another position in order to have the whole Calibrator kit together" 
+                                                        ' "Seleccione otra posición para tener todo el kit de calibración junto"
+
                                                         'Set the error value when there are not enough free positions for a Calibrator kit
-                                                        myGlobalDataTO.ErrorCode = "ROTOR_FULL_FOR_CALIBRATOR_KIT"
+                                                        'OLD  myGlobalDataTO.ErrorCode = "ROTOR_FULL_FOR_CALIBRATOR_KIT"
+                                                        myGlobalDataTO.ErrorCode = "ALL_CALIBRATOR_KIT_TOGETHER"
                                                         myGlobalDataTO.HasError = False
 
                                                     End If

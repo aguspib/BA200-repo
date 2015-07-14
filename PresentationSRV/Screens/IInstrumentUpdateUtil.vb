@@ -578,14 +578,16 @@ Public Class UiInstrumentUpdateUtil
     ''' </summary>
     ''' <param name="pData"></param>
     ''' <returns></returns>
-    ''' <remarks>Created by SGM 23/06/2011</remarks>
+    ''' <remarks>
+    ''' Created by:  SGM 23/06/2011
+    ''' Modified by: IT  13/07/2015 - BA-2659
+    ''' </remarks>
     Private Function ValidateAdjustmentsData(ByVal pData As String) As GlobalDataTO
         Dim myGlobal As New GlobalDataTO
         Try
             Dim myFwAdjustmentsDelegate As New FwAdjustmentsDelegate(MyClass.myAdjustmentsMasterDataDS)
-            Dim myAnalyzerModel As String = "A400"
             Dim myAnalyzerID As String = pData.Substring(pData.IndexOf("SN") + 2, 9)
-            myGlobal = myFwAdjustmentsDelegate.ConvertReceivedDataToDS(pData, myAnalyzerID, "", New SRVAdjustmentsDS)
+            myGlobal = myFwAdjustmentsDelegate.ConvertReceivedDataToDS(pData, myAnalyzerID, "", AnalyzerController.Instance.Analyzer.Model, New SRVAdjustmentsDS) 'IT  13/07/2015 - BA-2659
             If myGlobal.HasError OrElse myGlobal.SetDatos Is Nothing Then
                 Dim res As DialogResult = MyBase.ShowMessage(MyBase.myServiceMDI.Text, Messages.SRV_WRONG_ADJ_ASK.ToString)
                 'Dim ans As DialogResult = MessageBox.Show("The edited data is not valid." & vbCrLf & "Do you really want to continue anyway?", "", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation)
@@ -702,7 +704,10 @@ Public Class UiInstrumentUpdateUtil
     ''' Opens Adjustments file
     ''' </summary>
     ''' <returns></returns>
-    ''' <remarks>Created by SGM 23/06/2011</remarks>
+    ''' <remarks>
+    ''' Created by:  SGM 23/06/2011
+    ''' Modified by: IT  13/07/2015 - BA-2659
+    ''' </remarks>
     Private Function OpenAdjustmentsFile() As GlobalDataTO
 
         Dim myGlobal As New GlobalDataTO
@@ -755,7 +760,7 @@ Public Class UiInstrumentUpdateUtil
                         '    myOpenAdjustmentsDS.AnalyzerID = myRow.AnalyzerID
                         'End If
 
-                        myOpenAdjustmentsDS.AnalyzerModel = "A400"
+                        myOpenAdjustmentsDS.AnalyzerModel = AnalyzerController.Instance.Analyzer.Model 'IT 13/07/2015 - BA-2659
                         myOpenAdjustmentsDS.AnalyzerID = myRow.AnalyzerID
                         myOpenAdjustmentsDS.FirmwareVersion = myRow.FwVersion
                         myOpenAdjustmentsDS.ReadedDatetime = New FileInfo(path).CreationTime
@@ -1222,7 +1227,10 @@ Public Class UiInstrumentUpdateUtil
     ''' <summary>
     ''' Restores to the Analyzer an adjustments set from an external file
     ''' </summary>
-    ''' <remarks>Created by SGM 24/06/2011</remarks>
+    ''' <remarks>
+    ''' Created by:  SGM 24/06/2011
+    ''' Modified by: IT  13/07/2015 - BA-2659
+    ''' </remarks>
     Private Function RestoreAdjustments() As GlobalDataTO
         Dim myGlobal As New GlobalDataTO
         Try
@@ -1234,7 +1242,7 @@ Public Class UiInstrumentUpdateUtil
                 Dim mydata As String = Me.BSAdjHeaderRTextBox.Text & vbCrLf & Me.BsAdjustmentsRTextBox.Text.Trim 'SGM 03/10/2012
                 'Dim mydata As String = Me.BsAdjustmentsRTextBox.Text.Trim
                 Dim myAnalyzerID As String = mydata.Substring(mydata.IndexOf("SN") + 2, 9)
-                myGlobal = myAdjustmentsDelegate.ConvertReceivedDataToDS(mydata, "", "")
+                myGlobal = myAdjustmentsDelegate.ConvertReceivedDataToDS(mydata, "", "", AnalyzerController.Instance.Analyzer.Model) 'IT 13/07/2015 - BA-2659
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     MyClass.CurrentAdjustmentsDS = CType(myGlobal.SetDatos, SRVAdjustmentsDS)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
@@ -3497,7 +3505,7 @@ Public Class UiInstrumentUpdateUtil
                 If CBool(myGlobal.SetDatos) Then
                     MyClass.CurrentAdjustmentsDS = New SRVAdjustmentsDS
                     With MyClass.CurrentAdjustmentsDS
-                        .AnalyzerModel = "A400"
+                        .AnalyzerModel = AnalyzerController.Instance.Analyzer.Model 'IT  13/07/2015 - BA-2659
                         .AnalyzerID = AnalyzerController.Instance.Analyzer.ActiveAnalyzer '#REFACTORING
                         .FirmwareVersion = AnalyzerController.Instance.Analyzer.ActiveFwVersion '#REFACTORING
                         .ReadedDatetime = Nothing
