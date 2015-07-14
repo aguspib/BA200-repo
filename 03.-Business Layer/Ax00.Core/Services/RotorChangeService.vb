@@ -422,6 +422,7 @@ Namespace Biosystems.Ax00.Core.Services
 
             _analyzer.DynamicBaselineInitializationFailures = 0
             _analyzer.CurrentInstructionAction = InstructionActions.None
+            _baseLineService.Status = ServiceStatusEnum.NotYetStarted 'IT 14/07/2015 - BA-2718
 
             If _analyzer.Alarms.Contains(Alarms.BASELINE_INIT_ERR) Then
                 _analyzer.Alarms.Remove(Alarms.BASELINE_INIT_ERR)
