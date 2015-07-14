@@ -1008,6 +1008,7 @@ Namespace Biosystems.Ax00.Core.Services
                 If Not dtrAnalyzerSettings.IsCurrentValueNull() Then
                     dtrAnalyzerSettings.CurrentValue = newBLDate.ToString(Globalization.CultureInfo.InvariantCulture)
                     _analyzer.AnalyzerSettings.AcceptChanges()
+                    _analyzer.IsBlExpired = False
                 End If
             End If
         End Sub

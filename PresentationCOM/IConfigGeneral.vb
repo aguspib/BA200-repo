@@ -121,6 +121,10 @@ Public Class UiConfigGeneral
         InitializeComponent()
         ' Add any initialization after the InitializeComponent() call.
         MyClass.IsServiceAdjustmentsLoaded = pIsServiceAdjustmentsLoaded
+
+        If AnalyzerController.Instance.IsBA200 Then
+            bsSamplesRotorCvrCheckbox.Visible = False
+        End If
     End Sub
 
 #End Region
@@ -1255,11 +1259,17 @@ Public Class UiConfigGeneral
             If MyClass.IsService Then
                 bsDisabledElementsGroupBox.Text = MLRD.GetResourceText(Nothing, "LBL_DisabledElements", LanguageID)
                 bsGralAnalyzerCvrCheckbox.Text = MLRD.GetResourceText(Nothing, "LBL_GeneralAnalyzerCover", LanguageID)
-                bsSamplesRotorCvrCheckbox.Text = MLRD.GetResourceText(Nothing, "LBL_SamplesRotorCover", LanguageID)
-                bsReactionRotorCvrCheckbox.Text = MLRD.GetResourceText(Nothing, "LBL_ReactionRotorCover", LanguageID)
-                bsReagentsRotorCvrCheckbox.Text = MLRD.GetResourceText(Nothing, "LBL_ReagentsRotorCover", LanguageID)
-                bsClotDetectionCheckbox.Text = MLRD.GetResourceText(Nothing, "LBL_SRV_CLOT_DET", LanguageID)
+                'Labels in SAMPLES BARCODE area
+                If AnalyzerController.Instance.IsBA200 Then
+                    'Sample&Regeant Rotor cover
+                    bsReagentsRotorCvrCheckbox.Text = MLRD.GetResourceText(Nothing, "LBL_ReagentsRotorCover_BA200", LanguageID)
+                Else
+                    bsSamplesRotorCvrCheckbox.Text = MLRD.GetResourceText(Nothing, "LBL_SamplesRotorCover", LanguageID)
+                    bsReagentsRotorCvrCheckbox.Text = MLRD.GetResourceText(Nothing, "LBL_ReagentsRotorCover", LanguageID)
+                End If
 
+                bsReactionRotorCvrCheckbox.Text = MLRD.GetResourceText(Nothing, "LBL_ReactionRotorCover", LanguageID)
+                bsClotDetectionCheckbox.Text = MLRD.GetResourceText(Nothing, "LBL_SRV_CLOT_DET", LanguageID)
                 bsScreenToolTips.SetToolTip(Me.BsTestCommunicationsButton, MLRD.GetResourceText(Nothing, "SRV_BTN_Test", LanguageID) & " " & MLRD.GetResourceText(Nothing, "LBL_SRV_COMM", LanguageID))
             End If
 
