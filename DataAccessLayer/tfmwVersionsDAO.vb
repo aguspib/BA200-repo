@@ -169,7 +169,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' Modified by: IT 08/05/2015 - BA-2471
         ''' </remarks>
         Public Function UpdateDBSoftware(ByVal pDBConnection As SqlClient.SqlConnection,
-                                         ByVal pPackageID As String, ByVal pDBSoftware As String, ByVal pDBCommonRevisionNumber As String, ByVal pDBDataRevisionNumber As String) As GlobalDataTO
+                                         ByVal pPackageID As String, ByVal pDBSoftware As String, ByVal pDBCommonRevisionNumber As Integer, ByVal pDBDataRevisionNumber As Integer) As GlobalDataTO
             Dim resultData As New GlobalDataTO
 
             Try
@@ -179,8 +179,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 Else
 
                     If (String.IsNullOrEmpty(pDBSoftware)) _
-                        And ((String.IsNullOrEmpty(pDBCommonRevisionNumber)) OrElse (Not IsDBVersionRevisable(pDBConnection))) _
-                        And ((String.IsNullOrEmpty(pDBDataRevisionNumber)) OrElse (Not IsDBVersionRevisable(pDBConnection))) Then
+                        And ((pDBCommonRevisionNumber = 0) OrElse (Not IsDBVersionRevisable(pDBConnection))) _
+                        And ((pDBDataRevisionNumber = 0) OrElse (Not IsDBVersionRevisable(pDBConnection))) Then
                         Return resultData
                     End If
 
@@ -194,11 +194,11 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                     'cmdText &= " DBRevisionDate = N'" & pDBRevisionDate & "'" & vbCrLf 'yyyy-MM-dd'
 
-                    If (Not String.IsNullOrEmpty(pDBCommonRevisionNumber) And IsDBVersionRevisable(pDBConnection)) Then
+                    If (pDBCommonRevisionNumber > 0 And IsDBVersionRevisable(pDBConnection)) Then
                         cmdText &= " DBCommonRevisionNumber = N'" & pDBCommonRevisionNumber & "',"
                     End If
 
-                    If (Not String.IsNullOrEmpty(pDBDataRevisionNumber) And IsDBVersionRevisable(pDBConnection)) Then
+                    If (pDBDataRevisionNumber > 0 And IsDBVersionRevisable(pDBConnection)) Then
                         cmdText &= " DBDataRevisionNumber = N'" & pDBDataRevisionNumber & "'"
                     End If
 

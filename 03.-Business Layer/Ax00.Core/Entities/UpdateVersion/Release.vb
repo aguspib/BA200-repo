@@ -62,7 +62,7 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
             DataRevisions.Sort()
         End Sub
 
-        Function GenerateRevisionPack(fromCommonRevisionNumber As String, fromDataRevisionNumber As String) As Release
+        Function GenerateRevisionPack(fromCommonRevisionNumber As Integer, fromDataRevisionNumber As Integer) As Release
 
             Dim release As New Release
             release.Version = Version
@@ -150,7 +150,7 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
             Dim myVersionsDelegate As New VersionsDelegate
 
             ' update the new Database version. pass the server connection contex because we are inside a transaction that can affect the table.
-            myVersionsDelegate.SaveDBSoftwareVersion(pServer.ConnectionContext.SqlConnectionObject(), packageId, Version, "0", "0")
+            myVersionsDelegate.SaveDBSoftwareVersion(pServer.ConnectionContext.SqlConnectionObject(), packageId, Version, 0, 0)
 
         End Sub
 

@@ -73,7 +73,7 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
             Dim myVersionsDelegate As New VersionsDelegate
 
             ' update the new Database version. pass the server connection contex because we are inside a transaction that can affect the table.
-            myVersionsDelegate.SaveDBSoftwareVersion(pServer.ConnectionContext.SqlConnectionObject(), packageId, String.Empty, String.Empty, RevisionNumber)
+            myVersionsDelegate.SaveDBSoftwareVersion(pServer.ConnectionContext.SqlConnectionObject(), packageId, String.Empty, 0, RevisionNumber)
 
         End Sub
 
