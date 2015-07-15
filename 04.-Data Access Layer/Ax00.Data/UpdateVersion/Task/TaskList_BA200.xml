@@ -956,6 +956,32 @@
             Select 'False'
           </IntegrityScript>
         </DataRevision>
+        <DataRevision JiraID="BA-2632" SequenceNumber="4">
+          <PrerequisiteScript>
+          </PrerequisiteScript>
+          <DataScript>
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'LBL_REAGENTSROTORCOVER_BA200') AND (UPPER([LanguageID]) = 'ENG'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('LBL_ReagentsRotorCover_BA200', 'ENG', N'Sample and Reagent rotor cover', 1, convert(datetime,'20150714 11:32:23',112) ,  'MR', '03.00.09',  0, NULL, NULL, 'MR', convert(datetime,'20150714 11:32:23',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Sample and Reagent rotor cover', OnlyService  = 1, TS_User = 'MR', TS_DateTime  = convert(datetime,'20150714 11:32:23',112) , Translated = 1, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'LBL_REAGENTSROTORCOVER_BA200' AND UPPER(LanguageID) = 'ENG'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'LBL_REAGENTSROTORCOVER_BA200') AND (UPPER([LanguageID]) = 'SPA'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('LBL_ReagentsRotorCover_BA200', 'SPA', N'Sample and Reagent rotor cover', 1, convert(datetime,'20150714 11:32:23',112) ,  'MR', '03.00.09',  0, NULL, NULL, 'MR', convert(datetime,'20150714 11:32:23',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Sample and Reagent rotor cover', OnlyService  = 1, TS_User = 'MR', TS_DateTime  = convert(datetime,'20150714 11:32:23',112) , Translated = 1, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'LBL_REAGENTSROTORCOVER_BA200' AND UPPER(LanguageID) = 'SPA'
+            END
+            GO
+          </DataScript>
+          <IntegrityScript>
+          </IntegrityScript>
+        </DataRevision>
     </DataRevisions>
     </Release>
     <!-- 
