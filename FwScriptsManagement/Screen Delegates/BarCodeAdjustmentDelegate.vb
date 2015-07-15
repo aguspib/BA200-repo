@@ -763,6 +763,9 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         ''' <returns></returns>
         ''' <remarks>Created by XBC 15/12/2010</remarks>
         Private Function SendQueueForADJUST_PREPARING(ByVal pAdjustment As ADJUSTMENT_GROUPS) As GlobalDataTO
+            'TODO: MANEL: AÑADIR AQUÍ EL SWitch ON BARCODE!!!!
+            'JARL!!!!
+
             Dim myResultData As New GlobalDataTO
             Dim myListFwScript As New List(Of FwScriptQueueItem)
             Dim myFwScript1 As New FwScriptQueueItem
@@ -822,6 +825,19 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 Select Case pAdjustment
                     Case ADJUSTMENT_GROUPS.SAMPLES_ROTOR_BC
 
+
+                        Dim SwitchOnScript As New FwScriptQueueItem With {
+                                .EvaluateType = EVALUATE_TYPES.NUM_VALUE,
+                                .EvaluateValue = 1,
+                                .NextOnResultOK = Nothing,
+                                .NextOnResultNG = Nothing,
+                                .NextOnTimeOut = Nothing,
+                                .NextOnError = Nothing,
+                                .FwScriptID = FwSCRIPTS_IDS.SWITCH_ON_BARCODE.ToString,
+                                .ParamList = Nothing
+                            }
+                        myResultData = myFwScriptDelegate.AddToFwScriptQueue(SwitchOnScript, myFwScriptDelegate.CurrentFwScriptsQueue.Any = False)
+
                         ' Mov ABS Reactions Rotor
                         ' Absolute positioning of the samples rotor to a predefined position (Barcode) 
                         With myFwScript1
@@ -836,21 +852,14 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                             .ParamList = New List(Of String)
                             .ParamList.Add(MyClass.SamplesRotorBCPositionAttr)
                         End With
+                        SwitchOnScript.NextOnResultOK = myFwScript1
 
                         'add to the queue list
-                        If myListFwScript.Count > 0 Then
-                            For i As Integer = 0 To myListFwScript.Count - 1
-                                If i = 0 Then
-                                    ' First Script
-                                    If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myListFwScript(i), True)
-                                Else
-                                    If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myListFwScript(i), False)
-                                End If
-                            Next
-                            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, False)
-                        Else
-                            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, True)
-                        End If
+                        For i As Integer = 0 To myListFwScript.Count - 1
+                            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myListFwScript(i), myFwScriptDelegate.CurrentFwScriptsQueue.Any = False)
+                        Next
+                        If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, myFwScriptDelegate.CurrentFwScriptsQueue.Any = False)
+'
 
 
                     Case ADJUSTMENT_GROUPS.REAGENTS_ROTOR_BC
@@ -1076,7 +1085,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     .ParamList = Nothing
                 End With
 
-
+                myListFwScript.Add(myFwScript1)
                 Me.CurrentOperation = OPERATIONS.HOMES
 
                 'add to the queue list

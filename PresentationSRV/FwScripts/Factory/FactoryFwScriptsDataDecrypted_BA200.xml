@@ -1258,7 +1258,7 @@
     </FwScriptTO>
     <FwScriptTO>
       <FwScriptID>35</FwScriptID>
-      <ActionID>35</ActionID>
+      <ActionID>SAMPLES_REL_ROTOR</ActionID>
       <Description>Samples Rotor Relative Movement in wells</Description>
       <Instructions>
         <InstructionTO>
@@ -2016,7 +2016,7 @@
         <InstructionTO>
           <InstructionID>3</InstructionID>
           <Sequence>3</Sequence>
-          <Timer>2000</Timer>
+          <Timer>3000</Timer>
           <Code>BA1.MV.MPV</Code>
           <Params>10000.100000</Params>
           <EnableEdition>true</EnableEdition>
@@ -2024,7 +2024,7 @@
         <InstructionTO>
           <InstructionID>4</InstructionID>
           <Sequence>4</Sequence>
-          <Timer>2010</Timer>
+          <Timer>3010</Timer>
           <Code>BA1.MV.MMA</Code>
           <Params>#2@</Params>
           <EnableEdition>false</EnableEdition>
@@ -6373,21 +6373,13 @@
           <InstructionID>1</InstructionID>
           <Sequence>1</Sequence>
           <Timer>0</Timer>
-          <Code>RM1.CB.BLN</Code>
+          <Code>RR1.CB.BLN</Code>
           <Params />
           <EnableEdition>true</EnableEdition>
         </InstructionTO>
         <InstructionTO>
           <InstructionID>2</InstructionID>
           <Sequence>2</Sequence>
-          <Timer>10</Timer>
-          <Code>RR1.CB.BLN</Code>
-          <Params />
-          <EnableEdition>true</EnableEdition>
-        </InstructionTO>
-        <InstructionTO>
-          <InstructionID>3</InstructionID>
-          <Sequence>3</Sequence>
           <Timer>1000</Timer>
           <Code>END</Code>
           <Params />

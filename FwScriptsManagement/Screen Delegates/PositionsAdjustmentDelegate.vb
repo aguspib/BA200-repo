@@ -6438,13 +6438,13 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
                         Select Case myArmName
                             Case HISTORY_ARM_NAMES.SAMPLE
-                                res = MLRD.GetResourceText(pConnection, "LBL_SRV_SampleArm", pLanguageId)
+                                res = MLRD.GetResourceText(pConnection, If(AnalyzerController.Instance.IsBA200, "LBL_SRV_SAMPLEREAGENT_ARM", "LBL_SRV_SampleArm"), pLanguageId)
                             Case HISTORY_ARM_NAMES.REAGENT1
                                 res = MLRD.GetResourceText(pConnection, "LBL_SRV_Reagent1Arm", pLanguageId)
                             Case HISTORY_ARM_NAMES.REAGENT2
                                 res = MLRD.GetResourceText(pConnection, "LBL_SRV_Reagent2Arm", pLanguageId)
                             Case HISTORY_ARM_NAMES.MIXER1
-                                res = MLRD.GetResourceText(pConnection, "LBL_SRV_Mixer1Arm", pLanguageId)
+                                res = MLRD.GetResourceText(pConnection, If(AnalyzerController.Instance.IsBA200, "LBL_SRV_STIRRER", "LBL_SRV_Mixer1Arm"), pLanguageId)
                             Case HISTORY_ARM_NAMES.MIXER2
                                 res = MLRD.GetResourceText(pConnection, "LBL_SRV_Mixer2Arm", pLanguageId)
 
