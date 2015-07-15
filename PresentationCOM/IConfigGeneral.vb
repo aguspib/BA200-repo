@@ -123,6 +123,11 @@ Public Class UiConfigGeneral
         MyClass.IsServiceAdjustmentsLoaded = pIsServiceAdjustmentsLoaded
 
         If AnalyzerController.Instance.IsBA200 Then
+
+            Me.bsSamplesRotorCvrCheckbox.Location = New System.Drawing.Point(20, 142)
+            Me.bsReagentsRotorCvrCheckbox.Location = New System.Drawing.Point(20, 86)
+            Me.bsClotDetectionCheckbox.Location = New System.Drawing.Point(20, 114)
+
             bsSamplesRotorCvrCheckbox.Visible = False
         End If
     End Sub
@@ -1261,7 +1266,7 @@ Public Class UiConfigGeneral
                 bsGralAnalyzerCvrCheckbox.Text = MLRD.GetResourceText(Nothing, "LBL_GeneralAnalyzerCover", LanguageID)
                 'Labels in SAMPLES BARCODE area
                 If AnalyzerController.Instance.IsBA200 Then
-                    'Sample&Regeant Rotor cover
+                    'Sample and Regeant Rotor cover
                     bsReagentsRotorCvrCheckbox.Text = MLRD.GetResourceText(Nothing, "LBL_ReagentsRotorCover_BA200", LanguageID)
                 Else
                     bsSamplesRotorCvrCheckbox.Text = MLRD.GetResourceText(Nothing, "LBL_SamplesRotorCover", LanguageID)

@@ -317,18 +317,44 @@ Partial Class UiConfigGeneral
         Me.bsDisabledElementsGroupBox.TabStop = False
         Me.bsDisabledElementsGroupBox.Text = "  *Disabled elements"
         '
-        'bsClotDetectionCheckbox
+        'bsGralAnalyzerCvrCheckbox
         '
-        Me.bsClotDetectionCheckbox.AutoSize = True
-        Me.bsClotDetectionCheckbox.BackColor = System.Drawing.Color.Gainsboro
-        Me.bsClotDetectionCheckbox.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.bsClotDetectionCheckbox.ForeColor = System.Drawing.Color.Black
-        Me.bsClotDetectionCheckbox.Location = New System.Drawing.Point(20, 58)
-        Me.bsClotDetectionCheckbox.Name = "bsClotDetectionCheckbox"
-        Me.bsClotDetectionCheckbox.Size = New System.Drawing.Size(112, 17)
-        Me.bsClotDetectionCheckbox.TabIndex = 15
-        Me.bsClotDetectionCheckbox.Text = "*Clot detection"
-        Me.bsClotDetectionCheckbox.UseVisualStyleBackColor = False
+        Me.bsGralAnalyzerCvrCheckbox.AutoSize = True
+        Me.bsGralAnalyzerCvrCheckbox.BackColor = System.Drawing.Color.Gainsboro
+        Me.bsGralAnalyzerCvrCheckbox.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.bsGralAnalyzerCvrCheckbox.ForeColor = System.Drawing.Color.Black
+        Me.bsGralAnalyzerCvrCheckbox.Location = New System.Drawing.Point(20, 30)
+        Me.bsGralAnalyzerCvrCheckbox.Name = "bsGralAnalyzerCvrCheckbox"
+        Me.bsGralAnalyzerCvrCheckbox.Size = New System.Drawing.Size(171, 17)
+        Me.bsGralAnalyzerCvrCheckbox.TabIndex = 11
+        Me.bsGralAnalyzerCvrCheckbox.Text = "*General Analyzer Cover"
+        Me.bsGralAnalyzerCvrCheckbox.UseVisualStyleBackColor = False
+        '
+        'bsReactionRotorCvrCheckbox
+        '
+        Me.bsReactionRotorCvrCheckbox.AutoSize = True
+        Me.bsReactionRotorCvrCheckbox.BackColor = System.Drawing.Color.Gainsboro
+        Me.bsReactionRotorCvrCheckbox.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.bsReactionRotorCvrCheckbox.ForeColor = System.Drawing.Color.Black
+        Me.bsReactionRotorCvrCheckbox.Location = New System.Drawing.Point(20, 58)
+        Me.bsReactionRotorCvrCheckbox.Name = "bsReactionRotorCvrCheckbox"
+        Me.bsReactionRotorCvrCheckbox.Size = New System.Drawing.Size(156, 17)
+        Me.bsReactionRotorCvrCheckbox.TabIndex = 12
+        Me.bsReactionRotorCvrCheckbox.Text = "*Reaction Rotor Cover"
+        Me.bsReactionRotorCvrCheckbox.UseVisualStyleBackColor = False
+        '
+        'bsSamplesRotorCvrCheckbox
+        '
+        Me.bsSamplesRotorCvrCheckbox.AutoSize = True
+        Me.bsSamplesRotorCvrCheckbox.BackColor = System.Drawing.Color.Gainsboro
+        Me.bsSamplesRotorCvrCheckbox.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.bsSamplesRotorCvrCheckbox.ForeColor = System.Drawing.Color.Black
+        Me.bsSamplesRotorCvrCheckbox.Location = New System.Drawing.Point(20, 86)
+        Me.bsSamplesRotorCvrCheckbox.Name = "bsSamplesRotorCvrCheckbox"
+        Me.bsSamplesRotorCvrCheckbox.Size = New System.Drawing.Size(156, 17)
+        Me.bsSamplesRotorCvrCheckbox.TabIndex = 13
+        Me.bsSamplesRotorCvrCheckbox.Text = "*Samples Rotor Cover"
+        Me.bsSamplesRotorCvrCheckbox.UseVisualStyleBackColor = False
         '
         'bsReagentsRotorCvrCheckbox
         '
@@ -343,45 +369,21 @@ Partial Class UiConfigGeneral
         Me.bsReagentsRotorCvrCheckbox.Text = "*Reagents Rotor Cover"
         Me.bsReagentsRotorCvrCheckbox.UseMnemonic = False
         Me.bsReagentsRotorCvrCheckbox.UseVisualStyleBackColor = False
+
         '
-        'bsSamplesRotorCvrCheckbox
+        'bsClotDetectionCheckbox
         '
-        Me.bsSamplesRotorCvrCheckbox.AutoSize = True
-        Me.bsSamplesRotorCvrCheckbox.BackColor = System.Drawing.Color.Gainsboro
-        Me.bsSamplesRotorCvrCheckbox.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.bsSamplesRotorCvrCheckbox.ForeColor = System.Drawing.Color.Black
-        Me.bsSamplesRotorCvrCheckbox.Location = New System.Drawing.Point(20, 142)
-        Me.bsSamplesRotorCvrCheckbox.Name = "bsSamplesRotorCvrCheckbox"
-        Me.bsSamplesRotorCvrCheckbox.Size = New System.Drawing.Size(156, 17)
-        Me.bsSamplesRotorCvrCheckbox.TabIndex = 13
-        Me.bsSamplesRotorCvrCheckbox.Text = "*Samples Rotor Cover"
-        Me.bsSamplesRotorCvrCheckbox.UseVisualStyleBackColor = False
-        '
-        'bsReactionRotorCvrCheckbox
-        '
-        Me.bsReactionRotorCvrCheckbox.AutoSize = True
-        Me.bsReactionRotorCvrCheckbox.BackColor = System.Drawing.Color.Gainsboro
-        Me.bsReactionRotorCvrCheckbox.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.bsReactionRotorCvrCheckbox.ForeColor = System.Drawing.Color.Black
-        Me.bsReactionRotorCvrCheckbox.Location = New System.Drawing.Point(20, 86)
-        Me.bsReactionRotorCvrCheckbox.Name = "bsReactionRotorCvrCheckbox"
-        Me.bsReactionRotorCvrCheckbox.Size = New System.Drawing.Size(156, 17)
-        Me.bsReactionRotorCvrCheckbox.TabIndex = 12
-        Me.bsReactionRotorCvrCheckbox.Text = "*Reaction Rotor Cover"
-        Me.bsReactionRotorCvrCheckbox.UseVisualStyleBackColor = False
-        '
-        'bsGralAnalyzerCvrCheckbox
-        '
-        Me.bsGralAnalyzerCvrCheckbox.AutoSize = True
-        Me.bsGralAnalyzerCvrCheckbox.BackColor = System.Drawing.Color.Gainsboro
-        Me.bsGralAnalyzerCvrCheckbox.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.bsGralAnalyzerCvrCheckbox.ForeColor = System.Drawing.Color.Black
-        Me.bsGralAnalyzerCvrCheckbox.Location = New System.Drawing.Point(20, 30)
-        Me.bsGralAnalyzerCvrCheckbox.Name = "bsGralAnalyzerCvrCheckbox"
-        Me.bsGralAnalyzerCvrCheckbox.Size = New System.Drawing.Size(171, 17)
-        Me.bsGralAnalyzerCvrCheckbox.TabIndex = 11
-        Me.bsGralAnalyzerCvrCheckbox.Text = "*General Analyzer Cover"
-        Me.bsGralAnalyzerCvrCheckbox.UseVisualStyleBackColor = False
+        Me.bsClotDetectionCheckbox.AutoSize = True
+        Me.bsClotDetectionCheckbox.BackColor = System.Drawing.Color.Gainsboro
+        Me.bsClotDetectionCheckbox.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.bsClotDetectionCheckbox.ForeColor = System.Drawing.Color.Black
+        Me.bsClotDetectionCheckbox.Location = New System.Drawing.Point(20, 142)
+        Me.bsClotDetectionCheckbox.Name = "bsClotDetectionCheckbox"
+        Me.bsClotDetectionCheckbox.Size = New System.Drawing.Size(112, 17)
+        Me.bsClotDetectionCheckbox.TabIndex = 15
+        Me.bsClotDetectionCheckbox.Text = "*Clot detection"
+        Me.bsClotDetectionCheckbox.UseVisualStyleBackColor = False
+
         '
         'bsAlarmSoundDisabledCheckbox
         '
