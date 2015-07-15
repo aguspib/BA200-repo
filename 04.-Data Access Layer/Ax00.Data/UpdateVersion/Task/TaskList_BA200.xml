@@ -724,10 +724,10 @@
             UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '11930' WHERE CodeFw = 'A1DV';
             UPDATE [dbo].[srv_tfmwAdjustments] SET GroupId = 'SAMPLES_ARM_RING1', Value = '9385', CanSave = 0 WHERE CodeFw = 'RR1P1';
             UPDATE [dbo].[srv_tfmwAdjustments] SET GroupId = 'SAMPLES_ARM_RING2', Value = '10450', CanSave = 0 WHERE CodeFw = 'RR1P2';
-            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '3723' WHERE CodeFw = 'RRCB';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '3723' WHERE CodeFw = 'RMCB';
             UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '9385' WHERE CodeFw = 'RM1P1';
             UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '10450' WHERE CodeFw = 'RM1P2';
-            UPDATE [dbo].[srv_tfmwAdjustments] SET GroupId = 'REAGENTS_ROTOR_BC', Value = '3723' WHERE CodeFw = 'RMCB';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET GroupId = 'SAMPLES_ROTOR_BC', Value = '3723' WHERE CodeFw = 'RRCB';
             UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '7892' WHERE CodeFw = 'GFWR1';
             UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '28' WHERE CodeFw = 'GFENC';
             UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '-100' WHERE CodeFw = 'WSRV';
@@ -956,7 +956,33 @@
             Select 'False'
           </IntegrityScript>
         </DataRevision>
-    </DataRevisions>
+        <DataRevision JiraID="BA-2632" SequenceNumber="4">
+          <PrerequisiteScript>
+          </PrerequisiteScript>
+          <DataScript>
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'LBL_REAGENTSROTORCOVER_BA200') AND (UPPER([LanguageID]) = 'ENG'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('LBL_ReagentsRotorCover_BA200', 'ENG', N'Sample and Reagent rotor cover', 1, convert(datetime,'20150714 11:32:23',112) ,  'MR', '03.00.09',  0, NULL, NULL, 'MR', convert(datetime,'20150714 11:32:23',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Sample and Reagent rotor cover', OnlyService  = 1, TS_User = 'MR', TS_DateTime  = convert(datetime,'20150714 11:32:23',112) , Translated = 1, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'LBL_REAGENTSROTORCOVER_BA200' AND UPPER(LanguageID) = 'ENG'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'LBL_REAGENTSROTORCOVER_BA200') AND (UPPER([LanguageID]) = 'SPA'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('LBL_ReagentsRotorCover_BA200', 'SPA', N'Sample and Reagent rotor cover', 1, convert(datetime,'20150714 11:32:23',112) ,  'MR', '03.00.09',  0, NULL, NULL, 'MR', convert(datetime,'20150714 11:32:23',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Sample and Reagent rotor cover', OnlyService  = 1, TS_User = 'MR', TS_DateTime  = convert(datetime,'20150714 11:32:23',112) , Translated = 1, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'LBL_REAGENTSROTORCOVER_BA200' AND UPPER(LanguageID) = 'SPA'
+            END
+            GO
+          </DataScript>
+          <IntegrityScript>
+          </IntegrityScript>
+        </DataRevision>
+      </DataRevisions>
     </Release>
     <!-- 
 	  <Release Version="00.00.00">
