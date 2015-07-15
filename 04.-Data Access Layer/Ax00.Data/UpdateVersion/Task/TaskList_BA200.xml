@@ -956,7 +956,6 @@
             Select 'False'
           </IntegrityScript>
         </DataRevision>
-<<<<<<< HEAD
         <DataRevision JiraID="BA-2632" SequenceNumber="4">
           <PrerequisiteScript>
           </PrerequisiteScript>
@@ -983,11 +982,7 @@
           <IntegrityScript>
           </IntegrityScript>
         </DataRevision>
-    </DataRevisions>
-=======
-
       </DataRevisions>
->>>>>>> 0b0438cfd52cd3b50c1ec441399af244b36efadb
     </Release>
     <!-- 
 	  <Release Version="00.00.00">
