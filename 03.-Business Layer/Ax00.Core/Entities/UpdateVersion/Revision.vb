@@ -17,7 +17,7 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
         ''' This number can be used to sort nodes exection when there are several execution nodes registered to be run in the same day.
         ''' </summary>
         <XmlAttribute("SequenceNumber")>
-        Public Property RevisionNumber As String = "1"
+        Public Property RevisionNumber As Integer = 1
 
         <XmlAttribute("JiraID")>
         Public Property JiraId As String

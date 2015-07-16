@@ -733,10 +733,8 @@ Namespace Biosystems.Ax00.DAL
 
                 MyServer.ConnectionContext.Disconnect()
 
-            Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.DataBaseExist", EventLogEntryType.Error, False)
-
+            Catch
+                Throw
             End Try
 
             Return result
@@ -770,9 +768,7 @@ Namespace Biosystems.Ax00.DAL
                     result = True
                 End If
 
-
             Catch ex As Exception
-                GlobalBase.CreateLogActivity(ex)
                 Throw
             End Try
 

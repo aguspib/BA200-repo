@@ -993,6 +993,10 @@
       <Project>{bd38761f-269a-428a-a15e-9d40b387f992}</Project>
       <Name>Ax00.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\04.-Data Access Layer\Ax00.Data\Ax00.Data.vbproj">
+      <Project>{0bbd4088-b6ad-4125-91f7-e8947aba910b}</Project>
+      <Name>Ax00.Data</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Analyzer\Analyzer.vbproj">
       <Project>{BD816D19-6903-4603-8A75-A14C099D4EB2}</Project>
       <Name>Analyzer</Name>

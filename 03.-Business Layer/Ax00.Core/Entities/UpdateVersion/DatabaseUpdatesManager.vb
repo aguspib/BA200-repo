@@ -14,9 +14,9 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
         <XmlIgnoreAttribute()>
         Public Property FromVersion As String
         <XmlIgnoreAttribute()>
-        Public Property FromCommonRevisionNumber As String
+        Public Property FromCommonRevisionNumber As Integer
         <XmlIgnoreAttribute()>
-        Public Property FromDataRevisionNumber As String
+        Public Property FromDataRevisionNumber As Integer
         <XmlIgnoreAttribute()>
         Public Property ToVersion As String
 
@@ -89,7 +89,7 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
         End Function
 
 
-        Function GenerateUpdatePack(pFromVersion As String, pFromCommonRevisionNumberFrom As String, pFromDataRevisionNumber As String, pToVersion As String) As DatabaseUpdatesManager
+        Function GenerateUpdatePack(pFromVersion As String, pFromCommonRevisionNumberFrom As Integer, pFromDataRevisionNumber As Integer, pToVersion As String) As DatabaseUpdatesManager
 
             Dim updatesManager As New DatabaseUpdatesManager
             updatesManager.FromVersion = pFromVersion

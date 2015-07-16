@@ -7,6 +7,7 @@ Imports System.Windows.Forms
 Imports Biosystems.Ax00.Core.Entities.UpdateVersion
 Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Framework.CrossCutting
+Imports System.Data.SqlClient
 
 Namespace Biosystems.Ax00.BL.UpdateVersion
 
@@ -31,6 +32,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         '''              MR 09/06/2015 - BA-2566 ==> We change the flow of the function adding the functionality of rename the Database depends on which 
         '''                                          Intance Analyzer start the Application.
         '''              IT 11/06/2015 - BA-2600
+        '''              IT 15/07/2015 - BA-2693
         ''' </remarks>
         Public Function InstallUpdateProcess(ByVal pServerName As String, ByVal pDataBaseName As String, ByVal DBLogin As String, _
                                              ByVal DBPassword As String, Optional pLoadingRSAT As Boolean = False, Optional pModel As String = "") As GlobalDataTO
@@ -43,11 +45,9 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 'GlobalBase.CreateLogActivity("InstallUpdateProcess" & ".Updateprocess -Validating if Data Base exists ", "Installation validation", EventLogEntryType.Information, False)
                 initialTimeUpdate = Now 'Set the start time 
                 Debug.Print("INICIO-->" & initialTimeUpdate.TimeOfDay.ToString()) 'Print the time
-                GlobalBase.CreateLogActivity("InstallUpdateProcess" & ".Updateprocess - Database found", "Installation validation", _
-                                                                                                   EventLogEntryType.Information, False)
-                ValidateDatabaseName(pServerName, pDataBaseName, DBLogin, DBPassword)
+                'GlobalBase.CreateLogActivity("InstallUpdateProcess" & ".Updateprocess - Database found", "Installation validation", EventLogEntryType.Information, False)
 
-                If Not DataBaseManagerDelegate.DataBaseExist(pServerName, pDataBaseName, DBLogin, DBPassword) Then 'BA-2471: IT 08/05/2015
+                If Not ValidateDatabaseName(pServerName, pDataBaseName, DBLogin, DBPassword) Then 'IT 15/07/2015 - BA-2693
                     myGlobalDataTO = InstallProcessApplication(pServerName, pDataBaseName, DBLogin, DBPassword)
                 End If
 
@@ -199,7 +199,6 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
                 dbConnection = LocalServer.ConnectionContext.SqlConnectionObject()
 
-
                 If (Not dbConnection Is Nothing) Then
                     Dim tcfAnalyzerDAO As New DAL.DAO.tcfgAnalyzersDAO
                     Dim returnData As GlobalDataTO = Nothing
@@ -216,8 +215,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                     End If
                 End If
 
-            Catch ex As Exception
-                GlobalBase.CreateLogActivity(ex)
+            Catch
                 Throw
             Finally
                 If (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -472,8 +470,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 'Get installed Database Version
                 Dim packageId As String = String.Empty
                 Dim installedDatabaseVersion As String = String.Empty
-                Dim commonRevisionNumber As String = String.Empty
-                Dim dataRevisionNumber As String = String.Empty
+                Dim commonRevisionNumber As Integer = 0
+                Dim dataRevisionNumber As Integer = 0
 
                 Dim myVersionsDelegate As New VersionsDelegate
                 myGlobalDataTO = myVersionsDelegate.GetVersionsData(Nothing)
@@ -550,29 +548,34 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' <param name="fromCommonRevisionNumber"></param>
         ''' <param name="fromDataRevisionNumber"></param>
         ''' <returns></returns>
-        ''' <remarks></remarks>
-        Private Function ExecuteDatabaseUpdate(ByVal pDataBaseName As String, ByRef pServer As Server, databaseUpdatesManager As DatabaseUpdatesManager, packageId As String, fromVersion As String, fromCommonRevisionNumber As String, fromDataRevisionNumber As String) As GlobalDataTO
+        ''' <remarks>
+        ''' Modified by: IT 13/07/2015 - BA-2693
+        ''' </remarks>
+        Private Function ExecuteDatabaseUpdate(ByVal pDataBaseName As String, ByRef pServer As Server, databaseUpdatesManager As DatabaseUpdatesManager, packageId As String, fromVersion As String, fromCommonRevisionNumber As Integer, fromDataRevisionNumber As Integer) As GlobalDataTO
 
             Dim myGlobalDataTo As New GlobalDataTO
             Dim results As New ExecutionResults
 
-            If InitializeDatabase(pDataBaseName, pServer) Then
+            Dim appDataBaseVersion As String = Utilities.FormatToCorrectVersion(GlobalBase.DataBaseVersion)
 
-                Dim appDataBaseVersion As String = Utilities.FormatToCorrectVersion(GlobalBase.DataBaseVersion)
-                Dim updates = databaseUpdatesManager.GenerateUpdatePack(fromVersion, fromCommonRevisionNumber, fromDataRevisionNumber, appDataBaseVersion)
-
-                If updates.Releases.Count > 0 Then
-                    results = updates.RunScripts(pDataBaseName, pServer, packageId)
-
-                    If (Not results.Success) Then
-                        myGlobalDataTo.ErrorCode = GlobalEnumerates.Messages.INVALID_DATABASE_UPDATE.ToString()
-                        myGlobalDataTo.HasError = True
-                    End If
+            'IT 13/07/2015 - BA-2693 (INI)
+            If (fromVersion < appDataBaseVersion) Then
+                Dim initialized = InitializeDatabase(pDataBaseName, pServer)
+                If (Not initialized) Then
+                    myGlobalDataTo.ErrorCode = GlobalEnumerates.Messages.INVALID_DATABASE_UPDATE.ToString()
+                    myGlobalDataTo.HasError = True
                 End If
+            End If
+            'IT 13/07/2015 - BA-2693 (END)
 
-            Else
-                myGlobalDataTo.ErrorCode = GlobalEnumerates.Messages.INVALID_DATABASE_UPDATE.ToString()
-                myGlobalDataTo.HasError = True
+            Dim updates = databaseUpdatesManager.GenerateUpdatePack(fromVersion, fromCommonRevisionNumber, fromDataRevisionNumber, appDataBaseVersion)
+            If updates.Releases.Count > 0 Then
+                results = updates.RunScripts(pDataBaseName, pServer, packageId)
+
+                If (Not results.Success) Then
+                    myGlobalDataTo.ErrorCode = GlobalEnumerates.Messages.INVALID_DATABASE_UPDATE.ToString()
+                    myGlobalDataTo.HasError = True
+                End If
             End If
 
             Return myGlobalDataTo
@@ -766,11 +769,11 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                     Dim myDbVersion As String = Utilities.FormatToCorrectVersion(myVersionsDs.tfmwVersions(0).DBSoftware)
                     Dim appDataBaseVersion As String = Utilities.FormatToCorrectVersion(GlobalBase.DataBaseVersion)
 
-                    Dim myDbCommonRevisonNumber As String = myVersionsDs.tfmwVersions(0).DBCommonRevisionNumber
-                    Dim myDbDataRevisionNumber As String = myVersionsDs.tfmwVersions(0).DBDataRevisionNumber
+                    Dim myDbCommonRevisonNumber As Integer = myVersionsDs.tfmwVersions(0).DBCommonRevisionNumber
+                    Dim myDbDataRevisionNumber As Integer = myVersionsDs.tfmwVersions(0).DBDataRevisionNumber
 
-                    Dim dbCommonRevisionNumber As String = "0"
-                    Dim dbDataRevisionNumber As String = "0"
+                    Dim dbCommonRevisionNumber As Integer = 0
+                    Dim dbDataRevisionNumber As Integer = 0
 
                     If (Utilities.IsValidVersionFormat(myDbVersion) And Utilities.IsValidVersionFormat(appDataBaseVersion)) Then
                         'Compare the DB Versions
@@ -872,10 +875,13 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' <param name="pDataBaseName"></param>
         ''' <param name="DBLogin"></param>
         ''' <param name="DBPassword"></param>
+        ''' <returns>Return if exists the required database for current analyzer model</returns>
         ''' <remarks>
         ''' Modified by: IT 11/06/2015 - BA-2600
+        '''              IT 15/07/2015 - BA-2693
         ''' </remarks>
-        Private Sub ValidateDatabaseName(ByVal pServerName As String, ByVal pDataBaseName As String, ByVal DBLogin As String, ByVal DBPassword As String)
+        Private Function ValidateDatabaseName(ByVal pServerName As String, ByVal pDataBaseName As String, ByVal DBLogin As String, ByVal DBPassword As String) As Boolean
+
             'if A200 or A400 exist
             If Not DataBaseManagerDelegate.DataBaseExist(pServerName, pDataBaseName, DBLogin, DBPassword) Then 'BA-2471: IT 08/05/2015
                 'Ax00 Exist
@@ -884,10 +890,15 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                     If IsSameAnalyzer(pServerName, GlobalBase.CommonDatabaseName, DBLogin, DBPassword) Then
                         'if we start the same instance we rename the database, to a intance name and we follow with the update process.
                         DataBaseManagerDelegate.RenameDBByModel(pServerName, GlobalBase.CommonDatabaseName, pDataBaseName, DBLogin, DBPassword)
+                        Return True
                     End If
                 End If
+                Return False
+            Else
+                Return True
             End If
-        End Sub
+
+        End Function
 
 #Region "TEMPORARY FUNCTIONS TO UPDATE STRUCTURE FOR v3.0.1"
         ''' <summary>

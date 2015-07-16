@@ -1348,7 +1348,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
                 For i = auxContext.Steps.Range.Minimum To -1
                     Dim curStep = New ContextStep(ContaminationsSpecification.DispensesPerStep)
                     curStep(1) = ContaminationsSpecification.CreateDispensing()
-                    curStep(1).KindOfLiquid = IDispensing.KindOfDispensedLiquid.Dummy
+                    curStep(1).KindOfLiquid = KindOfDispensedLiquid.Dummy
                     auxContext.Steps.Append(curStep)
                     'dispense.f()
                 Next
@@ -1362,7 +1362,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
                 If i < cuenta Then
                     dispense.R1ReagentID = orderTests(i).ReagentID
                 Else
-                    dispense.KindOfLiquid = IDispensing.KindOfDispensedLiquid.Dummy
+                    dispense.KindOfLiquid = KindOfDispensedLiquid.Dummy
                 End If
                 myStep(1) = dispense
                 auxContext.Steps.Append(myStep)

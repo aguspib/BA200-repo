@@ -154,7 +154,7 @@ Namespace Biosystems.Ax00.BL
         ''' Create by:   TR 17/01/2013
         ''' Modified by: IT 08/05/2015 - BA-2471
         ''' </remarks>
-        Public Function SaveDBSoftwareVersion(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pPackageID As String, ByVal pDBSoftware As String, ByVal pDBCommonRevisionNumber As String, ByVal pDBDataRevisionNumber As String) As GlobalDataTO
+        Public Function SaveDBSoftwareVersion(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pPackageID As String, ByVal pDBSoftware As String, ByVal pDBCommonRevisionNumber As Integer, ByVal pDBDataRevisionNumber As Integer) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
 

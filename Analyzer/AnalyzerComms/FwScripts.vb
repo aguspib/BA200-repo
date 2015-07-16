@@ -718,7 +718,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Dim myTempFilePath As String = ""
             Try
                 'PG 26/11/2010. Add the function Decrypt 
-                Dim serializer As New XmlSerializer(pFwScriptsDataType)
+                Dim types As Type() = {pFwScriptsDataType}
+                Dim serializer As XmlSerializer = XmlSerializer.FromTypes(types)(0)
 
                 If pDecrypt Then
                     'Dim myGlobalbase As New GlobalBase
