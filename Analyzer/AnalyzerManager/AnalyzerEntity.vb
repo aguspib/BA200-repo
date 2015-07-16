@@ -70,6 +70,8 @@ Namespace Biosystems.Ax00.Core.Entities
         Public MustOverride Function GetCurrentBaseLineID(ByVal pdbConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                                       ByVal pWorkSessionID As String, ByVal pWell As Integer, ByVal pBaseLineWithAdjust As Boolean) As GlobalDataTO
 
+        Public MustOverride Function ExistBaseLineFinished() As Boolean Implements IAnalyzerManager.ExistBaseLineFinished
+
 #End Region
 
         'Public MustOverride Function ContaminationsSpecification() As IAnalyzerContaminationsSpecification Implements IAnalyzerManager.ContaminationsSpecification

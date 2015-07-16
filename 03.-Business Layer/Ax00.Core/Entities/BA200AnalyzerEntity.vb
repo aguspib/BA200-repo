@@ -56,6 +56,12 @@ Namespace Biosystems.Ax00.Core.Entities
         '    Return WSExecutionCreator.Instance.ContaminationsSpecification
         'End Function
 
+        Public Overrides Function ExistBaseLineFinished() As Boolean
+            Return SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty) = "END" AndAlso
+                SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill) = "END" AndAlso
+                SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read) = "END"
+        End Function
+
 #End Region
 
         Public Overrides ReadOnly Property WashingIDRequired As Boolean

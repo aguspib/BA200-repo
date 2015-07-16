@@ -297,6 +297,7 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Sub CreateAndThrowEventUiRefresh(Optional ByVal _uiRefreshEvent As UI_RefreshEvents = UI_RefreshEvents.NONE)
         Sub PrepareUINewAlarmType(ByVal _alarm As AlarmEnumerates.Alarms)
         Sub startListenerExpiration()
+        Function ExistBaseLineFinished() As Boolean
 
 #End Region
 

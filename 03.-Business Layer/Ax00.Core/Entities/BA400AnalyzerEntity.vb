@@ -45,7 +45,9 @@ Namespace Biosystems.Ax00.Core.Entities
         '    Return WSExecutionCreator.Instance.ContaminationsSpecification
         'End Function
 
-
+        Public Overrides Function ExistBaseLineFinished() As Boolean
+            Return SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine) = "END"
+        End Function
 
 #End Region
 

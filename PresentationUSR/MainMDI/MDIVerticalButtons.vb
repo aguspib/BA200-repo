@@ -805,8 +805,13 @@ Partial Public Class UiAx00MainMDI
                                         ElseIf pendingExecutionsLeft Then
                                             'JV + AG 18/10/2013 revision task # 1341
                                             'bsTSContinueSessionButton.Enabled = ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.CONTINUE_WS)
-                                            Dim bReturn As Boolean = ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.CONTINUE_WS)
-                                            showSTARTWSiconFlag = bReturn 'AG 23/01/2014 #1467 (showSTARTWSiconFlag Or bReturn)
+                                            If AnalyzerController.Instance.Analyzer.ExistBaseLineFinished() Then
+                                                Dim bReturn As Boolean = ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.CONTINUE_WS)
+                                                showSTARTWSiconFlag = bReturn 'AG 23/01/2014 #1467 (showSTARTWSiconFlag Or bReturn)
+                                            Else
+                                                showSTARTWSiconFlag = False
+                                            End If
+
                                             'JV + AG 18/10/2013 revision task # 1341
                                         Else 'All Executions pending are paused or locked
                                             'bsTSStartSessionButton.Enabled = False
