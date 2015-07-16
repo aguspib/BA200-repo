@@ -3615,7 +3615,7 @@ Public Class UiPositionsAdjustments
         Try
             Dim myFieldLimitsDelegate As New FieldLimitsDelegate()
             'Load the specified limits
-            myGlobalDataTO = myFieldLimitsDelegate.GetList(Nothing, pLimitsID)
+            myGlobalDataTO = myFieldLimitsDelegate.GetList(Nothing, pLimitsID, AnalyzerModel)
 
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log

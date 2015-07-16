@@ -1175,9 +1175,24 @@ Public Class UiMotorsPumpsValvesTest
             Me.ExWa_SwitchSimpleRButton.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_SimpleSwitch", pLanguageID)
             Me.ExWa_SwitchContinuousRButton.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ContinuousSwitch", pLanguageID)
             Me.ExWa_DistilledWaterLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_DISTILLED_WATER", pLanguageID)
-            Me.ExWa_SamplesNeedleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Sample", pLanguageID)
-            Me.ExWa_Reagent1NeedleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Reagent1Mixer2Arms", pLanguageID)
-            Me.ExWa_Reagent2NeedleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Reagent2Mixer1Arms", pLanguageID)
+
+            If AnalyzerController.Instance.IsBA200 Then
+                Me.ExWa_SamplesNeedleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_SampleAndReagent", pLanguageID)
+                Me.ExWa_Reagent1NeedleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Mixer1", pLanguageID)
+                'Hide Pump B3
+                Me.ExWa_Reagent2NeedleLabel.Visible = False
+                Me.ExWa_Reagent2_WS.Visible = False
+                Me.BsScadaPipeControl21.Visible = False
+                Me.ExWa_Reagent2_Pump.Visible = False
+                Me.ExWa_B3_Label.Visible = False
+                Me.BsScadaPipeControl20.Visible = False
+            Else
+                Me.ExWa_SamplesNeedleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Sample", pLanguageID)
+                Me.ExWa_Reagent1NeedleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Reagent1Mixer2Arms", pLanguageID)
+                Me.ExWa_Reagent2NeedleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Reagent2Mixer1Arms", pLanguageID)
+            End If
+            
+
 
             'WS ASPIRATION
             Me.BsWSAspirationInfoTitleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_INFO_TITLE", pLanguageID)
@@ -1570,6 +1585,7 @@ Public Class UiMotorsPumpsValvesTest
     ''' </summary>
     ''' <remarks>Created by SGM 13/05/2011</remarks>
     Private Sub InitializeExternalWashing()
+        Dim ToolTipTextForBA200 As String = ""
         Try
 
             'Syringes
@@ -1593,7 +1609,9 @@ Public Class UiMotorsPumpsValvesTest
                 .ActivationState = BsScadaControl.States._OFF
                 .Cursor = Cursors.Hand
             End With
-
+            If AnalyzerController.Instance.Analyzer.Model = AnalyzerModelEnum.A200.ToString Then
+                ToolTipTextForBA200 = "_BA200"
+            End If
 
             'Pumps
             With ExWa_Samples_Pump
@@ -1602,7 +1620,7 @@ Public Class UiMotorsPumpsValvesTest
                 .ActivationState = BsScadaControl.States._OFF
                 .Cursor = Cursors.Hand
                 .Enabled = False
-                .ToolTipText = MyBase.GetHWElementsName(.Identity, LanguageID)
+                .ToolTipText = MyBase.GetHWElementsName(.Identity & ToolTipTextForBA200, LanguageID)
             End With
             TestableElements.Add(ExWa_Samples_Pump)
 
@@ -1612,7 +1630,7 @@ Public Class UiMotorsPumpsValvesTest
                 .ActivationState = BsScadaControl.States._OFF
                 .Cursor = Cursors.Hand
                 .Enabled = False
-                .ToolTipText = MyBase.GetHWElementsName(.Identity, LanguageID)
+                .ToolTipText = MyBase.GetHWElementsName(.Identity & ToolTipTextForBA200, LanguageID)
             End With
             TestableElements.Add(ExWa_Reagent1_Pump)
 
