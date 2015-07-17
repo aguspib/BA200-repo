@@ -1,6 +1,7 @@
 ﻿Imports Biosystems.Ax00.CC
 Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Core.Entities.Worksession.Contaminations.Interfaces
+Imports Biosystems.Ax00.Types
 
 Namespace Biosystems.Ax00.Core.Entities.Worksession.Interfaces
     Public Interface IAnalyzerContaminationsSpecification
@@ -37,6 +38,10 @@ Namespace Biosystems.Ax00.Core.Entities.Worksession.Interfaces
         ReadOnly Property CurrentRunningContext As IContaminationsContext
 
         ReadOnly Property HighContaminationPersistence As Integer
+
+        Function GetActionRequiredInRunning(dispensing As IDispensing) As IActionRequiredForDispensing
+
+        Function ConvertRowToDispensing(row As ExecutionsDS.twksWSExecutionsRow) As IDispensing
 
     End Interface
 End Namespace

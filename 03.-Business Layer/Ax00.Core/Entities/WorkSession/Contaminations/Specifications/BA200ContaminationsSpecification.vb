@@ -16,6 +16,7 @@ Imports Biosystems.Ax00.Data
 Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specifications
     Public Class BA200ContaminationsSpecification
         Inherits Ax00ContaminationsSpecification
+
         Implements IAnalyzerContaminationsSpecification
 
         Sub New(analyzer As IAnalyzerManager)
@@ -72,18 +73,22 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
             Return testReagentsDataDS
         End Function
 
-        Public Sub FillContextFromAnayzerData(ByVal instruction As String) 'Implements IAnalyzerContaminationsSpecification.FillContextFromAnayzerData
+        Public Overrides Sub FillContextFromAnayzerData(ByVal instruction As String)
             MyBase.FillContextFromAnayzerData(instruction)
             'Handle bireactive long lasting memory
             HandleBireactives()
+            If lastestBireactives IsNot Nothing AndAlso lastestBireactives.Any Then
+                Debug.WriteLine("Historic bireactives context:")
+                Debug.WriteLine(GetHistoricalBireactivesContext.ToString)
+            End If
         End Sub
 
 
-        Private lastBireactives As LinkedList(Of IDispensing)
+        Private lastestBireactives As LinkedList(Of IDispensing)
 
         Private Sub HandleBireactives()
-            If lastBireactives Is Nothing Then
-                LoadLastBireactivesFromDB()
+            If lastestBireactives Is Nothing Then
+                LoadLastestBireactivesFromDB()
             End If
 
             ' ReSharper disable once InconsistentNaming
@@ -101,30 +106,29 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
             If dispenseToCheck IsNot Nothing Then
                 Select Case dispenseToCheck.KindOfLiquid
                     Case KindOfDispensedLiquid.Washing
-                        lastBireactives.AddLast(dispenseToCheck)
+                        lastestBireactives.AddLast(dispenseToCheck)
                         serializationRequired = True
                     Case KindOfDispensedLiquid.Reagent
                         If GetAnalysisModeForReagent(dispenseToCheck.R1ReagentID) = AnalysisMode.BiReactive Then
-                            lastBireactives.AddLast(dispenseToCheck)
+                            lastestBireactives.AddLast(dispenseToCheck)
                             serializationRequired = True
                         End If
                 End Select
             End If
-            While lastBireactives.Count > HighContaminationPersistence
-                lastBireactives.RemoveFirst()
+            While lastestBireactives.Count > HighContaminationPersistence
+                lastestBireactives.RemoveFirst()
                 serializationRequired = True
             End While
 
             If serializationRequired Then
                 SerializeLatestBireactives()
             End If
-            'CurrentRunningContext.ActionRequiredForDispensing()
         End Sub
 
-        Private Sub LoadLastBireactivesFromDB()
+        Private Sub LoadLastestBireactivesFromDB()
             Dim dao = New vWSExecutionsDAO
             Dim serializedData = dao.GetBireactivesContext()
-            lastBireactives = New LinkedList(Of IDispensing)
+            lastestBireactives = New LinkedList(Of IDispensing)
             For Each R In serializedData
                 Dim disp = CreateDispensing()
                 disp.ExecutionID = R.ExecutionID
@@ -135,16 +139,16 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
                     Case KindOfDispensedLiquid.Washing
                         disp.WashingID = R.WashingID
                 End Select
-                lastBireactives.AddLast(disp)
+                lastestBireactives.AddLast(disp)
             Next
         End Sub
         Private Sub SerializeLatestBireactives()
-            If lastBireactives Is Nothing Then Return
+            If lastestBireactives Is Nothing Then Return
 
             Dim dao = New vWSExecutionsDAO
 
             Dim table As New vWSExecutionsDS.twksWSBbireactiveContextDataTable
-            For Each disp In lastBireactives
+            For Each disp In lastestBireactives
                 table.AddtwksWSBbireactiveContextRow(
                     AnalyzerManager.GetCurrentAnalyzerManager.ActiveWorkSession,
                     AnalyzerManager.GetCurrentAnalyzerManager.ActiveAnalyzer,
@@ -154,10 +158,37 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
                     disp.WashingID)
             Next
 
-            dao.ClearBireactivesContext()
-            dao.SaveBireactivesContext(table)
+            Dim serializationOfData As New Task(Sub()
+                                                    dao.ClearBireactivesContext()
+                                                    dao.SaveBireactivesContext(table)
+                                                End Sub)
+            serializationOfData.Start()
 
         End Sub
 
+        Public Overrides Function GetActionRequiredInRunning(dispensing As IDispensing) As IActionRequiredForDispensing
+            Dim result = currentContext.ActionRequiredForDispensing(dispensing)
+
+            If (result.Action = IContaminationsAction.RequiredAction.GoAhead AndAlso
+                lastestBireactives IsNot Nothing AndAlso
+                lastestBireactives.Any) Then
+                Dim auxContext As Context.Context = GetHistoricalBireactivesContext()
+                result = auxContext.ActionRequiredForDispensing(dispensing)
+            End If
+
+            Return result
+
+        End Function
+
+        Private Function GetHistoricalBireactivesContext() As Context.Context
+
+            Dim auxContext = New Context.Context(Me)
+            auxContext.FillEmptyContextSteps()
+            If lastestBireactives IsNot Nothing AndAlso lastestBireactives.Any Then
+                If lastestBireactives.Last IsNot Nothing Then auxContext.Steps(-1)(1) = lastestBireactives.Last.Value
+                If lastestBireactives.First IsNot Nothing Then auxContext.Steps(-2)(1) = lastestBireactives.First.Value
+            End If
+            Return auxContext
+        End Function
     End Class
 End Namespace

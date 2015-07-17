@@ -48,7 +48,7 @@ Public Class ContaminationBetweenElementsSorter
             context.Steps(-i)(1) = disp
         Next
 
-        Dim result = context.ActionRequiredForAGivenDispensing(pExecutions(0))
+        Dim result = context.ActionRequiredForDispensing(pExecutions(0))
 
         If result.Action = IContaminationsAction.RequiredAction.GoAhead Then
             AddContaminationBetweenGroups = 0
