@@ -881,66 +881,6 @@ Public Class UiTankLevelsAdjustments
         Return myGlobalDataTO
     End Function
 
-    ''' <summary>
-    ''' Get Limits values from BD for every different arm
-    ''' </summary>
-    ''' <remarks>Created by XBC 05/01/2011</remarks>
-    Private Function GetLimitValues() As GlobalDataTO
-        Dim myGlobalDataTO As New GlobalDataTO
-        'Dim myGlobalbase As New GlobalBase
-        Try
-            ' Get Value limit ranges
-            Dim myFieldLimitsDS As New FieldLimitsDS
-
-            'myGlobalDataTO = GetControlsLimits(FieldLimitsEnum.SRV_WASH_SOLUTION_LIMIT)
-            'If (Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing) Then
-            '    myFieldLimitsDS = CType(myGlobalDataTO.SetDatos, FieldLimitsDS)
-            '    If myFieldLimitsDS.tfmwFieldLimits.Rows.Count > 0 Then
-            '        Me.WSLimitMin = CType(myFieldLimitsDS.tfmwFieldLimits(0).MinValue, Decimal)
-            '        Me.WSLimitMax = CType(myFieldLimitsDS.tfmwFieldLimits(0).MaxValue, Decimal)
-            '    End If
-            'Else
-            '    mybase.ShowMessage(Me.Name & ".GetLimitValues", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage, Me)
-            '    Throw New Exception(myGlobalDataTO.ErrorMessage)
-            'End If
-
-            'myGlobalDataTO = GetControlsLimits(FieldLimitsEnum.SRV_CONTAMINATED_LIMIT)
-            'If (Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing) Then
-            '    myFieldLimitsDS = CType(myGlobalDataTO.SetDatos, FieldLimitsDS)
-            '    If myFieldLimitsDS.tfmwFieldLimits.Rows.Count > 0 Then
-            '        Me.HCLimitMin = CType(myFieldLimitsDS.tfmwFieldLimits(0).MinValue, Decimal)
-            '        Me.HCLimitMax = CType(myFieldLimitsDS.tfmwFieldLimits(0).MaxValue, Decimal)
-            '    End If
-            'Else
-            '    mybase.ShowMessage(Me.Name & ".GetLimitValues", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage, Me)
-            '    Throw New Exception(myGlobalDataTO.ErrorMessage)
-            'End If
-
-            myGlobalDataTO = GetControlsLimits(FieldLimitsEnum.SRV_SCALES_PERCENT_LIMIT)
-            If (Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing) Then
-                myFieldLimitsDS = CType(myGlobalDataTO.SetDatos, FieldLimitsDS)
-                If myFieldLimitsDS.tfmwFieldLimits.Rows.Count > 0 Then
-                    Me.ScalesLimitMin = CType(myFieldLimitsDS.tfmwFieldLimits(0).MinValue, Decimal)
-                    Me.ScalesLimitMax = CType(myFieldLimitsDS.tfmwFieldLimits(0).MaxValue, Decimal)
-                End If
-            Else
-                MyBase.ShowMessage(Me.Name & ".GetLimitValues", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage, Me)
-                Throw New Exception(myGlobalDataTO.ErrorMessage)
-            End If
-
-            ' Another Initializations
-            Me.SCALESDINAMICRANGE = GlobalBase.ScalesDinamicRange
-
-        Catch ex As Exception
-            myGlobalDataTO.HasError = True
-            myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-            myGlobalDataTO.ErrorMessage = ex.Message
-
-            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetLimitValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".GetLimitValues ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
-        End Try
-        Return myGlobalDataTO
-    End Function
 #End Region
 
 
@@ -4564,7 +4504,8 @@ Public Class UiTankLevelsAdjustments
 
             MyClass.DisableAll()
 
-            myGlobal = GetLimitValues()
+            'Set Minimum allowed range between minimum and maximum
+            Me.SCALESDINAMICRANGE = GlobalBase.ScalesDinamicRange
 
             'Initialize homes SGM 20/09/2011
             MyClass.InitializeHomes()

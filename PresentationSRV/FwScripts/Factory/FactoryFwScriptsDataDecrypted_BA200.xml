@@ -3819,7 +3819,7 @@
     <FwScriptTO>
       <FwScriptID>1103</FwScriptID>
       <ActionID>SF1_B2_ON</ActionID>
-      <Description>External Washing Reagent1/Mixer2 Pump ON</Description>
+      <Description>External Washing Stirrer1 Pump ON</Description>
       <Instructions>
         <InstructionTO>
           <InstructionID>1</InstructionID>
@@ -3847,7 +3847,7 @@
     <FwScriptTO>
       <FwScriptID>1104</FwScriptID>
       <ActionID>SF1_B2_OFF</ActionID>
-      <Description>External Washing Reagent1/Mixer2 Pump OFF</Description>
+      <Description>External Washing Stirrer1 Pump OFF</Description>
       <Instructions>
         <InstructionTO>
           <InstructionID>1</InstructionID>
