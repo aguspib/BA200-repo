@@ -170,6 +170,12 @@
     <Compile Include="AppComLayer.vb" />
     <Compile Include="ReportSAT\EmptyMainMDI.vb" />
     <Compile Include="ReportSAT\IMainMDI.vb" />
+    <Compile Include="ReportSAT\ISATReport.Designer.vb">
+      <DependentUpon>ISATReport.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ReportSAT\ISATReport.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="ReportSAT\ISATReportLoad.designer.vb">
       <DependentUpon>ISATReportLoad.vb</DependentUpon>
     </Compile>
@@ -350,6 +356,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="BioSystems.pfx" />
+    <None Include="ReportSAT\ClassDiagram1.cd" />
     <None Include="packages.config" />
     <None Include="Reports\Test\XtraSubReportControls.vb">
       <SubType>Component</SubType>
@@ -551,6 +558,10 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="ReportSAT\ISATReport.resx">
+      <DependentUpon>ISATReport.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="ReportSAT\ISATReportLoad.resx">
       <DependentUpon>ISATReportLoad.vb</DependentUpon>
       <SubType>Designer</SubType>

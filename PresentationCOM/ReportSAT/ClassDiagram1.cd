@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Biosystems.Ax00.PresentationCOM.EmptyMainMDI" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="10" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgAQARgAAAAAQAAAAAAAAAAAAgAAIAABAAAAAIg=</HashCode>
+      <FileName>ReportSAT\EmptyMainMDI.vb</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Biosystems.Ax00.PresentationCOM.UiSATReport">
+    <Position X="3.25" Y="1" Width="1.75" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>GBJMAAKgACAgAEgAsAWAgClCAAABAoAAiIIBZqwAAAE=</HashCode>
+      <FileName>ReportSAT\ISATReport.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="Biosystems.Ax00.PresentationCOM.IMainMDI" Collapsed="true">
+    <Position X="8" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgAQARgAAAAAQAAAAAAAAAAAAgAAIAABAAAAAIg=</HashCode>
+      <FileName>ReportSAT\IMainMDI.vb</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
