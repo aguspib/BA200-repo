@@ -137,9 +137,9 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Tests
         <Test()>
         Public Sub ActionRequiredForAGivenDispensing()
             Dim cont = GetNewContextFilledWithData({1, 2, 3, 4, 5})
-            Dim result = cont.ActionRequiredForAGivenDispensing(GenerateTemporaryRow(2))
+            Dim result = cont.ActionRequiredForDispensing(GenerateTemporaryRow(2))
             Assert.AreEqual(result.Action, IContaminationsAction.RequiredAction.GoAhead)
-            result = cont.ActionRequiredForAGivenDispensing(GenerateTemporaryRow(1))
+            result = cont.ActionRequiredForDispensing(GenerateTemporaryRow(1))
             Assert.AreEqual(result.Action, IContaminationsAction.RequiredAction.Wash)
             Assert.AreEqual(result.InvolvedWashes(0).WashingSolutionCode, "DISW")
 

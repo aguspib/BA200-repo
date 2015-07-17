@@ -303,6 +303,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 IsWaitingForResponse = True
 
                 Debug.Print("ESTOY ENVIANDO EL SCRIPT >> " & pFwScriptQueueItem.FwScriptID.ToString)
+
                 myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.COMMAND, _
                                                          True, _
                                                          Nothing, _
@@ -313,7 +314,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
             Catch ex As Exception
                 myResultData.HasError = True
-                myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myResultData.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
                 'Dim myLogAcciones As New ApplicationLogManager()

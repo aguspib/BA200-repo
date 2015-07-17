@@ -7,6 +7,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
 
     Public Class BA400ContaminationsSpecification
         Inherits Ax00ContaminationsSpecification
+
         Implements IAnalyzerContaminationsSpecification
 
         Sub New(analyzer As IAnalyzerManager)
@@ -21,5 +22,11 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
         Public Overrides Function GetAnalysisModeForReagent(reagentID As Integer) As AnalysisMode
             Return AnalysisMode.MonoReactive
         End Function
+
+
+        Public Overrides Function GetActionRequiredInRunning(dispensing As IDispensing) As IActionRequiredForDispensing
+            Return currentContext.ActionRequiredForDispensing(dispensing)
+        End Function
+
     End Class
 End Namespace
