@@ -9,6 +9,8 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
     Public MustInherit Class Ax00ContaminationsSpecification
         Implements IAnalyzerContaminationsSpecification
 
+
+
 #Region "Public properties"
         Public Property AdditionalPredilutionSteps As Integer Implements IAnalyzerContaminationsSpecification.AdditionalPredilutionSteps
 
@@ -81,5 +83,12 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
         Protected currentContext As Context.Context
 #End Region
 
+        Public MustOverride Function GetActionRequiredInRunning(dispensing As IDispensing) As IActionRequiredForDispensing Implements IAnalyzerContaminationsSpecification.GetActionRequiredInRunning
+
+        Public Function ConvertRowToDispensing(row As Types.ExecutionsDS.twksWSExecutionsRow) As IDispensing Implements IAnalyzerContaminationsSpecification.ConvertRowToDispensing
+            Dim disp = CreateDispensing()
+            disp.R1ReagentID = row.ReagentID
+            Return disp
+        End Function
     End Class
 End Namespace

@@ -99,16 +99,18 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Sorting
 
                     'Now the sortedOTList contains the new orderTest order (but only these with executions pending), now we have to add the locked
                     AddLockedExecutions(pExecutions, sortedOTList)
-                    ContaminationNumber = GetContaminationNumber(pContaminationsDS, pExecutions)
+                    ContaminationNumber = WSExecutionCreator.Instance.GetContaminationNumber(calculateInRunning, pPreviousReagentID, pExecutions) 'GetContaminationNumber(pContaminationsDS, pExecutions)
                     'ExecutionsDelegate.GetContaminationNumber(pContaminationsDS, pExecutions, pHighContaminationPersistance) + addContaminationBetweenGroups
 
                 ElseIf myOTListLinq.Count = 1 Then 'No movement is possible
-                    ContaminationNumber = ContaminationBetweenGroups
+                    ContaminationNumber = WSExecutionCreator.Instance.GetContaminationNumber(calculateInRunning, pPreviousReagentID, pExecutions) 'ContaminationBetweenGroups
                 End If
                 myOTListLinq = Nothing
 
             Else 'If pPreviousElementLastReagentID = -1 OrElse originalOrderChanged Then
-                ContaminationNumber = GetContaminationNumber(pContaminationsDS, pExecutions) 'ExecutionsDelegate.GetContaminationNumber(pContaminationsDS, pExecutions, pHighContaminationPersistance) + addContaminationBetweenGroups
+                ContaminationNumber = WSExecutionCreator.Instance.GetContaminationNumber(calculateInRunning, pPreviousReagentID, pExecutions)
+
+                'GetContaminationNumber(pContaminationsDS, pExecutions) 'ExecutionsDelegate.GetContaminationNumber(pContaminationsDS, pExecutions, pHighContaminationPersistance) + addContaminationBetweenGroups
             End If
 
             Return ContaminationNumber

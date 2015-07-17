@@ -165,8 +165,8 @@ Public Class UiPositionsAdjustments
     Const ZTUBE_SAMPLE_ROW As Integer = 7
     Const ZREF_REAGENT_ROW As Integer = 1
     Const ZREF_MIXER_ROW As Integer = 1
-    ' XBC 28/03/2012
-    Const ISE_SAMPLE_ROW As Integer = 8
+    ' XBC 28/03/2012 -> Change to variable (AC)
+    Private ISE_SAMPLE_ROW As Integer = 8
 #End Region
 
 #Region "Variables"
@@ -1610,7 +1610,7 @@ Public Class UiPositionsAdjustments
 
             Return Table
 
-        Catch ex As Exception            
+        Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Name & ".CreateChartDataCounts", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Name & ".CreateChartDataCounts", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             Return Nothing
@@ -1659,7 +1659,7 @@ Public Class UiPositionsAdjustments
 
             Return Table
 
-        Catch ex As Exception            
+        Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Name & ".CreateChartDataEncoder", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Name & ".CreateChartDataEncoder", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             Return Nothing
@@ -4553,6 +4553,7 @@ Public Class UiPositionsAdjustments
                 Me.BsGridSample.ParameterCellValue(position, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_ISE.ToString, GlobalEnumerates.AXIS.POLAR).Value
                 Me.BsGridSample.ParameterCellValue(position, Z_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_ISE.ToString, GlobalEnumerates.AXIS.Z).Value
                 Me.BsGridSample.ParameterCellValue(position, ROTOR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_ISE.ToString, GlobalEnumerates.AXIS.ROTOR).Value
+                ISE_SAMPLE_ROW = position
                 position += 1
                 '' PARKING
                 Me.BsGridSample.ParameterCellValue(position, POLAR_COLUMN) = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_PARK.ToString, GlobalEnumerates.AXIS.POLAR).Value
@@ -6080,7 +6081,7 @@ Public Class UiPositionsAdjustments
             .InFile = True
         End With
         Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
-        
+
     End Sub
 
     ''' <summary>

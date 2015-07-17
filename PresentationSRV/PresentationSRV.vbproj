@@ -221,12 +221,6 @@
     <Compile Include="IErrorCodes.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ISATReportSRV.Designer.vb">
-      <DependentUpon>ISATReportSRV.vb</DependentUpon>
-    </Compile>
-    <Compile Include="ISATReportSRV.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="Screens\IChangeRotorSRV.Designer.vb">
       <DependentUpon>IChangeRotorSRV.vb</DependentUpon>
     </Compile>
@@ -396,9 +390,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="IErrorCodes.resx">
       <DependentUpon>IErrorCodes.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ISATReportSRV.resx">
-      <DependentUpon>ISATReportSRV.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\licenses.licx" />
     <EmbeddedResource Include="Screens\IChangeRotorSRV.resx">
@@ -676,32 +667,32 @@
   <ItemGroup>
     <PublishFile Include="Firmware\a25v2v360-rev14.bin">
       <Visible>False</Visible>
-      <PublishState>Include</PublishState>
-      <IncludeHash>True</IncludeHash>
       <Group>
       </Group>
       <TargetPath>
       </TargetPath>
+      <PublishState>Include</PublishState>
+      <IncludeHash>True</IncludeHash>
       <FileType>File</FileType>
     </PublishFile>
     <PublishFile Include="required Libraries\Microsoft.SqlServer.ConnectionInfo.dll">
       <Visible>False</Visible>
-      <PublishState>Include</PublishState>
-      <IncludeHash>True</IncludeHash>
       <Group>
       </Group>
       <TargetPath>
       </TargetPath>
+      <PublishState>Include</PublishState>
+      <IncludeHash>True</IncludeHash>
       <FileType>File</FileType>
     </PublishFile>
     <PublishFile Include="stdole">
       <Visible>False</Visible>
-      <PublishState>Include</PublishState>
-      <IncludeHash>True</IncludeHash>
       <Group>
       </Group>
       <TargetPath>
       </TargetPath>
+      <PublishState>Include</PublishState>
+      <IncludeHash>True</IncludeHash>
       <FileType>Assembly</FileType>
     </PublishFile>
   </ItemGroup>
@@ -781,7 +772,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>
-    <PreBuildEvent>call "$(SolutionDir)\Tools\SolutionTools.exe"</PreBuildEvent>
+    <PreBuildEvent>
+    </PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

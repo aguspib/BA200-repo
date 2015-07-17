@@ -59,6 +59,7 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
             Dim x As New XmlSerializer(auxVariable.GetType)
 
             auxVariable = TryCast(x.Deserialize(objStreamReader), DatabaseUpdatesManager)
+            auxVariable.SortContents()
             objStreamReader.Close()
 
             Return auxVariable
@@ -72,6 +73,7 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
             Dim x As XmlSerializer = XmlSerializer.FromTypes(types)(0)
 
             auxVariable = TryCast(x.Deserialize(xml), DatabaseUpdatesManager)
+            auxVariable.SortContents()
 
             Return auxVariable
         End Function
@@ -83,6 +85,7 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
             Dim x As New XmlSerializer(auxVariable.GetType)
 
             auxVariable = TryCast(x.Deserialize(stream), DatabaseUpdatesManager)
+            auxVariable.SortContents()
             stream.Close()
 
             Return auxVariable
