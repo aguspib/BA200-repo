@@ -1303,7 +1303,8 @@ Partial Public Class UiAx00MainMDI
             'This is the way a form should be called from the main window
             'Call the function OpenMDIChildForm and pass it as parameter the form name you want to open
             'The form to be opened should be assigned its AcceptButton property to its default exit button
-            OpenMDIChildForm(UiSATReport)
+
+            OpenMDIChildForm(UiSATReportForm)
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SATReportsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".SATReportsToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -2136,7 +2137,7 @@ Partial Public Class UiAx00MainMDI
     ''' <remarks></remarks>
     Private Sub bsTSReportSATButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsTSReportSATButton.Click
         Try
-            OpenMDIChildForm(UiSATReport)
+            OpenMDIChildForm(UiSATReportForm)
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSReportSATButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
