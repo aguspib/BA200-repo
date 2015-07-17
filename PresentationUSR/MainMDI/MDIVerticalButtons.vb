@@ -577,19 +577,19 @@ Partial Public Class UiAx00MainMDI
             'If ElapsedTimeTimer.Enabled Then ElapsedTimeTimer.Stop() TR 18/052012 commented
 
             'AG 23/03/2012 - ISE initialitation not finished (connection in StandBy) 
-            If String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess), "INPROCESS", False) = 0 Then
+            If AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS" Then
                 'Do nothing
 
                 'AG 04/09/2012 - ABORT session button:
                 'Recovery results starts in Running and allow Abort but it must be disabled once the analyzer becomes in StandBy
                 'Note that recovery results will be closed once the complete connection finishes
-                If String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.RESULTSRECOVERProcess), "INPROCESS", False) = 0 AndAlso bsTSAbortSessionButton.Enabled Then
+                If AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.RESULTSRECOVERProcess) = "INPROCESS" AndAlso bsTSAbortSessionButton.Enabled Then
                     bsTSAbortSessionButton.Enabled = False
                 End If
                 'AG 04/09/2012
             ElseIf AnalyzerController.Instance.Analyzer.ISEAnalyzer IsNot Nothing AndAlso AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEInitiating Then
                 '    'Do nothing, no activate buttons until the ISE initialitazion finishes
-            ElseIf String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.RESULTSRECOVERProcess), "INPROCESS", False) = 0 Then
+            ElseIf AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.RESULTSRECOVERProcess) = "INPROCESS" Then
                 'AG 27/08/2012 - STANDBY: All buttons Disabled | RUNNING: Abort button enabled
                 SetActionButtonsEnableProperty(False)
 
@@ -613,10 +613,10 @@ Partial Public Class UiAx00MainMDI
                         AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill) = "CANCELED" OrElse _
                         AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty) = "CANCELED") Then
                         warmUpPaused = True
-                    ElseIf String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess), "PAUSED", False) = 0 AndAlso _
-                       String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.Washing), "CANCELED", False) = 0 Then
+                    ElseIf AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess) = "PAUSED" AndAlso _
+                       AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.Washing) = "CANCELED" Then
                         abortPaused = True
-                    ElseIf String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess), "PAUSED", False) = 0 Then
+                    ElseIf AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess) = "PAUSED" Then
                         shutDownPaused = True
                     End If
                     'AG 30/09/2011
@@ -633,9 +633,8 @@ Partial Public Class UiAx00MainMDI
                             myAnalyzerSettingsDS = DirectCast(myGlobal.SetDatos, AnalyzerSettingsDS)
 
                             If (myAnalyzerSettingsDS.tcfgAnalyzerSettings.Rows.Count = 1) Then
-                                Dim myDate As String = ""
-                                myDate = myAnalyzerSettingsDS.tcfgAnalyzerSettings.First.CurrentValue
-                                If String.Compare(myDate, "", False) = 0 Then
+                                Dim myDate = myAnalyzerSettingsDS.tcfgAnalyzerSettings.First.CurrentValue
+                                If myDate = "" Then
                                     WarmUpFinishedAttribute = True
 
                                     'AG 22/03/2012
@@ -797,47 +796,31 @@ Partial Public Class UiAx00MainMDI
                                         ' XB 29/10/2013
 
                                         If Not wsStarted AndAlso pendingExecutionsLeft Then
-                                            'bsTSStartSessionButton.Enabled = ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.START_WS)
-                                            'JV + AG 18/10/2013 revision task # 1341
-                                            Dim bReturn As Boolean = ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.START_WS)
-                                            showSTARTWSiconFlag = bReturn 'AG 23/01/2014 #1467 (showSTARTWSiconFlag Or bReturn)
-                                            'JV + AG 18/10/2013 revision task # 1341
+                                            showSTARTWSiconFlag = False
+                                            If AnalyzerController.Instance.Analyzer.ExistBaseLineFinished() OrElse AnalyzerController.Instance.Analyzer.BaseLineNotStarted() Then
+                                                Dim bReturn As Boolean = ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.START_WS)
+                                                showSTARTWSiconFlag = bReturn 'AG 23/01/2014 #1467 (showSTARTWSiconFlag Or bReturn)
+                                            End If
                                         ElseIf pendingExecutionsLeft Then
-                                            'JV + AG 18/10/2013 revision task # 1341
-                                            'bsTSContinueSessionButton.Enabled = ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.CONTINUE_WS)
+                                            showSTARTWSiconFlag = False
                                             If AnalyzerController.Instance.Analyzer.ExistBaseLineFinished() Then
                                                 Dim bReturn As Boolean = ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.CONTINUE_WS)
                                                 showSTARTWSiconFlag = bReturn 'AG 23/01/2014 #1467 (showSTARTWSiconFlag Or bReturn)
-                                            Else
-                                                showSTARTWSiconFlag = False
                                             End If
-
-                                            'JV + AG 18/10/2013 revision task # 1341
                                         Else 'All Executions pending are paused or locked
-                                            'bsTSStartSessionButton.Enabled = False
-                                            'bsTSContinueSessionButton.Enabled = False
-                                            'JV + AG 18/10/2013 revision task # 1341
-                                            'bsTSMultiFunctionSessionButton.Image = imagePause
                                             showSTARTWSiconFlag = False
-                                            'JV + AG 18/10/2013 revision task # 1341
-                                            'AG 09/07/2013
-                                            'XB 23/07/2013 - auto HQ
-                                            'If autoWSCreationWithLISModeAttribute Then
                                             If autoWSCreationWithLISModeAttribute OrElse HQProcessByUserFlag Then
                                                 'XB 23/07/2013
                                                 If Not wsStarted Then
-                                                    'bsTSStartSessionButton.Enabled = ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.START_WS)
-                                                    'JV + AG 18/10/2013 revision task # 1341
-                                                    Dim bReturn As Boolean = ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.START_WS)
-                                                    'If bReturn Then bsTSMultiFunctionSessionButton.Image = imagePlay Else bsTSMultiFunctionSessionButton.Image = imagePause
-                                                    showSTARTWSiconFlag = bReturn 'AG 23/01/2014 #1467 (showSTARTWSiconFlag Or bReturn)
-                                                    'JV + AG 18/10/2013 revision task # 1341
+                                                    If AnalyzerController.Instance.Analyzer.ExistBaseLineFinished() OrElse AnalyzerController.Instance.Analyzer.BaseLineNotStarted() Then
+                                                        Dim bReturn As Boolean = ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.START_WS)
+                                                        showSTARTWSiconFlag = bReturn 'AG 23/01/2014 #1467 (showSTARTWSiconFlag Or bReturn)
+                                                    End If
                                                 Else
-                                                    'JV + AG 18/10/2013 revision task # 1341
-                                                    'bsTSContinueSessionButton.Enabled = ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.CONTINUE_WS)
-                                                    Dim bReturn As Boolean = ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.CONTINUE_WS)
-                                                    showSTARTWSiconFlag = bReturn 'AG 23/01/2014 #1467 (showSTARTWSiconFlag Or bReturn)
-                                                    'JV + AG 18/10/2013 revision task # 1341
+                                                    If AnalyzerController.Instance.Analyzer.ExistBaseLineFinished() Then
+                                                        Dim bReturn As Boolean = ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.CONTINUE_WS)
+                                                        showSTARTWSiconFlag = bReturn 'AG 23/01/2014 #1467 (showSTARTWSiconFlag Or bReturn)
+                                                    End If
                                                 End If
                                             End If
                                             'AG 09/07/2013
@@ -847,38 +830,24 @@ Partial Public Class UiAx00MainMDI
                                     'AG 08/07/2013 - Special code for auto WS creation with LIS
                                 Else
                                     'XB 23/07/2013 - auto HQ
-                                    'If autoWSCreationWithLISModeAttribute Then
+                                    showSTARTWSiconFlag = False
                                     If autoWSCreationWithLISModeAttribute OrElse HQProcessByUserFlag Then
-                                        'XB 23/07/2013
-                                        'JV + AG 18/10/2013 revision task # 1341
-                                        'bsTSStartSessionButton.Enabled = ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.START_WS)
-                                        Dim bReturn As Boolean = ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.START_WS)
-                                        showSTARTWSiconFlag = bReturn 'AG 23/01/2014 #1467 (showSTARTWSiconFlag Or bReturn)
-                                        'JV + AG 18/10/2013 revision task # 1341
+                                        If AnalyzerController.Instance.Analyzer.ExistBaseLineFinished() Then
+                                            Dim bReturn As Boolean = ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.START_WS)
+                                            showSTARTWSiconFlag = bReturn 'AG 23/01/2014 #1467 (showSTARTWSiconFlag Or bReturn)
+                                        End If
                                     End If
                                     'AG 08/07/2013
                                 End If
 
                             Else
-                                'bsTSStartSessionButton.Enabled = False
-                                'bsTSContinueSessionButton.Enabled = False
-                                'AG 18/10/2013 revision
-                                'bsTSMultiFunctionSessionButton.Image = imagePause
                                 showSTARTWSiconFlag = False
-                                'AG 18/10/2013 revision
-                                'AG 08/07/2013 - Special code for auto WS creation with LIS
-                                'XB 23/07/2013 - auto HQ
-                                ' If autoWSCreationWithLISModeAttribute AndAlso String.Compare(WSStatusAttribute, "EMPTY", False) = 0 Then
                                 If (autoWSCreationWithLISModeAttribute OrElse HQProcessByUserFlag) AndAlso String.Compare(WSStatusAttribute, "EMPTY", False) = 0 Then
-                                    'XB 23/07/2013
-                                    'JV + AG 18/10/2013 revision task # 1341
-                                    'bsTSStartSessionButton.Enabled = ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.START_WS)
-                                    Dim bReturn As Boolean = ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.START_WS)
-                                    showSTARTWSiconFlag = bReturn 'AG 23/01/2014 #1467 (showSTARTWSiconFlag Or bReturn)
-                                    'JV + AG 18/10/2013 revision task # 1341
+                                    If AnalyzerController.Instance.Analyzer.ExistBaseLineFinished() Then
+                                        Dim bReturn As Boolean = ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.START_WS)
+                                        showSTARTWSiconFlag = bReturn 'AG 23/01/2014 #1467 (showSTARTWSiconFlag Or bReturn)
+                                    End If
                                 End If
-                                'AG 08/07/2013 
-
                             End If 'If WorkSessionIDAttribute <> "" And AnalyzerIDAttribute <> "" Then
 
                         End If

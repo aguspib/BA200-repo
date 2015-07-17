@@ -22,6 +22,7 @@ Imports Biosystems.Ax00.Core.Entities
 
 Public Class Ax00ServiceMainMDI
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
+    Implements IMainMDI
 
 #Region "Declarations"
     'Private AutoConnectProcess As Boolean = False
@@ -146,6 +147,36 @@ Public Class Ax00ServiceMainMDI
 #Region "Properties"
 
     Private myConsole As DebugTrace
+
+    ''' <summary>
+    ''' To implement IMainMDI Interface in order to use same form for User SW and Service SW 
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property ErrorStatusLabelDisplayStyle() As ToolStripItemDisplayStyle Implements IMainMDI.ErrorStatusLabelDisplayStyle
+        Get
+            Return Nothing
+        End Get
+        Set(ByVal value As ToolStripItemDisplayStyle)
+
+        End Set
+    End Property
+
+    ''' <summary>
+    ''' To implement IMainMDI Interface in order to use same form for User SW and Service SW 
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property ErrorStatusLabelText() As String Implements IMainMDI.ErrorStatusLabelText
+        Get
+            Return String.Empty
+        End Get
+        Set(ByVal value As String)
+
+        End Set
+    End Property
 
     'SGM 25/11/2011
     Public Property SimulationMode() As Boolean
@@ -320,7 +351,7 @@ Public Class Ax00ServiceMainMDI
         Return myVersion
     End Function
 
-    Public WriteOnly Property CurrentLanguage() As String
+    Public WriteOnly Property CurrentLanguage() As String Implements IMainMDI.CurrentLanguage
         Set(ByVal value As String)
             If (String.Compare(CurrentLanguageAttribute, value, False) <> 0) Then
                 CurrentLanguageAttribute = value
@@ -3793,10 +3824,6 @@ Public Class Ax00ServiceMainMDI
         Return myGlobal
     End Function
 
-
-
-
-
     ''' <summary>
     ''' Writes the Configuration obtained from DDBB to the Analyzer for Codebars
     ''' </summary>
@@ -3876,9 +3903,6 @@ Public Class Ax00ServiceMainMDI
         End Try
         Return myGlobal
     End Function
-
-
-
 
     ''' <summary>
     ''' To be able to be opened from another screen, such as AnalyzerInfo (StartUp)
@@ -7445,7 +7469,6 @@ Public Class Ax00ServiceMainMDI
 
 #End Region
 
-
 #Region "Common Forms Returned Values"
     Private Sub LanguageConfig_Closed() Handles myLanguageConfig.FormClosed
         Try
@@ -7684,7 +7707,6 @@ Public Class Ax00ServiceMainMDI
     End Function
 
 #End Region
-
 
 #Region "Alarms Management"
 
@@ -8127,9 +8149,7 @@ Public Class Ax00ServiceMainMDI
     End Sub
 #End Region
 
-
-
-
+#Region "IMainMDI Implementation"
 
     ''' <summary>
     ''' Open Acrobat In One Button Click Using VB.Net {No API Or Other Ocx}
@@ -8182,7 +8202,8 @@ Public Class Ax00ServiceMainMDI
             'The form to be opened should be assigned its AcceptButton property to its default exit button
             Application.DoEvents()
             Me.Cursor = Cursors.WaitCursor
-            Dim mySATReport As UiSATReportSRV = New UiSATReportSRV '(MyClass.MDIAnalyzerManager) 'SGM 25/11/2011
+            Dim mySATReport As UiSATReport = New UiSATReport '(MyClass.MDIAnalyzerManager) 'SGM 25/11/2011
+            mySATReport.MainMDI = Me
             OpenMDIChildForm(mySATReport)
 
             Me.Text = My.Application.Info.ProductName & " - " & SATReportsToolStripMenuItem.Text 'SGM 22/02/2012
@@ -8195,4 +8216,78 @@ Public Class Ax00ServiceMainMDI
             Me.Cursor = Cursors.Default
         End Try
     End Sub
+
+    ''' <summary>
+    ''' To implement IMainMDI Interface in order to use same form for User SW and Service SW
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Sub ReleaseLIS() Implements IMainMDI.ReleaseLIS
+
+    End Sub
+
+    ''' <summary>
+    ''' To implement IMainMDI Interface in order to use same form for User SW and Service SW
+    ''' </summary>
+    ''' <param name="FormToClose"></param>
+    ''' <remarks>The Form is not closed from this method on this class, it only exists because we need to implement the Interface IMainMDI</remarks>
+    Public Sub CloseForm(FormToClose As Biosystems.Ax00.PresentationCOM.BSBaseForm) Implements IMainMDI.CloseForm
+        'The Form is not closed from this method
+    End Sub
+
+    ''' <summary>
+    ''' To implement IMainMDI Interface in order to use same form for User SW and Service SW
+    ''' </summary>
+    ''' <param name="pEnabled"></param>
+    ''' <param name="pForceValue"></param>
+    ''' <remarks></remarks>
+    Public Sub EnableButtonAndMenus(ByVal pEnabled As Boolean, Optional ByVal pForceValue As Boolean = False) Implements IMainMDI.EnableButtonAndMenus
+
+    End Sub
+
+    ''' <summary>
+    ''' To implement IMainMDI Interface in order to use same form for User SW and Service SW
+    ''' </summary>
+    ''' <param name="pStartingApplication"></param>
+    ''' <remarks></remarks>
+    Public Sub InitializeAnalyzerAndWorkSession(ByVal pStartingApplication As Boolean) Implements IMainMDI.InitializeAnalyzerAndWorkSession
+
+    End Sub
+
+    ''' <summary>
+    ''' To implement IMainMDI Interface in order to use same form for User SW and Service SW
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Sub InitializeMarqueeProgreesBar() Implements IMainMDI.InitializeMarqueeProgreesBar
+
+    End Sub
+
+    ''' <summary>
+    ''' To implement IMainMDI Interface in order to use same form for User SW and Service SW
+    ''' </summary>
+    ''' <param name="FormToClose"></param>
+    ''' <param name="pAutomaticProcessFlag"></param>
+    ''' <remarks></remarks>
+    Public Sub OpenMonitorForm(ByRef FormToClose As Form, Optional ByVal pAutomaticProcessFlag As Boolean = False) Implements IMainMDI.OpenMonitorForm
+        FormToClose.Close()
+    End Sub
+
+    ''' <summary>
+    ''' To implement IMainMDI Interface in order to use same form for User SW and Service SW
+    ''' </summary>
+    ''' <param name="pEnable"></param>
+    ''' <remarks></remarks>
+    Public Sub SetActionButtonsEnableProperty(ByVal pEnable As Boolean) Implements IMainMDI.SetActionButtonsEnableProperty
+
+    End Sub
+
+    ''' <summary>
+    ''' To implement IMainMDI Interface in order to use same form for User SW and Service SW
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Sub StopMarqueeProgressBar() Implements IMainMDI.StopMarqueeProgressBar
+
+    End Sub
+
+#End Region
+
 End Class
