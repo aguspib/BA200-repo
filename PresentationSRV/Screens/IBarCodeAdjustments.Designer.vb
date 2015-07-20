@@ -22,45 +22,45 @@ Partial Class UiBarCodeAdjustments
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.components = New System.ComponentModel.Container
-        Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle2 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle3 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle4 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
+        Me.components = New System.ComponentModel.Container()
+        Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle2 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle3 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle4 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiBarCodeAdjustments))
-        Me.BsMessagesPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.ProgressBar1 = New Biosystems.Ax00.Controls.UserControls.BSProgressBar
-        Me.BsMessageImage = New Biosystems.Ax00.Controls.UserControls.BSPictureBox
-        Me.BsMessageLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsButtonsPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.BsExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.BsCancelButtonNOUSED = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.BsSaveButtonNOUSED = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.BsAdjustButtonNOUSED = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.BsAdjustPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.TestGroupBox = New System.Windows.Forms.GroupBox
-        Me.BarCodeDataGridView = New Biosystems.Ax00.Controls.UserControls.BSDataGridView
-        Me.TestButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.ReadingBCGroupBox = New System.Windows.Forms.GroupBox
-        Me.StopButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.ReadedValueLabel = New System.Windows.Forms.Label
-        Me.StartReadingButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.CenterRotorGroupBox = New System.Windows.Forms.GroupBox
-        Me.ButtonCancel = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.SaveButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.BsAdjust = New Biosystems.Ax00.Controls.UserControls.BSAdjustControl
-        Me.AdjustButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.SelectRotorGroupBox = New System.Windows.Forms.GroupBox
-        Me.ReagentRotorRadioButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton
-        Me.SampleRotorRadioButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton
-        Me.BsButton6 = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.PictureBox1 = New System.Windows.Forms.PictureBox
-        Me.BsSubtitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsDemoModeInfoPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.BsInfoXPSViewer = New BsXPSViewer
-        Me.BsInfoTitle = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsTitleLabel = New System.Windows.Forms.Label
+        Me.BsMessagesPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.ProgressBar1 = New Biosystems.Ax00.Controls.UserControls.BSProgressBar()
+        Me.BsMessageImage = New Biosystems.Ax00.Controls.UserControls.BSPictureBox()
+        Me.BsMessageLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsButtonsPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.BsExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.BsCancelButtonNOUSED = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.BsSaveButtonNOUSED = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.BsAdjustButtonNOUSED = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.BsAdjustPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.TestGroupBox = New System.Windows.Forms.GroupBox()
+        Me.BarCodeDataGridView = New Biosystems.Ax00.Controls.UserControls.BSDataGridView()
+        Me.TestButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.ReadingBCGroupBox = New System.Windows.Forms.GroupBox()
+        Me.StopButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.ReadedValueLabel = New System.Windows.Forms.Label()
+        Me.StartReadingButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.CenterRotorGroupBox = New System.Windows.Forms.GroupBox()
+        Me.ButtonCancel = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.SaveButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.BsAdjust = New Biosystems.Ax00.Controls.UserControls.BSAdjustControl()
+        Me.AdjustButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.SelectRotorGroupBox = New System.Windows.Forms.GroupBox()
+        Me.ReagentRotorRadioButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton()
+        Me.SampleRotorRadioButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton()
+        Me.BsButton6 = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.BsSubtitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsDemoModeInfoPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.BsInfoXPSViewer = New BsXPSViewer()
+        Me.BsInfoTitle = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsTitleLabel = New System.Windows.Forms.Label()
         Me.TestProcessTimer = New System.Windows.Forms.Timer(Me.components)
+        Me.Footer = New System.Windows.Forms.Panel()
         Me.BsMessagesPanel.SuspendLayout()
         CType(Me.BsMessageImage, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.BsButtonsPanel.SuspendLayout()
@@ -70,19 +70,18 @@ Partial Class UiBarCodeAdjustments
         Me.ReadingBCGroupBox.SuspendLayout()
         Me.CenterRotorGroupBox.SuspendLayout()
         Me.SelectRotorGroupBox.SuspendLayout()
-        CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.BsDemoModeInfoPanel.SuspendLayout()
+        Me.Footer.SuspendLayout()
         Me.SuspendLayout()
         '
         'BsMessagesPanel
         '
-        Me.BsMessagesPanel.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsMessagesPanel.BackColor = System.Drawing.Color.WhiteSmoke
         Me.BsMessagesPanel.Controls.Add(Me.ProgressBar1)
         Me.BsMessagesPanel.Controls.Add(Me.BsMessageImage)
         Me.BsMessagesPanel.Controls.Add(Me.BsMessageLabel)
-        Me.BsMessagesPanel.Location = New System.Drawing.Point(0, 557)
+        Me.BsMessagesPanel.Dock = System.Windows.Forms.DockStyle.Left
+        Me.BsMessagesPanel.Location = New System.Drawing.Point(0, 0)
         Me.BsMessagesPanel.Name = "BsMessagesPanel"
         Me.BsMessagesPanel.Size = New System.Drawing.Size(811, 35)
         Me.BsMessagesPanel.TabIndex = 19
@@ -118,13 +117,13 @@ Partial Class UiBarCodeAdjustments
         '
         'BsButtonsPanel
         '
-        Me.BsButtonsPanel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsButtonsPanel.BackColor = System.Drawing.Color.WhiteSmoke
         Me.BsButtonsPanel.Controls.Add(Me.BsExitButton)
         Me.BsButtonsPanel.Controls.Add(Me.BsCancelButtonNOUSED)
         Me.BsButtonsPanel.Controls.Add(Me.BsSaveButtonNOUSED)
         Me.BsButtonsPanel.Controls.Add(Me.BsAdjustButtonNOUSED)
-        Me.BsButtonsPanel.Location = New System.Drawing.Point(810, 557)
+        Me.BsButtonsPanel.Dock = System.Windows.Forms.DockStyle.Right
+        Me.BsButtonsPanel.Location = New System.Drawing.Point(810, 0)
         Me.BsButtonsPanel.Name = "BsButtonsPanel"
         Me.BsButtonsPanel.Size = New System.Drawing.Size(168, 35)
         Me.BsButtonsPanel.TabIndex = 18
@@ -177,29 +176,28 @@ Partial Class UiBarCodeAdjustments
         '
         'BsAdjustPanel
         '
-        Me.BsAdjustPanel.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsAdjustPanel.BackColor = System.Drawing.Color.Gainsboro
         Me.BsAdjustPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.BsAdjustPanel.Controls.Add(Me.TestGroupBox)
         Me.BsAdjustPanel.Controls.Add(Me.ReadingBCGroupBox)
         Me.BsAdjustPanel.Controls.Add(Me.CenterRotorGroupBox)
         Me.BsAdjustPanel.Controls.Add(Me.SelectRotorGroupBox)
-        Me.BsAdjustPanel.Controls.Add(Me.PictureBox1)
-        Me.BsAdjustPanel.Controls.Add(Me.BsSubtitleLabel)
-        Me.BsAdjustPanel.Location = New System.Drawing.Point(234, 25)
+        Me.BsAdjustPanel.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.BsAdjustPanel.Location = New System.Drawing.Point(232, 20)
         Me.BsAdjustPanel.Name = "BsAdjustPanel"
-        Me.BsAdjustPanel.Size = New System.Drawing.Size(739, 532)
+        Me.BsAdjustPanel.Padding = New System.Windows.Forms.Padding(10)
+        Me.BsAdjustPanel.Size = New System.Drawing.Size(746, 538)
         Me.BsAdjustPanel.TabIndex = 64
         '
         'TestGroupBox
         '
         Me.TestGroupBox.Controls.Add(Me.BarCodeDataGridView)
         Me.TestGroupBox.Controls.Add(Me.TestButton)
-        Me.TestGroupBox.Location = New System.Drawing.Point(9, 337)
+        Me.TestGroupBox.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.TestGroupBox.Location = New System.Drawing.Point(10, 301)
         Me.TestGroupBox.Name = "TestGroupBox"
-        Me.TestGroupBox.Size = New System.Drawing.Size(723, 178)
+        Me.TestGroupBox.Padding = New System.Windows.Forms.Padding(10, 10, 5, 5)
+        Me.TestGroupBox.Size = New System.Drawing.Size(724, 225)
         Me.TestGroupBox.TabIndex = 76
         Me.TestGroupBox.TabStop = False
         Me.TestGroupBox.Text = "4. Test"
@@ -236,9 +234,10 @@ Partial Class UiBarCodeAdjustments
         DataGridViewCellStyle3.SelectionForeColor = System.Drawing.Color.White
         DataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
         Me.BarCodeDataGridView.DefaultCellStyle = DataGridViewCellStyle3
+        Me.BarCodeDataGridView.Dock = System.Windows.Forms.DockStyle.Left
         Me.BarCodeDataGridView.EnterToTab = False
         Me.BarCodeDataGridView.GridColor = System.Drawing.Color.Silver
-        Me.BarCodeDataGridView.Location = New System.Drawing.Point(24, 20)
+        Me.BarCodeDataGridView.Location = New System.Drawing.Point(10, 24)
         Me.BarCodeDataGridView.MultiSelect = False
         Me.BarCodeDataGridView.Name = "BarCodeDataGridView"
         Me.BarCodeDataGridView.ReadOnly = True
@@ -251,15 +250,15 @@ Partial Class UiBarCodeAdjustments
         DataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
         Me.BarCodeDataGridView.RowHeadersDefaultCellStyle = DataGridViewCellStyle4
         Me.BarCodeDataGridView.RowHeadersVisible = False
-        Me.BarCodeDataGridView.Size = New System.Drawing.Size(476, 152)
+        Me.BarCodeDataGridView.Size = New System.Drawing.Size(476, 196)
         Me.BarCodeDataGridView.TabIndex = 63
         Me.BarCodeDataGridView.TabToEnter = False
         '
         'TestButton
         '
-        Me.TestButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.TestButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.TestButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
-        Me.TestButton.Location = New System.Drawing.Point(687, 142)
+        Me.TestButton.Location = New System.Drawing.Point(686, 187)
         Me.TestButton.Name = "TestButton"
         Me.TestButton.Size = New System.Drawing.Size(32, 32)
         Me.TestButton.TabIndex = 14
@@ -270,9 +269,10 @@ Partial Class UiBarCodeAdjustments
         Me.ReadingBCGroupBox.Controls.Add(Me.StopButton)
         Me.ReadingBCGroupBox.Controls.Add(Me.ReadedValueLabel)
         Me.ReadingBCGroupBox.Controls.Add(Me.StartReadingButton)
-        Me.ReadingBCGroupBox.Location = New System.Drawing.Point(9, 246)
+        Me.ReadingBCGroupBox.Dock = System.Windows.Forms.DockStyle.Top
+        Me.ReadingBCGroupBox.Location = New System.Drawing.Point(10, 216)
         Me.ReadingBCGroupBox.Name = "ReadingBCGroupBox"
-        Me.ReadingBCGroupBox.Size = New System.Drawing.Size(723, 85)
+        Me.ReadingBCGroupBox.Size = New System.Drawing.Size(724, 85)
         Me.ReadingBCGroupBox.TabIndex = 75
         Me.ReadingBCGroupBox.TabStop = False
         Me.ReadingBCGroupBox.Text = "3. Reading Test/Adjustment"
@@ -281,7 +281,7 @@ Partial Class UiBarCodeAdjustments
         '
         Me.StopButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.StopButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
-        Me.StopButton.Location = New System.Drawing.Point(687, 42)
+        Me.StopButton.Location = New System.Drawing.Point(688, 42)
         Me.StopButton.Name = "StopButton"
         Me.StopButton.Size = New System.Drawing.Size(32, 32)
         Me.StopButton.TabIndex = 106
@@ -292,7 +292,7 @@ Partial Class UiBarCodeAdjustments
         '
         Me.ReadedValueLabel.BackColor = System.Drawing.Color.WhiteSmoke
         Me.ReadedValueLabel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.ReadedValueLabel.Font = New System.Drawing.Font("Digiface", 20.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.ReadedValueLabel.Font = New System.Drawing.Font("Microsoft Sans Serif", 20.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ReadedValueLabel.ForeColor = System.Drawing.Color.Black
         Me.ReadedValueLabel.Location = New System.Drawing.Point(26, 33)
         Me.ReadedValueLabel.Name = "ReadedValueLabel"
@@ -305,7 +305,7 @@ Partial Class UiBarCodeAdjustments
         '
         Me.StartReadingButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.StartReadingButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.StartReadingButton.Location = New System.Drawing.Point(687, 42)
+        Me.StartReadingButton.Location = New System.Drawing.Point(688, 42)
         Me.StartReadingButton.Name = "StartReadingButton"
         Me.StartReadingButton.Size = New System.Drawing.Size(30, 30)
         Me.StartReadingButton.TabIndex = 14
@@ -317,19 +317,20 @@ Partial Class UiBarCodeAdjustments
         Me.CenterRotorGroupBox.Controls.Add(Me.SaveButton)
         Me.CenterRotorGroupBox.Controls.Add(Me.BsAdjust)
         Me.CenterRotorGroupBox.Controls.Add(Me.AdjustButton)
-        Me.CenterRotorGroupBox.Location = New System.Drawing.Point(9, 94)
+        Me.CenterRotorGroupBox.Dock = System.Windows.Forms.DockStyle.Top
+        Me.CenterRotorGroupBox.Location = New System.Drawing.Point(10, 70)
         Me.CenterRotorGroupBox.Name = "CenterRotorGroupBox"
-        Me.CenterRotorGroupBox.Size = New System.Drawing.Size(723, 146)
+        Me.CenterRotorGroupBox.Size = New System.Drawing.Size(724, 146)
         Me.CenterRotorGroupBox.TabIndex = 74
         Me.CenterRotorGroupBox.TabStop = False
         Me.CenterRotorGroupBox.Text = "2. Center Rotor"
         '
-        'CancelButton
+        'ButtonCancel
         '
         Me.ButtonCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ButtonCancel.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
-        Me.ButtonCancel.Location = New System.Drawing.Point(687, 102)
-        Me.ButtonCancel.Name = "CancelButton"
+        Me.ButtonCancel.Location = New System.Drawing.Point(688, 102)
+        Me.ButtonCancel.Name = "ButtonCancel"
         Me.ButtonCancel.Size = New System.Drawing.Size(32, 32)
         Me.ButtonCancel.TabIndex = 17
         Me.ButtonCancel.UseVisualStyleBackColor = True
@@ -338,7 +339,7 @@ Partial Class UiBarCodeAdjustments
         '
         Me.SaveButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.SaveButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
-        Me.SaveButton.Location = New System.Drawing.Point(651, 102)
+        Me.SaveButton.Location = New System.Drawing.Point(652, 102)
         Me.SaveButton.Name = "SaveButton"
         Me.SaveButton.Size = New System.Drawing.Size(32, 32)
         Me.SaveButton.TabIndex = 16
@@ -367,7 +368,7 @@ Partial Class UiBarCodeAdjustments
         Me.BsAdjust.InfoValuesForeColor = System.Drawing.Color.Black
         Me.BsAdjust.IsFocused = False
         Me.BsAdjust.LastValueSavedTitle = "Last:"
-        Me.BsAdjust.Location = New System.Drawing.Point(24, 26)
+        Me.BsAdjust.Location = New System.Drawing.Point(25, 26)
         Me.BsAdjust.MaximumLimit = 50000.0!
         Me.BsAdjust.MaximumSize = New System.Drawing.Size(153, 127)
         Me.BsAdjust.MaxNumDecimals = 0
@@ -386,7 +387,7 @@ Partial Class UiBarCodeAdjustments
         '
         Me.AdjustButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.AdjustButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
-        Me.AdjustButton.Location = New System.Drawing.Point(615, 102)
+        Me.AdjustButton.Location = New System.Drawing.Point(616, 102)
         Me.AdjustButton.Name = "AdjustButton"
         Me.AdjustButton.Size = New System.Drawing.Size(32, 32)
         Me.AdjustButton.TabIndex = 14
@@ -397,9 +398,10 @@ Partial Class UiBarCodeAdjustments
         Me.SelectRotorGroupBox.Controls.Add(Me.ReagentRotorRadioButton)
         Me.SelectRotorGroupBox.Controls.Add(Me.SampleRotorRadioButton)
         Me.SelectRotorGroupBox.Controls.Add(Me.BsButton6)
-        Me.SelectRotorGroupBox.Location = New System.Drawing.Point(9, 29)
+        Me.SelectRotorGroupBox.Dock = System.Windows.Forms.DockStyle.Top
+        Me.SelectRotorGroupBox.Location = New System.Drawing.Point(10, 10)
         Me.SelectRotorGroupBox.Name = "SelectRotorGroupBox"
-        Me.SelectRotorGroupBox.Size = New System.Drawing.Size(723, 60)
+        Me.SelectRotorGroupBox.Size = New System.Drawing.Size(724, 60)
         Me.SelectRotorGroupBox.TabIndex = 73
         Me.SelectRotorGroupBox.TabStop = False
         Me.SelectRotorGroupBox.Text = "1. Select Rotor"
@@ -434,30 +436,21 @@ Partial Class UiBarCodeAdjustments
         '
         Me.BsButton6.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsButton6.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.BsButton6.Location = New System.Drawing.Point(688, 228)
+        Me.BsButton6.Location = New System.Drawing.Point(689, 228)
         Me.BsButton6.Name = "BsButton6"
         Me.BsButton6.Size = New System.Drawing.Size(30, 30)
         Me.BsButton6.TabIndex = 106
         Me.BsButton6.UseVisualStyleBackColor = True
         '
-        'PictureBox1
-        '
-        Me.PictureBox1.BackColor = System.Drawing.Color.Transparent
-        Me.PictureBox1.Location = New System.Drawing.Point(3, 23)
-        Me.PictureBox1.Name = "PictureBox1"
-        Me.PictureBox1.Size = New System.Drawing.Size(736, 501)
-        Me.PictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage
-        Me.PictureBox1.TabIndex = 61
-        Me.PictureBox1.TabStop = False
-        '
         'BsSubtitleLabel
         '
         Me.BsSubtitleLabel.BackColor = System.Drawing.Color.LightSteelBlue
+        Me.BsSubtitleLabel.Dock = System.Windows.Forms.DockStyle.Top
         Me.BsSubtitleLabel.Font = New System.Drawing.Font("Verdana", 10.0!)
         Me.BsSubtitleLabel.ForeColor = System.Drawing.Color.Black
-        Me.BsSubtitleLabel.Location = New System.Drawing.Point(0, 0)
+        Me.BsSubtitleLabel.Location = New System.Drawing.Point(232, 0)
         Me.BsSubtitleLabel.Name = "BsSubtitleLabel"
-        Me.BsSubtitleLabel.Size = New System.Drawing.Size(739, 20)
+        Me.BsSubtitleLabel.Size = New System.Drawing.Size(746, 20)
         Me.BsSubtitleLabel.TabIndex = 59
         Me.BsSubtitleLabel.Text = "Bar Code Adjustment/Test"
         Me.BsSubtitleLabel.Title = True
@@ -468,9 +461,10 @@ Partial Class UiBarCodeAdjustments
         Me.BsDemoModeInfoPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.BsDemoModeInfoPanel.Controls.Add(Me.BsInfoXPSViewer)
         Me.BsDemoModeInfoPanel.Controls.Add(Me.BsInfoTitle)
-        Me.BsDemoModeInfoPanel.Location = New System.Drawing.Point(4, 25)
+        Me.BsDemoModeInfoPanel.Dock = System.Windows.Forms.DockStyle.Left
+        Me.BsDemoModeInfoPanel.Location = New System.Drawing.Point(0, 0)
         Me.BsDemoModeInfoPanel.Name = "BsDemoModeInfoPanel"
-        Me.BsDemoModeInfoPanel.Size = New System.Drawing.Size(232, 532)
+        Me.BsDemoModeInfoPanel.Size = New System.Drawing.Size(232, 558)
         Me.BsDemoModeInfoPanel.TabIndex = 65
         '
         'BsInfoXPSViewer
@@ -481,6 +475,7 @@ Partial Class UiBarCodeAdjustments
         Me.BsInfoXPSViewer.CopyButtonVisible = True
         Me.BsInfoXPSViewer.DecreaseZoomButtonCaption = "Zoom Out"
         Me.BsInfoXPSViewer.DecreaseZoomButtonVisible = True
+        Me.BsInfoXPSViewer.Dock = System.Windows.Forms.DockStyle.Fill
         Me.BsInfoXPSViewer.FitToHeightButtonCaption = "Fit To Height"
         Me.BsInfoXPSViewer.FitToHeightButtonVisible = True
         Me.BsInfoXPSViewer.FitToWidthButtonCaption = "Fit To Width"
@@ -490,14 +485,14 @@ Partial Class UiBarCodeAdjustments
         Me.BsInfoXPSViewer.IncreaseZoomButtonVisible = True
         Me.BsInfoXPSViewer.IsLoaded = False
         Me.BsInfoXPSViewer.IsScrollable = False
-        Me.BsInfoXPSViewer.Location = New System.Drawing.Point(0, 22)
+        Me.BsInfoXPSViewer.Location = New System.Drawing.Point(0, 20)
         Me.BsInfoXPSViewer.MenuBarVisible = False
         Me.BsInfoXPSViewer.Name = "BsInfoXPSViewer"
         Me.BsInfoXPSViewer.PopupMenuEnabled = True
         Me.BsInfoXPSViewer.PrintButtonCaption = "Print"
         Me.BsInfoXPSViewer.PrintButtonVisible = True
         Me.BsInfoXPSViewer.SearchBarVisible = False
-        Me.BsInfoXPSViewer.Size = New System.Drawing.Size(230, 510)
+        Me.BsInfoXPSViewer.Size = New System.Drawing.Size(230, 536)
         Me.BsInfoXPSViewer.TabIndex = 35
         Me.BsInfoXPSViewer.TwoPagesButtonCaption = "Two Pages"
         Me.BsInfoXPSViewer.TwoPagesButtonVisible = True
@@ -508,14 +503,13 @@ Partial Class UiBarCodeAdjustments
         '
         'BsInfoTitle
         '
-        Me.BsInfoTitle.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsInfoTitle.BackColor = System.Drawing.Color.LightSteelBlue
+        Me.BsInfoTitle.Dock = System.Windows.Forms.DockStyle.Top
         Me.BsInfoTitle.Font = New System.Drawing.Font("Verdana", 10.0!)
         Me.BsInfoTitle.ForeColor = System.Drawing.Color.Black
         Me.BsInfoTitle.Location = New System.Drawing.Point(0, 0)
         Me.BsInfoTitle.Name = "BsInfoTitle"
-        Me.BsInfoTitle.Size = New System.Drawing.Size(231, 20)
+        Me.BsInfoTitle.Size = New System.Drawing.Size(230, 20)
         Me.BsInfoTitle.TabIndex = 22
         Me.BsInfoTitle.Text = "Information"
         Me.BsInfoTitle.Title = True
@@ -533,22 +527,31 @@ Partial Class UiBarCodeAdjustments
         'TestProcessTimer
         '
         '
-        'IBarCodeAdjustments
+        'Footer
+        '
+        Me.Footer.Controls.Add(Me.BsMessagesPanel)
+        Me.Footer.Controls.Add(Me.BsButtonsPanel)
+        Me.Footer.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.Footer.Location = New System.Drawing.Point(0, 558)
+        Me.Footer.Name = "Footer"
+        Me.Footer.Size = New System.Drawing.Size(978, 35)
+        Me.Footer.TabIndex = 77
+        '
+        'UiBarCodeAdjustments
         '
         Me.AcceptButton = Me.BsExitButton
         Me.Appearance.BackColor = System.Drawing.Color.Gainsboro
-        Me.Appearance.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Appearance.GradientMode = System.Drawing.Drawing2D.LinearGradientMode.ForwardDiagonal
         Me.Appearance.Options.UseBackColor = True
         Me.Appearance.Options.UseFont = True
         Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(978, 593)
-        Me.Controls.Add(Me.BsTitleLabel)
-        Me.Controls.Add(Me.BsDemoModeInfoPanel)
         Me.Controls.Add(Me.BsAdjustPanel)
-        Me.Controls.Add(Me.BsMessagesPanel)
-        Me.Controls.Add(Me.BsButtonsPanel)
+        Me.Controls.Add(Me.BsSubtitleLabel)
+        Me.Controls.Add(Me.BsDemoModeInfoPanel)
+        Me.Controls.Add(Me.Footer)
+        Me.Controls.Add(Me.BsTitleLabel)
         Me.Cursor = System.Windows.Forms.Cursors.Default
         Me.LookAndFeel.SkinName = "Blue"
         Me.LookAndFeel.UseDefaultLookAndFeel = False
@@ -565,8 +568,8 @@ Partial Class UiBarCodeAdjustments
         Me.CenterRotorGroupBox.ResumeLayout(False)
         Me.SelectRotorGroupBox.ResumeLayout(False)
         Me.SelectRotorGroupBox.PerformLayout()
-        CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.BsDemoModeInfoPanel.ResumeLayout(False)
+        Me.Footer.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -581,7 +584,6 @@ Partial Class UiBarCodeAdjustments
     Friend WithEvents BsSaveButtonNOUSED As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents BsAdjustButtonNOUSED As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents BsAdjustPanel As Biosystems.Ax00.Controls.UserControls.BSPanel
-    Private WithEvents PictureBox1 As System.Windows.Forms.PictureBox
     Friend WithEvents BsSubtitleLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
     Friend WithEvents BsDemoModeInfoPanel As Biosystems.Ax00.Controls.UserControls.BSPanel
     Friend WithEvents BsInfoXPSViewer As BsXPSViewer
@@ -604,4 +606,5 @@ Partial Class UiBarCodeAdjustments
     Friend WithEvents ReadedValueLabel As System.Windows.Forms.Label
     Friend WithEvents StopButton As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents TestProcessTimer As System.Windows.Forms.Timer
+    Friend WithEvents Footer As System.Windows.Forms.Panel
 End Class
