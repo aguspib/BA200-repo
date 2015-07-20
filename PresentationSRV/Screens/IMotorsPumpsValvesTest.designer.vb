@@ -26,344 +26,344 @@ Partial Class UiMotorsPumpsValvesTest
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.components = New System.ComponentModel.Container
+        Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiMotorsPumpsValvesTest))
-        Me.BsMessagesPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.ProgressBar1 = New System.Windows.Forms.ProgressBar
-        Me.BsMessageImage = New Biosystems.Ax00.Controls.UserControls.BSPictureBox
-        Me.BsMessageLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsButtonsPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.BsExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.BsCancelButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.BsSaveButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.BsAdjustButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.BsTabPagesControl = New DevExpress.XtraTab.XtraTabControl
-        Me.bsInternalDosingTabPage = New DevExpress.XtraTab.XtraTabPage
-        Me.BsInternalDosingTestPanel = New System.Windows.Forms.Panel
-        Me.InDo_Reagent1_Syringe = New Biosystems.Ax00.Controls.UserControls.BsScadaSyringeControl
-        Me.InDo_Samples_Syringe = New Biosystems.Ax00.Controls.UserControls.BsScadaSyringeControl
-        Me.InDo_Reagent2_Syringe = New Biosystems.Ax00.Controls.UserControls.BsScadaSyringeControl
-        Me.InDo_AirLabel = New System.Windows.Forms.Label
-        Me.InDo_SwitchGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.InDo_StopButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.InDo_SwitchSimpleRButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton
-        Me.InDo_SwitchContinuousRButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton
-        Me.InDo_Motors_AdjustControl = New Biosystems.Ax00.Controls.UserControls.BSAdjustControl
-        Me.InDo_AirWs_Pw_3Evalve = New Biosystems.Ax00.Controls.UserControls.BsScadaValve3Control
-        Me.InDo_Air_Ws_3Evalve = New Biosystems.Ax00.Controls.UserControls.BsScadaValve3Control
-        Me.InDo_DistilledWaterLabel = New System.Windows.Forms.Label
-        Me.InDo_WashingSolutionLabel = New System.Windows.Forms.Label
-        Me.BsScadaPipeControl77 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl76 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.InDo_SourceGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.InDo_SourceTypeLabel = New System.Windows.Forms.Label
-        Me.BsScadaPipeControl16 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl15 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl14 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.InDo_Reagent2_Pump = New Biosystems.Ax00.Controls.UserControls.BsScadaPumpControl
-        Me.BsScadaPipeControl63 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.InDo_Samples_EValve = New Biosystems.Ax00.Controls.UserControls.BsScadaValveControl
-        Me.InDo_Reagent1_Pump = New Biosystems.Ax00.Controls.UserControls.BsScadaPumpControl
-        Me.InDo_Samples_Pump = New Biosystems.Ax00.Controls.UserControls.BsScadaPumpControl
-        Me.InDo_Reagent2_EValve = New Biosystems.Ax00.Controls.UserControls.BsScadaValveControl
-        Me.InDo_Reagent1_EValve = New Biosystems.Ax00.Controls.UserControls.BsScadaValveControl
-        Me.BsScadaPipeControl12 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl10 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl4 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl3 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl2 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl51 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl1 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.InDo_EV4_Label = New System.Windows.Forms.Label
-        Me.BsScadaPipeControl62 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl52 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl53 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl50 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl59 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl57 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl54 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.InDo_EV5_Label = New System.Windows.Forms.Label
-        Me.InDo_JB3_Label = New System.Windows.Forms.Label
-        Me.InDo_JB2_Label = New System.Windows.Forms.Label
-        Me.InDo_JB1_Label = New System.Windows.Forms.Label
-        Me.InDo_EV3_Label = New System.Windows.Forms.Label
-        Me.InDo_EV2_Label = New System.Windows.Forms.Label
-        Me.InDo_EV1_Label = New System.Windows.Forms.Label
-        Me.InDo_Reagent2NeedleLabel = New System.Windows.Forms.Label
-        Me.InDo_Reagent1NeedleLabel = New System.Windows.Forms.Label
-        Me.InDo_SamplesNeedleLabel = New System.Windows.Forms.Label
-        Me.BsInternalDosingTestTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsScadaPipeControl58 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl56 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl55 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl11 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl13 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsInternalDosingMotorsPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.InDo_Reagent2_Motor = New Biosystems.Ax00.Controls.UserControls.BsScadaMotorControl
-        Me.InDo_Samples_Motor = New Biosystems.Ax00.Controls.UserControls.BsScadaMotorControl
-        Me.InDo_Reagent1_Motor = New Biosystems.Ax00.Controls.UserControls.BsScadaMotorControl
-        Me.InDo_M2_Label = New System.Windows.Forms.Label
-        Me.InDo_M1_Label = New System.Windows.Forms.Label
-        Me.InDo_M3_Label = New System.Windows.Forms.Label
-        Me.BsScadaPipeControl17 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl61 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl60 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsInternalDosingInfoPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.BsInfoInDoXPSViewer = New BsXPSViewer
-        Me.BsInternalDosingInfoTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsInternalDosingInfoLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsExternalWashingTabPage = New DevExpress.XtraTab.XtraTabPage
-        Me.BsExternalWashingInfoPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.BsInfoExWaXPSViewer = New BsXPSViewer
-        Me.BsExternalWashingInfoTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsExternalWashingInfoLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsExternalWashingTestPanel = New System.Windows.Forms.Panel
-        Me.ExWa_SwitchGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.ExWa_StopButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.ExWa_SwitchContinuousRButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton
-        Me.ExWa_SwitchSimpleRButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton
-        Me.ExWa_Reagent2NeedleLabel = New System.Windows.Forms.Label
-        Me.ExWa_Reagent1NeedleLabel = New System.Windows.Forms.Label
-        Me.ExWa_SamplesNeedleLabel = New System.Windows.Forms.Label
-        Me.ExWa_B3_Label = New System.Windows.Forms.Label
-        Me.ExWa_B2_Label = New System.Windows.Forms.Label
-        Me.ExWa_B1_Label = New System.Windows.Forms.Label
-        Me.ExWa_DistilledWaterLabel = New System.Windows.Forms.Label
-        Me.BsExternalWashingTestTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.ExWa_Reagent2_Pump = New Biosystems.Ax00.Controls.UserControls.BsScadaPumpControl
-        Me.ExWa_Samples_Pump = New Biosystems.Ax00.Controls.UserControls.BsScadaPumpControl
-        Me.ExWa_Reagent1_Pump = New Biosystems.Ax00.Controls.UserControls.BsScadaPumpControl
-        Me.BsScadaPipeControl20 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl19 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl18 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl21 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl22 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl23 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.ExWa_Samples_WS = New Biosystems.Ax00.Controls.UserControls.BsScadaWashControl
-        Me.ExWa_Reagent1_WS = New Biosystems.Ax00.Controls.UserControls.BsScadaWashControl
-        Me.ExWa_Reagent2_WS = New Biosystems.Ax00.Controls.UserControls.BsScadaWashControl
-        Me.bsAspirationTabPage = New DevExpress.XtraTab.XtraTabPage
-        Me.BsWSAspirationTestPanel = New System.Windows.Forms.Panel
-        Me.WSAsp_UpDownButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.WsAsp_B7_Pump = New Biosystems.Ax00.Controls.UserControls.BsScadaPumpControl
-        Me.WsAsp_B8_Pump = New Biosystems.Ax00.Controls.UserControls.BsScadaPumpControl
-        Me.WsAsp_B6_Pump = New Biosystems.Ax00.Controls.UserControls.BsScadaPumpControl
-        Me.WsAsp_B9_Pump = New Biosystems.Ax00.Controls.UserControls.BsScadaPumpControl
-        Me.WsAsp_B10_Pump = New Biosystems.Ax00.Controls.UserControls.BsScadaPumpControl
-        Me.WsAsp_HCLabel = New System.Windows.Forms.Label
-        Me.WsAsp_LCLabel = New System.Windows.Forms.Label
-        Me.Panel2 = New System.Windows.Forms.Panel
-        Me.Panel1 = New System.Windows.Forms.Panel
-        Me.Panel6 = New System.Windows.Forms.Panel
-        Me.Panel3 = New System.Windows.Forms.Panel
-        Me.Panel7 = New System.Windows.Forms.Panel
-        Me.Panel4 = New System.Windows.Forms.Panel
-        Me.BsScadaPipeControl110 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl108 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.Panel5 = New System.Windows.Forms.Panel
-        Me.BsScadaPipeControl106 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsWSAspirationPipe1 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl88 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl82 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsWSAspirationPipe2 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl79 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsWSAspirationPipe3 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl7 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl5 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsWSAspirationTestTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsScadaPipeControl24 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl26 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl9 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.WsAsp_B10_Label = New System.Windows.Forms.Label
-        Me.WsAsp_B9_Label = New System.Windows.Forms.Label
-        Me.WsAsp_B8_Label = New System.Windows.Forms.Label
-        Me.WsAsp_B7_Label = New System.Windows.Forms.Label
-        Me.WsAsp_B6_Label = New System.Windows.Forms.Label
-        Me.WSAsp_Needle1Label = New System.Windows.Forms.Label
-        Me.WSAsp_Needle23Label = New System.Windows.Forms.Label
-        Me.WSAsp_Needle45Label = New System.Windows.Forms.Label
-        Me.WSAsp_Needle6Label = New System.Windows.Forms.Label
-        Me.WSAsp_Needle7Label = New System.Windows.Forms.Label
-        Me.WSAsp_SwitchGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.WSAsp_StopButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.WsAsp_SwitchContinuousRButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton
-        Me.WsAsp_SwitchSimpleRButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton
-        Me.BsScadaPipeControl78 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl81 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl83 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl89 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl84 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl8 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl25 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl27 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl28 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl6 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl86 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsWSAspirationPipe4 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsWSAspirationPipe5 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsWSAspirationPipe6 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsWSAspirationPipe7 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsWSAspirationInfoPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.BsInfoWsAspXPSViewer = New BsXPSViewer
-        Me.BsWSAspirationInfoTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsWSAspirationInfoLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsDispensationTabPage = New DevExpress.XtraTab.XtraTabPage
-        Me.BsWSDispensationTestPanel = New System.Windows.Forms.Panel
-        Me.WSDisp_UpDownButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.WsDisp_SwitchGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.WsDisp_StopButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.WsDisp_SwitchContinuousRButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton
-        Me.WsDisp_SwitchSimpleRButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton
-        Me.WsDisp_GE5_Valve = New Biosystems.Ax00.Controls.UserControls.BsScadaValve3Control
-        Me.WsDisp_GE4_Valve = New Biosystems.Ax00.Controls.UserControls.BsScadaValve3Control
-        Me.WsDisp_GE3_Valve = New Biosystems.Ax00.Controls.UserControls.BsScadaValve3Control
-        Me.WsDisp_GE2_Valve = New Biosystems.Ax00.Controls.UserControls.BsScadaValve3Control
-        Me.WsDisp_GE1_Valve = New Biosystems.Ax00.Controls.UserControls.BsScadaValve3Control
-        Me.WsDisp_Plunger1Panel_Off = New System.Windows.Forms.Panel
-        Me.WsDisp_Plunger2Panel_Off = New System.Windows.Forms.Panel
-        Me.WsDisp_Plunger3Panel_Off = New System.Windows.Forms.Panel
-        Me.WsDisp_Needle5Panel = New System.Windows.Forms.Panel
-        Me.BsScadaPipeControl97 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsWSDispensationPipe1 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl99 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.WsDisp_Needle4Panel = New System.Windows.Forms.Panel
-        Me.BsScadaPipeControl94 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsWSDispensationPipe2 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl96 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.WsDisp_Needle3Panel = New System.Windows.Forms.Panel
-        Me.BsScadaPipeControl43 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsWSDispensationPipe3 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl93 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.WsDisp_Needle2Panel = New System.Windows.Forms.Panel
-        Me.BsScadaPipeControl40 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsWSDispensationPipe4 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl42 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.WsDisp_Needle1Panel = New System.Windows.Forms.Panel
-        Me.BsScadaPipeControl90 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsWSDispensationPipe5 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.WsDisp_GE5_Label = New System.Windows.Forms.Label
-        Me.WsDisp_GE3_Label = New System.Windows.Forms.Label
-        Me.WsDisp_GE4_Label = New System.Windows.Forms.Label
-        Me.WSDisp_MotorAdjustControl = New Biosystems.Ax00.Controls.UserControls.BSAdjustControl
-        Me.WsDisp_GE2_Label = New System.Windows.Forms.Label
-        Me.WsDisp_GE1_Label = New System.Windows.Forms.Label
-        Me.BsScadaPipeControl39 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.WSDisp_WashingSolutionLabel = New System.Windows.Forms.Label
-        Me.WSDisp_DistilledWaterLabel = New System.Windows.Forms.Label
-        Me.BsScadaPipeControl38 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl37 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl31 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl36 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl35 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl34 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl32 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl33 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl30 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl29 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.WSDisp_Needle5Label = New System.Windows.Forms.Label
-        Me.WSDisp_Needle4Label = New System.Windows.Forms.Label
-        Me.WSDisp_Needle3Label = New System.Windows.Forms.Label
-        Me.WSDisp_Needle2Label = New System.Windows.Forms.Label
-        Me.WSDisp_Needle1Label = New System.Windows.Forms.Label
-        Me.BsWSDispensationTestTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.WsDisp_M1_Motor = New Biosystems.Ax00.Controls.UserControls.BsScadaMotorControl
-        Me.BsScadaPipeControl104 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.WsDisp_Plunger5Panel_Off = New System.Windows.Forms.Panel
-        Me.WsDisp_Plunger4Panel_Off = New System.Windows.Forms.Panel
-        Me.WsDisp_Plunger5Panel_On = New System.Windows.Forms.Panel
-        Me.BsScadaPipeControl45 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl46 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.WsDisp_Plunger4Panel_On = New System.Windows.Forms.Panel
-        Me.WsDisp_Plunger3Panel_On = New System.Windows.Forms.Panel
-        Me.WsDisp_Plunger2Panel_On = New System.Windows.Forms.Panel
-        Me.WsDisp_Plunger1Panel_On = New System.Windows.Forms.Panel
-        Me.BsScadaPipeControl44 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl49 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl48 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl47 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl100 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl101 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl102 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl103 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsWSDispensationInfoPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.BsInfoWsDispXPSViewer = New BsXPSViewer
-        Me.BsWSDispensationInfoTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsInOutTabPage = New DevExpress.XtraTab.XtraTabPage
-        Me.BsInOutInfoPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.BsInfoInOutXPSViewer = New BsXPSViewer
-        Me.BsInOutInfoTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsInOutTestPanel = New System.Windows.Forms.Panel
-        Me.InOut_QuickConectorPictureBox = New Biosystems.Ax00.Controls.UserControls.BSPictureBox
-        Me.BsScadaPipeControl112 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.InOut_ExternalSourceLabel = New System.Windows.Forms.Label
-        Me.InOut_TankPumpLabel = New System.Windows.Forms.Label
-        Me.InOut_TankValveLabel = New System.Windows.Forms.Label
-        Me.InOut_LCPumpLabel = New System.Windows.Forms.Label
-        Me.InOut_SwitchGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.InOut_StopButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.InOut_SwitchContinuousRButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton
-        Me.InOut_SwitchSimpleRButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton
-        Me.InOut_PW_ExternalTankLabel = New System.Windows.Forms.Label
-        Me.InOut_PW_InternalTankLabel = New System.Windows.Forms.Label
-        Me.InOut_PW_Pump = New Biosystems.Ax00.Controls.UserControls.BsScadaPumpControl
-        Me.InOut_LC_Pump = New Biosystems.Ax00.Controls.UserControls.BsScadaPumpControl
-        Me.InOut_PWTank_Valve = New Biosystems.Ax00.Controls.UserControls.BsScadaValveControl
-        Me.InOut_PWSource_Valve = New Biosystems.Ax00.Controls.UserControls.BsScadaValveControl
-        Me.BsScadaPipeControl75 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl74 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl72 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl73 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl70 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl71 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl68 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl69 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl65 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl64 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.InOut_LC_ExternalTankLabel = New System.Windows.Forms.Label
-        Me.InOut_LC_InternalTankLabel = New System.Windows.Forms.Label
-        Me.BsInOutTestTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsScadaPipeControl66 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.BsScadaPipeControl67 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl
-        Me.InOut_ExternalSourcePictureBox = New Biosystems.Ax00.Controls.UserControls.BSPictureBox
-        Me.InOut_WallPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.InOut_SourceValveLabel = New System.Windows.Forms.Label
-        Me.bsCollisionTabPage = New DevExpress.XtraTab.XtraTabPage
-        Me.BsCollisionInfoPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.BsInfoColXPSViewer = New BsXPSViewer
-        Me.BsCollisionInfoTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsCollisionTestPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.Col_TestGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.Col_StartStopButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.Col_SamplesGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.Col_SamplesLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.Col_SamplesLED = New Biosystems.Ax00.Controls.UserControls.BSMonitorLED
-        Me.BsCollisionTestTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.Col_Reagent1GroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.Col_Reagent1Label = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.Col_Reagent1LED = New Biosystems.Ax00.Controls.UserControls.BSMonitorLED
-        Me.Col_Reagent2GroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.Col_Reagent2Label = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.Col_Reagent2LED = New Biosystems.Ax00.Controls.UserControls.BSMonitorLED
-        Me.Col_WashingStationGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.Col_WashingStationLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.Col_WashingStationLED = New Biosystems.Ax00.Controls.UserControls.BSMonitorLED
-        Me.BsEncoderTabPage = New DevExpress.XtraTab.XtraTabPage
-        Me.BsEncoderTestPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.BsEnco_TestPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.Enco_EncoderPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.Enco_UnitsLabel = New System.Windows.Forms.Label
-        Me.Enco_EncoderPosLabel = New System.Windows.Forms.Label
-        Me.BsEncoderTestTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.Enco_MotorAdjustControl = New Biosystems.Ax00.Controls.UserControls.BSAdjustControl
-        Me.Enco_MotorCaptionLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.Enco_EncoderCaptionLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsEncoderInfoPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.BsEncoderInfoTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsEncoderInfoLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
+        Me.BsMessagesPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.ProgressBar1 = New System.Windows.Forms.ProgressBar()
+        Me.BsMessageImage = New Biosystems.Ax00.Controls.UserControls.BSPictureBox()
+        Me.BsMessageLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsButtonsPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.BsExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.BsCancelButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.BsSaveButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.BsAdjustButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.BsTabPagesControl = New DevExpress.XtraTab.XtraTabControl()
+        Me.bsInternalDosingTabPage = New DevExpress.XtraTab.XtraTabPage()
+        Me.BsInternalDosingTestPanel = New System.Windows.Forms.Panel()
+        Me.InDo_Reagent1_Syringe = New Biosystems.Ax00.Controls.UserControls.BsScadaSyringeControl()
+        Me.InDo_Samples_Syringe = New Biosystems.Ax00.Controls.UserControls.BsScadaSyringeControl()
+        Me.InDo_Reagent2_Syringe = New Biosystems.Ax00.Controls.UserControls.BsScadaSyringeControl()
+        Me.InDo_AirLabel = New System.Windows.Forms.Label()
+        Me.InDo_SwitchGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.InDo_StopButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.InDo_SwitchSimpleRButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton()
+        Me.InDo_SwitchContinuousRButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton()
+        Me.InDo_Motors_AdjustControl = New Biosystems.Ax00.Controls.UserControls.BSAdjustControl()
+        Me.InDo_AirWs_Pw_3Evalve = New Biosystems.Ax00.Controls.UserControls.BsScadaValve3Control()
+        Me.InDo_Air_Ws_3Evalve = New Biosystems.Ax00.Controls.UserControls.BsScadaValve3Control()
+        Me.InDo_DistilledWaterLabel = New System.Windows.Forms.Label()
+        Me.InDo_WashingSolutionLabel = New System.Windows.Forms.Label()
+        Me.BsScadaPipeControl77 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl76 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.InDo_SourceGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.InDo_SourceTypeLabel = New System.Windows.Forms.Label()
+        Me.BsScadaPipeControl16 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl15 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl14 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.InDo_Reagent2_Pump = New Biosystems.Ax00.Controls.UserControls.BsScadaPumpControl()
+        Me.BsScadaPipeControl63 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.InDo_Samples_EValve = New Biosystems.Ax00.Controls.UserControls.BsScadaValveControl()
+        Me.InDo_Reagent1_Pump = New Biosystems.Ax00.Controls.UserControls.BsScadaPumpControl()
+        Me.InDo_Samples_Pump = New Biosystems.Ax00.Controls.UserControls.BsScadaPumpControl()
+        Me.InDo_Reagent2_EValve = New Biosystems.Ax00.Controls.UserControls.BsScadaValveControl()
+        Me.InDo_Reagent1_EValve = New Biosystems.Ax00.Controls.UserControls.BsScadaValveControl()
+        Me.BsScadaPipeControl12 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl10 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl4 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl3 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl2 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl51 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl1 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.InDo_EV4_Label = New System.Windows.Forms.Label()
+        Me.BsScadaPipeControl62 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl52 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl53 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl50 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl59 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl57 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl54 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.InDo_EV5_Label = New System.Windows.Forms.Label()
+        Me.InDo_JB3_Label = New System.Windows.Forms.Label()
+        Me.InDo_JB2_Label = New System.Windows.Forms.Label()
+        Me.InDo_JB1_Label = New System.Windows.Forms.Label()
+        Me.InDo_EV3_Label = New System.Windows.Forms.Label()
+        Me.InDo_EV2_Label = New System.Windows.Forms.Label()
+        Me.InDo_EV1_Label = New System.Windows.Forms.Label()
+        Me.InDo_Reagent2NeedleLabel = New System.Windows.Forms.Label()
+        Me.InDo_Reagent1NeedleLabel = New System.Windows.Forms.Label()
+        Me.InDo_SamplesNeedleLabel = New System.Windows.Forms.Label()
+        Me.BsInternalDosingTestTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsScadaPipeControl58 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl56 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl55 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl11 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl13 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsInternalDosingMotorsPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.InDo_Reagent2_Motor = New Biosystems.Ax00.Controls.UserControls.BsScadaMotorControl()
+        Me.InDo_Samples_Motor = New Biosystems.Ax00.Controls.UserControls.BsScadaMotorControl()
+        Me.InDo_Reagent1_Motor = New Biosystems.Ax00.Controls.UserControls.BsScadaMotorControl()
+        Me.InDo_M2_Label = New System.Windows.Forms.Label()
+        Me.InDo_M1_Label = New System.Windows.Forms.Label()
+        Me.InDo_M3_Label = New System.Windows.Forms.Label()
+        Me.BsScadaPipeControl17 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl61 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl60 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsInternalDosingInfoPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.BsInfoInDoXPSViewer = New BsXPSViewer()
+        Me.BsInternalDosingInfoTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsInternalDosingInfoLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsExternalWashingTabPage = New DevExpress.XtraTab.XtraTabPage()
+        Me.BsExternalWashingInfoPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.BsInfoExWaXPSViewer = New BsXPSViewer()
+        Me.BsExternalWashingInfoTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsExternalWashingInfoLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsExternalWashingTestPanel = New System.Windows.Forms.Panel()
+        Me.ExWa_SwitchGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.ExWa_StopButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.ExWa_SwitchContinuousRButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton()
+        Me.ExWa_SwitchSimpleRButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton()
+        Me.ExWa_Reagent2NeedleLabel = New System.Windows.Forms.Label()
+        Me.ExWa_Reagent1NeedleLabel = New System.Windows.Forms.Label()
+        Me.ExWa_SamplesNeedleLabel = New System.Windows.Forms.Label()
+        Me.ExWa_B3_Label = New System.Windows.Forms.Label()
+        Me.ExWa_B2_Label = New System.Windows.Forms.Label()
+        Me.ExWa_B1_Label = New System.Windows.Forms.Label()
+        Me.ExWa_DistilledWaterLabel = New System.Windows.Forms.Label()
+        Me.BsExternalWashingTestTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.ExWa_Reagent2_Pump = New Biosystems.Ax00.Controls.UserControls.BsScadaPumpControl()
+        Me.ExWa_Samples_Pump = New Biosystems.Ax00.Controls.UserControls.BsScadaPumpControl()
+        Me.ExWa_Reagent1_Pump = New Biosystems.Ax00.Controls.UserControls.BsScadaPumpControl()
+        Me.BsScadaPipeControl20 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl19 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl18 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl21 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl22 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl23 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.ExWa_Samples_WS = New Biosystems.Ax00.Controls.UserControls.BsScadaWashControl()
+        Me.ExWa_Reagent1_WS = New Biosystems.Ax00.Controls.UserControls.BsScadaWashControl()
+        Me.ExWa_Reagent2_WS = New Biosystems.Ax00.Controls.UserControls.BsScadaWashControl()
+        Me.bsAspirationTabPage = New DevExpress.XtraTab.XtraTabPage()
+        Me.BsWSAspirationTestPanel = New System.Windows.Forms.Panel()
+        Me.WSAsp_UpDownButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.WsAsp_B7_Pump = New Biosystems.Ax00.Controls.UserControls.BsScadaPumpControl()
+        Me.WsAsp_B8_Pump = New Biosystems.Ax00.Controls.UserControls.BsScadaPumpControl()
+        Me.WsAsp_B6_Pump = New Biosystems.Ax00.Controls.UserControls.BsScadaPumpControl()
+        Me.WsAsp_B9_Pump = New Biosystems.Ax00.Controls.UserControls.BsScadaPumpControl()
+        Me.WsAsp_B10_Pump = New Biosystems.Ax00.Controls.UserControls.BsScadaPumpControl()
+        Me.WsAsp_HCLabel = New System.Windows.Forms.Label()
+        Me.WsAsp_LCLabel = New System.Windows.Forms.Label()
+        Me.Panel2 = New System.Windows.Forms.Panel()
+        Me.Panel1 = New System.Windows.Forms.Panel()
+        Me.Panel6 = New System.Windows.Forms.Panel()
+        Me.Panel3 = New System.Windows.Forms.Panel()
+        Me.Panel7 = New System.Windows.Forms.Panel()
+        Me.Panel4 = New System.Windows.Forms.Panel()
+        Me.BsScadaPipeControl110 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl108 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.Panel5 = New System.Windows.Forms.Panel()
+        Me.BsScadaPipeControl106 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsWSAspirationPipe1 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl88 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl82 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsWSAspirationPipe2 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl79 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsWSAspirationPipe3 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl7 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl5 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsWSAspirationTestTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsScadaPipeControl24 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl26 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl9 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.WsAsp_B10_Label = New System.Windows.Forms.Label()
+        Me.WsAsp_B9_Label = New System.Windows.Forms.Label()
+        Me.WsAsp_B8_Label = New System.Windows.Forms.Label()
+        Me.WsAsp_B7_Label = New System.Windows.Forms.Label()
+        Me.WsAsp_B6_Label = New System.Windows.Forms.Label()
+        Me.WSAsp_Needle1Label = New System.Windows.Forms.Label()
+        Me.WSAsp_Needle23Label = New System.Windows.Forms.Label()
+        Me.WSAsp_Needle45Label = New System.Windows.Forms.Label()
+        Me.WSAsp_Needle6Label = New System.Windows.Forms.Label()
+        Me.WSAsp_Needle7Label = New System.Windows.Forms.Label()
+        Me.WSAsp_SwitchGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.WSAsp_StopButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.WsAsp_SwitchContinuousRButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton()
+        Me.WsAsp_SwitchSimpleRButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton()
+        Me.BsScadaPipeControl78 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl81 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl83 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl89 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl84 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl8 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl25 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl27 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl28 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl6 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl86 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsWSAspirationPipe4 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsWSAspirationPipe5 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsWSAspirationPipe6 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsWSAspirationPipe7 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsWSAspirationInfoPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.BsInfoWsAspXPSViewer = New BsXPSViewer()
+        Me.BsWSAspirationInfoTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsWSAspirationInfoLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsDispensationTabPage = New DevExpress.XtraTab.XtraTabPage()
+        Me.BsWSDispensationTestPanel = New System.Windows.Forms.Panel()
+        Me.WSDisp_UpDownButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.WsDisp_SwitchGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.WsDisp_StopButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.WsDisp_SwitchContinuousRButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton()
+        Me.WsDisp_SwitchSimpleRButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton()
+        Me.WsDisp_GE5_Valve = New Biosystems.Ax00.Controls.UserControls.BsScadaValve3Control()
+        Me.WsDisp_GE4_Valve = New Biosystems.Ax00.Controls.UserControls.BsScadaValve3Control()
+        Me.WsDisp_GE3_Valve = New Biosystems.Ax00.Controls.UserControls.BsScadaValve3Control()
+        Me.WsDisp_GE2_Valve = New Biosystems.Ax00.Controls.UserControls.BsScadaValve3Control()
+        Me.WsDisp_GE1_Valve = New Biosystems.Ax00.Controls.UserControls.BsScadaValve3Control()
+        Me.WsDisp_Plunger1Panel_Off = New System.Windows.Forms.Panel()
+        Me.WsDisp_Plunger2Panel_Off = New System.Windows.Forms.Panel()
+        Me.WsDisp_Plunger3Panel_Off = New System.Windows.Forms.Panel()
+        Me.WsDisp_Needle5Panel = New System.Windows.Forms.Panel()
+        Me.BsScadaPipeControl97 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsWSDispensationPipe1 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl99 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.WsDisp_Needle4Panel = New System.Windows.Forms.Panel()
+        Me.BsScadaPipeControl94 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsWSDispensationPipe2 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl96 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.WsDisp_Needle3Panel = New System.Windows.Forms.Panel()
+        Me.BsScadaPipeControl43 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsWSDispensationPipe3 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl93 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.WsDisp_Needle2Panel = New System.Windows.Forms.Panel()
+        Me.BsScadaPipeControl40 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsWSDispensationPipe4 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl42 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.WsDisp_Needle1Panel = New System.Windows.Forms.Panel()
+        Me.BsScadaPipeControl90 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsWSDispensationPipe5 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.WsDisp_GE5_Label = New System.Windows.Forms.Label()
+        Me.WsDisp_GE3_Label = New System.Windows.Forms.Label()
+        Me.WsDisp_GE4_Label = New System.Windows.Forms.Label()
+        Me.WSDisp_MotorAdjustControl = New Biosystems.Ax00.Controls.UserControls.BSAdjustControl()
+        Me.WsDisp_GE2_Label = New System.Windows.Forms.Label()
+        Me.WsDisp_GE1_Label = New System.Windows.Forms.Label()
+        Me.BsScadaPipeControl39 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.WSDisp_WashingSolutionLabel = New System.Windows.Forms.Label()
+        Me.WSDisp_DistilledWaterLabel = New System.Windows.Forms.Label()
+        Me.BsScadaPipeControl38 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl37 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl31 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl36 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl35 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl34 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl32 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl33 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl30 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl29 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.WSDisp_Needle5Label = New System.Windows.Forms.Label()
+        Me.WSDisp_Needle4Label = New System.Windows.Forms.Label()
+        Me.WSDisp_Needle3Label = New System.Windows.Forms.Label()
+        Me.WSDisp_Needle2Label = New System.Windows.Forms.Label()
+        Me.WSDisp_Needle1Label = New System.Windows.Forms.Label()
+        Me.BsWSDispensationTestTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.WsDisp_M1_Motor = New Biosystems.Ax00.Controls.UserControls.BsScadaMotorControl()
+        Me.BsScadaPipeControl104 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.WsDisp_Plunger5Panel_Off = New System.Windows.Forms.Panel()
+        Me.WsDisp_Plunger4Panel_Off = New System.Windows.Forms.Panel()
+        Me.WsDisp_Plunger5Panel_On = New System.Windows.Forms.Panel()
+        Me.BsScadaPipeControl45 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl46 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.WsDisp_Plunger4Panel_On = New System.Windows.Forms.Panel()
+        Me.WsDisp_Plunger3Panel_On = New System.Windows.Forms.Panel()
+        Me.WsDisp_Plunger2Panel_On = New System.Windows.Forms.Panel()
+        Me.WsDisp_Plunger1Panel_On = New System.Windows.Forms.Panel()
+        Me.BsScadaPipeControl44 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl49 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl48 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl47 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl100 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl101 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl102 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl103 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsWSDispensationInfoPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.BsInfoWsDispXPSViewer = New BsXPSViewer()
+        Me.BsWSDispensationInfoTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsInOutTabPage = New DevExpress.XtraTab.XtraTabPage()
+        Me.BsInOutInfoPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.BsInfoInOutXPSViewer = New BsXPSViewer()
+        Me.BsInOutInfoTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsInOutTestPanel = New System.Windows.Forms.Panel()
+        Me.InOut_QuickConectorPictureBox = New Biosystems.Ax00.Controls.UserControls.BSPictureBox()
+        Me.BsScadaPipeControl112 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.InOut_ExternalSourceLabel = New System.Windows.Forms.Label()
+        Me.InOut_TankPumpLabel = New System.Windows.Forms.Label()
+        Me.InOut_TankValveLabel = New System.Windows.Forms.Label()
+        Me.InOut_LCPumpLabel = New System.Windows.Forms.Label()
+        Me.InOut_SwitchGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.InOut_StopButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.InOut_SwitchContinuousRButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton()
+        Me.InOut_SwitchSimpleRButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton()
+        Me.InOut_PW_ExternalTankLabel = New System.Windows.Forms.Label()
+        Me.InOut_PW_InternalTankLabel = New System.Windows.Forms.Label()
+        Me.InOut_PW_Pump = New Biosystems.Ax00.Controls.UserControls.BsScadaPumpControl()
+        Me.InOut_LC_Pump = New Biosystems.Ax00.Controls.UserControls.BsScadaPumpControl()
+        Me.InOut_PWTank_Valve = New Biosystems.Ax00.Controls.UserControls.BsScadaValveControl()
+        Me.InOut_PWSource_Valve = New Biosystems.Ax00.Controls.UserControls.BsScadaValveControl()
+        Me.BsScadaPipeControl75 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl74 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl72 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl73 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl70 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl71 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl68 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl69 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl65 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl64 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.InOut_LC_ExternalTankLabel = New System.Windows.Forms.Label()
+        Me.InOut_LC_InternalTankLabel = New System.Windows.Forms.Label()
+        Me.BsInOutTestTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsScadaPipeControl66 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.BsScadaPipeControl67 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
+        Me.InOut_ExternalSourcePictureBox = New Biosystems.Ax00.Controls.UserControls.BSPictureBox()
+        Me.InOut_WallPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.InOut_SourceValveLabel = New System.Windows.Forms.Label()
+        Me.bsCollisionTabPage = New DevExpress.XtraTab.XtraTabPage()
+        Me.BsCollisionInfoPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.BsInfoColXPSViewer = New BsXPSViewer()
+        Me.BsCollisionInfoTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsCollisionTestPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.Col_TestGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.Col_StartStopButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.Col_SamplesGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.Col_SamplesLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.Col_SamplesLED = New Biosystems.Ax00.Controls.UserControls.BSMonitorLED()
+        Me.BsCollisionTestTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.Col_Reagent1GroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.Col_Reagent1Label = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.Col_Reagent1LED = New Biosystems.Ax00.Controls.UserControls.BSMonitorLED()
+        Me.Col_Reagent2GroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.Col_Reagent2Label = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.Col_Reagent2LED = New Biosystems.Ax00.Controls.UserControls.BSMonitorLED()
+        Me.Col_WashingStationGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.Col_WashingStationLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.Col_WashingStationLED = New Biosystems.Ax00.Controls.UserControls.BSMonitorLED()
+        Me.BsEncoderTabPage = New DevExpress.XtraTab.XtraTabPage()
+        Me.BsEncoderTestPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.BsEnco_TestPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.Enco_EncoderPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.Enco_UnitsLabel = New System.Windows.Forms.Label()
+        Me.Enco_EncoderPosLabel = New System.Windows.Forms.Label()
+        Me.BsEncoderTestTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.Enco_MotorAdjustControl = New Biosystems.Ax00.Controls.UserControls.BSAdjustControl()
+        Me.Enco_MotorCaptionLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.Enco_EncoderCaptionLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsEncoderInfoPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.BsEncoderInfoTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsEncoderInfoLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
         Me.BsHomingSimulationTimer = New System.Windows.Forms.Timer(Me.components)
         Me.BsSimulateContinuousTimer = New System.Windows.Forms.Timer(Me.components)
         Me.BsCollisionSimulationTimer = New System.Windows.Forms.Timer(Me.components)
-        Me.bsScreenToolTips2 = New Biosystems.Ax00.Controls.UserControls.BSToolTip
+        Me.bsScreenToolTips2 = New Biosystems.Ax00.Controls.UserControls.BSToolTip()
         Me.BsMessagesPanel.SuspendLayout()
         CType(Me.BsMessageImage, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.BsButtonsPanel.SuspendLayout()
@@ -412,7 +412,7 @@ Partial Class UiMotorsPumpsValvesTest
         'BsMessagesPanel
         '
         Me.BsMessagesPanel.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsMessagesPanel.BackColor = System.Drawing.Color.WhiteSmoke
         Me.BsMessagesPanel.Controls.Add(Me.ProgressBar1)
         Me.BsMessagesPanel.Controls.Add(Me.BsMessageImage)
@@ -525,7 +525,7 @@ Partial Class UiMotorsPumpsValvesTest
         Me.bsInternalDosingTabPage.Controls.Add(Me.BsInternalDosingTestPanel)
         Me.bsInternalDosingTabPage.Controls.Add(Me.BsInternalDosingInfoPanel)
         Me.bsInternalDosingTabPage.Name = "bsInternalDosingTabPage"
-        Me.bsInternalDosingTabPage.Size = New System.Drawing.Size(970, 529)
+        Me.bsInternalDosingTabPage.Size = New System.Drawing.Size(970, 530)
         Me.bsInternalDosingTabPage.Text = "Internal Dosing"
         '
         'BsInternalDosingTestPanel
@@ -1794,7 +1794,7 @@ Partial Class UiMotorsPumpsValvesTest
         'BsInternalDosingTestTitleLabel
         '
         Me.BsInternalDosingTestTitleLabel.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsInternalDosingTestTitleLabel.BackColor = System.Drawing.Color.LightSteelBlue
         Me.BsInternalDosingTestTitleLabel.Font = New System.Drawing.Font("Verdana", 10.0!)
         Me.BsInternalDosingTestTitleLabel.ForeColor = System.Drawing.Color.Black
@@ -2214,8 +2214,8 @@ Partial Class UiMotorsPumpsValvesTest
         Me.BsInfoInDoXPSViewer.ActualZoomButtonCaption = "Actual Zoom"
         Me.BsInfoInDoXPSViewer.ActualZoomButtonVisible = True
         Me.BsInfoInDoXPSViewer.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsInfoInDoXPSViewer.CopyButtonCaption = "Copy"
         Me.BsInfoInDoXPSViewer.CopyButtonVisible = True
         Me.BsInfoInDoXPSViewer.DecreaseZoomButtonCaption = "Zoom Out"
@@ -2224,9 +2224,10 @@ Partial Class UiMotorsPumpsValvesTest
         Me.BsInfoInDoXPSViewer.FitToHeightButtonVisible = True
         Me.BsInfoInDoXPSViewer.FitToWidthButtonCaption = "Fit To Width"
         Me.BsInfoInDoXPSViewer.FitToWidthButtonVisible = True
-        Me.BsInfoInDoXPSViewer.HorizontalPageMargin = 10
+        Me.BsInfoInDoXPSViewer.HorizontalPageMargin = 0
         Me.BsInfoInDoXPSViewer.IncreaseZoomButtonCaption = "Zoom In"
         Me.BsInfoInDoXPSViewer.IncreaseZoomButtonVisible = True
+        Me.BsInfoInDoXPSViewer.IsLoaded = False
         Me.BsInfoInDoXPSViewer.IsScrollable = False
         Me.BsInfoInDoXPSViewer.Location = New System.Drawing.Point(0, 22)
         Me.BsInfoInDoXPSViewer.MenuBarVisible = False
@@ -2239,14 +2240,14 @@ Partial Class UiMotorsPumpsValvesTest
         Me.BsInfoInDoXPSViewer.TabIndex = 86
         Me.BsInfoInDoXPSViewer.TwoPagesButtonCaption = "Two Pages"
         Me.BsInfoInDoXPSViewer.TwoPagesButtonVisible = True
-        Me.BsInfoInDoXPSViewer.VerticalPageMargin = 10
+        Me.BsInfoInDoXPSViewer.VerticalPageMargin = 0
         Me.BsInfoInDoXPSViewer.WholePageButtonCaption = "Whole Page"
         Me.BsInfoInDoXPSViewer.WholePageButtonVisible = True
         '
         'BsInternalDosingInfoTitleLabel
         '
         Me.BsInternalDosingInfoTitleLabel.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsInternalDosingInfoTitleLabel.BackColor = System.Drawing.Color.LightSteelBlue
         Me.BsInternalDosingInfoTitleLabel.Font = New System.Drawing.Font("Verdana", 10.0!)
         Me.BsInternalDosingInfoTitleLabel.ForeColor = System.Drawing.Color.Black
@@ -2260,8 +2261,8 @@ Partial Class UiMotorsPumpsValvesTest
         'BsInternalDosingInfoLabel
         '
         Me.BsInternalDosingInfoLabel.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsInternalDosingInfoLabel.BackColor = System.Drawing.Color.Transparent
         Me.BsInternalDosingInfoLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
         Me.BsInternalDosingInfoLabel.ForeColor = System.Drawing.Color.Black
@@ -2277,7 +2278,7 @@ Partial Class UiMotorsPumpsValvesTest
         Me.bsExternalWashingTabPage.Controls.Add(Me.BsExternalWashingTestPanel)
         Me.bsExternalWashingTabPage.Name = "bsExternalWashingTabPage"
         Me.bsExternalWashingTabPage.Padding = New System.Windows.Forms.Padding(3)
-        Me.bsExternalWashingTabPage.Size = New System.Drawing.Size(970, 529)
+        Me.bsExternalWashingTabPage.Size = New System.Drawing.Size(970, 530)
         Me.bsExternalWashingTabPage.Text = "External Washing"
         '
         'BsExternalWashingInfoPanel
@@ -2296,8 +2297,8 @@ Partial Class UiMotorsPumpsValvesTest
         Me.BsInfoExWaXPSViewer.ActualZoomButtonCaption = "Actual Zoom"
         Me.BsInfoExWaXPSViewer.ActualZoomButtonVisible = True
         Me.BsInfoExWaXPSViewer.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsInfoExWaXPSViewer.CopyButtonCaption = "Copy"
         Me.BsInfoExWaXPSViewer.CopyButtonVisible = True
         Me.BsInfoExWaXPSViewer.DecreaseZoomButtonCaption = "Zoom Out"
@@ -2306,9 +2307,10 @@ Partial Class UiMotorsPumpsValvesTest
         Me.BsInfoExWaXPSViewer.FitToHeightButtonVisible = True
         Me.BsInfoExWaXPSViewer.FitToWidthButtonCaption = "Fit To Width"
         Me.BsInfoExWaXPSViewer.FitToWidthButtonVisible = True
-        Me.BsInfoExWaXPSViewer.HorizontalPageMargin = 10
+        Me.BsInfoExWaXPSViewer.HorizontalPageMargin = 0
         Me.BsInfoExWaXPSViewer.IncreaseZoomButtonCaption = "Zoom In"
         Me.BsInfoExWaXPSViewer.IncreaseZoomButtonVisible = True
+        Me.BsInfoExWaXPSViewer.IsLoaded = False
         Me.BsInfoExWaXPSViewer.IsScrollable = False
         Me.BsInfoExWaXPSViewer.Location = New System.Drawing.Point(0, 22)
         Me.BsInfoExWaXPSViewer.MenuBarVisible = False
@@ -2321,14 +2323,14 @@ Partial Class UiMotorsPumpsValvesTest
         Me.BsInfoExWaXPSViewer.TabIndex = 87
         Me.BsInfoExWaXPSViewer.TwoPagesButtonCaption = "Two Pages"
         Me.BsInfoExWaXPSViewer.TwoPagesButtonVisible = True
-        Me.BsInfoExWaXPSViewer.VerticalPageMargin = 10
+        Me.BsInfoExWaXPSViewer.VerticalPageMargin = 0
         Me.BsInfoExWaXPSViewer.WholePageButtonCaption = "Whole Page"
         Me.BsInfoExWaXPSViewer.WholePageButtonVisible = True
         '
         'BsExternalWashingInfoTitleLabel
         '
         Me.BsExternalWashingInfoTitleLabel.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsExternalWashingInfoTitleLabel.BackColor = System.Drawing.Color.LightSteelBlue
         Me.BsExternalWashingInfoTitleLabel.Font = New System.Drawing.Font("Verdana", 10.0!)
         Me.BsExternalWashingInfoTitleLabel.ForeColor = System.Drawing.Color.Black
@@ -2342,8 +2344,8 @@ Partial Class UiMotorsPumpsValvesTest
         'BsExternalWashingInfoLabel
         '
         Me.BsExternalWashingInfoLabel.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsExternalWashingInfoLabel.BackColor = System.Drawing.Color.Transparent
         Me.BsExternalWashingInfoLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
         Me.BsExternalWashingInfoLabel.ForeColor = System.Drawing.Color.Black
@@ -2456,6 +2458,7 @@ Partial Class UiMotorsPumpsValvesTest
         Me.ExWa_SamplesNeedleLabel.Size = New System.Drawing.Size(72, 32)
         Me.ExWa_SamplesNeedleLabel.TabIndex = 104
         Me.ExWa_SamplesNeedleLabel.Text = "Samples needle"
+        Me.ExWa_SamplesNeedleLabel.UseMnemonic = False
         '
         'ExWa_B3_Label
         '
@@ -2503,7 +2506,7 @@ Partial Class UiMotorsPumpsValvesTest
         'BsExternalWashingTestTitleLabel
         '
         Me.BsExternalWashingTestTitleLabel.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsExternalWashingTestTitleLabel.BackColor = System.Drawing.Color.LightSteelBlue
         Me.BsExternalWashingTestTitleLabel.Font = New System.Drawing.Font("Verdana", 10.0!)
         Me.BsExternalWashingTestTitleLabel.ForeColor = System.Drawing.Color.Black
@@ -2871,7 +2874,7 @@ Partial Class UiMotorsPumpsValvesTest
         Me.bsAspirationTabPage.Controls.Add(Me.BsWSAspirationInfoPanel)
         Me.bsAspirationTabPage.Name = "bsAspirationTabPage"
         Me.bsAspirationTabPage.Padding = New System.Windows.Forms.Padding(3)
-        Me.bsAspirationTabPage.Size = New System.Drawing.Size(970, 529)
+        Me.bsAspirationTabPage.Size = New System.Drawing.Size(970, 530)
         Me.bsAspirationTabPage.Text = "Washing Station (aspiration)"
         '
         'BsWSAspirationTestPanel
@@ -3533,7 +3536,7 @@ Partial Class UiMotorsPumpsValvesTest
         'BsWSAspirationTestTitleLabel
         '
         Me.BsWSAspirationTestTitleLabel.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsWSAspirationTestTitleLabel.BackColor = System.Drawing.Color.LightSteelBlue
         Me.BsWSAspirationTestTitleLabel.Font = New System.Drawing.Font("Verdana", 10.0!)
         Me.BsWSAspirationTestTitleLabel.ForeColor = System.Drawing.Color.Black
@@ -4283,8 +4286,8 @@ Partial Class UiMotorsPumpsValvesTest
         Me.BsInfoWsAspXPSViewer.ActualZoomButtonCaption = "Actual Zoom"
         Me.BsInfoWsAspXPSViewer.ActualZoomButtonVisible = True
         Me.BsInfoWsAspXPSViewer.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsInfoWsAspXPSViewer.CopyButtonCaption = "Copy"
         Me.BsInfoWsAspXPSViewer.CopyButtonVisible = True
         Me.BsInfoWsAspXPSViewer.DecreaseZoomButtonCaption = "Zoom Out"
@@ -4296,6 +4299,7 @@ Partial Class UiMotorsPumpsValvesTest
         Me.BsInfoWsAspXPSViewer.HorizontalPageMargin = 10
         Me.BsInfoWsAspXPSViewer.IncreaseZoomButtonCaption = "Zoom In"
         Me.BsInfoWsAspXPSViewer.IncreaseZoomButtonVisible = True
+        Me.BsInfoWsAspXPSViewer.IsLoaded = False
         Me.BsInfoWsAspXPSViewer.IsScrollable = False
         Me.BsInfoWsAspXPSViewer.Location = New System.Drawing.Point(0, 22)
         Me.BsInfoWsAspXPSViewer.MenuBarVisible = False
@@ -4315,7 +4319,7 @@ Partial Class UiMotorsPumpsValvesTest
         'BsWSAspirationInfoTitleLabel
         '
         Me.BsWSAspirationInfoTitleLabel.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsWSAspirationInfoTitleLabel.BackColor = System.Drawing.Color.LightSteelBlue
         Me.BsWSAspirationInfoTitleLabel.Font = New System.Drawing.Font("Verdana", 10.0!)
         Me.BsWSAspirationInfoTitleLabel.ForeColor = System.Drawing.Color.Black
@@ -4329,8 +4333,8 @@ Partial Class UiMotorsPumpsValvesTest
         'BsWSAspirationInfoLabel
         '
         Me.BsWSAspirationInfoLabel.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsWSAspirationInfoLabel.BackColor = System.Drawing.Color.Transparent
         Me.BsWSAspirationInfoLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
         Me.BsWSAspirationInfoLabel.ForeColor = System.Drawing.Color.Black
@@ -4346,7 +4350,7 @@ Partial Class UiMotorsPumpsValvesTest
         Me.bsDispensationTabPage.Controls.Add(Me.BsWSDispensationInfoPanel)
         Me.bsDispensationTabPage.Name = "bsDispensationTabPage"
         Me.bsDispensationTabPage.Padding = New System.Windows.Forms.Padding(3)
-        Me.bsDispensationTabPage.Size = New System.Drawing.Size(970, 529)
+        Me.bsDispensationTabPage.Size = New System.Drawing.Size(970, 530)
         Me.bsDispensationTabPage.Text = "Washing Station (dispensation)"
         '
         'BsWSDispensationTestPanel
@@ -5681,7 +5685,7 @@ Partial Class UiMotorsPumpsValvesTest
         'BsWSDispensationTestTitleLabel
         '
         Me.BsWSDispensationTestTitleLabel.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsWSDispensationTestTitleLabel.BackColor = System.Drawing.Color.LightSteelBlue
         Me.BsWSDispensationTestTitleLabel.Font = New System.Drawing.Font("Verdana", 10.0!)
         Me.BsWSDispensationTestTitleLabel.ForeColor = System.Drawing.Color.Black
@@ -6164,8 +6168,8 @@ Partial Class UiMotorsPumpsValvesTest
         Me.BsInfoWsDispXPSViewer.ActualZoomButtonCaption = "Actual Zoom"
         Me.BsInfoWsDispXPSViewer.ActualZoomButtonVisible = True
         Me.BsInfoWsDispXPSViewer.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsInfoWsDispXPSViewer.CopyButtonCaption = "Copy"
         Me.BsInfoWsDispXPSViewer.CopyButtonVisible = True
         Me.BsInfoWsDispXPSViewer.DecreaseZoomButtonCaption = "Zoom Out"
@@ -6177,6 +6181,7 @@ Partial Class UiMotorsPumpsValvesTest
         Me.BsInfoWsDispXPSViewer.HorizontalPageMargin = 10
         Me.BsInfoWsDispXPSViewer.IncreaseZoomButtonCaption = "Zoom In"
         Me.BsInfoWsDispXPSViewer.IncreaseZoomButtonVisible = True
+        Me.BsInfoWsDispXPSViewer.IsLoaded = False
         Me.BsInfoWsDispXPSViewer.IsScrollable = False
         Me.BsInfoWsDispXPSViewer.Location = New System.Drawing.Point(0, 22)
         Me.BsInfoWsDispXPSViewer.MenuBarVisible = False
@@ -6196,7 +6201,7 @@ Partial Class UiMotorsPumpsValvesTest
         'BsWSDispensationInfoTitleLabel
         '
         Me.BsWSDispensationInfoTitleLabel.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsWSDispensationInfoTitleLabel.BackColor = System.Drawing.Color.LightSteelBlue
         Me.BsWSDispensationInfoTitleLabel.Font = New System.Drawing.Font("Verdana", 10.0!)
         Me.BsWSDispensationInfoTitleLabel.ForeColor = System.Drawing.Color.Black
@@ -6213,7 +6218,7 @@ Partial Class UiMotorsPumpsValvesTest
         Me.bsInOutTabPage.Controls.Add(Me.BsInOutTestPanel)
         Me.bsInOutTabPage.Name = "bsInOutTabPage"
         Me.bsInOutTabPage.Padding = New System.Windows.Forms.Padding(3)
-        Me.bsInOutTabPage.Size = New System.Drawing.Size(970, 529)
+        Me.bsInOutTabPage.Size = New System.Drawing.Size(970, 530)
         Me.bsInOutTabPage.Text = "In / Out"
         '
         'BsInOutInfoPanel
@@ -6231,8 +6236,8 @@ Partial Class UiMotorsPumpsValvesTest
         Me.BsInfoInOutXPSViewer.ActualZoomButtonCaption = "Actual Zoom"
         Me.BsInfoInOutXPSViewer.ActualZoomButtonVisible = True
         Me.BsInfoInOutXPSViewer.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsInfoInOutXPSViewer.CopyButtonCaption = "Copy"
         Me.BsInfoInOutXPSViewer.CopyButtonVisible = True
         Me.BsInfoInOutXPSViewer.DecreaseZoomButtonCaption = "Zoom Out"
@@ -6244,6 +6249,7 @@ Partial Class UiMotorsPumpsValvesTest
         Me.BsInfoInOutXPSViewer.HorizontalPageMargin = 10
         Me.BsInfoInOutXPSViewer.IncreaseZoomButtonCaption = "Zoom In"
         Me.BsInfoInOutXPSViewer.IncreaseZoomButtonVisible = True
+        Me.BsInfoInOutXPSViewer.IsLoaded = False
         Me.BsInfoInOutXPSViewer.IsScrollable = False
         Me.BsInfoInOutXPSViewer.Location = New System.Drawing.Point(0, 22)
         Me.BsInfoInOutXPSViewer.MenuBarVisible = False
@@ -6263,7 +6269,7 @@ Partial Class UiMotorsPumpsValvesTest
         'BsInOutInfoTitleLabel
         '
         Me.BsInOutInfoTitleLabel.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsInOutInfoTitleLabel.BackColor = System.Drawing.Color.LightSteelBlue
         Me.BsInOutInfoTitleLabel.Font = New System.Drawing.Font("Verdana", 10.0!)
         Me.BsInOutInfoTitleLabel.ForeColor = System.Drawing.Color.Black
@@ -6932,7 +6938,7 @@ Partial Class UiMotorsPumpsValvesTest
         'BsInOutTestTitleLabel
         '
         Me.BsInOutTestTitleLabel.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsInOutTestTitleLabel.BackColor = System.Drawing.Color.LightSteelBlue
         Me.BsInOutTestTitleLabel.Font = New System.Drawing.Font("Verdana", 10.0!)
         Me.BsInOutTestTitleLabel.ForeColor = System.Drawing.Color.Black
@@ -7045,7 +7051,7 @@ Partial Class UiMotorsPumpsValvesTest
         Me.bsCollisionTabPage.Controls.Add(Me.BsCollisionInfoPanel)
         Me.bsCollisionTabPage.Controls.Add(Me.BsCollisionTestPanel)
         Me.bsCollisionTabPage.Name = "bsCollisionTabPage"
-        Me.bsCollisionTabPage.Size = New System.Drawing.Size(970, 529)
+        Me.bsCollisionTabPage.Size = New System.Drawing.Size(970, 530)
         Me.bsCollisionTabPage.Text = "Collision sensors"
         '
         'BsCollisionInfoPanel
@@ -7063,8 +7069,8 @@ Partial Class UiMotorsPumpsValvesTest
         Me.BsInfoColXPSViewer.ActualZoomButtonCaption = "Actual Zoom"
         Me.BsInfoColXPSViewer.ActualZoomButtonVisible = True
         Me.BsInfoColXPSViewer.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsInfoColXPSViewer.CopyButtonCaption = "Copy"
         Me.BsInfoColXPSViewer.CopyButtonVisible = True
         Me.BsInfoColXPSViewer.DecreaseZoomButtonCaption = "Zoom Out"
@@ -7076,6 +7082,7 @@ Partial Class UiMotorsPumpsValvesTest
         Me.BsInfoColXPSViewer.HorizontalPageMargin = 10
         Me.BsInfoColXPSViewer.IncreaseZoomButtonCaption = "Zoom In"
         Me.BsInfoColXPSViewer.IncreaseZoomButtonVisible = True
+        Me.BsInfoColXPSViewer.IsLoaded = False
         Me.BsInfoColXPSViewer.IsScrollable = False
         Me.BsInfoColXPSViewer.Location = New System.Drawing.Point(0, 22)
         Me.BsInfoColXPSViewer.MenuBarVisible = False
@@ -7095,7 +7102,7 @@ Partial Class UiMotorsPumpsValvesTest
         'BsCollisionInfoTitleLabel
         '
         Me.BsCollisionInfoTitleLabel.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsCollisionInfoTitleLabel.BackColor = System.Drawing.Color.LightSteelBlue
         Me.BsCollisionInfoTitleLabel.Font = New System.Drawing.Font("Verdana", 10.0!)
         Me.BsCollisionInfoTitleLabel.ForeColor = System.Drawing.Color.Black
@@ -7109,8 +7116,8 @@ Partial Class UiMotorsPumpsValvesTest
         'BsCollisionTestPanel
         '
         Me.BsCollisionTestPanel.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsCollisionTestPanel.BackColor = System.Drawing.Color.Gainsboro
         Me.BsCollisionTestPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.BsCollisionTestPanel.Controls.Add(Me.Col_TestGroupBox)
@@ -7179,8 +7186,8 @@ Partial Class UiMotorsPumpsValvesTest
         Me.Col_SamplesLED.CurrentStatus = Biosystems.Ax00.Controls.UserControls.BSMonitorControlBase.Status.DISABLED
         Me.Col_SamplesLED.LightColor = CType(resources.GetObject("Col_SamplesLED.LightColor"), System.Collections.Generic.List(Of System.Drawing.Color))
         Me.Col_SamplesLED.Location = New System.Drawing.Point(15, 23)
-        Me.Col_SamplesLED.MaxLimit = 100
-        Me.Col_SamplesLED.MinLimit = 0
+        Me.Col_SamplesLED.MaxLimit = 100.0R
+        Me.Col_SamplesLED.MinLimit = 0.0R
         Me.Col_SamplesLED.Name = "Col_SamplesLED"
         Me.Col_SamplesLED.Size = New System.Drawing.Size(42, 42)
         Me.Col_SamplesLED.TabIndex = 0
@@ -7233,8 +7240,8 @@ Partial Class UiMotorsPumpsValvesTest
         Me.Col_Reagent1LED.CurrentStatus = Biosystems.Ax00.Controls.UserControls.BSMonitorControlBase.Status.DISABLED
         Me.Col_Reagent1LED.LightColor = CType(resources.GetObject("Col_Reagent1LED.LightColor"), System.Collections.Generic.List(Of System.Drawing.Color))
         Me.Col_Reagent1LED.Location = New System.Drawing.Point(15, 25)
-        Me.Col_Reagent1LED.MaxLimit = 100
-        Me.Col_Reagent1LED.MinLimit = 0
+        Me.Col_Reagent1LED.MaxLimit = 100.0R
+        Me.Col_Reagent1LED.MinLimit = 0.0R
         Me.Col_Reagent1LED.Name = "Col_Reagent1LED"
         Me.Col_Reagent1LED.Size = New System.Drawing.Size(42, 42)
         Me.Col_Reagent1LED.TabIndex = 0
@@ -7275,8 +7282,8 @@ Partial Class UiMotorsPumpsValvesTest
         Me.Col_Reagent2LED.CurrentStatus = Biosystems.Ax00.Controls.UserControls.BSMonitorControlBase.Status.DISABLED
         Me.Col_Reagent2LED.LightColor = CType(resources.GetObject("Col_Reagent2LED.LightColor"), System.Collections.Generic.List(Of System.Drawing.Color))
         Me.Col_Reagent2LED.Location = New System.Drawing.Point(15, 25)
-        Me.Col_Reagent2LED.MaxLimit = 100
-        Me.Col_Reagent2LED.MinLimit = 0
+        Me.Col_Reagent2LED.MaxLimit = 100.0R
+        Me.Col_Reagent2LED.MinLimit = 0.0R
         Me.Col_Reagent2LED.Name = "Col_Reagent2LED"
         Me.Col_Reagent2LED.Size = New System.Drawing.Size(42, 42)
         Me.Col_Reagent2LED.TabIndex = 0
@@ -7317,8 +7324,8 @@ Partial Class UiMotorsPumpsValvesTest
         Me.Col_WashingStationLED.CurrentStatus = Biosystems.Ax00.Controls.UserControls.BSMonitorControlBase.Status.DISABLED
         Me.Col_WashingStationLED.LightColor = CType(resources.GetObject("Col_WashingStationLED.LightColor"), System.Collections.Generic.List(Of System.Drawing.Color))
         Me.Col_WashingStationLED.Location = New System.Drawing.Point(18, 24)
-        Me.Col_WashingStationLED.MaxLimit = 100
-        Me.Col_WashingStationLED.MinLimit = 0
+        Me.Col_WashingStationLED.MaxLimit = 100.0R
+        Me.Col_WashingStationLED.MinLimit = 0.0R
         Me.Col_WashingStationLED.Name = "Col_WashingStationLED"
         Me.Col_WashingStationLED.Size = New System.Drawing.Size(42, 42)
         Me.Col_WashingStationLED.TabIndex = 0
@@ -7335,14 +7342,14 @@ Partial Class UiMotorsPumpsValvesTest
         Me.BsEncoderTabPage.Name = "BsEncoderTabPage"
         Me.BsEncoderTabPage.PageEnabled = False
         Me.BsEncoderTabPage.PageVisible = False
-        Me.BsEncoderTabPage.Size = New System.Drawing.Size(970, 529)
+        Me.BsEncoderTabPage.Size = New System.Drawing.Size(970, 530)
         Me.BsEncoderTabPage.Text = "Reactions Rotor Encoder"
         '
         'BsEncoderTestPanel
         '
         Me.BsEncoderTestPanel.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsEncoderTestPanel.BackColor = System.Drawing.Color.Gainsboro
         Me.BsEncoderTestPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.BsEncoderTestPanel.Controls.Add(Me.BsEnco_TestPanel)
@@ -7354,8 +7361,8 @@ Partial Class UiMotorsPumpsValvesTest
         'BsEnco_TestPanel
         '
         Me.BsEnco_TestPanel.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsEnco_TestPanel.BackColor = System.Drawing.Color.Gainsboro
         Me.BsEnco_TestPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.BsEnco_TestPanel.Controls.Add(Me.Enco_EncoderPanel)
@@ -7395,7 +7402,7 @@ Partial Class UiMotorsPumpsValvesTest
         'Enco_EncoderPosLabel
         '
         Me.Enco_EncoderPosLabel.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.Enco_EncoderPosLabel.BackColor = System.Drawing.Color.Black
         Me.Enco_EncoderPosLabel.Font = New System.Drawing.Font("Microsoft Sans Serif", 27.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Enco_EncoderPosLabel.ForeColor = System.Drawing.Color.Red
@@ -7495,7 +7502,7 @@ Partial Class UiMotorsPumpsValvesTest
         'BsEncoderInfoTitleLabel
         '
         Me.BsEncoderInfoTitleLabel.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsEncoderInfoTitleLabel.BackColor = System.Drawing.Color.LightSteelBlue
         Me.BsEncoderInfoTitleLabel.Font = New System.Drawing.Font("Verdana", 10.0!)
         Me.BsEncoderInfoTitleLabel.ForeColor = System.Drawing.Color.Black
@@ -7509,8 +7516,8 @@ Partial Class UiMotorsPumpsValvesTest
         'BsEncoderInfoLabel
         '
         Me.BsEncoderInfoLabel.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsEncoderInfoLabel.BackColor = System.Drawing.Color.Transparent
         Me.BsEncoderInfoLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
         Me.BsEncoderInfoLabel.ForeColor = System.Drawing.Color.Black
@@ -7532,11 +7539,10 @@ Partial Class UiMotorsPumpsValvesTest
         '
         Me.BsCollisionSimulationTimer.Interval = 1000
         '
-        'IMotorsPumpsValvesTest
+        'UiMotorsPumpsValvesTest
         '
         Me.AcceptButton = Me.BsExitButton
         Me.Appearance.BackColor = System.Drawing.Color.Gainsboro
-        Me.Appearance.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Appearance.GradientMode = System.Drawing.Drawing2D.LinearGradientMode.ForwardDiagonal
         Me.Appearance.Options.UseBackColor = True
         Me.Appearance.Options.UseFont = True
@@ -7546,6 +7552,7 @@ Partial Class UiMotorsPumpsValvesTest
         Me.Controls.Add(Me.BsMessagesPanel)
         Me.Controls.Add(Me.BsButtonsPanel)
         Me.Controls.Add(Me.BsTabPagesControl)
+        Me.Cursor = System.Windows.Forms.Cursors.Default
         Me.LookAndFeel.SkinName = "Blue"
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.Name = "UiMotorsPumpsValvesTest"
