@@ -748,7 +748,7 @@
         <InstructionTO>
           <InstructionID>3</InstructionID>
           <Sequence>3</Sequence>
-          <Timer>2000</Timer>
+          <Timer>3000</Timer>
           <Code>END</Code>
           <Params />
           <EnableEdition>false</EnableEdition>
