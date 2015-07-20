@@ -2182,6 +2182,7 @@ Public Class UiBarCodeAdjustments
 
     Private Sub SaveButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles SaveButton.Click
         Try
+            myScreenDelegate.BarcodeLaserEnabled = False
             MyBase.DisplayMessage("")
             Me.SaveAdjustment()
 
@@ -2195,7 +2196,7 @@ Public Class UiBarCodeAdjustments
         'Dim myGlobal As New GlobalDataTO
         Dim dialogResultToReturn As DialogResult = DialogResult.No
         Try
-
+            myScreenDelegate.BarcodeLaserEnabled = False
             If Me.ChangedValue Then
                 dialogResultToReturn = MyBase.ShowMessage("", Messages.SRV_DISCARD_CHANGES.ToString)
 
