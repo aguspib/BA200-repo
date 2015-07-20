@@ -1610,7 +1610,7 @@ Public Class UiPositionsAdjustments
 
             Return Table
 
-        Catch ex As Exception            
+        Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Name & ".CreateChartDataCounts", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Name & ".CreateChartDataCounts", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             Return Nothing
@@ -1659,7 +1659,7 @@ Public Class UiPositionsAdjustments
 
             Return Table
 
-        Catch ex As Exception            
+        Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Name & ".CreateChartDataEncoder", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Name & ".CreateChartDataEncoder", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             Return Nothing
@@ -6081,7 +6081,7 @@ Public Class UiPositionsAdjustments
             .InFile = True
         End With
         Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
-        
+
     End Sub
 
     ''' <summary>

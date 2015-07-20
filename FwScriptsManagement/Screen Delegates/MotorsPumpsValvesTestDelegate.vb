@@ -950,7 +950,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                         .ParamList.Add(MyClass.ArmMixer2ParkingPolar.ToString)
                         ' XBC 09/11/2011
                     End If
-                   
+
 
                 End With
 

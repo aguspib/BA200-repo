@@ -1189,7 +1189,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             Dim nextExecutionFound As Boolean = False
                             Dim indexNextToSend As Integer = 0
                             Dim previousReagentIDSentList As New List(Of AnalyzerManagerDS.sentPreparationsRow) 'The last reagents used are in the higher array indexes
-                            Dim contaminationFound = SeachContaminationBetweenPreviousAndFirsToSend(previousReagentIDSentList, pContaminationsDS, toSendList(0), pHighContaminationPersitance)
+                            Dim contaminationFound = SearchContaminationBetweenPreviousAndFirsToSend(previousReagentIDSentList, pContaminationsDS, toSendList(0), pHighContaminationPersitance)
 
 #If DEBUG Then
                             If contaminationFound Then
@@ -1345,15 +1345,16 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pHighContaminationPersitance"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Private Function SeachContaminationBetweenPreviousAndFirsToSend(ByRef previousReagentIDSentList As List(Of AnalyzerManagerDS.sentPreparationsRow), pContaminationsDS As ContaminationsDS, ReagentRow As ExecutionsDS.twksWSExecutionsRow, pHighContaminationPersitance As Integer) As Boolean
+        Private Function SearchContaminationBetweenPreviousAndFirsToSend(ByRef previousReagentIDSentList As List(Of AnalyzerManagerDS.sentPreparationsRow), pContaminationsDS As ContaminationsDS, ReagentRow As ExecutionsDS.twksWSExecutionsRow, pHighContaminationPersitance As Integer) As Boolean
             'RUNNING!
             previousReagentIDSentList = (From a As AnalyzerManagerDS.sentPreparationsRow In mySentPreparationsDS.sentPreparations _
                                      Where a.ExecutionType = "PREP_STD" Select a).ToList
             Debug.Print("SeachContaminationBetweenPreviousAndFirsToSend: " & previousReagentIDSentList.Count)
-            Dim context = WSCreator.ContaminationsSpecification.CurrentRunningContext
+            'Dim context = WSCreator.ContaminationsSpecification.CurrentRunningContext
 
             Debug.Print("CourrentContext read")
-            Dim result = context.ActionRequiredForDispensing(ReagentRow)
+            Dim dispensing = WSCreator.ContaminationsSpecification.ConvertRowToDispensing(ReagentRow)
+            Dim result = WSCreator.ContaminationsSpecification.GetActionRequiredInRunning(dispensing)
             If result.Action <> IContaminationsAction.RequiredAction.GoAhead Then
                 Debug.Print("Contaminations found")
 
@@ -1946,7 +1947,8 @@ Namespace Biosystems.Ax00.Core.Entities
                                                    ByVal toSendList As List(Of ExecutionsDS.twksWSExecutionsRow))
             If toSendList.Any Then
                 'RUNNING
-                Dim requiredAction = WSCreator.ContaminationsSpecification.CurrentRunningContext.ActionRequiredForDispensing(toSendList(0))
+                Dim dispensing = WSCreator.ContaminationsSpecification.ConvertRowToDispensing(toSendList(0))
+                Dim requiredAction = WSCreator.ContaminationsSpecification.GetActionRequiredInRunning(dispensing)
                 If requiredAction.Action = IContaminationsAction.RequiredAction.Wash Then
 
                     myWashSolutionType = requiredAction.InvolvedWashes(0).WashingSolutionCode
@@ -2365,7 +2367,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         Dim disp = WSCreator.ContaminationsSpecification.CreateDispensing
                         disp.R1ReagentID = myAnManagerDS.nextPreparation(0).ReagentID
                         'RUNNING
-                        Dim requiredActionBeforeDispensing = WSCreator.ContaminationsSpecification.CurrentRunningContext.ActionRequiredForDispensing(disp)
+                        Dim requiredActionBeforeDispensing = WSCreator.ContaminationsSpecification.GetActionRequiredInRunning(disp)
                         If requiredActionBeforeDispensing.Action = IContaminationsAction.RequiredAction.Wash Then
                             Debug.WriteLine("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
                             Debug.WriteLine("Incongruency found for reagent: " & disp.R1ReagentID & vbCr & WSCreator.ContaminationsSpecification.CurrentRunningContext.ToString)

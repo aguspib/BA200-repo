@@ -3094,14 +3094,21 @@ Partial Public Class UiAx00MainMDI
     ''' <remarks>JV + AG revision 18/10/2013 New Button Play/Pause/Continue event task # 1341</remarks>
     Private Sub bsTSMultiFunctionSessionButton_Click(sender As Object, e As EventArgs) Handles bsTSMultiFunctionSessionButton.Click
         Try
-            If AnalyzerManager.GetCurrentAnalyzerManager().IsBlExpired Then
-                Dim blService As New BaseLineService(AnalyzerManager.GetCurrentAnalyzerManager(), New AnalyzerManagerFlagsDelegate)
-                blService.StartService()
-                blService.OnServiceStatusChange = Sub(callback As IServiceStatusCallback)
-                                                      If callback.Sender.Status = ServiceStatusEnum.EndSuccess Then
-                                                          BeginInvoke(Sub() StartWorkSession())
-                                                      End If
-                                                  End Sub
+            If showSTARTWSiconFlag Then
+                If AnalyzerManager.GetCurrentAnalyzerManager().IsBlExpired Then
+                    Dim blService As New BaseLineService(AnalyzerManager.GetCurrentAnalyzerManager(), New AnalyzerManagerFlagsDelegate)
+                    blService.StartService()
+                    blService.OnServiceStatusChange = Sub(callback As IServiceStatusCallback)
+                                                          If callback.Sender.Status = ServiceStatusEnum.EndSuccess Then
+                                                              BeginInvoke(Sub()
+                                                                              showSTARTWSiconFlag = True
+                                                                              StartWorkSession()
+                                                                          End Sub)
+                                                          End If
+                                                      End Sub
+                Else
+                    StartWorkSession()
+                End If
             Else
                 StartWorkSession()
             End If

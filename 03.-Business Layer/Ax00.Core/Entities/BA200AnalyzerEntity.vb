@@ -62,6 +62,11 @@ Namespace Biosystems.Ax00.Core.Entities
                 SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read) = "END"
         End Function
 
+        Public Overrides Function BaseLineNotStarted() As Boolean
+            Return SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty) = "" AndAlso
+                SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill) = "" AndAlso
+                SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read) = ""
+        End Function
 #End Region
 
         Public Overrides ReadOnly Property WashingIDRequired As Boolean

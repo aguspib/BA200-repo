@@ -155,7 +155,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
         End Sub
 
 
-        Public Function ActionRequiredForAGivenDispensing(ReagentID As ExecutionsDS.twksWSExecutionsRow) As IActionRequiredForDispensing Implements IContaminationsContext.ActionRequiredForDispensing
+        Public Function ActionRequiredForDispensing(ReagentID As ExecutionsDS.twksWSExecutionsRow) As IActionRequiredForDispensing Implements IContaminationsContext.ActionRequiredForDispensing
             Dim dispense = ContaminationsSpecifications.CreateDispensing() 'As New Ax00Dispensing()
             dispense.FillDispense(ContaminationsSpecifications, ReagentID)
             Return ActionRequiredForDispensing(dispense)

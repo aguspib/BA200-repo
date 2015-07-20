@@ -298,6 +298,7 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Sub PrepareUINewAlarmType(ByVal _alarm As AlarmEnumerates.Alarms)
         Sub startListenerExpiration()
         Function ExistBaseLineFinished() As Boolean
+        Function BaseLineNotStarted() As Boolean
 
 #End Region
 
