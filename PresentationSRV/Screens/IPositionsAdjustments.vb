@@ -6198,16 +6198,14 @@ Public Class UiPositionsAdjustments
                 myAdjustmentsGroups.Add(ADJUSTMENT_GROUPS.SAMPLES_ARM_ZTUBE3.ToString)
             End If
 
-            If AnalyzerController.Instance.IsBA200 AndAlso myAdjustmentID = ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1 Then
-                myAdjustmentsGroups.Add(ADJUSTMENT_GROUPS.SAMPLES_ARM_ZTUBE1.ToString)
-            End If
-
-
             resultData = MyBase.myAdjustmentsDelegate.ReadAdjustmentsByGroupIDs(myAdjustmentsGroups)
             If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
                 Me.SelectedAdjustmentsDS = CType(resultData.SetDatos, SRVAdjustmentsDS)
             End If
 
+            If AnalyzerController.Instance.IsBA200 AndAlso myAdjustmentID = ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1 Then
+                SelectedAdjustmentsDS.srv_tfmwAdjustments.ImportRow(myAdjustmentsDelegate.ReadFirstAdjustmentValueByCode(Ax00Adjustsments.R1PH1.ToString))
+            End If
 
         Catch ex As Exception
             Me.SelectedAdjustmentsDS = CopyOfSelectedAdjustmentsDS

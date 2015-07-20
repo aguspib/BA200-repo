@@ -71,6 +71,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                                       ByVal pWorkSessionID As String, ByVal pWell As Integer, ByVal pBaseLineWithAdjust As Boolean) As GlobalDataTO
 
         Public MustOverride Function ExistBaseLineFinished() As Boolean Implements IAnalyzerManager.ExistBaseLineFinished
+        Public MustOverride Function BaseLineNotStarted() As Boolean Implements IAnalyzerManager.BaseLineNotStarted
 
 #End Region
 

@@ -49,6 +49,10 @@ Namespace Biosystems.Ax00.Core.Entities
             Return SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine) = "END"
         End Function
 
+        Public Overrides Function BaseLineNotStarted() As Boolean
+            Return SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine) = ""
+        End Function
+
 #End Region
 
         Public Overrides ReadOnly Property WashingIDRequired As Boolean

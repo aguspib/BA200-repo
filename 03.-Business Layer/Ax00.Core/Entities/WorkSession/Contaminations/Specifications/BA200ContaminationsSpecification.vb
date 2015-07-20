@@ -87,6 +87,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
         Private lastestBireactives As LinkedList(Of IDispensing)
 
         Private Sub HandleBireactives()
+            If currentContext Is Nothing Then Return
             If lastestBireactives Is Nothing Then
                 LoadLastestBireactivesFromDB()
             End If
