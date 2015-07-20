@@ -699,7 +699,7 @@
             UPDATE [dbo].[srv_tfmwAdjustments] SET GroupId = 'SAMPLES_ARM_RING1', Value = '10250', CanSave = 0 WHERE CodeFw = 'R1PH1';
             UPDATE [dbo].[srv_tfmwAdjustments] SET GroupId = 'SAMPLES_ARM_RING2', Value = '9200' , CanSave = 0 WHERE CodeFw = 'R1PH2';
             UPDATE [dbo].[srv_tfmwAdjustments] SET GroupId = 'REAGENT1_ARM_RING1', Value = '17200' WHERE CodeFw = 'R1PV1';
-            UPDATE [dbo].[srv_tfmwAdjustments] SET GroupId = 'REAGENT1_ARM_RING2', Value = '17200' WHERE CodeFw = 'R1PV2';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET GroupId = 'REAGENT1_ARM_RING1', Value = '17200' WHERE CodeFw = 'R1PV2';
             UPDATE [dbo].[srv_tfmwAdjustments] SET GroupId = 'SAMPLES_ARM_LEVEL_DET', Value = '4660' WHERE CodeFw = 'R1PI';
             UPDATE [dbo].[srv_tfmwAdjustments] SET GroupId = 'SAMPLES_ARM_DISP1', Value = '7160' WHERE CodeFw = 'R2DV';
             UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '16720' WHERE CodeFw = 'M1DH2';

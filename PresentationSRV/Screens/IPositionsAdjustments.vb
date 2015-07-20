@@ -5482,6 +5482,10 @@ Public Class UiPositionsAdjustments
                         If .canSaveZValue Then
                             Me.UpdateLocalSavedSpecificAdjustmentsDS(ReadSpecificAdjustmentData(GlobalEnumerates.AXIS.Z).CodeFw, .NewZValue.ToString)
 
+                            If ReadSpecificAdjustmentData(GlobalEnumerates.AXIS.Z).GroupID = ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1.ToString AndAlso AnalyzerController.Instance.IsBA200 Then
+                                Me.UpdateLocalSavedSpecificAdjustmentsDS(Ax00Adjustsments.R1PV2.ToString, .NewZValue.ToString)
+                            End If
+
                             ' XBC 12/09/2011 - By now ZTube 2 & 3 takes the value of ZTube1
                             If ReadSpecificAdjustmentData(GlobalEnumerates.AXIS.Z).GroupID = ADJUSTMENT_GROUPS.SAMPLES_ARM_ZTUBE1.ToString Then
                                 Me.UpdateLocalSavedSpecificAdjustmentsDS(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_ZTUBE2.ToString, GlobalEnumerates.AXIS.Z).CodeFw, .NewZValue.ToString)
