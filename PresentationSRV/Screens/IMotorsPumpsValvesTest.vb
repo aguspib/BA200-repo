@@ -778,8 +778,10 @@ Public Class UiMotorsPumpsValvesTest
                     myStartStopButtonImage = myStopImage
                     bsScreenToolTips2.SetToolTip(Col_StartStopButton, MyClass.myStopButtonToolTip)
 
-                    Me.Col_Reagent1LED.CurrentStatus = BSMonitorControlBase.Status._ON
-                    Me.Col_Reagent2LED.CurrentStatus = BSMonitorControlBase.Status._ON
+                    If Not AnalyzerController.Instance.IsBA200 Then
+                        Me.Col_Reagent1LED.CurrentStatus = BSMonitorControlBase.Status._ON
+                        Me.Col_Reagent2LED.CurrentStatus = BSMonitorControlBase.Status._ON
+                    End If
                     Me.Col_SamplesLED.CurrentStatus = BSMonitorControlBase.Status._ON
 
                     Me.ManageTabPages = False
@@ -813,9 +815,11 @@ Public Class UiMotorsPumpsValvesTest
                     myStartStopButtonImage = myStartImage
                     bsScreenToolTips2.SetToolTip(Col_StartStopButton, MyClass.myStartButtonToolTip)
 
-                    Me.Col_Reagent1LED.CurrentStatus = BSMonitorControlBase.Status.DISABLED
-                    Me.Col_Reagent2LED.CurrentStatus = BSMonitorControlBase.Status.DISABLED
                     Me.Col_SamplesLED.CurrentStatus = BSMonitorControlBase.Status.DISABLED
+                    If Not AnalyzerController.Instance.IsBA200 Then
+                        Me.Col_Reagent1LED.CurrentStatus = BSMonitorControlBase.Status.DISABLED
+                        Me.Col_Reagent2LED.CurrentStatus = BSMonitorControlBase.Status.DISABLED
+                    End If
 
                     If MyClass.CurrentTestPanel Is BsCollisionTestPanel Then
                         Me.ManageTabPages = True
@@ -825,11 +829,10 @@ Public Class UiMotorsPumpsValvesTest
                     'SGM 25/10/2012
                     Me.bsScreenToolTips2.SetToolTip(Col_StartStopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Test", MyClass.LanguageID))
                     Me.Col_StartStopButton.Enabled = True
-                End If
+                    End If
 
-                If myStartStopButtonImage IsNot Nothing Then
-                    Col_StartStopButton.Image = myStartStopButtonImage
-                    'Col_StartStopButton.BackgroundImageLayout = ImageLayout.Center
+                    If myStartStopButtonImage IsNot Nothing Then
+                        Col_StartStopButton.Image = myStartStopButtonImage
                 End If
 
             Catch ex As Exception
@@ -848,16 +851,20 @@ Public Class UiMotorsPumpsValvesTest
             MyClass.CollidedNeedleAttr = value
 
             If value <> UTILCollidedNeedles.None Then
+                Col_SamplesLED.CurrentStatus = BSMonitorControlBase.Status._ON
+                If Not AnalyzerController.Instance.IsBA200 Then
+                    Col_Reagent1LED.CurrentStatus = BSMonitorControlBase.Status._ON
+                    Col_Reagent2LED.CurrentStatus = BSMonitorControlBase.Status._ON
 
-                Me.Col_Reagent1LED.CurrentStatus = BSMonitorControlBase.Status._ON
-                Me.Col_Reagent2LED.CurrentStatus = BSMonitorControlBase.Status._ON
-                Me.Col_SamplesLED.CurrentStatus = BSMonitorControlBase.Status._ON
+                    Select Case value
+                        Case UTILCollidedNeedles.DR1 : Col_Reagent1LED.CurrentStatus = BSMonitorControlBase.Status._OFF
+                        Case UTILCollidedNeedles.DR2 : Col_Reagent2LED.CurrentStatus = BSMonitorControlBase.Status._OFF
+                        Case UTILCollidedNeedles.DM1 : Col_SamplesLED.CurrentStatus = BSMonitorControlBase.Status._OFF
+                    End Select
 
-                Select Case value
-                    Case UTILCollidedNeedles.DR1 : Me.Col_Reagent1LED.CurrentStatus = BSMonitorControlBase.Status._OFF
-                    Case UTILCollidedNeedles.DR2 : Me.Col_Reagent2LED.CurrentStatus = BSMonitorControlBase.Status._OFF
-                    Case UTILCollidedNeedles.DM1 : Me.Col_SamplesLED.CurrentStatus = BSMonitorControlBase.Status._OFF
-                End Select
+                Else
+                    If value = UTILCollidedNeedles.DR1 Then Col_SamplesLED.CurrentStatus = BSMonitorControlBase.Status._OFF
+                End If
 
             End If
         End Set
@@ -1032,87 +1039,6 @@ Public Class UiMotorsPumpsValvesTest
             MyBase.SetButtonImage(WSAsp_UpDownButton, "UPDOWN")
             MyBase.SetButtonImage(WSDisp_UpDownButton, "UPDOWN")
 
-
-            ''EXIT Button
-            'auxIconName = GetIconName("CANCEL")
-            'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
-            '    'BsExitButton.BackgroundImageLayout = ImageLayout.Stretch
-            'End If
-
-            ''CANCEL Button
-            'auxIconName = GetIconName("HOME")
-            'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
-            '    'BsCancelButton.BackgroundImageLayout = ImageLayout.Stretch
-            'End If
-
-            ''START STOP Collision Test Button
-            'bsScreenToolTips.SetToolTip(Col_StartStopButton, MyClass.myStartButtonToolTip)
-            'auxIconName = GetIconName("ADJUSTMENT")
-            'Dim myStartImage As Image
-            'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Dim myImage As Image
-            '    myImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
-
-            '    myGlobal = Utilities.ResizeImage(myImage, New Size(28, 28))
-            '    If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
-            '        myStartImage = CType(myGlobal.SetDatos, Bitmap)
-            '    Else
-            '        myStartImage = CType(myImage, Bitmap)
-            '    End If
-
-            '    Col_StartStopButton.Image = myStartImage
-            '    'Col_StartStopButton.BackgroundImageLayout = ImageLayout.Center
-
-            'Else
-            '    myStartImage = Nothing
-            'End If
-
-
-
-
-            ''STOP Buttons
-            'auxIconName = GetIconName("STOP")
-            'Dim myStopImage As Image
-            'If System.IO.File.Exists(iconPath & auxIconName) Then
-
-            '    Dim myImage As Image
-            '    myImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
-
-            '    myGlobal = Utilities.ResizeImage(myImage, New Size(26, 26))
-            '    If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
-            '        myStopImage = CType(myGlobal.SetDatos, Bitmap)
-            '    Else
-            '        myStopImage = CType(myImage, Bitmap)
-            '    End If
-
-
-            '    InDo_StopButton.Image = myStopImage
-            '    'InDo_StopButton.BackgroundImageLayout = ImageLayout.Center
-
-            '    ExWa_StopButton.Image = myStopImage
-            '    'ExWa_StopButton.BackgroundImageLayout = ImageLayout.Center
-
-            '    WSAsp_StopButton.Image = myStopImage
-            '    'WSAsp_StopButton.BackgroundImageLayout = ImageLayout.Center
-
-            '    WsDisp_StopButton.Image = myStopImage
-            '    'WsDisp_StopButton.BackgroundImageLayout = ImageLayout.Center
-
-            '    InOut_StopButton.Image = myStopImage
-            '    'InOut_StopButton.BackgroundImageLayout = ImageLayout.Center
-
-            '    Col_StartStopButton.Image = myStopImage
-            '    'Col_StartStopButton.BackgroundImageLayout = ImageLayout.Center
-
-            'Else
-            '    myStopImage = Nothing
-            'End If
-
-
-
-
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareButtons", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
@@ -1254,7 +1180,7 @@ Public Class UiMotorsPumpsValvesTest
     'COLLISION
             Me.BsCollisionInfoTitleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_INFO_TITLE", pLanguageID)
             Me.Col_WashingStationLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_WashStation", pLanguageID)
-            Me.Col_SamplesLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_SAMPLE", pLanguageID) + " " + myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Needle", pLanguageID)
+            Me.Col_SamplesLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_SAMPLEANDREAGENT", pLanguageID) + " " + myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Needle", pLanguageID)
             Me.Col_Reagent1Label.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Reagent1", pLanguageID) + " " + myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Needle", pLanguageID)
             Me.Col_Reagent2Label.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Reagent2", pLanguageID) + " " + myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Needle", pLanguageID)
 
@@ -2036,14 +1962,19 @@ Public Class UiMotorsPumpsValvesTest
                 .CurrentStatus = BSMonitorControlBase.Status._ON
                 .CurrentStatus = BSMonitorControlBase.Status.DISABLED
             End With
-            With Col_Reagent1LED
-                .CurrentStatus = BSMonitorControlBase.Status._ON
-                .CurrentStatus = BSMonitorControlBase.Status.DISABLED
-            End With
-            With Col_Reagent2LED
-                .CurrentStatus = BSMonitorControlBase.Status._ON
-                .CurrentStatus = BSMonitorControlBase.Status.DISABLED
-            End With
+            If Not AnalyzerController.Instance.IsBA200 Then
+                With Col_Reagent1LED
+                    .CurrentStatus = BSMonitorControlBase.Status._ON
+                    .CurrentStatus = BSMonitorControlBase.Status.DISABLED
+                End With
+                With Col_Reagent2LED
+                    .CurrentStatus = BSMonitorControlBase.Status._ON
+                    .CurrentStatus = BSMonitorControlBase.Status.DISABLED
+                End With
+            Else
+                Me.Col_Reagent1GroupBox.Visible = False
+                Me.Col_Reagent2GroupBox.Visible = False
+            End If
 
             'WS NOT FOR TESTING
             Me.Col_WashingStationGroupBox.Visible = False

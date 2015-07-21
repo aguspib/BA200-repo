@@ -7079,7 +7079,7 @@ Partial Class UiMotorsPumpsValvesTest
         Me.BsInfoColXPSViewer.FitToHeightButtonVisible = True
         Me.BsInfoColXPSViewer.FitToWidthButtonCaption = "Fit To Width"
         Me.BsInfoColXPSViewer.FitToWidthButtonVisible = True
-        Me.BsInfoColXPSViewer.HorizontalPageMargin = 10
+        Me.BsInfoColXPSViewer.HorizontalPageMargin = 0
         Me.BsInfoColXPSViewer.IncreaseZoomButtonCaption = "Zoom In"
         Me.BsInfoColXPSViewer.IncreaseZoomButtonVisible = True
         Me.BsInfoColXPSViewer.IsLoaded = False
@@ -7095,7 +7095,7 @@ Partial Class UiMotorsPumpsValvesTest
         Me.BsInfoColXPSViewer.TabIndex = 87
         Me.BsInfoColXPSViewer.TwoPagesButtonCaption = "Two Pages"
         Me.BsInfoColXPSViewer.TwoPagesButtonVisible = True
-        Me.BsInfoColXPSViewer.VerticalPageMargin = 10
+        Me.BsInfoColXPSViewer.VerticalPageMargin = 0
         Me.BsInfoColXPSViewer.WholePageButtonCaption = "Whole Page"
         Me.BsInfoColXPSViewer.WholePageButtonVisible = True
         '
@@ -7179,6 +7179,7 @@ Partial Class UiMotorsPumpsValvesTest
         Me.Col_SamplesLabel.Text = "Samples needle"
         Me.Col_SamplesLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         Me.Col_SamplesLabel.Title = False
+        Me.Col_SamplesLabel.UseMnemonic = False
         '
         'Col_SamplesLED
         '
