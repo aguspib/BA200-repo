@@ -4272,7 +4272,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 End If
 
                                 ' Temperature measured points 1 to 4
-                                For i As Integer = 0 To 3
+                                For i As Integer = 0 To ReactionsRotorPrepareWellDoneAttr.Count - 1 'IT 21/07/2015 - BA-2649
                                     If Not MyClass.ReactionsRotorPrepareWellDoneAttr(i) Then
                                         returnValue += "0"
                                     Else
@@ -4445,7 +4445,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 End If
 
                                 ' Temperature measured points 1 to 4
-                                For i As Integer = 0 To 3
+                                For i As Integer = 0 To ReactionsRotorPrepareWellDoneAttr.Count - 1 'IT 21/07/2015 - BA-2649
                                     If Not MyClass.ReactionsRotorPrepareWellDoneAttr(i) Then
                                         returnValue += "0"
                                     Else

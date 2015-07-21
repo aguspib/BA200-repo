@@ -149,6 +149,22 @@ Public Class Ax00ServiceMainMDI
     Private myConsole As DebugTrace
 
     ''' <summary>
+    ''' Gets SATReport form, if it is not created or is disposed (closed), then it creates a new one
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    ReadOnly Property UiSATReportForm As Biosystems.Ax00.PresentationCOM.UiSATReport
+        Get
+            Static tempUiSATReportLoad As UiSATReport
+
+            If tempUiSATReportLoad Is Nothing OrElse tempUiSATReportLoad.IsDisposed Then tempUiSATReportLoad = New Biosystems.Ax00.PresentationCOM.UiSATReport
+            Return tempUiSATReportLoad
+
+        End Get
+    End Property
+
+    ''' <summary>
     ''' To implement IMainMDI Interface in order to use same form for User SW and Service SW 
     ''' </summary>
     ''' <value></value>

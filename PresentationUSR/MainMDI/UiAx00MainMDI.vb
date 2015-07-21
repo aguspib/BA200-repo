@@ -202,12 +202,29 @@ Partial Public Class UiAx00MainMDI
     ''' <value></value>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    ReadOnly Property UiSATReportForm As Biosystems.Ax00.PresentationCOM.UiSATReportLoad
+    ReadOnly Property UiSATReportLoadForm As Biosystems.Ax00.PresentationCOM.UiSATReportLoad
         Get
             Static tempUiSATReportLoad As UiSATReportLoad
 
             If tempUiSATReportLoad Is Nothing OrElse tempUiSATReportLoad.IsDisposed Then tempUiSATReportLoad = New UiSATReportLoad
             Return tempUiSATReportLoad
+
+        End Get
+    End Property
+
+
+    ''' <summary>
+    ''' Gets SATReportform, if it is not created or is disposed (closed), then it creates a new one
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    ReadOnly Property UiSATReportCreateForm As Biosystems.Ax00.PresentationCOM.UiSATReport
+        Get
+            Static tempUiSATReportCreate As UiSATReport
+
+            If tempUiSATReportCreate Is Nothing OrElse tempUiSATReportCreate.IsDisposed Then tempUiSATReportCreate = New UiSATReport
+            Return tempUiSATReportCreate
 
         End Get
     End Property
@@ -1303,7 +1320,9 @@ Partial Public Class UiAx00MainMDI
             'This is the way a form should be called from the main window
             'Call the function OpenMDIChildForm and pass it as parameter the form name you want to open
             'The form to be opened should be assigned its AcceptButton property to its default exit button
-            OpenMDIChildForm(UiSATReport)
+
+            OpenMDIChildForm(UiSATReportCreateForm)
+            UiSATReportCreateForm.MainMDI = Me
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SATReportsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".SATReportsToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -2136,7 +2155,8 @@ Partial Public Class UiAx00MainMDI
     ''' <remarks></remarks>
     Private Sub bsTSReportSATButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsTSReportSATButton.Click
         Try
-            OpenMDIChildForm(UiSATReport)
+            OpenMDIChildForm(UiSATReportCreateForm)
+            UiSATReportCreateForm.MainMDI = Me
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSReportSATButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -2228,11 +2248,11 @@ Partial Public Class UiAx00MainMDI
     ''' <remarks></remarks>
     Private Sub LoadSATReportToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles LoadSATReportToolStripMenuItem.Click
         Try
-            UiSATReportForm.RestorePointMode = False
+            UiSATReportLoadForm.RestorePointMode = False
 
-            UiSATReportForm.MainMDI = Me
+            UiSATReportLoadForm.MainMDI = Me
 
-            OpenMDIChildForm(UiSATReportForm)
+            OpenMDIChildForm(UiSATReportLoadForm)
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadSATReportToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".LoadSATReportToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -2249,11 +2269,11 @@ Partial Public Class UiAx00MainMDI
     ''' <remarks></remarks>
     Private Sub RestorePreviousDataToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RestorePreviousDataToolStripMenuItem.Click
         Try
-            UiSATReportForm.RestorePointMode = True
+            UiSATReportLoadForm.RestorePointMode = True
 
-            UiSATReportForm.MainMDI = Me
+            UiSATReportLoadForm.MainMDI = Me
 
-            OpenMDIChildForm(UiSATReportForm)
+            OpenMDIChildForm(UiSATReportLoadForm)
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".RestorePreviousDataToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
