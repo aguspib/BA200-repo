@@ -72,6 +72,10 @@ Public Class UiBarCodeAdjustments
 
         ' Add any initialization after the InitializeComponent() call.
         DefineScreenLayout()
+
+        If AnalyzerController.Instance.IsBA200 Then
+            Me.SelectRotorGroupBox.Visible = False
+        End If
     End Sub
 #End Region
 
@@ -1415,6 +1419,8 @@ Public Class UiBarCodeAdjustments
                         Me.TempToSendAdjustmentsDelegate = New FwAdjustmentsDelegate(Me.TemporalAdjustmentsDS)
                         ' Update dataset of the temporal dataset of Adjustments to sent to Fw
                         myGlobal = Me.UpdateTemporalAdjustmentsDS()
+                        SelectedAdjustmentsDS = TryCast(Me.SelectedAdjustmentsDS.Clone, SRVAdjustmentsDS)
+
                     Else
                         Me.PrepareErrorMode()
                         Exit Sub
@@ -1677,10 +1683,7 @@ Public Class UiBarCodeAdjustments
         Dim myGlobal As New GlobalDataTO
         Try
             For Each SR As SRVAdjustmentsDS.srv_tfmwAdjustmentsRow In Me.TemporalAdjustmentsDS.srv_tfmwAdjustments.Rows
-                If SR.CodeFw.Trim = pCodew.Trim Then
-                    SR.Value = pValue
-                    Exit For
-                End If
+                SR.Value = pValue
             Next
         Catch ex As Exception
             myGlobal.HasError = True
@@ -2179,6 +2182,7 @@ Public Class UiBarCodeAdjustments
 
     Private Sub SaveButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles SaveButton.Click
         Try
+            myScreenDelegate.BarcodeLaserEnabled = False
             MyBase.DisplayMessage("")
             Me.SaveAdjustment()
 
@@ -2192,7 +2196,7 @@ Public Class UiBarCodeAdjustments
         'Dim myGlobal As New GlobalDataTO
         Dim dialogResultToReturn As DialogResult = DialogResult.No
         Try
-
+            myScreenDelegate.BarcodeLaserEnabled = False
             If Me.ChangedValue Then
                 dialogResultToReturn = MyBase.ShowMessage("", Messages.SRV_DISCARD_CHANGES.ToString)
 

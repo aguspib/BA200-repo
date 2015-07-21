@@ -741,6 +741,29 @@ Public Class UiThermosAdjustments
         End Try
     End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="model"></param>
+    ''' <remarks>
+    ''' Created by:  IT 21/07/2015 - BA-2649
+    ''' Modified by: IT 21/07/2015 - BA-2650
+    ''' </remarks>
+    Private Sub ApplyElementsVisibility(model As String)
+        Select Case model
+            Case AnalyzerModelEnum.A200.ToString
+                'Reaction Rotor Tab2
+                Label4.Visible = False
+                Label7.Visible = False
+                Tab1TextBoxTemp3.Visible = False
+                Tab1TextBoxTemp4.Visible = False
+
+                'Reagents Tips Tab3
+                Tab2RadioButtonR2.Visible = False
+
+        End Select
+    End Sub
+
     Private Sub InitializeRotorReationsTemps()
         Try
             Me.Tab1TextBoxTemp1.Text = ""
@@ -806,7 +829,8 @@ Public Class UiThermosAdjustments
     ''' Get texts in the current application language for all screen controls
     ''' </summary>
     ''' <remarks>
-    ''' Created by: XBC 15/06/2011
+    ''' Created by:  XBC 15/06/2011
+    ''' Modified by: IT  21/07/2015 - BA-2650
     ''' </remarks>
     Private Sub GetScreenLabels()
         Try
@@ -833,8 +857,15 @@ Public Class UiThermosAdjustments
             Me.Tab2ConditioningGroupBox.Text = "2. " & myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_CONDITIONING", currentLanguage)
             Me.Tab2MeasurementGroupBox.Text = "3. " & myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_TEMP_MES", currentLanguage)
             Me.Tab2AdjustGroupBox.Text = "4. " & myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJUST", currentLanguage)
-            Me.Tab2RadioButtonR1.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Reagent1Arm", currentLanguage)
-            Me.Tab2RadioButtonR2.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Reagent2Arm", currentLanguage)
+
+            'IT 21/07/2015 - BA-2650
+            If AnalyzerController.Instance.IsBA200 Then
+                Me.Tab2RadioButtonR1.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Reagent1Arm", currentLanguage)
+                Me.Tab2RadioButtonR2.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Reagent2Arm", currentLanguage)
+            Else
+                Me.Tab2RadioButtonR1.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Reagent1Arm", currentLanguage)
+            End If
+
             Me.Tab2ConditioningDescLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_CONDITIONING_DESC1", currentLanguage)
             Me.Tab2TempMeasuredLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_THERMO_NEEDLE_PROC", currentLanguage)
             Me.Tab2AdjustProposedLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_REAG_TEMP_PROS", currentLanguage)
@@ -2486,7 +2517,8 @@ Public Class UiThermosAdjustments
     ''' 
     ''' </summary>
     ''' <remarks>
-    ''' Modified by XBC 28/01/2013 - change CSng function by Utilities.FormatToSingle method (Bugs tracking #1122)
+    ''' Modified by: XBC 28/01/2013 - change CSng function by Utilities.FormatToSingle method (Bugs tracking #1122)
+    '''               IT 21/07/2015 - BA-2649
     ''' </remarks>
     Private Sub ValidateToCalulatePHOTOMETRYMeanTemps()
         Dim myResultData As New GlobalDataTO
@@ -2557,7 +2589,7 @@ Public Class UiThermosAdjustments
             '        End If
             '    End If
             'End If
-            If Me.Tab1TextBoxTemp1.Text.Length = 0 Then
+            If (Me.Tab1TextBoxTemp1.Visible) And (Me.Tab1TextBoxTemp1.Text.Length = 0) Then 'BA-2649
                 AllTempsFilled = False
             Else
                 If IsNumeric(Me.Tab1TextBoxTemp1.Text) Then
@@ -2567,7 +2599,7 @@ Public Class UiThermosAdjustments
                 End If
             End If
 
-            If Me.Tab1TextBoxTemp2.Text.Length = 0 Then
+            If (Me.Tab1TextBoxTemp2.Visible) And (Me.Tab1TextBoxTemp2.Text.Length = 0) Then 'BA-2649
                 AllTempsFilled = False
             Else
                 If IsNumeric(Me.Tab1TextBoxTemp2.Text) Then
@@ -2577,7 +2609,7 @@ Public Class UiThermosAdjustments
                 End If
             End If
 
-            If Me.Tab1TextBoxTemp3.Text.Length = 0 Then
+            If (Me.Tab1TextBoxTemp3.Visible) And (Me.Tab1TextBoxTemp3.Text.Length = 0) Then 'BA-2649
                 AllTempsFilled = False
             Else
                 If IsNumeric(Me.Tab1TextBoxTemp3.Text) Then
@@ -2587,7 +2619,7 @@ Public Class UiThermosAdjustments
                 End If
             End If
 
-            If Me.Tab1TextBoxTemp4.Text.Length = 0 Then
+            If (Me.Tab1TextBoxTemp4.Visible) And (Me.Tab1TextBoxTemp4.Text.Length = 0) Then 'BA-2649
                 AllTempsFilled = False
             Else
                 If IsNumeric(Me.Tab1TextBoxTemp4.Text) Then
@@ -2608,13 +2640,13 @@ Public Class UiThermosAdjustments
                 '    AllTempsFilled = False
                 'ElseIf CSng(Me.Tab1TextBoxTemp4.Text) = 0 Then
                 '    AllTempsFilled = False
-                If Utilities.FormatToSingle(Me.Tab1TextBoxTemp1.Text) = 0 Then
+                If (Me.Tab1TextBoxTemp1.Visible) And (Utilities.FormatToSingle(Me.Tab1TextBoxTemp1.Text) = 0) Then 'BA-2649
                     AllTempsFilled = False
-                ElseIf Utilities.FormatToSingle(Me.Tab1TextBoxTemp2.Text) = 0 Then
+                ElseIf (Me.Tab1TextBoxTemp2.Visible) And (Utilities.FormatToSingle(Me.Tab1TextBoxTemp2.Text) = 0) Then 'BA-2649
                     AllTempsFilled = False
-                ElseIf Utilities.FormatToSingle(Me.Tab1TextBoxTemp3.Text) = 0 Then
+                ElseIf (Me.Tab1TextBoxTemp3.Visible) And (Utilities.FormatToSingle(Me.Tab1TextBoxTemp3.Text) = 0) Then 'BA-2649
                     AllTempsFilled = False
-                ElseIf Utilities.FormatToSingle(Me.Tab1TextBoxTemp4.Text) = 0 Then
+                ElseIf (Me.Tab1TextBoxTemp4.Visible) And (Utilities.FormatToSingle(Me.Tab1TextBoxTemp4.Text) = 0) Then 'BA-2649
                     AllTempsFilled = False
 
 
@@ -3288,6 +3320,7 @@ Public Class UiThermosAdjustments
 
             MyClass.Initializations()
 
+            ApplyElementsVisibility(AnalyzerController.Instance.Analyzer.Model)
 
             MyClass.DisableAll()
 
