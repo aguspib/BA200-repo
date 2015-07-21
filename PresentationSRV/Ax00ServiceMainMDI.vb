@@ -154,11 +154,11 @@ Public Class Ax00ServiceMainMDI
     ''' <value></value>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Public Property ErrorStatusLabelDisplayStyle() As ToolStripItemDisplayStyle Implements IMainMDI.ErrorStatusLabelDisplayStyle
+    Public Property ErrorStatusLabelDisplayStyle As ToolStripItemDisplayStyle Implements IMainMDI.ErrorStatusLabelDisplayStyle
         Get
             Return Nothing
         End Get
-        Set(ByVal value As ToolStripItemDisplayStyle)
+        Set(value As ToolStripItemDisplayStyle)
 
         End Set
     End Property
@@ -169,21 +169,21 @@ Public Class Ax00ServiceMainMDI
     ''' <value></value>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Public Property ErrorStatusLabelText() As String Implements IMainMDI.ErrorStatusLabelText
+    Public Property ErrorStatusLabelText As String Implements IMainMDI.ErrorStatusLabelText
         Get
             Return String.Empty
         End Get
-        Set(ByVal value As String)
+        Set(value As String)
 
         End Set
     End Property
 
     'SGM 25/11/2011
-    Public Property SimulationMode() As Boolean
+    Public Property SimulationMode As Boolean
         Get
             Return SimulationModeAttr
         End Get
-        Set(ByVal value As Boolean)
+        Set(value As Boolean)
             If SimulationModeAttr <> value Then
                 SimulationModeAttr = value
             End If
@@ -191,11 +191,11 @@ Public Class Ax00ServiceMainMDI
     End Property
 
     'SGM 15/11/2011
-    Public Property isWaitingForConnected() As Boolean
+    Public Property isWaitingForConnected As Boolean
         Get
             Return isWaitingForConnectedAttr
         End Get
-        Set(ByVal value As Boolean)
+        Set(value As Boolean)
             If isWaitingForConnectedAttr <> value Then
                 isWaitingForConnectedAttr = value
             End If
@@ -203,11 +203,11 @@ Public Class Ax00ServiceMainMDI
     End Property
 
     'SGM 15/11/2011
-    Public Property isWaitingForStandBy() As Boolean
+    Public Property isWaitingForStandBy As Boolean
         Get
             Return isWaitingForStandByAttr
         End Get
-        Set(ByVal value As Boolean)
+        Set(value As Boolean)
             If isWaitingForStandByAttr <> value Then
                 isWaitingForStandByAttr = value
             End If
@@ -215,11 +215,11 @@ Public Class Ax00ServiceMainMDI
     End Property
 
     'SGM 15/11/2011
-    Public Property isWaitingForSleep() As Boolean
+    Public Property isWaitingForSleep As Boolean
         Get
             Return isWaitingForSleepAttr
         End Get
-        Set(ByVal value As Boolean)
+        Set(value As Boolean)
             If isWaitingForSleepAttr <> value Then
                 isWaitingForSleepAttr = value
             End If
@@ -227,11 +227,11 @@ Public Class Ax00ServiceMainMDI
     End Property
 
     'SGM 15/11/2011
-    Public Property isWaitingForCloseApp() As Boolean
+    Public Property isWaitingForCloseApp As Boolean
         Get
             Return isWaitingForCloseAppAttr
         End Get
-        Set(ByVal value As Boolean)
+        Set(value As Boolean)
             If isWaitingForCloseAppAttr <> value Then
                 isWaitingForCloseAppAttr = value
             End If
@@ -239,11 +239,11 @@ Public Class Ax00ServiceMainMDI
     End Property
 
     'SGM 15/11/2011
-    Public Property isWaitingForAdjust() As Boolean
+    Public Property isWaitingForAdjust As Boolean
         Get
             Return isWaitingForAdjustAttr
         End Get
-        Set(ByVal value As Boolean)
+        Set(value As Boolean)
             If isWaitingForAdjustAttr <> value Then
                 isWaitingForAdjustAttr = value
             End If
@@ -251,11 +251,11 @@ Public Class Ax00ServiceMainMDI
     End Property
 
     ' XBC 23/10/2012
-    Public Property isWaitingForRecover() As Boolean
+    Public Property isWaitingForRecover As Boolean
         Get
             Return IsWaitingForRecoverAttr
         End Get
-        Set(ByVal value As Boolean)
+        Set(value As Boolean)
             If IsWaitingForRecoverAttr <> value Then
                 IsWaitingForRecoverAttr = value
             End If
@@ -263,7 +263,7 @@ Public Class Ax00ServiceMainMDI
     End Property
 
     'SGM 15/11/2011
-    Private ReadOnly Property IsWaitingForNewStatus() As Boolean
+    Private ReadOnly Property IsWaitingForNewStatus As Boolean
         Get
             Return (MyClass.isWaitingForConnected Or _
                     MyClass.isWaitingForStandBy Or _
@@ -272,49 +272,49 @@ Public Class Ax00ServiceMainMDI
         End Get
     End Property
 
-    Public Property ActiveAnalyzerModel() As String
+    Public Property ActiveAnalyzerModel As String
         Get
             Return AnalyzerModelAttribute
         End Get
-        Set(ByVal value As String)
+        Set(value As String)
             AnalyzerModelAttribute = value
         End Set
     End Property
 
-    Public Property ActiveAnalyzer() As String
+    Public Property ActiveAnalyzer As String
         Get
             Return AnalyzerIDAttribute
         End Get
-        Set(ByVal value As String)
+        Set(value As String)
             AnalyzerIDAttribute = value
         End Set
     End Property
 
-    Public Property WorkSessionID() As String
+    Public Property WorkSessionID As String
         Get
             Return WorkSessionIDAttribute
         End Get
-        Set(ByVal value As String)
+        Set(value As String)
             AnalyzerIDAttribute = value
         End Set
     End Property
 
     ' XB 12/11/2013
-    Public Property ActiveStatus() As String
+    Public Property ActiveStatus As String
         Get
             Return WSStatusAttribute
         End Get
-        Set(ByVal value As String)
+        Set(value As String)
             WSStatusAttribute = value
         End Set
     End Property
 
     'SGM 28/11/2011
-    Public Property ActiveFwVersion() As String
+    Public Property ActiveFwVersion As String
         Get
             Return FwVersionAttribute
         End Get
-        Set(ByVal value As String)
+        Set(value As String)
             If (String.Compare(FwVersionAttribute, value, False) <> 0) Then
                 FwVersionAttribute = value
             End If
@@ -322,7 +322,7 @@ Public Class Ax00ServiceMainMDI
     End Property
 
     'SGM 30/05/2012
-    Public ReadOnly Property ActiveSwVersion() As String
+    Public ReadOnly Property ActiveSwVersion As String
         Get
             Dim myFileVersion As FileVersionInfo = FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly.Location)
             With myFileVersion
@@ -338,7 +338,7 @@ Public Class Ax00ServiceMainMDI
     ''' <returns></returns>
     ''' <remarks>SGM 30/05/2012</remarks>
     Public Function GetApplicationVersion() As String
-        Dim myVersion As String = ""
+        Dim myVersion = ""
         Try
             Dim myFileVersion As FileVersionInfo = FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly.Location)
             With myFileVersion
@@ -351,8 +351,8 @@ Public Class Ax00ServiceMainMDI
         Return myVersion
     End Function
 
-    Public WriteOnly Property CurrentLanguage() As String Implements IMainMDI.CurrentLanguage
-        Set(ByVal value As String)
+    Public WriteOnly Property CurrentLanguage As String Implements IMainMDI.CurrentLanguage
+        Set(value As String)
             If (String.Compare(CurrentLanguageAttribute, value, False) <> 0) Then
                 CurrentLanguageAttribute = value
                 GetScreenLabels()
@@ -360,20 +360,20 @@ Public Class Ax00ServiceMainMDI
         End Set
     End Property
 
-    Public Property FwCompatible() As Boolean
+    Public Property FwCompatible As Boolean
         Get
             Return Me.FwCompatibleAttr
         End Get
-        Set(ByVal value As Boolean)
+        Set(value As Boolean)
             Me.FwCompatibleAttr = value
         End Set
     End Property
 
-    Public Property AdjustmentsReaded() As Boolean
+    Public Property AdjustmentsReaded As Boolean
         Get
             Return AdjustmentsReadedAttr
         End Get
-        Set(ByVal value As Boolean)
+        Set(value As Boolean)
 
             Dim myGlobal As New GlobalDataTO
 
@@ -409,11 +409,11 @@ Public Class Ax00ServiceMainMDI
     End Property
 
     'SGM 23/09/2011
-    Public Property IsFinalWashingNeeded() As Boolean
+    Public Property IsFinalWashingNeeded As Boolean
         Get
             Return IsFinalWashingNeededAttr
         End Get
-        Set(ByVal value As Boolean)
+        Set(value As Boolean)
             If Not IsFinalWashingNeededAttr And value Then
                 Me.IsFinalWashed = False
             End If
@@ -422,11 +422,11 @@ Public Class Ax00ServiceMainMDI
     End Property
 
     'SGM 29/09/2011
-    Private Property AutoConnectProcess() As Boolean
+    Private Property AutoConnectProcess As Boolean
         Get
             Return AutoConnectProcessAttr
         End Get
-        Set(ByVal value As Boolean)
+        Set(value As Boolean)
             If AutoConnectProcessAttr <> value Then
                 AutoConnectProcessAttr = value
             End If
@@ -434,14 +434,14 @@ Public Class Ax00ServiceMainMDI
     End Property
 
     'SGM 02/02/2012
-    Private ReadOnly Property FwScriptsLoadedOK() As Boolean
+    Private ReadOnly Property FwScriptsLoadedOK As Boolean
         Get
             Return FwScriptsLoadedOKAttr
         End Get
     End Property
 
     'SGM 02/02/2012
-    Private ReadOnly Property FwAdjustmentsMasterDataLoadedOK() As Boolean
+    Private ReadOnly Property FwAdjustmentsMasterDataLoadedOK As Boolean
         Get
             Return FwAdjustmentsMasterDataLoadedOKAttr
         End Get
@@ -457,7 +457,7 @@ Public Class Ax00ServiceMainMDI
     ''' 'SGM 16/04/2012
     ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
-    Public ReadOnly Property IsAnalyzerInitiated() As Boolean
+    Public ReadOnly Property IsAnalyzerInitiated As Boolean
         Get
             If MyClass.SimulationMode Or GlobalConstants.REAL_DEVELOPMENT_MODE = 2 Then
                 Return True
@@ -506,11 +506,11 @@ Public Class Ax00ServiceMainMDI
     End Property
 
     'SGM 08/11/2012
-    Private Property ManageAlarmType() As GlobalEnumerates.ManagementAlarmTypes
+    Private Property ManageAlarmType As GlobalEnumerates.ManagementAlarmTypes
         Get
             Return ManageAlarmTypeAttr
         End Get
-        Set(ByVal value As GlobalEnumerates.ManagementAlarmTypes)
+        Set(value As GlobalEnumerates.ManagementAlarmTypes)
             If ManageAlarmTypeAttr <> value Then
                 ManageAlarmTypeAttr = value
             End If
@@ -531,7 +531,7 @@ Public Class Ax00ServiceMainMDI
         Public CanSave As Boolean
 
 
-        Public Sub New(ByVal pCodeFw As String)
+        Public Sub New(pCodeFw As String)
             CodeFw = pCodeFw
             Value = ""
             GroupID = ""
@@ -603,8 +603,8 @@ Public Class Ax00ServiceMainMDI
     ''' <remarks>
     ''' Created by: RH - 27/05/2011
     ''' </remarks>
-    Public Sub OnManageReceptionEvent(ByVal pInstructionReceived As String, ByVal pTreated As Boolean, _
-                                      ByVal pRefreshEvent As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As UIRefreshDS, ByVal pMainThread As Boolean) _
+    Public Sub OnManageReceptionEvent(pInstructionReceived As String, pTreated As Boolean, _
+                                      pRefreshEvent As List(Of GlobalEnumerates.UI_RefreshEvents), pRefreshDS As UIRefreshDS, pMainThread As Boolean) _
                                       Handles MDIAnalyzerManager.ReceptionEvent
 
         Me.UIThread(Function() ManageReceptionEvent(pInstructionReceived, pTreated, pRefreshEvent, pRefreshDS, pMainThread))
@@ -623,8 +623,8 @@ Public Class Ax00ServiceMainMDI
     '''              XB - 13/10/2014 - Use NROTOR instead WSCTRL when Wash Station is down - BA-2004
     '''              IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
-    Public Function ManageReceptionEvent(ByVal pInstructionReceived As String, ByVal pTreated As Boolean, _
-                                  ByVal pRefreshEvent As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As UIRefreshDS, ByVal pMainThread As Boolean) As Boolean
+    Public Function ManageReceptionEvent(pInstructionReceived As String, pTreated As Boolean, _
+                                  pRefreshEvent As List(Of GlobalEnumerates.UI_RefreshEvents), pRefreshDS As UIRefreshDS, pMainThread As Boolean) As Boolean
 
         Dim myGlobal As New GlobalDataTO
 
@@ -676,13 +676,13 @@ Public Class Ax00ServiceMainMDI
 
                             'SGM 18/09/2012 - Refresh ISE Utilities
                             If (TypeOf ActiveMdiChild Is UiISEUtilities) Then
-                                Dim CurrentMdiChild As UiISEUtilities = CType(ActiveMdiChild, UiISEUtilities)
+                                Dim CurrentMdiChild = CType(ActiveMdiChild, UiISEUtilities)
                                 CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                             End If
 
                             'SGM 09/11/2012 - Refresh Analyzer Info
                             If (TypeOf ActiveMdiChild Is AnalyzerInfo) Then
-                                Dim CurrentMdiChild As AnalyzerInfo = CType(ActiveMdiChild, AnalyzerInfo)
+                                Dim CurrentMdiChild = CType(ActiveMdiChild, AnalyzerInfo)
                                 CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                             End If
                         End If
@@ -750,7 +750,7 @@ Public Class Ax00ServiceMainMDI
                         ' Refresh Analyzer Info screen
                         For Each oForm As Form In Me.MdiChildren
                             If oForm Is AnalyzerInfo Then
-                                Dim CurrentMdiChild As AnalyzerInfo = CType(oForm, AnalyzerInfo)
+                                Dim CurrentMdiChild = CType(oForm, AnalyzerInfo)
 
                                 Select Case AnalyzerController.Instance.Analyzer.AnalyzerCurrentAction
                                     Case AnalyzerManagerAx00Actions.STANDBY_START
@@ -778,7 +778,7 @@ Public Class Ax00ServiceMainMDI
                         ' Refresh Instrument Update Utility screen
                         If Not ActiveMdiChild Is Nothing Then
                             If (TypeOf ActiveMdiChild Is UiInstrumentUpdateUtil) Then
-                                Dim CurrentMdiChild As UiInstrumentUpdateUtil = CType(ActiveMdiChild, UiInstrumentUpdateUtil)
+                                Dim CurrentMdiChild = CType(ActiveMdiChild, UiInstrumentUpdateUtil)
 
                                 Select Case AnalyzerController.Instance.Analyzer.AnalyzerCurrentAction
                                     Case AnalyzerManagerAx00Actions.STANDBY_START
@@ -799,7 +799,7 @@ Public Class Ax00ServiceMainMDI
                         ' Refresh Thermos Adjustment screen
                         If Not ActiveMdiChild Is Nothing Then
                             If (TypeOf ActiveMdiChild Is UiThermosAdjustments) Then
-                                Dim CurrentMdiChild As UiThermosAdjustments = CType(ActiveMdiChild, UiThermosAdjustments)
+                                Dim CurrentMdiChild = CType(ActiveMdiChild, UiThermosAdjustments)
 
                                 Select Case AnalyzerController.Instance.Analyzer.AnalyzerCurrentAction
                                     Case AnalyzerManagerAx00Actions.WASHSTATION_CTRL_START
@@ -829,7 +829,7 @@ Public Class Ax00ServiceMainMDI
                         If Not ActiveMdiChild Is Nothing Then
 
                             If (TypeOf ActiveMdiChild Is UiPositionsAdjustments) Then
-                                Dim CurrentMdiChild As UiPositionsAdjustments = CType(ActiveMdiChild, UiPositionsAdjustments)
+                                Dim CurrentMdiChild = CType(ActiveMdiChild, UiPositionsAdjustments)
 
                                 Select Case AnalyzerController.Instance.Analyzer.AnalyzerCurrentAction
                                     Case AnalyzerManagerAx00Actions.WASHSTATION_CTRL_START
@@ -858,7 +858,7 @@ Public Class Ax00ServiceMainMDI
                         If Not ActiveMdiChild Is Nothing Then
 
                             If (TypeOf ActiveMdiChild Is UiMotorsPumpsValvesTest) Then
-                                Dim CurrentMdiChild As UiMotorsPumpsValvesTest = CType(ActiveMdiChild, UiMotorsPumpsValvesTest)
+                                Dim CurrentMdiChild = CType(ActiveMdiChild, UiMotorsPumpsValvesTest)
 
                                 Select Case AnalyzerController.Instance.Analyzer.AnalyzerCurrentAction
                                     Case AnalyzerManagerAx00Actions.WASHSTATION_CTRL_START
@@ -891,7 +891,7 @@ Public Class Ax00ServiceMainMDI
                         ' Refresh Photometry Adjustment screen 
                         If Not ActiveMdiChild Is Nothing Then
                             If (TypeOf ActiveMdiChild Is UiPhotometryAdjustments) Then
-                                Dim CurrentMdiChild As UiPhotometryAdjustments = CType(ActiveMdiChild, UiPhotometryAdjustments)
+                                Dim CurrentMdiChild = CType(ActiveMdiChild, UiPhotometryAdjustments)
 
                                 Select Case AnalyzerController.Instance.Analyzer.AnalyzerCurrentAction
                                     Case AnalyzerManagerAx00Actions.WASHSTATION_CTRL_START
@@ -920,7 +920,7 @@ Public Class Ax00ServiceMainMDI
                         If Not ActiveMdiChild Is Nothing Then
 
                             If (TypeOf ActiveMdiChild Is UiChangeRotorSRV) Then
-                                Dim CurrentMdiChild As UiChangeRotorSRV = CType(ActiveMdiChild, UiChangeRotorSRV)
+                                Dim CurrentMdiChild = CType(ActiveMdiChild, UiChangeRotorSRV)
 
                                 Select Case AnalyzerController.Instance.Analyzer.AnalyzerCurrentAction
                                     Case AnalyzerManagerAx00Actions.WASHSTATION_CTRL_START
@@ -945,7 +945,7 @@ Public Class Ax00ServiceMainMDI
                         'SGM 18/09/2012 - Refresh ISE Utilities 
                         If Not ActiveMdiChild Is Nothing Then
                             If (TypeOf ActiveMdiChild Is UiISEUtilities) Then
-                                Dim CurrentMdiChild As UiISEUtilities = CType(ActiveMdiChild, UiISEUtilities)
+                                Dim CurrentMdiChild = CType(ActiveMdiChild, UiISEUtilities)
                                 CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                             End If
                         End If
@@ -1044,9 +1044,9 @@ Public Class Ax00ServiceMainMDI
                                             '' XBC 01/05/2012
 
 
-                                            Dim myText1 As String = ""
-                                            Dim myText2 As String = ""
-                                            Dim myMultiLangResourcesDelegate As MultilanguageResourcesDelegate = New MultilanguageResourcesDelegate
+                                            Dim myText1 = ""
+                                            Dim myText2 = ""
+                                            Dim myMultiLangResourcesDelegate = New MultilanguageResourcesDelegate
                                             myText1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_FW_VERSION_READ", CurrentLanguageAttribute)
                                             myText2 = ""
                                             Me.BsMonitor.DisableAllSensors()
@@ -1228,7 +1228,7 @@ Public Class Ax00ServiceMainMDI
                             ' Refresh Stress Mode screen
                             If Not ActiveMdiChild Is Nothing Then
                                 If (TypeOf ActiveMdiChild Is UiStressModeTest) Then
-                                    Dim CurrentMdiChild As UiStressModeTest = CType(ActiveMdiChild, UiStressModeTest)
+                                    Dim CurrentMdiChild = CType(ActiveMdiChild, UiStressModeTest)
                                     CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                 End If
                             End If
@@ -1278,13 +1278,13 @@ Public Class Ax00ServiceMainMDI
 
                                 'SGM 25/10/2012 - reset Collision Detected Sensor
                                 If (TypeOf ActiveMdiChild Is UiMotorsPumpsValvesTest) Then
-                                    Dim CurrentMdiChild As UiMotorsPumpsValvesTest = CType(ActiveMdiChild, UiMotorsPumpsValvesTest)
+                                    Dim CurrentMdiChild = CType(ActiveMdiChild, UiMotorsPumpsValvesTest)
                                     CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                 End If
                                 'end SGM 25/10/2012
 
                                 If (TypeOf ActiveMdiChild Is AnalyzerInfo) Then
-                                    Dim CurrentMdiChild As AnalyzerInfo = CType(ActiveMdiChild, AnalyzerInfo)
+                                    Dim CurrentMdiChild = CType(ActiveMdiChild, AnalyzerInfo)
                                     CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
 
                                 End If
@@ -1374,7 +1374,7 @@ Public Class Ax00ServiceMainMDI
                                 If Not ActiveMdiChild Is Nothing Then
                                     ' Refresh Tank Levels screen
                                     If (TypeOf ActiveMdiChild Is UiTankLevelsAdjustments) Then
-                                        Dim CurrentMdiChild As UiTankLevelsAdjustments = CType(ActiveMdiChild, UiTankLevelsAdjustments)
+                                        Dim CurrentMdiChild = CType(ActiveMdiChild, UiTankLevelsAdjustments)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
 
@@ -1386,7 +1386,7 @@ Public Class Ax00ServiceMainMDI
 
                                     ' Refresh Thermos screen
                                     If (TypeOf ActiveMdiChild Is UiThermosAdjustments) Then
-                                        Dim CurrentMdiChild As UiThermosAdjustments = CType(ActiveMdiChild, UiThermosAdjustments)
+                                        Dim CurrentMdiChild = CType(ActiveMdiChild, UiThermosAdjustments)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
 
@@ -1402,7 +1402,7 @@ Public Class Ax00ServiceMainMDI
                                     'SGM 17/04/2012
                                     ' Refresh Motors screen (for the moment no POLHW values can be obtained from Fw so some values will be obtained by means of ANSINF)
                                     If (TypeOf ActiveMdiChild Is UiMotorsPumpsValvesTest) Then
-                                        Dim CurrentMdiChild As UiMotorsPumpsValvesTest = CType(ActiveMdiChild, UiMotorsPumpsValvesTest)
+                                        Dim CurrentMdiChild = CType(ActiveMdiChild, UiMotorsPumpsValvesTest)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
 
@@ -1502,7 +1502,7 @@ Public Class Ax00ServiceMainMDI
 
                                             myGlobal = AnalyzerController.Instance.Analyzer.GetFwVersionNeeded(mySwVersion)
                                             If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
-                                                Dim myNeededFwVersion As String = CStr(myGlobal.SetDatos)
+                                                Dim myNeededFwVersion = CStr(myGlobal.SetDatos)
 
                                                 Dim TextPar As New List(Of String)
                                                 TextPar.Add(myNeededFwVersion)
@@ -1535,7 +1535,7 @@ Public Class Ax00ServiceMainMDI
                                         ' Refresh Analyzer Info screen
                                         For Each oForm As Form In Me.MdiChildren
                                             If oForm Is AnalyzerInfo Then
-                                                Dim CurrentMdiChild As AnalyzerInfo = CType(oForm, AnalyzerInfo)
+                                                Dim CurrentMdiChild = CType(oForm, AnalyzerInfo)
                                                 CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                                 Exit For
                                             End If
@@ -1616,7 +1616,7 @@ Public Class Ax00ServiceMainMDI
                         ' Refresh Analyzer Info screen
                         For Each oForm As Form In Me.MdiChildren
                             If oForm Is AnalyzerInfo Then
-                                Dim CurrentMdiChild As AnalyzerInfo = CType(oForm, AnalyzerInfo)
+                                Dim CurrentMdiChild = CType(oForm, AnalyzerInfo)
                                 CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                 Exit For
                             End If
@@ -1632,7 +1632,7 @@ Public Class Ax00ServiceMainMDI
                         ' Instrument Update Utility screen
                         If Not ActiveMdiChild Is Nothing Then
                             If (TypeOf ActiveMdiChild Is UiInstrumentUpdateUtil) Then
-                                Dim CurrentMdiChild As UiInstrumentUpdateUtil = CType(ActiveMdiChild, UiInstrumentUpdateUtil)
+                                Dim CurrentMdiChild = CType(ActiveMdiChild, UiInstrumentUpdateUtil)
                                 CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                             End If
                         End If
@@ -1649,7 +1649,7 @@ Public Class Ax00ServiceMainMDI
                                 ' Refresh Analyzer Info screen
                                 If Not ActiveMdiChild Is Nothing Then
                                     If (TypeOf ActiveMdiChild Is AnalyzerInfo) Then
-                                        Dim CurrentMdiChild As AnalyzerInfo = CType(ActiveMdiChild, AnalyzerInfo)
+                                        Dim CurrentMdiChild = CType(ActiveMdiChild, AnalyzerInfo)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
                                 End If
@@ -1668,7 +1668,7 @@ Public Class Ax00ServiceMainMDI
                                 ' Refresh Motors Pumps screen
                                 If Not ActiveMdiChild Is Nothing Then
                                     If (TypeOf ActiveMdiChild Is UiMotorsPumpsValvesTest) Then
-                                        Dim CurrentMdiChild As UiMotorsPumpsValvesTest = CType(ActiveMdiChild, UiMotorsPumpsValvesTest)
+                                        Dim CurrentMdiChild = CType(ActiveMdiChild, UiMotorsPumpsValvesTest)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
                                 End If
@@ -1676,7 +1676,7 @@ Public Class Ax00ServiceMainMDI
                                 ' Refresh Analyzer Info screen
                                 If Not ActiveMdiChild Is Nothing Then
                                     If (TypeOf ActiveMdiChild Is AnalyzerInfo) Then
-                                        Dim CurrentMdiChild As AnalyzerInfo = CType(ActiveMdiChild, AnalyzerInfo)
+                                        Dim CurrentMdiChild = CType(ActiveMdiChild, AnalyzerInfo)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
                                 End If
@@ -1684,7 +1684,7 @@ Public Class Ax00ServiceMainMDI
                                 ' Cycles Count screen
                                 If Not ActiveMdiChild Is Nothing Then
                                     If (TypeOf ActiveMdiChild Is UiCycleCountScreen) Then
-                                        Dim CurrentMdiChild As UiCycleCountScreen = CType(ActiveMdiChild, UiCycleCountScreen)
+                                        Dim CurrentMdiChild = CType(ActiveMdiChild, UiCycleCountScreen)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
                                 End If
@@ -1703,7 +1703,7 @@ Public Class Ax00ServiceMainMDI
                                 ' Refresh Motors Pumps screen
                                 If Not ActiveMdiChild Is Nothing Then
                                     If (TypeOf ActiveMdiChild Is UiMotorsPumpsValvesTest) Then
-                                        Dim CurrentMdiChild As UiMotorsPumpsValvesTest = CType(ActiveMdiChild, UiMotorsPumpsValvesTest)
+                                        Dim CurrentMdiChild = CType(ActiveMdiChild, UiMotorsPumpsValvesTest)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
                                 End If
@@ -1711,7 +1711,7 @@ Public Class Ax00ServiceMainMDI
                                 ' Refresh Analyzer Info screen
                                 If Not ActiveMdiChild Is Nothing Then
                                     If (TypeOf ActiveMdiChild Is AnalyzerInfo) Then
-                                        Dim CurrentMdiChild As AnalyzerInfo = CType(ActiveMdiChild, AnalyzerInfo)
+                                        Dim CurrentMdiChild = CType(ActiveMdiChild, AnalyzerInfo)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
                                 End If
@@ -1719,7 +1719,7 @@ Public Class Ax00ServiceMainMDI
                                 ' Cycles Count screen
                                 If Not ActiveMdiChild Is Nothing Then
                                     If (TypeOf ActiveMdiChild Is UiCycleCountScreen) Then
-                                        Dim CurrentMdiChild As UiCycleCountScreen = CType(ActiveMdiChild, UiCycleCountScreen)
+                                        Dim CurrentMdiChild = CType(ActiveMdiChild, UiCycleCountScreen)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
                                 End If
@@ -1741,7 +1741,7 @@ Public Class Ax00ServiceMainMDI
                                     If (TypeOf ActiveMdiChild Is UiPhotometryAdjustments) Or _
                                     (TypeOf ActiveMdiChild Is UiMotorsPumpsValvesTest) Then
 
-                                        Dim CurrentMdiChild As UiMotorsPumpsValvesTest = CType(ActiveMdiChild, UiMotorsPumpsValvesTest)
+                                        Dim CurrentMdiChild = CType(ActiveMdiChild, UiMotorsPumpsValvesTest)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
                                 End If
@@ -1749,7 +1749,7 @@ Public Class Ax00ServiceMainMDI
                                 ' Refresh Analyzer Info screen
                                 If Not ActiveMdiChild Is Nothing Then
                                     If (TypeOf ActiveMdiChild Is AnalyzerInfo) Then
-                                        Dim CurrentMdiChild As AnalyzerInfo = CType(ActiveMdiChild, AnalyzerInfo)
+                                        Dim CurrentMdiChild = CType(ActiveMdiChild, AnalyzerInfo)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
                                 End If
@@ -1757,7 +1757,7 @@ Public Class Ax00ServiceMainMDI
                                 ' Cycles Count screen
                                 If Not ActiveMdiChild Is Nothing Then
                                     If (TypeOf ActiveMdiChild Is UiCycleCountScreen) Then
-                                        Dim CurrentMdiChild As UiCycleCountScreen = CType(ActiveMdiChild, UiCycleCountScreen)
+                                        Dim CurrentMdiChild = CType(ActiveMdiChild, UiCycleCountScreen)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
                                 End If
@@ -1777,7 +1777,7 @@ Public Class Ax00ServiceMainMDI
                                 ' Refresh Analyzer Info screen
                                 If Not ActiveMdiChild Is Nothing Then
                                     If (TypeOf ActiveMdiChild Is AnalyzerInfo) Then
-                                        Dim CurrentMdiChild As AnalyzerInfo = CType(ActiveMdiChild, AnalyzerInfo)
+                                        Dim CurrentMdiChild = CType(ActiveMdiChild, AnalyzerInfo)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
                                 End If
@@ -1785,7 +1785,7 @@ Public Class Ax00ServiceMainMDI
                                 ' Cycles Count screen
                                 If Not ActiveMdiChild Is Nothing Then
                                     If (TypeOf ActiveMdiChild Is UiCycleCountScreen) Then
-                                        Dim CurrentMdiChild As UiCycleCountScreen = CType(ActiveMdiChild, UiCycleCountScreen)
+                                        Dim CurrentMdiChild = CType(ActiveMdiChild, UiCycleCountScreen)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
                                 End If
@@ -1805,7 +1805,7 @@ Public Class Ax00ServiceMainMDI
                                 ' Refresh Analyzer Info screen
                                 If Not ActiveMdiChild Is Nothing Then
                                     If (TypeOf ActiveMdiChild Is AnalyzerInfo) Then
-                                        Dim CurrentMdiChild As AnalyzerInfo = CType(ActiveMdiChild, AnalyzerInfo)
+                                        Dim CurrentMdiChild = CType(ActiveMdiChild, AnalyzerInfo)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
                                 End If
@@ -1813,7 +1813,7 @@ Public Class Ax00ServiceMainMDI
                                 ' Refresh Level Detection screen
                                 If Not ActiveMdiChild Is Nothing Then
                                     If (TypeOf ActiveMdiChild Is UiLevelDetectionTest) Then
-                                        Dim CurrentMdiChild As UiLevelDetectionTest = CType(ActiveMdiChild, UiLevelDetectionTest)
+                                        Dim CurrentMdiChild = CType(ActiveMdiChild, UiLevelDetectionTest)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
                                 End If
@@ -1833,7 +1833,7 @@ Public Class Ax00ServiceMainMDI
                                 ' Refresh Analyzer Info screen
                                 If Not ActiveMdiChild Is Nothing Then
                                     If (TypeOf ActiveMdiChild Is AnalyzerInfo) Then
-                                        Dim CurrentMdiChild As AnalyzerInfo = CType(ActiveMdiChild, AnalyzerInfo)
+                                        Dim CurrentMdiChild = CType(ActiveMdiChild, AnalyzerInfo)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
                                 End If
@@ -1841,7 +1841,7 @@ Public Class Ax00ServiceMainMDI
                                 ' Cycles Count screen
                                 If Not ActiveMdiChild Is Nothing Then
                                     If (TypeOf ActiveMdiChild Is UiCycleCountScreen) Then
-                                        Dim CurrentMdiChild As UiCycleCountScreen = CType(ActiveMdiChild, UiCycleCountScreen)
+                                        Dim CurrentMdiChild = CType(ActiveMdiChild, UiCycleCountScreen)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
                                 End If
@@ -1858,7 +1858,7 @@ Public Class Ax00ServiceMainMDI
                                 ' Refresh Analyzer Info screen
                                 If Not ActiveMdiChild Is Nothing Then
                                     If (TypeOf ActiveMdiChild Is AnalyzerInfo) Then
-                                        Dim CurrentMdiChild As AnalyzerInfo = CType(ActiveMdiChild, AnalyzerInfo)
+                                        Dim CurrentMdiChild = CType(ActiveMdiChild, AnalyzerInfo)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
                                 End If
@@ -1866,7 +1866,7 @@ Public Class Ax00ServiceMainMDI
                                 ' Refresh Motors screen
                                 If Not ActiveMdiChild Is Nothing Then
                                     If (TypeOf ActiveMdiChild Is UiMotorsPumpsValvesTest) Then
-                                        Dim CurrentMdiChild As UiMotorsPumpsValvesTest = CType(ActiveMdiChild, UiMotorsPumpsValvesTest)
+                                        Dim CurrentMdiChild = CType(ActiveMdiChild, UiMotorsPumpsValvesTest)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
                                 End If
@@ -1902,7 +1902,7 @@ Public Class Ax00ServiceMainMDI
                             ' Refresh BarCode Info screen
                             If Not ActiveMdiChild Is Nothing Then
                                 If (TypeOf ActiveMdiChild Is UiBarCodeAdjustments) Then
-                                    Dim CurrentMdiChild As UiBarCodeAdjustments = CType(ActiveMdiChild, UiBarCodeAdjustments)
+                                    Dim CurrentMdiChild = CType(ActiveMdiChild, UiBarCodeAdjustments)
                                     CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                 End If
                             End If
@@ -1919,17 +1919,17 @@ Public Class Ax00ServiceMainMDI
                         If Not ActiveMdiChild Is Nothing Then
 
                             If (TypeOf ActiveMdiChild Is AnalyzerInfo) Then
-                                Dim CurrentMdiChild As AnalyzerInfo = CType(ActiveMdiChild, AnalyzerInfo)
+                                Dim CurrentMdiChild = CType(ActiveMdiChild, AnalyzerInfo)
                                 CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                             End If
 
                             If (TypeOf ActiveMdiChild Is UiISEUtilities) Then
-                                Dim CurrentMdiChild As UiISEUtilities = CType(ActiveMdiChild, UiISEUtilities)
+                                Dim CurrentMdiChild = CType(ActiveMdiChild, UiISEUtilities)
                                 CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                             End If
 
                             If (TypeOf ActiveMdiChild Is UiStressModeTest) Then
-                                Dim CurrentMdiChild As UiStressModeTest = CType(ActiveMdiChild, UiStressModeTest)
+                                Dim CurrentMdiChild = CType(ActiveMdiChild, UiStressModeTest)
                                 CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                             End If
 
@@ -2028,7 +2028,7 @@ Public Class Ax00ServiceMainMDI
                         If Not ActiveMdiChild Is Nothing Then
 
                             If (TypeOf ActiveMdiChild Is UiInstrumentUpdateUtil) Then
-                                Dim CurrentMdiChild As UiInstrumentUpdateUtil = CType(ActiveMdiChild, UiInstrumentUpdateUtil)
+                                Dim CurrentMdiChild = CType(ActiveMdiChild, UiInstrumentUpdateUtil)
                                 CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                 Return True 'not to refresh sensors
 
@@ -2048,7 +2048,7 @@ Public Class Ax00ServiceMainMDI
                         '
                         ' STRESS MODE ANSWER
                         '
-                        Dim openStressScreen As Boolean = False
+                        Dim openStressScreen = False
                         myGlobal = AnalyzerController.Instance.Analyzer.ReadStressModeData
                         If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                             Dim MyResultsStressTest As StressDataTO
@@ -2264,7 +2264,7 @@ Public Class Ax00ServiceMainMDI
             ' XB 04/12/2013 - Use the same functionality to Export Logs to XML that is used by User Sw - BT #171 SERVICE
             Dim myGlobalDataTO As New GlobalDataTO
             'Dim myLogAcciones As New ApplicationLogManager()
-            Dim myLogMaxDays As Integer = 30
+            Dim myLogMaxDays = 30
 
             myGlobalDataTO = SwParametersDelegate.ReadNumValueByParameterName(Nothing, GlobalEnumerates.SwParameters.MAX_DAYS_IN_PREVIOUSLOG.ToString(), Nothing)
             If Not myGlobalDataTO.HasError Then myLogMaxDays = CInt(myGlobalDataTO.SetDatos)
@@ -2290,7 +2290,7 @@ Public Class Ax00ServiceMainMDI
     Private Sub ShowTimeoutMessage()
         Dim myGlobal As New GlobalDataTO
         Try
-            Dim myTitle As String = ""
+            Dim myTitle = ""
             myGlobal.ErrorCode = Messages.ERROR_COMM.ToString
             myTitle = "Warning"
             AutoConnectFailsErrorCode = myGlobal.ErrorCode
@@ -2300,7 +2300,7 @@ Public Class Ax00ServiceMainMDI
             If String.Compare(AutoConnectFailsTitle, "", False) <> 0 Then
 
                 Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
-                Dim myAdtionalText As String = ""
+                Dim myAdtionalText = ""
                 For Each oForm As Form In Me.MdiChildren
                     If oForm Is AnalyzerInfo Or _
                        oForm Is UiPositionsAdjustments Or _
@@ -2372,7 +2372,7 @@ Public Class Ax00ServiceMainMDI
     Private Sub ShowISETimeoutMessage()
         Dim myGlobal As New GlobalDataTO
         Try
-            Dim myTitle As String = ""
+            Dim myTitle = ""
             myGlobal.ErrorCode = Messages.ERROR_COMM.ToString
             myTitle = "Warning"
 
@@ -2393,7 +2393,7 @@ Public Class Ax00ServiceMainMDI
             Me.ActivateMenus(True)
             Me.ActivateActionButtonBar(True)
 
-            Dim myAdtionalText As String = ""
+            Dim myAdtionalText = ""
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
             myAdtionalText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "ISE_TIMEOUT_ERR", CurrentLanguageAttribute)
 
@@ -2413,7 +2413,7 @@ Public Class Ax00ServiceMainMDI
     ''' <remarks>
     ''' Created by XB 05/11/2014 - BA-1872
     ''' </remarks>
-    Private Sub OnManageSentEvent(ByVal pInstructionSent As String) Handles MDIAnalyzerManager.SendEvent
+    Private Sub OnManageSentEvent(pInstructionSent As String) Handles MDIAnalyzerManager.SendEvent
 
         Me.UIThread(Function() ManageSentEvent(pInstructionSent))
 
@@ -2427,7 +2427,7 @@ Public Class Ax00ServiceMainMDI
     ''' <remarks>
     ''' Created by XB 05/11/2014 - code copied from the old OnManageSentEvent method and add new code for ISE timeouts - BA-1872
     ''' </remarks>
-    Private Function ManageSentEvent(ByVal pInstructionSent As String) As Boolean
+    Private Function ManageSentEvent(pInstructionSent As String) As Boolean
         Try
             ' XBC 18/11/2011
             If String.Compare(pInstructionSent, AnalyzerManagerSwActionList.NO_THREADS.ToString, False) = 0 Then
@@ -2450,7 +2450,7 @@ Public Class Ax00ServiceMainMDI
                     If AnalyzerController.Instance.Analyzer.ISEAnalyzer IsNot Nothing AndAlso _
                    AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEModuleInstalled AndAlso _
                    AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentProcedure <> ISEManager.ISEProcedures.None Then
-                        Dim myISEResultWithComErrors As ISEResultTO = New ISEResultTO
+                        Dim myISEResultWithComErrors = New ISEResultTO
                         myISEResultWithComErrors.ISEResultType = ISEResultTO.ISEResultTypes.ComError
                         AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastISEResult = myISEResultWithComErrors
                     End If
@@ -2458,7 +2458,7 @@ Public Class Ax00ServiceMainMDI
                     If Not ActiveMdiChild Is Nothing Then
 
                         If (TypeOf ActiveMdiChild Is UiISEUtilities) Then
-                            Dim CurrentMdiChild As UiISEUtilities = CType(ActiveMdiChild, UiISEUtilities)
+                            Dim CurrentMdiChild = CType(ActiveMdiChild, UiISEUtilities)
                             CurrentMdiChild.PrepareErrorMode()
                         End If
 
@@ -2581,11 +2581,11 @@ Public Class Ax00ServiceMainMDI
     ''' <remarks>CREATE BY: 'TR 20/10/2011
     ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016) 
     ''' </remarks>
-    Private Sub OnDeviceRemoved(ByVal sender As Object, ByVal e As Biosystems.Ax00.PresentationCOM.DetectorForm.DriveDetectorEventArgs)
+    Private Sub OnDeviceRemoved(sender As Object, e As Biosystems.Ax00.PresentationCOM.DetectorForm.DriveDetectorEventArgs)
         Try
             'Get the open port.
-            Dim myConnectedPort As String = ""
-            Dim isConnected As Boolean = False
+            Dim myConnectedPort = ""
+            Dim isConnected = False
             If Not AnalyzerController.Instance.Analyzer Is Nothing Then
                 isConnected = AnalyzerController.Instance.Analyzer.Connected
                 myConnectedPort = AnalyzerController.Instance.Analyzer.PortName
@@ -2632,7 +2632,7 @@ Public Class Ax00ServiceMainMDI
                         '- Configuration screen (close screen without save changes)
                         ' The 1st idea was update the ports combo but it was CANCELED due a system error was triggered and it was difficult to solve
                         If (TypeOf ActiveMdiChild Is UiConfigGeneral) Then
-                            Dim CurrentMdiChild As UiConfigGeneral = CType(ActiveMdiChild, UiConfigGeneral)
+                            Dim CurrentMdiChild = CType(ActiveMdiChild, UiConfigGeneral)
                             Dim emptyRefreshDS As UIRefreshDS = Nothing
                             Dim emptyRefreshEventList As New List(Of GlobalEnumerates.UI_RefreshEvents)
                             CurrentMdiChild.RefreshScreen(emptyRefreshEventList, emptyRefreshDS) 'DL16/09/2011 CurrentMdiChild.RefreshScreen(pRefreshEvent, pRefreshDS)
@@ -2657,7 +2657,7 @@ Public Class Ax00ServiceMainMDI
     ''' <remarks>
     ''' Created by: AG 01/06/2010 (Tested ok)
     ''' </remarks>
-    Private Sub bsTSConnectButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsTSConnectButton.Click
+    Private Sub bsTSConnectButton_Click(sender As System.Object, e As System.EventArgs) Handles bsTSConnectButton.Click
         Try
             If Not MyClass.FwScriptsLoadedOK Then
                 Me.bsTSConnectButton.Enabled = False
@@ -2705,7 +2705,7 @@ Public Class Ax00ServiceMainMDI
     ''' Created by:  AG 02/11/2010 - Tested: ok
     ''' </remarks>
     ''' PDT !!!
-    Private Sub bsTSShutdownButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsTSShutdownButton.Click
+    Private Sub bsTSShutdownButton_Click(sender As System.Object, e As System.EventArgs) Handles bsTSShutdownButton.Click
         Try
             Me.ShutDownAnalyzer()
 
@@ -2724,7 +2724,7 @@ Public Class Ax00ServiceMainMDI
     ''' <remarks>Created by SGM 18/10/2012
     ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
-    Private Sub bsTSRecoverButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsTSRecoverButton.Click
+    Private Sub bsTSRecoverButton_Click(sender As System.Object, e As System.EventArgs) Handles bsTSRecoverButton.Click
         Try
             If Not AnalyzerController.Instance.Analyzer Is Nothing Then
 
@@ -2775,7 +2775,7 @@ Public Class Ax00ServiceMainMDI
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     ''' <remarks>Created by XBC 07/11/2012</remarks>
-    Private Sub bsTSWarningButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsTSWarningButton.Click
+    Private Sub bsTSWarningButton_Click(sender As System.Object, e As System.EventArgs) Handles bsTSWarningButton.Click
         Try
             myErrCodesForm = New UiErrorCodes
 
@@ -2792,7 +2792,7 @@ Public Class Ax00ServiceMainMDI
     ''' </summary>
     ''' <param name="pEnable"></param>
     ''' <remarks>Created by XBC 08/02/2012</remarks>
-    Public Sub OnManageActivateScreenEvent(ByVal pEnable As Boolean, ByVal pMessageID As GlobalEnumerates.Messages) Handles myISEUtilities.ActivateScreenEvent
+    Public Sub OnManageActivateScreenEvent(pEnable As Boolean, pMessageID As GlobalEnumerates.Messages) Handles myISEUtilities.ActivateScreenEvent
         Try
             MyClass.ActivateActionButtonBar(pEnable)
             MyClass.ActivateMenus(pEnable)
@@ -3176,7 +3176,7 @@ Public Class Ax00ServiceMainMDI
         Return myGlobalDataTO
     End Function
 
-    Private Sub BsInfoTimer_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsInfoTimer.Tick
+    Private Sub BsInfoTimer_Tick(sender As System.Object, e As System.EventArgs) Handles BsInfoTimer.Tick
 
         Dim myGlobal As New GlobalDataTO
         Dim continousSimulation As Boolean
@@ -3213,17 +3213,17 @@ Public Class Ax00ServiceMainMDI
 
                             ' Refresh Tank Levels screen
                             If (TypeOf ActiveMdiChild Is UiTankLevelsAdjustments) Then
-                                Dim CurrentMdiChild As UiTankLevelsAdjustments = CType(ActiveMdiChild, UiTankLevelsAdjustments)
+                                Dim CurrentMdiChild = CType(ActiveMdiChild, UiTankLevelsAdjustments)
                                 CurrentMdiChild.RefreshScreen(myRefreshEvent, mySimRefreshDS)
                             End If
                             ' Refresh Motors, Pumps Valves screen
                             If (TypeOf ActiveMdiChild Is UiMotorsPumpsValvesTest) Then
-                                Dim CurrentMdiChild As UiMotorsPumpsValvesTest = CType(ActiveMdiChild, UiMotorsPumpsValvesTest)
+                                Dim CurrentMdiChild = CType(ActiveMdiChild, UiMotorsPumpsValvesTest)
                                 CurrentMdiChild.RefreshScreen(myRefreshEvent, mySimRefreshDS)
                             End If
                             ' Refresh Thermos screen
                             If (TypeOf ActiveMdiChild Is UiThermosAdjustments) Then
-                                Dim CurrentMdiChild As UiThermosAdjustments = CType(ActiveMdiChild, UiThermosAdjustments)
+                                Dim CurrentMdiChild = CType(ActiveMdiChild, UiThermosAdjustments)
                                 CurrentMdiChild.RefreshScreen(myRefreshEvent, mySimRefreshDS)
                             End If
                         End If
@@ -3267,7 +3267,7 @@ Public Class Ax00ServiceMainMDI
             If Me.SimulationMode Then
                 Me.BsMonitor.DisableAllSensors()
 
-                Dim myConnected As Integer = 0
+                Dim myConnected = 0
                 Dim myConnectedText As String = Me.NotConnectedText
                 If AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                     myConnected = 1
@@ -3292,7 +3292,7 @@ Public Class Ax00ServiceMainMDI
     ''' Refresh Monitor Panel with the information received from the Instrument
     ''' </summary>
     ''' <remarks>Created by XBC 17/05/2011</remarks>
-    Private Sub RefreshMonitorPanel(ByVal pSensorValueChanged As UIRefreshDS.SensorValueChangedDataTable)
+    Private Sub RefreshMonitorPanel(pSensorValueChanged As UIRefreshDS.SensorValueChangedDataTable)
 
         Dim myGlobal As New GlobalDataTO
         Dim mySensorValuesChangedDT As New UIRefreshDS.SensorValueChangedDataTable
@@ -3428,7 +3428,7 @@ Public Class Ax00ServiceMainMDI
                         End If
                     ElseIf String.Compare(S.SensorID, AnalyzerSensors.CONNECTED.ToString, False) = 0 Then
                         Dim MLRD As New MultilanguageResourcesDelegate
-                        Dim myConectedTitle As String = ""
+                        Dim myConectedTitle = ""
                         If S.Value > 0 Then
                             myConectedTitle = Me.ConnectedText
                         Else
@@ -3618,7 +3618,7 @@ Public Class Ax00ServiceMainMDI
     ''' <remarks>Created by XBC 30/09/2011
     ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
-    Public Function SEND_READ_ADJUSTMENTS(ByVal pQueryMode As GlobalEnumerates.Ax00Adjustsments) As GlobalDataTO
+    Public Function SEND_READ_ADJUSTMENTS(pQueryMode As GlobalEnumerates.Ax00Adjustsments) As GlobalDataTO
         Dim myGlobal As New GlobalDataTO
         Try
             If Not AnalyzerController.Instance.Analyzer Is Nothing Then
@@ -3651,7 +3651,7 @@ Public Class Ax00ServiceMainMDI
     ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     ''' 
-    Public Function SEND_ISE_COMMAND(ByVal pISECommand As ISECommandTO) As GlobalDataTO
+    Public Function SEND_ISE_COMMAND(pISECommand As ISECommandTO) As GlobalDataTO
         Dim myGlobal As New GlobalDataTO
         Try
             If Not AnalyzerController.Instance.Analyzer Is Nothing Then
@@ -3789,7 +3789,7 @@ Public Class Ax00ServiceMainMDI
     ''' <remarks>Created by XBC 03/10/2011
     ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
-    Public Function SEND_POLLFW(ByVal ID As POLL_IDs) As GlobalDataTO
+    Public Function SEND_POLLFW(ID As POLL_IDs) As GlobalDataTO
         Dim myGlobal As New GlobalDataTO
         Try
             If Not AnalyzerController.Instance.Analyzer Is Nothing Then
@@ -3941,7 +3941,7 @@ Public Class Ax00ServiceMainMDI
     ''' Created by SGM 27/09/2011
     ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
-    Public Sub ActivateMenus(ByVal pEnable As Boolean, _
+    Public Sub ActivateMenus(pEnable As Boolean, _
                              Optional ByVal pDisableForced As Boolean = False, _
                              Optional ByVal pFwUpdated As Boolean = False)
         Dim isconnected As Boolean
@@ -3977,7 +3977,7 @@ Public Class Ax00ServiceMainMDI
             ' XBC 22/05/2012
             If Not ActiveMdiChild Is Nothing Then
                 If (TypeOf ActiveMdiChild Is UiPositionsAdjustments) Then
-                    Dim CurrentMdiChild As UiPositionsAdjustments = CType(ActiveMdiChild, UiPositionsAdjustments)
+                    Dim CurrentMdiChild = CType(ActiveMdiChild, UiPositionsAdjustments)
                     If CurrentMdiChild.IsCenteringOptic Then
                         pEnable = False
                     End If
@@ -4090,7 +4090,7 @@ Public Class Ax00ServiceMainMDI
                             'SGM 08/11/2012 - if Stop Alarm occured while initialization
                             If Not ActiveMdiChild Is Nothing Then
                                 If (TypeOf ActiveMdiChild Is AnalyzerInfo) Then
-                                    Dim CurrentMdiChild As AnalyzerInfo = CType(ActiveMdiChild, AnalyzerInfo)
+                                    Dim CurrentMdiChild = CType(ActiveMdiChild, AnalyzerInfo)
                                     If CurrentMdiChild.IsStopAlarmWhileInitialization Then
                                         If Not RecoverRequested Then
                                             Me.ConfigurationToolStripMenuItem.Enabled = True
@@ -4238,16 +4238,16 @@ Public Class Ax00ServiceMainMDI
     ''' Modified by SGM 27/09/2011
     '''              IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
-    Public Sub ActivateActionButtonBar(ByVal pEnabled As Boolean, _
+    Public Sub ActivateActionButtonBar(pEnabled As Boolean, _
                                        Optional ByVal pDisableForced As Boolean = False, _
                                        Optional ByVal pFwUpdated As Boolean = False)
-        Dim isconnected As Boolean = False
+        Dim isconnected = False
         Try
 
             ' XBC 22/05/2012
             If Not ActiveMdiChild Is Nothing Then
                 If (TypeOf ActiveMdiChild Is UiPositionsAdjustments) Then
-                    Dim CurrentMdiChild As UiPositionsAdjustments = CType(ActiveMdiChild, UiPositionsAdjustments)
+                    Dim CurrentMdiChild = CType(ActiveMdiChild, UiPositionsAdjustments)
                     If CurrentMdiChild.IsCenteringOptic Then
                         pEnabled = False
                     End If
@@ -4394,7 +4394,7 @@ Public Class Ax00ServiceMainMDI
     End Sub
 
     'SGM 25/11/2011
-    Public Sub WriteDebugConsoleTraceLine(ByVal pData As String)
+    Public Sub WriteDebugConsoleTraceLine(pData As String)
         Try
 #If DEBUG Then
             If myConsole IsNot Nothing Then
@@ -4419,7 +4419,7 @@ Public Class Ax00ServiceMainMDI
     ''' Created by XBC 18/05/2011
     ''' Modified by XB 04/02/2013 - Upper conversions redundants because the value is already in UpperCase must delete to avoid Regional Settings problems (Bugs tracking #1112)
     ''' </remarks>
-    Private Function ReadSensorAdjustmentValue(ByVal pAdjType As ADJUSTMENT_GROUPS, ByVal pSubType As AXIS) As Single
+    Private Function ReadSensorAdjustmentValue(pAdjType As ADJUSTMENT_GROUPS, pSubType As AXIS) As Single
         Dim myGlobal As New GlobalDataTO
         Dim myResult As Single = -99999
         ''Dim myUtil As New Utilities.
@@ -4582,7 +4582,7 @@ Public Class Ax00ServiceMainMDI
     Private Sub ManageMenuOptionsByUserLevel()
 
         Try
-            Dim myCurrentUser As USER_LEVEL = CType(Me.CurrentUserLevelAttribute, USER_LEVEL)
+            Dim myCurrentUser = CType(Me.CurrentUserLevelAttribute, USER_LEVEL)
 
             Me.SettingsToolStripMenuItem.Visible = (myCurrentUser >= USER_LEVEL.lBIOSYSTEMS)
             Me.SendableScriptsToolStripMenuItem.Visible = (myCurrentUser >= USER_LEVEL.lBIOSYSTEMS)
@@ -4630,8 +4630,8 @@ Public Class Ax00ServiceMainMDI
     ''' Modified by: SA 20/09/2010 - After validation on the ActiveMDIChild, close all open MdiChildren (to avoid problems with
     '''                              "small" forms like Language Conf., Analyzer Conf., etc)
     ''' </remarks>
-    Private Function OpenMDIChildForm(ByVal pScreenToOpen As BSBaseForm) As Boolean
-        Dim screenOpened As Boolean = True
+    Private Function OpenMDIChildForm(pScreenToOpen As BSBaseForm) As Boolean
+        Dim screenOpened = True
 
         Try
             ' XBC 20/04/2012
@@ -4690,7 +4690,7 @@ Public Class Ax00ServiceMainMDI
 
                                 'SGM 10/05/2012
                                 If TypeOf ActiveMdiChild Is UiISEUtilities Then
-                                    Dim myISEUtilities As UiISEUtilities = CType(ActiveMdiChild, UiISEUtilities)
+                                    Dim myISEUtilities = CType(ActiveMdiChild, UiISEUtilities)
                                     myISEUtilities.myScreenPendingToOpenWhileISEUtilClosing = pScreenToOpen
                                 Else
                                     ' XBC 20/04/2012
@@ -4705,7 +4705,7 @@ Public Class Ax00ServiceMainMDI
 
                 If (screenOpened) Then
                     'If the ActiveMDI was closed, verify any other screen is open before opening the requested one
-                    Dim i As Integer = 0
+                    Dim i = 0
                     For i = Me.MdiChildren.Length - 1 To 0 Step -1
                         If (MdiChildren(i).Name = pScreenToOpen.Name) Then
                             screenOpened = False
@@ -4794,32 +4794,32 @@ Public Class Ax00ServiceMainMDI
                         'SGM 28/03/2012
                         If TypeOf ActiveMdiChild Is BSAdjustmentBaseForm Then
                             If Not (TypeOf ActiveMdiChild Is UiStressModeTest) Then
-                                Dim myBaseAdjForm As BSAdjustmentBaseForm = CType(ActiveMdiChild, BSAdjustmentBaseForm)
+                                Dim myBaseAdjForm = CType(ActiveMdiChild, BSAdjustmentBaseForm)
                                 myBaseAdjForm.CloseWithoutShutDownRequestedByMDI = True
                                 myBaseAdjForm.CloseRequestedByMDI = True
                                 If TypeOf ActiveMdiChild Is UiMotorsPumpsValvesTest Then
-                                    Dim myMotorsForm As UiMotorsPumpsValvesTest = CType(Me.ActiveMdiChild, UiMotorsPumpsValvesTest)
+                                    Dim myMotorsForm = CType(Me.ActiveMdiChild, UiMotorsPumpsValvesTest)
                                     If Not myMotorsForm.IsReadyToClose Then
                                         Me.isWaitingForCloseApp = True
                                         Return myGlobal
                                     End If
                                 End If
                                 If TypeOf ActiveMdiChild Is UiPositionsAdjustments Then
-                                    Dim myPosForm As UiPositionsAdjustments = CType(Me.ActiveMdiChild, UiPositionsAdjustments)
+                                    Dim myPosForm = CType(Me.ActiveMdiChild, UiPositionsAdjustments)
                                     If Not myPosForm.IsReadyToClose Then
                                         Me.isWaitingForCloseApp = True
                                         Return myGlobal
                                     End If
                                 End If
                                 If TypeOf ActiveMdiChild Is UiTankLevelsAdjustments Then
-                                    Dim myTankForm As UiTankLevelsAdjustments = CType(Me.ActiveMdiChild, UiTankLevelsAdjustments)
+                                    Dim myTankForm = CType(Me.ActiveMdiChild, UiTankLevelsAdjustments)
                                     If Not myTankForm.IsReadyToClose Then
                                         Me.isWaitingForCloseApp = True
                                         Return myGlobal
                                     End If
                                 End If
                                 If TypeOf ActiveMdiChild Is UiBarCodeAdjustments Then
-                                    Dim myBarcodeForm As UiBarCodeAdjustments = CType(Me.ActiveMdiChild, UiBarCodeAdjustments)
+                                    Dim myBarcodeForm = CType(Me.ActiveMdiChild, UiBarCodeAdjustments)
                                     If Not myBarcodeForm.IsReadyToClose Then
                                         Me.isWaitingForCloseApp = True
                                         Return myGlobal
@@ -4834,7 +4834,7 @@ Public Class Ax00ServiceMainMDI
                                 'End If
                             End If
                         ElseIf TypeOf ActiveMdiChild Is UiISEUtilities Then
-                            Dim myISEUtilities As UiISEUtilities = CType(ActiveMdiChild, UiISEUtilities)
+                            Dim myISEUtilities = CType(ActiveMdiChild, UiISEUtilities)
 
                             'SGM 19/09/2012
                             If Not myISEUtilities.IsCompletelyClosed Then
@@ -4931,7 +4931,7 @@ Public Class Ax00ServiceMainMDI
                 Me.Owner = Nothing 'RH 02/03/2012 Remove IBackground
 
                 'RH 01/03/2012 Close all opened forms
-                Dim Index As Integer = 0
+                Dim Index = 0
                 While Application.OpenForms.Count > 1 'Only left this one open
                     If String.Compare(Application.OpenForms(Index).Name, Me.Name, False) = 0 Then
                         Index += 1
@@ -5002,18 +5002,18 @@ Public Class Ax00ServiceMainMDI
                         'SGM 28/03/2012
                         If TypeOf ActiveMdiChild Is BSAdjustmentBaseForm Then
                             If Not (TypeOf ActiveMdiChild Is UiStressModeTest) Then
-                                Dim myBaseAdjForm As BSAdjustmentBaseForm = CType(ActiveMdiChild, BSAdjustmentBaseForm)
+                                Dim myBaseAdjForm = CType(ActiveMdiChild, BSAdjustmentBaseForm)
                                 myBaseAdjForm.CloseWithShutDownRequestedByMDI = True
                                 myBaseAdjForm.CloseRequestedByMDI = True
                                 If TypeOf ActiveMdiChild Is UiMotorsPumpsValvesTest Then
-                                    Dim myMotorsForm As UiMotorsPumpsValvesTest = CType(Me.ActiveMdiChild, UiMotorsPumpsValvesTest)
+                                    Dim myMotorsForm = CType(Me.ActiveMdiChild, UiMotorsPumpsValvesTest)
                                     If Not myMotorsForm.IsReadyToClose Then
                                         Me.isWaitingForCloseApp = True
                                         Return myGlobal
                                     End If
                                 End If
                                 If TypeOf ActiveMdiChild Is UiPositionsAdjustments Then
-                                    Dim myPosForm As UiPositionsAdjustments = CType(Me.ActiveMdiChild, UiPositionsAdjustments)
+                                    Dim myPosForm = CType(Me.ActiveMdiChild, UiPositionsAdjustments)
                                     If Not myPosForm.IsReadyToClose Then
                                         Me.isWaitingForCloseApp = True
                                         Return myGlobal
@@ -5264,7 +5264,7 @@ Public Class Ax00ServiceMainMDI
     ''' </summary>
     ''' <param name="pAnalyzerID"></param>
     ''' <remarks>Created by SGM 20/01/2012</remarks>
-    Public Sub UpdatePreliminaryHomesMasterData(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String)
+    Public Sub UpdatePreliminaryHomesMasterData(pDBConnection As SqlClient.SqlConnection, pAnalyzerID As String)
 
         Dim myGlobal As New GlobalDataTO
 
@@ -5272,7 +5272,7 @@ Public Class Ax00ServiceMainMDI
             Dim myScreenDelegate As New BaseFwScriptDelegate(pAnalyzerID)
             myGlobal = myScreenDelegate.GetAllPreliminaryHomes(pDBConnection)
             If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
-                Dim myHomesDS As SRVPreliminaryHomesDS = CType(myGlobal.SetDatos, SRVPreliminaryHomesDS)
+                Dim myHomesDS = CType(myGlobal.SetDatos, SRVPreliminaryHomesDS)
                 If myHomesDS IsNot Nothing AndAlso myHomesDS.srv_tadjPreliminaryHomes.Rows.Count = 0 Then
                     'if missing then create homes related to the new analyzer
                     myGlobal = myScreenDelegate.InsertNewAnalyzerPreliminaryHomes(pDBConnection)
@@ -5440,7 +5440,7 @@ Public Class Ax00ServiceMainMDI
                     'Dim myGlobal As New GlobalDataTO
                     myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.CONNECT, True)
 
-                    Dim myTitle As String = ""
+                    Dim myTitle = ""
                     If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                         If Not AnalyzerController.Instance.Analyzer.Connected Then
                             myGlobal.ErrorCode = "ERROR_COMM"
@@ -5621,7 +5621,7 @@ Public Class Ax00ServiceMainMDI
     ''' <param name="pTitleText"></param>
     ''' <param name="pWaitText"></param>
     ''' <remarks>Created by SGM 29/09/2011</remarks>
-    Private Sub WaitControl(ByVal pTitleText As String, ByVal pWaitText As String)
+    Private Sub WaitControl(pTitleText As String, pWaitText As String)
         Try
 
             Me.ActivateActionButtonBar(False)
@@ -5921,7 +5921,7 @@ Public Class Ax00ServiceMainMDI
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     ''' <remarks>AG 28/07/2010</remarks>
-    Private Sub BsAutoConnect_DoWork(ByVal sender As System.Object, ByVal e As System.ComponentModel.DoWorkEventArgs) Handles BsAutoConnect.DoWork
+    Private Sub BsAutoConnect_DoWork(sender As System.Object, e As System.ComponentModel.DoWorkEventArgs) Handles BsAutoConnect.DoWork
         Try
 
             AutoConnectProcess = True
@@ -5953,7 +5953,7 @@ Public Class Ax00ServiceMainMDI
     ''' <remarks>AG 28/07/2010
     ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
-    Private Sub BsAutoConnect_RunWorkerCompleted(ByVal sender As System.Object, ByVal e As System.ComponentModel.RunWorkerCompletedEventArgs) Handles BsAutoConnect.RunWorkerCompleted
+    Private Sub BsAutoConnect_RunWorkerCompleted(sender As System.Object, e As System.ComponentModel.RunWorkerCompletedEventArgs) Handles BsAutoConnect.RunWorkerCompleted
         Try
             'RH 14/10/2010
             'Long story short: if you dropped a BGW on a form then everything is taken care of automatically, you don't have to help.
@@ -6042,7 +6042,7 @@ Public Class Ax00ServiceMainMDI
 
             'Me.BsMonitor.Enabled = True
 
-            Dim myConnected As Integer = 0
+            Dim myConnected = 0
             Dim myConnectedText As String = Me.NotConnectedText
             If AnalyzerController.Instance.Analyzer.Connected Then
                 myConnected = 1
@@ -6120,7 +6120,7 @@ Public Class Ax00ServiceMainMDI
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     ''' <remarks>Created by SGM 29/09/2011</remarks>
-    Private Sub bsWaitStandBy_DoWork(ByVal sender As System.Object, ByVal e As System.ComponentModel.DoWorkEventArgs) Handles bsWaitControl.DoWork
+    Private Sub bsWaitStandBy_DoWork(sender As System.Object, e As System.ComponentModel.DoWorkEventArgs) Handles bsWaitControl.DoWork
         Try
 
             If Me.ReconnectRequested Then
@@ -6167,7 +6167,7 @@ Public Class Ax00ServiceMainMDI
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     ''' <remarks>Created by SGM 29/09/2011</remarks>
-    Private Sub bsWaitStandBy_RunWorkerCompleted(ByVal sender As System.Object, ByVal e As System.ComponentModel.RunWorkerCompletedEventArgs) Handles bsWaitControl.RunWorkerCompleted
+    Private Sub bsWaitStandBy_RunWorkerCompleted(sender As System.Object, e As System.ComponentModel.RunWorkerCompletedEventArgs) Handles bsWaitControl.RunWorkerCompleted
         Try
             Me.wfWaitScreen.Close()
 
@@ -6225,7 +6225,7 @@ Public Class Ax00ServiceMainMDI
 
 #Region "Events "
 
-    Private Sub Ax00ServiceMainMDI_FormClosed(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosedEventArgs) Handles Me.FormClosed
+    Private Sub Ax00ServiceMainMDI_FormClosed(sender As Object, e As System.Windows.Forms.FormClosedEventArgs) Handles Me.FormClosed
         Try
             'SGM 07/11/2012 - log Application End
             Static isLogged As Boolean
@@ -6279,7 +6279,7 @@ Public Class Ax00ServiceMainMDI
     ''' <remarks>
     ''' Created by:  AG 28/07/2010
     ''' </remarks>
-    Private Sub Ax00ServiceMainMDI_Shown(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Shown
+    Private Sub Ax00ServiceMainMDI_Shown(sender As Object, e As System.EventArgs) Handles Me.Shown
         Try
             'Option1: Slow UI refresh
             'Me.Connect()
@@ -6323,7 +6323,7 @@ Public Class Ax00ServiceMainMDI
     '''              IT 23/10/2014 - REFACTORING (BA-2016)
     ''' 
     ''' </remarks>
-    Private Sub Ax00ServiceMainMDI_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+    Private Sub Ax00ServiceMainMDI_Load(sender As Object, e As System.EventArgs) Handles Me.Load
         Dim myGlobal As New GlobalDataTO
         'Dim myGlobalbase As New GlobalBase
         Try
@@ -6333,8 +6333,8 @@ Public Class Ax00ServiceMainMDI
             Me.ErrorStatusLabel.Text = ""
 
             'Search the current user level
-            Dim dialogResultToReturn As DialogResult = Windows.Forms.DialogResult.Yes
-            Dim CurrentUserLevel As String = ""
+            Dim dialogResultToReturn = Windows.Forms.DialogResult.Yes
+            Dim CurrentUserLevel = ""
             CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
             'AG 13/01/2010 - Once we have the current user level we need found his numerical level
             Dim myUsersLevel As New UsersLevelDelegate
@@ -6401,7 +6401,7 @@ Public Class Ax00ServiceMainMDI
                 'MDIAnalyzerManager = AnalyzerController.Instance.CreateAnalyzer(My.Application.Info.AssemblyName, Me.AnalyzerModel, True, String.Empty, AnalyzerIDAttribute, FwVersionAttribute)
                 MDIAnalyzerManager = AnalyzerController.Instance.CreateAnalyzer(My.Application.Info.AssemblyName, "A400", True, String.Empty, AnalyzerIDAttribute, FwVersionAttribute)
 
-                Dim blnStartComm As Boolean = False
+                Dim blnStartComm = False
                 blnStartComm = AnalyzerController.Instance.Analyzer.Start(False)   'AG 21/04/2010 Start the CommAx00 process'blnStartComm = GlobalAnalyzerManager.Start(False)   'AG 21/04/2010 Start the CommAx00 process
 
                 'RH 14/10/2010 Fixed in LinkLayer!
@@ -6446,7 +6446,7 @@ Public Class Ax00ServiceMainMDI
 
                 'SGM 25/11/2011 Load simulated Adjustments and export to File
                 If MyClass.SimulationMode Then
-                    Dim mySimulatedAdjustmentsDS As SRVAdjustmentsDS = CType(myGlobal.SetDatos, SRVAdjustmentsDS)
+                    Dim mySimulatedAdjustmentsDS = CType(myGlobal.SetDatos, SRVAdjustmentsDS)
                     If mySimulatedAdjustmentsDS IsNot Nothing Then
                         MyClass.myFwAdjustmentsDelegate = New FwAdjustmentsDelegate(mySimulatedAdjustmentsDS)
                         myGlobal = MyClass.myFwAdjustmentsDelegate.ExportDSToFile(AnalyzerController.Instance.Analyzer.ActiveAnalyzer)
@@ -6490,12 +6490,12 @@ Public Class Ax00ServiceMainMDI
         End Try
     End Sub
 
-    Private Sub BorrameToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BorrameToolStripMenuItem.Click
+    Private Sub BorrameToolStripMenuItem_Click(sender As System.Object, e As System.EventArgs) Handles BorrameToolStripMenuItem.Click
         Dim myTestForm As New TestForm(Me) 'Dim myTestForm As New TestForm(MyBase.GlobalAnalyzerManager)
         myTestForm.Show()
     End Sub
 
-    Private Sub bsDateTimer_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsDateTimer.Tick
+    Private Sub bsDateTimer_Tick(sender As System.Object, e As System.EventArgs) Handles bsDateTimer.Tick
         Try
             Me.bsTSDateLabel.Text = String.Format("{0} {1}", Today.ToShortDateString(), Now.ToShortTimeString())
         Catch ex As Exception
@@ -6510,7 +6510,7 @@ Public Class Ax00ServiceMainMDI
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     ''' <remarks>SGM 04/04/11</remarks>
-    Private Sub UsersManagementToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
+    Private Sub UsersManagementToolStripMenuItem_Click(sender As System.Object, e As System.EventArgs)
         Try
             Cursor = Cursors.WaitCursor
             Application.DoEvents()
@@ -6537,7 +6537,7 @@ Public Class Ax00ServiceMainMDI
     ''' Modified by AG 17/06/2010: Ask confirmation and close current screen properly (Using the code of the property AcceptButton)
     ''' Modified by SG 22/06/2011: Unify the Closing Operation in a unique Method
     ''' </remarks>
-    Private Sub ApplicationClosing(ByVal sender As System.Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles MyBase.FormClosing
+    Private Sub ApplicationClosing(sender As System.Object, e As System.Windows.Forms.FormClosingEventArgs) Handles MyBase.FormClosing
 
         Try
             If Not Me.IsFinalClosing Then
@@ -6619,7 +6619,7 @@ Public Class Ax00ServiceMainMDI
     ''' <remarks>
     ''' Modified by: SA 06/07/2010 - Inform property for the AnalyzerID before open the Form
     ''' </remarks>
-    Private Sub bsTSAnalysersButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsTSAnalysersButton.Click
+    Private Sub bsTSAnalysersButton_Click(sender As System.Object, e As System.EventArgs) Handles bsTSAnalysersButton.Click
         Try
             Application.DoEvents()
             'myConfigAnalyzers = New IConfigGeneral(Me) 'SG 03/12/10
@@ -6639,7 +6639,7 @@ Public Class Ax00ServiceMainMDI
     ''' <remarks>
     ''' Modified by: XBC 09/11/2010 - Changes due to new function OpenMDIChildForm
     ''' </remarks>
-    Private Sub HeadPToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SendableScriptsToolStripMenuItem.Click
+    Private Sub HeadPToolStripMenuItem_Click(sender As System.Object, e As System.EventArgs) Handles SendableScriptsToolStripMenuItem.Click
         Try
             'This is the way a form should be called from the main window
             'Call the function OpenMDIChildForm and pass it as parameter the form name you want to open
@@ -6664,7 +6664,7 @@ Public Class Ax00ServiceMainMDI
     ''' <remarks>
     ''' Created by: XBC 11/11/2010
     ''' </remarks>
-    Private Sub PositionsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PositionsToolStripMenuItem.Click
+    Private Sub PositionsToolStripMenuItem_Click(sender As System.Object, e As System.EventArgs) Handles PositionsToolStripMenuItem.Click
         Try
             ''DELETE
             'If Not Me.SimulationMode Then
@@ -6711,7 +6711,7 @@ Public Class Ax00ServiceMainMDI
     ''' <remarks>
     ''' Created by: XBC 15/02/2011
     ''' </remarks>
-    Private Sub PhotometryToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PhotometryToolStripMenuItem.Click
+    Private Sub PhotometryToolStripMenuItem_Click(sender As System.Object, e As System.EventArgs) Handles PhotometryToolStripMenuItem.Click
         Try
             'This is the way a form should be called from the main window
             'Call the function OpenMDIChildForm and pass it as parameter the form name you want to open
@@ -6736,7 +6736,7 @@ Public Class Ax00ServiceMainMDI
     ''' <remarks>
     ''' Created by: SGM 22/02/2011
     ''' </remarks>
-    Private Sub TankLevelsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TankLevelsToolStripMenuItem.Click
+    Private Sub TankLevelsToolStripMenuItem_Click(sender As System.Object, e As System.EventArgs) Handles TankLevelsToolStripMenuItem.Click
         Try
 
             ' ''DELETE
@@ -6778,7 +6778,7 @@ Public Class Ax00ServiceMainMDI
     ''' <remarks>
     ''' Created by: XBC 22/03/2011
     ''' </remarks>
-    Private Sub StressTestToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles StressTestToolStripMenuItem.Click
+    Private Sub StressTestToolStripMenuItem_Click(sender As System.Object, e As System.EventArgs) Handles StressTestToolStripMenuItem.Click
         Try
             'This is the way a form should be called from the main window
             'Call the function OpenMDIChildForm and pass it as parameter the form name you want to open
@@ -6797,7 +6797,7 @@ Public Class Ax00ServiceMainMDI
         End Try
     End Sub
 
-    Private Sub DemoModeToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles DemoModeToolStripMenuItem.Click
+    Private Sub DemoModeToolStripMenuItem_Click(sender As System.Object, e As System.EventArgs) Handles DemoModeToolStripMenuItem.Click
         Try
             'This is the way a form should be called from the main window
             'Call the function OpenMDIChildForm and pass it as parameter the form name you want to open
@@ -6816,7 +6816,7 @@ Public Class Ax00ServiceMainMDI
         End Try
     End Sub
 
-    Private Sub MotorsTestToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MotorsTestToolStripMenuItem.Click
+    Private Sub MotorsTestToolStripMenuItem_Click(sender As System.Object, e As System.EventArgs) Handles MotorsTestToolStripMenuItem.Click
         Try
             ' ''DELETE
             'If Not Me.SimulationMode Then
@@ -6843,7 +6843,7 @@ Public Class Ax00ServiceMainMDI
         End Try
     End Sub
 
-    Private Sub AnalyzerInfoToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AnalyzerInfoToolStripMenuItem.Click
+    Private Sub AnalyzerInfoToolStripMenuItem_Click(sender As System.Object, e As System.EventArgs) Handles AnalyzerInfoToolStripMenuItem.Click
         Try
             Me.OpenAnalyzerInfoScreen()
 
@@ -6855,9 +6855,9 @@ Public Class Ax00ServiceMainMDI
         End Try
     End Sub
 
-    Private Sub bsMonitorSensorsButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsMonitorSensorsButton.Click
+    Private Sub bsMonitorSensorsButton_Click(sender As System.Object, e As System.EventArgs) Handles bsMonitorSensorsButton.Click
         Try
-            Dim continousSimulation As Boolean = True
+            Dim continousSimulation = True
             Application.DoEvents()
             If Not ActiveMdiChild Is Nothing Then
                 If (TypeOf ActiveMdiChild Is UiTankLevelsAdjustments) Then
@@ -6884,7 +6884,7 @@ Public Class Ax00ServiceMainMDI
         End Try
     End Sub
 
-    Private Sub ShowMonitorToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
+    Private Sub ShowMonitorToolStripMenuItem_Click(sender As System.Object, e As System.EventArgs)
         Try
             Dim myGlobal As New GlobalDataTO
 
@@ -6904,7 +6904,7 @@ Public Class Ax00ServiceMainMDI
         End Try
     End Sub
 
-    Private Sub MonitorToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MonitorToolStripMenuItem.Click
+    Private Sub MonitorToolStripMenuItem_Click(sender As System.Object, e As System.EventArgs) Handles MonitorToolStripMenuItem.Click
         Try
             Me.BsInfoTimer.Enabled = True
         Catch ex As Exception
@@ -6914,7 +6914,7 @@ Public Class Ax00ServiceMainMDI
 
 
 
-    Private Sub ThermosTestToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ThermosTestToolStripMenuItem.Click
+    Private Sub ThermosTestToolStripMenuItem_Click(sender As System.Object, e As System.EventArgs) Handles ThermosTestToolStripMenuItem.Click
         Try
             'This is the way a form should be called from the main window
             'Call the function OpenMDIChildForm and pass it as parameter the form name you want to open
@@ -6933,7 +6933,7 @@ Public Class Ax00ServiceMainMDI
         End Try
     End Sub
 
-    Private Sub CycleCountsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CycleCountsToolStripMenuItem.Click
+    Private Sub CycleCountsToolStripMenuItem_Click(sender As System.Object, e As System.EventArgs) Handles CycleCountsToolStripMenuItem.Click
         Try
             ' ''DELETE
             'If Not Me.SimulationMode Then
@@ -6964,7 +6964,7 @@ Public Class Ax00ServiceMainMDI
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     ''' <remarks>Created by SGM 22/06/2011</remarks>
-    Private Sub bsTSEmergencyButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
+    Private Sub bsTSEmergencyButton_Click(sender As System.Object, e As System.EventArgs)
 
         'Dim myGlobal As New GlobalDataTO
 
@@ -6984,7 +6984,7 @@ Public Class Ax00ServiceMainMDI
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     ''' <remarks>Created by SGM 22/06/2011</remarks>
-    Private Sub WithOutShutDownToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles WithOutShutDownToolStripMenuItem.Click
+    Private Sub WithOutShutDownToolStripMenuItem_Click(sender As System.Object, e As System.EventArgs) Handles WithOutShutDownToolStripMenuItem.Click
 
         Dim myGlobal As New GlobalDataTO
         Try
@@ -7016,7 +7016,7 @@ Public Class Ax00ServiceMainMDI
     ''' <remarks>
     ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
-    Private Sub InstrumentUpdateToolStripMenuItem_Click_1(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles InstrumentUpdateToolStripMenuItem.Click
+    Private Sub InstrumentUpdateToolStripMenuItem_Click_1(sender As System.Object, e As System.EventArgs) Handles InstrumentUpdateToolStripMenuItem.Click
         Try
             If AnalyzerController.Instance.Analyzer.Connected Then
                 If AnalyzerController.Instance.Analyzer.IsFwSwCompatible Then
@@ -7041,7 +7041,7 @@ Public Class Ax00ServiceMainMDI
         End Try
     End Sub
 
-    Private Sub HistoryToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles HistoryToolStripMenuItem.Click
+    Private Sub HistoryToolStripMenuItem_Click(sender As System.Object, e As System.EventArgs) Handles HistoryToolStripMenuItem.Click
         Try
             'This is the way a form should be called from the main window
             'Call the function OpenMDIChildForm and pass it as parameter the form name you want to open
@@ -7062,7 +7062,7 @@ Public Class Ax00ServiceMainMDI
 
 
 
-    Private Sub WithShutToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles WithShutToolStripMenuItem.Click
+    Private Sub WithShutToolStripMenuItem_Click(sender As System.Object, e As System.EventArgs) Handles WithShutToolStripMenuItem.Click
         Try
             Dim myGlobal As New GlobalDataTO
 
@@ -7100,7 +7100,7 @@ Public Class Ax00ServiceMainMDI
     ''' Created by SGM 11/11/2011
     ''' Modified by XBC 23/05/2012
     ''' </remarks>
-    Private Sub OperationGuideToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OperationGuideToolStripMenuItem.Click
+    Private Sub OperationGuideToolStripMenuItem_Click(sender As System.Object, e As System.EventArgs) Handles OperationGuideToolStripMenuItem.Click
 
 
         ''Help.ShowHelp(Me, GetHelpFilePath(HELP_FILE_TYPE.MANUAL_SRV, CurrentLanguageAttribute))
@@ -7121,7 +7121,7 @@ Public Class Ax00ServiceMainMDI
 
         Try
             ' Get the Help File Path and Name.
-            Dim myHelpPath As String = ""
+            Dim myHelpPath = ""
             Dim myHelpFilesSettingDelegate As New HelpFilesSettingDelegate
             Dim myGlobalDataTO As New GlobalDataTO
             Dim myHelpFilesSettingDS As New HelpFilesSettingDS
@@ -7166,7 +7166,7 @@ Public Class Ax00ServiceMainMDI
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     ''' <remarks>Created by SGM 11/11/2011</remarks>
-    Private Sub MaintenancePlanToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MaintenancePlanToolStripMenuItem.Click
+    Private Sub MaintenancePlanToolStripMenuItem_Click(sender As System.Object, e As System.EventArgs) Handles MaintenancePlanToolStripMenuItem.Click
         Try
             'Pending
         Catch ex As Exception
@@ -7184,7 +7184,7 @@ Public Class Ax00ServiceMainMDI
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     ''' <remarks>Created by SGM 11/11/2011</remarks>
-    Private Sub TroubleshooterToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TroubleshooterToolStripMenuItem.Click
+    Private Sub TroubleshooterToolStripMenuItem_Click(sender As System.Object, e As System.EventArgs) Handles TroubleshooterToolStripMenuItem.Click
         Try
             'Pending
         Catch ex As Exception
@@ -7195,7 +7195,7 @@ Public Class Ax00ServiceMainMDI
         End Try
     End Sub
 
-    Private Sub LevelDetectionToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles LevelDetectionToolStripMenuItem.Click
+    Private Sub LevelDetectionToolStripMenuItem_Click(sender As System.Object, e As System.EventArgs) Handles LevelDetectionToolStripMenuItem.Click
         Try
             'This is the way a form should be called from the main window
             'Call the function OpenMDIChildForm and pass it as parameter the form name you want to open
@@ -7214,7 +7214,7 @@ Public Class Ax00ServiceMainMDI
         End Try
     End Sub
 
-    Private Sub BarCodeToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BarCodeToolStripMenuItem.Click
+    Private Sub BarCodeToolStripMenuItem_Click(sender As System.Object, e As System.EventArgs) Handles BarCodeToolStripMenuItem.Click
         Try
             'This is the way a form should be called from the main window
             'Call the function OpenMDIChildForm and pass it as parameter the form name you want to open
@@ -7233,7 +7233,7 @@ Public Class Ax00ServiceMainMDI
         End Try
     End Sub
 
-    Private Sub ISEModuleToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ISEModuleToolStripMenuItem.Click
+    Private Sub ISEModuleToolStripMenuItem_Click(sender As System.Object, e As System.EventArgs) Handles ISEModuleToolStripMenuItem.Click
         Try
             'This is the way a form should be called from the main window
             'Call the function OpenMDIChildForm and pass it as parameter the form name you want to open
@@ -7260,7 +7260,7 @@ Public Class Ax00ServiceMainMDI
         End Try
     End Sub
 
-    Private Sub SettingsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SettingsToolStripMenuItem.Click
+    Private Sub SettingsToolStripMenuItem_Click(sender As System.Object, e As System.EventArgs) Handles SettingsToolStripMenuItem.Click
         Try
             'This is the way a form should be called from the main window
             'Call the function OpenMDIChildForm and pass it as parameter the form name you want to open
@@ -7288,7 +7288,7 @@ Public Class Ax00ServiceMainMDI
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     ''' <remarks>Created by SGM 12/11/2012</remarks>
-    Private Sub ChangeRotorToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ChangeRotorToolStripMenuItem.Click
+    Private Sub ChangeRotorToolStripMenuItem_Click(sender As System.Object, e As System.EventArgs) Handles ChangeRotorToolStripMenuItem.Click
         Try
 
             myChangeRotor = New UiChangeRotorSRV()
@@ -7302,7 +7302,7 @@ Public Class Ax00ServiceMainMDI
         End Try
     End Sub
 
-    Private Sub BarcodesConfigToolStripMenuItem_Click_1(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BarcodesConfigToolStripMenuItem.Click
+    Private Sub BarcodesConfigToolStripMenuItem_Click_1(sender As System.Object, e As System.EventArgs) Handles BarcodesConfigToolStripMenuItem.Click
         Try
             'This is the way a form should be called from the main window
             'Call the function OpenMDIChildForm and pass it as parameter the form name you want to open
@@ -7324,7 +7324,7 @@ Public Class Ax00ServiceMainMDI
         End Try
     End Sub
 
-    Private Sub ISEMonitorTestToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ISEMonitorTestToolStripMenuItem.Click
+    Private Sub ISEMonitorTestToolStripMenuItem_Click(sender As System.Object, e As System.EventArgs) Handles ISEMonitorTestToolStripMenuItem.Click
         Cursor = Cursors.WaitCursor
         Application.DoEvents()
         TestISEMonitor.SimulationMode = MyClass.SimulationMode
@@ -7332,7 +7332,7 @@ Public Class Ax00ServiceMainMDI
         Cursor = Cursors.Default
     End Sub
 
-    Private Sub GeneralToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles GeneralToolStripMenuItem.Click
+    Private Sub GeneralToolStripMenuItem_Click(sender As System.Object, e As System.EventArgs) Handles GeneralToolStripMenuItem.Click
         Try
             Cursor = Cursors.WaitCursor
             Application.DoEvents()
@@ -7349,7 +7349,7 @@ Public Class Ax00ServiceMainMDI
         End Try
     End Sub
 
-    Private Sub UserToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles UserToolStripMenuItem.Click
+    Private Sub UserToolStripMenuItem_Click(sender As System.Object, e As System.EventArgs) Handles UserToolStripMenuItem.Click
         Try
             Cursor = Cursors.WaitCursor
             Application.DoEvents()
@@ -7366,7 +7366,7 @@ Public Class Ax00ServiceMainMDI
         End Try
     End Sub
 
-    Private Sub UtilitiesToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles UtilitiesToolStripMenuItem.Click
+    Private Sub UtilitiesToolStripMenuItem_Click(sender As System.Object, e As System.EventArgs) Handles UtilitiesToolStripMenuItem.Click
         Try
 
 
@@ -7384,7 +7384,7 @@ Public Class Ax00ServiceMainMDI
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     ''' <remarks>SGM 25/05/2012</remarks>
-    Private Sub ChangeUserToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ChangeUserToolStripMenuItem.Click
+    Private Sub ChangeUserToolStripMenuItem_Click(sender As System.Object, e As System.EventArgs) Handles ChangeUserToolStripMenuItem.Click
         Try
             Cursor = Cursors.WaitCursor
             Application.DoEvents()
@@ -7399,7 +7399,7 @@ Public Class Ax00ServiceMainMDI
         End Try
     End Sub
 
-    Private Sub LanguageToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles LanguageToolStripMenuItem.Click
+    Private Sub LanguageToolStripMenuItem_Click(sender As System.Object, e As System.EventArgs) Handles LanguageToolStripMenuItem.Click
         Try
             Cursor = Cursors.WaitCursor
             Application.DoEvents()
@@ -7422,7 +7422,7 @@ Public Class Ax00ServiceMainMDI
     ''' <remarks>
     ''' Created by: RH 28/03/2012
     ''' </remarks>
-    Private Sub AboutToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AboutToolStripMenuItem.Click
+    Private Sub AboutToolStripMenuItem_Click(sender As System.Object, e As System.EventArgs) Handles AboutToolStripMenuItem.Click
         Try
             myAbout = New UiAboutBox()
 
@@ -7445,7 +7445,7 @@ Public Class Ax00ServiceMainMDI
     ''' <remarks>
     ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
-    Private Sub AdjustmentsTestsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AdjustmentsTestsToolStripMenuItem.Click
+    Private Sub AdjustmentsTestsToolStripMenuItem_Click(sender As System.Object, e As System.EventArgs) Handles AdjustmentsTestsToolStripMenuItem.Click
         Try
             If MyClass.SimulationMode Then
                 Me.ISEModuleToolStripMenuItem.Enabled = True
@@ -7532,7 +7532,7 @@ Public Class Ax00ServiceMainMDI
     ''' <remarks>
     ''' Created by XBC 08/02/2012
     ''' </remarks>
-    Private Sub CommonForms_Closed(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosedEventArgs) Handles myISEUtilities.FormClosed
+    Private Sub CommonForms_Closed(sender As Object, e As System.Windows.Forms.FormClosedEventArgs) Handles myISEUtilities.FormClosed
         Try
             If ActiveMdiChild IsNot Nothing AndAlso ActiveMdiChild.Tag Is Nothing Then 'It is been closed by Form Close button
                 Me.OnManageActivateScreenEvent(True, Messages.STANDBY)
@@ -7656,7 +7656,7 @@ Public Class Ax00ServiceMainMDI
 
             Dim myRefreshDS As New UIRefreshDS
 
-            For S As Integer = 1 To 15 Step 1
+            For S = 1 To 15 Step 1
                 Dim mySensorId As AnalyzerSensors
                 mySensorId = CType(S, AnalyzerSensors)
                 If mySensorId <> Nothing Then
@@ -7718,7 +7718,7 @@ Public Class Ax00ServiceMainMDI
     ''' Created by SGM 19/10/2012
     ''' Modified by XBC 24/10/2012 - Add StopCurrentOperation call when AnalyzerInfo screen is hide
     ''' </remarks>
-    Private Sub ManageAlarmStep1(ByVal pAlarmType As GlobalEnumerates.ManagementAlarmTypes)
+    Private Sub ManageAlarmStep1(pAlarmType As GlobalEnumerates.ManagementAlarmTypes)
         Try
             If pAlarmType = ManagementAlarmTypes.NONE Then Exit Sub
 
@@ -7730,7 +7730,7 @@ Public Class Ax00ServiceMainMDI
                     If IsAnalyzerInfoScreenRunning Then
                         For Each oForm As Form In Me.MdiChildren
                             If oForm Is AnalyzerInfo Then
-                                Dim CurrentMdiChild As AnalyzerInfo = CType(oForm, AnalyzerInfo)
+                                Dim CurrentMdiChild = CType(oForm, AnalyzerInfo)
                                 CurrentMdiChild.StopCurrentOperation(pAlarmType)
                                 Exit For
                             End If
@@ -7742,19 +7742,19 @@ Public Class Ax00ServiceMainMDI
                 Else
 
                     If (TypeOf ActiveMdiChild Is BSAdjustmentBaseForm) Then 'Service screens
-                        Dim CurrentMdiChild As BSAdjustmentBaseForm = CType(ActiveMdiChild, BSAdjustmentBaseForm)
+                        Dim CurrentMdiChild = CType(ActiveMdiChild, BSAdjustmentBaseForm)
                         CurrentMdiChild.StopCurrentOperation(pAlarmType)
 
                     ElseIf (TypeOf ActiveMdiChild Is UiConfigGeneral) Then 'General screen
-                        Dim CurrentMdiChild As UiConfigGeneral = CType(ActiveMdiChild, UiConfigGeneral)
+                        Dim CurrentMdiChild = CType(ActiveMdiChild, UiConfigGeneral)
                         CurrentMdiChild.StopCurrentOperation(pAlarmType)
 
                     ElseIf (TypeOf ActiveMdiChild Is UiBarCodesConfig) Then 'Barcode config screen
-                        Dim CurrentMdiChild As UiBarCodesConfig = CType(ActiveMdiChild, UiBarCodesConfig)
+                        Dim CurrentMdiChild = CType(ActiveMdiChild, UiBarCodesConfig)
                         CurrentMdiChild.StopCurrentOperation(pAlarmType)
 
                     ElseIf (TypeOf ActiveMdiChild Is UiISEUtilities) Then 'ISE Utilities screen
-                        Dim CurrentMdiChild As UiISEUtilities = CType(ActiveMdiChild, UiISEUtilities)
+                        Dim CurrentMdiChild = CType(ActiveMdiChild, UiISEUtilities)
                         CurrentMdiChild.StopCurrentOperation(pAlarmType)
 
                     Else
@@ -7779,7 +7779,7 @@ Public Class Ax00ServiceMainMDI
     ''' </summary>
     ''' <param name="pAlarmType"></param>
     ''' <remarks>Created by SGM 19/10/2012</remarks>
-    Public Sub ManageAlarmStep2(ByVal pAlarmType As GlobalEnumerates.ManagementAlarmTypes)
+    Public Sub ManageAlarmStep2(pAlarmType As GlobalEnumerates.ManagementAlarmTypes)
         Try
             If pAlarmType = ManagementAlarmTypes.NONE Then Exit Sub
 
@@ -7819,11 +7819,11 @@ Public Class Ax00ServiceMainMDI
     ''' <remarks>Created by SGM 19/10/2012
     ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
-    Private Sub ShowAlarmOrSensorsWarningMessages(ByVal pAlarmType As GlobalEnumerates.ManagementAlarmTypes)
+    Private Sub ShowAlarmOrSensorsWarningMessages(pAlarmType As GlobalEnumerates.ManagementAlarmTypes)
         Try
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
-            Dim myMessage As String = ""
+            Dim myMessage = ""
             Dim myMessages As List(Of String) = Nothing
 
             Dim myErrorsString As String = AnalyzerController.Instance.Analyzer.ErrorCodes
@@ -7881,7 +7881,7 @@ Public Class Ax00ServiceMainMDI
     ''' </summary>
     ''' <param name="pAlarmType"></param>
     ''' <remarks>Created by SGM 18/10/2012</remarks>
-    Private Sub AlarmFinalTreatment(ByVal pAlarmType As GlobalEnumerates.ManagementAlarmTypes)
+    Private Sub AlarmFinalTreatment(pAlarmType As GlobalEnumerates.ManagementAlarmTypes)
         Try
             Me.isWaitingForConnected = False
             Me.ReconnectRequested = False
@@ -8082,7 +8082,7 @@ Public Class Ax00ServiceMainMDI
     ''' </summary>
     ''' <param name="pAlarmType"></param>
     ''' <remarks>SGM 25/10/2012</remarks>
-    Private Sub On_CommonScreenStopOperationFinished(ByVal pAlarmType As ManagementAlarmTypes) Handles myConfigAnalyzers.StopCurrentOperationFinished, _
+    Private Sub On_CommonScreenStopOperationFinished(pAlarmType As ManagementAlarmTypes) Handles myConfigAnalyzers.StopCurrentOperationFinished, _
                                                                                                 myConfigBarCode.StopCurrentOperationFinished, _
                                                                                                 myISEUtilities.StopCurrentOperationFinished
         Try
@@ -8095,7 +8095,7 @@ Public Class Ax00ServiceMainMDI
         End Try
     End Sub
 
-    Private Sub On_ConfigGeneralIsClosed(ByVal sender As Object) Handles myConfigAnalyzers.FormIsClosed
+    Private Sub On_ConfigGeneralIsClosed(sender As Object) Handles myConfigAnalyzers.FormIsClosed
         Try
             Dim isSleeping As Boolean = (AnalyzerController.Instance.Analyzer.Connected AndAlso AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING) '#REFACTORING
 
@@ -8121,19 +8121,19 @@ Public Class Ax00ServiceMainMDI
 
             Else
                 If TypeOf (ActiveMdiChild) Is BSAdjustmentBaseForm Then
-                    Dim CurrentMdiChild As BSAdjustmentBaseForm = CType(ActiveMdiChild, BSAdjustmentBaseForm)
+                    Dim CurrentMdiChild = CType(ActiveMdiChild, BSAdjustmentBaseForm)
                     CurrentMdiChild.StopCurrentOperation()
 
                 ElseIf TypeOf (ActiveMdiChild) Is UiConfigGeneral Then
-                    Dim CurrentMdiChild As UiConfigGeneral = CType(ActiveMdiChild, UiConfigGeneral)
+                    Dim CurrentMdiChild = CType(ActiveMdiChild, UiConfigGeneral)
                     CurrentMdiChild.StopCurrentOperation()
 
                 ElseIf TypeOf (ActiveMdiChild) Is UiBarCodesConfig Then
-                    Dim CurrentMdiChild As UiBarCodesConfig = CType(ActiveMdiChild, UiBarCodesConfig)
+                    Dim CurrentMdiChild = CType(ActiveMdiChild, UiBarCodesConfig)
                     CurrentMdiChild.StopCurrentOperation()
 
                 ElseIf TypeOf (ActiveMdiChild) Is UiISEUtilities Then
-                    Dim CurrentMdiChild As UiISEUtilities = CType(ActiveMdiChild, UiISEUtilities)
+                    Dim CurrentMdiChild = CType(ActiveMdiChild, UiISEUtilities)
                     CurrentMdiChild.StopCurrentOperation()
 
                 End If
@@ -8157,10 +8157,10 @@ Public Class Ax00ServiceMainMDI
     ''' <remarks>
     ''' Created by:  DL 21/11/2012 
     ''' </remarks>    
-    Private Sub UserManualToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles UserManualToolStripMenuItem.Click
+    Private Sub UserManualToolStripMenuItem_Click(sender As System.Object, e As System.EventArgs) Handles UserManualToolStripMenuItem.Click
         Try
             ' Get the Help File Path and Name.
-            Dim myHelpPath As String = ""
+            Dim myHelpPath = ""
             Dim myHelpFilesSettingDelegate As New HelpFilesSettingDelegate
             Dim myGlobalDataTO As New GlobalDataTO
             Dim myHelpFilesSettingDS As New HelpFilesSettingDS
@@ -8195,14 +8195,14 @@ Public Class Ax00ServiceMainMDI
 
     End Sub
 
-    Private Sub SATReportsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SATReportsToolStripMenuItem.Click
+    Private Sub SATReportsToolStripMenuItem_Click(sender As System.Object, e As System.EventArgs) Handles SATReportsToolStripMenuItem.Click
         Try
             'This is the way a form should be called from the main window
             'Call the function OpenMDIChildForm and pass it as parameter the form name you want to open
             'The form to be opened should be assigned its AcceptButton property to its default exit button
             Application.DoEvents()
             Me.Cursor = Cursors.WaitCursor
-            Dim mySATReport As UiSATReport = New UiSATReport '(MyClass.MDIAnalyzerManager) 'SGM 25/11/2011
+            Dim mySATReport = New UiSATReport '(MyClass.MDIAnalyzerManager) 'SGM 25/11/2011
             mySATReport.MainMDI = Me
             OpenMDIChildForm(mySATReport)
 
@@ -8240,7 +8240,7 @@ Public Class Ax00ServiceMainMDI
     ''' <param name="pEnabled"></param>
     ''' <param name="pForceValue"></param>
     ''' <remarks></remarks>
-    Public Sub EnableButtonAndMenus(ByVal pEnabled As Boolean, Optional ByVal pForceValue As Boolean = False) Implements IMainMDI.EnableButtonAndMenus
+    Public Sub EnableButtonAndMenus(pEnabled As Boolean, Optional ByVal pForceValue As Boolean = False) Implements IMainMDI.EnableButtonAndMenus
 
     End Sub
 
@@ -8249,7 +8249,7 @@ Public Class Ax00ServiceMainMDI
     ''' </summary>
     ''' <param name="pStartingApplication"></param>
     ''' <remarks></remarks>
-    Public Sub InitializeAnalyzerAndWorkSession(ByVal pStartingApplication As Boolean) Implements IMainMDI.InitializeAnalyzerAndWorkSession
+    Public Sub InitializeAnalyzerAndWorkSession(pStartingApplication As Boolean) Implements IMainMDI.InitializeAnalyzerAndWorkSession
 
     End Sub
 
@@ -8276,7 +8276,7 @@ Public Class Ax00ServiceMainMDI
     ''' </summary>
     ''' <param name="pEnable"></param>
     ''' <remarks></remarks>
-    Public Sub SetActionButtonsEnableProperty(ByVal pEnable As Boolean) Implements IMainMDI.SetActionButtonsEnableProperty
+    Public Sub SetActionButtonsEnableProperty(pEnable As Boolean) Implements IMainMDI.SetActionButtonsEnableProperty
 
     End Sub
 
