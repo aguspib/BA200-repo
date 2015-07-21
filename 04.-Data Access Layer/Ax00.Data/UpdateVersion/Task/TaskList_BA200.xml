@@ -699,7 +699,7 @@
             UPDATE [dbo].[srv_tfmwAdjustments] SET GroupId = 'SAMPLES_ARM_RING1', Value = '10250', CanSave = 0 WHERE CodeFw = 'R1PH1';
             UPDATE [dbo].[srv_tfmwAdjustments] SET GroupId = 'SAMPLES_ARM_RING2', Value = '9200' , CanSave = 0 WHERE CodeFw = 'R1PH2';
             UPDATE [dbo].[srv_tfmwAdjustments] SET GroupId = 'REAGENT1_ARM_RING1', Value = '17200' WHERE CodeFw = 'R1PV1';
-            UPDATE [dbo].[srv_tfmwAdjustments] SET GroupId = 'REAGENT1_ARM_RING2', Value = '17200' WHERE CodeFw = 'R1PV2';
+            UPDATE [dbo].[srv_tfmwAdjustments] SET GroupId = 'REAGENT1_ARM_RING1', Value = '17200' WHERE CodeFw = 'R1PV2';
             UPDATE [dbo].[srv_tfmwAdjustments] SET GroupId = 'SAMPLES_ARM_LEVEL_DET', Value = '4660' WHERE CodeFw = 'R1PI';
             UPDATE [dbo].[srv_tfmwAdjustments] SET GroupId = 'SAMPLES_ARM_DISP1', Value = '7160' WHERE CodeFw = 'R2DV';
             UPDATE [dbo].[srv_tfmwAdjustments] SET Value = '16720' WHERE CodeFw = 'M1DH2';
@@ -981,6 +981,97 @@
           </DataScript>
           <IntegrityScript>
           </IntegrityScript>
+        </DataRevision>
+        <DataRevision JiraID="BA-2634" SequenceNumber="5">
+          <PrerequisiteScript>
+            IF
+            ((SELECT COUNT(1) FROM [A200].[dbo].[tfmwFieldLimits]
+WHERE [LimitID] IN ('SRV_MIXER1_POLAR_LIMIT','SRV_MIXER1_Z_FINE_LIMIT','SRV_MIXER1_Z_LIMIT','SRV_REAGENT1_Z_FINE_LIMIT','SRV_REAGENT1_Z_LIMIT','SRV_SAMPLE_POLAR_LIMIT','SRV_SAMPLE_ROTOR_LIMIT',
+'SRV_SAMPLE_Z_FINE_LIMIT','SRV_SAMPLE_Z_LIMIT','SRV_WASHING_Z_LIMIT') AND [AnalyzerModel] = 'A200') = 10)
+            Select 'True'
+            ELSE
+            Select 'False'
+          </PrerequisiteScript>
+          <DataScript>
+            UPDATE [A200].[dbo].[tfmwFieldLimits]
+               SET 
+                  [MinValue] = -1000,
+                  [MaxValue] = 13000
+             WHERE [LimitID] = 'SRV_MIXER1_POLAR_LIMIT' And [AnalyzerModel] = 'A200'
+            GO
+
+            UPDATE [A200].[dbo].[tfmwFieldLimits]
+               SET 
+                  [MinValue] = 0,
+                  [MaxValue] = 5000
+             WHERE [LimitID] = 'SRV_MIXER1_Z_FINE_LIMIT' And [AnalyzerModel] = 'A200'
+            GO
+
+            UPDATE [A200].[dbo].[tfmwFieldLimits]
+               SET 
+                  [MinValue] = -1000,
+                  [MaxValue] = 13000
+             WHERE [LimitID] = 'SRV_MIXER1_Z_LIMIT' And [AnalyzerModel] = 'A200'
+            GO
+
+            UPDATE [A200].[dbo].[tfmwFieldLimits]
+               SET 
+                  [MinValue] = 0,
+                  [MaxValue] = 1000
+             WHERE [LimitID] = 'SRV_REAGENT1_Z_FINE_LIMIT' And [AnalyzerModel] = 'A200'
+            GO
+
+            UPDATE [A200].[dbo].[tfmwFieldLimits]
+               SET 
+                  [MinValue] = -1000,
+                  [MaxValue] = 19500
+             WHERE [LimitID] = 'SRV_REAGENT1_Z_LIMIT' And [AnalyzerModel] = 'A200'
+            GO
+
+            UPDATE [A200].[dbo].[tfmwFieldLimits]
+               SET 
+                  [MinValue] = -1000,
+                  [MaxValue] = 17500
+             WHERE [LimitID] = 'SRV_SAMPLE_POLAR_LIMIT' And [AnalyzerModel] = 'A200'
+            GO
+
+            UPDATE [A200].[dbo].[tfmwFieldLimits]
+               SET 
+                  [MinValue] = -15000,
+                  [MaxValue] = 32000
+             WHERE [LimitID] = 'SRV_SAMPLE_ROTOR_LIMIT' And [AnalyzerModel] = 'A200'
+            GO
+
+            UPDATE [A200].[dbo].[tfmwFieldLimits]
+               SET 
+                  [MinValue] = 0,
+                  [MaxValue] = 1000
+             WHERE [LimitID] = 'SRV_SAMPLE_Z_FINE_LIMIT' And [AnalyzerModel] = 'A200'
+            GO
+
+            UPDATE [A200].[dbo].[tfmwFieldLimits]
+               SET 
+                  [MinValue] = -1000,
+                  [MaxValue] = 19500
+             WHERE [LimitID] = 'SRV_SAMPLE_Z_LIMIT' And [AnalyzerModel] = 'A200'
+            GO
+
+            UPDATE [A200].[dbo].[tfmwFieldLimits]
+               SET 
+                  [MinValue] = -1000,
+                  [MaxValue] = 3000
+             WHERE [LimitID] = 'SRV_WASHING_Z_LIMIT' And [AnalyzerModel] = 'A200'
+            GO
+          </DataScript>
+          <IntegrityScript>
+            IF
+            ((SELECT COUNT(1) FROM [A200].[dbo].[tfmwFieldLimits]
+WHERE [LimitID] IN ('SRV_MIXER1_POLAR_LIMIT','SRV_MIXER1_Z_FINE_LIMIT','SRV_MIXER1_Z_LIMIT','SRV_REAGENT1_Z_FINE_LIMIT','SRV_REAGENT1_Z_LIMIT','SRV_SAMPLE_POLAR_LIMIT','SRV_SAMPLE_ROTOR_LIMIT',
+'SRV_SAMPLE_Z_FINE_LIMIT','SRV_SAMPLE_Z_LIMIT','SRV_WASHING_Z_LIMIT') AND [AnalyzerModel] = 'A200') = 10)
+            Select 'True'
+            ELSE
+            Select 'False'
+          </IntegrityScript> 
         </DataRevision>
       </DataRevisions>
     </Release>

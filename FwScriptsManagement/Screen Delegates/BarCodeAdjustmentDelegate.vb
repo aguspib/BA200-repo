@@ -78,6 +78,59 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             End Set
         End Property
 
+        Private BarcodeLaserEnabled_ As Boolean
+        Public Property BarcodeLaserEnabled As Boolean
+            Get
+                Return BarcodeLaserEnabled_
+            End Get
+            Set(value As Boolean)
+                Dim myResultData As New GlobalDataTO
+                Dim myFwScript1 As New FwScriptQueueItem
+                Try
+                    ' Initializations 
+                    BcResultsAttr = Nothing
+
+                    If myFwScriptDelegate.CurrentFwScriptsQueue IsNot Nothing Then myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
+
+                    'Script1
+                    With myFwScript1
+                        .EvaluateType = EVALUATE_TYPES.NUM_VALUE
+                        .EvaluateValue = 1
+                        .NextOnResultOK = Nothing
+                        .NextOnResultNG = Nothing
+                        .NextOnTimeOut = Nothing
+                        .NextOnError = Nothing
+                        .FwScriptID = If(value, FwSCRIPTS_IDS.SWITCH_ON_BARCODE.ToString, FwSCRIPTS_IDS.SWITCH_OFF_BARCODE.ToString)
+                        .ParamList = Nothing
+                    End With
+
+                    'add to the queue list
+                    If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, True)
+
+                    If Not myResultData.HasError Then
+                        If NoneInstructionToSend Then
+                            myResultData = myFwScriptDelegate.StartFwScriptQueue
+                        End If
+                    End If
+
+
+                Catch ex As Exception
+                    myResultData.HasError = True
+                    myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                    myResultData.ErrorMessage = ex.Message
+
+                    If myFwScriptDelegate.CurrentFwScriptsQueue IsNot Nothing Then
+                        myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
+                    End If
+
+                    'Dim myLogAcciones As New ApplicationLogManager()
+                    GlobalBase.CreateLogActivity(ex)
+                End Try
+                BarcodeLaserEnabled_ = value
+            End Set
+        End Property
+
+
         Public Property ReadSignalOk() As Integer
             Get
                 Return MyClass.ReadSignalOkAttr
@@ -692,7 +745,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     .NextOnResultNG = Nothing
                     .NextOnTimeOut = Nothing
                     .NextOnError = Nothing
-                    .FwScriptID = FwSCRIPTS_IDS.SWITCH_ON_BARCODE.ToString
+                    .FwScriptID = FwSCRIPTS_IDS.SWITCH_OFF_BARCODE.ToString
                     .ParamList = Nothing
                 End With
 
@@ -763,9 +816,6 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         ''' <returns></returns>
         ''' <remarks>Created by XBC 15/12/2010</remarks>
         Private Function SendQueueForADJUST_PREPARING(ByVal pAdjustment As ADJUSTMENT_GROUPS) As GlobalDataTO
-            'TODO: MANEL: AÑADIR AQUÍ EL SWitch ON BARCODE!!!!
-            'JARL!!!!
-
             Dim myResultData As New GlobalDataTO
             Dim myListFwScript As New List(Of FwScriptQueueItem)
             Dim myFwScript1 As New FwScriptQueueItem
@@ -790,113 +840,80 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                         myListFwScript.Add(myFwScript)
                     Next
 
+                    ' ReSharper disable once InconsistentNaming  'Delta expressions are better to avoid Cut&Paste operations in code: 
+                    Dim SetScriptValues = Sub(script As FwScriptQueueItem, nextScriptToRun As FwScriptQueueItem, requiredHomeID As String)
+                                              With script
+                                                  .FwScriptID = requiredHomeID
+                                                  .EvaluateType = EVALUATE_TYPES.NUM_VALUE
+                                                  .EvaluateValue = 1
+                                                  .NextOnResultOK = nextScriptToRun
+                                                  .NextOnResultNG = Nothing
+                                                  .NextOnTimeOut = nextScriptToRun
+                                                  .NextOnError = Nothing
+                                                  .ParamList = Nothing
+                                              End With
+                                          End Sub
+
                     Dim i As Integer = 0
-                    For Each H As SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow In myPendingHomesList
+                    For Each home As SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow In myPendingHomesList
+
                         'GET EACH PENDING HOME'S FWSCRIPT FROM FWSCRIPT DATA AND ADD TO THE FWSCRIPT QUEUE
                         If i = myListFwScript.Count - 1 Then
-                            'Last index
-                            With myListFwScript(i)
-                                .FwScriptID = H.RequiredHomeID.ToString
-                                .EvaluateType = EVALUATE_TYPES.NUM_VALUE
-                                .EvaluateValue = 1
-                                .NextOnResultOK = myFwScript1
-                                .NextOnResultNG = Nothing
-                                .NextOnTimeOut = myFwScript1
-                                .NextOnError = Nothing
-                                .ParamList = Nothing
-                            End With
+                            SetScriptValues(myListFwScript(i), myFwScript1, home.RequiredHomeID)
                         Else
-                            With myListFwScript(i)
-                                .FwScriptID = H.RequiredHomeID.ToString
-                                .EvaluateType = EVALUATE_TYPES.NUM_VALUE
-                                .EvaluateValue = 1
-                                .NextOnResultOK = myListFwScript(i + 1)
-                                .NextOnResultNG = Nothing
-                                .NextOnTimeOut = myListFwScript(i + 1)
-                                .NextOnError = Nothing
-                                .ParamList = Nothing
-                            End With
+                            SetScriptValues(myListFwScript(i), myListFwScript(i + 1), home.RequiredHomeID)
                         End If
                         i += 1
                     Next
-
                 End If
 
+                Dim scriptID As FwSCRIPTS_IDS, addRequiredScript As Boolean = False
+
                 Select Case pAdjustment
+
                     Case ADJUSTMENT_GROUPS.SAMPLES_ROTOR_BC
-
-
-                        Dim SwitchOnScript As New FwScriptQueueItem With {
-                                .EvaluateType = EVALUATE_TYPES.NUM_VALUE,
-                                .EvaluateValue = 1,
-                                .NextOnResultOK = Nothing,
-                                .NextOnResultNG = Nothing,
-                                .NextOnTimeOut = Nothing,
-                                .NextOnError = Nothing,
-                                .FwScriptID = FwSCRIPTS_IDS.SWITCH_ON_BARCODE.ToString,
-                                .ParamList = Nothing
-                            }
-                        myResultData = myFwScriptDelegate.AddToFwScriptQueue(SwitchOnScript, myFwScriptDelegate.CurrentFwScriptsQueue.Any = False)
-
-                        ' Mov ABS Reactions Rotor
-                        ' Absolute positioning of the samples rotor to a predefined position (Barcode) 
-                        With myFwScript1
-                            .FwScriptID = FwSCRIPTS_IDS.SAMPLES_ABS_ROTOR.ToString
-                            .EvaluateType = EVALUATE_TYPES.NUM_VALUE
-                            .EvaluateValue = 1
-                            .NextOnResultOK = Nothing
-                            .NextOnResultNG = Nothing
-                            .NextOnTimeOut = Nothing
-                            .NextOnError = Nothing
-                            ' expects 1 param
-                            .ParamList = New List(Of String)
-                            .ParamList.Add(MyClass.SamplesRotorBCPositionAttr)
-                        End With
-                        SwitchOnScript.NextOnResultOK = myFwScript1
-
-                        'add to the queue list
-                        For i As Integer = 0 To myListFwScript.Count - 1
-                            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myListFwScript(i), myFwScriptDelegate.CurrentFwScriptsQueue.Any = False)
-                        Next
-                        If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, myFwScriptDelegate.CurrentFwScriptsQueue.Any = False)
-'
-
+                        scriptID = FwSCRIPTS_IDS.SAMPLES_ABS_ROTOR
+                        addRequiredScript = True
 
                     Case ADJUSTMENT_GROUPS.REAGENTS_ROTOR_BC
-
-                        ' Mov ABS Reactions Rotor
-                        ' Absolute positioning of the samples rotor to a predefined position (Barcode) 
-                        With myFwScript1
-                            .FwScriptID = FwSCRIPTS_IDS.REAGENTS_ABS_ROTOR.ToString
-                            .EvaluateType = EVALUATE_TYPES.NUM_VALUE
-                            .EvaluateValue = 1
-                            .NextOnResultOK = Nothing
-                            .NextOnResultNG = Nothing
-                            .NextOnTimeOut = Nothing
-                            .NextOnError = Nothing
-                            ' expects 1 param
-                            .ParamList = New List(Of String)
-                            .ParamList.Add(MyClass.ReagentsRotorBCPositionAttr)
-                        End With
-
-                        'add to the queue list
-                        If myListFwScript.Count > 0 Then
-                            For i As Integer = 0 To myListFwScript.Count - 1
-                                If i = 0 Then
-                                    ' First Script
-                                    If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myListFwScript(i), True)
-                                Else
-                                    If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myListFwScript(i), False)
-                                End If
-                            Next
-                            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, False)
-                        Else
-                            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, True)
-                        End If
-
-
+                        scriptID = FwSCRIPTS_IDS.REAGENTS_ABS_ROTOR
+                        addRequiredScript = True
 
                 End Select
+
+                If addRequiredScript Then
+                    With myFwScript1
+                        .FwScriptID = scriptID.ToString
+                        .EvaluateType = EVALUATE_TYPES.NUM_VALUE
+                        .EvaluateValue = 1
+                        .NextOnResultOK = Nothing
+                        .NextOnResultNG = Nothing
+                        .NextOnTimeOut = Nothing
+                        .NextOnError = Nothing
+                        ' expects 1 param
+                        .ParamList = New List(Of String)
+                        .ParamList.Add(MyClass.SamplesRotorBCPositionAttr)
+                    End With
+
+                    For i As Integer = 0 To myListFwScript.Count - 1
+                        If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myListFwScript(i), myFwScriptDelegate.CurrentFwScriptsQueue.Any = False)
+                    Next
+                    If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, myFwScriptDelegate.CurrentFwScriptsQueue.Any = False)
+
+                    Dim switchOnBc As New FwScriptQueueItem With
+                        {
+                            .FwScriptID = FwSCRIPTS_IDS.SWITCH_ON_BARCODE.ToString,
+                            .EvaluateType = EVALUATE_TYPES.NUM_VALUE,
+                            .EvaluateValue = 1,
+                            .NextOnResultOK = Nothing,
+                            .NextOnResultNG = Nothing,
+                            .NextOnTimeOut = Nothing,
+                            .NextOnError = Nothing,
+                            .ParamList = Nothing
+                        }
+                    myFwScript1.NextOnResultOK = switchOnBc
+                    If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(switchOnBc, myFwScriptDelegate.CurrentFwScriptsQueue.Any = False)
+                End If
 
             Catch ex As Exception
                 myResultData.HasError = True

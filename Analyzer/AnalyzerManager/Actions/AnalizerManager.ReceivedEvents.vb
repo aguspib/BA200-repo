@@ -121,7 +121,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Dim myBarCodeRotorTypeRead As String = ""
             InstructionTypeReceivedAttribute = AnalyzerManagerSwActionList.ANSCBR_RECEIVED
-            myGlobal = ProcessCodeBarInstructionReceived(pInstructionReceived, myBarCodeRotorTypeRead)
+            myGlobal = ProcessBarCodeInstructionReceived(pInstructionReceived, myBarCodeRotorTypeRead)
 
             If Not myGlobal.HasError Then
                 If Not GlobalBase.IsServiceAssembly Then

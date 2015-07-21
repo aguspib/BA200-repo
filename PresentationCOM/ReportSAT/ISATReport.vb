@@ -11,6 +11,8 @@ Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.Controls.UserControls
 Imports Biosystems.Ax00.App
 Imports Biosystems.Ax00.Framework.CrossCutting
+Imports System.Windows.Forms
+Imports System.Drawing
 
 
 Public Class UiSATReport
@@ -29,6 +31,12 @@ Public Class UiSATReport
 
     Private EditonMode As Boolean
     Private ChangesMade As Boolean
+
+#End Region
+
+#Region "Properties"
+
+    Public Property MainMDI As IMainMDI = New EmptyMainMDI
 
 #End Region
 
@@ -166,7 +174,7 @@ Public Class UiSATReport
                 Else
                     'Normal button click
                     'Open the WS Monitor form and close this one
-                    UiAx00MainMDI.OpenMonitorForm(Me)
+                    MainMDI.OpenMonitorForm(Me)
                 End If
             End If
             'TR 14/02/2012 -END.
@@ -214,7 +222,7 @@ Public Class UiSATReport
                     ExitButton.Enabled = False
                     FolderButton.Enabled = False
                     bsSATDirListBox.Enabled = False
-                    UiAx00MainMDI.SetActionButtonsEnableProperty(False) 'AG 12/07/2011 - Disable all vertical action buttons bar
+                    MainMDI.SetActionButtonsEnableProperty(False) 'AG 12/07/2011 - Disable all vertical action buttons bar
 
                     Application.DoEvents()
                     Dim workingThread As New Threading.Thread(AddressOf CreateReportSAT_NEW)
@@ -226,69 +234,39 @@ Public Class UiSATReport
                     processing = True
                     ScreenWorkingProcess = True  'AG 08/11/2012 - Inform this flag because the MDI requires it
                     workingThread.Start()
-                    UiAx00MainMDI.EnableButtonAndMenus(False) 'TR 04/10/2011 -Implement new method.
+                    MainMDI.EnableButtonAndMenus(False) 'TR 04/10/2011 -Implement new method.
 
+
+   
+                    MainMDI.InitializeMarqueeProgreesBar()
                     While processing
-                        UiAx00MainMDI.InitializeMarqueeProgreesBar()
                         Application.DoEvents()
-                        Threading.Thread.Sleep(100)
+                        Dim waiter = Threading.Tasks.Task.Delay(100)
+                        waiter.Wait()
                     End While
-                    UiAx00MainMDI.StopMarqueeProgressBar()
+                    MainMDI.StopMarqueeProgressBar()
 
-                    'TR 22/12/2011 - Validate if file is created on the current folder.
+
+    'TR 22/12/2011 - Validate if file is created on the current folder.
                     If (File.Exists(FolderPathTextBox.Text & "\" & FileNameTextBox.Text & "." & AnalyzerController.Instance.Analyzer.Model)) Then
-                        'Load all SAT reports in current Dir
+    'Load all SAT reports in current Dir
                         LoadFilesInSatDirectory()
                         resetSaveButtonTimer.Enabled = True
                         Application.DoEvents()
 
-                        '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+    '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
                         GlobalBase.CreateLogActivity("Before Email -> ReportSAT Generated (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                         "ISATReport.bsSaveSATRepButton_Click", EventLogEntryType.Information, False)
-                        '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+    '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
-                        'DL 05/12/2012 We don't ask if we want send report by mail. BEGIN
-                        'If (ShowMessage("AX00", GlobalEnumerates.Messages.SEND_REPORT_SAT.ToString()) = DialogResult.Yes) Then
-                        '    Dim recipient As String = "address@biosystem.es"
-                        '    Dim subject As String = MyBase.AnalyzerModel & " Data"
-                        '    Dim body As String = "Lorem Ipsum..."
-
-                        '    'SGM 08/03/11 Get from SWParameters table
-                        '    Dim myGlobalDataTO As GlobalDataTO
-                        '    Dim myParams As New SwParametersDelegate
-                        '    'Recipient
-                        '    myGlobalDataTO = myParams.ReadTextValueByParameterName(Nothing, GlobalEnumerates.SwParameters.EMAIL_RECIPIENT.ToString, Nothing)
-                        '    If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
-                        '        recipient = CStr(myGlobalDataTO.SetDatos)
-                        '    End If
-                        '    'subject
-                        '    myGlobalDataTO = myParams.ReadTextValueByParameterName(Nothing, GlobalEnumerates.SwParameters.EMAIL_SUBJECT.ToString, MyBase.AnalyzerModel)
-                        '    If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
-                        '        subject = CStr(myGlobalDataTO.SetDatos)
-                        '    End If
-                        '    'body
-                        '    myGlobalDataTO = myParams.ReadTextValueByParameterName(Nothing, GlobalEnumerates.SwParameters.EMAIL_BODY.ToString, Nothing)
-                        '    If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
-                        '        body = CStr(myGlobalDataTO.SetDatos)
-                        '    Else
-                        '        body = "Lorem Ipsum..."
-                        '    End If
-                        '    'Dim attachment As String = dirName & zipExtension
-                        '    Dim attachment As String = FolderPathTextBox.Text & "\" & FileNameTextBox.Text & GlobalBase.ZIPExtension
-                        '    'RH 11/11/2010
-                        '    'Using new SendMail(), which uses the default Windows e-mail client, such as:
-                        '    'MS Outlook, Outlook Express, Windows Mail, Eudora or Thunderbird, for sending the e-mail,
-                        '    'and not forces the user to install MS Outlook instead.
-                        '    SendMail(recipient, subject, body, attachment)
-                        'End If
-                        'DL 05/12/2012 We don't ask if we want send report by mail. END
+    
                     Else
-                        'bsProgressBar.Position = 0 'DL 18/07/2011
+    'bsProgressBar.Position = 0 'DL 18/07/2011
                         Application.DoEvents()
                         ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), "Unable to create the Report SAT. There has been some errors.")
                     End If
                 Else
-                    'Directory Do not Exist Message.
+    'Directory Do not Exist Message.
                     ShowMessage("Warning", GlobalEnumerates.Messages.PATH_NOFOUND.ToString())
                 End If
             End If
@@ -302,10 +280,10 @@ Public Class UiSATReport
             ExitButton.Enabled = True
             FolderButton.Enabled = True
             bsSATDirListBox.Enabled = True
-            UiAx00MainMDI.SetActionButtonsEnableProperty(True)
-            UiAx00MainMDI.EnableButtonAndMenus(True) 'TR 04/10/2011 - Implement new method
+            MainMDI.SetActionButtonsEnableProperty(True)
+            MainMDI.EnableButtonAndMenus(True) 'TR 04/10/2011 - Implement new method
 
-            'TR 09/01/2012 - Indicate Rsat END on Application LOG.'TR 09/01/2012 -Indicate Rsat END on Application LOG.
+    'TR 09/01/2012 - Indicate Rsat END on Application LOG.'TR 09/01/2012 -Indicate Rsat END on Application LOG.
             GlobalBase.CreateLogActivity("RSAT END  Time: " & Now.ToLongTimeString, Name & ".bsSaveSATRepButton_Click", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
         End Try
     End Sub
@@ -586,98 +564,6 @@ Public Class UiSATReport
     End Sub
 
     ''' <summary>
-    ''' Sends an e-mail using the default Windows e-mail client, such as:
-    ''' MS Outlook, Outlook Express, Windows Mail, Eudora or Thunderbird
-    ''' </summary>
-    ''' <param name="pTo"></param>
-    ''' <param name="pSubject"></param>
-    ''' <param name="pBody"></param>
-    ''' <param name="pAttachment"></param>
-    ''' <remarks>
-    ''' Created by:  RH 11/11/2010
-    ''' Modified by: TR 08/03/2012 - Create new message on message table and multilanguage, set implementation:
-    '''                              1) Unable to send email to SAT EMAIL_ERROR.
-    '''                              2) SAT Email sent successfully. EMAIL_SUCCESS.
-    ''' </remarks>
-    Private Sub SendMail(ByVal pTo As String, ByVal pSubject As String, ByVal pBody As String, Optional ByVal pAttachment As String = "")
-        Try
-            Dim ma As New Mapi()
-            Dim errorMessage As String = GetMessageText(GlobalEnumerates.Messages.EMAIL_ERROR.ToString(), currentLanguage) '"*Unable to send e-mail to SAT.*"
-
-            If Not ma.Logon(IntPtr.Zero) Then
-                'Write error SYSTEM_ERROR in the Application Log
-                GlobalBase.CreateLogActivity(errorMessage, Me.Name & " SendMail ", EventLogEntryType.Error, _
-                                                                GetApplicationInfoSession().ActivateSystemLog)
-                'Show error message
-                ShowMessage("Information", GlobalEnumerates.Messages.EMAIL_ERROR.ToString())
-                Return
-            End If
-
-            If Not String.IsNullOrEmpty(pAttachment) Then ma.Attach(pAttachment)
-
-            ma.AddRecip(pTo, Nothing, False)
-
-            If Not ma.Send(pSubject, pBody) Then
-                'Write error SYSTEM_ERROR in the Application Log
-                GlobalBase.CreateLogActivity(errorMessage, Me.Name & " SendMail ", EventLogEntryType.Error, _
-                                                                GetApplicationInfoSession().ActivateSystemLog)
-                'Show error message
-                ShowMessage("Information", GlobalEnumerates.Messages.EMAIL_ERROR.ToString())
-                Return
-            End If
-
-            ma.Logoff()
-
-            GlobalBase.CreateLogActivity(GetMessageText(GlobalEnumerates.Messages.EMAIL_ERROR.ToString(), currentLanguage), Me.Name & " SendMail ", _
-                              EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
-        Catch ex As Exception
-            'Write error SYSTEM_ERROR in the Application Log
-            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " SendMail ", EventLogEntryType.Error, _
-                                                            GetApplicationInfoSession().ActivateSystemLog)
-            'Show error message
-            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
-        End Try
-    End Sub
-
-    ''' <summary>
-    ''' Encode text to Outlook parameters format
-    ''' </summary>
-    ''' <remarks>
-    ''' Created by: SG 03/08/2010
-    ''' </remarks>
-    Private Function EncodeMail(ByVal pContent As String) As GlobalDataTO
-        Dim res As String = pContent
-        Dim myResult As New GlobalDataTO
-
-        Try
-            res = res.Replace(" ", "%20")
-            res = res.Replace(",", "%2C")
-            res = res.Replace("?", "%3F")
-            res = res.Replace("¿", "%3F")
-            res = res.Replace(".", "%2E")
-            res = res.Replace("!", "%21")
-            res = res.Replace("¡", "%A1")
-            res = res.Replace(":", "%3A")
-            res = res.Replace(";", "%3B")
-            res = res.Replace("@", "%40")
-            res = res.Replace("#", "%23")
-            res = res.Replace("-", "%2D")
-            res = res.Replace("+", "%2B")
-            res = res.Replace("_", "%5F")
-
-            myResult.SetDatos = res
-        Catch ex As Exception
-            myResult.HasError = True
-            myResult.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-            myResult.ErrorMessage = ex.Message
-
-            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " EncodeMail ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
-        End Try
-        Return myResult
-    End Function
-
-    ''' <summary>
     ''' Get the ReportSAT prefix
     ''' </summary>
     ''' <returns></returns>
@@ -714,10 +600,10 @@ Public Class UiSATReport
         Try
             'TR - Validate if Path exists
             If Not FolderPathTextBox.Text = String.Empty AndAlso Directory.Exists(FolderPathTextBox.Text) Then
-                ZIPExtension = ".SAT"
+                zipExtension = ".SAT"
                 Dim DirList As New DirectoryInfo(FolderPathTextBox.Text)
                 bsSATDirListBox.Items.Clear()
-                For Each SATFile As FileSystemInfo In DirList.GetFileSystemInfos("*" & ZIPExtension).ToList()
+                For Each SATFile As FileSystemInfo In DirList.GetFileSystemInfos("*" & zipExtension).ToList()
                     bsSATDirListBox.Items.Add(SATFile.Name)
                 Next
                 'Include .Model SAT Files
@@ -784,236 +670,6 @@ Public Class UiSATReport
         End Try
         Return ExistFileName
     End Function
-
-#End Region
-
-#Region "TO DELETE"
-    ' ''' <summary>
-    ' ''' 
-    ' ''' </summary>
-    ' ''' <remarks>Created by SG 13/10/10</remarks>
-    'Private Sub CreateReportSAT()
-    '    Try
-    '        'AG 25/10/2011 - Stop ANSINF
-    '        Dim myGlobal As New GlobalDataTO
-    '        'TR-AG 05/01/2012 -Commented because cause functional error on RUNTIME
-    '        'If Not mdiAnalyzerCopy Is Nothing Then
-    '        '    If AnalyzerController.Instance.Analyzer.Connected AndAlso AnalyzerController.Instance.Analyzer.AnalyzerStatus <> GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
-    '        '        myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STP) 'Stop ANSINF
-    '        '    End If
-    '        'End If
-    '        'AG 25/10/2011
-    '        'TR-AG 05/01/2012 -END.
-
-    '        If Not myGlobal.HasError Then
-    '            ' Begin DL 15/11/2010
-    '            ' Backup tparpatient
-    '            Dim original_Patients As New PatientsDS
-    '            Dim modify_Patients As New PatientsDS
-    '            Dim resultData As GlobalDataTO
-    '            Dim patientsList As New PatientDelegate
-
-    '            Dim original_HisPatients As New HisPatientDS
-    '            Dim modify_HisPatients As New HisPatientDS
-    '            Dim hisPatientsList As New HisPatientsDelegate
-
-    '            '-----------
-    '            'Modify confidential Data Before Export data to ReportSat
-    '            '-----------
-    '            ' Patient DL 15/11/2010
-    '            resultData = patientsList.GetListWithFilters(Nothing, Nothing)
-    '            If Not resultData.HasError Then
-    '                original_Patients = CType(resultData.SetDatos, PatientsDS)
-    '                modify_Patients = CType(original_Patients.Copy(), PatientsDS)
-    '                ' Modify tparPatient Confidential Data 
-    '                Dim myPatientIndex As Integer = 1
-    '                For Each myrow As PatientsDS.tparPatientsRow In modify_Patients.tparPatients.Rows
-    '                    myrow.FirstName = String.Format("FN_{0:000000000}", myPatientIndex)
-    '                    myrow.LastName = String.Format("LN_{0:000000000}", myPatientIndex)
-    '                    myPatientIndex += 1
-    '                    myrow.AcceptChanges()
-    '                Next myrow
-    '                ' Update on DB before to generate SAT Report
-    '                resultData = patientsList.ModifyPatientsByID(Nothing, modify_Patients.tparPatients)
-    '            End If
-
-    '            'JC 11/06/2013
-    '            ' HistPatient
-    '            resultData = hisPatientsList.GetAllPatientsHistory(Nothing)
-    '            If Not resultData.HasError Then
-    '                original_HisPatients = CType(resultData.SetDatos, HisPatientDS)
-    '                modify_HisPatients = CType(original_HisPatients.Copy(), HisPatientDS)
-    '                ' Modify tparPatient Confidential Data 
-    '                Dim myPatientIndex As Integer = 1
-    '                For Each myrow As HisPatientDS.thisPatientsRow In modify_HisPatients.thisPatients.Rows
-    '                    myrow.FirstName = String.Format("FN_{0:000000000}", myPatientIndex)
-    '                    myrow.LastName = String.Format("LN_{0:000000000}", myPatientIndex)
-    '                    myPatientIndex += 1
-    '                    myrow.AcceptChanges()
-    '                Next myrow
-    '                ' Update on DB before to generate SAT Report
-    '                resultData = hisPatientsList.ModifyPatientsByID(Nothing, modify_HisPatients.thisPatients)
-    '            End If
-    '            '---------
-    '            'End Modify Confidential Data Before Export data to Report Sat
-    '            '---------
-
-
-    '            'TR 21/12/2011 
-    '            SATFileName = FileNameTextBox.Text
-    '            SATFilePath = FolderPathTextBox.Text
-    '            'TR 21/12/2011 -END.
-
-    '            ' XBC 02/08/2012 - If WS status is Running mark this into a flag
-    '            If AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
-    '                Dim pFlagsDS As New AnalyzerManagerFlagsDS
-    '                'Add row into Dataset to Update
-    '                Dim flagRow As AnalyzerManagerFlagsDS.tcfgAnalyzerManagerFlagsRow
-    '                flagRow = pFlagsDS.tcfgAnalyzerManagerFlags.NewtcfgAnalyzerManagerFlagsRow
-    '                With flagRow
-    '                    .BeginEdit()
-    '                    .AnalyzerID = AnalyzerController.Instance.Analyzer.ActiveAnalyzer
-    '                    .FlagID = GlobalEnumerates.AnalyzerManagerFlags.ReportSATonRUNNING.ToString
-    '                    .Value = "INPROCESS"
-    '                    .EndEdit()
-    '                End With
-    '                pFlagsDS.tcfgAnalyzerManagerFlags.AddtcfgAnalyzerManagerFlagsRow(flagRow)
-    '                pFlagsDS.AcceptChanges()
-
-    '                Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
-    '                myGlobal = myFlagsDelg.Update(Nothing, pFlagsDS)
-    '            End If
-    '            ' XBC 02/08/2012 
-
-    '            Dim mySATUtil As New SATReportUtilities
-    '            'TR 02/02/2012 -Set the result value of CreateSatReport mothod to GlobalDataTO, to 
-    '            '               Validate if there's any error on the process.
-    '            myGlobal = mySATUtil.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_REPORT, False, "", _
-    '                                      MyClass.AnalyzerController.Instance.Analyzer.AdjustmentsFilePath, SATFilePath, SATFileName)
-
-    '            '-----------
-    '            'Restore confidential Data After Export data to ReportSat
-    '            '-----------
-    '            ' Patient
-    '            If Not myGlobal.HasError Then
-    '                resultData = patientsList.ModifyPatientsByID(Nothing, original_Patients.tparPatients)
-
-    '                ChangesMade = False 'TR 14/02/2012
-    '            End If
-
-    '            ' HistPatient JC 11/06/2013
-    '            If Not myGlobal.HasError Then
-    '                resultData = hisPatientsList.ModifyPatientsByID(Nothing, original_HisPatients.thisPatients)
-
-    '                ChangesMade = ChangesMade OrElse False 'JC 11/06/2013
-    '            End If
-    '            '---------
-    '            'End Restore Confidential Data After Export data to Report Sat
-    '            '---------
-
-    '            'TR 02/02/2012 -END
-    '        End If
-
-    '        ' XBC 02/08/2012 - If WS status is Running mark this into a flag
-    '        If AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
-    '            Dim pFlagsDS As New AnalyzerManagerFlagsDS
-    '            'Add row into Dataset to Update
-    '            Dim flagRow As AnalyzerManagerFlagsDS.tcfgAnalyzerManagerFlagsRow
-    '            flagRow = pFlagsDS.tcfgAnalyzerManagerFlags.NewtcfgAnalyzerManagerFlagsRow
-    '            With flagRow
-    '                .BeginEdit()
-    '                .AnalyzerID = AnalyzerController.Instance.Analyzer.ActiveAnalyzer
-    '                .FlagID = GlobalEnumerates.AnalyzerManagerFlags.ReportSATonRUNNING.ToString
-    '                .Value = "CLOSED"
-    '                .EndEdit()
-    '            End With
-    '            pFlagsDS.tcfgAnalyzerManagerFlags.AddtcfgAnalyzerManagerFlagsRow(flagRow)
-    '            pFlagsDS.AcceptChanges()
-
-    '            Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
-    '            myGlobal = myFlagsDelg.Update(Nothing, pFlagsDS)
-    '        End If
-    '        ' XBC 02/08/2012
-
-
-    '        'TR-AG 05/01/2012 -Commented because cause functional error on RUNTIME
-    '        ''AG 25/10/2011 - Start ANSINF
-    '        'If Not myGlobal.HasError AndAlso Not mdiAnalyzerCopy Is Nothing Then
-    '        '    If AnalyzerController.Instance.Analyzer.Connected AndAlso AnalyzerController.Instance.Analyzer.AnalyzerStatus <> GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
-    '        '        myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STR) 'Start ANSINF
-    '        '    End If
-    '        'End If
-    '        'AG 25/10/2011
-    '        'TR-AG 05/01/2012 -END
-
-    '    Catch ex As Exception
-    '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " CreateReportSAT ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-    '        'DL 15/05/2013
-    '        'ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
-    '        Me.UIThread(Function() ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))"))
-    '        'DL 15/05/2013
-
-    '    Finally
-    '        processing = False
-    '        ScreenWorkingProcess = False 'AG 08/11/2012 - inform this flag because the MDI requires it
-
-    '    End Try
-
-
-    'End Sub
-#End Region
-
-#Region "Old SendMail that only works with Outlook.exe"
-
-    '''' <summary>
-    '''' Encode the email contents and open the current installed outlook
-    '''' </summary>
-    '''' <param name="pTo"></param>
-    '''' <param name="pSubject"></param>
-    '''' <param name="pBody"></param>
-    '''' <param name="pAttachment"></param>
-    '''' <remarks>Created by SG 03/08/2010</remarks>
-    'Private Sub SendMail(ByVal pTo As String, ByVal pSubject As String, ByVal pBody As String, Optional ByVal pAttachment As String = "")
-    '    Try
-    '        Dim myGlobal As New GlobalDataTO
-
-    '        myGlobal = EncodeMail(pSubject)
-
-    '        If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-    '            pSubject = CStr(myGlobal.SetDatos)
-
-    '            myGlobal = EncodeMail(pBody)
-
-    '            If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-
-    '                pBody = CStr(myGlobal.SetDatos)
-
-
-    '                Dim strMessage As String = "mailto:" & pTo & "?subject=" & pSubject & "&body=" & pBody ' & "&attachment=""" & pAttachment & """"
-
-    '                If pAttachment <> "" Then
-    '                    pAttachment = """" & pAttachment & """"
-    '                    System.Diagnostics.Process.Start("Outlook.exe", "/c ipm.note /m " & strMessage & "/a " & pAttachment)
-    '                Else
-    '                    System.Diagnostics.Process.Start("Outlook.exe", "/c ipm.note /m " & strMessage)
-    '                End If
-    '            Else
-    '                Throw New Exception(myGlobal.ErrorMessage)
-    '            End If
-
-    '        Else
-    '            Throw New Exception(myGlobal.ErrorMessage)
-    '        End If
-
-
-    '    Catch ex As Exception
-    '        'Write error SYSTEM_ERROR in the Application Log
-    '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " SendMail ", EventLogEntryType.Error, _
-    '                                                        GetApplicationInfoSession().ActivateSystemLog)
-    '        'Show error message
-    '        ShowMessage("Error", "SYSTEM_ERROR", ex.Message + " ((" + ex.HResult.ToString + "))")
-    '    End Try
-    'End Sub
 
 #End Region
 

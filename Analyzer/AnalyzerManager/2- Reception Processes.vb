@@ -991,7 +991,7 @@ Namespace Biosystems.Ax00.Core.Entities
         '''                                          the way of get the returned value has been changed: instead of use DirectCast(CInt(value), Integer) - This has 
         '''                                          not sense!, use CType(value, Integer). Replaced all String.Compare by comparisons using = 
         ''' </remarks>
-        Private Function ProcessCodeBarInstructionReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO), ByRef pRotorType As String) As GlobalDataTO
+        Private Function ProcessBarCodeInstructionReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO), ByRef pRotorType As String) As GlobalDataTO
             Dim dbConnection As New SqlConnection
             Dim myGlobal As New GlobalDataTO
 
@@ -1037,7 +1037,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         'Get Reader selector (parameter index 3)
                         Dim rotorSelected As Integer = 0
-                        myGlobal = GetItemByParameterIndex(pInstructionReceived, 3)
+                        myGlobal = GetItemByParameterIndex(pInstructionReceived, 3) '--> MANEL
                         If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                             myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
 
@@ -1103,41 +1103,42 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                 'Read the general configuration and sent the CONFIG instruction
                                 'The analyzer answers with a Status instruction action = config done
-                                If (rotorSelected = Ax00CodeBarReader.SAMPLES) Then
-                                    'When Codebar SAMPLES CONFIG_DONE is received then Codebar REAGENTS CONFIG instruction is sent
-                                    Dim BarCodeDS As New AnalyzerManagerDS
-                                    Dim rowBarCode As AnalyzerManagerDS.barCodeRequestsRow
+                                Select Case rotorSelected
+                                    Case Ax00CodeBarReader.SAMPLES
+                                        'When Codebar SAMPLES CONFIG_DONE is received then Codebar REAGENTS CONFIG instruction is sent
+                                        Dim BarCodeDS As New AnalyzerManagerDS
+                                        Dim rowBarCode As AnalyzerManagerDS.barCodeRequestsRow
 
-                                    rowBarCode = BarCodeDS.barCodeRequests.NewbarCodeRequestsRow
-                                    With rowBarCode
-                                        .RotorType = "REAGENTS"
-                                        .Action = Ax00CodeBarAction.CONFIG
-                                        .Position = 0
-                                    End With
-                                    BarCodeDS.barCodeRequests.AddbarCodeRequestsRow(rowBarCode)
-                                    BarCodeDS.AcceptChanges()
+                                        rowBarCode = BarCodeDS.barCodeRequests.NewbarCodeRequestsRow
+                                        With rowBarCode
+                                            .RotorType = "REAGENTS"
+                                            .Action = Ax00CodeBarAction.CONFIG
+                                            .Position = 0
+                                        End With
+                                        BarCodeDS.barCodeRequests.AddbarCodeRequestsRow(rowBarCode)
+                                        BarCodeDS.AcceptChanges()
 
-                                    myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.BARCODE_REQUEST, True, Nothing, BarCodeDS)
+                                        myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.BARCODE_REQUEST, True, Nothing, BarCodeDS)
 
-                                ElseIf (rotorSelected = Ax00CodeBarReader.REAGENTS) Then
-                                    'SG 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                                    If (GlobalBase.IsServiceAssembly) Then
-                                        'Service SW
-                                        myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.CONFIG, True)
-                                    Else
-                                        'User Sw
-                                        'When Codebar REAGENTS CONFIG_DONE is received then General CONFIG instruction is sent
-                                        If (mySessionFlags(AnalyzerManagerFlags.CONNECTprocess.ToString) = "INPROCESS") Then
+                                    Case Ax00CodeBarReader.REAGENTS, Ax00CodeBarReader.SAMPLESANDREAGENTS
+                                        'SG 01/02/2012 - Check if it is Service Assembly - Bug #1112
+                                        If (GlobalBase.IsServiceAssembly) Then
+                                            'Service SW
                                             myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.CONFIG, True)
+                                        Else
+                                            'User Sw
+                                            'When Codebar REAGENTS CONFIG_DONE is received then General CONFIG instruction is sent
+                                            If (mySessionFlags(AnalyzerManagerFlags.CONNECTprocess.ToString) = "INPROCESS") Then
+                                                myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.CONFIG, True)
 
-                                        ElseIf (mySessionFlags(AnalyzerManagerFlags.WUPprocess.ToString) = "INPROCESS") Then
-                                            'UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.WUPprocess, "CLOSED")
-                                            'myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.CONFIG, True)
-                                            'ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ConfigureBarCode) 'BA-2075 
-                                            RaiseEvent ProcessFlagEventHandler(AnalyzerManagerFlags.Barcode) 'BA-2288
+                                            ElseIf (mySessionFlags(AnalyzerManagerFlags.WUPprocess.ToString) = "INPROCESS") Then
+                                                'UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.WUPprocess, "CLOSED")
+                                                'myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.CONFIG, True)
+                                                'ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ConfigureBarCode) 'BA-2075 
+                                                RaiseEvent ProcessFlagEventHandler(AnalyzerManagerFlags.Barcode) 'BA-2288
+                                            End If
                                         End If
-                                    End If
-                                End If
+                                End Select
 
                                 'SG 01/02/2012 - Check if it is Service Assembly - Bug #1112
                                 If (GlobalBase.IsServiceAssembly) Then

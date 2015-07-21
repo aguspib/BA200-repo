@@ -1610,7 +1610,7 @@ Public Class UiPositionsAdjustments
 
             Return Table
 
-        Catch ex As Exception            
+        Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Name & ".CreateChartDataCounts", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Name & ".CreateChartDataCounts", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             Return Nothing
@@ -1659,7 +1659,7 @@ Public Class UiPositionsAdjustments
 
             Return Table
 
-        Catch ex As Exception            
+        Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Name & ".CreateChartDataEncoder", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Name & ".CreateChartDataEncoder", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             Return Nothing
@@ -5482,6 +5482,10 @@ Public Class UiPositionsAdjustments
                         If .canSaveZValue Then
                             Me.UpdateLocalSavedSpecificAdjustmentsDS(ReadSpecificAdjustmentData(GlobalEnumerates.AXIS.Z).CodeFw, .NewZValue.ToString)
 
+                            If ReadSpecificAdjustmentData(GlobalEnumerates.AXIS.Z).GroupID = ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1.ToString AndAlso AnalyzerController.Instance.IsBA200 Then
+                                Me.UpdateLocalSavedSpecificAdjustmentsDS(Ax00Adjustsments.R1PV2.ToString, .NewZValue.ToString)
+                            End If
+
                             ' XBC 12/09/2011 - By now ZTube 2 & 3 takes the value of ZTube1
                             If ReadSpecificAdjustmentData(GlobalEnumerates.AXIS.Z).GroupID = ADJUSTMENT_GROUPS.SAMPLES_ARM_ZTUBE1.ToString Then
                                 Me.UpdateLocalSavedSpecificAdjustmentsDS(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_ZTUBE2.ToString, GlobalEnumerates.AXIS.Z).CodeFw, .NewZValue.ToString)
@@ -6081,7 +6085,7 @@ Public Class UiPositionsAdjustments
             .InFile = True
         End With
         Me.TempToSendAdjustmentsDelegate.AddNewRowToDS(myNewRow)
-        
+
     End Sub
 
     ''' <summary>
@@ -6198,16 +6202,14 @@ Public Class UiPositionsAdjustments
                 myAdjustmentsGroups.Add(ADJUSTMENT_GROUPS.SAMPLES_ARM_ZTUBE3.ToString)
             End If
 
-            If AnalyzerController.Instance.IsBA200 AndAlso myAdjustmentID = ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1 Then
-                myAdjustmentsGroups.Add(ADJUSTMENT_GROUPS.SAMPLES_ARM_ZTUBE1.ToString)
-            End If
-
-
             resultData = MyBase.myAdjustmentsDelegate.ReadAdjustmentsByGroupIDs(myAdjustmentsGroups)
             If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
                 Me.SelectedAdjustmentsDS = CType(resultData.SetDatos, SRVAdjustmentsDS)
             End If
 
+            If AnalyzerController.Instance.IsBA200 AndAlso myAdjustmentID = ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1 Then
+                SelectedAdjustmentsDS.srv_tfmwAdjustments.ImportRow(myAdjustmentsDelegate.ReadFirstAdjustmentValueByCode(Ax00Adjustsments.R1PH1.ToString))
+            End If
 
         Catch ex As Exception
             Me.SelectedAdjustmentsDS = CopyOfSelectedAdjustmentsDS
