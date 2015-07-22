@@ -2881,17 +2881,27 @@ Public Class UiThermosAdjustments
     Private Sub LoadAdjustmentsData()
         Try
             With myScreenDelegate
-                .ArmReagent1DispPolar = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_DISP1.ToString, GlobalEnumerates.AXIS.POLAR).Value
-                .ArmReagent1DispZ = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_DISP1.ToString, GlobalEnumerates.AXIS.Z).Value
-                .ArmReagent1WSPolar = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_WASH.ToString, GlobalEnumerates.AXIS.POLAR).Value
-                .ArmReagent1Ring1Polar = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1.ToString, GlobalEnumerates.AXIS.POLAR).Value
-                .ArmReagent1Ring1Z = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1.ToString, GlobalEnumerates.AXIS.Z).Value
+                'IT 22/07/2015 - BA-2650 (INI)
+                If AnalyzerController.Instance.IsBA200 Then
+                    .ArmReagent1DispPolar = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_DISP1.ToString, GlobalEnumerates.AXIS.POLAR).Value
+                    .ArmReagent1DispZ = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_DISP1.ToString, GlobalEnumerates.AXIS.Z).Value
+                    .ArmReagent1WSPolar = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_WASH.ToString, GlobalEnumerates.AXIS.POLAR).Value
+                    .ArmReagent1Ring1Polar = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1.ToString, GlobalEnumerates.AXIS.POLAR).Value
+                    .ArmReagent1Ring1Z = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1.ToString, GlobalEnumerates.AXIS.Z).Value
+                Else
+                    .ArmReagent1DispPolar = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_DISP1.ToString, GlobalEnumerates.AXIS.POLAR).Value
+                    .ArmReagent1DispZ = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_DISP1.ToString, GlobalEnumerates.AXIS.Z).Value
+                    .ArmReagent1WSPolar = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_WASH.ToString, GlobalEnumerates.AXIS.POLAR).Value
+                    .ArmReagent1Ring1Polar = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1.ToString, GlobalEnumerates.AXIS.POLAR).Value
+                    .ArmReagent1Ring1Z = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1.ToString, GlobalEnumerates.AXIS.Z).Value
 
-                .ArmReagent2DispPolar = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_DISP1.ToString, GlobalEnumerates.AXIS.POLAR).Value
-                .ArmReagent2DispZ = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_DISP1.ToString, GlobalEnumerates.AXIS.Z).Value
-                .ArmReagent2WSPolar = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_WASH.ToString, GlobalEnumerates.AXIS.POLAR).Value
-                .ArmReagent2Ring1Polar = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_RING1.ToString, GlobalEnumerates.AXIS.POLAR).Value
-                .ArmReagent2Ring1Z = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_RING1.ToString, GlobalEnumerates.AXIS.Z).Value
+                    .ArmReagent2DispPolar = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_DISP1.ToString, GlobalEnumerates.AXIS.POLAR).Value
+                    .ArmReagent2DispZ = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_DISP1.ToString, GlobalEnumerates.AXIS.Z).Value
+                    .ArmReagent2WSPolar = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_WASH.ToString, GlobalEnumerates.AXIS.POLAR).Value
+                    .ArmReagent2Ring1Polar = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_RING1.ToString, GlobalEnumerates.AXIS.POLAR).Value
+                    .ArmReagent2Ring1Z = ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_RING1.ToString, GlobalEnumerates.AXIS.Z).Value
+                End If
+                'IT 22/07/2015 - BA-2650 (END)
             End With
 
         Catch ex As Exception
@@ -4703,17 +4713,21 @@ Public Class UiThermosAdjustments
 
                             Select Case myScreenDelegate.CurrentTest
                                 Case ADJUSTMENT_GROUPS.THERMOS_REAGENT1
-                                    myScreenDelegate.R1WSHorizontalPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_WASH.ToString, GlobalEnumerates.AXIS.POLAR, True).Value)
-                                    myScreenDelegate.R1WSVerticalRefPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_WASH.ToString, GlobalEnumerates.AXIS.Z, True).Value)
-                                    myScreenDelegate.R1VerticalSafetyPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_VSEC.ToString, GlobalEnumerates.AXIS.Z, True).Value)
-
-
+                                    'IT 22/07/2015 - BA-2650 (INI)
+                                    If (AnalyzerController.Instance.IsBA200) Then
+                                        myScreenDelegate.R1WSHorizontalPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_WASH.ToString, GlobalEnumerates.AXIS.POLAR, True).Value)
+                                        myScreenDelegate.R1WSVerticalRefPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_WASH.ToString, GlobalEnumerates.AXIS.Z, True).Value)
+                                        myScreenDelegate.R1VerticalSafetyPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_VSEC.ToString, GlobalEnumerates.AXIS.Z, True).Value)
+                                    Else
+                                        myScreenDelegate.R1WSHorizontalPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_WASH.ToString, GlobalEnumerates.AXIS.POLAR, True).Value)
+                                        myScreenDelegate.R1WSVerticalRefPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_WASH.ToString, GlobalEnumerates.AXIS.Z, True).Value)
+                                        myScreenDelegate.R1VerticalSafetyPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_VSEC.ToString, GlobalEnumerates.AXIS.Z, True).Value)
+                                    End If
+                                    'IT 22/07/2015 - BA-2650 (END)
                                 Case ADJUSTMENT_GROUPS.THERMOS_REAGENT2
                                     myScreenDelegate.R2WSHorizontalPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_WASH.ToString, GlobalEnumerates.AXIS.POLAR, True).Value)
                                     myScreenDelegate.R2WSVerticalRefPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_WASH.ToString, GlobalEnumerates.AXIS.Z, True).Value)
                                     myScreenDelegate.R2VerticalSafetyPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_VSEC.ToString, GlobalEnumerates.AXIS.Z, True).Value)
-
-
                             End Select
 
                             MyBase.DisplayMessage(Messages.SRV_CONDITIONING_SYSTEM.ToString)
@@ -4760,14 +4774,25 @@ Public Class UiThermosAdjustments
                 If Not MyBase.SimulationMode Then
                     Select Case myScreenDelegate.CurrentTest
                         Case ADJUSTMENT_GROUPS.THERMOS_REAGENT1
-                            myScreenDelegate.R1RotorPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1.ToString, GlobalEnumerates.AXIS.ROTOR, True).Value)
-                            myScreenDelegate.R1RotorRing1HorPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1.ToString, GlobalEnumerates.AXIS.POLAR, True).Value)
-                            myScreenDelegate.R1RotorRing1DetMaxVerPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1.ToString, GlobalEnumerates.AXIS.Z, True).Value)
-                            myScreenDelegate.R1VerticalSafetyPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_VSEC.ToString, GlobalEnumerates.AXIS.Z, True).Value)
-                            myScreenDelegate.R1WSHorizontalPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_WASH.ToString, GlobalEnumerates.AXIS.POLAR, True).Value)
-
-                            ' XBC 19/04/2012 - Change maneuver
-                            myScreenDelegate.R1InitialPointLevelDet = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_LEVEL.ToString, GlobalEnumerates.AXIS.Z, True).Value)
+                            'IT 22/07/2015 - BA-2650 (INI)
+                            If AnalyzerController.Instance.IsBA200 Then
+                                myScreenDelegate.R1RotorPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1.ToString, GlobalEnumerates.AXIS.ROTOR, True).Value)
+                                myScreenDelegate.R1RotorRing1HorPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1.ToString, GlobalEnumerates.AXIS.POLAR, True).Value)
+                                myScreenDelegate.R1RotorRing1DetMaxVerPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1.ToString, GlobalEnumerates.AXIS.Z, True).Value)
+                                myScreenDelegate.R1VerticalSafetyPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_VSEC.ToString, GlobalEnumerates.AXIS.Z, True).Value)
+                                myScreenDelegate.R1WSHorizontalPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_WASH.ToString, GlobalEnumerates.AXIS.POLAR, True).Value)
+                                ' XBC 19/04/2012 - Change maneuver
+                                myScreenDelegate.R1InitialPointLevelDet = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_LEVEL_DET.ToString, GlobalEnumerates.AXIS.Z, True).Value)
+                            Else
+                                myScreenDelegate.R1RotorPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1.ToString, GlobalEnumerates.AXIS.ROTOR, True).Value)
+                                myScreenDelegate.R1RotorRing1HorPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1.ToString, GlobalEnumerates.AXIS.POLAR, True).Value)
+                                myScreenDelegate.R1RotorRing1DetMaxVerPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1.ToString, GlobalEnumerates.AXIS.Z, True).Value)
+                                myScreenDelegate.R1VerticalSafetyPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_VSEC.ToString, GlobalEnumerates.AXIS.Z, True).Value)
+                                myScreenDelegate.R1WSHorizontalPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_WASH.ToString, GlobalEnumerates.AXIS.POLAR, True).Value)
+                                ' XBC 19/04/2012 - Change maneuver
+                                myScreenDelegate.R1InitialPointLevelDet = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_LEVEL.ToString, GlobalEnumerates.AXIS.Z, True).Value)
+                            End If
+                            'IT 22/07/2015 - BA-2650 (END)
 
                         Case ADJUSTMENT_GROUPS.THERMOS_REAGENT2
                             myScreenDelegate.R2RotorPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_RING1.ToString, GlobalEnumerates.AXIS.ROTOR, True).Value)
