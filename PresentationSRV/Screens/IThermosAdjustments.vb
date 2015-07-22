@@ -860,10 +860,10 @@ Public Class UiThermosAdjustments
 
             'IT 21/07/2015 - BA-2650
             If AnalyzerController.Instance.IsBA200 Then
-                Me.Tab2RadioButtonR1.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Reagent1Arm", currentLanguage)
-                Me.Tab2RadioButtonR2.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Reagent2Arm", currentLanguage)
+                Me.Tab2RadioButtonR1.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_SamplesAndReagentsArm", currentLanguage)
             Else
                 Me.Tab2RadioButtonR1.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Reagent1Arm", currentLanguage)
+                Me.Tab2RadioButtonR2.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Reagent2Arm", currentLanguage)
             End If
 
             Me.Tab2ConditioningDescLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_CONDITIONING_DESC1", currentLanguage)

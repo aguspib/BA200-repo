@@ -364,6 +364,7 @@
       <SyntaxOK>false</SyntaxOK>
       <TestedOK>false</TestedOK>
     </FwScriptTO>
+    <!--
     <FwScriptTO>
       <FwScriptID>6</FwScriptID>
       <ActionID>REAGENT2_ARM_HOME_POLAR</ActionID>
@@ -392,7 +393,8 @@
       <SyntaxOK>false</SyntaxOK>
       <TestedOK>false</TestedOK>
     </FwScriptTO>
-    <FwScriptTO>
+    -->
+    <!--<FwScriptTO>
       <FwScriptID>7</FwScriptID>
       <ActionID>REAGENT2_ARM_HOME_Z</ActionID>
       <Description>takes Reagent2 Arm to Vertical Home</Description>
@@ -419,7 +421,7 @@
       <Author>SW</Author>
       <SyntaxOK>false</SyntaxOK>
       <TestedOK>false</TestedOK>
-    </FwScriptTO>
+    </FwScriptTO>-->
     <FwScriptTO>
       <FwScriptID>8</FwScriptID>
       <ActionID>MIXER1_ARM_HOME_POLAR</ActionID>
@@ -4940,7 +4942,7 @@
       <SyntaxOK>false</SyntaxOK>
       <TestedOK>false</TestedOK>
     </FwScriptTO>
-    <FwScriptTO>
+    <!--<FwScriptTO>
       <FwScriptID>2011</FwScriptID>
       <ActionID>NEEDLES_DISPENSE_R2</ActionID>
       <Description>dispenses reagent through the reagent arm 2</Description>
@@ -5136,6 +5138,7 @@
       <SyntaxOK>false</SyntaxOK>
       <TestedOK>false</TestedOK>
     </FwScriptTO>
+    -->
     <FwScriptTO>
       <FwScriptID>2012</FwScriptID>
       <ActionID>NEEDLES_PRIME_R1</ActionID>
@@ -5308,7 +5311,7 @@
       <SyntaxOK>false</SyntaxOK>
       <TestedOK>false</TestedOK>
     </FwScriptTO>
-    <FwScriptTO>
+    <!--<FwScriptTO>
       <FwScriptID>2013</FwScriptID>
       <ActionID>NEEDLES_PRIME_R2</ActionID>
       <Description>Primes the Reagent2 arm</Description>
@@ -5480,6 +5483,7 @@
       <SyntaxOK>false</SyntaxOK>
       <TestedOK>false</TestedOK>
     </FwScriptTO>
+    -->
     <FwScriptTO>
       <FwScriptID>2014</FwScriptID>
       <ActionID>ROTOR_PRIME_INI</ActionID>
