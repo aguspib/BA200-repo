@@ -60,8 +60,9 @@ Public Class UiAx00Login
 
         'DL 28/03/2012
         If IsUserChange Then
-            Me.ShowInTaskbar = False
-            'Me.Text = " "
+            ShowInTaskbar = False
+        Else
+            ShowInTaskbar = True
         End If
 
     End Sub
@@ -808,15 +809,18 @@ Public Class UiAx00Login
         Try
 
 #If DEBUG Then
-            'TR set the bio user
-            bsUserIDTextBox.Text = "BIOSYSTEMS"
-
             'SGM 01/02/2012 - Set that is Service Assembly - Bug #1112
             'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
             If GlobalBase.IsServiceAssembly Then
-                bsUserIDTextBox.Text = "SERVICE"
-                bsPasswordTextBox.Text = "BA400"
+                If Environment.GetCommandLineArgs.Contains("/DEMOMODE") Then
+                    bsUserIDTextBox.Text = "BIOSRV"
+                    bsPasswordTextBox.Text = "costabrava"
+                Else
+                    bsUserIDTextBox.Text = "SERVICE"
+                    bsPasswordTextBox.Text = "BA400"
+                End If
             Else
+                bsUserIDTextBox.Text = "BIOSYSTEMS"
                 bsPasswordTextBox.Text = "CostaBrava"
             End If
 

@@ -38,7 +38,7 @@ Public Class UiBarCodeAdjustments
 
 #Region "Properties"
     Private IsReadyToCloseAttr As Boolean
-    Public ReadOnly Property IsReadyToClose() As Boolean
+    Public ReadOnly Property IsReadyToClose As Boolean
         Get
             Return IsReadyToCloseAttr
         End Get
@@ -86,7 +86,7 @@ Public Class UiBarCodeAdjustments
     ''' <param name="pResponse"></param>
     ''' <param name="pData"></param>
     ''' <remarks>Created by XBC 15/12/2011</remarks>
-    Public Sub ScreenReceptionLastFwScriptEvent(ByVal pResponse As RESPONSE_TYPES, ByVal pData As Object) Handles myScreenDelegate.ReceivedLastFwScriptEvent
+    Public Sub ScreenReceptionLastFwScriptEvent(pResponse As RESPONSE_TYPES, pData As Object) Handles myScreenDelegate.ReceivedLastFwScriptEvent
 
         Me.UIThread(Function() ManageReceptionEvent(pResponse, pData))
 
@@ -99,7 +99,7 @@ Public Class UiBarCodeAdjustments
     ''' <param name="pResponse">response type</param>
     ''' <param name="pData">data received</param>
     ''' <remarks>Created by XBC 15/12/2011</remarks>
-    Private Function ManageReceptionEvent(ByVal pResponse As RESPONSE_TYPES, ByVal pData As Object) As Boolean
+    Private Function ManageReceptionEvent(pResponse As RESPONSE_TYPES, pData As Object) As Boolean
         Dim myGlobal As New GlobalDataTO
         Try
             'manage special operations according to the screen characteristics
@@ -108,11 +108,11 @@ Public Class UiBarCodeAdjustments
             If pResponse = RESPONSE_TYPES.TIMEOUT Then
                 Select Case pData.ToString
                     Case AnalyzerManagerSwActionList.TRYING_CONNECTION.ToString
-                        MyBase.DisplayMessage(Messages.TRY_CONNECTION.ToString)
+                        DisplayMessage(Messages.TRY_CONNECTION.ToString)
 
                     Case AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString
-                        MyBase.CurrentMode = ADJUSTMENT_MODES.ERROR_MODE
-                        MyBase.DisplayMessage(Messages.ERROR_COMM.ToString)
+                        CurrentMode = ADJUSTMENT_MODES.ERROR_MODE
+                        DisplayMessage(Messages.ERROR_COMM.ToString)
                         PrepareErrorMode()
 
                 End Select
@@ -124,14 +124,14 @@ Public Class UiBarCodeAdjustments
             ' timeout limit repetitions
 
             'if needed manage the event in the Base Form
-            MyBase.OnReceptionLastFwScriptEvent(pResponse, pData)
+            OnReceptionLastFwScriptEvent(pResponse, pData)
 
 
-            Select Case MyBase.CurrentMode
+            Select Case CurrentMode
                 Case ADJUSTMENT_MODES.ADJUSTMENTS_READED
                     If pResponse = RESPONSE_TYPES.OK Then
 
-                        MyBase.DisplayMessage(Messages.SRV_ADJUSTMENTS_READED.ToString)
+                        DisplayMessage(Messages.SRV_ADJUSTMENTS_READED.ToString)
 
                         Application.DoEvents()
 
@@ -152,16 +152,16 @@ Public Class UiBarCodeAdjustments
 
                 Case ADJUSTMENT_MODES.ADJUST_PREPARED
                     If pResponse = RESPONSE_TYPES.OK Then
-                        If MyBase.SimulationMode Then
+                        If SimulationMode Then
 
-                            MyBase.myServiceMDI.Focus()
+                            myServiceMDI.Focus()
 
                             Me.Cursor = Cursors.WaitCursor
                             Thread.Sleep(SimulationProcessTime)
-                            MyBase.myServiceMDI.Focus()
+                            myServiceMDI.Focus()
                             Me.Cursor = Cursors.Default
 
-                            MyBase.myServiceMDI.Focus()
+                            myServiceMDI.Focus()
 
                         Else
                             ' homes are done for current adjust
@@ -173,7 +173,7 @@ Public Class UiBarCodeAdjustments
 
                         End If
 
-                        MyBase.DisplayMessage(Messages.SRV_HOMES_FINISHED.ToString, Messages.SRV_ADJUSTMENTS_READY.ToString)
+                        DisplayMessage(Messages.SRV_HOMES_FINISHED.ToString, Messages.SRV_ADJUSTMENTS_READY.ToString)
 
                         PrepareArea()
                     End If
@@ -181,7 +181,7 @@ Public Class UiBarCodeAdjustments
 
                 Case ADJUSTMENT_MODES.ADJUSTED
                     If pResponse = RESPONSE_TYPES.OK Then
-                        MyBase.DisplayMessage(Messages.SRV_COMPLETED.ToString)
+                        DisplayMessage(Messages.SRV_COMPLETED.ToString)
                         PrepareArea()
                     End If
 
@@ -190,7 +190,7 @@ Public Class UiBarCodeAdjustments
                         ' Nothing by now
                     End If
                     If pResponse = RESPONSE_TYPES.OK Then
-                        MyBase.DisplayMessage(Messages.SRV_ADJUSTMENTS_SAVED.ToString)
+                        DisplayMessage(Messages.SRV_ADJUSTMENTS_SAVED.ToString)
                         PrepareArea()
                     End If
 
@@ -203,8 +203,8 @@ Public Class UiBarCodeAdjustments
                                 Me.ProgressBar1.Maximum = myScreenDelegate.CurrentTimeOperation
                                 Me.ProgressBar1.Value = 0
                                 Me.ProgressBar1.Visible = True
-                                MyClass.TestProcessTimer.Interval = 1000 ' 1 second
-                                MyClass.TestProcessTimer.Enabled = True
+                                TestProcessTimer.Interval = 1000 ' 1 second
+                                TestProcessTimer.Enabled = True
                                 Me.Cursor = Cursors.WaitCursor
                             End If
                         End If
@@ -228,14 +228,14 @@ Public Class UiBarCodeAdjustments
 
 
                 Case ADJUSTMENT_MODES.ERROR_MODE
-                    MyBase.DisplayMessage(Messages.FWSCRIPT_DATA_ERROR.ToString)
+                    DisplayMessage(Messages.FWSCRIPT_DATA_ERROR.ToString)
                     PrepareErrorMode()
             End Select
 
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ScreenReceptionLastFwScriptEvent ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".ScreenReceptionLastFwScriptEvent", Messages.SYSTEM_ERROR.ToString, myGlobal.ErrorMessage, Me)
+            ShowMessage(Me.Name & ".ScreenReceptionLastFwScriptEvent", Messages.SYSTEM_ERROR.ToString, myGlobal.ErrorMessage, Me)
         End Try
 
         Return True
@@ -250,20 +250,20 @@ Public Class UiBarCodeAdjustments
     ''' <param name="pRefreshEventType"></param>
     ''' <param name="pRefreshDS"></param>
     ''' <remarks>Created by XBC 16/12/2011</remarks>
-    Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of UI_RefreshEvents), ByVal pRefreshDS As UIRefreshDS)
+    Public Overrides Sub RefreshScreen(pRefreshEventType As List(Of UI_RefreshEvents), pRefreshDS As UIRefreshDS)
         'Dim myGlobal As New GlobalDataTO
         Try
             myScreenDelegate.RefreshDelegate(pRefreshEventType, pRefreshDS)
 
             'if needed manage the event in the Base Form
-            MyBase.OnReceptionLastFwScriptEvent(RESPONSE_TYPES.OK, Nothing)
+            OnReceptionLastFwScriptEvent(RESPONSE_TYPES.OK, Nothing)
 
             PrepareArea()
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".RefreshScreen ", EventLogEntryType.Error, _
                                                                     GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".RefreshScreen", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Me.Name & ".RefreshScreen", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
@@ -282,7 +282,7 @@ Public Class UiBarCodeAdjustments
             ' Stop FwScripts
             myFwScriptDelegate.StopFwScriptQueue()
 
-            Select Case MyBase.CurrentMode
+            Select Case CurrentMode
 
                 Case ADJUSTMENT_MODES.ADJUSTMENTS_READING
                     ' No additional treatment to do
@@ -317,7 +317,7 @@ Public Class UiBarCodeAdjustments
             PrepareErrorMode()
 
             'when stop action is finished, perform final operations after alarm received
-            MyBase.myServiceMDI.ManageAlarmStep2(pAlarmType)
+            myServiceMDI.ManageAlarmStep2(pAlarmType)
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".StopCurrentOperation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -336,7 +336,7 @@ Public Class UiBarCodeAdjustments
     ''' <param name="pMode"></param>
     ''' <param name="pAdjustmentGroup"></param>
     ''' <remarks>XBC 15/12/2011</remarks>
-    Private Sub SendFwScript(ByVal pMode As ADJUSTMENT_MODES, _
+    Private Sub SendFwScript(pMode As ADJUSTMENT_MODES, _
                              Optional ByVal pAdjustmentGroup As ADJUSTMENT_GROUPS = Nothing)
         Dim myGlobal As New GlobalDataTO
         Try
@@ -356,17 +356,17 @@ Public Class UiBarCodeAdjustments
 
             If myGlobal.HasError Then
                 PrepareErrorMode()
-                If MyBase.myFwScriptDelegate.CurrentFwScriptsQueue IsNot Nothing Then
-                    MyBase.myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
+                If myFwScriptDelegate.CurrentFwScriptsQueue IsNot Nothing Then
+                    myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
                 GlobalBase.CreateLogActivity(myGlobal.ErrorCode, Me.Name & ".SendFwScript ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-                MyBase.ShowMessage(Me.Name & ".SendFwScript ", myGlobal.ErrorCode, myGlobal.ErrorMessage, Me)
+                ShowMessage(Me.Name & ".SendFwScript ", myGlobal.ErrorCode, myGlobal.ErrorMessage, Me)
             End If
 
         Catch ex As Exception
             Me.Cursor = Cursors.Default
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SendFwScript ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".SendFwScript ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Me.Name & ".SendFwScript ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
@@ -376,7 +376,7 @@ Public Class UiBarCodeAdjustments
     ''' <remarks>XBC 14/12/2011</remarks>
     Private Sub DefineScreenLayout()
         Try
-            With MyBase.myScreenLayout
+            With myScreenLayout
 
                 .ButtonsPanel.SaveButton = Me.SaveButton
                 .ButtonsPanel.CancelButton = Me.ButtonCancel
@@ -389,13 +389,13 @@ Public Class UiBarCodeAdjustments
                 .ButtonsPanel.AdjustButton = Me.AdjustButton
                 .ButtonsPanel.TestButton = Nothing
                 .AdjustmentPanel.AdjustPanel.Container = Me.BsAdjustPanel
-                .AdjustmentPanel.AdjustPanel.AdjustAreas = MyBase.GetAdjustAreas(Me.BsAdjustPanel)
+                .AdjustmentPanel.AdjustPanel.AdjustAreas = GetAdjustAreas(Me.BsAdjustPanel)
 
             End With
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".DefineScreenLayout ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".DefineScreenLayout ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Me.Name & ".DefineScreenLayout ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
@@ -423,7 +423,7 @@ Public Class UiBarCodeAdjustments
                 PrepareErrorMode()
             End If
 
-            If MyBase.CurrentUserNumericalLevel = USER_LEVEL.lOPERATOR Then
+            If CurrentUserNumericalLevel = USER_LEVEL.lOPERATOR Then
                 Me.AdjustButton.Visible = False
                 Me.SaveButton.Visible = False
                 Me.ButtonCancel.Visible = False
@@ -431,7 +431,7 @@ Public Class UiBarCodeAdjustments
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Initializations ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".Initializations ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Me.Name & ".Initializations ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
@@ -445,16 +445,16 @@ Public Class UiBarCodeAdjustments
         Try
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
-            Me.BsTitleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_MENU_BarCode", currentLanguage) 'dl 30/11/2012 SRV_MENU_BarCode
-            Me.BsInfoTitle.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_INFO_TITLE", currentLanguage)
-            Me.BsSubtitleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_TITLE_BARCODE", currentLanguage)
-            Me.SelectRotorGroupBox.Text = "1. " + myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_SELECT_ROTOR", currentLanguage)
-            Me.SampleRotorRadioButton.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Samples", currentLanguage)
-            Me.ReagentRotorRadioButton.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Reagents", currentLanguage)
-            Me.CenterRotorGroupBox.Text = "2. " + myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_RotorCentering", currentLanguage)
-            Me.ReadingBCGroupBox.Text = "3. " + myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ReadingTest", currentLanguage)
-            Me.TestGroupBox.Text = "4. " + myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Test", currentLanguage)
-            Me.BsAdjust.RangeTitle = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_RANGE", currentLanguage)
+            BsTitleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_MENU_BarCode", currentLanguage) 'dl 30/11/2012 SRV_MENU_BarCode
+            BsInfoTitle.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_INFO_TITLE", currentLanguage)
+            BsSubtitleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_TITLE_BARCODE", currentLanguage)
+            SelectRotorGroupBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_SELECT_ROTOR", currentLanguage)
+            SampleRotorRadioButton.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Samples", currentLanguage)
+            ReagentRotorRadioButton.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Reagents", currentLanguage)
+            CenterRotorGroupBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_RotorCentering", currentLanguage)
+            ReadingBCGroupBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ReadingTest", currentLanguage)
+            TestGroupBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Test", currentLanguage)
+            BsAdjust.RangeTitle = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_RANGE", currentLanguage)
 
             ' Tooltips
             GetScreenTooltip()
@@ -477,16 +477,16 @@ Public Class UiBarCodeAdjustments
 
             ' For Tooltips...
 
-            MyBase.bsScreenToolTipsControl.SetToolTip(AdjustButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJUST", currentLanguage)) 'JB 01/10/2012 - Resource String unification
-            MyBase.bsScreenToolTipsControl.SetToolTip(SaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
-            MyBase.bsScreenToolTipsControl.SetToolTip(ButtonCancel, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
+            bsScreenToolTipsControl.SetToolTip(AdjustButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJUST", currentLanguage)) 'JB 01/10/2012 - Resource String unification
+            bsScreenToolTipsControl.SetToolTip(SaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
+            bsScreenToolTipsControl.SetToolTip(ButtonCancel, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
 
-            MyBase.bsScreenToolTipsControl.SetToolTip(StartReadingButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStart", currentLanguage))
-            MyBase.bsScreenToolTipsControl.SetToolTip(StopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", currentLanguage))
+            bsScreenToolTipsControl.SetToolTip(StartReadingButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStart", currentLanguage))
+            bsScreenToolTipsControl.SetToolTip(StopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", currentLanguage))
 
-            MyBase.bsScreenToolTipsControl.SetToolTip(TestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Test", currentLanguage))
+            bsScreenToolTipsControl.SetToolTip(TestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Test", currentLanguage))
 
-            MyBase.bsScreenToolTipsControl.SetToolTip(BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
+            bsScreenToolTipsControl.SetToolTip(BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Name & ".GetScreenTooltip ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -500,17 +500,17 @@ Public Class UiBarCodeAdjustments
     ''' <remarks>Created by: XBC 14/12/2011</remarks>
     Private Sub PrepareButtons()
         'Dim auxIconName As String = ""
-        'Dim iconPath As String = MyBase.IconsPath
+        'Dim iconPath As String =  IconsPath
         ''Dim myUtil As New Utilities.
         Try
 
-            MyBase.SetButtonImage(AdjustButton, "ADJUSTMENT")
-            MyBase.SetButtonImage(SaveButton, "SAVE")
-            MyBase.SetButtonImage(ButtonCancel, "UNDO")
-            MyBase.SetButtonImage(StartReadingButton, "ADJUSTMENT")
-            MyBase.SetButtonImage(StopButton, "STOP", 24, 24)
-            MyBase.SetButtonImage(TestButton, "ADJUSTMENT")
-            MyBase.SetButtonImage(BsExitButton, "CANCEL")
+            SetButtonImage(AdjustButton, "ADJUSTMENT")
+            SetButtonImage(SaveButton, "SAVE")
+            SetButtonImage(ButtonCancel, "UNDO")
+            SetButtonImage(StartReadingButton, "ADJUSTMENT")
+            SetButtonImage(StopButton, "STOP", 24, 24)
+            SetButtonImage(TestButton, "ADJUSTMENT")
+            SetButtonImage(BsExitButton, "CANCEL")
 
 
             ''ADJUST Button
@@ -584,37 +584,36 @@ Public Class UiBarCodeAdjustments
 
     Private Sub ExitScreen()
         'Dim myGlobal As New GlobalDataTO
-        Dim dialogResultToReturn As DialogResult = DialogResult.No
+        Dim dialogResultToReturn = DialogResult.No
         Try
-            If MyBase.CurrentMode = ADJUSTMENT_MODES.ERROR_MODE Then
-                MyClass.IsReadyToCloseAttr = True
+            If CurrentMode = ADJUSTMENT_MODES.ERROR_MODE Then
+                IsReadyToCloseAttr = True
                 Me.Close()
                 Exit Sub
             End If
 
             Me.WaitForScriptsExitingScreen = False
             If ChangedValue Then
-                dialogResultToReturn = MyBase.ShowMessage(GetMessageText(Messages.SAVE_PENDING.ToString), Messages.SAVE_PENDING.ToString)
+                dialogResultToReturn = ShowMessage(GetMessageText(Messages.SAVE_PENDING.ToString), Messages.SAVE_PENDING.ToString)
 
                 If dialogResultToReturn = DialogResult.Yes Then
                     'dialogResultToReturn = Windows.Forms.DialogResult.No
-                    Me.SaveAdjustment()
-                    Me.WaitForScriptsExitingScreen = True
+                    SaveAdjustment()
+                    WaitForScriptsExitingScreen = True
                 Else
-                    Me.CancelAdjustment()
+                    CancelAdjustment()
                 End If
             End If
 
-            If Not Me.WaitForScriptsExitingScreen Then
+            If Not WaitForScriptsExitingScreen Then
                 ' XBC 17-04-2012
-                'Me.FinishExitScreen()
-                Me.PreviousFinishExitScreen()
+                PreviousFinishExitScreen()
                 ' XBC 17-04-2012
             End If
 
         Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ExitScreen", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".ExitScreen", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            GlobalBase.CreateLogActivity(ex)
+            ShowMessage(Me.Name & ".ExitScreen", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
@@ -625,17 +624,17 @@ Public Class UiBarCodeAdjustments
     Private Sub PreviousFinishExitScreen()
         'Dim myGlobal As New GlobalDataTO
         Try
-            MyBase.ExitTest()
+            ExitTest()
 
             Me.DisableAll()
 
-            If MyBase.SimulationMode Then
+            If SimulationMode Then
                 ' simulating
                 Me.Cursor = Cursors.WaitCursor
                 Thread.Sleep(SimulationProcessTime)
-                MyBase.myServiceMDI.Focus()
+                myServiceMDI.Focus()
                 Me.Cursor = Cursors.Default
-                MyBase.CurrentMode = ADJUSTMENT_MODES.TEST_EXITED
+                CurrentMode = ADJUSTMENT_MODES.TEST_EXITED
                 PrepareArea()
             Else
                 ' Manage FwScripts must to be sent to adjusting
@@ -644,7 +643,7 @@ Public Class UiBarCodeAdjustments
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PreviousFinishExitScreen", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".PreviousFinishExitScreen", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Me.Name & ".PreviousFinishExitScreen", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
@@ -655,21 +654,21 @@ Public Class UiBarCodeAdjustments
     Private Sub FinishExitScreen()
         Dim myGlobal As New GlobalDataTO
         Try
-            myGlobal = MyBase.CloseForm()
+            myGlobal = CloseForm()
             If myGlobal.HasError Then
                 Me.PrepareErrorMode()
             Else
                 Me.PrepareArea()
-                MyClass.IsReadyToCloseAttr = True
+                IsReadyToCloseAttr = True
                 Me.Close()
 
                 'SGM 22/05/2012
-                If MyBase.CloseRequestedByMDI Then
-                    MyBase.myServiceMDI.isWaitingForCloseApp = True
-                    If MyBase.CloseWithShutDownRequestedByMDI Then
-                        MyBase.myServiceMDI.WithShutToolStripMenuItem.PerformClick()
-                    ElseIf MyBase.CloseWithoutShutDownRequestedByMDI Then
-                        MyBase.myServiceMDI.WithOutShutDownToolStripMenuItem.PerformClick()
+                If CloseRequestedByMDI Then
+                    myServiceMDI.isWaitingForCloseApp = True
+                    If CloseWithShutDownRequestedByMDI Then
+                        myServiceMDI.WithShutToolStripMenuItem.PerformClick()
+                    ElseIf CloseWithoutShutDownRequestedByMDI Then
+                        myServiceMDI.WithOutShutDownToolStripMenuItem.PerformClick()
                     Else
                         Me.Close()
                     End If
@@ -679,7 +678,7 @@ Public Class UiBarCodeAdjustments
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".FinishExitScreen", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".FinishExitScreen", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Me.Name & ".FinishExitScreen", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
@@ -700,7 +699,7 @@ Public Class UiBarCodeAdjustments
             ' Disable Area Buttons
             Me.BsExitButton.Enabled = False
 
-            MyBase.ActivateMDIMenusButtons(False)
+            ActivateMDIMenusButtons(False)
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".DisableAll ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -716,14 +715,14 @@ Public Class UiBarCodeAdjustments
     Private Function InitializeHomes() As GlobalDataTO
         Dim myGlobal As New GlobalDataTO
         Try
-            myGlobal = myScreenDelegate.ResetAllPreliminaryHomes(MyBase.myServiceMDI.ActiveAnalyzer)
+            myGlobal = myScreenDelegate.ResetAllPreliminaryHomes(myServiceMDI.ActiveAnalyzer)
 
         Catch ex As Exception
             myGlobal.HasError = True
             myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeHomes ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".InitializeHomes", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Me.Name & ".InitializeHomes", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobal
     End Function
@@ -737,7 +736,7 @@ Public Class UiBarCodeAdjustments
         Try
             ' Get Value limit ranges
             Dim myFieldLimitsDelegate As New FieldLimitsDelegate()
-            Dim myFieldLimitsDS As New FieldLimitsDS
+            Dim myFieldLimitsDS As FieldLimitsDS
 
             With Me.EditedValue
                 'Load the specified limits values
@@ -754,10 +753,10 @@ Public Class UiBarCodeAdjustments
                         .LimitMinValue = CType(myFieldLimitsDS.tfmwFieldLimits(0).MinValue, Decimal)
                         .LimitMaxValue = CType(myFieldLimitsDS.tfmwFieldLimits(0).MaxValue, Decimal)
 
-                        Me.BsAdjust.MinimumLimit = .LimitMinValue
-                        Me.BsAdjust.MaximumLimit = .LimitMaxValue
-                        Me.BsAdjust.MaxNumDecimals = 0
-                        Me.BsAdjust.CurrentStepValue = 1
+                        BsAdjust.MinimumLimit = .LimitMinValue
+                        BsAdjust.MaximumLimit = .LimitMaxValue
+                        BsAdjust.MaxNumDecimals = 0
+                        BsAdjust.CurrentStepValue = 1
                     End If
                 End If
 
@@ -765,7 +764,7 @@ Public Class UiBarCodeAdjustments
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetLimitValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".GetLimitValues ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Me.Name & ".GetLimitValues ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobal
     End Function
@@ -777,7 +776,7 @@ Public Class UiBarCodeAdjustments
     Private Function GetParameters() As GlobalDataTO
         Dim myGlobal As New GlobalDataTO
         Try
-            Me.ActiveAnalyzerModel = MyBase.myServiceMDI.ActiveAnalyzerModel
+            ActiveAnalyzerModel = myServiceMDI.ActiveAnalyzerModel
             myGlobal = myScreenDelegate.GetParameters(Me.ActiveAnalyzerModel)
             If myGlobal.HasError Then
                 PrepareErrorMode()
@@ -791,8 +790,8 @@ Public Class UiBarCodeAdjustments
             End If
 
         Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetParameters ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".GetParameters ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            GlobalBase.CreateLogActivity(ex)
+            ShowMessage(Me.Name & ".GetParameters ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobal
     End Function
@@ -810,8 +809,8 @@ Public Class UiBarCodeAdjustments
             End With
 
         Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeAdjustControls ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".InitializeAdjustControls ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            GlobalBase.CreateLogActivity(ex)
+            ShowMessage(Me.Name & ".InitializeAdjustControls ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
@@ -824,19 +823,19 @@ Public Class UiBarCodeAdjustments
             Application.DoEvents()
 
             ' Enabling/desabling form components to this child screen
-            Select Case MyBase.CurrentMode
+            Select Case CurrentMode
 
                 Case ADJUSTMENT_MODES.ADJUSTMENTS_READING
-                    MyBase.DisplayMessage(Messages.SRV_READ_ADJUSTMENTS.ToString)
+                    DisplayMessage(Messages.SRV_READ_ADJUSTMENTS.ToString)
 
                 Case ADJUSTMENT_MODES.ADJUSTMENTS_READED
-                    MyBase.DisplayMessage(Messages.SRV_ADJUSTMENTS_READED.ToString)
+                    DisplayMessage(Messages.SRV_ADJUSTMENTS_READED.ToString)
 
-                    MyClass.LoadAdjustmentsData()
-                    MyClass.LoadAdjustmentGroupData()
-                    MyClass.PopulateEditionValues()
+                    LoadAdjustmentsData()
+                    LoadAdjustmentGroupData()
+                    PopulateEditionValues()
 
-                    MyClass.PrepareLoadingMode()
+                    PrepareLoadingMode()
 
                 Case ADJUSTMENT_MODES.ADJUST_PREPARING
                     Me.PrepareAdjustPreparingMode()
@@ -873,15 +872,15 @@ Public Class UiBarCodeAdjustments
                     PrepareErrorMode()
             End Select
 
-            If MyBase.myServiceMDI IsNot Nothing Then
-                If Not MyBase.SimulationMode And AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING Then '#REFACTORING
-                    MyClass.PrepareErrorMode()
-                    MyBase.DisplayMessage("")
+            If myServiceMDI IsNot Nothing Then
+                If Not SimulationMode And AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING Then '#REFACTORING
+                    PrepareErrorMode()
+                    DisplayMessage("")
                 End If
             End If
 
         Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareArea ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex)
             ShowMessage(Me.Name & ".PrepareArea ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -892,19 +891,19 @@ Public Class UiBarCodeAdjustments
     ''' <remarks>Created by XBC 30/03/2012</remarks>
     Private Sub PrepareLoadingMode()
         Try
-            MyBase.Initialize()
+            Initialize()
 
             Me.DisableAll()
 
             ' Initializations
 
-            If MyBase.SimulationMode Then
+            If SimulationMode Then
                 ' simulating
                 Me.Cursor = Cursors.WaitCursor
                 Thread.Sleep(SimulationProcessTime)
-                MyBase.myServiceMDI.Focus()
+                myServiceMDI.Focus()
                 Me.Cursor = Cursors.Default
-                MyBase.CurrentMode = ADJUSTMENT_MODES.LOADED
+                CurrentMode = ADJUSTMENT_MODES.LOADED
                 PrepareArea()
             Else
                 ' Manage FwScripts must to be sent to adjusting
@@ -912,7 +911,7 @@ Public Class UiBarCodeAdjustments
             End If
 
         Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareLoadingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex)
             ShowMessage(Me.Name & ".PrepareLoadingMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -928,19 +927,19 @@ Public Class UiBarCodeAdjustments
             DisableAll()
 
             ' Reading Adjustments
-            If Not MyClass.myServiceMDI.AdjustmentsReaded Then
+            If Not myServiceMDI.AdjustmentsReaded Then
                 ' Parent Reading Adjustments
-                MyBase.ReadAdjustments()
+                ReadAdjustments()
                 PrepareArea()
 
                 ' Manage FwScripts must to be sent at load screen
-                If MyBase.SimulationMode Then
+                If SimulationMode Then
                     ' simulating...
                     Me.Cursor = Cursors.WaitCursor
                     Thread.Sleep(SimulationProcessTime)
-                    MyBase.myServiceMDI.Focus()
+                    myServiceMDI.Focus()
                     Me.Cursor = Cursors.Default
-                    MyClass.CurrentMode = ADJUSTMENT_MODES.ADJUSTMENTS_READED
+                    CurrentMode = ADJUSTMENT_MODES.ADJUSTMENTS_READED
                     PrepareArea()
                 Else
                     If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
@@ -948,7 +947,7 @@ Public Class UiBarCodeAdjustments
                     End If
                 End If
             Else
-                MyClass.CurrentMode = ADJUSTMENT_MODES.ADJUSTMENTS_READED
+                CurrentMode = ADJUSTMENT_MODES.ADJUSTMENTS_READED
                 PrepareArea()
             End If
 
@@ -957,7 +956,7 @@ Public Class UiBarCodeAdjustments
             End If
 
         Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareAdjustReadingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex)
             ShowMessage(Me.Name & ".PrepareAdjustReadingMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -992,12 +991,12 @@ Public Class UiBarCodeAdjustments
             Me.BsExitButton.Enabled = True
 
             ' OTHERS
-            MyBase.ActivateMDIMenusButtons(True)
+            ActivateMDIMenusButtons(True)
             Me.ProgressBar1.Visible = False
 
         Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareLoadedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".PrepareLoadedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            GlobalBase.CreateLogActivity(ex)
+            ShowMessage(Me.Name & ".PrepareLoadedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         Finally
             Me.Cursor = Cursors.Default
         End Try
@@ -1012,8 +1011,8 @@ Public Class UiBarCodeAdjustments
             DisableAll()
 
         Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareAdjustPreparingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".PrepareAdjustPreparingMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            GlobalBase.CreateLogActivity(ex)
+            ShowMessage(Me.Name & ".PrepareAdjustPreparingMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
@@ -1033,18 +1032,18 @@ Public Class UiBarCodeAdjustments
                 Me.BsAdjust.CurrentValue = .CurrentValue
                 Me.BsAdjust.Enabled = True
             End With
-            MyBase.SetAdjustmentItems(Me.BsAdjust)
+            SetAdjustmentItems(Me.BsAdjust)
 
             Me.BsAdjust.Focus()
 
-            MyBase.ActivateMDIMenusButtons(True)
+            ActivateMDIMenusButtons(True)
             Me.AdjustButton.Enabled = False
             Me.ButtonCancel.Enabled = True
-            MyBase.DisplayMessage(Messages.SRV_ADJUSTMENTS_READY.ToString)
+            DisplayMessage(Messages.SRV_ADJUSTMENTS_READY.ToString)
 
         Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareAdjustPreparedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".PrepareAdjustPreparedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            GlobalBase.CreateLogActivity(ex)
+            ShowMessage(Me.Name & ".PrepareAdjustPreparedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         Finally
             Me.Cursor = Cursors.Default
         End Try
@@ -1056,11 +1055,11 @@ Public Class UiBarCodeAdjustments
     ''' <remarks>Created by XBC 15/12/2011</remarks>
     Private Sub PrepareAdjustingMode()
         Try
-            MyBase.ActivateMDIMenusButtons(False)
+            ActivateMDIMenusButtons(False)
 
         Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareAdjustingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".PrepareAdjustingMode", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            GlobalBase.CreateLogActivity(ex)
+            ShowMessage(Me.Name & ".PrepareAdjustingMode", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
@@ -1088,11 +1087,11 @@ Public Class UiBarCodeAdjustments
             Me.BsExitButton.Enabled = True
 
             Me.Enabled = True
-            MyBase.ActivateMDIMenusButtons(True)
+            ActivateMDIMenusButtons(True)
 
         Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareAdjustedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".PrepareAdjustedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            GlobalBase.CreateLogActivity(ex)
+            ShowMessage(Me.Name & ".PrepareAdjustedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         Finally
             Me.Cursor = Cursors.Default
         End Try
@@ -1106,10 +1105,11 @@ Public Class UiBarCodeAdjustments
         Try
             Me.Cursor = Cursors.WaitCursor
             Me.DisableAll()
-
+            MsgBox(Reflection.MethodInfo.GetCurrentMethod.ToString & " @ " & Reflection.MethodInfo.GetCurrentMethod.ReflectedType.Namespace & "." & Reflection.MethodInfo.GetCurrentMethod.ReflectedType.Name)
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareSavingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".PrepareSavingMode", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            Dim MethodName = (Reflection.MethodInfo.GetCurrentMethod.ToString & " @ " & Reflection.MethodInfo.GetCurrentMethod.ReflectedType.Namespace & "." & Reflection.MethodInfo.GetCurrentMethod.ReflectedType.Name)
+            ShowMessage(MethodName, Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
@@ -1131,7 +1131,7 @@ Public Class UiBarCodeAdjustments
                     .NewValue = 0
                 End With
 
-                myGlobal = MyBase.UpdateAdjustments(Me.SelectedAdjustmentsDS)
+                myGlobal = UpdateAdjustments(Me.SelectedAdjustmentsDS)
 
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
 
@@ -1156,7 +1156,7 @@ Public Class UiBarCodeAdjustments
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareSavedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".PrepareSavedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Me.Name & ".PrepareSavedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         Finally
             Me.Cursor = Cursors.Default
         End Try
@@ -1174,7 +1174,7 @@ Public Class UiBarCodeAdjustments
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".PrepareTestingMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Me.Name & ".PrepareTestingMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
@@ -1200,13 +1200,13 @@ Public Class UiBarCodeAdjustments
                         Me.ProgressBar1.Value = 0
                         Me.ProgressBar1.Visible = False
                         Me.ProgressBar1.Refresh()
-                        MyClass.TestProcessTimer.Enabled = False
+                        TestProcessTimer.Enabled = False
 
                         ' refresh info into grid
                         If myScreenDelegate.BcResultsCount > 0 Then
                             Me.BarCodeDataGridView.Rows.Clear()
 
-                            For i As Integer = 0 To myScreenDelegate.BcResultsCount - 1
+                            For i = 0 To myScreenDelegate.BcResultsCount - 1
                                 Me.BarCodeDataGridView.Rows.Add()
                                 Me.BarCodeDataGridView.Rows(i).Cells(0).Value = myScreenDelegate.BcResults(i).Position
                                 Me.BarCodeDataGridView.Rows(i).Cells(1).Value = myScreenDelegate.BcResults(i).Value
@@ -1214,7 +1214,7 @@ Public Class UiBarCodeAdjustments
 
                         End If
 
-                        MyBase.DisplayMessage(Messages.SRV_TEST_COMPLETED.ToString)
+                        DisplayMessage(Messages.SRV_TEST_COMPLETED.ToString)
 
                         Me.PrepareLoadedMode()
 
@@ -1237,19 +1237,19 @@ Public Class UiBarCodeAdjustments
                     Me.StartReadingButton.Visible = False
                     Me.StopButton.Visible = True
 
-                    MyBase.DisplayMessage(Messages.SRV_TEST_IN_PROCESS.ToString)
+                    DisplayMessage(Messages.SRV_TEST_IN_PROCESS.ToString)
 
                 Case BarCodeAdjustmentDelegate.OPERATIONS.TEST_MODE_END
 
                     If myScreenDelegate.TestModeDone Then
-                        MyBase.DisplayMessage(Messages.SRV_TEST_COMPLETED.ToString)
+                        DisplayMessage(Messages.SRV_TEST_COMPLETED.ToString)
 
                         Me.PrepareLoadedMode()
 
                         Me.StartReadingButton.Visible = True
                         Me.StopButton.Visible = False
 
-                        MyBase.myServiceMDI.SEND_INFO_START()
+                        myServiceMDI.SEND_INFO_START()
                     End If
 
             End Select
@@ -1257,7 +1257,7 @@ Public Class UiBarCodeAdjustments
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTestedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".PrepareTestedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Me.Name & ".PrepareTestedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         Finally
             Me.Cursor = Cursors.Default
         End Try
@@ -1269,7 +1269,7 @@ Public Class UiBarCodeAdjustments
     ''' <remarks>Created by XBC 14/12/2011</remarks>
     Public Overrides Sub PrepareErrorMode(Optional ByVal pAlarmType As ManagementAlarmTypes = ManagementAlarmTypes.NONE)
         Try
-            MyBase.ErrorMode()
+            ErrorMode()
             Me.ProgressBar1.Visible = False
             DisableAll()
             Me.ReadingBCGroupBox.Enabled = False
@@ -1321,7 +1321,7 @@ Public Class UiBarCodeAdjustments
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".LoadAdjustmentsData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".LoadAdjustmentsData ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Me.Name & ".LoadAdjustmentsData ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
@@ -1340,7 +1340,7 @@ Public Class UiBarCodeAdjustments
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PopulateEditionValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".PopulateEditionValues ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Me.Name & ".PopulateEditionValues ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
@@ -1349,14 +1349,14 @@ Public Class UiBarCodeAdjustments
     ''' </summary>
     ''' <param name="pMovement"></param>
     ''' <remarks>XBC 15/15/2011</remarks>
-    Private Sub MakeAdjustment(ByVal pMovement As MOVEMENT)
+    Private Sub MakeAdjustment(pMovement As MOVEMENT)
         Dim myGlobal As New GlobalDataTO
         Try
             Dim AdjustToDo As ADJUSTMENT_GROUPS
             Dim MovToDo As MOVEMENT
             Dim valueToDo As Single
 
-            myGlobal = MyBase.Adjust()
+            myGlobal = Adjust()
             If myGlobal.HasError Then
                 PrepareErrorMode()
             Else
@@ -1390,7 +1390,7 @@ Public Class UiBarCodeAdjustments
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".MakeAdjustment ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".MakeAdjustment ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Me.Name & ".MakeAdjustment ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
@@ -1401,7 +1401,7 @@ Public Class UiBarCodeAdjustments
     Private Sub SaveAdjustment()
         Dim myGlobal As New GlobalDataTO
         Try
-            myGlobal = MyBase.Save()
+            myGlobal = Save()
             If myGlobal.HasError Then
                 Me.PrepareErrorMode()
             Else
@@ -1429,25 +1429,25 @@ Public Class UiBarCodeAdjustments
                     If myGlobal.HasError Then
                         Me.PrepareErrorMode()
                     Else
-                        If MyBase.SimulationMode Then
+                        If SimulationMode Then
                             ' Insert the new activity into Historic reports
                             myScreenDelegate.AdjustmentBCPoint = EditedValue.NewValue
                             myGlobal = myScreenDelegate.InsertReport("ADJUST", "BARCODE")
                             If Not myGlobal.HasError Then
                                 myScreenDelegate.LoadAdjDone = True
-                                MyBase.CurrentMode = ADJUSTMENT_MODES.SAVED
+                                CurrentMode = ADJUSTMENT_MODES.SAVED
                                 Me.PrepareArea()
                             Else
                                 Me.PrepareErrorMode()
                             End If
                         Else
-                            MyBase.DisplayMessage(Messages.SRV_SAVE_ADJUSTMENTS.ToString)
+                            DisplayMessage(Messages.SRV_SAVE_ADJUSTMENTS.ToString)
 
                             ' Convert dataset to String for sending to Fw
                             myGlobal = Me.TempToSendAdjustmentsDelegate.ConvertDSToString()
 
                             If Not myGlobal.SetDatos Is Nothing AndAlso Not myGlobal.HasError Then
-                                Dim pAdjuststr As String = CType(myGlobal.SetDatos, String)
+                                Dim pAdjuststr = CType(myGlobal.SetDatos, String)
                                 myScreenDelegate.pValueAdjust = pAdjuststr
 
                                 myScreenDelegate.AdjustmentBCPoint = EditedValue.NewValue
@@ -1465,15 +1465,15 @@ Public Class UiBarCodeAdjustments
 
                 Else
                     Me.myScreenDelegate.LoadAdjDone = True
-                    MyBase.CurrentMode = ADJUSTMENT_MODES.SAVED
+                    CurrentMode = ADJUSTMENT_MODES.SAVED
                     Me.PrepareArea()
-                    MyBase.DisplayMessage(Messages.SRV_ADJUSTMENTS_SAVED.ToString)
+                    DisplayMessage(Messages.SRV_ADJUSTMENTS_SAVED.ToString)
                 End If
             End If
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SaveAdjustment ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".SaveAdjustment ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Me.Name & ".SaveAdjustment ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
@@ -1485,38 +1485,38 @@ Public Class UiBarCodeAdjustments
         'Dim myGlobal As New GlobalDataTO
         Try
             If Me.ChangedValue Then
-                MyBase.DisplayMessage(Messages.SRV_ADJUSTMENTS_CANCELLED.ToString)
+                DisplayMessage(Messages.SRV_ADJUSTMENTS_CANCELLED.ToString)
             Else
-                MyBase.DisplayMessage("")
+                DisplayMessage("")
             End If
 
             Me.ChangedValue = False
-            MyBase.CurrentMode = ADJUSTMENT_MODES.LOADED
+            CurrentMode = ADJUSTMENT_MODES.LOADED
             PrepareArea()
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".CancelAdjustment ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".CancelAdjustment ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Me.Name & ".CancelAdjustment ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
     Private Sub ScanningBarCode()
         Dim myGlobal As New GlobalDataTO
         Try
-            myGlobal = MyBase.Test
+            myGlobal = Test
             If myGlobal.HasError Then
                 PrepareErrorMode()
             Else
                 PrepareArea()
 
                 If Not myGlobal.HasError Then
-                    If MyBase.SimulationMode Then
+                    If SimulationMode Then
                         ' simulating
                         Me.Cursor = Cursors.WaitCursor
                         Thread.Sleep(SimulationProcessTime)
-                        MyBase.myServiceMDI.Focus()
+                        myServiceMDI.Focus()
                         Me.Cursor = Cursors.Default
-                        MyBase.CurrentMode = ADJUSTMENT_MODES.TESTED
+                        CurrentMode = ADJUSTMENT_MODES.TESTED
                         PrepareArea()
                     Else
                         'Get the available Rotor Types for the Analyzer according its model
@@ -1566,7 +1566,7 @@ Public Class UiBarCodeAdjustments
     ''' <remarks>Created by XBC 23/10/2012</remarks>
     Private Sub StartReading()
         Try
-            MyBase.myServiceMDI.SEND_INFO_STOP()
+            myServiceMDI.SEND_INFO_STOP()
             Me.DisableAll()
             Thread.Sleep(500)
 
@@ -1600,7 +1600,7 @@ Public Class UiBarCodeAdjustments
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".StartReading ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".StartReading ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Me.Name & ".StartReading ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
@@ -1639,7 +1639,7 @@ Public Class UiBarCodeAdjustments
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".StopReading ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".StopReading ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Me.Name & ".StopReading ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
@@ -1652,10 +1652,10 @@ Public Class UiBarCodeAdjustments
     ''' <param name="pValue"></param>
     ''' <returns></returns>
     ''' <remarks>XBC 14/12/2011</remarks>
-    Private Function UpdateSpecificAdjustmentsDS(ByVal pCodew As String, ByVal pValue As String) As GlobalDataTO
+    Private Function UpdateSpecificAdjustmentsDS(pCodew As String, pValue As String) As GlobalDataTO
         Dim myGlobal As New GlobalDataTO
         Try
-            For Each SR As SRVAdjustmentsDS.srv_tfmwAdjustmentsRow In MyClass.SelectedAdjustmentsDS.srv_tfmwAdjustments.Rows
+            For Each SR As SRVAdjustmentsDS.srv_tfmwAdjustmentsRow In SelectedAdjustmentsDS.srv_tfmwAdjustments.Rows
                 If SR.CodeFw.Trim = pCodew.Trim Then
                     SR.Value = pValue
                     Exit For
@@ -1666,9 +1666,9 @@ Public Class UiBarCodeAdjustments
             myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".UpdateSpecificAdjustmentsDS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".UpdateSpecificAdjustmentsDS", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Me.Name & ".UpdateSpecificAdjustmentsDS", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
-        MyClass.SelectedAdjustmentsDS.AcceptChanges()
+        SelectedAdjustmentsDS.AcceptChanges()
         Return myGlobal
     End Function
 
@@ -1679,7 +1679,7 @@ Public Class UiBarCodeAdjustments
     ''' <param name="pValue"></param>
     ''' <returns></returns>
     ''' <remarks>XBC 14/12/2011</remarks>
-    Private Function UpdateTemporalSpecificAdjustmentsDS(ByVal pCodew As String, ByVal pValue As String) As GlobalDataTO
+    Private Function UpdateTemporalSpecificAdjustmentsDS(pCodew As String, pValue As String) As GlobalDataTO
         Dim myGlobal As New GlobalDataTO
         Try
             For Each SR As SRVAdjustmentsDS.srv_tfmwAdjustmentsRow In Me.TemporalAdjustmentsDS.srv_tfmwAdjustments.Rows
@@ -1690,7 +1690,7 @@ Public Class UiBarCodeAdjustments
             myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".UpdateTemporalSpecificAdjustmentsDS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".UpdateTemporalSpecificAdjustmentsDS", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Me.Name & ".UpdateTemporalSpecificAdjustmentsDS", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Me.TemporalAdjustmentsDS.AcceptChanges()
         Return myGlobal
@@ -1710,7 +1710,7 @@ Public Class UiBarCodeAdjustments
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".UpdateTemporalAdjustmentsDS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".UpdateTemporalAdjustmentsDS ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Me.Name & ".UpdateTemporalAdjustmentsDS ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobal
     End Function
@@ -1724,7 +1724,7 @@ Public Class UiBarCodeAdjustments
     ''' Created by XBC 14/12/2011
     ''' Modified by XB 04/02/2013 - Upper conversions redundants because the value is already in UpperCase must delete to avoid Regional Settings problems (Bugs tracking #1112)
     ''' </remarks>
-    Private Function ReadGlobalAdjustmentData(ByVal pGroupID As String, ByVal pAxis As AXIS, Optional ByVal pNotForDisplaying As Boolean = False) As FwAdjustmentsDataTO
+    Private Function ReadGlobalAdjustmentData(pGroupID As String, pAxis As AXIS, Optional ByVal pNotForDisplaying As Boolean = False) As FwAdjustmentsDataTO
         'Dim myGlobal As New GlobalDataTO
         Dim myAdjustmentRowData As New FwAdjustmentsDataTO("")
         Try
@@ -1737,7 +1737,7 @@ Public Class UiBarCodeAdjustments
 
             Dim myAdjustmentRows As New List(Of SRVAdjustmentsDS.srv_tfmwAdjustmentsRow)
             myAdjustmentRows = (From a As SRVAdjustmentsDS.srv_tfmwAdjustmentsRow _
-                                In MyBase.myAllAdjustmentsDS.srv_tfmwAdjustments _
+                                In myAllAdjustmentsDS.srv_tfmwAdjustments _
                                 Where a.GroupID.Trim = myGroup.Trim _
                                 And a.AxisID.Trim = myAxis.Trim _
                                 Select a).ToList
@@ -1759,7 +1759,7 @@ Public Class UiBarCodeAdjustments
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ReadGlobalAdjustmentValue ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".ReadGlobalAdjustmentValue ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Me.Name & ".ReadGlobalAdjustmentValue ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
         If pNotForDisplaying Then
@@ -1778,7 +1778,7 @@ Public Class UiBarCodeAdjustments
     ''' Created by XBC 14/12/2011
     ''' Modified by XB 04/02/2013 - Upper conversions redundants because the value is already in UpperCase must delete to avoid Regional Settings problems (Bugs tracking #1112)
     ''' </remarks>
-    Private Function ReadSpecificAdjustmentData(ByVal pAxis As AXIS) As FwAdjustmentsDataTO
+    Private Function ReadSpecificAdjustmentData(pAxis As AXIS) As FwAdjustmentsDataTO
         'Dim myGlobal As New GlobalDataTO
         Dim myAdjustmentRowData As New FwAdjustmentsDataTO("")
         Try
@@ -1787,7 +1787,7 @@ Public Class UiBarCodeAdjustments
 
             Dim myAdjustmentRows As New List(Of SRVAdjustmentsDS.srv_tfmwAdjustmentsRow)
             myAdjustmentRows = (From a As SRVAdjustmentsDS.srv_tfmwAdjustmentsRow _
-                                In MyClass.SelectedAdjustmentsDS.srv_tfmwAdjustments _
+                                In SelectedAdjustmentsDS.srv_tfmwAdjustments _
                                 Where a.AxisID.Trim = myAxis.Trim _
                                 Select a).ToList
             'Where a.AxisID.Trim.ToUpper = myAxis.Trim.ToUpper _
@@ -1807,7 +1807,7 @@ Public Class UiBarCodeAdjustments
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ReadSpecificAdjustmentData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".ReadSpecificAdjustmentData ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Me.Name & ".ReadSpecificAdjustmentData ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
         If myAdjustmentRowData.Value = "" Then myAdjustmentRowData.Value = "0"
@@ -1822,22 +1822,22 @@ Public Class UiBarCodeAdjustments
     ''' <remarks>XBC 14/12/2011</remarks>
     Private Function LoadAdjustmentGroupData() As GlobalDataTO
         Dim resultData As New GlobalDataTO
-        Dim CopyOfSelectedAdjustmentsDS As SRVAdjustmentsDS = MyClass.SelectedAdjustmentsDS
+        Dim CopyOfSelectedAdjustmentsDS As SRVAdjustmentsDS = SelectedAdjustmentsDS
         Dim myAdjustmentsGroups As New List(Of String)
         Try
-            If MyClass.SelectedAdjustmentsDS IsNot Nothing Then
-                MyClass.SelectedAdjustmentsDS.Clear()
+            If SelectedAdjustmentsDS IsNot Nothing Then
+                SelectedAdjustmentsDS.Clear()
             End If
             myAdjustmentsGroups.Add(Me.EditedValue.AdjustmentID.ToString)
-            resultData = MyBase.myAdjustmentsDelegate.ReadAdjustmentsByGroupIDs(myAdjustmentsGroups)
+            resultData = myAdjustmentsDelegate.ReadAdjustmentsByGroupIDs(myAdjustmentsGroups)
             If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-                MyClass.SelectedAdjustmentsDS = CType(resultData.SetDatos, SRVAdjustmentsDS)
+                SelectedAdjustmentsDS = CType(resultData.SetDatos, SRVAdjustmentsDS)
             End If
 
         Catch ex As Exception
-            MyClass.SelectedAdjustmentsDS = CopyOfSelectedAdjustmentsDS
+            SelectedAdjustmentsDS = CopyOfSelectedAdjustmentsDS
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".LoadAdjustmentGroupData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".LoadAdjustmentGroupData ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Me.Name & ".LoadAdjustmentGroupData ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return resultData
     End Function
@@ -1849,69 +1849,69 @@ Public Class UiBarCodeAdjustments
     Private Sub SimulateRELPositioning()
         Try
             ' simulating
-            MyBase.DisplayMessage(Messages.SRV_STEP_POSITIONING.ToString)
+            DisplayMessage(Messages.SRV_STEP_POSITIONING.ToString)
 
-            MyBase.CurrentMode = ADJUSTMENT_MODES.ADJUSTING
+            CurrentMode = ADJUSTMENT_MODES.ADJUSTING
             PrepareArea()
 
             Me.Cursor = Cursors.WaitCursor
             Thread.Sleep(SimulationProcessTime)
-            MyBase.myServiceMDI.Focus()
+            myServiceMDI.Focus()
             Me.Cursor = Cursors.Default
 
-            MyBase.CurrentMode = ADJUSTMENT_MODES.ADJUSTED
-            MyBase.DisplayMessage(Messages.SRV_COMPLETED.ToString)
+            CurrentMode = ADJUSTMENT_MODES.ADJUSTED
+            DisplayMessage(Messages.SRV_COMPLETED.ToString)
             PrepareArea()
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Name & ".SimulateStepPositioning", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Name & ".SimulateStepPositioning", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Name & ".SimulateStepPositioning", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
     Private Sub SimulateABSPositioning()
         Try
             ' simulating
-            MyBase.DisplayMessage(Messages.SRV_ABS_REQUESTED.ToString)
+            DisplayMessage(Messages.SRV_ABS_REQUESTED.ToString)
 
-            MyBase.CurrentMode = ADJUSTMENT_MODES.ADJUSTING
+            CurrentMode = ADJUSTMENT_MODES.ADJUSTING
             PrepareArea()
 
             Me.Cursor = Cursors.WaitCursor
             Thread.Sleep(SimulationProcessTime)
-            MyBase.myServiceMDI.Focus()
+            myServiceMDI.Focus()
             Me.Cursor = Cursors.Default
 
-            MyBase.CurrentMode = ADJUSTMENT_MODES.ADJUSTED
-            MyBase.DisplayMessage(Messages.SRV_COMPLETED.ToString)
+            CurrentMode = ADJUSTMENT_MODES.ADJUSTED
+            DisplayMessage(Messages.SRV_COMPLETED.ToString)
             PrepareArea()
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Name & ".SimulateAbsPositioning", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Name & ".SimulateAbsPositioning", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Name & ".SimulateAbsPositioning", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
     Private Sub SimulateHOMEPositioning()
         Try
             ' simulating
-            MyBase.DisplayMessage(Messages.SRV_HOMES_IN_PROGRESS.ToString)
+            DisplayMessage(Messages.SRV_HOMES_IN_PROGRESS.ToString)
 
-            MyBase.CurrentMode = ADJUSTMENT_MODES.ADJUSTING
+            CurrentMode = ADJUSTMENT_MODES.ADJUSTING
             PrepareArea()
 
             Me.Cursor = Cursors.WaitCursor
             Thread.Sleep(SimulationProcessTime)
-            MyBase.myServiceMDI.Focus()
+            myServiceMDI.Focus()
             Me.Cursor = Cursors.Default
 
-            MyBase.CurrentMode = ADJUSTMENT_MODES.ADJUSTED
-            MyBase.DisplayMessage(Messages.SRV_COMPLETED.ToString)
+            CurrentMode = ADJUSTMENT_MODES.ADJUSTED
+            DisplayMessage(Messages.SRV_COMPLETED.ToString)
             PrepareArea()
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Name & ".SimulateHOMEPositioning", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Name & ".SimulateHOMEPositioning", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Name & ".SimulateHOMEPositioning", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
@@ -1933,7 +1933,7 @@ Public Class UiBarCodeAdjustments
             myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
             GlobalBase.CreateLogActivity(ex.Message, Name & ".SimulateBarcodeReading", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Name & ".SimulateBarcodeReading", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Name & ".SimulateBarcodeReading", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobal
     End Function
@@ -1946,18 +1946,18 @@ Public Class UiBarCodeAdjustments
 
 #Region "GENERIC"
 
-    Private Sub IBarCodeAdjustments_FormClosing(ByVal sender As Object, ByVal e As FormClosingEventArgs) Handles Me.FormClosing
+    Private Sub IBarCodeAdjustments_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
         Try
 
             If e.CloseReason = CloseReason.MdiFormClosing Then
                 e.Cancel = True
             Else
-                MyClass.myScreenDelegate.Dispose()
-                MyClass.myScreenDelegate = Nothing
+                myScreenDelegate.Dispose()
+                myScreenDelegate = Nothing
 
                 'SGM 28/02/2012
-                MyBase.ActivateMDIMenusButtons(Not MyBase.CloseRequestedByMDI)
-                MyBase.myServiceMDI.IsFinalClosing = MyBase.CloseRequestedByMDI
+                ActivateMDIMenusButtons(Not CloseRequestedByMDI)
+                myServiceMDI.IsFinalClosing = CloseRequestedByMDI
 
             End If
 
@@ -1967,19 +1967,19 @@ Public Class UiBarCodeAdjustments
         End Try
     End Sub
 
-    Private Sub IBarCodeAdjustments_Load(ByVal sender As Object, ByVal e As EventArgs) Handles Me.Load
+    Private Sub IBarCodeAdjustments_Load(sender As Object, e As EventArgs) Handles Me.Load
         Dim myGlobal As New GlobalDataTO
         'Dim myGlobalbase As New GlobalBase
         Try
-            MyBase.MyBase_Load(sender, e)
+            MyBase_Load(sender, e)
 
-            MyBase.GetUserNumericalLevel()
+            GetUserNumericalLevel()
 
             'Get the current Language from the current Application Session
             currentLanguage = GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Screen delegate
-            MyClass.myScreenDelegate = New BarCodeAdjustmentDelegate(MyBase.myServiceMDI.ActiveAnalyzer, MyBase.myFwScriptDelegate)
+            myScreenDelegate = New BarCodeAdjustmentDelegate(myServiceMDI.ActiveAnalyzer, myFwScriptDelegate)
 
             'Load the multilanguage texts for all Screen Labels and get Icons for graphical Buttons
             GetScreenLabels()
@@ -1999,7 +1999,7 @@ Public Class UiBarCodeAdjustments
             ' Check communications with Instrument
             If Not AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                 PrepareErrorMode()
-                MyBase.ActivateMDIMenusButtons(True)
+                ActivateMDIMenusButtons(True)
             Else
                 PrepareAdjustReadingMode()
             End If
@@ -2017,7 +2017,7 @@ Public Class UiBarCodeAdjustments
         End Try
     End Sub
 
-    Private Sub IBarCodeAdjustments_Shown(ByVal sender As Object, ByVal e As EventArgs) Handles Me.Shown
+    Private Sub IBarCodeAdjustments_Shown(sender As Object, e As EventArgs) Handles Me.Shown
         Try
             Me.BsInfoXPSViewer.Visible = True
             Me.BsInfoXPSViewer.RefreshPage()
@@ -2028,10 +2028,10 @@ Public Class UiBarCodeAdjustments
         End Try
     End Sub
 
-    Private Sub BsExitButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsExitButton.Click
+    Private Sub BsExitButton_Click(sender As Object, e As EventArgs) Handles BsExitButton.Click
         Try
-            MyBase.DisplayMessage("")
-            Me.ExitScreen()
+            DisplayMessage("")
+            ExitScreen()
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsExitButton.Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -2045,7 +2045,7 @@ Public Class UiBarCodeAdjustments
     ''' <remarks>
     ''' Created by XBC 14/12/2011
     ''' </remarks>
-    Private Sub ConfigUsers_KeyDown(ByVal sender As Object, ByVal e As KeyEventArgs) Handles Me.KeyDown
+    Private Sub ConfigUsers_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
         Try
             If (e.KeyCode = Keys.Escape) Then
                 'If (Me.BsExitButton.Enabled) Then
@@ -2057,20 +2057,20 @@ Public Class UiBarCodeAdjustments
             End If
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".KeyDown", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Me.Name & ".KeyDown", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
-    Private Sub TestProcessTimer_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles TestProcessTimer.Tick
+    Private Sub TestProcessTimer_Tick(sender As Object, e As EventArgs) Handles TestProcessTimer.Tick
         Try
             Me.ProgressBar1.Value += 1
             Me.ProgressBar1.Refresh()
 
         Catch ex As Exception
-            MyClass.TestProcessTimer.Enabled = False
+            TestProcessTimer.Enabled = False
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".TestProcessTimer_Tick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            'MyBase.ShowMessage(Me.Name & ".TestProcessTimer_Tick", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
-            Me.PrepareErrorMode()
+            ' ShowMessage(Me.Name & ".TestProcessTimer_Tick", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            PrepareErrorMode()
         End Try
     End Sub
 
@@ -2078,24 +2078,24 @@ Public Class UiBarCodeAdjustments
 
 #Region "ROTOR SELECTION"
 
-    Private Sub SampleRotorRadioButton_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Handles SampleRotorRadioButton.CheckedChanged
+    Private Sub SampleRotorRadioButton_CheckedChanged(sender As Object, e As EventArgs) Handles SampleRotorRadioButton.CheckedChanged
         Try
-            If Me.PageInitialized Then
+            If PageInitialized Then
 
-                Me.BarCodeDataGridView.Rows.Clear()
-                Me.ReadedValueLabel.Text = ""
+                BarCodeDataGridView.Rows.Clear()
+                ReadedValueLabel.Text = ""
 
-                With Me.EditedValue
-                    If Me.SampleRotorRadioButton.Checked Then
+                With EditedValue
+                    If SampleRotorRadioButton.Checked Then
                         .AdjustmentID = ADJUSTMENT_GROUPS.SAMPLES_ROTOR_BC
                         myScreenDelegate.AdjustmentID = ADJUSTMENT_GROUPS.SAMPLES_ROTOR_BC
 
                         LoadAdjustmentGroupData()
                         PopulateEditionValues()
 
-                        MyBase.CurrentMode = ADJUSTMENT_MODES.LOADED
+                        CurrentMode = ADJUSTMENT_MODES.LOADED
                         PrepareArea()
-                        MyBase.DisplayMessage("")
+                        DisplayMessage("")
 
                     End If
                 End With
@@ -2104,28 +2104,28 @@ Public Class UiBarCodeAdjustments
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SampleRotorRadioButton_CheckedChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".SampleRotorRadioButton_CheckedChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Me.Name & ".SampleRotorRadioButton_CheckedChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
-    Private Sub ReagentRotorRadioButton_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Handles ReagentRotorRadioButton.CheckedChanged
+    Private Sub ReagentRotorRadioButton_CheckedChanged(sender As Object, e As EventArgs) Handles ReagentRotorRadioButton.CheckedChanged
         Try
-            If Me.PageInitialized Then
+            If PageInitialized Then
 
-                Me.BarCodeDataGridView.Rows.Clear()
-                Me.ReadedValueLabel.Text = ""
+                BarCodeDataGridView.Rows.Clear()
+                ReadedValueLabel.Text = ""
 
-                With Me.EditedValue
-                    If Me.ReagentRotorRadioButton.Checked Then
+                With EditedValue
+                    If ReagentRotorRadioButton.Checked Then
                         .AdjustmentID = ADJUSTMENT_GROUPS.REAGENTS_ROTOR_BC
                         myScreenDelegate.AdjustmentID = ADJUSTMENT_GROUPS.REAGENTS_ROTOR_BC
 
                         LoadAdjustmentGroupData()
                         PopulateEditionValues()
 
-                        MyBase.CurrentMode = ADJUSTMENT_MODES.LOADED
+                        CurrentMode = ADJUSTMENT_MODES.LOADED
                         PrepareArea()
-                        MyBase.DisplayMessage("")
+                        DisplayMessage("")
 
                     End If
                 End With
@@ -2134,7 +2134,7 @@ Public Class UiBarCodeAdjustments
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ReagentRotorRadioButton_CheckedChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".ReagentRotorRadioButton_CheckedChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Me.Name & ".ReagentRotorRadioButton_CheckedChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
@@ -2142,11 +2142,11 @@ Public Class UiBarCodeAdjustments
 
 #Region "ROTOR CENTERING"
 
-    Private Sub AdjustButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles AdjustButton.Click
+    Private Sub AdjustButton_Click(sender As Object, e As EventArgs) Handles AdjustButton.Click
         Dim myGlobal As New GlobalDataTO
         Try
-            MyBase.DisplayMessage("")
-            myGlobal = MyBase.PrepareAdjust()
+            DisplayMessage("")
+            myGlobal = PrepareAdjust()
             If myGlobal.HasError Then
                 PrepareErrorMode()
             Else
@@ -2158,17 +2158,17 @@ Public Class UiBarCodeAdjustments
                     PrepareErrorMode()
                 Else
 
-                    If MyBase.SimulationMode Then
+                    If SimulationMode Then
                         ' simulating
-                        Me.Cursor = Cursors.WaitCursor
+                        Cursor = Cursors.WaitCursor
                         Thread.Sleep(SimulationProcessTime)
-                        MyBase.myServiceMDI.Focus()
-                        Me.Cursor = Cursors.Default
-                        MyBase.CurrentMode = ADJUSTMENT_MODES.ADJUST_PREPARED
+                        myServiceMDI.Focus()
+                        Cursor = Cursors.Default
+                        CurrentMode = ADJUSTMENT_MODES.ADJUST_PREPARED
                         PrepareArea()
                     Else
                         ' Manage FwScripts must to be sent to adjusting
-                        Me.SendFwScript(Me.CurrentMode, EditedValue.AdjustmentID)
+                        SendFwScript(CurrentMode, EditedValue.AdjustmentID)
                     End If
                 End If
 
@@ -2176,29 +2176,29 @@ Public Class UiBarCodeAdjustments
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".AdjustButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".AdjustButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Me.Name & ".AdjustButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
-    Private Sub SaveButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles SaveButton.Click
+    Private Sub SaveButton_Click(sender As Object, e As EventArgs) Handles SaveButton.Click
         Try
             myScreenDelegate.BarcodeLaserEnabled = False
-            MyBase.DisplayMessage("")
-            Me.SaveAdjustment()
+            DisplayMessage("")
+            SaveAdjustment()
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SaveButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".SaveButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Me.Name & ".SaveButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
-    Private Sub CancelButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles ButtonCancel.Click
+    Private Sub CancelButton_Click(sender As Object, e As EventArgs) Handles ButtonCancel.Click
         'Dim myGlobal As New GlobalDataTO
-        Dim dialogResultToReturn As DialogResult = DialogResult.No
+        Dim dialogResultToReturn = DialogResult.No
         Try
             myScreenDelegate.BarcodeLaserEnabled = False
             If Me.ChangedValue Then
-                dialogResultToReturn = MyBase.ShowMessage("", Messages.SRV_DISCARD_CHANGES.ToString)
+                dialogResultToReturn = ShowMessage("", Messages.SRV_DISCARD_CHANGES.ToString)
 
                 If dialogResultToReturn = DialogResult.Yes Then
                     Me.CancelAdjustment()
@@ -2209,91 +2209,91 @@ Public Class UiBarCodeAdjustments
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".CancelButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".CancelButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Me.Name & ".CancelButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
 #Region "event handler overloads"
     ' SET ABSOLUTE POINT
-    Private Sub BsAdjustRotor_SetABSPointReleased(ByVal sender As Object, ByVal Value As Single) Handles BsAdjust.AbsoluteSetPointReleased
+    Private Sub BsAdjustRotor_SetABSPointReleased(sender As Object, Value As Single) Handles BsAdjust.AbsoluteSetPointReleased
         Try
             Me.EditedValue.NewValue = Value
 
-            If MyBase.SimulationMode Then
+            If SimulationMode Then
                 Me.SimulateABSPositioning()
             Else
                 MakeAdjustment(MOVEMENT.ABSOLUTE)
-                MyBase.DisplayMessage(Messages.SRV_ABS_REQUESTED.ToString)
+                DisplayMessage(Messages.SRV_ABS_REQUESTED.ToString)
             End If
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsAdjustRotor_SetABSPointReleased ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".BsAdjustRotor_SetABSPointReleased ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Me.Name & ".BsAdjustRotor_SetABSPointReleased ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
     ' SET RELATIVE POINT
-    Private Sub BsAdjustRotor_SetRELPointReleased(ByVal sender As Object, ByVal Value As Single) Handles BsAdjust.RelativeSetPointReleased
+    Private Sub BsAdjustRotor_SetRELPointReleased(sender As Object, Value As Single) Handles BsAdjust.RelativeSetPointReleased
         Try
             Me.EditedValue.stepValue = Value
             Me.EditedValue.NewValue = Me.EditedValue.CurrentValue + Value
 
-            If MyBase.SimulationMode Then
+            If SimulationMode Then
                 Me.SimulateRELPositioning()
             Else
                 MakeAdjustment(MOVEMENT.RELATIVE)
-                MyBase.DisplayMessage(Messages.SRV_STEP_POSITIONING.ToString)
+                DisplayMessage(Messages.SRV_STEP_POSITIONING.ToString)
             End If
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsAdjustRotor_SetRELPointReleased ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".BsAdjustRotor_SetRELPointReleased ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Me.Name & ".BsAdjustRotor_SetRELPointReleased ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
     ' HOMES
-    Private Sub BsAdjustRotor_HomeRequestReleased(ByVal sender As Object) Handles BsAdjust.HomeRequestReleased
+    Private Sub BsAdjustRotor_HomeRequestReleased(sender As Object) Handles BsAdjust.HomeRequestReleased
         Try
             Me.EditedValue.NewValue = 0 ' HomeRotor
 
-            If MyBase.SimulationMode Then
+            If SimulationMode Then
                 Me.SimulateHOMEPositioning()
                 Me.BsAdjust.CurrentValue = 0
                 Me.EditedValue.CurrentValue = 0
             Else
                 MakeAdjustment(MOVEMENT.HOME)
-                MyBase.DisplayMessage(Messages.SRV_HOMES_IN_PROGRESS.ToString)
+                DisplayMessage(Messages.SRV_HOMES_IN_PROGRESS.ToString)
             End If
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsAdjustRotor_HomeRequestReleased ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".BsAdjustRotor_HomeRequestReleased ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Me.Name & ".BsAdjustRotor_HomeRequestReleased ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
     ' SET POINT OUT OF RANGE
-    Private Sub BsAdjustRotor_SetPointOutOfRange(ByVal sender As Object) Handles BsAdjust.SetPointOutOfRange
+    Private Sub BsAdjustRotor_SetPointOutOfRange(sender As Object) Handles BsAdjust.SetPointOutOfRange
         Try
-            MyBase.DisplayMessage(Messages.SRV_OUTOFRANGE.ToString)
+            DisplayMessage(Messages.SRV_OUTOFRANGE.ToString)
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsAdjustRotor_SetPointOutOfRange ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".BsAdjustRotor_SetPointOutOfRange ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Me.Name & ".BsAdjustRotor_SetPointOutOfRange ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
     '' VALIDATION ERROR
     'Private Sub BsAdjustRotor_ValidationError(ByVal sender As Object, ByVal Value As String) Handles BsAdjust.ValidationError
     '    Try
-    '        MyBase.DisplayMessage(Messages.FWSCRIPT_VALIDATION_ERROR.ToString)
+    '         DisplayMessage(Messages.FWSCRIPT_VALIDATION_ERROR.ToString)
     '    Catch ex As Exception
     '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsAdjustRotor_ValidationError ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-    '        MyBase.ShowMessage(Me.Name & ".BsAdjustRotor_ValidationError ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+    '         ShowMessage(Me.Name & ".BsAdjustRotor_ValidationError ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
 
-    Private Sub BsAdjustRotor_FocusReceived(ByVal sender As Object) Handles BsAdjust.FocusReceived
+    Private Sub BsAdjustRotor_FocusReceived(sender As Object) Handles BsAdjust.FocusReceived
         Try
-            MyBase.myFocusedAdjustControl = CType(sender, BSAdjustControl)
+            myFocusedAdjustControl = CType(sender, BSAdjustControl)
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsAdjustRotor_FocusReceived ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".BsAdjustRotor_FocusReceived ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Me.Name & ".BsAdjustRotor_FocusReceived ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
@@ -2302,12 +2302,12 @@ Public Class UiBarCodeAdjustments
     ''' </summary>
     ''' <param name="sender"></param>
     ''' <remarks>XBC 15/12/2011</remarks>
-    Private Sub BsAdjustRotor_OnEditionMode(ByVal sender As Object, ByVal pEditionMode As Boolean) Handles BsAdjust.EditionModeChanged
+    Private Sub BsAdjustRotor_OnEditionMode(sender As Object, pEditionMode As Boolean) Handles BsAdjust.EditionModeChanged
 
         Try
-            Dim myControl As BSAdjustControl = CType(sender, BSAdjustControl)
+            Dim myControl = CType(sender, BSAdjustControl)
             If myControl.Enabled Then
-                With MyBase.myScreenLayout.ButtonsPanel
+                With myScreenLayout.ButtonsPanel
                     If pEditionMode Then
                         .AdjustButton.Enabled = False
                         .SaveButton.Enabled = False
@@ -2317,7 +2317,7 @@ Public Class UiBarCodeAdjustments
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsAdjustRotor_OnEditionMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".BsAdjustRotor_OnEditionMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Me.Name & ".BsAdjustRotor_OnEditionMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
@@ -2327,11 +2327,11 @@ Public Class UiBarCodeAdjustments
 
 #Region "ROTOR READING"
 
-    Private Sub StartReadingButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles StartReadingButton.Click
+    Private Sub StartReadingButton_Click(sender As Object, e As EventArgs) Handles StartReadingButton.Click
         Dim myGlobal As New GlobalDataTO
         Try
-            MyBase.DisplayMessage("")
-            myGlobal = MyBase.Test
+            DisplayMessage("")
+            myGlobal = Test
             If myGlobal.HasError Then
                 PrepareErrorMode()
             Else
@@ -2341,15 +2341,15 @@ Public Class UiBarCodeAdjustments
                 Me.StopButton.Visible = True
 
                 If Not myGlobal.HasError Then
-                    If MyBase.SimulationMode Then
+                    If SimulationMode Then
                         ' simulating
                         Me.Cursor = Cursors.WaitCursor
                         Thread.Sleep(SimulationProcessTime)
-                        MyBase.myServiceMDI.Focus()
+                        myServiceMDI.Focus()
                         Me.Cursor = Cursors.Default
                         Me.ReadedValueLabel.Text = "100 %"
                         myScreenDelegate.CurrentOperation = BarCodeAdjustmentDelegate.OPERATIONS.TEST_MODE
-                        MyBase.CurrentMode = ADJUSTMENT_MODES.TESTED
+                        CurrentMode = ADJUSTMENT_MODES.TESTED
                         PrepareArea()
                     Else
                         StartReading()
@@ -2360,28 +2360,28 @@ Public Class UiBarCodeAdjustments
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".StartReadingButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".StartReadingButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Me.Name & ".StartReadingButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
-    Private Sub StopButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles StopButton.Click
+    Private Sub StopButton_Click(sender As Object, e As EventArgs) Handles StopButton.Click
         Dim myGlobal As New GlobalDataTO
         Try
-            myGlobal = MyBase.Test
+            myGlobal = Test
             If myGlobal.HasError Then
                 PrepareErrorMode()
             Else
                 PrepareArea()
 
                 If Not myGlobal.HasError Then
-                    If MyBase.SimulationMode Then
+                    If SimulationMode Then
                         ' simulating
                         Me.Cursor = Cursors.WaitCursor
                         Thread.Sleep(SimulationProcessTime)
-                        MyBase.myServiceMDI.Focus()
+                        myServiceMDI.Focus()
                         Me.Cursor = Cursors.Default
                         myScreenDelegate.CurrentOperation = BarCodeAdjustmentDelegate.OPERATIONS.TEST_MODE_END
-                        MyBase.CurrentMode = ADJUSTMENT_MODES.TESTED
+                        CurrentMode = ADJUSTMENT_MODES.TESTED
                         PrepareArea()
                     Else
                         StopReading()
@@ -2392,7 +2392,7 @@ Public Class UiBarCodeAdjustments
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".StopButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".StopButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Me.Name & ".StopButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
@@ -2400,12 +2400,12 @@ Public Class UiBarCodeAdjustments
 
 #Region "BARCODE TEST"
 
-    Private Sub TestButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles TestButton.Click
+    Private Sub TestButton_Click(sender As Object, e As EventArgs) Handles TestButton.Click
         Dim myGlobal As New GlobalDataTO
         Try
             'me.myScreenDelegate.SendQueueForLOADING()
-            MyBase.DisplayMessage("")
-            myGlobal = MyBase.Test
+            DisplayMessage("")
+            myGlobal = Test
             If myGlobal.HasError Then
                 PrepareErrorMode()
             Else
@@ -2417,9 +2417,9 @@ Public Class UiBarCodeAdjustments
                 Me.BarCodeDataGridView.Rows.Clear()
 
                 If Not myGlobal.HasError Then
-                    If MyBase.SimulationMode Then
+                    If SimulationMode Then
                         ' simulating
-                        MyBase.DisplayMessage(Messages.SRV_HOMES_IN_PROGRESS.ToString)
+                        DisplayMessage(Messages.SRV_HOMES_IN_PROGRESS.ToString)
 
                         Me.Cursor = Cursors.WaitCursor
 
@@ -2427,8 +2427,8 @@ Public Class UiBarCodeAdjustments
                         Me.ProgressBar1.Maximum = 5
                         Me.ProgressBar1.Visible = True
 
-                        For i As Integer = 1 To Me.ProgressBar1.Maximum
-                            Thread.Sleep(i * MyBase.SimulationProcessTime)
+                        For i = 1 To Me.ProgressBar1.Maximum
+                            Thread.Sleep(i * SimulationProcessTime)
                             Me.ProgressBar1.Value = i
                             Me.ProgressBar1.Refresh()
                         Next
@@ -2439,14 +2439,14 @@ Public Class UiBarCodeAdjustments
                         Me.Cursor = Cursors.Default
 
                         myScreenDelegate.CurrentOperation = BarCodeAdjustmentDelegate.OPERATIONS.TEST
-                        MyBase.CurrentMode = ADJUSTMENT_MODES.TESTED
+                        CurrentMode = ADJUSTMENT_MODES.TESTED
                         PrepareArea()
                     Else
                         ' Manage FwScripts must to be sent to testing
 
                         Me.SendFwScript(Me.CurrentMode, EditedValue.AdjustmentID)
                         If myScreenDelegate.HomesDone Then
-                            MyBase.CurrentMode = ADJUSTMENT_MODES.TESTED
+                            CurrentMode = ADJUSTMENT_MODES.TESTED
                             PrepareArea()
                         End If
                     End If
@@ -2456,7 +2456,7 @@ Public Class UiBarCodeAdjustments
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".TestButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".TestButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Me.Name & ".TestButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
@@ -2467,10 +2467,10 @@ Public Class UiBarCodeAdjustments
 
 #Region "XPS Info Events"
 
-    Private Sub BsXPSViewer_Load(ByVal sender As Object, ByVal e As EventArgs) Handles BsInfoXPSViewer.Load
+    Private Sub BsXPSViewer_Load(sender As Object, e As EventArgs) Handles BsInfoXPSViewer.Load
 
         Try
-            Dim myBsXPSViewer As BsXPSViewer = CType(sender, BsXPSViewer)
+            Dim myBsXPSViewer = CType(sender, BsXPSViewer)
             If myBsXPSViewer IsNot Nothing Then
                 If myBsXPSViewer.IsScrollable Then
                     myBsXPSViewer.FitToPageWidth()
@@ -2481,7 +2481,7 @@ Public Class UiBarCodeAdjustments
             End If
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsXPSViewer_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".BsXPSViewer_Load ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Me.Name & ".BsXPSViewer_Load ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 

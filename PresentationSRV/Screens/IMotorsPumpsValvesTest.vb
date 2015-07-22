@@ -6604,8 +6604,11 @@ Public Class UiMotorsPumpsValvesTest
             myGlobal = MyBase.DisplayMessage(Messages.SRV_TEST_IN_PROCESS.ToString)
 
             If MyBase.SimulationMode Then
+                myGlobal = MyBase.myServiceMDI.SEND_INFO_STOP
                 System.Threading.Thread.Sleep(MyBase.SimulationProcessTime)
-                myGlobal = MyBase.DisplayMessage(Messages.SRV_COLLISION_TEST_READY.ToString)
+                myGlobal = MyBase.myServiceMDI.SEND_INFO_STOP
+                Col_SimulateCollision()
+                'myGlobal = MyBase.DisplayMessage(Messages.SRV_COLLISION_TEST_READY.ToString)
 
             Else
 
