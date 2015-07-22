@@ -2962,26 +2962,25 @@ Namespace Biosystems.Ax00.Core.Entities
         End Function
 
         Public Function SimpleTranslateErrorCodeToAlarmId(pDbConnection As SqlConnection, errorCode As Integer) As Alarms Implements IAnalyzerManager.SimpleTranslateErrorCodeToAlarmId
-            'Dim dbConnection As TypedGlobalDataTo(Of SqlConnection) = Nothing
             Try
-                'dbConnection = GetSafeOpenDBConnection(pDbConnection)
-                'If (Not dbConnection.HasError AndAlso Not dbConnection.SetDatos Is Nothing) Then
-                Dim c = (From a As AlarmsDS.tfmwAlarmsRow In alarmsDefintionTableDS.tfmwAlarms Where a.ErrorCode = errorCode Select a.AlarmID)
-                If c.Any Then
-                    Return DirectCast([Enum].Parse(GetType(Alarms), c.FirstOrDefault()), Alarms)
+                If alarmsDefintionTableDS Is Nothing OrElse alarmsDefintionTableDS.tfmwAlarms Is Nothing OrElse Not alarmsDefintionTableDS.tfmwAlarms.Any Then
+                    Throw New Exception("Alarms dataset was not ready at " & Environment.StackTrace.ToString)
+                Else
+                    Dim c = (From a As AlarmsDS.tfmwAlarmsRow In alarmsDefintionTableDS.tfmwAlarms Where a.ErrorCode = errorCode Select a.AlarmID)
+                    If c.Any Then
+                        Return DirectCast([Enum].Parse(GetType(Alarms), c.FirstOrDefault()), Alarms)
+                    Else
+                        CreateLogActivity(String.Format("Data integrity error. Alarm with code {0} was returned by firmware, but it does not exist in the database.", errorCode), Reflection.MethodInfo.GetCurrentMethod.ReflectedType.FullName & " . " & Reflection.MethodInfo.GetCurrentMethod.Name, EventLogEntryType.Warning, False)
+                        Debug.WriteLine(String.Format("ATTENTION!! DATA INTEGRITY ERROR: Error was found while processing a satus alarm. Alarm with code {0} was not found in the database. ", errorCode))
+                        Return AlarmEnumerates.Alarms.NONE
+                    End If
                 End If
-                'End If
-                Return AlarmEnumerates.Alarms.NONE
+
             Catch
                 Throw
-            Finally
-                'If pDbConnection Is Nothing AndAlso dbConnection IsNot Nothing AndAlso dbConnection.SetDatos IsNot Nothing Then
-                'Try : dbConnection.SetDatos.Close()
-                'Catch : End Try
-                'End If
             End Try
-
         End Function
+
 
         ''' <summary>
         ''' Transforms a string list of Alarm Codes to a list of Alarm Enumerates
