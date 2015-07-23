@@ -83,6 +83,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
         Private lastestBireactives As LinkedList(Of IDispensing)
 
         Private Sub HandleBireactives()
+            Debug.WriteLine("HANDLING BIREACTIVES!")
             If currentContext Is Nothing Then Return
             If lastestBireactives Is Nothing Then
                 LoadLastestBireactivesFromDB()
@@ -100,15 +101,25 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
                 dispenseToCheck = stepToCheck.Dispensing(R1)
             End If
 
+
             If dispenseToCheck IsNot Nothing Then
                 Select Case dispenseToCheck.KindOfLiquid
                     Case KindOfDispensedLiquid.Washing
-                        lastestBireactives.AddLast(dispenseToCheck)
-                        serializationRequired = True
-                    Case KindOfDispensedLiquid.Reagent
-                        If GetAnalysisModeForReagent(dispenseToCheck.R1ReagentID) = AnalysisMode.BiReactive Then
+                        If lastestBireactives.Any AndAlso lastestBireactives.Last.Value.KindOfLiquid = KindOfDispensedLiquid.Washing AndAlso lastestBireactives.Last.Value.WashingID = dispenseToCheck.WashingID Then
+                            'This dispense has been already added to the latest bireactvies list
+                        Else
                             lastestBireactives.AddLast(dispenseToCheck)
                             serializationRequired = True
+                        End If
+                    Case KindOfDispensedLiquid.Reagent
+                        If GetAnalysisModeForReagent(dispenseToCheck.R1ReagentID) = AnalysisMode.BiReactive Then
+
+                            If lastestBireactives.Any AndAlso lastestBireactives.Last.Value.KindOfLiquid = KindOfDispensedLiquid.Reagent AndAlso lastestBireactives.Last.Value.ExecutionID = dispenseToCheck.ExecutionID Then
+                                'This dispense has been already added to the latest bireactvies list
+                            Else
+                                lastestBireactives.AddLast(dispenseToCheck)
+                                serializationRequired = True
+                            End If
                         End If
                 End Select
             End If
@@ -120,6 +131,8 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
             If serializationRequired Then
                 SerializeLatestBireactives()
             End If
+
+
         End Sub
 
         Private Sub LoadLastestBireactivesFromDB()
@@ -146,13 +159,16 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
 
             Dim table As New vWSExecutionsDS.twksWSBbireactiveContextDataTable
             For Each disp In lastestBireactives
-                table.AddtwksWSBbireactiveContextRow(
+                Dim row = table.AddtwksWSBbireactiveContextRow(
                     AnalyzerManager.GetCurrentAnalyzerManager.ActiveWorkSession,
                     AnalyzerManager.GetCurrentAnalyzerManager.ActiveAnalyzer,
                     disp.ExecutionID,
                     CByte(disp.KindOfLiquid),
                     CShort(disp.R1ReagentID),
                     disp.WashingID)
+                If disp.KindOfLiquid = KindOfDispensedLiquid.Washing Then
+                    row.ExecutionID = disp.WashingID
+                End If
             Next
 
             Dim serializationOfData As New Task(Sub()

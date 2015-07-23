@@ -48,6 +48,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
                         Dim contaAction = New RequiredAction
                         contaAction.Action = IContaminationsAction.RequiredAction.RemoveRequiredWashing
                         Dim a = WashingID
+
                         Dim WashingSolutionID As String = _washingDescription.WashingSolutionCode
                         contaAction.InvolvedWash = New WashingDescription(-1, WashingSolutionID)
                         Return contaAction
