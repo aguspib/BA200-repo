@@ -26,6 +26,7 @@ Partial Class Form_MR
         Me.Btn_create_refresh = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.BsDelete_refresh = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.BsBtnUpdteBLexpirationdate = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.btnLogActivity = New Biosystems.Ax00.Controls.UserControls.BSButton()
         CType(Me.QcResultsCalculationDS1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -57,18 +58,29 @@ Partial Class Form_MR
         'BsBtnUpdteBLexpirationdate
         '
         Me.BsBtnUpdteBLexpirationdate.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.BsBtnUpdteBLexpirationdate.Location = New System.Drawing.Point(260, 24)
+        Me.BsBtnUpdteBLexpirationdate.Location = New System.Drawing.Point(23, 100)
         Me.BsBtnUpdteBLexpirationdate.Name = "BsBtnUpdteBLexpirationdate"
         Me.BsBtnUpdteBLexpirationdate.Size = New System.Drawing.Size(142, 38)
         Me.BsBtnUpdteBLexpirationdate.TabIndex = 30
         Me.BsBtnUpdteBLexpirationdate.Text = "Update datetime BL_Expired"
         Me.BsBtnUpdteBLexpirationdate.UseVisualStyleBackColor = True
         '
+        'btnLogActivity
+        '
+        Me.btnLogActivity.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
+        Me.btnLogActivity.Location = New System.Drawing.Point(573, 12)
+        Me.btnLogActivity.Name = "btnLogActivity"
+        Me.btnLogActivity.Size = New System.Drawing.Size(142, 38)
+        Me.btnLogActivity.TabIndex = 31
+        Me.btnLogActivity.Text = "Check createLogActivity"
+        Me.btnLogActivity.UseVisualStyleBackColor = True
+        '
         'Form_MR
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(727, 262)
+        Me.Controls.Add(Me.btnLogActivity)
         Me.Controls.Add(Me.BsBtnUpdteBLexpirationdate)
         Me.Controls.Add(Me.BsDelete_refresh)
         Me.Controls.Add(Me.Btn_create_refresh)
@@ -82,4 +94,5 @@ Partial Class Form_MR
     Friend WithEvents Btn_create_refresh As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents BsDelete_refresh As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents BsBtnUpdteBLexpirationdate As Biosystems.Ax00.Controls.UserControls.BSButton
+    Friend WithEvents btnLogActivity As Biosystems.Ax00.Controls.UserControls.BSButton
 End Class
