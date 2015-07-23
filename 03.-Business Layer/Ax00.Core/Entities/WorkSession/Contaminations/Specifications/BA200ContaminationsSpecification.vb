@@ -159,7 +159,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
 
             Dim table As New vWSExecutionsDS.twksWSBbireactiveContextDataTable
             For Each disp In lastestBireactives
-                table.AddtwksWSBbireactiveContextRow(
+                Dim row = table.AddtwksWSBbireactiveContextRow(
                     AnalyzerManager.GetCurrentAnalyzerManager.ActiveWorkSession,
                     AnalyzerManager.GetCurrentAnalyzerManager.ActiveAnalyzer,
                     disp.ExecutionID,

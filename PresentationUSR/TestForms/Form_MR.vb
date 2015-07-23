@@ -40,22 +40,15 @@ Public Class Form_MR
     End Sub
 
     Private Sub btnLogActivity_Click(sender As Object, e As EventArgs) Handles btnLogActivity.Click
-        Dim i As String
         Try
-            'If Not IsNumeric(i) Then
-            '    Throw New ArgumentException("Error: El valor introducido no es numérico")
-            'End If
 
-            CreateLogActivity(EventLogEntryType.Information)
+            CreateLogActivity("Test Create Log Activity.", EventLogEntryType.Information)
 
-            'nombredelafuncion()
         Catch ex As Exception
             CreateLogActivity(ex)
         End Try
 
-
-
-
+        
         'CheckTemperaturesAlarms(Nothing, pSensors(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_FRIDGE), _
         '                pSensors(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_REACTIONS), _
         '                pSensors(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_WASHINGSTATION), _
@@ -66,12 +59,4 @@ Public Class Form_MR
 
 
     End Sub
-    Private Sub nombredelafuncion()
-        Dim st As New System.Diagnostics.StackTrace()
-
-        ' Obtenemos el último marco de la pila
-        Dim nombreMetodo As String = st.GetFrame(1).GetMethod.DeclaringType.FullName() & "." & st.GetFrame(1).GetMethod().Name & "." & st.GetFrame(0).GetMethod().Name
-
-    End Sub
-
-    End Class
+End Class
