@@ -2589,7 +2589,7 @@ Public Class UiThermosAdjustments
             '        End If
             '    End If
             'End If
-            If (Me.Tab1TextBoxTemp1.Visible) And (Me.Tab1TextBoxTemp1.Text.Length = 0) Then 'BA-2649
+            If (Me.Tab1TextBoxTemp1.Visible) AndAlso (Me.Tab1TextBoxTemp1.Text.Length = 0) Then 'BA-2649
                 AllTempsFilled = False
             Else
                 If IsNumeric(Me.Tab1TextBoxTemp1.Text) Then
@@ -2599,7 +2599,7 @@ Public Class UiThermosAdjustments
                 End If
             End If
 
-            If (Me.Tab1TextBoxTemp2.Visible) And (Me.Tab1TextBoxTemp2.Text.Length = 0) Then 'BA-2649
+            If (Me.Tab1TextBoxTemp2.Visible) AndAlso (Me.Tab1TextBoxTemp2.Text.Length = 0) Then 'BA-2649
                 AllTempsFilled = False
             Else
                 If IsNumeric(Me.Tab1TextBoxTemp2.Text) Then
@@ -2609,7 +2609,7 @@ Public Class UiThermosAdjustments
                 End If
             End If
 
-            If (Me.Tab1TextBoxTemp3.Visible) And (Me.Tab1TextBoxTemp3.Text.Length = 0) Then 'BA-2649
+            If (Me.Tab1TextBoxTemp3.Visible) AndAlso (Me.Tab1TextBoxTemp3.Text.Length = 0) Then 'BA-2649
                 AllTempsFilled = False
             Else
                 If IsNumeric(Me.Tab1TextBoxTemp3.Text) Then
@@ -2619,7 +2619,7 @@ Public Class UiThermosAdjustments
                 End If
             End If
 
-            If (Me.Tab1TextBoxTemp4.Visible) And (Me.Tab1TextBoxTemp4.Text.Length = 0) Then 'BA-2649
+            If (Me.Tab1TextBoxTemp4.Visible) AndAlso (Me.Tab1TextBoxTemp4.Text.Length = 0) Then 'BA-2649
                 AllTempsFilled = False
             Else
                 If IsNumeric(Me.Tab1TextBoxTemp4.Text) Then
@@ -2640,13 +2640,13 @@ Public Class UiThermosAdjustments
                 '    AllTempsFilled = False
                 'ElseIf CSng(Me.Tab1TextBoxTemp4.Text) = 0 Then
                 '    AllTempsFilled = False
-                If (Me.Tab1TextBoxTemp1.Visible) And (Utilities.FormatToSingle(Me.Tab1TextBoxTemp1.Text) = 0) Then 'BA-2649
+                If (Me.Tab1TextBoxTemp1.Visible) AndAlso (Utilities.FormatToSingle(Me.Tab1TextBoxTemp1.Text) = 0) Then 'BA-2649
                     AllTempsFilled = False
-                ElseIf (Me.Tab1TextBoxTemp2.Visible) And (Utilities.FormatToSingle(Me.Tab1TextBoxTemp2.Text) = 0) Then 'BA-2649
+                ElseIf (Me.Tab1TextBoxTemp2.Visible) AndAlso (Utilities.FormatToSingle(Me.Tab1TextBoxTemp2.Text) = 0) Then 'BA-2649
                     AllTempsFilled = False
-                ElseIf (Me.Tab1TextBoxTemp3.Visible) And (Utilities.FormatToSingle(Me.Tab1TextBoxTemp3.Text) = 0) Then 'BA-2649
+                ElseIf (Me.Tab1TextBoxTemp3.Visible) AndAlso (Utilities.FormatToSingle(Me.Tab1TextBoxTemp3.Text) = 0) Then 'BA-2649
                     AllTempsFilled = False
-                ElseIf (Me.Tab1TextBoxTemp4.Visible) And (Utilities.FormatToSingle(Me.Tab1TextBoxTemp4.Text) = 0) Then 'BA-2649
+                ElseIf (Me.Tab1TextBoxTemp4.Visible) AndAlso (Utilities.FormatToSingle(Me.Tab1TextBoxTemp4.Text) = 0) Then 'BA-2649
                     AllTempsFilled = False
 
 
