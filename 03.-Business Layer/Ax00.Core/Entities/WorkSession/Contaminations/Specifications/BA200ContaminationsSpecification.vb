@@ -166,9 +166,6 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
                     CByte(disp.KindOfLiquid),
                     CShort(disp.R1ReagentID),
                     disp.WashingID)
-                If disp.KindOfLiquid = KindOfDispensedLiquid.Washing Then
-                    row.ExecutionID = disp.WashingID
-                End If
             Next
 
             Dim serializationOfData As New Task(Sub()
