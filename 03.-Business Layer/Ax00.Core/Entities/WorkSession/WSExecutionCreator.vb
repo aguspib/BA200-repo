@@ -420,11 +420,9 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
                     End If
                 End If
             End If
-            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            'GlobalBase.CreateLogActivity("Not RUNNING: Search and Delete NOT IN COURSE " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-            '                               "ExecutionsDelegate.SearchNotInCourseExecutionsToDelete", EventLogEntryType.Information, False)
 
-            GlobalBase.CreateLogActivity(EventLogEntryType.Information, "Not RUNNING: Search and Delete NOT IN COURSE " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0))
+            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+            GlobalBase.CreateLogActivity("Not RUNNING: Search and Delete NOT IN COURSE " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), EventLogEntryType.Information)
             Return resultData
         End Function
 
@@ -1097,9 +1095,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
             Dim resultData = RecalculateStatusForNotDeletedExecutionsNEW(pDBConnection, pAnalyzerID, pWorkSessionID, pWorkInRunningMode, pPauseMode)
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            ' GlobalBase.CreateLogActivity("Recalculate Status " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-            '                                "ExecutionsDelegate.RecalculateStatusForNotDeletedExecutions", EventLogEntryType.Information, False)
-            GlobalBase.CreateLogActivity(EventLogEntryType.Information, "Recalculate Status " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0))
+            GlobalBase.CreateLogActivity("Recalculate Status " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), EventLogEntryType.Information)
 
             Return resultData
         End Function
@@ -1213,8 +1209,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
             If GlobalConstants.CreateWSExecutionsWithSemaphore AndAlso pManualRerunFlag Then
                 GlobalSemaphores.createWSExecutionsSemaphore.Release()
                 GlobalSemaphores.createWSExecutionsQueue = 0 'Only 1 thread is allowed, so reset to 0 instead of decrement --1 'GlobalSemaphores.createWSExecutionsQueue -= 1
-                'GlobalBase.CreateLogActivity("CreateWSExecutions semaphore: Released, semaphore free", "ExecutionsDelegate.ReleaseSemaphoreToAvailable", EventLogEntryType.Information, False)
-                GlobalBase.CreateLogActivity(EventLogEntryType.Information, "CreateWSExecutions semaphore: Released, semaphore free")
+                GlobalBase.CreateLogActivity("CreateWSExecutions semaphore: Released, semaphore free", EventLogEntryType.Information)
             End If
         End Sub
 
