@@ -1894,7 +1894,10 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.SRV_WELL1_FILL_GLF_THERMO.ToString, pAnalyzerModel)
                 If Not myResultData.HasError And Not myResultData.SetDatos Is Nothing Then
                     myParametersDS = CType(myResultData.SetDatos, ParametersDS)
-                    MyClass.ReactionsRotorMeasuredWellsAttr.Add(CInt(myParametersDS.tfmwSwParameters.Item(0).ValueNumeric))
+                    'IT 23/07/2015 - BA-2649
+                    If (myParametersDS.tfmwSwParameters.Rows.Count > 0) Then
+                        MyClass.ReactionsRotorMeasuredWellsAttr.Add(CInt(myParametersDS.tfmwSwParameters.Item(0).ValueNumeric))
+                    End If
                 Else
                     myResultData.HasError = True
                     Exit Try
@@ -1903,7 +1906,10 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.SRV_WELL2_FILL_GLF_THERMO.ToString, pAnalyzerModel)
                 If Not myResultData.HasError And Not myResultData.SetDatos Is Nothing Then
                     myParametersDS = CType(myResultData.SetDatos, ParametersDS)
-                    MyClass.ReactionsRotorMeasuredWellsAttr.Add(CInt(myParametersDS.tfmwSwParameters.Item(0).ValueNumeric))
+                    'IT 23/07/2015 - BA-2649
+                    If (myParametersDS.tfmwSwParameters.Rows.Count > 0) Then
+                        MyClass.ReactionsRotorMeasuredWellsAttr.Add(CInt(myParametersDS.tfmwSwParameters.Item(0).ValueNumeric))
+                    End If
                 Else
                     myResultData.HasError = True
                     Exit Try
@@ -1912,7 +1918,10 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.SRV_WELL3_FILL_GLF_THERMO.ToString, pAnalyzerModel)
                 If Not myResultData.HasError And Not myResultData.SetDatos Is Nothing Then
                     myParametersDS = CType(myResultData.SetDatos, ParametersDS)
-                    MyClass.ReactionsRotorMeasuredWellsAttr.Add(CInt(myParametersDS.tfmwSwParameters.Item(0).ValueNumeric))
+                    'IT 23/07/2015 - BA-2649
+                    If (myParametersDS.tfmwSwParameters.Rows.Count > 0) Then
+                        MyClass.ReactionsRotorMeasuredWellsAttr.Add(CInt(myParametersDS.tfmwSwParameters.Item(0).ValueNumeric))
+                    End If
                 Else
                     myResultData.HasError = True
                     Exit Try
@@ -1921,7 +1930,10 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.SRV_WELL4_FILL_GLF_THERMO.ToString, pAnalyzerModel)
                 If Not myResultData.HasError And Not myResultData.SetDatos Is Nothing Then
                     myParametersDS = CType(myResultData.SetDatos, ParametersDS)
-                    MyClass.ReactionsRotorMeasuredWellsAttr.Add(CInt(myParametersDS.tfmwSwParameters.Item(0).ValueNumeric))
+                    'IT 23/07/2015 - BA-2649
+                    If (myParametersDS.tfmwSwParameters.Rows.Count > 0) Then
+                        MyClass.ReactionsRotorMeasuredWellsAttr.Add(CInt(myParametersDS.tfmwSwParameters.Item(0).ValueNumeric))
+                    End If
                 Else
                     myResultData.HasError = True
                     Exit Try
