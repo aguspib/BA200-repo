@@ -829,10 +829,10 @@ Public Class UiMotorsPumpsValvesTest
                     'SGM 25/10/2012
                     Me.bsScreenToolTips2.SetToolTip(Col_StartStopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Test", MyClass.LanguageID))
                     Me.Col_StartStopButton.Enabled = True
-                    End If
+                End If
 
-                    If myStartStopButtonImage IsNot Nothing Then
-                        Col_StartStopButton.Image = myStartStopButtonImage
+                If myStartStopButtonImage IsNot Nothing Then
+                    Col_StartStopButton.Image = myStartStopButtonImage
                 End If
 
             Catch ex As Exception
@@ -1084,16 +1084,55 @@ Public Class UiMotorsPumpsValvesTest
             Me.InDo_SwitchGroupBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Switch", pLanguageID)
             Me.InDo_SwitchSimpleRButton.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_SimpleSwitch", pLanguageID)
             Me.InDo_SwitchContinuousRButton.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ContinuousSwitch", pLanguageID)
-            MyClass.WashingSolutionCaption = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_WashSolution", pLanguageID)
-            MyClass.DistilledWaterCaption = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_DISTILLED_WATER", pLanguageID)
-            MyClass.AirCaption = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_AIR", pLanguageID)
+            Me.WashingSolutionCaption = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_WashSolution", pLanguageID)
+            Me.DistilledWaterCaption = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_DISTILLED_WATER", pLanguageID)
+            Me.AirCaption = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_AIR", pLanguageID)
             Me.InDo_WashingSolutionLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_WashSolution", pLanguageID)
             Me.InDo_DistilledWaterLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_DISTILLED_WATER", pLanguageID)
             Me.InDo_AirLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_AIR", pLanguageID)
-            Me.InDo_SamplesNeedleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_SamplesNeedle", pLanguageID)
-            Me.InDo_Reagent1NeedleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Reagent1Needle", pLanguageID)
-            Me.InDo_Reagent2NeedleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Reagent2Needle", pLanguageID)
+           
             Me.InDo_Motors_AdjustControl.RangeTitle = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Range", pLanguageID) & ":"
+
+            If AnalyzerController.Instance.IsBA200 Then
+                Me.InDo_SamplesNeedleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_SAMPLEANDREAGENT", pLanguageID)
+                InDo_EV4_Label.Text = "EV2"
+                InDo_EV5_Label.Text = "EV3"
+                'Hide Reagent2 Elements
+                BsScadaPipeControl12.Visible = False
+                BsScadaPipeControl11.Visible = False
+                BsScadaPipeControl53.Visible = False
+                BsScadaPipeControl52.Visible = False
+                BsScadaPipeControl49.Visible = False
+                BsScadaPipeControl63.Visible = False
+                BsScadaPipeControl58.Visible = False
+                BsScadaPipeControl17.Visible = False
+                InDo_Reagent2_EValve.Visible = False
+                InDo_EV3_Label.Visible = False
+                InDo_Reagent2_Syringe.Visible = False
+                InDo_JB3_Label.Visible = False
+                InDo_Reagent2_Motor.Visible = False
+                InDo_M3_Label.Visible = False
+
+                'Hide Reagent1 Elements
+                BsScadaPipeControl60.Visible = False
+                BsScadaPipeControl50.Visible = False
+                BsScadaPipeControl57.Visible = False
+                BsScadaPipeControl2.Visible = False
+                BsScadaPipeControl10.Visible = False
+                BsScadaPipeControl56.Visible = False
+                BsScadaPipeControl11.Visible = False
+                InDo_Reagent1_EValve.Visible = False
+                InDo_EV2_Label.Visible = False
+                InDo_Reagent1_Syringe.Visible = False
+                InDo_JB2_Label.Visible = False
+                InDo_Reagent1_Pump.Visible = False
+                InDo_Reagent1_Motor.Visible = False
+                InDo_M2_Label.Visible = False
+            Else
+                Me.InDo_SamplesNeedleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_SamplesNeedle", pLanguageID)
+                Me.InDo_Reagent1NeedleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Reagent1Needle", pLanguageID)
+                Me.InDo_Reagent2NeedleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Reagent2Needle", pLanguageID)
+            End If
 
             'EXTERNAL WASHING
             Me.BsExternalWashingInfoTitleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_INFO_TITLE", pLanguageID)
@@ -1117,7 +1156,7 @@ Public Class UiMotorsPumpsValvesTest
                 Me.ExWa_Reagent1NeedleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Reagent1Mixer2Arms", pLanguageID)
                 Me.ExWa_Reagent2NeedleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Reagent2Mixer1Arms", pLanguageID)
             End If
-            
+
 
 
             'WS ASPIRATION
@@ -1152,7 +1191,7 @@ Public Class UiMotorsPumpsValvesTest
                     Me.WSAsp_Needle7Label.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Needle", pLanguageID) + " 13" ' " 7" ' XBC 18/09/2012 - spec change
             End Select
 
-    'WS DISPENSATION
+            'WS DISPENSATION
             Me.BsWSDispensationInfoTitleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_INFO_TITLE", pLanguageID)
             Me.WsDisp_SwitchGroupBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Switch", pLanguageID)
             Me.WsDisp_SwitchSimpleRButton.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_SimpleSwitch", pLanguageID)
@@ -1166,7 +1205,7 @@ Public Class UiMotorsPumpsValvesTest
             Me.WSDisp_Needle5Label.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Needle", pLanguageID) + " 5"
             Me.WSDisp_MotorAdjustControl.RangeTitle = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Range", pLanguageID) & ":"
 
-    'IN OUT
+            'IN OUT
             Me.BsInOutInfoTitleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_INFO_TITLE", pLanguageID)
             Me.InOut_SwitchGroupBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Switch", pLanguageID)
             Me.InOut_SwitchSimpleRButton.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_SimpleSwitch", pLanguageID)
@@ -1177,24 +1216,24 @@ Public Class UiMotorsPumpsValvesTest
             Me.InOut_PW_ExternalTankLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_DistilledWaterExtTank", pLanguageID)
             Me.InOut_ExternalSourceLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_EXTERNAL_SOURCE", pLanguageID)
 
-    'COLLISION
+            'COLLISION
             Me.BsCollisionInfoTitleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_INFO_TITLE", pLanguageID)
             Me.Col_WashingStationLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_WashStation", pLanguageID)
             Me.Col_SamplesLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_SAMPLEANDREAGENT", pLanguageID) + " " + myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Needle", pLanguageID)
             Me.Col_Reagent1Label.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Reagent1", pLanguageID) + " " + myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Needle", pLanguageID)
             Me.Col_Reagent2Label.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Reagent2", pLanguageID) + " " + myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Needle", pLanguageID)
 
-    'ENCODER 'PDT
+            'ENCODER 'PDT
             Me.BsEncoderInfoTitleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_INFO_TITLE", pLanguageID)
             Me.Enco_MotorCaptionLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_EncoderTestMotor", pLanguageID)
             Me.Enco_EncoderCaptionLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_EncoderTestEncoder", pLanguageID) + " " + myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Needle", pLanguageID)
 
-    'LBL_SRV_CollisionTest
-    'LBL_SRV_EncoderTest
-    'LBL_SRV_EncoderTestMotor
-    'LBL_SRV_EncoderTestEncoder
+            'LBL_SRV_CollisionTest
+            'LBL_SRV_EncoderTest
+            'LBL_SRV_EncoderTestMotor
+            'LBL_SRV_EncoderTestEncoder
 
-    ' Tooltips
+            ' Tooltips
             GetScreenTooltip(pLanguageID)
 
         Catch ex As Exception
@@ -8743,4 +8782,7 @@ Public Class UiMotorsPumpsValvesTest
 
 
 
+    Private Sub InDo_Air_Ws_3Evalve_Load(sender As Object, e As EventArgs) Handles InDo_Air_Ws_3Evalve.Load
+
+    End Sub
 End Class

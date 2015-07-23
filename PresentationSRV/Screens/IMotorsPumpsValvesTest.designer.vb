@@ -40,6 +40,7 @@ Partial Class UiMotorsPumpsValvesTest
         Me.BsTabPagesControl = New DevExpress.XtraTab.XtraTabControl()
         Me.bsInternalDosingTabPage = New DevExpress.XtraTab.XtraTabPage()
         Me.BsInternalDosingTestPanel = New System.Windows.Forms.Panel()
+        Me.BsScadaPipeControl12 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
         Me.InDo_Reagent1_Syringe = New Biosystems.Ax00.Controls.UserControls.BsScadaSyringeControl()
         Me.InDo_Samples_Syringe = New Biosystems.Ax00.Controls.UserControls.BsScadaSyringeControl()
         Me.InDo_Reagent2_Syringe = New Biosystems.Ax00.Controls.UserControls.BsScadaSyringeControl()
@@ -67,7 +68,6 @@ Partial Class UiMotorsPumpsValvesTest
         Me.InDo_Samples_Pump = New Biosystems.Ax00.Controls.UserControls.BsScadaPumpControl()
         Me.InDo_Reagent2_EValve = New Biosystems.Ax00.Controls.UserControls.BsScadaValveControl()
         Me.InDo_Reagent1_EValve = New Biosystems.Ax00.Controls.UserControls.BsScadaValveControl()
-        Me.BsScadaPipeControl12 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
         Me.BsScadaPipeControl10 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
         Me.BsScadaPipeControl4 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
         Me.BsScadaPipeControl3 = New Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl()
@@ -532,6 +532,7 @@ Partial Class UiMotorsPumpsValvesTest
         '
         Me.BsInternalDosingTestPanel.BackColor = System.Drawing.Color.Gainsboro
         Me.BsInternalDosingTestPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.BsInternalDosingTestPanel.Controls.Add(Me.BsScadaPipeControl12)
         Me.BsInternalDosingTestPanel.Controls.Add(Me.InDo_Reagent1_Syringe)
         Me.BsInternalDosingTestPanel.Controls.Add(Me.InDo_Samples_Syringe)
         Me.BsInternalDosingTestPanel.Controls.Add(Me.InDo_Reagent2_Syringe)
@@ -555,7 +556,6 @@ Partial Class UiMotorsPumpsValvesTest
         Me.BsInternalDosingTestPanel.Controls.Add(Me.InDo_Samples_Pump)
         Me.BsInternalDosingTestPanel.Controls.Add(Me.InDo_Reagent2_EValve)
         Me.BsInternalDosingTestPanel.Controls.Add(Me.InDo_Reagent1_EValve)
-        Me.BsInternalDosingTestPanel.Controls.Add(Me.BsScadaPipeControl12)
         Me.BsInternalDosingTestPanel.Controls.Add(Me.BsScadaPipeControl10)
         Me.BsInternalDosingTestPanel.Controls.Add(Me.BsScadaPipeControl4)
         Me.BsInternalDosingTestPanel.Controls.Add(Me.BsScadaPipeControl3)
@@ -594,6 +594,38 @@ Partial Class UiMotorsPumpsValvesTest
         Me.BsInternalDosingTestPanel.Name = "BsInternalDosingTestPanel"
         Me.BsInternalDosingTestPanel.Size = New System.Drawing.Size(740, 529)
         Me.BsInternalDosingTestPanel.TabIndex = 71
+        '
+        'BsScadaPipeControl12
+        '
+        Me.BsScadaPipeControl12.ActivatedColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(150, Byte), Integer), CType(CType(230, Byte), Integer))
+        Me.BsScadaPipeControl12.ActivationState = Biosystems.Ax00.Controls.UserControls.BsScadaControl.States._OFF
+        Me.BsScadaPipeControl12.ActivatorVisible = True
+        Me.BsScadaPipeControl12.BackColor = System.Drawing.Color.Transparent
+        Me.BsScadaPipeControl12.BackgroundColor = System.Drawing.Color.Transparent
+        Me.BsScadaPipeControl12.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.BsScadaPipeControl12.DeactivatedColor = System.Drawing.Color.LightGray
+        Me.BsScadaPipeControl12.DefaultState = Biosystems.Ax00.Controls.UserControls.BsScadaControl.States._OFF
+        Me.BsScadaPipeControl12.Description = "Element Description"
+        Me.BsScadaPipeControl12.End1Visible = False
+        Me.BsScadaPipeControl12.End2Visible = False
+        Me.BsScadaPipeControl12.FluidColor = System.Drawing.Color.Transparent
+        Me.BsScadaPipeControl12.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.BsScadaPipeControl12.Group = "GROUP"
+        Me.BsScadaPipeControl12.Identity = "ID"
+        Me.BsScadaPipeControl12.InnerColor = System.Drawing.Color.WhiteSmoke
+        Me.BsScadaPipeControl12.IsAlarm = False
+        Me.BsScadaPipeControl12.Location = New System.Drawing.Point(475, 256)
+        Me.BsScadaPipeControl12.Margin = New System.Windows.Forms.Padding(0)
+        Me.BsScadaPipeControl12.Name = "BsScadaPipeControl12"
+        Me.BsScadaPipeControl12.Orientation = Biosystems.Ax00.Controls.UserControls.BsScadaControl.Orientations._90
+        Me.BsScadaPipeControl12.OuterColor = System.Drawing.Color.DimGray
+        Me.BsScadaPipeControl12.OuterWidth = 1
+        Me.BsScadaPipeControl12.PipeType = Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl.PipeTypes._0
+        Me.BsScadaPipeControl12.PipeWidth = 5
+        Me.BsScadaPipeControl12.Selected = False
+        Me.BsScadaPipeControl12.Size = New System.Drawing.Size(5, 47)
+        Me.BsScadaPipeControl12.TabIndex = 163
+        Me.BsScadaPipeControl12.ToolTipText = ""
         '
         'InDo_Reagent1_Syringe
         '
@@ -848,7 +880,7 @@ Partial Class UiMotorsPumpsValvesTest
         Me.InDo_WashingSolutionLabel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.InDo_WashingSolutionLabel.Font = New System.Drawing.Font("Verdana", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.InDo_WashingSolutionLabel.ForeColor = System.Drawing.Color.Blue
-        Me.InDo_WashingSolutionLabel.Location = New System.Drawing.Point(175, 401)
+        Me.InDo_WashingSolutionLabel.Location = New System.Drawing.Point(175, 396)
         Me.InDo_WashingSolutionLabel.Name = "InDo_WashingSolutionLabel"
         Me.InDo_WashingSolutionLabel.Size = New System.Drawing.Size(110, 60)
         Me.InDo_WashingSolutionLabel.TabIndex = 89
@@ -1232,38 +1264,6 @@ Partial Class UiMotorsPumpsValvesTest
         Me.InDo_Reagent1_EValve.TabIndex = 123
         Me.InDo_Reagent1_EValve.ToolTipText = ""
         Me.InDo_Reagent1_EValve.WayType = Biosystems.Ax00.Controls.UserControls.BsScadaValveControl.WayTypes.Normally_Open
-        '
-        'BsScadaPipeControl12
-        '
-        Me.BsScadaPipeControl12.ActivatedColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(150, Byte), Integer), CType(CType(230, Byte), Integer))
-        Me.BsScadaPipeControl12.ActivationState = Biosystems.Ax00.Controls.UserControls.BsScadaControl.States._OFF
-        Me.BsScadaPipeControl12.ActivatorVisible = True
-        Me.BsScadaPipeControl12.BackColor = System.Drawing.Color.Transparent
-        Me.BsScadaPipeControl12.BackgroundColor = System.Drawing.Color.Transparent
-        Me.BsScadaPipeControl12.Cursor = System.Windows.Forms.Cursors.Hand
-        Me.BsScadaPipeControl12.DeactivatedColor = System.Drawing.Color.LightGray
-        Me.BsScadaPipeControl12.DefaultState = Biosystems.Ax00.Controls.UserControls.BsScadaControl.States._OFF
-        Me.BsScadaPipeControl12.Description = "Element Description"
-        Me.BsScadaPipeControl12.End1Visible = False
-        Me.BsScadaPipeControl12.End2Visible = False
-        Me.BsScadaPipeControl12.FluidColor = System.Drawing.Color.Transparent
-        Me.BsScadaPipeControl12.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BsScadaPipeControl12.Group = "GROUP"
-        Me.BsScadaPipeControl12.Identity = "ID"
-        Me.BsScadaPipeControl12.InnerColor = System.Drawing.Color.WhiteSmoke
-        Me.BsScadaPipeControl12.IsAlarm = False
-        Me.BsScadaPipeControl12.Location = New System.Drawing.Point(475, 256)
-        Me.BsScadaPipeControl12.Margin = New System.Windows.Forms.Padding(0)
-        Me.BsScadaPipeControl12.Name = "BsScadaPipeControl12"
-        Me.BsScadaPipeControl12.Orientation = Biosystems.Ax00.Controls.UserControls.BsScadaControl.Orientations._90
-        Me.BsScadaPipeControl12.OuterColor = System.Drawing.Color.DimGray
-        Me.BsScadaPipeControl12.OuterWidth = 1
-        Me.BsScadaPipeControl12.PipeType = Biosystems.Ax00.Controls.UserControls.BsScadaPipeControl.PipeTypes._0
-        Me.BsScadaPipeControl12.PipeWidth = 5
-        Me.BsScadaPipeControl12.Selected = False
-        Me.BsScadaPipeControl12.Size = New System.Drawing.Size(5, 47)
-        Me.BsScadaPipeControl12.TabIndex = 163
-        Me.BsScadaPipeControl12.ToolTipText = ""
         '
         'BsScadaPipeControl10
         '
