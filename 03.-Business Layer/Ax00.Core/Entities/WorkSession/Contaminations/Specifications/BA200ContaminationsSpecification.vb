@@ -159,13 +159,16 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
 
             Dim table As New vWSExecutionsDS.twksWSBbireactiveContextDataTable
             For Each disp In lastestBireactives
-                table.AddtwksWSBbireactiveContextRow(
+                Dim row = table.AddtwksWSBbireactiveContextRow(
                     AnalyzerManager.GetCurrentAnalyzerManager.ActiveWorkSession,
                     AnalyzerManager.GetCurrentAnalyzerManager.ActiveAnalyzer,
                     disp.ExecutionID,
                     CByte(disp.KindOfLiquid),
                     CShort(disp.R1ReagentID),
                     disp.WashingID)
+                If disp.KindOfLiquid = KindOfDispensedLiquid.Washing Then
+                    row.ExecutionID = disp.WashingID
+                End If
             Next
 
             Dim serializationOfData As New Task(Sub()

@@ -198,6 +198,9 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
 
                 orderTestLockedByLISList = Nothing
 
+                Dim a = New Ax00.Data.vWSExecutionsDAO
+                a.ClearBireactivesContext()
+
             Catch ex As Exception
                 'When the Database Connection was opened locally, then the Rollback is executed
                 If (GlobalConstants.CreateWSExecutionsWithMultipleTransactions) Then
