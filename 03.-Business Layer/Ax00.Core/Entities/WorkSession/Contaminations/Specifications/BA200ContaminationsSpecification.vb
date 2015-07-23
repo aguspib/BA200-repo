@@ -41,8 +41,14 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
                     testReagentsDataDS = GetAllReagents()
                 End If
 
-                Dim result = (From a In testReagentsDataDS.tparTestReagents
-                              Where a.ReagentID = reagentID Select a.ReagentsNumber).First
+                Dim resultList = (From a In testReagentsDataDS.tparTestReagents
+                              Where a.ReagentID = reagentID Select a.ReagentsNumber)
+                Dim result As AnalysisMode
+                If resultList IsNot Nothing AndAlso resultList.Any Then
+                    result = DirectCast(resultList.First(), AnalysisMode)
+                Else
+                    result = AnalysisMode.MonoReactive
+                End If
 
                 Dim mode = CType(result, AnalysisMode)
                 catchedReagents.TryAdd(reagentID, mode)
@@ -72,16 +78,6 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
 
             Return testReagentsDataDS
         End Function
-
-        Public Overrides Sub FillContextFromAnayzerData(ByVal instruction As String)
-            MyBase.FillContextFromAnayzerData(instruction)
-            'Handle bireactive long lasting memory
-            HandleBireactives()
-            If lastestBireactives IsNot Nothing AndAlso lastestBireactives.Any Then
-                Debug.WriteLine("Historic bireactives context:")
-                Debug.WriteLine(GetHistoricalBireactivesContext.ToString)
-            End If
-        End Sub
 
 
         Private lastestBireactives As LinkedList(Of IDispensing)
@@ -191,5 +187,15 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
             End If
             Return auxContext
         End Function
+
+        Protected Overrides Sub OnContextRequestProcessed()
+            HandleBireactives()
+            If lastestBireactives IsNot Nothing AndAlso lastestBireactives.Any Then
+                Debug.WriteLine("Historic bireactives context:")
+                Debug.WriteLine(GetHistoricalBireactivesContext.ToString)
+            End If
+        End Sub
+
+
     End Class
 End Namespace
