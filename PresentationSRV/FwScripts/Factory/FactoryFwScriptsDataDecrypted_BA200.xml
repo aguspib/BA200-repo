@@ -364,6 +364,7 @@
       <SyntaxOK>false</SyntaxOK>
       <TestedOK>false</TestedOK>
     </FwScriptTO>
+    <!--
     <FwScriptTO>
       <FwScriptID>6</FwScriptID>
       <ActionID>REAGENT2_ARM_HOME_POLAR</ActionID>
@@ -392,7 +393,8 @@
       <SyntaxOK>false</SyntaxOK>
       <TestedOK>false</TestedOK>
     </FwScriptTO>
-    <FwScriptTO>
+    -->
+    <!--<FwScriptTO>
       <FwScriptID>7</FwScriptID>
       <ActionID>REAGENT2_ARM_HOME_Z</ActionID>
       <Description>takes Reagent2 Arm to Vertical Home</Description>
@@ -419,7 +421,7 @@
       <Author>SW</Author>
       <SyntaxOK>false</SyntaxOK>
       <TestedOK>false</TestedOK>
-    </FwScriptTO>
+    </FwScriptTO>-->
     <FwScriptTO>
       <FwScriptID>8</FwScriptID>
       <ActionID>MIXER1_ARM_HOME_POLAR</ActionID>
@@ -4777,7 +4779,7 @@
           <InstructionID>4</InstructionID>
           <Sequence>4</Sequence>
           <Timer>139</Timer>
-          <Code>JE1.M2.MPV</Code>
+          <Code>JE1.M1.MPV</Code>
           <Params>4000.50000</Params>
           <EnableEdition>true</EnableEdition>
         </InstructionTO>
@@ -4793,14 +4795,14 @@
           <InstructionID>6</InstructionID>
           <Sequence>6</Sequence>
           <Timer>198</Timer>
-          <Code>JE1.M2.MMR</Code>
+          <Code>JE1.M1.MMR</Code>
           <Params>-100</Params>
           <EnableEdition>true</EnableEdition>
         </InstructionTO>
         <InstructionTO>
           <InstructionID>7</InstructionID>
           <Sequence>7</Sequence>
-          <Timer>306</Timer>
+          <Timer>2306</Timer>
           <Code>BR1.MV.MMA</Code>
           <Params>#3@</Params>
           <EnableEdition>false</EnableEdition>
@@ -4808,7 +4810,7 @@
         <InstructionTO>
           <InstructionID>8</InstructionID>
           <Sequence>8</Sequence>
-          <Timer>482</Timer>
+          <Timer>2482</Timer>
           <Code>BR1.MV.MPV</Code>
           <Params>14000.400000</Params>
           <EnableEdition>true</EnableEdition>
@@ -4816,7 +4818,7 @@
         <InstructionTO>
           <InstructionID>9</InstructionID>
           <Sequence>9</Sequence>
-          <Timer>483</Timer>
+          <Timer>2483</Timer>
           <Code>DR1.DE.LDE</Code>
           <Params />
           <EnableEdition>true</EnableEdition>
@@ -4824,7 +4826,7 @@
         <InstructionTO>
           <InstructionID>10</InstructionID>
           <Sequence>10</Sequence>
-          <Timer>483</Timer>
+          <Timer>2483</Timer>
           <Code>BR1.MV.MMD</Code>
           <Params>#4@</Params>
           <EnableEdition>false</EnableEdition>
@@ -4832,15 +4834,15 @@
         <InstructionTO>
           <InstructionID>11</InstructionID>
           <Sequence>11</Sequence>
-          <Timer>1487</Timer>
-          <Code>JE1.M2.MMR</Code>
+          <Timer>3487</Timer>
+          <Code>JE1.M1.MMR</Code>
           <Params>-2500</Params>
           <EnableEdition>true</EnableEdition>
         </InstructionTO>
         <InstructionTO>
           <InstructionID>12</InstructionID>
           <Sequence>12</Sequence>
-          <Timer>1700</Timer>
+          <Timer>3700</Timer>
           <Code>BR1.MV.MED</Code>
           <Params />
           <EnableEdition>true</EnableEdition>
@@ -4848,7 +4850,7 @@
         <InstructionTO>
           <InstructionID>13</InstructionID>
           <Sequence>13</Sequence>
-          <Timer>2560</Timer>
+          <Timer>4560</Timer>
           <Code>BR1.MV.MPV</Code>
           <Params>3000.500000</Params>
           <EnableEdition>true</EnableEdition>
@@ -4856,7 +4858,7 @@
         <InstructionTO>
           <InstructionID>14</InstructionID>
           <Sequence>14</Sequence>
-          <Timer>2562</Timer>
+          <Timer>4562</Timer>
           <Code>BR1.MV.MMR</Code>
           <Params>-1000</Params>
           <EnableEdition>true</EnableEdition>
@@ -4864,15 +4866,15 @@
         <InstructionTO>
           <InstructionID>15</InstructionID>
           <Sequence>15</Sequence>
-          <Timer>2951</Timer>
-          <Code>JE1.M2.MMR</Code>
+          <Timer>4951</Timer>
+          <Code>JE1.M1.MMR</Code>
           <Params>-15</Params>
           <EnableEdition>true</EnableEdition>
         </InstructionTO>
         <InstructionTO>
           <InstructionID>16</InstructionID>
           <Sequence>16</Sequence>
-          <Timer>2986</Timer>
+          <Timer>4986</Timer>
           <Code>BR1.MV.MPV</Code>
           <Params>50000.500000</Params>
           <EnableEdition>true</EnableEdition>
@@ -4880,7 +4882,7 @@
         <InstructionTO>
           <InstructionID>17</InstructionID>
           <Sequence>17</Sequence>
-          <Timer>2991</Timer>
+          <Timer>4991</Timer>
           <Code>BR1.MV.MMA</Code>
           <Params>#5@</Params>
           <EnableEdition>false</EnableEdition>
@@ -4888,7 +4890,7 @@
         <InstructionTO>
           <InstructionID>18</InstructionID>
           <Sequence>18</Sequence>
-          <Timer>3451</Timer>
+          <Timer>5451</Timer>
           <Code>BR1.MH.MPV</Code>
           <Params>26666.266666</Params>
           <EnableEdition>true</EnableEdition>
@@ -4896,7 +4898,7 @@
         <InstructionTO>
           <InstructionID>19</InstructionID>
           <Sequence>19</Sequence>
-          <Timer>3456</Timer>
+          <Timer>5456</Timer>
           <Code>BR1.MH.MMA</Code>
           <Params>#6@</Params>
           <EnableEdition>false</EnableEdition>
@@ -4904,23 +4906,23 @@
         <InstructionTO>
           <InstructionID>20</InstructionID>
           <Sequence>20</Sequence>
-          <Timer>4570</Timer>
-          <Code>JE1.M2.MPV</Code>
+          <Timer>6570</Timer>
+          <Code>JE1.M1.MPV</Code>
           <Params>6000.90000</Params>
           <EnableEdition>true</EnableEdition>
         </InstructionTO>
         <InstructionTO>
           <InstructionID>21</InstructionID>
           <Sequence>21</Sequence>
-          <Timer>4575</Timer>
-          <Code>JE1.M2.MMA</Code>
+          <Timer>6575</Timer>
+          <Code>JE1.M1.MMA</Code>
           <Params>9700</Params>
           <EnableEdition>true</EnableEdition>
         </InstructionTO>
         <InstructionTO>
           <InstructionID>22</InstructionID>
           <Sequence>22</Sequence>
-          <Timer>6000</Timer>
+          <Timer>8000</Timer>
           <Code>BR1.MH.MMR</Code>
           <Params>500</Params>
           <EnableEdition>true</EnableEdition>
@@ -4928,7 +4930,7 @@
         <InstructionTO>
           <InstructionID>23</InstructionID>
           <Sequence>23</Sequence>
-          <Timer>6500</Timer>
+          <Timer>8500</Timer>
           <Code>END</Code>
           <Params />
           <EnableEdition>true</EnableEdition>
@@ -4940,7 +4942,7 @@
       <SyntaxOK>false</SyntaxOK>
       <TestedOK>false</TestedOK>
     </FwScriptTO>
-    <FwScriptTO>
+    <!--<FwScriptTO>
       <FwScriptID>2011</FwScriptID>
       <ActionID>NEEDLES_DISPENSE_R2</ActionID>
       <Description>dispenses reagent through the reagent arm 2</Description>
@@ -5136,6 +5138,7 @@
       <SyntaxOK>false</SyntaxOK>
       <TestedOK>false</TestedOK>
     </FwScriptTO>
+    -->
     <FwScriptTO>
       <FwScriptID>2012</FwScriptID>
       <ActionID>NEEDLES_PRIME_R1</ActionID>
@@ -5168,7 +5171,7 @@
         <InstructionTO>
           <InstructionID>4</InstructionID>
           <Sequence>4</Sequence>
-          <Timer>2500</Timer>
+          <Timer>3500</Timer>
           <Code>BR1.MH.MMA</Code>
           <Params>#2@</Params>
           <EnableEdition>false</EnableEdition>
@@ -5176,7 +5179,7 @@
         <InstructionTO>
           <InstructionID>5</InstructionID>
           <Sequence>5</Sequence>
-          <Timer>4500</Timer>
+          <Timer>6500</Timer>
           <Code>BR1.MV.MMR</Code>
           <Params>#3@</Params>
           <EnableEdition>false</EnableEdition>
@@ -5184,71 +5187,71 @@
         <InstructionTO>
           <InstructionID>6</InstructionID>
           <Sequence>6</Sequence>
-          <Timer>5500</Timer>
-          <Code>JE1.M2.MPV</Code>
+          <Timer>7500</Timer>
+          <Code>JE1.M1.MPV</Code>
           <Params>4000.50000</Params>
           <EnableEdition>true</EnableEdition>
         </InstructionTO>
         <InstructionTO>
           <InstructionID>7</InstructionID>
           <Sequence>7</Sequence>
-          <Timer>5500</Timer>
-          <Code>JE1.E2.EON</Code>
+          <Timer>7500</Timer>
+          <Code>JE1.E1.EON</Code>
           <Params />
           <EnableEdition>true</EnableEdition>
         </InstructionTO>
         <InstructionTO>
           <InstructionID>8</InstructionID>
           <Sequence>8</Sequence>
-          <Timer>6000</Timer>
-          <Code>JE1.B2.DCS</Code>
+          <Timer>8000</Timer>
+          <Code>JE1.B1.DCS</Code>
           <Params>100.1</Params>
           <EnableEdition>true</EnableEdition>
         </InstructionTO>
         <InstructionTO>
           <InstructionID>9</InstructionID>
           <Sequence>9</Sequence>
-          <Timer>7000</Timer>
-          <Code>JE1.M2.MMA</Code>
+          <Timer>9000</Timer>
+          <Code>JE1.M1.MMA</Code>
           <Params>9800</Params>
           <EnableEdition>true</EnableEdition>
         </InstructionTO>
         <InstructionTO>
           <InstructionID>10</InstructionID>
           <Sequence>10</Sequence>
-          <Timer>10000</Timer>
-          <Code>JE1.M2.MMR</Code>
+          <Timer>12000</Timer>
+          <Code>JE1.M1.MMR</Code>
           <Params>-80</Params>
           <EnableEdition>true</EnableEdition>
         </InstructionTO>
         <InstructionTO>
           <InstructionID>11</InstructionID>
           <Sequence>11</Sequence>
-          <Timer>11000</Timer>
-          <Code>SF1.B2.DCS</Code>
+          <Timer>13000</Timer>
+          <Code>SF1.B1.DCS</Code>
           <Params>100.1</Params>
           <EnableEdition>true</EnableEdition>
         </InstructionTO>
         <InstructionTO>
           <InstructionID>12</InstructionID>
           <Sequence>12</Sequence>
-          <Timer>12000</Timer>
-          <Code>JE1.B2.DCE</Code>
+          <Timer>14000</Timer>
+          <Code>JE1.B1.DCE</Code>
           <Params />
           <EnableEdition>true</EnableEdition>
         </InstructionTO>
         <InstructionTO>
           <InstructionID>13</InstructionID>
           <Sequence>13</Sequence>
-          <Timer>13000</Timer>
-          <Code>JE1.E2.EOF</Code>
+          <Timer>15000</Timer>
+          <Code>JE1.E1.EOF</Code>
           <Params />
           <EnableEdition>true</EnableEdition>
         </InstructionTO>
         <InstructionTO>
           <InstructionID>14</InstructionID>
           <Sequence>14</Sequence>
-          <Timer>14000</Timer>
+          <Timer>16000</Timer>
           <Code>BR1.MV.MPV</Code>
           <Params>3000.500000</Params>
           <EnableEdition>true</EnableEdition>
@@ -5256,7 +5259,7 @@
         <InstructionTO>
           <InstructionID>15</InstructionID>
           <Sequence>15</Sequence>
-          <Timer>14050</Timer>
+          <Timer>16050</Timer>
           <Code>BR1.MV.MMR</Code>
           <Params>-1600</Params>
           <EnableEdition>true</EnableEdition>
@@ -5264,15 +5267,15 @@
         <InstructionTO>
           <InstructionID>16</InstructionID>
           <Sequence>16</Sequence>
-          <Timer>16000</Timer>
-          <Code>SF1.B2.DCE</Code>
+          <Timer>18000</Timer>
+          <Code>SF1.B1.DCE</Code>
           <Params />
           <EnableEdition>true</EnableEdition>
         </InstructionTO>
         <InstructionTO>
           <InstructionID>17</InstructionID>
           <Sequence>17</Sequence>
-          <Timer>17000</Timer>
+          <Timer>19000</Timer>
           <Code>BR1.MV.MPV</Code>
           <Params>50000.500000</Params>
           <EnableEdition>true</EnableEdition>
@@ -5280,7 +5283,7 @@
         <InstructionTO>
           <InstructionID>18</InstructionID>
           <Sequence>18</Sequence>
-          <Timer>17050</Timer>
+          <Timer>19050</Timer>
           <Code>BR1.MV.MMA</Code>
           <Params>#4@</Params>
           <EnableEdition>false</EnableEdition>
@@ -5288,7 +5291,7 @@
         <InstructionTO>
           <InstructionID>19</InstructionID>
           <Sequence>19</Sequence>
-          <Timer>21000</Timer>
+          <Timer>23000</Timer>
           <Code>BR1.MH.MMR</Code>
           <Params>500</Params>
           <EnableEdition>true</EnableEdition>
@@ -5296,7 +5299,7 @@
         <InstructionTO>
           <InstructionID>20</InstructionID>
           <Sequence>20</Sequence>
-          <Timer>23000</Timer>
+          <Timer>25000</Timer>
           <Code>END</Code>
           <Params />
           <EnableEdition>true</EnableEdition>
@@ -5308,7 +5311,7 @@
       <SyntaxOK>false</SyntaxOK>
       <TestedOK>false</TestedOK>
     </FwScriptTO>
-    <FwScriptTO>
+    <!--<FwScriptTO>
       <FwScriptID>2013</FwScriptID>
       <ActionID>NEEDLES_PRIME_R2</ActionID>
       <Description>Primes the Reagent2 arm</Description>
@@ -5480,6 +5483,7 @@
       <SyntaxOK>false</SyntaxOK>
       <TestedOK>false</TestedOK>
     </FwScriptTO>
+    -->
     <FwScriptTO>
       <FwScriptID>2014</FwScriptID>
       <ActionID>ROTOR_PRIME_INI</ActionID>

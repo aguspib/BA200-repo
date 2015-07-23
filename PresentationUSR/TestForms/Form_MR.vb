@@ -1,4 +1,5 @@
-﻿Imports Biosystems.Ax00.Core.Interfaces
+﻿Imports System.IO
+Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Core.Entities
 Imports Biosystems.Ax00.Core.Services.BaseLine
 Imports Biosystems.Ax00.Global
@@ -37,4 +38,40 @@ Public Class Form_MR
         blService.UpdateAnalyzerSettings()
 
     End Sub
-End Class
+
+    Private Sub btnLogActivity_Click(sender As Object, e As EventArgs) Handles btnLogActivity.Click
+        Dim i As String
+        Try
+            'If Not IsNumeric(i) Then
+            '    Throw New ArgumentException("Error: El valor introducido no es numérico")
+            'End If
+
+            CreateLogActivity(EventLogEntryType.Information)
+
+            'nombredelafuncion()
+        Catch ex As Exception
+            CreateLogActivity(ex)
+        End Try
+
+
+
+
+        'CheckTemperaturesAlarms(Nothing, pSensors(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_FRIDGE), _
+        '                pSensors(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_REACTIONS), _
+        '                pSensors(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_WASHINGSTATION), _
+        '                pSensors(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_R1), _
+        '                pSensors(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_R2), myAlarmList, myAlarmStatusList)
+
+
+
+
+    End Sub
+    Private Sub nombredelafuncion()
+        Dim st As New System.Diagnostics.StackTrace()
+
+        ' Obtenemos el último marco de la pila
+        Dim nombreMetodo As String = st.GetFrame(1).GetMethod.DeclaringType.FullName() & "." & st.GetFrame(1).GetMethod().Name & "." & st.GetFrame(0).GetMethod().Name
+
+    End Sub
+
+    End Class

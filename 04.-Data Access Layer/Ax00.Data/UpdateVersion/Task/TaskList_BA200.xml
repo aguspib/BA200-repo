@@ -1073,6 +1073,66 @@ WHERE [LimitID] IN ('SRV_MIXER1_POLAR_LIMIT','SRV_MIXER1_Z_FINE_LIMIT','SRV_MIXE
             Select 'False'
           </IntegrityScript> 
         </DataRevision>
+        <DataRevision JiraID="BA-2650" SequenceNumber="6">
+          <PrerequisiteScript>
+          </PrerequisiteScript>
+          <DataScript>
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'LBL_SRV_SamplesAndReagentsArm') AND (UPPER([LanguageID]) = 'ENG'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('LBL_SRV_SamplesAndReagentsArm', 'ENG', N'Samples and Reagents arm', 1, GETDATE() ,  'IT', '03.00.09',  0, NULL, NULL, 'IT', GETDATE() )
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'LBL_SRV_SamplesAndReagentsArm') AND (UPPER([LanguageID]) = 'SPA'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('LBL_SRV_SamplesAndReagentsArm', 'SPA', N'Brazo muestras y reactivos.', 1, GETDATE()  ,  'IT', '03.00.09',  0, NULL, NULL, 'IT', GETDATE()  )
+            END
+            GO
+
+            DELETE FROM [A200].[dbo].[srv_tadjPreliminaryHomes]
+            WHERE RequiredHomeID = 'REAGENT2_ARM_HOME_Z'
+            AND AdjustmentGroupID IN ('THERMOS_REAGENT1','THERMOS_REAGENT2')
+
+            DELETE FROM [A200].[dbo].[srv_tadjPreliminaryHomes]
+            WHERE AdjustmentGroupID = 'THERMOS_REAGENT2'
+
+            UPDATE [A200].[dbo].[srv_tadjPreliminaryHomes]
+            SET ExeOrder = 2
+            WHERE AdjustmentGroupID = 'THERMOS_REAGENT1'
+            AND RequiredHomeID = 'REAGENTS_HOME_ROTOR'
+
+            UPDATE [A200].[dbo].[srv_tadjPreliminaryHomes]
+            SET ExeOrder = 3
+            WHERE AdjustmentGroupID = 'THERMOS_REAGENT1'
+            AND RequiredHomeID = 'REAGENT1_ARM_HOME_POLAR'
+
+          </DataScript>
+          <IntegrityScript>
+            IF ( (EXISTS (SELECT * FROM [A200].[dbo].[tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'LBL_SRV_SamplesAndReagentsArm')))
+            AND (NOT EXISTS (SELECT * FROM [A200].[dbo].[srv_tadjPreliminaryHomes] WHERE RequiredHomeID = 'REAGENT2_ARM_HOME_Z' AND AdjustmentGroupID IN ('THERMOS_REAGENT1','THERMOS_REAGENT2')))
+            AND (NOT EXISTS (SELECT * FROM [A200].[dbo].[srv_tadjPreliminaryHomes] WHERE RequiredHomeID = 'THERMOS_REAGENT2'))
+            AND (EXISTS (SELECT * FROM [A200].[dbo].[srv_tadjPreliminaryHomes] WHERE RequiredHomeID = 'REAGENTS_HOME_ROTOR' AND AdjustmentGroupID = 'THERMOS_REAGENT1' AND ExeOrder = 2))
+            AND (EXISTS (SELECT * FROM [A200].[dbo].[srv_tadjPreliminaryHomes] WHERE RequiredHomeID = 'REAGENT1_ARM_HOME_POLAR' AND AdjustmentGroupID = 'THERMOS_REAGENT1' AND ExeOrder = 3)))
+            Select 'True'
+            ELSE
+            Select 'False'
+          </IntegrityScript>
+        </DataRevision>
+        <DataRevision JiraID="BA-2649" SequenceNumber="7">
+          <PrerequisiteScript>
+          </PrerequisiteScript>
+          <DataScript>
+              UPDATE [A200].[dbo].[tfmwSwParameters] 
+              SET ValueNumeric = 2
+              WHERE ParameterName = 'SRV_WELLS_TO_MEASURE_GLF_THERMO'
+              AND AnalyzerModel = 'A200'
+          </DataScript>
+          <IntegrityScript>
+              IF (EXISTS (SELECT * FROM [A200].[dbo].[tfmwSwParameters] WHERE ParameterName = 'SRV_WELLS_TO_MEASURE_GLF_THERMO' AND AnalyzerModel = 'A200' AND ValueNumeric = 2))
+              Select 'True'
+              ELSE
+              Select 'False'
+          </IntegrityScript> 
+        </DataRevision>
       </DataRevisions>
     </Release>
     <!-- 
