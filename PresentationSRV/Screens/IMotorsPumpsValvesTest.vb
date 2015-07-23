@@ -1105,6 +1105,7 @@ Public Class UiMotorsPumpsValvesTest
                 BsScadaPipeControl49.Visible = False
                 BsScadaPipeControl63.Visible = False
                 BsScadaPipeControl58.Visible = False
+                BsScadaPipeControl59.Visible = False
                 BsScadaPipeControl17.Visible = False
                 InDo_Reagent2_EValve.Visible = False
                 InDo_EV3_Label.Visible = False
@@ -1112,6 +1113,8 @@ Public Class UiMotorsPumpsValvesTest
                 InDo_JB3_Label.Visible = False
                 InDo_Reagent2_Motor.Visible = False
                 InDo_M3_Label.Visible = False
+                InDo_Reagent2_Pump.Visible = False
+                InDo_Reagent2NeedleLabel.Visible = False
 
                 'Hide Reagent1 Elements
                 BsScadaPipeControl60.Visible = False
@@ -1128,6 +1131,7 @@ Public Class UiMotorsPumpsValvesTest
                 InDo_Reagent1_Pump.Visible = False
                 InDo_Reagent1_Motor.Visible = False
                 InDo_M2_Label.Visible = False
+                InDo_Reagent1NeedleLabel.Visible = False
             Else
                 Me.InDo_SamplesNeedleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_SamplesNeedle", pLanguageID)
                 Me.InDo_Reagent1NeedleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Reagent1Needle", pLanguageID)
