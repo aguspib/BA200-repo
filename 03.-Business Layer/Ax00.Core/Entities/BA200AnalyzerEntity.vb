@@ -68,28 +68,28 @@ Namespace Biosystems.Ax00.Core.Entities
                 SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read) = ""
         End Function
 
-        Public Overrides ReadOnly Property GetModelValue(ByVal pAnalyzerID As String) As String
-            'AJG Pendiente de poner lo que le toca
-            Get
-                Dim returnValue As String = ""
+        'Public Overrides ReadOnly Property GetModelValue(ByVal pAnalyzerID As String) As String
+        '    'AJG Pendiente de poner lo que le toca
+        '    Get
+        '        Dim returnValue As String = ""
 
-                If pAnalyzerID.Length > 0 Then
-                    Dim strTocompare As String
+        '        If pAnalyzerID.Length > 0 Then
+        '            Dim strTocompare As String
 
-                    strTocompare = GetUpperPartSN(pAnalyzerID)
+        '            strTocompare = GetUpperPartSN(pAnalyzerID)
 
-                    Select Case strTocompare
-                        Case "SN0"  ' Generic
-                            returnValue = "A200"
+        '            Select Case strTocompare
+        '                Case "SN0"  ' Generic
+        '                    returnValue = "A200"
 
-                        Case GlobalBase.BA400ModelID
-                            returnValue = "A200"
-                    End Select
-                End If
+        '                Case GlobalBase.BA400ModelID
+        '                    returnValue = "A200"
+        '            End Select
+        '        End If
 
-                Return returnValue
-            End Get
-        End Property
+        '        Return returnValue
+        '    End Get
+        'End Property
 #End Region
 
         Public Overrides ReadOnly Property WashingIDRequired As Boolean
