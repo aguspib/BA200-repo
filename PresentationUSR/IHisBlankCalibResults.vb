@@ -10,6 +10,7 @@ Imports Biosystems.Ax00.BL
 Imports System.Windows.Forms
 Imports System.Drawing
 Imports System.Globalization
+Imports Biosystems.Ax00.App
 Imports Biosystems.Ax00.PresentationCOM
 
 Public Class UiHisBlankCalibResults
@@ -1413,16 +1414,20 @@ Public Class UiHisBlankCalibResults
                       Select row).ToList()
                     If TestList.Count > 0 Then
                         'Get the analyzer mode
-                        Dim myAnalyzers As New AnalyzersDelegate
-                        Dim myModel As String = "A400" 'Default value
-                        resultData = myAnalyzers.GetAnalyzerModel(Nothing, pRow.AnalyzerID)
-                        If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-                            Dim analyzerCfgDS As New AnalyzersDS
-                            analyzerCfgDS = CType(resultData.SetDatos, AnalyzersDS)
-                            If analyzerCfgDS.tcfgAnalyzers.Rows.Count > 0 AndAlso Not analyzerCfgDS.tcfgAnalyzers.First.IsAnalyzerModelNull Then
-                                myModel = analyzerCfgDS.tcfgAnalyzers.First.AnalyzerModel
-                            End If
-                        End If
+
+                        'AJG. Re-Factoring code
+                        'Dim myAnalyzers As New AnalyzersDelegate
+                        'Dim myModel As String = "A400" 'Default value
+                        'resultData = myAnalyzers.GetAnalyzerModel(Nothing, pRow.AnalyzerID)
+                        'If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                        '    Dim analyzerCfgDS As New AnalyzersDS
+                        '    analyzerCfgDS = CType(resultData.SetDatos, AnalyzersDS)
+                        '    If analyzerCfgDS.tcfgAnalyzers.Rows.Count > 0 AndAlso Not analyzerCfgDS.tcfgAnalyzers.First.IsAnalyzerModelNull Then
+                        '        myModel = analyzerCfgDS.tcfgAnalyzers.First.AnalyzerModel
+                        '    End If
+                        'End If
+
+                        Dim myModel = AnalyzerController.Instance.Analyzer.GetModelValue(pRow.AnalyzerID)
 
                         'Open the aux screen
                         Using myCurveForm As New UiResultsCalibCurve
