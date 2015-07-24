@@ -1790,6 +1790,7 @@ Partial Class UiMotorsPumpsValvesTest
         Me.InDo_SamplesNeedleLabel.TabIndex = 91
         Me.InDo_SamplesNeedleLabel.Text = "Samples needle"
         Me.InDo_SamplesNeedleLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.InDo_SamplesNeedleLabel.UseMnemonic = False
         '
         'BsInternalDosingTestTitleLabel
         '

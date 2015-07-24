@@ -1350,8 +1350,12 @@ Public Class UiMotorsPumpsValvesTest
     ''' </summary>
     ''' <remarks>Created by SGM 13/05/2011</remarks>
     Private Sub InitializeInternalDosing()
+        Dim toolTipModelChoice As String = ""
         Try
-
+            If AnalyzerController.Instance.IsBA200 Then
+                'Used to get the correct tooltip text of the BA200 model on different elements
+                toolTipModelChoice = "_BA200"
+            End If
             'Syringes
             With InDo_Samples_Syringe
                 .Selected = False
@@ -1380,7 +1384,7 @@ Public Class UiMotorsPumpsValvesTest
                 .ActivationState = BsScadaControl.States._OFF
                 .CurrentPosition = 1542 'for simulation
                 .Cursor = Cursors.Hand
-                .ToolTipText = MyBase.GetHWElementsName(.Identity, LanguageID)
+                .ToolTipText = MyBase.GetHWElementsName(.Identity & toolTipModelChoice, LanguageID)
             End With
             TestableElements.Add(InDo_Samples_Motor)
 
@@ -1413,7 +1417,7 @@ Public Class UiMotorsPumpsValvesTest
                 .ActivationState = BsScadaControl.States._OFF
                 .Cursor = Cursors.Hand
                 .Enabled = False
-                .ToolTipText = MyBase.GetHWElementsName(.Identity, LanguageID)
+                .ToolTipText = MyBase.GetHWElementsName(.Identity & toolTipModelChoice, LanguageID)
             End With
             TestableElements.Add(InDo_Samples_EValve)
 
@@ -1446,7 +1450,7 @@ Public Class UiMotorsPumpsValvesTest
                 .ActivationState = BsScadaControl.States._OFF
                 .Cursor = Cursors.Hand
                 .Enabled = False
-                .ToolTipText = MyBase.GetHWElementsName(.Identity, LanguageID)
+                .ToolTipText = MyBase.GetHWElementsName(.Identity & toolTipModelChoice, LanguageID)
             End With
             TestableElements.Add(InDo_Samples_Pump)
 
@@ -8787,9 +8791,4 @@ Public Class UiMotorsPumpsValvesTest
 
 #End Region
 
-
-
-    Private Sub InDo_Air_Ws_3Evalve_Load(sender As Object, e As EventArgs) Handles InDo_Air_Ws_3Evalve.Load
-
-    End Sub
 End Class
