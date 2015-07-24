@@ -879,28 +879,28 @@ Namespace Biosystems.Ax00.Core.Entities
         'End Property
 
 
-        Public ReadOnly Property GetModelValue(ByVal pAnalyzerID As String) As String Implements IAnalyzerManager.GetModelValue
-            Get
-                'AG 10/11/2014 BA-2082 pending to adapt for compatibility between BA200 and BA400
-                Dim returnValue As String = ""
+        Public MustOverride ReadOnly Property GetModelValue(ByVal pAnalyzerID As String) As String Implements IAnalyzerManager.GetModelValue
+        '    Get
+        '        'AG 10/11/2014 BA-2082 pending to adapt for compatibility between BA200 and BA400
+        '        Dim returnValue As String = ""
 
-                If pAnalyzerID.Length > 0 Then
-                    Dim strTocompare As String
+        '        If pAnalyzerID.Length > 0 Then
+        '            Dim strTocompare As String
 
-                    strTocompare = GetUpperPartSN(pAnalyzerID)
+        '            strTocompare = GetUpperPartSN(pAnalyzerID)
 
-                    Select Case strTocompare
-                        Case "SN0"  ' Generic
-                            returnValue = "A200"
+        '            Select Case strTocompare
+        '                Case "SN0"  ' Generic
+        '                    returnValue = "A200"
 
-                        Case GlobalBase.BA400ModelID
-                            returnValue = "A200"
-                    End Select
-                End If
+        '                Case GlobalBase.BA400ModelID
+        '                    returnValue = "A200"
+        '            End Select
+        '        End If
 
-                Return returnValue
-            End Get
-        End Property
+        '        Return returnValue
+        '    End Get
+        'End Property
 
         ' XBC 07/06/2012
         Public ReadOnly Property GetUpperPartSN(ByVal pAnalyzerID As String) As String Implements IAnalyzerManager.GetUpperPartSN
