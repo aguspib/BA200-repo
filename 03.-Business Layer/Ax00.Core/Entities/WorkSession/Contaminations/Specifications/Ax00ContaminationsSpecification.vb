@@ -66,9 +66,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
                     context.FillContentsFromAnalyzer(analyzerFrame)
                     currentContext = context
                     Debug.WriteLine("Context filled in running! " & Mid(instruction, InStr(instruction, "R2B2:")))
-
-
-
+                    OnContextRequestProcessed()
                 End If
             Catch ex As Exception
                 Debug.WriteLine("EXCEPTION FILLING CONTEXT " & ex.Message)
@@ -81,6 +79,10 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
 
 #Region "Private members"
         Protected currentContext As Context.Context
+
+        Protected Overridable Sub OnContextRequestProcessed()
+
+        End Sub
 #End Region
 
         Public MustOverride Function GetActionRequiredInRunning(dispensing As IDispensing) As IActionRequiredForDispensing Implements IAnalyzerContaminationsSpecification.GetActionRequiredInRunning

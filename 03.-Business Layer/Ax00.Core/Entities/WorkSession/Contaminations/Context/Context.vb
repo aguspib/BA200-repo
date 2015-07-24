@@ -226,6 +226,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Context
                 '    Debug.WriteLine(Me)
                 '    Debug.WriteLine("")
             End If
+            If results.Action = IContaminationsAction.RequiredAction.Wash AndAlso results.InvolvedWashes.Any = False Then results.Action = IContaminationsAction.RequiredAction.GoAhead
         End Sub
 
         Private Sub FillSteps()

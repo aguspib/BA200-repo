@@ -771,7 +771,8 @@ Namespace Biosystems.Ax00.Core.Entities
                                 tempSetPoint = FormatToSingle(adjustValue)
                             Else
                                 'Dim myLogAcciones2 As New ApplicationLogManager()
-                                GlobalBase.CreateLogActivity("Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Error, False)
+                                'GlobalBase.CreateLogActivity(Ax00Adjustsments.GTGF.ToString() & "Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Warning, False)
+                                GlobalBase.CreateLogActivity(Ax00Adjustsments.GTGF.ToString() & "Adjust Temperature value not valid.", EventLogEntryType.Warning)
                             End If
 
                             'Verify the Reactions Rotor Temperature is inside the allowed limits: 
@@ -812,7 +813,8 @@ Namespace Biosystems.Ax00.Core.Entities
                                 tempSetPoint = FormatToSingle(adjustValue)
                             Else
                                 'Dim myLogAcciones2 As New ApplicationLogManager()
-                                GlobalBase.CreateLogActivity("Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Error, False)
+                                'GlobalBase.CreateLogActivity(Ax00Adjustsments.GTN1.ToString() & "Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Warning, False)
+                                GlobalBase.CreateLogActivity(Ax00Adjustsments.GTN1.ToString() & "Adjust Temperature value not valid.", EventLogEntryType.Warning)
                             End If
 
                             'Verify the Fridge Temperature is inside the allowed limits: 
@@ -853,7 +855,8 @@ Namespace Biosystems.Ax00.Core.Entities
                                 tempSetPoint = FormatToSingle(adjustValue)
                             Else
                                 'Dim myLogAcciones2 As New ApplicationLogManager()
-                                GlobalBase.CreateLogActivity("Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Error, False)
+                                'GlobalBase.CreateLogActivity(Ax00Adjustsments.GTH1.ToString() & "Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Warning, False)
+                                GlobalBase.CreateLogActivity(Ax00Adjustsments.GTH1.ToString() & "Adjust Temperature value not valid.", EventLogEntryType.Warning)
                             End If
 
                             'Verify the Washing Station Temperature is inside the allowed limits: 
@@ -890,7 +893,8 @@ Namespace Biosystems.Ax00.Core.Entities
                                     tempSetPoint = FormatToSingle(adjustValue)
                                 Else
                                     'Dim myLogAcciones2 As New ApplicationLogManager()
-                                    GlobalBase.CreateLogActivity("Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Error, False)
+                                    'GlobalBase.CreateLogActivity(Ax00Adjustsments.GTR1.ToString() & "Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Warning, False)
+                                    GlobalBase.CreateLogActivity(Ax00Adjustsments.GTR1.ToString() & "Adjust Temperature value not valid.", EventLogEntryType.Warning)
                                 End If
 
                                 'Verify the R1 Arm Temperature is inside the allowed limits: 
@@ -925,7 +929,8 @@ Namespace Biosystems.Ax00.Core.Entities
                                     tempSetPoint = FormatToSingle(adjustValue)
                                 Else
                                     'Dim myLogAcciones2 As New ApplicationLogManager()
-                                    GlobalBase.CreateLogActivity("Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Error, False)
+                                    'GlobalBase.CreateLogActivity(Ax00Adjustsments.GTR2.ToString() & "Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Warning, False)
+                                    GlobalBase.CreateLogActivity(Ax00Adjustsments.GTR2.ToString() & "Adjust Temperature value not valid.", EventLogEntryType.Warning)
                                 End If
 
                                 'Verify the R2 Arm Temperature is inside the allowed limits: 

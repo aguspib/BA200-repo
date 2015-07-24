@@ -1117,6 +1117,22 @@ WHERE [LimitID] IN ('SRV_MIXER1_POLAR_LIMIT','SRV_MIXER1_Z_FINE_LIMIT','SRV_MIXE
             Select 'False'
           </IntegrityScript>
         </DataRevision>
+        <DataRevision JiraID="BA-2649" SequenceNumber="7">
+          <PrerequisiteScript>
+          </PrerequisiteScript>
+          <DataScript>
+              UPDATE [A200].[dbo].[tfmwSwParameters] 
+              SET ValueNumeric = 2
+              WHERE ParameterName = 'SRV_WELLS_TO_MEASURE_GLF_THERMO'
+              AND AnalyzerModel = 'A200'
+          </DataScript>
+          <IntegrityScript>
+              IF (EXISTS (SELECT * FROM [A200].[dbo].[tfmwSwParameters] WHERE ParameterName = 'SRV_WELLS_TO_MEASURE_GLF_THERMO' AND AnalyzerModel = 'A200' AND ValueNumeric = 2))
+              Select 'True'
+              ELSE
+              Select 'False'
+          </IntegrityScript> 
+        </DataRevision>
       </DataRevisions>
     </Release>
     <!-- 

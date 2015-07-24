@@ -198,6 +198,9 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
 
                 orderTestLockedByLISList = Nothing
 
+                Dim a = New Ax00.Data.vWSExecutionsDAO
+                a.ClearBireactivesContext()
+
             Catch ex As Exception
                 'When the Database Connection was opened locally, then the Rollback is executed
                 If (GlobalConstants.CreateWSExecutionsWithMultipleTransactions) Then
@@ -417,9 +420,9 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
                     End If
                 End If
             End If
+
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            GlobalBase.CreateLogActivity("Not RUNNING: Search and Delete NOT IN COURSE " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                            "ExecutionsDelegate.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
+            GlobalBase.CreateLogActivity("Not RUNNING: Search and Delete NOT IN COURSE " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), EventLogEntryType.Information)
             Return resultData
         End Function
 
@@ -500,7 +503,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
             myBlankExecutionsDS.AcceptChanges()
 
             GlobalBase.CreateLogActivity("Get Executions For BLANKS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                            "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
+                                            "ExecutionsDelegate.GetExecutionsForBlanks", EventLogEntryType.Information, False)
 
         End Sub
 
@@ -536,7 +539,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
                 End If
             Next
             GlobalBase.CreateLogActivity("Get Executions For CALIBRATORS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                            "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
+                                            "ExecutionsDelegate.GetExecutionsForCalibrators", EventLogEntryType.Information, False)
 
         End Sub
 
@@ -574,7 +577,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
                 End If
             Next
             GlobalBase.CreateLogActivity("Get Executions For CONTROLS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                            "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
+                                            "ExecutionsDelegate.GetExecutionsForControls", EventLogEntryType.Information, False)
 
         End Sub
 
@@ -612,7 +615,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
                 End If
             Next
             GlobalBase.CreateLogActivity("Get Executions For PATIENTS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                            "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
+                                            "ExecutionsDelegate.GetExecutionsForPatients", EventLogEntryType.Information, False)
         End Sub
 
         ''' <summary>
@@ -819,7 +822,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             GlobalBase.CreateLogActivity("Locks for BLANKS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                            "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
+                                            "ExecutionsDelegate.LockAllTestsFromBlanks", EventLogEntryType.Information, False)
         End Sub
 
         ''' <summary>
@@ -844,7 +847,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             GlobalBase.CreateLogActivity("Locks for CALIBRATORS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                            "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
+                                            "ExecutionsDelegate.LockAllTestsFromCalibrators", EventLogEntryType.Information, False)
         End Sub
 
         ''' <summary>
@@ -897,7 +900,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             GlobalBase.CreateLogActivity("Mark STATS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                            "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
+                                            "ExecutionsDelegate.MarkAllTestsSTAT", EventLogEntryType.Information, False)
         End Sub
 
         ''' <summary>
@@ -923,7 +926,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             GlobalBase.CreateLogActivity("Unify all Pending and Locked " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                            "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
+                                            "ExecutionsDelegate.MovePendingAndLockedExecutions", EventLogEntryType.Information, False)
             Return result
         End Function
 
@@ -990,7 +993,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
             End If
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             GlobalBase.CreateLogActivity("Sort and create all PENDING " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                            "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
+                                            "ExecutionsDelegate.SortAndManageContaminations", EventLogEntryType.Information, False)
             Return resultData
         End Function
 
@@ -1077,7 +1080,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             GlobalBase.CreateLogActivity("Final Processing " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                            "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
+                                            "ExecutionsDelegate.UpdateStatus", EventLogEntryType.Information, False)
 
             Return resultData
         End Function
@@ -1092,8 +1095,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
             Dim resultData = RecalculateStatusForNotDeletedExecutionsNEW(pDBConnection, pAnalyzerID, pWorkSessionID, pWorkInRunningMode, pPauseMode)
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            GlobalBase.CreateLogActivity("Recalculate Status " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                            "ExecutionsDelegate.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
+            GlobalBase.CreateLogActivity("Recalculate Status " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), EventLogEntryType.Information)
 
             Return resultData
         End Function
@@ -1207,7 +1209,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession
             If GlobalConstants.CreateWSExecutionsWithSemaphore AndAlso pManualRerunFlag Then
                 GlobalSemaphores.createWSExecutionsSemaphore.Release()
                 GlobalSemaphores.createWSExecutionsQueue = 0 'Only 1 thread is allowed, so reset to 0 instead of decrement --1 'GlobalSemaphores.createWSExecutionsQueue -= 1
-                GlobalBase.CreateLogActivity("CreateWSExecutions semaphore: Released, semaphore free", "AnalyzerManager.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
+                GlobalBase.CreateLogActivity("CreateWSExecutions semaphore: Released, semaphore free", EventLogEntryType.Information)
             End If
         End Sub
 
