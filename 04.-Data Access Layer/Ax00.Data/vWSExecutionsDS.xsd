@@ -122,7 +122,7 @@
   <xs:element name="vWSExecutionsDS" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="true" msprop:Generator_DataSetName="vWSExecutionsDS" msprop:Generator_UserDSName="vWSExecutionsDS">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
-        <xs:element name="vWSExecutionsSELECT" msprop:Generator_TableClassName="vWSExecutionsSELECTDataTable" msprop:Generator_TableVarName="tablevWSExecutionsSELECT" msprop:Generator_RowChangedName="vWSExecutionsSELECTRowChanged" msprop:Generator_TablePropName="vWSExecutionsSELECT" msprop:Generator_RowDeletingName="vWSExecutionsSELECTRowDeleting" msprop:Generator_RowChangingName="vWSExecutionsSELECTRowChanging" msprop:Generator_RowEvHandlerName="vWSExecutionsSELECTRowChangeEventHandler" msprop:Generator_RowDeletedName="vWSExecutionsSELECTRowDeleted" msprop:Generator_RowClassName="vWSExecutionsSELECTRow" msprop:Generator_UserTableName="vWSExecutionsSELECT" msprop:Generator_RowEvArgName="vWSExecutionsSELECTRowChangeEvent">
+        <xs:element name="vWSExecutionsSELECT" msprop:Generator_TableClassName="vWSExecutionsSELECTDataTable" msprop:Generator_TableVarName="tablevWSExecutionsSELECT" msprop:Generator_TablePropName="vWSExecutionsSELECT" msprop:Generator_RowDeletingName="vWSExecutionsSELECTRowDeleting" msprop:Generator_RowChangingName="vWSExecutionsSELECTRowChanging" msprop:Generator_RowEvHandlerName="vWSExecutionsSELECTRowChangeEventHandler" msprop:Generator_RowDeletedName="vWSExecutionsSELECTRowDeleted" msprop:Generator_UserTableName="vWSExecutionsSELECT" msprop:Generator_RowChangedName="vWSExecutionsSELECTRowChanged" msprop:Generator_RowEvArgName="vWSExecutionsSELECTRowChangeEvent" msprop:Generator_RowClassName="vWSExecutionsSELECTRow">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="ExecutionID" msprop:Generator_ColumnVarNameInTable="columnExecutionID" msprop:Generator_ColumnPropNameInRow="ExecutionID" msprop:Generator_ColumnPropNameInTable="ExecutionIDColumn" msprop:Generator_UserColumnName="ExecutionID" type="xs:int" />
@@ -197,7 +197,7 @@
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element name="WashingSolutionSELECT" msprop:Generator_TableClassName="WashingSolutionSELECTDataTable" msprop:Generator_TableVarName="tableWashingSolutionSELECT" msprop:Generator_TablePropName="WashingSolutionSELECT" msprop:Generator_RowDeletingName="WashingSolutionSELECTRowDeleting" msprop:Generator_RowChangingName="WashingSolutionSELECTRowChanging" msprop:Generator_RowEvHandlerName="WashingSolutionSELECTRowChangeEventHandler" msprop:Generator_RowDeletedName="WashingSolutionSELECTRowDeleted" msprop:Generator_UserTableName="WashingSolutionSELECT" msprop:Generator_RowChangedName="WashingSolutionSELECTRowChanged" msprop:Generator_RowEvArgName="WashingSolutionSELECTRowChangeEvent" msprop:Generator_RowClassName="WashingSolutionSELECTRow">
+        <xs:element name="WashingSolutionSELECT" msprop:Generator_TableClassName="WashingSolutionSELECTDataTable" msprop:Generator_TableVarName="tableWashingSolutionSELECT" msprop:Generator_RowChangedName="WashingSolutionSELECTRowChanged" msprop:Generator_TablePropName="WashingSolutionSELECT" msprop:Generator_RowDeletingName="WashingSolutionSELECTRowDeleting" msprop:Generator_RowChangingName="WashingSolutionSELECTRowChanging" msprop:Generator_RowEvHandlerName="WashingSolutionSELECTRowChangeEventHandler" msprop:Generator_RowDeletedName="WashingSolutionSELECTRowDeleted" msprop:Generator_RowClassName="WashingSolutionSELECTRow" msprop:Generator_UserTableName="WashingSolutionSELECT" msprop:Generator_RowEvArgName="WashingSolutionSELECTRowChangeEvent">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="ELEMENTID" msprop:Generator_ColumnVarNameInTable="columnELEMENTID" msprop:Generator_ColumnPropNameInRow="ELEMENTID" msprop:Generator_ColumnPropNameInTable="ELEMENTIDColumn" msprop:Generator_UserColumnName="ELEMENTID" type="xs:int" minOccurs="0" />
@@ -218,7 +218,7 @@
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element name="twksWSBbireactiveContext" msprop:Generator_TableClassName="twksWSBbireactiveContextDataTable" msprop:Generator_TableVarName="tabletwksWSBbireactiveContext" msprop:Generator_TablePropName="twksWSBbireactiveContext" msprop:Generator_RowDeletingName="twksWSBbireactiveContextRowDeleting" msprop:Generator_RowChangingName="twksWSBbireactiveContextRowChanging" msprop:Generator_RowEvHandlerName="twksWSBbireactiveContextRowChangeEventHandler" msprop:Generator_RowDeletedName="twksWSBbireactiveContextRowDeleted" msprop:Generator_UserTableName="twksWSBbireactiveContext" msprop:Generator_RowChangedName="twksWSBbireactiveContextRowChanged" msprop:Generator_RowEvArgName="twksWSBbireactiveContextRowChangeEvent" msprop:Generator_RowClassName="twksWSBbireactiveContextRow">
+        <xs:element name="twksWSBbireactiveContext" msprop:Generator_TableClassName="twksWSBbireactiveContextDataTable" msprop:Generator_TableVarName="tabletwksWSBbireactiveContext" msprop:Generator_RowChangedName="twksWSBbireactiveContextRowChanged" msprop:Generator_TablePropName="twksWSBbireactiveContext" msprop:Generator_RowDeletingName="twksWSBbireactiveContextRowDeleting" msprop:Generator_RowChangingName="twksWSBbireactiveContextRowChanging" msprop:Generator_RowEvHandlerName="twksWSBbireactiveContextRowChangeEventHandler" msprop:Generator_RowDeletedName="twksWSBbireactiveContextRowDeleted" msprop:Generator_RowClassName="twksWSBbireactiveContextRow" msprop:Generator_UserTableName="twksWSBbireactiveContext" msprop:Generator_RowEvArgName="twksWSBbireactiveContextRowChangeEvent">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="WorksessionID" msprop:Generator_ColumnVarNameInTable="columnWorksessionID" msprop:Generator_ColumnPropNameInRow="WorksessionID" msprop:Generator_ColumnPropNameInTable="WorksessionIDColumn" msprop:Generator_UserColumnName="WorksessionID">
@@ -249,6 +249,9 @@
       <xs:field xpath="mstns:WorksessionID" />
       <xs:field xpath="mstns:AnalyzerID" />
       <xs:field xpath="mstns:ExecutionID" />
+      <xs:field xpath="mstns:KindOfLiquid" />
+      <xs:field xpath="mstns:R1ReagentID" />
+      <xs:field xpath="mstns:WashingID" />
     </xs:unique>
   </xs:element>
 </xs:schema>
