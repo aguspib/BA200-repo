@@ -8791,9 +8791,4 @@ Public Class UiMotorsPumpsValvesTest
 
 #End Region
 
-
-
-    Private Sub InDo_Air_Ws_3Evalve_Load(sender As Object, e As EventArgs) Handles InDo_Air_Ws_3Evalve.Load
-
-    End Sub
 End Class
