@@ -289,7 +289,7 @@ Public Class UiWSDeleteAuxScreen
 
             'Load the list of existing Virtual Rotors sorted by Rotor Type and Rotor Name...
             Dim resultData As GlobalDataTO
-            If (String.Compare(AnalyzerModel(), "A400", False) = 0) Then
+            If (AnalyzerModel() = "A400" OrElse AnalyzerModel() = "A200") Then
                 Dim myVRotorsDelegate As New VirtualRotorsDelegate
 
                 'Get all Virtual Rotors 
