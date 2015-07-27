@@ -5141,7 +5141,7 @@ Partial Public Class UiAx00MainMDI
         Dim ExistVRotor As Boolean = True
         Try
             Dim rmyGlobalDataTO As GlobalDataTO
-            If String.Equals(AnalyzerModelAttribute, "A400") Then
+            If (AnalyzerModelAttribute = "A400" OrElse AnalyzerModelAttribute = "A200") Then
                 Dim myVRotorsDelegate As New VirtualRotorsDelegate
 
                 'Get all Virtual Rotors 

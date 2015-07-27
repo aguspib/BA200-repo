@@ -1197,7 +1197,16 @@ WHERE [LimitID] IN ('SRV_MIXER1_POLAR_LIMIT','SRV_MIXER1_Z_FINE_LIMIT','SRV_MIXE
           <IntegrityScript>
           </IntegrityScript>
         </DataRevision>
-
+        <DataRevision JiraID="BA-2706" SequenceNumber="9">
+          <PrerequisiteScript>
+          </PrerequisiteScript>
+          <DataScript>
+            UPDATE dbo.tfmwVersions SET UserSoftware = '3.0.9', ServiceSoftware = '1.2.5', FirmwareScripts = '1.1.0', Firmware = '1.50.2'
+            GO
+          </DataScript>
+          <IntegrityScript>
+          </IntegrityScript>
+        </DataRevision>
       </DataRevisions>
     </Release>
     <!-- 
