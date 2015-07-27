@@ -1133,7 +1133,7 @@ WHERE [LimitID] IN ('SRV_MIXER1_POLAR_LIMIT','SRV_MIXER1_Z_FINE_LIMIT','SRV_MIXE
               Select 'False'
           </IntegrityScript> 
         </DataRevision>
-        <CommonRevision JiraID="BA-2642" SequenceNumber="8">
+        <DataRevision JiraID="BA-2642" SequenceNumber="8">
           <PrerequisiteScript>
           </PrerequisiteScript>
           <StructureScript>
@@ -1196,7 +1196,7 @@ WHERE [LimitID] IN ('SRV_MIXER1_POLAR_LIMIT','SRV_MIXER1_Z_FINE_LIMIT','SRV_MIXE
           </DataScript>
           <IntegrityScript>
           </IntegrityScript>
-        </CommonRevision>
+        </DataRevision>
 
       </DataRevisions>
     </Release>
