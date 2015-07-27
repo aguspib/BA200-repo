@@ -879,28 +879,28 @@ Namespace Biosystems.Ax00.Core.Entities
         'End Property
 
 
-        Public MustOverride ReadOnly Property GetModelValue(ByVal pAnalyzerID As String) As String Implements IAnalyzerManager.GetModelValue
-        '    Get
-        '        'AG 10/11/2014 BA-2082 pending to adapt for compatibility between BA200 and BA400
-        '        Dim returnValue As String = ""
+        Public ReadOnly Property GetModelValue(ByVal pAnalyzerID As String) As String Implements IAnalyzerManager.GetModelValue
+            Get
+                'AG 10/11/2014 BA-2082 pending to adapt for compatibility between BA200 and BA400
+                Dim returnValue As String = ""
 
-        '        If pAnalyzerID.Length > 0 Then
-        '            Dim strTocompare As String
+                If pAnalyzerID.Length > 0 Then
+                    Dim strTocompare As String
 
-        '            strTocompare = GetUpperPartSN(pAnalyzerID)
+                    strTocompare = GetUpperPartSN(pAnalyzerID)
 
-        '            Select Case strTocompare
-        '                Case "SN0"  ' Generic
-        '                    returnValue = "A200"
+                    Select Case strTocompare
+                        Case "SN0"  ' Generic
+                            returnValue = "A200"
 
-        '                Case GlobalBase.BA400ModelID
-        '                    returnValue = "A200"
-        '            End Select
-        '        End If
+                        Case GlobalBase.BA400ModelID
+                            returnValue = "A200"
+                    End Select
+                End If
 
-        '        Return returnValue
-        '    End Get
-        'End Property
+                Return returnValue
+            End Get
+        End Property
 
         ' XBC 07/06/2012
         Public ReadOnly Property GetUpperPartSN(ByVal pAnalyzerID As String) As String Implements IAnalyzerManager.GetUpperPartSN
@@ -1983,7 +1983,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 If Not myGlobalDataTo.HasError AndAlso Not myGlobalDataTo.SetDatos Is Nothing Then
                     alarmsDefintionTableDS = DirectCast(myGlobalDataTo.SetDatos, AlarmsDS)
                 End If
-                
+
                 'AG 20/04/2011 - Define methods who will implement work
                 AddHandler wellBaseLineWorker.DoWork, AddressOf wellBaseLineWorker_DoWork
                 AddHandler wellBaseLineWorker.RunWorkerCompleted, AddressOf wellBaseLineWorker_RunWorkerCompleted
@@ -2681,7 +2681,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 myGlobal = AppLayer.ActivateProtocol(AppLayerEventList.SKIP)
 
                             Case AnalyzerManagerSwActionList.RUNNING
-                                myGlobal = RunningSendEvent(pAction, pSwAdditionalParameters, pFwScriptID, pServiceParams)
+                                myGlobal = RunningSendEvent(pAction, pSwAdditionalParameters, pFwScriptId, pServiceParams)
 
                             Case AnalyzerManagerSwActionList.PAUSE
                                 myGlobal = PauseSendEvent(pAction, myGlobal, pSwAdditionalParameters)
@@ -2738,7 +2738,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 myGlobal = ReadAdjSendEvent(myGlobal, pSwAdditionalParameters)
 
                             Case AnalyzerManagerSwActionList.ISE_CMD
-                                myGlobal = IseCmdSendEvent(pAction, myGlobal, pSwAdditionalParameters, pFwScriptID, pServiceParams)
+                                myGlobal = IseCmdSendEvent(pAction, myGlobal, pSwAdditionalParameters, pFwScriptId, pServiceParams)
 
                             Case AnalyzerManagerSwActionList.FW_UTIL
                                 myGlobal = FwUtilSendEvent(myGlobal, pSwAdditionalParameters)
@@ -2750,7 +2750,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 myGlobal = PollRdSendEvent(myGlobal, pSwAdditionalParameters)
 
                             Case AnalyzerManagerSwActionList.COMMAND
-                                myGlobal = CommandSendEvent(pAction, pSwAdditionalParameters, pFwScriptID, pServiceParams)
+                                myGlobal = CommandSendEvent(pAction, pSwAdditionalParameters, pFwScriptId, pServiceParams)
 
                             Case AnalyzerManagerSwActionList.LOADADJ
                                 myGlobal = LoadAdjSendEvent(myGlobal, pSwAdditionalParameters)
@@ -3242,17 +3242,17 @@ Namespace Biosystems.Ax00.Core.Entities
         Public Function UpdateFwAdjustmentsDS(ByVal pAdjustmentsDs As SRVAdjustmentsDS) As GlobalDataTO Implements IAnalyzerManager.UpdateFwAdjustmentsDS
             Dim myGlobal As New GlobalDataTO
             Try
-                If pAdjustmentsDS IsNot Nothing Then
+                If pAdjustmentsDs IsNot Nothing Then
 
                     'SGM 05/12/2011
-                    pAdjustmentsDS.AnalyzerModel = myAnalyzerModel
-                    pAdjustmentsDS.AnalyzerID = ActiveAnalyzer
-                    pAdjustmentsDS.FirmwareVersion = FwVersionAttribute
-                    pAdjustmentsDS.ReadedDatetime = DateTime.Now
+                    pAdjustmentsDs.AnalyzerModel = myAnalyzerModel
+                    pAdjustmentsDs.AnalyzerID = ActiveAnalyzer
+                    pAdjustmentsDs.FirmwareVersion = FwVersionAttribute
+                    pAdjustmentsDs.ReadedDatetime = DateTime.Now
                     'end SGM 05/12/2011
 
-                    AppLayer.UpdateFwAdjustmentsDS(pAdjustmentsDS)
-                    myGlobal.SetDatos = pAdjustmentsDS
+                    AppLayer.UpdateFwAdjustmentsDS(pAdjustmentsDs)
+                    myGlobal.SetDatos = pAdjustmentsDs
                 End If
 
             Catch ex As Exception
@@ -3580,7 +3580,7 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim dbConnection As SqlConnection = Nothing
 
             Try
-                resultData = GetOpenDBConnection(pDBConnection)
+                resultData = GetOpenDBConnection(pDbConnection)
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
                     If (Not dbConnection Is Nothing) Then
@@ -3829,7 +3829,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ManageBarCodeRequestBeforeRUNNING", EventLogEntryType.Error, False)
             Finally
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+                If (pDbConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return resultData
         End Function
@@ -4044,7 +4044,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessUpdateWSByAnalyzerID", EventLogEntryType.Error, False)
             Finally
-                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
+                If (pDbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return myGlobal
         End Function
@@ -4081,9 +4081,9 @@ Namespace Biosystems.Ax00.Core.Entities
 
                     'Reset the current WS
                     If (Not HISTWorkingMode) Then
-                        myGlobal = myWsDelegate.ResetWS(pDbConnection, pWSAnalyzerID, ActiveWorkSession, myAnalyzerModel, False) 'AG 17/11/2014 BA-2065 inform analyzerModel
+                        myGlobal = myWsDelegate.ResetWS(pDbConnection, pWsAnalyzerId, ActiveWorkSession, myAnalyzerModel, False) 'AG 17/11/2014 BA-2065 inform analyzerModel
                     Else
-                        myGlobal = myWsDelegate.ResetWSNEW(pDbConnection, pWSAnalyzerID, ActiveWorkSession, myAnalyzerModel, False, False) 'AG 17/11/2014 BA-2065 inform analyzerModel
+                        myGlobal = myWsDelegate.ResetWSNEW(pDbConnection, pWsAnalyzerId, ActiveWorkSession, myAnalyzerModel, False, False) 'AG 17/11/2014 BA-2065 inform analyzerModel
                     End If
                     If (Not myGlobal.HasError) Then ResetWorkSession()
                 End If
@@ -4091,7 +4091,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 If (Not myGlobal.HasError) Then
                     'Update field AnalyzerID in table Reactions Rotor WS
                     Dim myReactionsRotorDelegate As New ReactionsRotorDelegate
-                    myGlobal = myReactionsRotorDelegate.UpdateWSAnalyzerID(pDbConnection, ActiveAnalyzer, pWSAnalyzerID)
+                    myGlobal = myReactionsRotorDelegate.UpdateWSAnalyzerID(pDbConnection, ActiveAnalyzer, pWsAnalyzerId)
                 End If
 
                 If (Not myGlobal.HasError) Then
@@ -4206,10 +4206,10 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         If Not myGlobal.HasError Then
                             'When the Database Connection was opened locally, then the Commit is executed
-                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                            If (pDbConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
                         Else
                             'When the Database Connection was opened locally, then the Rollback is executed
-                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                            If (pDbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
                         End If
 
                     End If
@@ -4224,7 +4224,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ReadAdjustments", EventLogEntryType.Error, False)
             Finally
-                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
+                If (pDbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return myGlobal
         End Function
@@ -4361,7 +4361,7 @@ Namespace Biosystems.Ax00.Core.Entities
         End Function
 
         Public Sub ResetFLIGHT() Implements IAnalyzerManager.ResetFLIGHT
-            validFLIGHTAttribute = False            
+            validFLIGHTAttribute = False
         End Sub
 
 

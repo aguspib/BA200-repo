@@ -1133,6 +1133,71 @@ WHERE [LimitID] IN ('SRV_MIXER1_POLAR_LIMIT','SRV_MIXER1_Z_FINE_LIMIT','SRV_MIXE
               Select 'False'
           </IntegrityScript> 
         </DataRevision>
+        <DataRevision JiraID="BA-2642" SequenceNumber="8">
+          <PrerequisiteScript>
+          </PrerequisiteScript>
+          <StructureScript>
+          </StructureScript>
+          <DataScript>
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'LBL_SRV_JE1_B1_BA200') AND (UPPER([LanguageID]) = 'ENG'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('LBL_SRV_JE1_B1_BA200', 'ENG', N'Sample &amp; reagent dosing pump', 1, convert(datetime,'20150724 07:26:27',112) ,  'ACR', '03.00.09',  0, NULL, NULL, 'ACR', convert(datetime,'20150724 07:26:27',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Sample &amp; Reagent dosing pump', OnlyService  = 1, TS_User = 'ACR', TS_DateTime  = convert(datetime,'20150724 07:26:27',112) , Translated = 1, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'LBL_SRV_JE1_B1_BA200' AND UPPER(LanguageID) = 'ENG'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'LBL_SRV_JE1_B1_BA200') AND (UPPER([LanguageID]) = 'SPA'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('LBL_SRV_JE1_B1_BA200', 'SPA', N'Bomba dosificación muestra y reactivo', 1, convert(datetime,'20150724 07:26:27',112) ,  'ACR', '03.00.09',  0, NULL, NULL, 'ACR', convert(datetime,'20150724 07:26:27',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Bomba dosificación muestra y reactivo', OnlyService  = 1, TS_User = 'ACR', TS_DateTime  = convert(datetime,'20150724 07:26:27',112) , Translated = 1, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'LBL_SRV_JE1_B1_BA200' AND UPPER(LanguageID) = 'SPA'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'LBL_SRV_JE1_EV1_BA200') AND (UPPER([LanguageID]) = 'ENG'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('LBL_SRV_JE1_EV1_BA200', 'ENG', N'Sample &amp; Reagent dosing valve', 1, convert(datetime,'20150724 07:27:43',112) ,  'ACR', '03.00.09',  0, NULL, NULL, 'ACR', convert(datetime,'20150724 07:27:43',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Sample &amp; Reagent dosing valve', OnlyService  = 1, TS_User = 'ACR', TS_DateTime  = convert(datetime,'20150724 07:27:43',112) , Translated = 1, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'LBL_SRV_JE1_EV1_BA200' AND UPPER(LanguageID) = 'ENG'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'LBL_SRV_JE1_EV1_BA200') AND (UPPER([LanguageID]) = 'SPA'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('LBL_SRV_JE1_EV1_BA200', 'SPA', N'Válvula dosificación muestra y reactivo', 1, convert(datetime,'20150724 07:27:43',112) ,  'ACR', '03.00.09',  0, NULL, NULL, 'ACR', convert(datetime,'20150724 07:27:43',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Válvula dosificación muestra y reactivo', OnlyService  = 1, TS_User = 'ACR', TS_DateTime  = convert(datetime,'20150724 07:27:43',112) , Translated = 1, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'LBL_SRV_JE1_EV1_BA200' AND UPPER(LanguageID) = 'SPA'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'LBL_SRV_JE1_MS_BA200') AND (UPPER([LanguageID]) = 'ENG'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('LBL_SRV_JE1_MS_BA200', 'ENG', N'Sample &amp; Reagent dosing DC pump', 1, convert(datetime,'20150724 07:29:31',112) ,  'ACR', '03.00.09',  0, NULL, NULL, 'ACR', convert(datetime,'20150724 07:29:31',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Sample &amp; Reagent dosing DC pump', OnlyService  = 1, TS_User = 'ACR', TS_DateTime  = convert(datetime,'20150724 07:29:31',112) , Translated = 1, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'LBL_SRV_JE1_MS_BA200' AND UPPER(LanguageID) = 'ENG'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'LBL_SRV_JE1_MS_BA200') AND (UPPER([LanguageID]) = 'SPA'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('LBL_SRV_JE1_MS_BA200', 'SPA', N'Bomba DC dosificación muestra y reactivo', 1, convert(datetime,'20150724 07:29:31',112) ,  'ACR', '03.00.09',  0, NULL, NULL, 'ACR', convert(datetime,'20150724 07:29:31',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Bomba DC dosificación muestra y reactivo', OnlyService  = 1, TS_User = 'ACR', TS_DateTime  = convert(datetime,'20150724 07:29:31',112) , Translated = 1, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'LBL_SRV_JE1_MS_BA200' AND UPPER(LanguageID) = 'SPA'
+            END
+            GO
+          </DataScript>
+          <IntegrityScript>
+          </IntegrityScript>
+        </DataRevision>
+
       </DataRevisions>
     </Release>
     <!-- 

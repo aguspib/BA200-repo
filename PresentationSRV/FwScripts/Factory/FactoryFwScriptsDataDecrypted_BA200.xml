@@ -2969,7 +2969,7 @@
     <FwScriptTO>
       <FwScriptID>1011</FwScriptID>
       <ActionID>JE1_MS_HOME</ActionID>
-      <Description>Samples Dosing Motor Home</Description>
+      <Description>Sample and Reagent Dosing Motor Home</Description>
       <Instructions>
         <InstructionTO>
           <InstructionID>1</InstructionID>
@@ -2997,7 +2997,7 @@
     <FwScriptTO>
       <FwScriptID>1012</FwScriptID>
       <ActionID>JE1_MS_REL</ActionID>
-      <Description>Samples Dosing Motor Relative</Description>
+      <Description>Sample and Reagent Dosing Motor Relative</Description>
       <Instructions>
         <InstructionTO>
           <InstructionID>1</InstructionID>
@@ -3033,7 +3033,7 @@
     <FwScriptTO>
       <FwScriptID>1013</FwScriptID>
       <ActionID>JE1_MS_ABS</ActionID>
-      <Description>Samples Dosing Motor Absolute</Description>
+      <Description>Sample and Reagent Dosing Motor Absolute</Description>
       <Instructions>
         <InstructionTO>
           <InstructionID>1</InstructionID>
@@ -3269,7 +3269,7 @@
     <FwScriptTO>
       <FwScriptID>1051</FwScriptID>
       <ActionID>JE1_B1_ON</ActionID>
-      <Description>Internal Dosing Samples Pump ON</Description>
+      <Description>Internal Dosing Sample and Reagent Pump ON</Description>
       <Instructions>
         <InstructionTO>
           <InstructionID>1</InstructionID>
@@ -3305,7 +3305,7 @@
     <FwScriptTO>
       <FwScriptID>1052</FwScriptID>
       <ActionID>JE1_B1_OFF</ActionID>
-      <Description>Internal Dosing Samples Pump OFF</Description>
+      <Description>Internal Dosing Sample and Reagent Pump OFF</Description>
       <Instructions>
         <InstructionTO>
           <InstructionID>1</InstructionID>
@@ -3485,7 +3485,7 @@
     <FwScriptTO>
       <FwScriptID>1061</FwScriptID>
       <ActionID>JE1_EV1_ON</ActionID>
-      <Description>Internal Dosing Samples Valve ON</Description>
+      <Description>Internal Dosing Sample and Reagent Valve ON</Description>
       <Instructions>
         <InstructionTO>
           <InstructionID>1</InstructionID>
@@ -3513,7 +3513,7 @@
     <FwScriptTO>
       <FwScriptID>1062</FwScriptID>
       <ActionID>JE1_EV1_OFF</ActionID>
-      <Description>Internal Dosing Samples Valve OFF</Description>
+      <Description>Internal Dosing Sample and Reagent Valve OFF</Description>
       <Instructions>
         <InstructionTO>
           <InstructionID>1</InstructionID>
