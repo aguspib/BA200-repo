@@ -41,8 +41,14 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
                     testReagentsDataDS = GetAllReagents()
                 End If
 
-                Dim result = (From a In testReagentsDataDS.tparTestReagents
-                              Where a.ReagentID = reagentID Select a.ReagentsNumber).First
+                Dim resultList = (From a In testReagentsDataDS.tparTestReagents
+                              Where a.ReagentID = reagentID Select a.ReagentsNumber)
+                Dim result As AnalysisMode
+                If resultList IsNot Nothing AndAlso resultList.Any Then
+                    result = DirectCast(resultList.First(), AnalysisMode)
+                Else
+                    result = AnalysisMode.MonoReactive
+                End If
 
                 Dim mode = CType(result, AnalysisMode)
                 catchedReagents.TryAdd(reagentID, mode)
@@ -73,20 +79,11 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
             Return testReagentsDataDS
         End Function
 
-        Public Overrides Sub FillContextFromAnayzerData(ByVal instruction As String)
-            MyBase.FillContextFromAnayzerData(instruction)
-            'Handle bireactive long lasting memory
-            HandleBireactives()
-            If lastestBireactives IsNot Nothing AndAlso lastestBireactives.Any Then
-                Debug.WriteLine("Historic bireactives context:")
-                Debug.WriteLine(GetHistoricalBireactivesContext.ToString)
-            End If
-        End Sub
-
 
         Private lastestBireactives As LinkedList(Of IDispensing)
 
         Private Sub HandleBireactives()
+            Debug.WriteLine("HANDLING BIREACTIVES!")
             If currentContext Is Nothing Then Return
             If lastestBireactives Is Nothing Then
                 LoadLastestBireactivesFromDB()
@@ -104,15 +101,25 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
                 dispenseToCheck = stepToCheck.Dispensing(R1)
             End If
 
+
             If dispenseToCheck IsNot Nothing Then
                 Select Case dispenseToCheck.KindOfLiquid
                     Case KindOfDispensedLiquid.Washing
-                        lastestBireactives.AddLast(dispenseToCheck)
-                        serializationRequired = True
-                    Case KindOfDispensedLiquid.Reagent
-                        If GetAnalysisModeForReagent(dispenseToCheck.R1ReagentID) = AnalysisMode.BiReactive Then
+                        If lastestBireactives.Any AndAlso lastestBireactives.Last.Value.KindOfLiquid = KindOfDispensedLiquid.Washing AndAlso lastestBireactives.Last.Value.WashingID = dispenseToCheck.WashingID Then
+                            'This dispense has been already added to the latest bireactvies list
+                        Else
                             lastestBireactives.AddLast(dispenseToCheck)
                             serializationRequired = True
+                        End If
+                    Case KindOfDispensedLiquid.Reagent
+                        If GetAnalysisModeForReagent(dispenseToCheck.R1ReagentID) = AnalysisMode.BiReactive Then
+
+                            If lastestBireactives.Any AndAlso lastestBireactives.Last.Value.KindOfLiquid = KindOfDispensedLiquid.Reagent AndAlso lastestBireactives.Last.Value.ExecutionID = dispenseToCheck.ExecutionID Then
+                                'This dispense has been already added to the latest bireactvies list
+                            Else
+                                lastestBireactives.AddLast(dispenseToCheck)
+                                serializationRequired = True
+                            End If
                         End If
                 End Select
             End If
@@ -124,6 +131,8 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
             If serializationRequired Then
                 SerializeLatestBireactives()
             End If
+
+
         End Sub
 
         Private Sub LoadLastestBireactivesFromDB()
@@ -150,7 +159,7 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
 
             Dim table As New vWSExecutionsDS.twksWSBbireactiveContextDataTable
             For Each disp In lastestBireactives
-                table.AddtwksWSBbireactiveContextRow(
+                Dim row = table.AddtwksWSBbireactiveContextRow(
                     AnalyzerManager.GetCurrentAnalyzerManager.ActiveWorkSession,
                     AnalyzerManager.GetCurrentAnalyzerManager.ActiveAnalyzer,
                     disp.ExecutionID,
@@ -191,5 +200,15 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
             End If
             Return auxContext
         End Function
+
+        Protected Overrides Sub OnContextRequestProcessed()
+            HandleBireactives()
+            If lastestBireactives IsNot Nothing AndAlso lastestBireactives.Any Then
+                Debug.WriteLine("Historic bireactives context:")
+                Debug.WriteLine(GetHistoricalBireactivesContext.ToString)
+            End If
+        End Sub
+
+
     End Class
 End Namespace

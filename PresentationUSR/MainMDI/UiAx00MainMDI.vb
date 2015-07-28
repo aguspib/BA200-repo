@@ -5141,7 +5141,7 @@ Partial Public Class UiAx00MainMDI
         Dim ExistVRotor As Boolean = True
         Try
             Dim rmyGlobalDataTO As GlobalDataTO
-            If String.Equals(AnalyzerModelAttribute, "A400") Then
+            If (AnalyzerModelAttribute = "A400" OrElse AnalyzerModelAttribute = "A200") Then
                 Dim myVRotorsDelegate As New VirtualRotorsDelegate
 
                 'Get all Virtual Rotors 
@@ -8798,37 +8798,42 @@ Partial Public Class UiAx00MainMDI
     ''' Created by: RH 20/03/2012 (AG define as public)
     ''' </remarks>
     Public Sub ShowStatus(ByVal pMessageID As GlobalEnumerates.Messages)
-        Try
-            'AG + DL 17/07/2013 - Execute this code only when current text not is Waiting for LIS
-            If bsAnalyzerStatus.Text.ToString.Trim <> myAutoLISWaitingOrder.ToString.Trim Then
-                Dim msgText As String = String.Empty
-                SaveStatusMessageID = pMessageID
+        If InvokeRequired Then
+            Invoke(Sub() ShowStatus(pMessageID))
+        Else
+            Try
+                'AG + DL 17/07/2013 - Execute this code only when current text not is Waiting for LIS
+                If bsAnalyzerStatus.Text.ToString.Trim <> myAutoLISWaitingOrder.ToString.Trim Then
+                    Dim msgText As String = String.Empty
+                    SaveStatusMessageID = pMessageID
 
-                If pMessageID <> Messages._NONE Then
-                    Dim myMessageMessageDelegate As New MessageDelegate()
-                    Dim myMessagesDS As MessagesDS
-                    Dim myGlobalDataTO As GlobalDataTO
+                    If pMessageID <> Messages._NONE Then
+                        Dim myMessageMessageDelegate As New MessageDelegate()
+                        Dim myMessagesDS As MessagesDS
+                        Dim myGlobalDataTO As GlobalDataTO
 
-                    myGlobalDataTO = myMessageMessageDelegate.GetMessageDescription(Nothing, pMessageID.ToString())
+                        myGlobalDataTO = myMessageMessageDelegate.GetMessageDescription(Nothing, pMessageID.ToString())
 
-                    If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                        myMessagesDS = DirectCast(myGlobalDataTO.SetDatos, MessagesDS)
-                        msgText = myMessagesDS.tfmwMessages(0).MessageText
-                    Else
-                        'Do something with the error
-                        ShowMessage(Name & ".ShowStatus ", Messages.SYSTEM_ERROR.ToString(), myGlobalDataTO.ErrorCode)
+                        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                            myMessagesDS = DirectCast(myGlobalDataTO.SetDatos, MessagesDS)
+                            msgText = myMessagesDS.tfmwMessages(0).MessageText
+                        Else
+                            'Do something with the error
+                            ShowMessage(Name & ".ShowStatus ", Messages.SYSTEM_ERROR.ToString(), myGlobalDataTO.ErrorCode)
+                        End If
                     End If
+
+                    bsAnalyzerStatus.Text = String.Format("{0} ", msgText)
                 End If
+            Catch ex As Exception
+                'Remove Status text
+                bsAnalyzerStatus.Text = String.Empty
 
-                bsAnalyzerStatus.Text = String.Format("{0} ", msgText)
-            End If
-        Catch ex As Exception
-            'Remove Status text
-            bsAnalyzerStatus.Text = String.Empty
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ShowStatus", EventLogEntryType.Error, False)
+                ShowMessage(Name & ".ShowStatus ", Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
+            End Try
+        End If
 
-            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ShowStatus", EventLogEntryType.Error, False)
-            ShowMessage(Name & ".ShowStatus ", Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
-        End Try
     End Sub
 
     ''' <summary>

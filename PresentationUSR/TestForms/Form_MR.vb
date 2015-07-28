@@ -1,4 +1,5 @@
-﻿Imports Biosystems.Ax00.Core.Interfaces
+﻿Imports System.IO
+Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Core.Entities
 Imports Biosystems.Ax00.Core.Services.BaseLine
 Imports Biosystems.Ax00.Global
@@ -35,6 +36,27 @@ Public Class Form_MR
 
         Dim blService As New BaseLineService(AnalyzerManager.GetCurrentAnalyzerManager(), New AnalyzerManagerFlagsDelegate)
         blService.UpdateAnalyzerSettings()
+
+    End Sub
+
+    Private Sub btnLogActivity_Click(sender As Object, e As EventArgs) Handles btnLogActivity.Click
+        Try
+
+            CreateLogActivity("Test Create Log Activity.", EventLogEntryType.Information)
+
+        Catch ex As Exception
+            CreateLogActivity(ex)
+        End Try
+
+        
+        'CheckTemperaturesAlarms(Nothing, pSensors(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_FRIDGE), _
+        '                pSensors(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_REACTIONS), _
+        '                pSensors(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_WASHINGSTATION), _
+        '                pSensors(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_R1), _
+        '                pSensors(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_R2), myAlarmList, myAlarmStatusList)
+
+
+
 
     End Sub
 End Class

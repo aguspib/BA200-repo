@@ -319,6 +319,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
                                 'TR 16/01/2013 - Update the DB Structures (tables and views) 
                                 myGlobalDataTO = UpdateDatabaseStructureAndData(pDataBaseName, myServer)
+                                myServer.ConnectionContext.CommitTransaction()
+                                myServer.ConnectionContext.BeginTransaction()
 
                                 'TR 18/02/2013 - Update the DB Preloaded Data 
                                 If (Not myGlobalDataTO.HasError) Then

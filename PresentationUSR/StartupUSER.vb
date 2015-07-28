@@ -17,7 +17,7 @@ Public NotInheritable Class StartupUSER
 
 
     Public Sub New()
-
+        'Debugger.Launch()
         ' This call is required by the Windows Form Designer.
         InitializeComponent()
 
