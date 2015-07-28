@@ -6373,7 +6373,15 @@ Public Class Ax00ServiceMainMDI
                 Dim myTopMostForm As New Form
                 myTopMostForm.TopMost = True
                 Dim myMsg As String = GetMessageText(Messages.SRV_WORK_MODE_QUESTION.ToString)
+#If config = "Debug" Then
+                If Environment.GetCommandLineArgs().Contains("/DEMOMODE") Then
+                    dialogResultToReturn = Windows.Forms.DialogResult.No
+                Else
+                    dialogResultToReturn = MessageBox.Show(myTopMostForm, myMsg, My.Application.Info.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question)
+                End If
+#Else
                 dialogResultToReturn = MessageBox.Show(myTopMostForm, myMsg, My.Application.Info.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question)
+#End If
                 'end 08/05/2012
 
                 If dialogResultToReturn = Windows.Forms.DialogResult.No Then
