@@ -366,6 +366,7 @@
 		<row><td>AxInterop.AcroPDFLib.dll</td><td>{5191F28D-3781-49A5-8CB8-99B6CA423E8A}</td><td>USER_SW</td><td>72</td><td>0=1</td><td/><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>BA200Service.exe</td><td>{2C6DA74C-FB03-4B24-9A09-FFE0B95D5B74}</td><td>SERVICE_SW</td><td>8</td><td/><td>ba200service.exe</td><td>17</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>BA200User.exe</td><td>{6CA43578-2171-4E60-9A06-F594D5F07156}</td><td>USER_SW</td><td>8</td><td/><td>ba200user.exe</td><td>17</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>BA200v150r02</td><td>{260F86DF-FFDC-42D9-832F-B281C6F335E4}</td><td>FIRMWARE</td><td>8</td><td/><td>ba200v150r02.ba2</td><td>17</td><td>This component consists of files not belonging to other components.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>BSCSharpControl_Library.dll</td><td>{C4A1D993-C05A-4964-9C96-DD57DB872F9C}</td><td>SERVICE_SW</td><td>8</td><td/><td>bscsharpcontrol_library.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>BSCSharpControl_Library.dll1</td><td>{7581964F-9CF2-4344-AAAC-01BA3A94B561}</td><td>USER_SW</td><td>8</td><td/><td>bscsharpcontrol_library.dll1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>BSControl_Library.dll</td><td>{96B2BCD3-F0DD-4DFE-84AC-450C03C7FBBC}</td><td>SERVICE_SW</td><td>8</td><td/><td>bscontrol_library.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -2130,8 +2131,7 @@
 		<row><td>BA200</td><td>Ax00.Framework.Data.dll1</td></row>
 		<row><td>BA200</td><td>Biosystems.Ax00.Data.dll</td></row>
 		<row><td>BA200</td><td>Biosystems.Ax00.Data.dll1</td></row>
-		<row><td>Firmware</td><td>FwBA200v013</td></row>
-		<row><td>Firmware</td><td>FwBA200v044r02</td></row>
+		<row><td>Firmware</td><td>BA200v150r02</td></row>
 		<row><td>Service_Sw</td><td>AX00Global.dll</td></row>
 		<row><td>Service_Sw</td><td>AX00Types.dll</td></row>
 		<row><td>Service_Sw</td><td>Analyzer.dll</td></row>
@@ -2362,6 +2362,7 @@
 		<row><td>ba200user.exe.config</td><td>AllOtherFiles1</td><td>BA200U~1.CON|BA200User.exe.config</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES1&gt;\BA200User.exe.config</td><td>1</td><td/></row>
 		<row><td>ba200v013.ba4</td><td>FwBA200v013</td><td>BA200V~1.BA4|BA200v013.ba4</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_INSTALLSHIELD 2_FILES&gt;\Old Components\FW\BA200\BA200v013.ba4</td><td>1</td><td/></row>
 		<row><td>ba200v044r02.ba2</td><td>FwBA200v044r02</td><td>BA200V~1.BA2|BA200v044r02.ba2</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_INSTALLSHIELD 2_FILES&gt;\BA200 Fw\BA200v044r02.ba2</td><td>1</td><td/></row>
+		<row><td>ba200v150r02.ba2</td><td>BA200v150r02</td><td>BA200V~1.BA2|BA200v150r02.ba2</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_INSTALLSHIELD 2_FILES&gt;\BA200 Fw\BA200v150r02.ba2</td><td>1</td><td/></row>
 		<row><td>ba400srv.ico</td><td>ServiceSw_Images_Embedded</td><td>BA400SRV.ico</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\BA400SRV.ico</td><td>1</td><td/></row>
 		<row><td>ba400user.ico</td><td>ServiceSw_Images_Embedded</td><td>BA400U~1.ICO|BA400USER.ico</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\BA400USER.ico</td><td>1</td><td/></row>
 		<row><td>ba4svr_login.png</td><td>ServiceSw_Images_Embedded</td><td>BA4SVR~1.PNG|BA4SVR_Login.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\BA4SVR_Login.png</td><td>1</td><td/></row>
@@ -3136,6 +3137,7 @@
 		<row><td>AxInterop.AcroPDFLib.dll</td><td/><td/><td>_34E813AC_9479_400B_AF6F_D95B2216C1C1_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>BA200Service.exe</td><td/><td/><td>_79BD38FB_53D3_410D_99C5_9840319D219A_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>BA200User.exe</td><td/><td/><td>_9FBC032E_BC06_4FFE_A8A7_AF1FBB8F9675_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>BA200v150r02</td><td/><td/><td>_79BBB62D_EBC1_48FD_9AEF_440975A9F254_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>BSCSharpControl_Library.dll</td><td/><td/><td>_72AA2BAD_A4F6_41BC_AFDC_A7A8CA8EAD56_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>BSCSharpControl_Library.dll1</td><td/><td/><td>_AB54945A_BBB1_4A1B_BF1F_D15EE58F562C_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>BSControl_Library.dll</td><td/><td/><td>_FCF0AA95_4E28_4D4C_B7D8_B2D3DB049B1B_FILTER</td><td/><td/><td/><td/></row>
@@ -6140,7 +6142,7 @@ TgBlAHQAdwBvAHIAawABAEQAZQBmAGEAdQBsAHQAIABDAG8AbgBmAGkAZwB1AHIAYQB0AGkAbwBuAA==
 		<col def="s72">ActionProperty</col>
 		<col def="S72">ISDisplayName</col>
 		<row><td>{00000000-0000-0000-0000-000000000000}</td><td>***ALL_VERSIONS***</td><td></td><td></td><td>2</td><td/><td>ISFOUNDNEWERPRODUCTVERSION</td><td>ISPreventDowngrade</td></row>
-		<row><td>{00000000-0000-0000-0000-000000000000}</td><td></td><td>***ALL_VERSIONS***</td><td></td><td>257</td><td/><td>ISACTIONPROP1</td><td>NewUpgradeEntry1</td></row>
+		<row><td>{00000000-0000-0000-0000-000000000000}</td><td></td><td>***ALL_VERSIONS***</td><td></td><td>257</td><td/><td>ISACTIONPROP1</td><td>FWVersion</td></row>
 	</table>
 
 	<table name="Verb">

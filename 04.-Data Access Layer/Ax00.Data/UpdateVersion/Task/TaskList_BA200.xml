@@ -1201,7 +1201,7 @@ WHERE [LimitID] IN ('SRV_MIXER1_POLAR_LIMIT','SRV_MIXER1_Z_FINE_LIMIT','SRV_MIXE
           <PrerequisiteScript>
           </PrerequisiteScript>
           <DataScript>
-            UPDATE dbo.tfmwVersions SET UserSoftware = '3.0.9', ServiceSoftware = '1.2.5', FirmwareScripts = '1.1.0', Firmware = '1.50.2'
+            UPDATE dbo.tfmwVersions SET UserSoftware = '3.0.8', ServiceSoftware = '1.2.5', FirmwareScripts = '1.0.0', Firmware = '1.50.2'
             GO
           </DataScript>
           <IntegrityScript>
@@ -1209,6 +1209,7 @@ WHERE [LimitID] IN ('SRV_MIXER1_POLAR_LIMIT','SRV_MIXER1_Z_FINE_LIMIT','SRV_MIXE
         </DataRevision>
       </DataRevisions>
     </Release>
+    
     <!-- 
 	  <Release Version="00.00.00">
     <DataRevisions>
