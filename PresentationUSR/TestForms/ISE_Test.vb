@@ -202,7 +202,7 @@ Public Class ISE_Test
     End Function
 
     Private Function GetMessageToSend() As String
-        Dim msg As String = "A400;ANSISE;P:0;R:"
+        Dim msg As String = AnalyzerManager.GetCurrentAnalyzerManager().GetModelValue(AnalyzerManager.GetCurrentAnalyzerManager().ActiveAnalyzer) & ";ANSISE;P:0;R:"
         Select Case GetISEAction()
             Case ISEManager.ISEProcedures.Clean
                 If Not chkERC.Checked Then msg &= "<ISE!>"

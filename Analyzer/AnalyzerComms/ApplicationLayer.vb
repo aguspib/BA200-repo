@@ -3372,7 +3372,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     'blocks must be passed directly as byte array in order to avoid data loss in conversion
 
                     'Dim myUtilities As New Utilities
-                    Dim myCommand As String = "A400;FWUTIL;A:2;N:" & pFWAction.DataBlockIndex.ToString & ";S:" & pFWAction.DataBlockSize.ToString & ";"
+                    'Dim myCommand As String = "A400;FWUTIL;A:2;N:" & pFWAction.DataBlockIndex.ToString & ";S:" & pFWAction.DataBlockSize.ToString & ";"
+                    Dim myCommand As String = AnalyzerManager.GetCurrentAnalyzerManager().GetModelValue(AnalyzerManager.GetCurrentAnalyzerManager().ActiveAnalyzer) & ";FWUTIL;A:2;N:" & pFWAction.DataBlockIndex.ToString & ";S:" & pFWAction.DataBlockSize.ToString & ";"
                     myGlobal = Utilities.ConvertStringToAscii(myCommand, True)
                     If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                         Dim myCommandInBytes() As Byte = CType(myGlobal.SetDatos, Byte())

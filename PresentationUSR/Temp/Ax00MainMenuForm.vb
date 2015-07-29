@@ -2,6 +2,7 @@
 Option Explicit On
 Option Infer On
 
+Imports Biosystems.Ax00.App
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
@@ -105,7 +106,7 @@ Public Class Ax00MainMenuForm
                 Dim myWS As New WorkSessionsDelegate
                 Dim myGlobal As New GlobalDataTO
 
-                myGlobal = myWS.ResetWS(Nothing, "SN0000099999_Ax400", Me.TextBox1.Text, "A400")
+                myGlobal = myWS.ResetWS(Nothing, AnalyzerController.Instance.Analyzer.GenericDefaultAnalyzer(), TextBox1.Text, AnalyzerController.Instance.Analyzer.GetModelValue(AnalyzerController.Instance.Analyzer.GenericDefaultAnalyzer()))
                 If (Not myGlobal.HasError) Then
                     MsgBox("OK ")
                 Else

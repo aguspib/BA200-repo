@@ -192,6 +192,8 @@ Partial Public Class UiAx00MainMDI
     Private CheckAnalyzerIDOnFirstConnection As Boolean = True  ' XB 03/12/2013
     Private CheckAnalyzerIDOnFirstConnectionForISE As Boolean = True  ' XB 03/12/2013
 
+    Private QuitBecauseWrongAnalyzer As Boolean = False  'AJG 28/07/2015
+
 #End Region
 
 #Region "Fields"
@@ -836,8 +838,9 @@ Partial Public Class UiAx00MainMDI
             Dim currentUserName As String = GlobalBase.GetSessionInfo().UserName
 
             'Me.Text = "BA400 User Sw" & " - " & CurrentUserLevel 'DL 15/05/2012
-            Me.Text = "BA400 User Sw" & " - " & currentUserName 'AG 22/05/2012
+            'Me.Text = "BA400 User Sw" & " - " & currentUserName 'AG 22/05/2012
 
+            Text = String.Format("B{0} User Sw - {1}", AnalyzerController.Instance.Analyzer.GetModelValue(AnalyzerController.Instance.Analyzer.ActiveAnalyzer()), currentUserName)
 
             Select Case CurrentUserLevel
                 Case "OPERATOR"
@@ -1903,6 +1906,8 @@ Partial Public Class UiAx00MainMDI
             If (MyClass.IsISEUtilClosing) Then
                 res = Windows.Forms.DialogResult.Yes
             ElseIf (flagExitWithShutDown) Then
+                res = Windows.Forms.DialogResult.Yes
+            ElseIf QuitBecauseWrongAnalyzer Then
                 res = Windows.Forms.DialogResult.Yes
             Else
                 res = ShowMessage(Name, GlobalEnumerates.Messages.EXIT_PROGRAM.ToString())
@@ -5141,19 +5146,19 @@ Partial Public Class UiAx00MainMDI
         Dim ExistVRotor As Boolean = True
         Try
             Dim rmyGlobalDataTO As GlobalDataTO
-            If (AnalyzerModelAttribute = "A400" OrElse AnalyzerModelAttribute = "A200") Then
-                Dim myVRotorsDelegate As New VirtualRotorsDelegate
+            'If (AnalyzerModelAttribute = "A400") Then
+            Dim myVRotorsDelegate As New VirtualRotorsDelegate
 
-                'Get all Virtual Rotors 
-                rmyGlobalDataTO = myVRotorsDelegate.GetVRotorsByRotorType(Nothing, "")
+            'Get all Virtual Rotors 
+            rmyGlobalDataTO = myVRotorsDelegate.GetVRotorsByRotorType(Nothing, "")
 
-                If (Not rmyGlobalDataTO.HasError AndAlso Not rmyGlobalDataTO.SetDatos Is Nothing AndAlso _
-                        DirectCast(rmyGlobalDataTO.SetDatos, VirtualRotorsDS).tparVirtualRotors.Count = 0) Then
+            If (Not rmyGlobalDataTO.HasError AndAlso Not rmyGlobalDataTO.SetDatos Is Nothing AndAlso _
+                    DirectCast(rmyGlobalDataTO.SetDatos, VirtualRotorsDS).tparVirtualRotors.Count = 0) Then
 
-                    ShowMessage(Me.Name, GlobalEnumerates.Messages.NO_VIRTUAL_ROTORS.ToString, "", Me)
-                    ExistVRotor = False
-                End If
+                ShowMessage(Me.Name, GlobalEnumerates.Messages.NO_VIRTUAL_ROTORS.ToString, "", Me)
+                ExistVRotor = False
             End If
+            'End If
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ExistVirtualSavedRotor", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)

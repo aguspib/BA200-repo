@@ -289,44 +289,44 @@ Public Class UiWSDeleteAuxScreen
 
             'Load the list of existing Virtual Rotors sorted by Rotor Type and Rotor Name...
             Dim resultData As GlobalDataTO
-            If (AnalyzerModel() = "A400" OrElse AnalyzerModel() = "A200") Then
-                Dim myVRotorsDelegate As New VirtualRotorsDelegate
+            'If (AnalyzerModel() = "A400") Then
+            Dim myVRotorsDelegate As New VirtualRotorsDelegate
 
-                'Get all Virtual Rotors 
-                resultData = myVRotorsDelegate.GetVRotorsByRotorType(Nothing, "")
-                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    Dim myVRotorDS As VirtualRotorsDS = DirectCast(resultData.SetDatos, VirtualRotorsDS)
+            'Get all Virtual Rotors 
+            resultData = myVRotorsDelegate.GetVRotorsByRotorType(Nothing, "")
+            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                Dim myVRotorDS As VirtualRotorsDS = DirectCast(resultData.SetDatos, VirtualRotorsDS)
 
-                    If (myVRotorDS.tparVirtualRotors.Rows.Count > 0) Then
-                        'Get Icons for Reagents and Samples Rotors
-                        Dim myIcons As New ImageList
-                        Dim auxIconName As String = ""
-                        Dim iconPath As String = MyBase.IconsPath
+                If (myVRotorDS.tparVirtualRotors.Rows.Count > 0) Then
+                    'Get Icons for Reagents and Samples Rotors
+                    Dim myIcons As New ImageList
+                    Dim auxIconName As String = ""
+                    Dim iconPath As String = MyBase.IconsPath
 
-                        'Icon for RotorType=Reagents
-                        auxIconName = GetIconName("REAGENTPOS")
-                        If (String.Compare(auxIconName, String.Empty, False) <> 0) Then myIcons.Images.Add("REAGENTS", ImageUtilities.ImageFromFile(iconPath & auxIconName))
+                    'Icon for RotorType=Reagents
+                    auxIconName = GetIconName("REAGENTPOS")
+                    If (String.Compare(auxIconName, String.Empty, False) <> 0) Then myIcons.Images.Add("REAGENTS", ImageUtilities.ImageFromFile(iconPath & auxIconName))
 
-                        'Icon for RotorType=Samples
-                        auxIconName = GetIconName("SAMPLEPOS")
-                        If (String.Compare(auxIconName, String.Empty, False) <> 0) Then myIcons.Images.Add("SAMPLES", ImageUtilities.ImageFromFile(iconPath & auxIconName))
+                    'Icon for RotorType=Samples
+                    auxIconName = GetIconName("SAMPLEPOS")
+                    If (String.Compare(auxIconName, String.Empty, False) <> 0) Then myIcons.Images.Add("SAMPLES", ImageUtilities.ImageFromFile(iconPath & auxIconName))
 
-                        'Link the Icons to the ListView
-                        bsElementsListView.SmallImageList = myIcons
+                    'Link the Icons to the ListView
+                    bsElementsListView.SmallImageList = myIcons
 
-                        'Load elements in the ListView
-                        Dim i As Integer = 0
-                        For Each vRotors As VirtualRotorsDS.tparVirtualRotorsRow In myVRotorDS.tparVirtualRotors.Rows
-                            bsElementsListView.Items.Add(vRotors.VirtualRotorID.ToString(), vRotors.VirtualRotorName, vRotors.RotorType)
-                            bsElementsListView.Items(i).SubItems.Add(vRotors.VirtualRotorID.ToString())
-                            i += 1
-                        Next
-                    End If
-                Else
-                    'Error getting the list of VirtualRotors 
-                    ShowMessage(Me.Name & ".LoadVirtualRotors", resultData.ErrorCode, resultData.ErrorMessage, Me)
+                    'Load elements in the ListView
+                    Dim i As Integer = 0
+                    For Each vRotors As VirtualRotorsDS.tparVirtualRotorsRow In myVRotorDS.tparVirtualRotors.Rows
+                        bsElementsListView.Items.Add(vRotors.VirtualRotorID.ToString(), vRotors.VirtualRotorName, vRotors.RotorType)
+                        bsElementsListView.Items(i).SubItems.Add(vRotors.VirtualRotorID.ToString())
+                        i += 1
+                    Next
                 End If
+            Else
+                'Error getting the list of VirtualRotors 
+                ShowMessage(Me.Name & ".LoadVirtualRotors", resultData.ErrorCode, resultData.ErrorMessage, Me)
             End If
+            'End If
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadVirtualRotors", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".LoadVirtualRotors", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)

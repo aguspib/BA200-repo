@@ -324,7 +324,7 @@ Partial Public Class UiAx00MainMDI
                 ' XB 24/10/2013 - Specific ISE commands are allowed in RUNNING (pause mode) - BT #1343
                 'If AnalyzerController.Instance.Analyzer.InstructionTypeReceived = AnalyzerManagerSwActionList.ISE_RESULT_RECEIVED Then
                 If (AnalyzerController.Instance.Analyzer.InstructionTypeReceived = AnalyzerManagerSwActionList.ISE_RESULT_RECEIVED) Or _
-                   (pInstructionReceived.Contains("A400;ANSISE;")) Or _
+                   (pInstructionReceived.Contains(AnalyzerManager.GetCurrentAnalyzerManager().GetModelValue(AnalyzerManager.GetCurrentAnalyzerManager().ActiveAnalyzer) & ";ANSISE;")) Or _
                    (ISENotReady AndAlso (ShutDownisPending Or StartSessionisPending)) Then
                     ' XB 24/10/2013
                     ' XB 20/06/2014 - #1441
@@ -707,6 +707,14 @@ Partial Public Class UiAx00MainMDI
                     End If
                 End If
             End If
+
+            'AJG Gestionar si el analizador conectado es compatible con el software
+            If Not AnalyzerController.Instance.Analyzer.IsConnectedWithRightModel() Then
+                MessageBox.Show("mensajito")
+                QuitBecauseWrongAnalyzer = True
+                Close()
+            End If
+
 
             '//JVV 20/09/2013 Si el evento de Auto_Report está activo, se tratará según este if
             If copyRefreshEventList.Contains(GlobalEnumerates.UI_RefreshEvents.AUTO_REPORT) Then
