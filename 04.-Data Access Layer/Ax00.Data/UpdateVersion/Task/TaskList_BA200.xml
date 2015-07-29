@@ -182,7 +182,7 @@
             DECLARE @maxParamID INT = (SELECT MAX(ParameterID)+1 FROM tfmwSwParameters)
 
             INSERT INTO tfmwSWParameters (ParameterID, ParameterName, DependByModel, AnalyzerModel, ValueNumeric, ValueText, Description)
-            VALUES (@maxParamID, 'BL_LIFETIME',1,'A200', 240, NULL, 'dynamic base line lifetime, in minutes')
+            VALUES (@maxParamID, 'BL_LIFETIME',1,'A200', 480, NULL, 'dynamic base line lifetime, in minutes')
             SET IDENTITY_INSERT tfmwSWParameters OFF
 
             GO
