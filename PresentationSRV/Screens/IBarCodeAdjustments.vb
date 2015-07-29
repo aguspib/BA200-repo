@@ -1105,7 +1105,6 @@ Public Class UiBarCodeAdjustments
         Try
             Me.Cursor = Cursors.WaitCursor
             Me.DisableAll()
-            MsgBox(Reflection.MethodInfo.GetCurrentMethod.ToString & " @ " & Reflection.MethodInfo.GetCurrentMethod.ReflectedType.Namespace & "." & Reflection.MethodInfo.GetCurrentMethod.ReflectedType.Name)
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareSavingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             Dim MethodName = (Reflection.MethodInfo.GetCurrentMethod.ToString & " @ " & Reflection.MethodInfo.GetCurrentMethod.ReflectedType.Namespace & "." & Reflection.MethodInfo.GetCurrentMethod.ReflectedType.Name)

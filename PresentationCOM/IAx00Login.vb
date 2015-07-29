@@ -815,6 +815,7 @@ Public Class UiAx00Login
                 If Environment.GetCommandLineArgs.Contains("/DEMOMODE") Then
                     bsUserIDTextBox.Text = "BIOSRV"
                     bsPasswordTextBox.Text = "costabrava"
+                    AddHandler Me.Shown, Sub() bsLoginButton.PerformClick()
                 Else
                     bsUserIDTextBox.Text = "SERVICE"
                     bsPasswordTextBox.Text = "BA400"
@@ -823,8 +824,6 @@ Public Class UiAx00Login
                 bsUserIDTextBox.Text = "BIOSYSTEMS"
                 bsPasswordTextBox.Text = "CostaBrava"
             End If
-
-
 #Else
             bsUserIDTextBox.Clear()
             bsPasswordTextBox.Clear()

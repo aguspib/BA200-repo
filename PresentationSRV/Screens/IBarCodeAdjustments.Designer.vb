@@ -41,15 +41,18 @@ Partial Class UiBarCodeAdjustments
         Me.TestGroupBox = New System.Windows.Forms.GroupBox()
         Me.BarCodeDataGridView = New Biosystems.Ax00.Controls.UserControls.BSDataGridView()
         Me.TestButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.LblSeparator3 = New System.Windows.Forms.Label()
         Me.ReadingBCGroupBox = New System.Windows.Forms.GroupBox()
         Me.StopButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.ReadedValueLabel = New System.Windows.Forms.Label()
         Me.StartReadingButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.LblSeparator2 = New System.Windows.Forms.Label()
         Me.CenterRotorGroupBox = New System.Windows.Forms.GroupBox()
         Me.ButtonCancel = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.SaveButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.BsAdjust = New Biosystems.Ax00.Controls.UserControls.BSAdjustControl()
         Me.AdjustButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.LblSeparator1 = New System.Windows.Forms.Label()
         Me.SelectRotorGroupBox = New System.Windows.Forms.GroupBox()
         Me.ReagentRotorRadioButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton()
         Me.SampleRotorRadioButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton()
@@ -179,8 +182,11 @@ Partial Class UiBarCodeAdjustments
         Me.BsAdjustPanel.BackColor = System.Drawing.Color.Gainsboro
         Me.BsAdjustPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.BsAdjustPanel.Controls.Add(Me.TestGroupBox)
+        Me.BsAdjustPanel.Controls.Add(Me.LblSeparator3)
         Me.BsAdjustPanel.Controls.Add(Me.ReadingBCGroupBox)
+        Me.BsAdjustPanel.Controls.Add(Me.LblSeparator2)
         Me.BsAdjustPanel.Controls.Add(Me.CenterRotorGroupBox)
+        Me.BsAdjustPanel.Controls.Add(Me.LblSeparator1)
         Me.BsAdjustPanel.Controls.Add(Me.SelectRotorGroupBox)
         Me.BsAdjustPanel.Dock = System.Windows.Forms.DockStyle.Fill
         Me.BsAdjustPanel.Location = New System.Drawing.Point(232, 20)
@@ -194,13 +200,13 @@ Partial Class UiBarCodeAdjustments
         Me.TestGroupBox.Controls.Add(Me.BarCodeDataGridView)
         Me.TestGroupBox.Controls.Add(Me.TestButton)
         Me.TestGroupBox.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.TestGroupBox.Location = New System.Drawing.Point(10, 301)
+        Me.TestGroupBox.Location = New System.Drawing.Point(10, 322)
         Me.TestGroupBox.Name = "TestGroupBox"
         Me.TestGroupBox.Padding = New System.Windows.Forms.Padding(10, 10, 5, 5)
-        Me.TestGroupBox.Size = New System.Drawing.Size(724, 225)
+        Me.TestGroupBox.Size = New System.Drawing.Size(724, 204)
         Me.TestGroupBox.TabIndex = 76
         Me.TestGroupBox.TabStop = False
-        Me.TestGroupBox.Text = "4. Test"
+        Me.TestGroupBox.Text = "Test"
         '
         'BarCodeDataGridView
         '
@@ -250,7 +256,7 @@ Partial Class UiBarCodeAdjustments
         DataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
         Me.BarCodeDataGridView.RowHeadersDefaultCellStyle = DataGridViewCellStyle4
         Me.BarCodeDataGridView.RowHeadersVisible = False
-        Me.BarCodeDataGridView.Size = New System.Drawing.Size(476, 196)
+        Me.BarCodeDataGridView.Size = New System.Drawing.Size(476, 175)
         Me.BarCodeDataGridView.TabIndex = 63
         Me.BarCodeDataGridView.TabToEnter = False
         '
@@ -258,11 +264,19 @@ Partial Class UiBarCodeAdjustments
         '
         Me.TestButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.TestButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
-        Me.TestButton.Location = New System.Drawing.Point(686, 187)
+        Me.TestButton.Location = New System.Drawing.Point(686, 166)
         Me.TestButton.Name = "TestButton"
         Me.TestButton.Size = New System.Drawing.Size(32, 32)
         Me.TestButton.TabIndex = 14
         Me.TestButton.UseVisualStyleBackColor = True
+        '
+        'LblSeparator3
+        '
+        Me.LblSeparator3.Dock = System.Windows.Forms.DockStyle.Top
+        Me.LblSeparator3.Location = New System.Drawing.Point(10, 315)
+        Me.LblSeparator3.Name = "LblSeparator3"
+        Me.LblSeparator3.Size = New System.Drawing.Size(724, 7)
+        Me.LblSeparator3.TabIndex = 78
         '
         'ReadingBCGroupBox
         '
@@ -270,12 +284,13 @@ Partial Class UiBarCodeAdjustments
         Me.ReadingBCGroupBox.Controls.Add(Me.ReadedValueLabel)
         Me.ReadingBCGroupBox.Controls.Add(Me.StartReadingButton)
         Me.ReadingBCGroupBox.Dock = System.Windows.Forms.DockStyle.Top
-        Me.ReadingBCGroupBox.Location = New System.Drawing.Point(10, 216)
+        Me.ReadingBCGroupBox.Location = New System.Drawing.Point(10, 230)
+        Me.ReadingBCGroupBox.Margin = New System.Windows.Forms.Padding(3, 10, 3, 3)
         Me.ReadingBCGroupBox.Name = "ReadingBCGroupBox"
         Me.ReadingBCGroupBox.Size = New System.Drawing.Size(724, 85)
         Me.ReadingBCGroupBox.TabIndex = 75
         Me.ReadingBCGroupBox.TabStop = False
-        Me.ReadingBCGroupBox.Text = "3. Reading Test/Adjustment"
+        Me.ReadingBCGroupBox.Text = "Reading Test/Adjustment"
         '
         'StopButton
         '
@@ -311,6 +326,14 @@ Partial Class UiBarCodeAdjustments
         Me.StartReadingButton.TabIndex = 14
         Me.StartReadingButton.UseVisualStyleBackColor = True
         '
+        'LblSeparator2
+        '
+        Me.LblSeparator2.Dock = System.Windows.Forms.DockStyle.Top
+        Me.LblSeparator2.Location = New System.Drawing.Point(10, 223)
+        Me.LblSeparator2.Name = "LblSeparator2"
+        Me.LblSeparator2.Size = New System.Drawing.Size(724, 7)
+        Me.LblSeparator2.TabIndex = 77
+        '
         'CenterRotorGroupBox
         '
         Me.CenterRotorGroupBox.Controls.Add(Me.ButtonCancel)
@@ -318,12 +341,13 @@ Partial Class UiBarCodeAdjustments
         Me.CenterRotorGroupBox.Controls.Add(Me.BsAdjust)
         Me.CenterRotorGroupBox.Controls.Add(Me.AdjustButton)
         Me.CenterRotorGroupBox.Dock = System.Windows.Forms.DockStyle.Top
-        Me.CenterRotorGroupBox.Location = New System.Drawing.Point(10, 70)
+        Me.CenterRotorGroupBox.Location = New System.Drawing.Point(10, 77)
+        Me.CenterRotorGroupBox.Margin = New System.Windows.Forms.Padding(3, 3, 3, 10)
         Me.CenterRotorGroupBox.Name = "CenterRotorGroupBox"
         Me.CenterRotorGroupBox.Size = New System.Drawing.Size(724, 146)
         Me.CenterRotorGroupBox.TabIndex = 74
         Me.CenterRotorGroupBox.TabStop = False
-        Me.CenterRotorGroupBox.Text = "2. Center Rotor"
+        Me.CenterRotorGroupBox.Text = "Center Rotor"
         '
         'ButtonCancel
         '
@@ -393,6 +417,14 @@ Partial Class UiBarCodeAdjustments
         Me.AdjustButton.TabIndex = 14
         Me.AdjustButton.UseVisualStyleBackColor = True
         '
+        'LblSeparator1
+        '
+        Me.LblSeparator1.Dock = System.Windows.Forms.DockStyle.Top
+        Me.LblSeparator1.Location = New System.Drawing.Point(10, 70)
+        Me.LblSeparator1.Name = "LblSeparator1"
+        Me.LblSeparator1.Size = New System.Drawing.Size(724, 7)
+        Me.LblSeparator1.TabIndex = 64
+        '
         'SelectRotorGroupBox
         '
         Me.SelectRotorGroupBox.Controls.Add(Me.ReagentRotorRadioButton)
@@ -404,7 +436,7 @@ Partial Class UiBarCodeAdjustments
         Me.SelectRotorGroupBox.Size = New System.Drawing.Size(724, 60)
         Me.SelectRotorGroupBox.TabIndex = 73
         Me.SelectRotorGroupBox.TabStop = False
-        Me.SelectRotorGroupBox.Text = "1. Select Rotor"
+        Me.SelectRotorGroupBox.Text = "Select Rotor"
         '
         'ReagentRotorRadioButton
         '
@@ -607,4 +639,7 @@ Partial Class UiBarCodeAdjustments
     Friend WithEvents StopButton As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents TestProcessTimer As System.Windows.Forms.Timer
     Friend WithEvents Footer As System.Windows.Forms.Panel
+    Friend WithEvents LblSeparator3 As System.Windows.Forms.Label
+    Friend WithEvents LblSeparator2 As System.Windows.Forms.Label
+    Friend WithEvents LblSeparator1 As System.Windows.Forms.Label
 End Class

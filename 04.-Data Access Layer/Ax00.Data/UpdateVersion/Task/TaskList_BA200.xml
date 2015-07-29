@@ -182,7 +182,7 @@
             DECLARE @maxParamID INT = (SELECT MAX(ParameterID)+1 FROM tfmwSwParameters)
 
             INSERT INTO tfmwSWParameters (ParameterID, ParameterName, DependByModel, AnalyzerModel, ValueNumeric, ValueText, Description)
-            VALUES (@maxParamID, 'BL_LIFETIME',1,'A200', 240, NULL, 'dynamic base line lifetime, in minutes')
+            VALUES (@maxParamID, 'BL_LIFETIME',1,'A200', 480, NULL, 'dynamic base line lifetime, in minutes')
             SET IDENTITY_INSERT tfmwSWParameters OFF
 
             GO
@@ -1197,9 +1197,19 @@ WHERE [LimitID] IN ('SRV_MIXER1_POLAR_LIMIT','SRV_MIXER1_Z_FINE_LIMIT','SRV_MIXE
           <IntegrityScript>
           </IntegrityScript>
         </DataRevision>
-
+        <DataRevision JiraID="BA-2706" SequenceNumber="9">
+          <PrerequisiteScript>
+          </PrerequisiteScript>
+          <DataScript>
+            UPDATE dbo.tfmwVersions SET UserSoftware = '3.0.8', ServiceSoftware = '1.2.5', FirmwareScripts = '1.0.0', Firmware = '1.50.2'
+            GO
+          </DataScript>
+          <IntegrityScript>
+          </IntegrityScript>
+        </DataRevision>
       </DataRevisions>
     </Release>
+    
     <!-- 
 	  <Release Version="00.00.00">
     <DataRevisions>
