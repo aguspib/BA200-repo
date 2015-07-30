@@ -840,7 +840,9 @@ Partial Public Class UiAx00MainMDI
             'Me.Text = "BA400 User Sw" & " - " & CurrentUserLevel 'DL 15/05/2012
             'Me.Text = "BA400 User Sw" & " - " & currentUserName 'AG 22/05/2012
 
-            Text = String.Format("B{0} User Sw - {1}", AnalyzerController.Instance.Analyzer.GetModelValue(AnalyzerController.Instance.Analyzer.ActiveAnalyzer()), currentUserName)
+            If AnalyzerController.Instance.Analyzer IsNot Nothing Then
+                Text = String.Format("B{0} User Sw - {1}", AnalyzerController.Instance.Analyzer.GetModelValue(AnalyzerController.Instance.Analyzer.ActiveAnalyzer()), currentUserName)
+            End If
 
             Select Case CurrentUserLevel
                 Case "OPERATOR"

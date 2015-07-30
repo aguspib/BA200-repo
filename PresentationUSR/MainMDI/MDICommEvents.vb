@@ -676,7 +676,12 @@ Partial Public Class UiAx00MainMDI
                 '                                 EventLogEntryType.FailureAudit, False)
             End If
 
-
+            'AJG Gestionar si el analizador conectado es compatible con el software
+            If Not AnalyzerController.Instance.Analyzer.IsConnectedWithRightModel() Then
+                MessageBox.Show("mensajito")
+                QuitBecauseWrongAnalyzer = True
+                Close()
+            End If
 
             'Debug.Print("IAx00MainMDI.ManageReceptionEvent: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0)) 'AG 12/06/2012 - time estimation
 
@@ -707,14 +712,6 @@ Partial Public Class UiAx00MainMDI
                     End If
                 End If
             End If
-
-            'AJG Gestionar si el analizador conectado es compatible con el software
-            If Not AnalyzerController.Instance.Analyzer.IsConnectedWithRightModel() Then
-                MessageBox.Show("mensajito")
-                QuitBecauseWrongAnalyzer = True
-                Close()
-            End If
-
 
             '//JVV 20/09/2013 Si el evento de Auto_Report está activo, se tratará según este if
             If copyRefreshEventList.Contains(GlobalEnumerates.UI_RefreshEvents.AUTO_REPORT) Then
