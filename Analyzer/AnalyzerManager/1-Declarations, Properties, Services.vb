@@ -12,6 +12,7 @@ Imports System.Data
 Imports System.ComponentModel
 Imports System.Data.SqlClient
 Imports System.Threading 'AG 20/04/2011 - added when create instance to an BackGroundWorker
+Imports System.Windows.Forms
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.Core.Interfaces
 
@@ -310,6 +311,9 @@ Namespace Biosystems.Ax00.Core.Entities
         Private IsAlreadyManagedAlarmsAttr As Boolean = False
 
         Private numWashes As Integer = 0
+
+        Private _connectedRightModel As Boolean = True
+
 #End Region
 
 #Region "Properties"
@@ -407,6 +411,10 @@ Namespace Biosystems.Ax00.Core.Entities
                             InitBaseLineCalculations(Nothing, StartingApplicationAttr)
                         End If
                         ' XBC 14/06/2012
+
+                        If previousValue <> "" Then
+                            _connectedRightModel = (GetModelValue(previousValue) = GetModelValue(value))
+                        End If
                     End If 'AG 20/11/2014 BA-2133
 
                 End If
@@ -879,28 +887,28 @@ Namespace Biosystems.Ax00.Core.Entities
         'End Property
 
 
-        Public ReadOnly Property GetModelValue(ByVal pAnalyzerID As String) As String Implements IAnalyzerManager.GetModelValue
-            Get
-                'AG 10/11/2014 BA-2082 pending to adapt for compatibility between BA200 and BA400
-                Dim returnValue As String = ""
+        Public MustOverride ReadOnly Property GetModelValue(ByVal pAnalyzerID As String) As String Implements IAnalyzerManager.GetModelValue
+        '    Get
+        '        'AG 10/11/2014 BA-2082 pending to adapt for compatibility between BA200 and BA400
+        '        Dim returnValue As String = ""
 
-                If pAnalyzerID.Length > 0 Then
-                    Dim strTocompare As String
+        '        If pAnalyzerID.Length > 0 Then
+        '            Dim strTocompare As String
 
-                    strTocompare = GetUpperPartSN(pAnalyzerID)
+        '            strTocompare = GetUpperPartSN(pAnalyzerID)
 
-                    Select Case strTocompare
-                        Case "SN0"  ' Generic
-                            returnValue = "A200"
+        '            Select Case strTocompare
+        '                Case "SN0"  ' Generic
+        '                    returnValue = "A200"
 
-                        Case GlobalBase.BA400ModelID
-                            returnValue = "A200"
-                    End Select
-                End If
+        '                Case GlobalBase.BA400ModelID
+        '                    returnValue = "A200"
+        '            End Select
+        '        End If
 
-                Return returnValue
-            End Get
-        End Property
+        '        Return returnValue
+        '    End Get
+        'End Property
 
         ' XBC 07/06/2012
         Public ReadOnly Property GetUpperPartSN(ByVal pAnalyzerID As String) As String Implements IAnalyzerManager.GetUpperPartSN
@@ -1583,9 +1591,18 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
+        Public MustOverride ReadOnly Property GenericDefaultAnalyzer() As String Implements IAnalyzerManager.GenericDefaultAnalyzer
+
+        Public ReadOnly Property IsConnectedWithRightModel() As Boolean Implements IAnalyzerManager.IsConnectedWithRightModel
+            Get
+                Return _connectedRightModel
+            End Get
+        End Property
 #End Region
 
 #Region "Events definition & methods"
+
+
         ''' <summary>
         ''' Event with the instruction received
         ''' 2 reception events are raised:
