@@ -19,53 +19,53 @@ Partial Class UiResultsCalibCurve
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.components = New System.ComponentModel.Container
-        Dim XyDiagram1 As DevExpress.XtraCharts.XYDiagram = New DevExpress.XtraCharts.XYDiagram
-        Dim RectangleGradientFillOptions1 As DevExpress.XtraCharts.RectangleGradientFillOptions = New DevExpress.XtraCharts.RectangleGradientFillOptions
-        Dim Series1 As DevExpress.XtraCharts.Series = New DevExpress.XtraCharts.Series
-        Dim PointSeriesLabel1 As DevExpress.XtraCharts.PointSeriesLabel = New DevExpress.XtraCharts.PointSeriesLabel
-        Dim LineSeriesView1 As DevExpress.XtraCharts.LineSeriesView = New DevExpress.XtraCharts.LineSeriesView
-        Dim Series2 As DevExpress.XtraCharts.Series = New DevExpress.XtraCharts.Series
-        Dim PointSeriesLabel2 As DevExpress.XtraCharts.PointSeriesLabel = New DevExpress.XtraCharts.PointSeriesLabel
-        Dim PointSeriesView1 As DevExpress.XtraCharts.PointSeriesView = New DevExpress.XtraCharts.PointSeriesView
-        Dim PointSeriesLabel3 As DevExpress.XtraCharts.PointSeriesLabel = New DevExpress.XtraCharts.PointSeriesLabel
-        Dim PointSeriesView2 As DevExpress.XtraCharts.PointSeriesView = New DevExpress.XtraCharts.PointSeriesView
-        Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle2 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle3 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle4 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle5 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
+        Me.components = New System.ComponentModel.Container()
+        Dim XyDiagram1 As DevExpress.XtraCharts.XYDiagram = New DevExpress.XtraCharts.XYDiagram()
+        Dim RectangleGradientFillOptions1 As DevExpress.XtraCharts.RectangleGradientFillOptions = New DevExpress.XtraCharts.RectangleGradientFillOptions()
+        Dim Series1 As DevExpress.XtraCharts.Series = New DevExpress.XtraCharts.Series()
+        Dim PointSeriesLabel1 As DevExpress.XtraCharts.PointSeriesLabel = New DevExpress.XtraCharts.PointSeriesLabel()
+        Dim LineSeriesView1 As DevExpress.XtraCharts.LineSeriesView = New DevExpress.XtraCharts.LineSeriesView()
+        Dim Series2 As DevExpress.XtraCharts.Series = New DevExpress.XtraCharts.Series()
+        Dim PointSeriesLabel2 As DevExpress.XtraCharts.PointSeriesLabel = New DevExpress.XtraCharts.PointSeriesLabel()
+        Dim PointSeriesView1 As DevExpress.XtraCharts.PointSeriesView = New DevExpress.XtraCharts.PointSeriesView()
+        Dim PointSeriesLabel3 As DevExpress.XtraCharts.PointSeriesLabel = New DevExpress.XtraCharts.PointSeriesLabel()
+        Dim PointSeriesView2 As DevExpress.XtraCharts.PointSeriesView = New DevExpress.XtraCharts.PointSeriesView()
+        Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle2 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle3 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle4 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle5 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiResultsCalibCurve))
-        Me.BsErrorProvider1 = New Biosystems.Ax00.Controls.UserControls.BSErrorProvider
-        Me.bsProgTestToolTips = New Biosystems.Ax00.Controls.UserControls.BSToolTip
-        Me.bsExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsPrintButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsCurveResultTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsOrderDetailsGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.TypeGroupbox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.bsIncreasingRadioButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton
-        Me.bsDecreasingRadioButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton
-        Me.CalibrationCurveCombo = New Biosystems.Ax00.Controls.UserControls.BSComboBox
-        Me.bsCalibrationCurveLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsLotTextBox = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsCalibratorNameTextBox = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsSampleTypeTextBox = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.YAxisCombo = New Biosystems.Ax00.Controls.UserControls.BSComboBox
-        Me.bsSampleTypeLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsYAxisLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsCalibrationCurveTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.XAxisCombo = New Biosystems.Ax00.Controls.UserControls.BSComboBox
-        Me.TestDescriptionTextBox = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsXAxisLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsTestNameLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.ResultsPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.TitleChartLabel = New DevExpress.XtraEditors.LabelControl
-        Me.AbsLabelControl = New DevExpress.XtraEditors.LabelControl
-        Me.DXChartControl = New DevExpress.XtraCharts.ChartControl
-        Me.bsLotLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.CalibratorsDataGridView = New Biosystems.Ax00.Controls.UserControls.BSDataGridView
-        Me.bsCalibratorNameLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsButton1 = New Biosystems.Ax00.Controls.UserControls.BSButton
+        Me.BsErrorProvider1 = New Biosystems.Ax00.Controls.UserControls.BSErrorProvider()
+        Me.bsProgTestToolTips = New Biosystems.Ax00.Controls.UserControls.BSToolTip()
+        Me.bsExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsPrintButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsCurveResultTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsOrderDetailsGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.TypeGroupbox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.bsIncreasingRadioButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton()
+        Me.bsDecreasingRadioButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton()
+        Me.CalibrationCurveCombo = New Biosystems.Ax00.Controls.UserControls.BSComboBox()
+        Me.bsCalibrationCurveLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsLotTextBox = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsCalibratorNameTextBox = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsSampleTypeTextBox = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.YAxisCombo = New Biosystems.Ax00.Controls.UserControls.BSComboBox()
+        Me.bsSampleTypeLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsYAxisLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsCalibrationCurveTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.XAxisCombo = New Biosystems.Ax00.Controls.UserControls.BSComboBox()
+        Me.TestDescriptionTextBox = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsXAxisLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsTestNameLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.ResultsPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.TitleChartLabel = New DevExpress.XtraEditors.LabelControl()
+        Me.AbsLabelControl = New DevExpress.XtraEditors.LabelControl()
+        Me.DXChartControl = New DevExpress.XtraCharts.ChartControl()
+        Me.bsLotLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.CalibratorsDataGridView = New Biosystems.Ax00.Controls.UserControls.BSDataGridView()
+        Me.bsCalibratorNameLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsButton1 = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.ToolTipController1 = New DevExpress.Utils.ToolTipController(Me.components)
         CType(Me.BsErrorProvider1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.bsOrderDetailsGroupBox.SuspendLayout()
@@ -399,25 +399,24 @@ Partial Class UiResultsCalibCurve
         '
         'DXChartControl
         '
-        Me.DXChartControl.AppearanceName = "Chameleon"
+        Me.DXChartControl.AppearanceNameSerializable = "Chameleon"
+        Me.DXChartControl.CrosshairEnabled = DevExpress.Utils.DefaultBoolean.[False]
         XyDiagram1.AxisX.GridLines.Visible = True
         XyDiagram1.AxisX.Label.Font = New System.Drawing.Font("Verdana", 8.0!)
-        XyDiagram1.AxisX.WholeRange.AutoSideMargins = True
-        XyDiagram1.AxisX.VisualRange.AutoSideMargins = True
         XyDiagram1.AxisX.Tickmarks.MinorVisible = False
         XyDiagram1.AxisX.Title.Antialiasing = False
         XyDiagram1.AxisX.Title.Font = New System.Drawing.Font("Verdana", 8.0!)
         XyDiagram1.AxisX.Title.Text = "*Concentration"
-        XyDiagram1.AxisX.Title.Visibility = DevExpress.Utils.DefaultBoolean.True
+        XyDiagram1.AxisX.Title.Visibility = DevExpress.Utils.DefaultBoolean.[True]
         XyDiagram1.AxisX.VisibleInPanesSerializable = "-1"
-        XyDiagram1.AxisY.WholeRange.AutoSideMargins = True
-        XyDiagram1.AxisY.VisualRange.AutoSideMargins = True
+        XyDiagram1.AxisX.WholeRange.AutoSideMargins = True
         XyDiagram1.AxisY.Tickmarks.MinorVisible = False
         XyDiagram1.AxisY.Title.Antialiasing = False
         XyDiagram1.AxisY.Title.Font = New System.Drawing.Font("Verdana", 8.0!)
         XyDiagram1.AxisY.Title.Text = "*Absorbance"
-        XyDiagram1.AxisY.Title.Visibility = DevExpress.Utils.DefaultBoolean.True
+        XyDiagram1.AxisY.Title.Visibility = DevExpress.Utils.DefaultBoolean.[True]
         XyDiagram1.AxisY.VisibleInPanesSerializable = "-1"
+        XyDiagram1.AxisY.WholeRange.AutoSideMargins = True
         XyDiagram1.DefaultPane.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
         XyDiagram1.DefaultPane.FillStyle.FillMode = DevExpress.XtraCharts.FillMode.Gradient
         RectangleGradientFillOptions1.Color2 = System.Drawing.Color.Gainsboro
@@ -425,15 +424,16 @@ Partial Class UiResultsCalibCurve
         XyDiagram1.DefaultPane.FillStyle.Options = RectangleGradientFillOptions1
         XyDiagram1.Margins.Top = 25
         Me.DXChartControl.Diagram = XyDiagram1
-        Me.DXChartControl.Legend.Visibility = DevExpress.Utils.DefaultBoolean.False
+        Me.DXChartControl.Legend.Visibility = DevExpress.Utils.DefaultBoolean.[False]
         Me.DXChartControl.Location = New System.Drawing.Point(0, 0)
         Me.DXChartControl.Name = "DXChartControl"
+        Me.DXChartControl.RuntimeHitTesting = True
         Series1.ArgumentScaleType = DevExpress.XtraCharts.ScaleType.Numerical
-        PointSeriesLabel1.LineVisibility = DevExpress.Utils.DefaultBoolean.True
+        PointSeriesLabel1.LineVisibility = DevExpress.Utils.DefaultBoolean.[True]
         Series1.Label = PointSeriesLabel1
+        Series1.LabelsVisibility = DevExpress.Utils.DefaultBoolean.[False]
         Series1.Name = "Series 1"
         Series1.ShowInLegend = False
-        Series1.LabelsVisibility = DevExpress.Utils.DefaultBoolean.False
         LineSeriesView1.Color = System.Drawing.Color.LightSkyBlue
         LineSeriesView1.LineMarkerOptions.BorderVisible = False
         LineSeriesView1.LineMarkerOptions.FillStyle.FillMode = DevExpress.XtraCharts.FillMode.Solid
@@ -442,9 +442,9 @@ Partial Class UiResultsCalibCurve
         Series2.ArgumentScaleType = DevExpress.XtraCharts.ScaleType.Numerical
         PointSeriesLabel2.Angle = 90
         PointSeriesLabel2.BackColor = System.Drawing.Color.Transparent
-        PointSeriesLabel2.Border.Visibility = DevExpress.Utils.DefaultBoolean.False
+        PointSeriesLabel2.Border.Visibility = DevExpress.Utils.DefaultBoolean.[False]
         PointSeriesLabel2.Font = New System.Drawing.Font("Verdana", 8.0!, System.Drawing.FontStyle.Bold)
-        PointSeriesLabel2.LineVisibility = DevExpress.Utils.DefaultBoolean.False
+        PointSeriesLabel2.LineVisibility = DevExpress.Utils.DefaultBoolean.[False]
         PointSeriesLabel2.ResolveOverlappingMode = DevExpress.XtraCharts.ResolveOverlappingMode.JustifyAroundPoint
         PointSeriesLabel2.TextColor = System.Drawing.Color.Black
         Series2.Label = PointSeriesLabel2
@@ -457,7 +457,7 @@ Partial Class UiResultsCalibCurve
         PointSeriesView1.PointMarkerOptions.Size = 12
         Series2.View = PointSeriesView1
         Me.DXChartControl.SeriesSerializable = New DevExpress.XtraCharts.Series() {Series1, Series2}
-        PointSeriesLabel3.LineVisibility = DevExpress.Utils.DefaultBoolean.True
+        PointSeriesLabel3.LineVisibility = DevExpress.Utils.DefaultBoolean.[True]
         Me.DXChartControl.SeriesTemplate.Label = PointSeriesLabel3
         Me.DXChartControl.SeriesTemplate.View = PointSeriesView2
         Me.DXChartControl.Size = New System.Drawing.Size(448, 499)
@@ -559,11 +559,10 @@ Partial Class UiResultsCalibCurve
         Me.BsButton1.UseVisualStyleBackColor = True
         Me.BsButton1.Visible = False
         '
-        'IResultsCalibCurve
+        'UiResultsCalibCurve
         '
         Me.AcceptButton = Me.bsExitButton
         Me.Appearance.BackColor = System.Drawing.Color.Gainsboro
-        Me.Appearance.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Appearance.GradientMode = System.Drawing.Drawing2D.LinearGradientMode.ForwardDiagonal
         Me.Appearance.Options.UseBackColor = True
         Me.Appearance.Options.UseFont = True

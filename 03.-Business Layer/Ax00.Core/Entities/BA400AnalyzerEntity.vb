@@ -53,28 +53,34 @@ Namespace Biosystems.Ax00.Core.Entities
             Return SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine) = ""
         End Function
 
-        'Public Overrides ReadOnly Property GetModelValue(ByVal pAnalyzerID As String) As String
-        '    'AJG Pendiente de poner lo que le toca
-        '    Get
-        '        Dim returnValue As String = ""
+        Public Overrides ReadOnly Property GetModelValue(ByVal pAnalyzerID As String) As String
+            'AJG Pendiente de poner lo que le toca
+            Get
+                Dim returnValue As String = ""
 
-        '        If pAnalyzerID.Length > 0 Then
-        '            Dim strTocompare As String
+                If pAnalyzerID.Length > 0 Then
 
-        '            strTocompare = GetUpperPartSN(pAnalyzerID)
+                    If (pAnalyzerID = GenericDefaultAnalyzer()) Then
+                        returnValue = "A400"
+                    Else
+                        Dim strTocompare = GetUpperPartSN(pAnalyzerID)
 
-        '            Select Case strTocompare
-        '                Case "SN0"  ' Generic
-        '                    returnValue = "A400"
+                        If (strTocompare = BA400ModelID) Then
+                            returnValue = "A400"
+                        End If
+                    End If
+                End If
 
-        '                Case GlobalBase.BA400ModelID
-        '                    returnValue = "A400"
-        '            End Select
-        '        End If
+                Return returnValue
+            End Get
+        End Property
 
-        '        Return returnValue
-        '    End Get
-        'End Property
+        Public Overrides ReadOnly Property GenericDefaultAnalyzer() As String
+            Get
+                Return "SN0000099999_Ax400"
+            End Get
+        End Property
+
 #End Region
 
         Public Overrides ReadOnly Property WashingIDRequired As Boolean

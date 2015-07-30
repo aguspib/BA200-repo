@@ -1,4 +1,5 @@
-﻿Imports Biosystems.Ax00.PresentationCOM
+﻿Imports Biosystems.Ax00.App
+Imports Biosystems.Ax00.PresentationCOM
 Imports Biosystems.Ax00.Global
 
 Public NotInheritable Class StartupSRV
