@@ -4485,7 +4485,9 @@ Public Class UiMotorsPumpsValvesTest
     ''' <summary>
     ''' Prepare GUI for Fw Events Enabled Mode
     ''' </summary>
-    ''' <remarks>Created by SGM 11/07/2011</remarks>
+    ''' <remarks>
+    ''' Created by: SGM 11/07/2011
+    ''' </remarks>
     Private Sub PrepareCollisionTestEnabledMode()
 
         Dim myGlobal As New GlobalDataTO
@@ -4507,7 +4509,10 @@ Public Class UiMotorsPumpsValvesTest
     ''' <summary>
     ''' Prepare GUI for Fw Events Disabling Mode
     ''' </summary>
-    ''' <remarks>Created by SGM 11/07/2011</remarks>
+    ''' <remarks>
+    ''' Created by: SGM 11/07/2011
+    ''' Modified by: IT 30/07/2015 - BA-2743
+    ''' </remarks>
     Private Sub PrepareCollisionTestDisablingMode()
 
         Dim myGlobal As New GlobalDataTO
@@ -4515,7 +4520,12 @@ Public Class UiMotorsPumpsValvesTest
         Try
             'myGlobal = MyBase.DisplayMessage(Messages.SRV_DISABLING_FW_EVENTS.ToString)
             'Me.Col_StartButton.Enabled = False
+
             Me.Col_StartStopButton.Enabled = False
+            Me.IsCollisionTestEnabled = False
+            If MyBase.SimulationMode Then
+                Me.BsCollisionSimulationTimer.Enabled = False
+            End If
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareCollisionTestDisablingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -6641,7 +6651,10 @@ Public Class UiMotorsPumpsValvesTest
     ''' Enables Needle Collision test
     ''' </summary>
     ''' <returns></returns>
-    ''' <remarks>Created SGM 04/10/2012</remarks>
+    ''' <remarks>
+    ''' Created by: SGM 04/10/2012
+    ''' Modified by: IT 30/07/2015 - BA-2743
+    ''' </remarks>
     Private Function Col_EnableTest() As GlobalDataTO
 
         Dim myGlobal As New GlobalDataTO
@@ -6654,8 +6667,11 @@ Public Class UiMotorsPumpsValvesTest
                 myGlobal = MyBase.myServiceMDI.SEND_INFO_STOP
                 System.Threading.Thread.Sleep(MyBase.SimulationProcessTime)
                 myGlobal = MyBase.myServiceMDI.SEND_INFO_STOP
-                Col_SimulateCollision()
+                'Col_SimulateCollision()
                 'myGlobal = MyBase.DisplayMessage(Messages.SRV_COLLISION_TEST_READY.ToString)
+
+                MyBase.CurrentMode = ADJUSTMENT_MODES.COLLISION_TEST_ENABLED
+                PrepareArea()
 
             Else
 
@@ -6696,6 +6712,12 @@ Public Class UiMotorsPumpsValvesTest
 
     End Function
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks>
+    ''' Modified by: IT 30/07/2015 - BA-2743
+    ''' </remarks>
     Private Function Col_DisableTest() As GlobalDataTO
 
         Dim myGlobal As New GlobalDataTO
@@ -6705,9 +6727,12 @@ Public Class UiMotorsPumpsValvesTest
             myGlobal = MyBase.DisplayMessage(Messages.SRV_DISABLING_FW_EVENTS.ToString)
 
             If MyBase.SimulationMode Then
-                System.Threading.Thread.Sleep(MyBase.SimulationProcessTime)
+                MyBase.CurrentMode = ADJUSTMENT_MODES.COLLISION_TEST_DISABLING
+                PrepareArea()
+
                 myGlobal = MyBase.DisplayMessage(Messages.SRV_TEST_COMPLETED.ToString)
-                MyBase.CurrentMode = ADJUSTMENT_MODES.LOADED
+                System.Threading.Thread.Sleep(MyBase.SimulationProcessTime)
+                
             Else
 
                 If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
@@ -6747,31 +6772,58 @@ Public Class UiMotorsPumpsValvesTest
 
     End Function
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks>
+    ''' Modified by: IT 30/07/2015 - BA-2743
+    ''' </remarks>
     Private Sub Col_SimulateCollision()
         Try
+            Dim result As Integer = 0
 
+            Math.DivRem(Now.Second, 4, result)
 
-            If Now.Second > 0 And Now.Second <= 15 Then
-                Me.Col_SamplesLED.CurrentStatus = ConvertFwStringToCollisionStatus("1")
-                Me.Col_Reagent1LED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
-                Me.Col_Reagent2LED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
-                Me.Col_WashingStationLED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
-            ElseIf Now.Second > 15 And Now.Second <= 30 Then
-                Me.Col_SamplesLED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
-                Me.Col_Reagent1LED.CurrentStatus = ConvertFwStringToCollisionStatus("1")
-                Me.Col_Reagent2LED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
-                Me.Col_WashingStationLED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
-            ElseIf Now.Second > 30 And Now.Second <= 45 Then
-                Me.Col_SamplesLED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
-                Me.Col_Reagent1LED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
-                Me.Col_Reagent2LED.CurrentStatus = ConvertFwStringToCollisionStatus("1")
-                Me.Col_WashingStationLED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
-            ElseIf Now.Second > 45 And Now.Second <= 60 Then
-                Me.Col_SamplesLED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
-                Me.Col_Reagent1LED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
-                Me.Col_Reagent2LED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
-                Me.Col_WashingStationLED.CurrentStatus = ConvertFwStringToCollisionStatus("1")
+            If Not AnalyzerController.Instance.IsBA200 Then
+                If result = 1 Then
+                    Me.Col_SamplesLED.CurrentStatus = ConvertFwStringToCollisionStatus("1")
+                    Me.Col_Reagent1LED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
+                    Me.Col_Reagent2LED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
+                    Me.Col_WashingStationLED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
+                End If
+                If result = 2 Then
+                    Me.Col_SamplesLED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
+                    Me.Col_Reagent1LED.CurrentStatus = ConvertFwStringToCollisionStatus("1")
+                    Me.Col_Reagent2LED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
+                    Me.Col_WashingStationLED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
+                End If
+                If result = 3 Then
+                    Me.Col_SamplesLED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
+                    Me.Col_Reagent1LED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
+                    Me.Col_Reagent2LED.CurrentStatus = ConvertFwStringToCollisionStatus("1")
+                    Me.Col_WashingStationLED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
+                End If
+                If result = 4 Then
+                    Me.Col_SamplesLED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
+                    Me.Col_Reagent1LED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
+                    Me.Col_Reagent2LED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
+                    Me.Col_WashingStationLED.CurrentStatus = ConvertFwStringToCollisionStatus("1")
+                End If
+            Else
+                If result = 1 Then
+                    Me.Col_SamplesLED.CurrentStatus = ConvertFwStringToCollisionStatus("1")
+                    Me.Col_Reagent1LED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
+                    Me.Col_Reagent2LED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
+                    Me.Col_WashingStationLED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
+                End If
+                If result = 3 Then
+                    Me.Col_SamplesLED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
+                    Me.Col_Reagent1LED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
+                    Me.Col_Reagent2LED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
+                    Me.Col_WashingStationLED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
+                End If
             End If
+
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Col_SimulateCollision ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -8596,11 +8648,11 @@ Public Class UiMotorsPumpsValvesTest
     Private Sub BsCollisionSimulationTimer_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsCollisionSimulationTimer.Tick
         Try
 
-            BsCollisionSimulationTimer.Enabled = False
+            'BsCollisionSimulationTimer.Enabled = False
 
             MyClass.Col_SimulateCollision()
 
-            BsCollisionSimulationTimer.Enabled = True
+            'BsCollisionSimulationTimer.Enabled = True
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsHomingSimulationTimer_Tick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
