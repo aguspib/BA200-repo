@@ -1033,7 +1033,7 @@
           <InstructionID>1</InstructionID>
           <Sequence>1</Sequence>
           <Timer>0</Timer>
-          <Code>BM1.MH.MMR</Code>
+          <Code>BR1.MH.MMR</Code>
           <Params>#1@</Params>
           <EnableEdition>false</EnableEdition>
         </InstructionTO>
