@@ -174,7 +174,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
             Try
 
-                If MyClass.HistoryArea <> Nothing Then
+                If Me.HistoryArea <> Nothing Then
 
                     Dim myHistoricReportDS As New SRVResultsServiceDS
                     Dim myHistoricReportRow As SRVResultsServiceDS.srv_thrsResultsServiceRow
@@ -182,13 +182,13 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     Dim myTask As String = ""
                     Dim myAction As String = ""
 
-                    Select Case MyClass.HistoryTask
+                    Select Case Me.HistoryTask
                         Case PreloadedMasterDataEnum.SRV_ACT_ADJ_TYPES : myTask = "ADJUST"
                         Case PreloadedMasterDataEnum.SRV_ACT_TEST_TYPES : myTask = "TEST"
                         Case PreloadedMasterDataEnum.SRV_ACT_UTIL_TYPES : myTask = "UTIL"
                     End Select
 
-                    Select Case MyClass.HistoryArea
+                    Select Case Me.HistoryArea
                         Case HISTORY_AREAS.BACKUP_ADJ : myAction = "ADJ_BK"
                         Case HISTORY_AREAS.RESTORE_ADJ : myAction = "ADJ_RES"
                         Case HISTORY_AREAS.RESTORE_FACTORY_ADJ : myAction = "ADJ_FAC"
@@ -209,8 +209,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                         .BeginEdit()
                         .TaskID = myTask
                         .ActionID = myAction
-                        .Data = MyClass.GenerateResultData()
-                        .AnalyzerID = MyClass.AnalyzerId
+                        .Data = Me.GenerateResultData()
+                        .AnalyzerID = Me.AnalyzerId
                         .EndEdit()
                     End With
 
@@ -227,11 +227,11 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                         ' pending implementation for add possibles Recommendations usings in case of INCIDENCE!!!
                         If generatedID >= 0 Then
                             ' Insert recommendations if existing
-                            If MyClass.RecommendationsList IsNot Nothing Then
+                            If Me.RecommendationsList IsNot Nothing Then
                                 Dim myRecommendationsList As New SRVRecommendationsServiceDS
                                 Dim myRecommendationsRow As SRVRecommendationsServiceDS.srv_thrsRecommendationsServiceRow
 
-                                For Each R As HISTORY_RECOMMENDATIONS In MyClass.RecommendationsList
+                                For Each R As HISTORY_RECOMMENDATIONS In Me.RecommendationsList
                                     myRecommendationsRow = myRecommendationsList.srv_thrsRecommendationsService.Newsrv_thrsRecommendationsServiceRow
                                     myRecommendationsRow.ResultServiceID = generatedID
                                     myRecommendationsRow.RecommendationID = CInt(R)
@@ -335,7 +335,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                         Dim myColWidth As Integer = 35
                         Dim myColSep As Integer = 3
 
-                        Dim myResult As HISTORY_RESULTS = MyClass.DecodeHistoryDataResult(pData)
+                        Dim myResult As HISTORY_RESULTS = Me.DecodeHistoryDataResult(pData)
 
                         myLine = New List(Of String)
 
@@ -348,7 +348,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 text1 = (MLRD.GetResourceText(dbConnection, "LBL_SRV_ADJ_BK", pLanguageId) + ":")
                                 myLine.Add(text1)
 
-                                text2 = MyClass.GetResultLanguageResource(dbConnection, myResult, pLanguageId)
+                                text2 = Me.GetResultLanguageResource(dbConnection, myResult, pLanguageId)
                                 myLine.Add(text2)
 
 
@@ -361,7 +361,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 text1 = (MLRD.GetResourceText(dbConnection, "LBL_SRV_ ADJ_RES", pLanguageId) + ":")
                                 myLine.Add(text1)
 
-                                text2 = MyClass.GetResultLanguageResource(dbConnection, myResult, pLanguageId)
+                                text2 = Me.GetResultLanguageResource(dbConnection, myResult, pLanguageId)
                                 myLine.Add(text2)
 
 
@@ -373,7 +373,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 text1 = (MLRD.GetResourceText(dbConnection, "LBL_SRV_ ADJ_FAC", pLanguageId) + ":")
                                 myLine.Add(text1)
 
-                                text2 = MyClass.GetResultLanguageResource(dbConnection, myResult, pLanguageId)
+                                text2 = Me.GetResultLanguageResource(dbConnection, myResult, pLanguageId)
                                 myLine.Add(text2)
 
 
@@ -385,7 +385,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 text1 = (MLRD.GetResourceText(dbConnection, "LBL_SRV_FW_UPDATE_OPEN", pLanguageId) + ":")
                                 myLine.Add(text1)
 
-                                text2 = MyClass.GetResultLanguageResource(dbConnection, myResult, pLanguageId)
+                                text2 = Me.GetResultLanguageResource(dbConnection, myResult, pLanguageId)
                                 myLine.Add(text2)
 
                             Case HISTORY_AREAS.UPDATE_FW_START
@@ -396,7 +396,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 text1 = (MLRD.GetResourceText(dbConnection, "LBL_SRV_FW_UPDATE_START", pLanguageId) + ":")
                                 myLine.Add(text1)
 
-                                text2 = MyClass.GetResultLanguageResource(dbConnection, myResult, pLanguageId)
+                                text2 = Me.GetResultLanguageResource(dbConnection, myResult, pLanguageId)
                                 myLine.Add(text2)
 
                             Case HISTORY_AREAS.UPDATE_FW_SEND
@@ -407,7 +407,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 text1 = (MLRD.GetResourceText(dbConnection, "LBL_SRV_FW_UPDATE_SEND", pLanguageId) + ":")
                                 myLine.Add(text1)
 
-                                text2 = MyClass.GetResultLanguageResource(dbConnection, myResult, pLanguageId)
+                                text2 = Me.GetResultLanguageResource(dbConnection, myResult, pLanguageId)
                                 myLine.Add(text2)
 
                             Case HISTORY_AREAS.UPDATE_FW_QUERY
@@ -418,7 +418,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 text1 = (MLRD.GetResourceText(dbConnection, "LBL_SRV_FW_UPDATE_QUERY", pLanguageId) + ":")
                                 myLine.Add(text1)
 
-                                text2 = MyClass.GetResultLanguageResource(dbConnection, myResult, pLanguageId)
+                                text2 = Me.GetResultLanguageResource(dbConnection, myResult, pLanguageId)
                                 myLine.Add(text2)
 
                             Case HISTORY_AREAS.UPDATE_FW_CPU
@@ -429,7 +429,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 text1 = (MLRD.GetResourceText(dbConnection, "LBL_SRV_FW_UPDATE_CPU", pLanguageId) + ":")
                                 myLine.Add(text1)
 
-                                text2 = MyClass.GetResultLanguageResource(dbConnection, myResult, pLanguageId)
+                                text2 = Me.GetResultLanguageResource(dbConnection, myResult, pLanguageId)
                                 myLine.Add(text2)
 
                             Case HISTORY_AREAS.UPDATE_FW_PER
@@ -440,7 +440,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 text1 = (MLRD.GetResourceText(dbConnection, "LBL_SRV_FW_UPDATE_PER", pLanguageId) + ":")
                                 myLine.Add(text1)
 
-                                text2 = MyClass.GetResultLanguageResource(dbConnection, myResult, pLanguageId)
+                                text2 = Me.GetResultLanguageResource(dbConnection, myResult, pLanguageId)
                                 myLine.Add(text2)
 
                             Case HISTORY_AREAS.UPDATE_FW_MAN
@@ -451,7 +451,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 text1 = (MLRD.GetResourceText(dbConnection, "LBL_SRV_FW_UPDATE_MAN", pLanguageId) + ":")
                                 myLine.Add(text1)
 
-                                text2 = MyClass.GetResultLanguageResource(dbConnection, myResult, pLanguageId)
+                                text2 = Me.GetResultLanguageResource(dbConnection, myResult, pLanguageId)
                                 myLine.Add(text2)
 
                             Case HISTORY_AREAS.UPDATE_FW_ADJ
@@ -462,7 +462,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 text1 = (MLRD.GetResourceText(dbConnection, "LBL_SRV_FW_UPDATE_ADJ", pLanguageId) + ":")
                                 myLine.Add(text1)
 
-                                text2 = MyClass.GetResultLanguageResource(dbConnection, myResult, pLanguageId)
+                                text2 = Me.GetResultLanguageResource(dbConnection, myResult, pLanguageId)
                                 myLine.Add(text2)
 
 
@@ -471,7 +471,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
                         If myResult = HISTORY_RESULTS.NOK Then
 
-                            text3 = MyClass.DecodeHistoryNOKReasons(pData, dbConnection, pLanguageId)
+                            text3 = Me.DecodeHistoryNOKReasons(pData, dbConnection, pLanguageId)
                             myLine.Add(text3)
 
 
@@ -520,8 +520,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Dim myData As String = ""
 
             Try
-                myData = MyClass.EncodeHistoryResult(MyClass.HistoryResult)
-                myData &= CInt(MyClass.HistoryNOKReason).ToString
+                myData = Me.EncodeHistoryResult(Me.HistoryResult)
+                myData &= CInt(Me.HistoryNOKReason).ToString
 
 
 
@@ -686,17 +686,17 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Try
                 ' registering the incidence in historical reports activity
 
-                'If MyClass.RecommendationsReport Is Nothing Then
-                '    ReDim MyClass.RecommendationsReport(0)
+                'If me.RecommendationsReport Is Nothing Then
+                '    ReDim me.RecommendationsReport(0)
                 'Else
-                '    ReDim Preserve MyClass.RecommendationsReport(UBound(MyClass.RecommendationsReport) + 1)
+                '    ReDim Preserve me.RecommendationsReport(UBound(me.RecommendationsReport) + 1)
                 'End If
-                'MyClass.RecommendationsReport(UBound(MyClass.RecommendationsReport)) = pRecommendationID
+                'me.RecommendationsReport(UBound(me.RecommendationsReport)) = pRecommendationID
 
-                If MyClass.RecommendationsList Is Nothing Then
-                    MyClass.RecommendationsList = New List(Of HISTORY_RECOMMENDATIONS)
+                If Me.RecommendationsList Is Nothing Then
+                    Me.RecommendationsList = New List(Of HISTORY_RECOMMENDATIONS)
                 End If
-                MyClass.RecommendationsList.Add(pRecommendationID)
+                Me.RecommendationsList.Add(pRecommendationID)
 
             Catch ex As Exception
                 'Dim myLogAcciones As New ApplicationLogManager()
@@ -726,10 +726,10 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 If pResponse = RESPONSE_TYPES.TIMEOUT Or _
                    pResponse = RESPONSE_TYPES.EXCEPTION Then
 
-                    If MyClass.ReportCountTimeout = 0 Then
-                        MyClass.ReportCountTimeout += 1
+                    If Me.ReportCountTimeout = 0 Then
+                        Me.ReportCountTimeout += 1
                         ' registering the incidence in historical reports activity
-                        MyClass.UpdateRecommendationsList(HISTORY_RECOMMENDATIONS.ERR_COMM)
+                        Me.UpdateRecommendationsList(HISTORY_RECOMMENDATIONS.ERR_COMM)
                     End If
 
                     Exit Sub
@@ -773,11 +773,11 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         Public Function SendRESTORE_ADJUSTMENTS() As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
-                'MyClass.RestoringAdjustmentsTextAttr = "ISEINS:1;" 'QUITAR
-                If MyClass.RestoringAdjustmentsTextAttr.Length > 0 Then
+                'me.RestoringAdjustmentsTextAttr = "ISEINS:1;" 'QUITAR
+                If Me.RestoringAdjustmentsTextAttr.Length > 0 Then
                     myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.LOADADJ, _
                                                                                      True, Nothing, _
-                                                                                     MyClass.RestoringAdjustmentsTextAttr) '#REFACTORING
+                                                                                     Me.RestoringAdjustmentsTextAttr) '#REFACTORING
                 End If
 
             Catch ex As Exception
@@ -788,7 +788,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.SendRESTORE_ADJUSTMENTS", EventLogEntryType.Error, False)
             End Try
-            MyClass.RestoringAdjustmentsTextAttr = ""
+            Me.RestoringAdjustmentsTextAttr = ""
             Return myGlobal
         End Function
 
@@ -914,7 +914,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
         Public ReadOnly Property FWFileSendingBlockIndex() As Integer
             Get
-                Return MyClass.FWFileSendingBlockIndexAttr
+                Return Me.FWFileSendingBlockIndexAttr
             End Get
         End Property
 
@@ -946,9 +946,9 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '    Dim myGlobal As New GlobalDataTO
         '    Try
 
-        '        MyClass.FWUpdateCurrentActionAttr = FwUpdateActions.StartUpdate
+        '        me.FWUpdateCurrentActionAttr = FwUpdateActions.StartUpdate
 
-        '        myGlobal = MyClass.SendFWUTIL
+        '        myGlobal = me.SendFWUTIL
 
         '    Catch ex As Exception
         '        myGlobal.HasError = True
@@ -958,7 +958,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.StartUPDATE_FIRMWARE", EventLogEntryType.Error, False)
         '    End Try
-        '    MyClass.RestoringAdjustmentsTextAttr = ""
+        '    me.RestoringAdjustmentsTextAttr = ""
         '    Return myGlobal
         'End Function
 
@@ -976,8 +976,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
 
 
-                If MyClass.FWUpdateCurrentAction <> FwUpdateActions.None Then
-                    myFWUpdateRequest = New FWUpdateRequestTO(MyClass.FWUpdateCurrentAction)
+                If Me.FWUpdateCurrentAction <> FwUpdateActions.None Then
+                    myFWUpdateRequest = New FWUpdateRequestTO(Me.FWUpdateCurrentAction)
 
                     With myFWUpdateRequest
 
@@ -991,14 +991,14 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
 
                         If .ActionType = FwUpdateActions.StartUpdate Then
-                            .DataBlockIndex = MyClass.FWFileBlocksAttr.Count
-                            '.DataBlockSize = MyClass.FWFileSizeAttr
+                            .DataBlockIndex = Me.FWFileBlocksAttr.Count
+                            '.DataBlockSize = me.FWFileSizeAttr
 
                         ElseIf .ActionType = FwUpdateActions.SendRepository Then
-                            MyClass.FWFileSendingBlockIndexAttr = BlockIndex
-                            .DataBlockIndex = MyClass.FWFileSendingBlockIndexAttr + 1
-                            .DataBlockSize = MyClass.FWFileBlocksAttr(BlockIndex).Length
-                            .DataBlockBytes = MyClass.FWFileBlocksAttr(BlockIndex)
+                            Me.FWFileSendingBlockIndexAttr = BlockIndex
+                            .DataBlockIndex = Me.FWFileSendingBlockIndexAttr + 1
+                            .DataBlockSize = Me.FWFileBlocksAttr(BlockIndex).Length
+                            .DataBlockBytes = Me.FWFileBlocksAttr(BlockIndex)
                             BlockIndex += 1
 
                         Else
@@ -1061,23 +1061,23 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     Dim myStringData = System.Text.ASCIIEncoding.ASCII.GetString(myFileBytes)
 
                     '1- Get Header Information
-                    myGlobal = MyClass.GetFWFileHeaderInfo(myStringData)
+                    myGlobal = Me.GetFWFileHeaderInfo(myStringData)
 
                     If Not myGlobal.HasError Then
 
                         '2- Validate Compatibility with Software
-                        myGlobal = MyClass.ValidateFwFileVersion(MyClass.FWFileHeaderVersion)
+                        myGlobal = Me.ValidateFwFileVersion(Me.FWFileHeaderVersion)
                         If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
-                            MyClass.IsFwFileCompatibleAttr = CBool(myGlobal.SetDatos)
+                            Me.IsFwFileCompatibleAttr = CBool(myGlobal.SetDatos)
 
-                            If Not MyClass.IsFwFileCompatibleAttr Then
+                            If Not Me.IsFwFileCompatibleAttr Then
                                 myGlobal.HasError = True
                             End If
 
                         End If
 
                         ''it is allowe any fw file - TO TEST !!!
-                        'MyClass.IsFwFileCompatibleAttr = True
+                        'me.IsFwFileCompatibleAttr = True
 
                         '3- Calculate CRC32 of all Repository File
                         If Not myGlobal.HasError Then
@@ -1089,14 +1089,14 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
                         '4- Load obtained data: CRC calculated and bytes
                         If Not myGlobal.HasError Then
-                            MyClass.FWFileCRC32HexAttr = myCRC32Hex
-                            MyClass.FWFileBytesDataAttr = myFileBytes
+                            Me.FWFileCRC32HexAttr = myCRC32Hex
+                            Me.FWFileBytesDataAttr = myFileBytes
 
-                            MyClass.FWFileStringDataAttr = myStringData
+                            Me.FWFileStringDataAttr = myStringData
 
-                            myGlobal = MyClass.SplitFwFile(2048) 'split in 2048 bytes blocks
+                            myGlobal = Me.SplitFwFile(2048) 'split in 2048 bytes blocks
                             If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
-                                MyClass.FWFileBlocksAttr = CType(myGlobal.SetDatos, List(Of Byte()))
+                                Me.FWFileBlocksAttr = CType(myGlobal.SetDatos, List(Of Byte()))
                             End If
                         End If
                     End If
@@ -1125,20 +1125,20 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Dim myGlobal As New GlobalDataTO
             Try
                 Dim myBlocks As New List(Of Byte())
-                If MyClass.FWFileBytesDataAttr.Length > 0 AndAlso MyClass.FWFileHeaderSizeAttr > 0 Then
+                If Me.FWFileBytesDataAttr.Length > 0 AndAlso Me.FWFileHeaderSizeAttr > 0 Then
                     Dim index = 0
 
-                    While (index <= MyClass.FWFileBytesDataAttr.Length - pBytesCount)
+                    While (index <= Me.FWFileBytesDataAttr.Length - pBytesCount)
                         Dim myBlock(pBytesCount - 1) As Byte
-                        Array.Copy(MyClass.FWFileBytesDataAttr, index, myBlock, 0, pBytesCount)
+                        Array.Copy(Me.FWFileBytesDataAttr, index, myBlock, 0, pBytesCount)
                         myBlocks.Add(myBlock)
                         index += pBytesCount
                     End While
 
-                    Dim rest As Integer = MyClass.FWFileBytesDataAttr.Length - index '- 1
+                    Dim rest As Integer = Me.FWFileBytesDataAttr.Length - index '- 1
                     If rest > 0 Then
                         Dim myBlock(rest - 1) As Byte
-                        Array.Copy(MyClass.FWFileBytesDataAttr, index, myBlock, 0, rest)
+                        Array.Copy(Me.FWFileBytesDataAttr, index, myBlock, 0, rest)
                         myBlocks.Add(myBlock)
                     End If
 
@@ -1192,10 +1192,6 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
                         ElseIf myLine.Contains(InstrumentUpdateUtilDelegate.SizeTag) Then
                             mySize = CInt(myLine.Substring(myLine.IndexOf("=") + 1).Replace(";", "").Trim)
-                            'If mySize Mod 4 > 0 Then
-                            '    myGlobal.HasError = True
-                            '    myGlobal.ErrorMessage = "File Size must be multiple of 4!!"
-                            'End If
                             Exit For
 
                         End If
@@ -1203,10 +1199,10 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 Next
 
                 If Not myGlobal.HasError Then
-                    'MyClass.FWFileHeaderVersionAttr = myVersion
-                    MyClass.FWFileHeaderVersionAttr = myVersion & "." & myRelease
-                    MyClass.FWFileHeaderCRC32HexAttr = myCRC32Hex
-                    MyClass.FWFileHeaderSizeAttr = mySize
+                    'me.FWFileHeaderVersionAttr = myVersion
+                    Me.FWFileHeaderVersionAttr = myVersion & "." & myRelease
+                    Me.FWFileHeaderCRC32HexAttr = myCRC32Hex
+                    Me.FWFileHeaderSizeAttr = mySize
                 End If
 
             Catch ex As Exception

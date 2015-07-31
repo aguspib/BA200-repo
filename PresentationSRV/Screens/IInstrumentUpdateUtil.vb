@@ -1523,7 +1523,7 @@ Public Class UiInstrumentUpdateUtil
             With Me.OpenFwFileDialog
                 .Title = Me.BsTabPagesControl.TabPages(1).Text ' "Update Firmware"
                 .InitialDirectory = My.Computer.FileSystem.SpecialDirectories.MyDocuments
-                .Filter = "BAx00 Firmware files|*.BA4"
+                .Filter = "BAx00 Firmware files|" & AnalyzerController.Instance.Analyzer.FirmwareFileExtension
                 .CheckFileExists = True
                 .Multiselect = False
                 .FileName = ""
