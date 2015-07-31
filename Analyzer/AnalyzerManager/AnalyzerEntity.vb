@@ -10,6 +10,7 @@ Namespace Biosystems.Ax00.Core.Entities
         Implements IAnalyzerManager
 
 
+
         Private WithEvents _baseLine As IBaseLineEntity
         Private WithEvents _iseAnalyzer As IISEManager
 
@@ -79,6 +80,8 @@ Namespace Biosystems.Ax00.Core.Entities
 
         Public MustOverride ReadOnly Property WashingIDRequired As Boolean Implements IAnalyzerManager.WashingIDRequired
 
+
+        Public MustOverride ReadOnly Property FirmwareFileExtension As String Implements IAnalyzerManager.FirmwareFileExtension
 
     End Class
 End Namespace

@@ -10,6 +10,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
     Public Class BA200AnalyzerEntity
         Inherits AnalyzerManager
+
         Private BL_expListener As BaseLineExpirationListener
 
         Public Sub New(assemblyName As String, analyzerModel As String, baseLine As IBaseLineEntity)
@@ -106,6 +107,11 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
 
+        Public Overrides ReadOnly Property FirmwareFileExtension As String
+            Get
+                Return "*.ba2"
+            End Get
+        End Property
     End Class
 
 End Namespace

@@ -142,6 +142,8 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Property IsBlExpired As Boolean
         ReadOnly Property GenericDefaultAnalyzer As String
         ReadOnly Property IsConnectedWithRightModel As Boolean
+        ReadOnly Property FirmwareFileExtension As String
+
 #End Region
 
 #Region "Events definition & methods"
