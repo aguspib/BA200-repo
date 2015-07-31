@@ -2381,6 +2381,7 @@ Public Class UiBarCodeAdjustments
                         Me.Cursor = Cursors.Default
                         myScreenDelegate.CurrentOperation = BarCodeAdjustmentDelegate.OPERATIONS.TEST_MODE_END
                         CurrentMode = ADJUSTMENT_MODES.TESTED
+                        Me.myScreenDelegate.TestModeDone = True
                         PrepareArea()
                     Else
                         StopReading()

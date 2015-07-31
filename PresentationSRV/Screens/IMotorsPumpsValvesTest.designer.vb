@@ -1108,7 +1108,7 @@ Partial Class UiMotorsPumpsValvesTest
         Me.BsScadaPipeControl63.DefaultState = Biosystems.Ax00.Controls.UserControls.BsScadaControl.States._OFF
         Me.BsScadaPipeControl63.Description = "Element Description"
         Me.BsScadaPipeControl63.End1Visible = False
-        Me.BsScadaPipeControl63.End2Visible = True
+        Me.BsScadaPipeControl63.End2Visible = False
         Me.BsScadaPipeControl63.FluidColor = System.Drawing.Color.Transparent
         Me.BsScadaPipeControl63.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.BsScadaPipeControl63.Group = "GROUP"
