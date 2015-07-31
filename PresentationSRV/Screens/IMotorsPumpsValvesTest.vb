@@ -6782,9 +6782,8 @@ Public Class UiMotorsPumpsValvesTest
         Try
             Dim result As Integer = 0
 
-            Math.DivRem(Now.Second, 4, result)
-
             If Not AnalyzerController.Instance.IsBA200 Then
+                Math.DivRem(Now.Second, 4, result)
                 If result = 1 Then
                     Me.Col_SamplesLED.CurrentStatus = ConvertFwStringToCollisionStatus("1")
                     Me.Col_Reagent1LED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
@@ -6810,18 +6809,10 @@ Public Class UiMotorsPumpsValvesTest
                     Me.Col_WashingStationLED.CurrentStatus = ConvertFwStringToCollisionStatus("1")
                 End If
             Else
-                If result = 1 Then
-                    Me.Col_SamplesLED.CurrentStatus = ConvertFwStringToCollisionStatus("1")
-                    Me.Col_Reagent1LED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
-                    Me.Col_Reagent2LED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
-                    Me.Col_WashingStationLED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
-                End If
-                If result = 3 Then
-                    Me.Col_SamplesLED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
-                    Me.Col_Reagent1LED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
-                    Me.Col_Reagent2LED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
-                    Me.Col_WashingStationLED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
-                End If
+                Me.Col_SamplesLED.CurrentStatus = ConvertFwStringToCollisionStatus("1")
+                Me.Col_Reagent1LED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
+                Me.Col_Reagent2LED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
+                Me.Col_WashingStationLED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
             End If
 
 
