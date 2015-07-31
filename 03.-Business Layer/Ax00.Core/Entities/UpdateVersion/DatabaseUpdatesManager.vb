@@ -91,7 +91,17 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
             Return auxVariable
         End Function
 
-
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="pFromVersion"></param>
+        ''' <param name="pFromCommonRevisionNumberFrom"></param>
+        ''' <param name="pFromDataRevisionNumber"></param>
+        ''' <param name="pToVersion"></param>
+        ''' <returns></returns>
+        ''' <remarks>
+        ''' Modified by: IT 31/07/2015 - BA-2759
+        ''' </remarks>
         Function GenerateUpdatePack(pFromVersion As String, pFromCommonRevisionNumberFrom As Integer, pFromDataRevisionNumber As Integer, pToVersion As String) As DatabaseUpdatesManager
 
             Dim updatesManager As New DatabaseUpdatesManager
@@ -105,8 +115,11 @@ Namespace Biosystems.Ax00.Core.Entities.UpdateVersion
                     'Ignore previous versions
                     Continue For
                 ElseIf release.Version = pFromVersion Then
-                    '    'Ignore previous subversions, but get required subversion
-                    updatesManager.Releases.Add(release.GenerateRevisionPack(pFromCommonRevisionNumberFrom, pFromDataRevisionNumber))
+                    'Ignore previous subversions, but get required subversion
+                    Dim tmpRelease = release.GenerateRevisionPack(pFromCommonRevisionNumberFrom, pFromDataRevisionNumber)
+                    If (tmpRelease.CommonRevisions.Count > 0 Or tmpRelease.DataRevisions.Count > 0) Then
+                        updatesManager.Releases.Add(tmpRelease)
+                    End If
                     'Else
                     '    'Add newer versions
                     '    updatesManager.Releases.Add(release)
