@@ -169,6 +169,22 @@
         <InstructionTO>
           <InstructionID>1</InstructionID>
           <Sequence>1</Sequence>
+          <Timer>0</Timer>
+          <Code>SF1.B6.DCS</Code>
+          <Params>#1@.#2@</Params>
+          <EnableEdition>false</EnableEdition>
+        </InstructionTO>
+        <InstructionTO>
+          <InstructionID>1</InstructionID>
+          <Sequence>1</Sequence>
+          <Timer>0</Timer>
+          <Code>SF1.B6.DCE</Code>
+          <Params />
+          <EnableEdition>true</EnableEdition>
+        </InstructionTO>
+        <InstructionTO>
+          <InstructionID>1</InstructionID>
+          <Sequence>1</Sequence>
           <Timer>2000</Timer>
           <Code>END</Code>
           <Params />
@@ -2046,31 +2062,87 @@
           <InstructionID>2</InstructionID>
           <Sequence>2</Sequence>
           <Timer>10</Timer>
-          <Code>GLF.MP.MHO</Code>
+          <Code>SF1.M1.MHO</Code>
           <Params />
           <EnableEdition>true</EnableEdition>
         </InstructionTO>
         <InstructionTO>
           <InstructionID>3</InstructionID>
           <Sequence>3</Sequence>
-          <Timer>7000</Timer>
-          <Code>GLF.MR.MPV</Code>
-          <Params>12000.100000</Params>
-          <EnableEdition>true</EnableEdition>
+          <Timer>5000</Timer>
+          <Code>SF1.B6.DCS</Code>
+          <Params>100.1</Params>
+          <EnableEdition>false</EnableEdition>
         </InstructionTO>
         <InstructionTO>
           <InstructionID>4</InstructionID>
           <Sequence>4</Sequence>
-          <Timer>7010</Timer>
-          <Code>SF1.M1.MHO</Code>
-          <Params />
-          <EnableEdition>true</EnableEdition>
+          <Timer>5010</Timer>
+          <Code>SF1.B7.DCS</Code>
+          <Params>100.1</Params>
+          <EnableEdition>false</EnableEdition>
         </InstructionTO>
         <InstructionTO>
           <InstructionID>5</InstructionID>
           <Sequence>5</Sequence>
-          <Timer>8000</Timer>
-          <Code>JE1.B1.DCE</Code>
+          <Timer>5020</Timer>
+          <Code>SF1.B8.DCS</Code>
+          <Params>100.1</Params>
+          <EnableEdition>false</EnableEdition>
+        </InstructionTO>
+        <InstructionTO>
+          <InstructionID>6</InstructionID>
+          <Sequence>6</Sequence>
+          <Timer>5030</Timer>
+          <Code>SF1.B9.DCS</Code>
+          <Params>100.1</Params>
+          <EnableEdition>false</EnableEdition>
+        </InstructionTO>
+        <InstructionTO>
+          <InstructionID>7</InstructionID>
+          <Sequence>7</Sequence>
+          <Timer>5040</Timer>
+          <Code>SF1.B10.DCS</Code>
+          <Params>100.1</Params>
+          <EnableEdition>false</EnableEdition>
+        </InstructionTO>
+        <InstructionTO>
+          <InstructionID>8</InstructionID>
+          <Sequence>8</Sequence>
+          <Timer>10000</Timer>
+          <Code>SF1.B6.DCE</Code>
+          <Params />
+          <EnableEdition>true</EnableEdition>
+        </InstructionTO>
+        <InstructionTO>
+          <InstructionID>9</InstructionID>
+          <Sequence>9</Sequence>
+          <Timer>10010</Timer>
+          <Code>SF1.B7.DCE</Code>
+          <Params />
+          <EnableEdition>true</EnableEdition>
+        </InstructionTO>
+        <InstructionTO>
+          <InstructionID>10</InstructionID>
+          <Sequence>10</Sequence>
+          <Timer>10020</Timer>
+          <Code>SF1.B8.DCE</Code>
+          <Params />
+          <EnableEdition>true</EnableEdition>
+        </InstructionTO>
+        <InstructionTO>
+          <InstructionID>11</InstructionID>
+          <Sequence>11</Sequence>
+          <Timer>10030</Timer>
+          <Code>SF1.B9.DCE</Code>
+          <Params />
+          <EnableEdition>true</EnableEdition>
+        </InstructionTO>
+        <InstructionTO>
+          <InstructionID>12</InstructionID>
+          <Sequence>12</Sequence>
+          <Timer>10040</Timer>
+          <Code>SF1.B10.DCE</Code>
           <Params />
           <EnableEdition>true</EnableEdition>
         </InstructionTO>
@@ -2091,17 +2163,17 @@
           <EnableEdition>true</EnableEdition>
         </InstructionTO> -->
         <InstructionTO>
-          <InstructionID>6</InstructionID>
-          <Sequence>6</Sequence>
-          <Timer>9001</Timer>
+          <InstructionID>13</InstructionID>
+          <Sequence>13</Sequence>
+          <Timer>12001</Timer>
           <Code>SF1.B1.DCE</Code>
           <Params />
           <EnableEdition>true</EnableEdition>
         </InstructionTO>
         <InstructionTO>
-          <InstructionID>7</InstructionID>
-          <Sequence>7</Sequence>
-          <Timer>9002</Timer>
+          <InstructionID>14</InstructionID>
+          <Sequence>14</Sequence>
+          <Timer>12002</Timer>
           <Code>SF1.B2.DCE</Code>
           <Params />
           <EnableEdition>true</EnableEdition>
@@ -2115,33 +2187,33 @@
           <EnableEdition>true</EnableEdition>
         </InstructionTO> -->
         <InstructionTO>
-          <InstructionID>8</InstructionID>
-          <Sequence>8</Sequence>
-          <Timer>9003</Timer>
+          <InstructionID>15</InstructionID>
+          <Sequence>15</Sequence>
+          <Timer>12003</Timer>
           <Code>SF1.B4.DCE</Code>
           <Params />
           <EnableEdition>true</EnableEdition>
         </InstructionTO>
         <InstructionTO>
-          <InstructionID>9</InstructionID>
-          <Sequence>9</Sequence>
-          <Timer>9004</Timer>
+          <InstructionID>16</InstructionID>
+          <Sequence>16</Sequence>
+          <Timer>12004</Timer>
           <Code>SF1.B5.DCE</Code>
           <Params />
           <EnableEdition>true</EnableEdition>
         </InstructionTO>
-        <InstructionTO>
-          <InstructionID>10</InstructionID>
-          <Sequence>10</Sequence>
-          <Timer>9005</Timer>
+        <!--<InstructionTO>
+          <InstructionID>20</InstructionID>
+          <Sequence>20</Sequence>
+          <Timer>12005</Timer>
           <Code>SF1.B6.DCE</Code>
           <Params />
           <EnableEdition>true</EnableEdition>
         </InstructionTO>
         <InstructionTO>
-          <InstructionID>11</InstructionID>
-          <Sequence>11</Sequence>
-          <Timer>9006</Timer>
+          <InstructionID>21</InstructionID>
+          <Sequence>21</Sequence>
+          <Timer>12006</Timer>
           <Code>SF1.B7.DCE</Code>
           <Params />
           <EnableEdition>true</EnableEdition>
@@ -2169,27 +2241,51 @@
           <Code>SF1.B10.DCE</Code>
           <Params />
           <EnableEdition>true</EnableEdition>
+        </InstructionTO>-->
+        <InstructionTO>
+          <InstructionID>17</InstructionID>
+          <Sequence>17</Sequence>
+          <Timer>12005</Timer>
+          <Code>GLF.MP.MHO</Code>
+          <Params />
+          <EnableEdition>true</EnableEdition>
         </InstructionTO>
         <InstructionTO>
-          <InstructionID>15</InstructionID>
-          <Sequence>15</Sequence>
-          <Timer>10001</Timer>
+          <InstructionID>18</InstructionID>
+          <Sequence>18</Sequence>
+          <Timer>19000</Timer>
+          <Code>GLF.MR.MPV</Code>
+          <Params>12000.100000</Params>
+          <EnableEdition>true</EnableEdition>
+        </InstructionTO>
+          <InstructionTO>
+          <InstructionID>19</InstructionID>
+          <Sequence>19</Sequence>
+          <Timer>19001</Timer>
+          <Code>JE1.B1.DCE</Code>
+          <Params />
+          <EnableEdition>true</EnableEdition>
+        </InstructionTO>
+          <InstructionTO>
+          <InstructionID>20</InstructionID>
+          <Sequence>20</Sequence>
+          <Timer>19002</Timer>
           <Code>JE1.E1.EOF</Code>
           <Params />
           <EnableEdition>true</EnableEdition>
         </InstructionTO>
         <InstructionTO>
-          <InstructionID>16</InstructionID>
-          <Sequence>16</Sequence>
-          <Timer>10002</Timer>
+          <InstructionID>21</InstructionID>
+          <Sequence>21</Sequence>
+          <Timer>19003</Timer>
           <Code>JE1.E2.EOF</Code>
           <Params />
           <EnableEdition>true</EnableEdition>
         </InstructionTO>
         <InstructionTO>
-          <InstructionID>17</InstructionID>
-          <Sequence>17</Sequence>
-          <Timer>10003</Timer>
+          <InstructionID>22</InstructionID>
+          <Sequence>22</Sequence>
+          <Timer>19004</Timer>
           <Code>JE1.E3.EOF</Code>
           <Params />
           <EnableEdition>true</EnableEdition>
@@ -2211,40 +2307,40 @@
           <EnableEdition>true</EnableEdition>
         </InstructionTO> -->
         <InstructionTO>
-          <InstructionID>18</InstructionID>
-          <Sequence>18</Sequence>
-          <Timer>11001</Timer>
+          <InstructionID>23</InstructionID>
+          <Sequence>23</Sequence>
+          <Timer>19005</Timer>
           <Code>SF1.E1.EOF</Code>
           <Params />
           <EnableEdition>true</EnableEdition>
         </InstructionTO>
         <InstructionTO>
-          <InstructionID>19</InstructionID>
-          <Sequence>19</Sequence>
-          <Timer>11002</Timer>
+          <InstructionID>24</InstructionID>
+          <Sequence>24</Sequence>
+          <Timer>19006</Timer>
           <Code>SF1.E2.EOF</Code>
           <Params />
           <EnableEdition>true</EnableEdition>
         </InstructionTO>
         <InstructionTO>
-          <InstructionID>20</InstructionID>
-          <Sequence>20</Sequence>
-          <Timer>12000</Timer>
+          <InstructionID>24</InstructionID>
+          <Sequence>24</Sequence>
+          <Timer>19007</Timer>
           <Code>SF1.GE1.DCE</Code>
           <Params />
           <EnableEdition>true</EnableEdition>
         </InstructionTO>
         <InstructionTO>
-          <InstructionID>21</InstructionID>
-          <Sequence>21</Sequence>
-          <Timer>13000</Timer>
+          <InstructionID>25</InstructionID>
+          <Sequence>25</Sequence>
+          <Timer>20000</Timer>
           <Code>END</Code>
           <Params />
           <EnableEdition>true</EnableEdition>
         </InstructionTO>
       </Instructions>
       <Created>2013-07-24T08:41:53.1511384+02:00</Created>
-      <Modified>2013-07-24T08:41:53.1511384+02:00</Modified>
+      <Modified>2015-07-30T08:41:53.1511384+02:00</Modified>
       <Author>SW</Author>
       <SyntaxOK>false</SyntaxOK>
       <TestedOK>false</TestedOK>
