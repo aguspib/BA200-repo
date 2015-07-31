@@ -1209,7 +1209,37 @@ WHERE [LimitID] IN ('SRV_MIXER1_POLAR_LIMIT','SRV_MIXER1_Z_FINE_LIMIT','SRV_MIXE
         </DataRevision>
       </DataRevisions>
     </Release>
-    
+    <Release Version="03.00.10">
+      <DataRevisions>
+        <DataRevision JiraID="BA-2764" SequenceNumber="1">
+          <PrerequisiteScript>
+          </PrerequisiteScript>
+          <DataScript>
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'LBL_BARCODE_TYPE') AND (UPPER([LanguageID]) = 'ENG'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('LBL_BARCODE_TYPE', 'ENG', N'Sample Barcode Types', 1, convert(datetime,'20150731 12:00:00',112) ,  'IT', '03.00.10',  0, NULL, NULL, 'IT', convert(datetime,'20150731 12:00:00',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Sample Barcode Types', OnlyService  = 1, TS_User = 'IT', TS_DateTime  = convert(datetime,'20150731 12:00:00',112) , Translated = 0, ApplicationVersion = '03.00.10' WHERE  UPPER(ResourceID) = 'LBL_BARCODE_TYPE' AND UPPER(LanguageID) = 'ENG'
+            END
+            GO
+
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'LBL_BARCODE_TYPE') AND (UPPER([LanguageID]) = 'SPA'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('LBL_BARCODE_TYPE', 'SPA', N'Tipos de códigos de barras de Muestras', 1, convert(datetime,'20150731 12:00:00',112) ,  'IT', '03.00.10',  0, NULL, NULL, 'IT', convert(datetime,'20150731 12:00:00',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Tipos de Códigos de Barras de Muestras', OnlyService  = 1, TS_User = 'IT', TS_DateTime  = convert(datetime,'20150731 12:00:00',112) , Translated = 0, ApplicationVersion = '03.00.10' WHERE  UPPER(ResourceID) = 'LBL_BARCODE_TYPE' AND UPPER(LanguageID) = 'SPA'
+            END
+            GO
+          </DataScript>
+          <IntegrityScript>
+          </IntegrityScript>
+        </DataRevision>
+      </DataRevisions>
+    </Release>
     <!-- 
 	  <Release Version="00.00.00">
     <DataRevisions>
