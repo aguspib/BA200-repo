@@ -935,14 +935,11 @@ Public Class UiThermosAdjustments
             MyBase.bsScreenToolTipsControl.SetToolTip(BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
 
             MyBase.bsScreenToolTipsControl.SetToolTip(Tab1ConditioningButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Conditionate", currentLanguage))
-            'MyBase.bsScreenToolTips.SetToolTip(Tab1MeasureButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_MeasureTemp", currentLanguage))
-            'MyBase.bsScreenToolTips.SetToolTip(Tab1UndoMeasureButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
             MyBase.bsScreenToolTipsControl.SetToolTip(Tab1AdjustButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJUST", currentLanguage)) 'JB 01/10/2012 - Resource String uification
 
             MyBase.bsScreenToolTipsControl.SetToolTip(Tab2ConditioningButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Conditionate", currentLanguage))
             MyBase.bsScreenToolTipsControl.SetToolTip(Tab2MeasureButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_MeasureTemp", currentLanguage))
             MyBase.bsScreenToolTipsControl.SetToolTip(Tab2AdjustButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJUST", currentLanguage)) 'JB 01/10/2012 - Resource String unification
-            'MyBase.bsScreenToolTips.SetToolTip(Tab2AuxButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_ToParking", currentLanguage)) SGM 01/12/2011
 
             MyBase.bsScreenToolTipsControl.SetToolTip(Tab3ConditioningButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Conditionate", currentLanguage))
             MyBase.bsScreenToolTipsControl.SetToolTip(Tab3AdjustButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJUST", currentLanguage)) 'JB 01/10/2012 - Resource String unification
@@ -968,18 +965,6 @@ Public Class UiThermosAdjustments
             Me.Tab1ManualRadioButton.Enabled = False
             Me.Tab1ConditioningButton.Enabled = True 'it remains enabled to allow to stop conditioning
 
-            'Me.Tab1TextBoxTemp1.Enabled = False
-            'Me.Tab1TextBoxTemp2.Enabled = False
-            'Me.Tab1TextBoxTemp3.Enabled = False
-            'Me.Tab1TextBoxTemp4.Enabled = False
-            'Me.Tab1TextBoxTemp5.Enabled = False
-            'Me.Tab1TextBoxTemp6.Enabled = False
-            'Me.Tab1TextBoxTemp7.Enabled = False
-            'Me.Tab1TextBoxTemp8.Enabled = False
-            'Me.Tab1MeasureButton.Enabled = False
-
-            'Me.Tab1UndoMeasureButton.Enabled = False
-
             Me.Tab1UndoMeasure = False
             Me.Tab1CorrectionTextBox.Enabled = False
             Me.Tab1AdjustButton.Enabled = False
@@ -998,7 +983,6 @@ Public Class UiThermosAdjustments
             Me.Tab2CorrectionTextBox.Enabled = False
             Me.Tab2AdjustButton.Enabled = False
             Me.Tab2AuxButton.Enabled = False
-            'Me.Tab2AuxButton.Enabled = False 'SGM 01/12/2011
 
             ' TAB HEATER
             Me.Tab3ConditioningButton.Enabled = False
@@ -1045,7 +1029,7 @@ Public Class UiThermosAdjustments
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetParameters ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".GetParameters ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            ShowMessage(Me.Name & ".GetParameters ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobal
     End Function
