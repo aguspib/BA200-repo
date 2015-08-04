@@ -223,6 +223,9 @@ Public Class UiMotorsPumpsValvesTest
 #End Region
 
 #Region "Flags"
+
+    Private AllItemsToDefaultPending As Boolean = False
+
     Private ManageTabPages As Boolean = False
     Private IsLoaded As Boolean = False
     Private IsInternalDosingSourceChanging As Boolean = False
@@ -4077,6 +4080,7 @@ Public Class UiMotorsPumpsValvesTest
     ''' Modified by: XB 15/10/2014 - Use NROTOR when Wash Station is down - BA-2004
     ''' </remarks>
     Private Sub PrepareArea()
+
         Try
             Application.DoEvents()
 
@@ -4101,8 +4105,13 @@ Public Class UiMotorsPumpsValvesTest
                     MyClass.WashingStationToDownAfterNRotor()
 
                 Case ADJUSTMENT_MODES.MBEV_WASHING_STATION_IS_DOWN
-                    MyClass.PrepareWashingStationIsDownMode()
-
+                    If AllItemsToDefaultPending AndAlso AnalyzerController.Instance.IsBA200 Then
+                        Me.CurrentMode = ADJUSTMENT_MODES.MBEV_ALL_ARMS_IN_WASHING
+                        AllItemsToDefaultPending = False
+                        PrepareArea()
+                    Else
+                        Me.PrepareWashingStationIsDownMode()
+                    End If
                 Case ADJUSTMENT_MODES.MBEV_WASHING_STATION_IS_UP
                     MyClass.PrepareWashingStationIsUpMode()
 
@@ -4110,7 +4119,8 @@ Public Class UiMotorsPumpsValvesTest
                     MyClass.PrepareAllArmsInParkingMode()
 
                 Case ADJUSTMENT_MODES.MBEV_ALL_SWITCHED_OFF
-                    MyClass.PrepareAllSwitchedOffMode()
+
+                    Me.PrepareAllSwitchedOffMode()
 
                 Case ADJUSTMENT_MODES.LOADED
                     MyClass.PrepareLoadedMode()
@@ -4778,14 +4788,15 @@ Public Class UiMotorsPumpsValvesTest
 
                 Else
 
-                    If Not MyClass.IsLoaded Then
-                        MyClass.AllItemsToDefault()
-                    Else
+                    Me.AllItemsToDefault()
+                    'If Not MyClass.IsLoaded Then
 
-                        MyBase.CurrentMode = ADJUSTMENT_MODES.LOADED
-                        MyClass.PrepareArea()
+                    'Else
 
-                    End If
+                    '    MyBase.CurrentMode = ADJUSTMENT_MODES.LOADED
+                    '    MyClass.PrepareArea()
+
+                    'End If
                 End If
 
             Else
@@ -5045,8 +5056,6 @@ Public Class UiMotorsPumpsValvesTest
                     'while asuming Open Loop
                     MyClass.AsumeAllSwitchOff() 'we asume that all elements are switched off
 
-                    'MyClass.myScreenDelegate.IsWashingStationDown = False
-
                     If Not MyClass.IsScreenCloseRequested Then
                         ' XBC 10/11/2011
 
@@ -5058,35 +5067,15 @@ Public Class UiMotorsPumpsValvesTest
 
                         ElseIf MyClass.IsActionRequested And Not MyClass.IsReading Then
                             MyClass.StartReadingTimer()
-
                         Else
                             If MyClass.SelectedPage = TEST_PAGES.WS_ASPIRATION Or MyClass.SelectedPage = TEST_PAGES.WS_DISPENSATION Then
                                 MyClass.myScreenDelegate.IsWashingStationDown = False
                                 MyClass.WashingStationToDown()
                             Else
-                                If MyClass.SelectedPage = TEST_PAGES.WS_ASPIRATION Or MyClass.SelectedPage = TEST_PAGES.WS_DISPENSATION Then
-                                    MyClass.myScreenDelegate.IsWashingStationDown = False
-                                    MyClass.WashingStationToDown()
-                                Else
-                                    MyClass.myScreenDelegate.IsWashingStationDown = True
-                                    MyClass.WashingStationToUp()
-                                End If
-                                'MyBase.CurrentMode = ADJUSTMENT_MODES.LOADED
-                                'MyClass.PrepareArea()
+                                MyClass.myScreenDelegate.IsWashingStationDown = True
+                                MyClass.WashingStationToUp()
                             End If
-
                         End If
-
-
-
-                        'If Not MyClass.IsFirstReadingDone Then
-                        '    MyBase.CurrentMode = ADJUSTMENT_MODES.LOADED
-                        '    MyClass.PrepareArea()
-                        'Else
-                        '    If MyClass.IsActionRequested And Not MyClass.IsReading Then
-                        '        MyClass.StartReadingTimer()
-                        '    End If
-                        'End If
                         ' XBC 10/11/2011
                     Else
                         If MyClass.myScreenDelegate.IsWashingStationDown Then
@@ -5167,7 +5156,7 @@ Public Class UiMotorsPumpsValvesTest
     Private Sub WashingStationToDown()
         Dim myGlobal As New GlobalDataTO
         Try
-            If MyClass.myScreenDelegate.IsWashingStationDown Then Exit Sub
+            If Me.myScreenDelegate.IsWashingStationDown Then Exit Sub
 
             'SGM 18/05/2012
             Me.WSAsp_UpDownButton.Enabled = False
@@ -5175,16 +5164,16 @@ Public Class UiMotorsPumpsValvesTest
 
 
             'in case some motor selected
-            MyClass.UnSelectMotor()
+            Me.UnSelectMotor()
 
-            MyBase.DisplayMessage(Messages.SRV_WS_TO_DOWN.ToString)
+            Me.DisplayMessage(Messages.SRV_WS_TO_DOWN.ToString)
 
-            MyClass.myScreenDelegate.IsWashingStationDown = True
+            Me.myScreenDelegate.IsWashingStationDown = True
 
-            MyClass.DisableCurrentPage()
+            Me.DisableCurrentPage()
 
             'MyClass.StartWashingStationToDownTimer()
-            MyClass.StartWashingStationToNRotorTimer()
+            Me.StartWashingStationToNRotorTimer()
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".WashingStationToDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -5218,7 +5207,10 @@ Public Class UiMotorsPumpsValvesTest
         Try
             If MyBase.SimulationMode Then Exit Sub
 
-            If Not MyClass.myScreenDelegate.IsWashingStationDown Then Exit Sub
+            If Not MyClass.myScreenDelegate.IsWashingStationDown Then
+                Exit Sub
+            End If
+
 
             'SGM 18/05/2012
             Me.WSAsp_UpDownButton.Enabled = False
@@ -5249,20 +5241,28 @@ Public Class UiMotorsPumpsValvesTest
     Private Sub AllItemsToDefault()
         Dim myGlobal As New GlobalDataTO
         Try
-            'in case some motor selected
-            MyClass.UnSelectMotor()
+            If Not Me.myScreenDelegate.IsWashingStationDown AndAlso AnalyzerController.Instance.IsBA200 Then
+                Me.WashingStationToDown()
+                AllItemsToDefaultPending = True
+            Else
+                'in case some motor selected
+                MyClass.UnSelectMotor()
 
-            MyClass.CurrentMode = ADJUSTMENT_MODES.MBEV_ALL_SWITCHING_OFF
-            MyClass.PrepareCommonAreas()
 
-            MyClass.IsSettingDefaultStates = True
+                MyClass.CurrentMode = ADJUSTMENT_MODES.MBEV_ALL_SWITCHING_OFF
+                MyClass.PrepareCommonAreas()
 
-            ' XBC 11/11/2011
-            'If Not MyBase.SimulationMode Then
-            '    MyClass.StartSettingDefaultTimer()
-            'End If
-            MyClass.StartSettingDefaultTimer()
-            ' XBC 11/11/2011
+                MyClass.IsSettingDefaultStates = True
+
+                ' XBC 11/11/2011
+                'If Not MyBase.SimulationMode Then
+                '    MyClass.StartSettingDefaultTimer()
+                'End If
+                MyClass.StartSettingDefaultTimer()
+                ' XBC 11/11/2011
+            End If
+
+
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".AllItemsToDefault ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -7773,7 +7773,11 @@ Public Class UiMotorsPumpsValvesTest
             '    MyClass.IsSettingDefaultStates = True
             '    MyClass.WashingStationToUp()
             'Else
-            MyClass.AllItemsToDefault()
+           
+                Me.AllItemsToDefault()
+
+
+
             'End If
 
         Catch ex As Exception

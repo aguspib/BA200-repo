@@ -1123,7 +1123,6 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         End Function
 
 
-
         ''' <summary>
         ''' Creates the Script List for items switching off operation
         ''' </summary>
@@ -1151,17 +1150,18 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     .NextOnTimeOut = Nothing
                     .NextOnError = Nothing
 
-                    ' XBC 08/11/2011 
-                    ''expects 6 params
-                    '.ParamList = New List(Of String)
-                    '.ParamList.Add(MyClass.SamplesMotorDefaultPosition.ToString)
-                    '.ParamList.Add(MyClass.Reagent1MotorDefaultPosition.ToString)
-                    '.ParamList.Add(MyClass.Reagent2MotorDefaultPosition.ToString)
-                    '.ParamList.Add(MyClass.DispensationMotorDefaultPosition.ToString)
-                    '.ParamList.Add(MyClass.ReactionsRotorMotorDefaultPosition.ToString)
-                    '.ParamList.Add(MyClass.WashingStationMotorDefaultPosition.ToString)
-                    .ParamList = Nothing
-                    ' XBC 08/11/2011 
+                        ' XBC 08/11/2011 
+                        ''expects 6 params
+                        '.ParamList = New List(Of String)
+                        '.ParamList.Add(MyClass.SamplesMotorDefaultPosition.ToString)
+                        '.ParamList.Add(MyClass.Reagent1MotorDefaultPosition.ToString)
+                        '.ParamList.Add(MyClass.Reagent2MotorDefaultPosition.ToString)
+                        '.ParamList.Add(MyClass.DispensationMotorDefaultPosition.ToString)
+                        '.ParamList.Add(MyClass.ReactionsRotorMotorDefaultPosition.ToString)
+                        '.ParamList.Add(MyClass.WashingStationMotorDefaultPosition.ToString)
+                        .ParamList = Nothing
+                        ' XBC 08/11/2011 
+                  
                 End With
 
                 'add to the queue list
