@@ -1,7 +1,11 @@
-﻿Imports Biosystems.Ax00.Core.Entities
+﻿Imports System.Data.SqlClient
+Imports System.Runtime.CompilerServices
+Imports Biosystems.Ax00.Core.Entities
 Imports Biosystems.Ax00.Core.Interfaces
+Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Global
 Imports NUnit.Framework
+Imports Telerik.JustMock
 
 
 Namespace Biosystems.Ax00.Core.Entities.Tests
@@ -39,6 +43,21 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
         End Sub
 
         <Test()> Public Sub ManageAnalyzerReceivedStatus_StatusErr560RetryWithReset_OK()
+
+            GlobalBase.CreateLogActivityPointer = Sub(str As String, str2 As String, type As EventLogEntryType, sys As Boolean)
+                                                      Dim trace = New StackTrace()
+                                                      Debug.Print("Mocked CreateLogActivity with value: " & str)
+                                                  End Sub
+
+            DAOBase.GetSafeOpenDBConnectionPointer = Function(connection As SqlConnection) As TypedGlobalDataTo(Of SqlConnection)
+                                                         Return New TypedGlobalDataTo(Of SqlConnection) With{.SetDatos= New SqlConnection, .HasError = False}
+                                                     End Function
+
+            Dim swParametersMock As ItfmwSwParameters = Mock.Create(Of ItfmwSwParameters)()
+            SwParametersDelegate.GettfmwSwParametersDAO = Function() As ItfmwSwParameters
+                                                              Return swParametersMock
+                                                          End Function
+            Mock.Arrange(Function() swParametersMock.ReadByParameterName(Arg.IsAny(Of SqlConnection), "USB_REGISTRY_KEY", Arg.IsAny(Of String))).Returns(New GlobalDataTO() With {.SetDatos = "SYSTEM\CURRENTCONTROLSET\ENUM\FTDIBUS", .HasError = False})
 
             Dim analyzerManager As IAnalyzerManager = New BA200AnalyzerEntity(String.Empty, String.Empty, Nothing)
 
