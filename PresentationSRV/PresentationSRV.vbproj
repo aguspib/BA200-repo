@@ -529,7 +529,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="AboutBA4SRV.ico" />
-    <Content Include="FwScripts\Factory\DES_FactoryFwScriptsData.xml" />
+    <Content Include="FwScripts\Factory\DES_FactoryFwScriptsData.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="FwScripts\Factory\DES_FactoryFwScriptsData_2012_10_11.xml" />
     <Content Include="FwScripts\Factory\DES_FactoryFwScriptsData_2012_05_02.xml" />
     <Content Include="FwScripts\Factory\FactoryFwScriptsData.xml">

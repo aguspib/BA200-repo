@@ -5,7 +5,6 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.Global.GlobalEnumerates
-'Imports Biosystems.Ax00.PresentationCOM
 Imports Biosystems.Ax00.FwScriptsManagement
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Controls.UserControls
@@ -6732,7 +6731,7 @@ Public Class UiMotorsPumpsValvesTest
 
                 myGlobal = MyBase.DisplayMessage(Messages.SRV_TEST_COMPLETED.ToString)
                 System.Threading.Thread.Sleep(MyBase.SimulationProcessTime)
-                
+
             Else
 
                 If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING

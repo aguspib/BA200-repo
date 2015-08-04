@@ -3,14 +3,11 @@ Option Strict On
 
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
-'Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.FwScriptsManagement
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.App
 
-'Imports DevExpress.XtraCharts
-'Imports Biosystems.Ax00.Controls.UserControls
 
 Public Class UiThermosAdjustments
     Inherits PesentationLayer.BSAdjustmentBaseForm
@@ -38,8 +35,6 @@ Public Class UiThermosAdjustments
 
     ' Language
     Private currentLanguage As String
-    ' User level
-    'Private CurrentUserNumericalLevel As Integer = -1   'Initial value when NO userlevel exists
 
     Private ActiveAnalyzerModel As String
 
@@ -56,9 +51,6 @@ Public Class UiThermosAdjustments
 
     Private myDecimalSeparator As String
 
-    '' XBC 22/11/2011 - Counter placed to Delegate to register it into Historics
-    'Private NeedlesDispensationsCount As Integer = 0
-
     Private NeedlesConditioningStopRequested As Boolean = False
 
     'Information
@@ -66,14 +58,12 @@ Public Class UiThermosAdjustments
     Private SelectedAdjPanel As Panel
     Private SelectedInfoExpandButton As Panel
 
-    'Private CurrentModeBeforeNeedlesArmsOut As ADJUSTMENT_MODES = ADJUSTMENT_MODES._NONE 'SGM 01/12/2011
 
 
 
 #End Region
 
 #Region "Attributes"
-    'Private IsNeedleArmOutOfWashingAttr As Boolean = False 'SGM 01/12/2011
     Private IsRotorConditioningRequestedAttr As Boolean = False 'SGM 01/12/2011
     Private IsRotorConditioningCancelRequestedAttr As Boolean = False 'SGM 02/12/2011
 #End Region
@@ -81,72 +71,12 @@ Public Class UiThermosAdjustments
 #Region "Properties"
     Public WriteOnly Property Tab1UndoMeasure() As Boolean
         Set(ByVal value As Boolean)
-            ' XBC 18/10/2011 - Canceled
-            'Me.Tab1UndoMeasureButton.Enabled = value
-
             Me.Tab1TextBoxTemp1.Enabled = value
             Me.Tab1TextBoxTemp2.Enabled = value
             Me.Tab1TextBoxTemp3.Enabled = value
             Me.Tab1TextBoxTemp4.Enabled = value
-            'Me.Tab1TextBoxTemp5.Enabled = value
-            'Me.Tab1TextBoxTemp6.Enabled = value
-            'Me.Tab1TextBoxTemp7.Enabled = value
-            'Me.Tab1TextBoxTemp8.Enabled = value
-
         End Set
     End Property
-
-    '''' <summary>
-    '''' Informs if the needle arm is out of the washing station after pressing the auxiliary button
-    '''' </summary>
-    '''' <value></value>
-    '''' <returns></returns>
-    '''' <remarks>Created by SGM 01/12/2011</remarks>
-    'Private Property IsNeedleArmOutOfWashing() As Boolean
-    '    Get
-    '        Return IsNeedleArmOutOfWashingAttr
-    '    End Get
-    '    Set(ByVal value As Boolean)
-
-    '        IsNeedleArmOutOfWashingAttr = value
-
-    '        Try
-    '            Dim myGlobal As New GlobalDataTO
-    '            'Dim myUtil As New Utilities.
-    '            Dim auxIconName As String = String.Empty
-    '            Dim iconPath As String = MyBase.IconsPath
-    '            Dim myAuxButtonImage As Image
-
-    '            If value Then
-    '                auxIconName = GetIconName("REDO")
-    '                If System.IO.File.Exists(iconPath & auxIconName) Then
-    '                    myAuxButtonImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
-    '                Else
-    '                    myAuxButtonImage = Nothing
-    '                End If
-    '                bsScreenToolTips.SetToolTip(Me.Tab2AuxButton, "SRV_BTN_ToWashing")
-
-    '            Else
-    '                auxIconName = GetIconName("UNDO")
-    '                If System.IO.File.Exists(iconPath & auxIconName) Then
-    '                    myAuxButtonImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
-    '                Else
-    '                    myAuxButtonImage = Nothing
-    '                End If
-    '                bsScreenToolTips.SetToolTip(Me.Tab2AuxButton, "SRV_BTN_ToParking")
-    '            End If
-
-    '            If myAuxButtonImage IsNot Nothing Then
-    '                Me.Tab2AuxButton.BackgroundImage = myAuxButtonImage
-    '                Me.Tab2AuxButton.BackgroundImageLayout = ImageLayout.Stretch
-    '            End If
-
-    '        Catch ex As Exception
-    '            Throw ex
-    '        End Try
-
-    '    End Set
-    'End Property
 
     ''' <summary>
     ''' Informs if the rotor is being conditioned
@@ -164,7 +94,6 @@ Public Class UiThermosAdjustments
 
             Try
                 Dim myGlobal As New GlobalDataTO
-                'Dim Utilities As New Utilities
                 Dim auxIconName As String = String.Empty
                 Dim iconPath As String = MyBase.IconsPath
                 Dim myRotorCondImage As Image
@@ -172,11 +101,11 @@ Public Class UiThermosAdjustments
 
                 If value Then
 
-                    MyBase.myServiceMDI.SEND_INFO_STOP()
+                    myServiceMDI.SEND_INFO_STOP()
 
                     auxIconName = GetIconName("STOP")
 
-                    If System.IO.File.Exists(iconPath & auxIconName) Then
+                    If IO.File.Exists(iconPath & auxIconName) Then
                         Dim myImage As Image
                         myImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
@@ -190,11 +119,10 @@ Public Class UiThermosAdjustments
                         myRotorCondImage = Nothing
                     End If
 
-                    'bsScreenToolTips.SetToolTip(Me.Tab1ConditioningButton, "SRV_BTN_TestStop")
-                    MyBase.bsScreenToolTipsControl.SetToolTip(Me.Tab1ConditioningButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", currentLanguage))
+                    bsScreenToolTipsControl.SetToolTip(Me.Tab1ConditioningButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", currentLanguage))
 
                 Else
-                    MyBase.myServiceMDI.SEND_INFO_START()
+                    myServiceMDI.SEND_INFO_START()
 
                     auxIconName = GetIconName("ADJUSTMENT")
                     If System.IO.File.Exists(iconPath & auxIconName) Then
@@ -203,14 +131,12 @@ Public Class UiThermosAdjustments
                         myRotorCondImage = Nothing
                     End If
 
-                    'bsScreenToolTips.SetToolTip(Me.Tab1ConditioningButton, "SRV_BTN_Conditionate")
-                    MyBase.bsScreenToolTipsControl.SetToolTip(Me.Tab1ConditioningButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Conditionate", currentLanguage))
+                    bsScreenToolTipsControl.SetToolTip(Me.Tab1ConditioningButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Conditionate", currentLanguage))
 
                 End If
 
                 If myRotorCondImage IsNot Nothing Then
                     Me.Tab1ConditioningButton.Image = myRotorCondImage
-                    'Me.Tab1ConditioningButton.BackgroundImageLayout = ImageLayout.Center
                 End If
 
                 Me.Tab1ConditioningButton.Cursor = Cursors.Default
@@ -236,26 +162,21 @@ Public Class UiThermosAdjustments
             If IsRotorConditioningCancelRequestedAttr <> value Then
                 IsRotorConditioningCancelRequestedAttr = value
                 If IsRotorConditioningRequested Then
-                    Select Case MyClass.myScreenDelegate.CurrentOperation
+                    Select Case myScreenDelegate.CurrentOperation
                         Case ThermosAdjustmentsDelegate.OPERATIONS.CONDITIONING_ROTOR, ThermosAdjustmentsDelegate.OPERATIONS.CONDITIONING_MANUAL_DOWN, ThermosAdjustmentsDelegate.OPERATIONS.CONDITIONING_MANUAL_UP
                             If value Then
-                                MyClass.myScreenDelegate.RotorConditioningCancelRequested = True
-                                'If Not MyBase.SimulationMode Then
-                                '    If MyClass.myScreenDelegate.FillMode = FILL_MODE.AUTOMATIC Then
-                                '        MyClass.myFwScriptDelegate.CurrentFwScriptsQueueAborted = True
-                                '    End If
-                                'End If
+                                myScreenDelegate.RotorConditioningCancelRequested = True
                             End If
 
                         Case ThermosAdjustmentsDelegate.OPERATIONS.ROTATING_ROTOR
                             If value Then
-                                MyClass.myScreenDelegate.RotorRotatingCancelRequested = True
-                                MyClass.myScreenDelegate.IsKeepRotating = False
+                                myScreenDelegate.RotorRotatingCancelRequested = True
+                                myScreenDelegate.IsKeepRotating = False
                             End If
 
                         Case Else
                             IsRotorConditioningCancelRequestedAttr = False
-                            MyClass.IsRotorConditioningRequested = False
+                            IsRotorConditioningRequested = False
                     End Select
 
                 Else
@@ -270,12 +191,7 @@ Public Class UiThermosAdjustments
 #Region "Variables"
     Private ManageTabPages As Boolean
     Private UnableHandlers As Boolean
-    'Private RunningTest As Boolean
-
-    ' XBC 18/10/2011 - Cancelled
-    'Private EditionMode As Boolean
     Private TempBoxEditing As Integer
-
     Private EditingRotorTemperatures As Boolean
     Private EditingRotorCorrection As Boolean
     Private EditingNeedleTemperature As Boolean
@@ -310,39 +226,6 @@ Public Class UiThermosAdjustments
         Public NewCorrection As Single
     End Structure
 
-    ' XBC 22/06/2011 - This structure is placed on Global/FwAdjustmentsDataTO to be accessible from any part of the application
-    'Private Structure AdjustmentRowData
-
-    '    Public CodeFw As String
-    '    Public Value As String
-    '    Public CanSave As Boolean
-    '    Public CanMove As Boolean
-    '    Public AxisID As String
-    '    Public GroupID As String
-    '    Public InFile As Boolean
-
-
-    '    Public Sub New(ByVal pCodeFw As String)
-    '        CodeFw = pCodeFw
-
-    '        Value = ""
-    '        CanSave = False
-    '        CanMove = False
-    '        GroupID = ""
-    '        AxisID = ""
-    '        InFile = False
-    '    End Sub
-
-    '    Public Sub Clear()
-    '        CodeFw = ""
-    '        Value = ""
-    '        CanSave = False
-    '        CanMove = False
-    '        GroupID = ""
-    '        AxisID = ""
-    '        InFile = False
-    '    End Sub
-    'End Structure
 #End Region
 
 #Region "Constructor"
@@ -436,74 +319,6 @@ Public Class UiThermosAdjustments
                         MyClass.PrepareArea()
                     End If
 
-
-                    'Case ADJUSTMENT_MODES.PRIME_NEEDLE 'SGM 14/10/2011
-                    '    If pResponse = RESPONSE_TYPES.START Then
-                    '        'If Not Me.WaitProgressBar.IsProgressing Then
-                    '        '    Me.WaitProgressBar.Value = 0
-                    '        '    Me.WaitProgressBar.TimeForWait = 1000 * myScreenDelegate.CurrentTimeOperation
-                    '        '    Me.WaitProgressBar.StartWaiting()
-                    '        '    Me.WaitProgressBar.Refresh()
-
-                    '        'End If
-                    '        MyClass.PrepareArea()
-
-                    '    ElseIf pResponse = RESPONSE_TYPES.OK Then
-                    '        Me.WaitProgressBar.StopWaiting()
-
-                    '        MyBase.CurrentMode = ADJUSTMENT_MODES.PRIME_NEEDLE_DONE
-                    '        MyClass.PrepareArea()
-                    '    Else
-                    '        MyClass.PrepareErrorMode()
-                    '        Exit Function
-                    '    End If
-
-                    'Case ADJUSTMENT_MODES.DISPENSE_WS 'SGM 14/10/2011
-                    '    If pResponse = RESPONSE_TYPES.START Then
-                    '        'If Not Me.WaitProgressBar.IsProgressing Then
-                    '        '    Me.WaitProgressBar.Value = 0
-                    '        '    Me.WaitProgressBar.TimeForWait = 1000 * myScreenDelegate.CurrentTimeOperation
-                    '        '    Me.WaitProgressBar.StartWaiting()
-                    '        '    Me.WaitProgressBar.Refresh()
-                    '        'End If
-                    '        MyClass.PrepareArea()
-
-                    '    ElseIf pResponse = RESPONSE_TYPES.OK Then
-                    '        Me.WaitProgressBar.StopWaiting()
-
-                    '        MyBase.CurrentMode = ADJUSTMENT_MODES.DISPENSE_WS_DONE
-                    '        MyClass.PrepareArea()
-
-                    '        MyClass.NeedlesDispensationsCount = MyClass.NeedlesDispensationsCount + 1
-                    '        Me.Tab2DispensationsCountLabel.Text = MyClass.NeedlesDispensationsCount.ToString
-
-                    '        MyClass.NeedlesArmsCondition()
-
-                    '    Else
-                    '        MyClass.PrepareErrorMode()
-                    '        Exit Function
-                    '    End If
-
-                    '    'SGM 01/12/2011
-                    'Case ADJUSTMENT_MODES.THERMO_ARM_IN_PARKING
-                    '    If pResponse = RESPONSE_TYPES.START Then
-                    '        ' Nothing by now
-                    '    End If
-                    '    If pResponse = RESPONSE_TYPES.OK Then
-                    '        MyClass.PrepareArea()
-                    '    End If
-
-                    'Case ADJUSTMENT_MODES.THERMO_ARM_IN_WASHING
-                    '    If pResponse = RESPONSE_TYPES.START Then
-                    '        ' Nothing by now
-                    '    End If
-                    '    If pResponse = RESPONSE_TYPES.OK Then
-                    '        MyClass.PrepareArea()
-                    '    End If
-                    '    'SGM 01/12/2011
-
-
-                    ' XBC 20/04/2012
                 Case ADJUSTMENT_MODES.PARKED
                     If pResponse = RESPONSE_TYPES.OK Then
                         PrepareArea()
@@ -674,11 +489,6 @@ Public Class UiThermosAdjustments
 
             Me.InitializeRotorReationsTemps()
 
-            'Me.Tab2TextBoxTemp.Text = "0"
-            'Me.Tab2CorrectionTextBox.Text = ""
-            'Me.Tab3TextBoxTemp.Text = "0"
-            'Me.Tab3CorrectionTextBox.Text = ""
-
             ' Instantiate a new EditionValue structure
             Me.EditedValue = New EditedValueStruct
             With Me.EditedValue
@@ -717,8 +527,6 @@ Public Class UiThermosAdjustments
             'Reagents Needles priming not done
             myScreenDelegate.ReagentNeedleConditioningDone = False
 
-            ' XBC 18/10/2011 - Cancelled
-            'Me.EditionMode = False
             Me.Tab1UndoMeasure = True
 
             Me.EditingRotorTemperatures = False
@@ -771,17 +579,8 @@ Public Class UiThermosAdjustments
             Me.Tab1TextBoxTemp3.Text = ""
             Me.Tab1TextBoxTemp4.Text = ""
 
-            ' XBC 18/10/2011 - Canceled
-            'Me.Tab1TextBoxTemp5.Text = ""
-            'Me.Tab1TextBoxTemp6.Text = ""
-            'Me.Tab1TextBoxTemp7.Text = ""
-            'Me.Tab1TextBoxTemp8.Text = ""
-
             Me.TabMeanTempLabel.Text = ""
             Me.Tab1CorrectionTextBox.Text = ""
-
-            ' XBC 18/10/2011 - Canceled
-            'myScreenDelegate.ReactionsRotorMeasuredTempDone = False
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeRotorReationsTemps ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -1136,122 +935,7 @@ Public Class UiThermosAdjustments
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
                 BsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
-            End If
-            'dl 20/04/2012
-
-            'MyBase.SetButtonImage(Tab1ConditioningButton, "ADJUSTMENT")
-            'MyBase.SetButtonImage(Tab1AdjustButton, "ADJUSTMENT")
-            'MyBase.SetButtonImage(Tab2MeasureButton, "ADJUSTMENT")
-            'MyBase.SetButtonImage(Tab2AdjustButton, "ADJUSTMENT")
-            'MyBase.SetButtonImage(Tab3ConditioningButton, "ADJUSTMENT")
-            'MyBase.SetButtonImage(Tab3AdjustButton, "ADJUSTMENT")
-            'MyBase.SetButtonImage(Tab3AdjustButton, "ADJUSTMENT")  'dl 20/04/2012
-            'MyBase.SetButtonImage(BsSaveButton, "SAVE")
-            '            MyBase.SetButtonImage(BsExitButton, "CANCEL")
-            ' XBC 20/04/2012
-            'MyBase.SetButtonImage(BsUpDownWSButton1, "UPDOWN", 20, 20)
-            'MyBase.SetButtonImage(BsUpDownWSButton2, "UPDOWN", 20, 20)
-
-            ''
-            '' TAB ROTOR
-            '' 
-
-            ''CONDITIONING Button
-            'auxIconName = GetIconName("ADJUSTMENT")
-            'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Tab1ConditioningButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
-            '    'Tab1ConditioningButton.BackgroundImageLayout = ImageLayout.Center
-            'End If
-
-            ' ''MEASUREMENT TEMP Button
-            ''auxIconName = GetIconName("ADJUSTMENT")
-            ''If System.IO.File.Exists(iconPath & auxIconName) Then
-            ''    Tab1MeasureButton.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
-            ''    Tab1MeasureButton.BackgroundImageLayout = ImageLayout.Center
-            ''End If
-
-            ' ''CANCEL MEASUREMENT Button
-            ''auxIconName = GetIconName("UNDO")
-            ''If System.IO.File.Exists(iconPath & auxIconName) Then
-            ''    Tab1UndoMeasureButton.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
-            ''    Tab1UndoMeasureButton.BackgroundImageLayout = ImageLayout.Stretch
-            ''End If
-
-            ''TEST ADJUSTMENT Button
-            'auxIconName = GetIconName("ADJUSTMENT")
-            'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Tab1AdjustButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
-            '    'Tab1AdjustButton.BackgroundImageLayout = ImageLayout.Center
-            'End If
-
-
-            ''
-            '' TAB NEEDLES
-            '' 
-
-            ''CONDITIONING Button
-            'auxIconName = GetIconName("ADJUSTMENT")
-            'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Tab2ConditioningButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
-            '    'Tab2ConditioningButton.BackgroundImageLayout = ImageLayout.Center
-            'End If
-
-            ''MEASUREMENT TEMP Button
-            'auxIconName = GetIconName("ADJUSTMENT")
-            'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Tab2MeasureButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
-            '    'Tab2MeasureButton.BackgroundImageLayout = ImageLayout.Center
-            'End If
-
-            ''TEST ADJUSTMENT Button
-            'auxIconName = GetIconName("ADJUSTMENT")
-            'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Tab2AdjustButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
-            '    'Tab2AdjustButton.BackgroundImageLayout = ImageLayout.Center
-            'End If
-
-            ' ''AUX TO PARKING/TO WASHING Button SGM 01/12/2011
-            ''auxIconName = GetIconName("UNDO")
-            ''If System.IO.File.Exists(iconPath & auxIconName) Then
-            ''    Tab2AuxButton.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
-            ''    Tab2AdjustButton.BackgroundImageLayout = ImageLayout.Stretch
-            ''End If
-
-
-            ''
-            '' TAB HEATER
-            '' 
-
-            ''CONDITIONING Button
-            'auxIconName = GetIconName("ADJUSTMENT")
-            'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Tab3ConditioningButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
-            '    'Tab3ConditioningButton.BackgroundImageLayout = ImageLayout.Center
-            'End If
-
-            ''TEST ADJUSTMENT Button
-            'auxIconName = GetIconName("ADJUSTMENT")
-            'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Tab3AdjustButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
-            '    'Tab3AdjustButton.BackgroundImageLayout = ImageLayout.Center
-            'End If
-
-
-            '' BUTTONS AREA
-
-            ''SAVE Button
-            'auxIconName = GetIconName("SAVE")
-            'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsSaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
-            '    'BsSaveButton.BackgroundImageLayout = ImageLayout.Stretch
-            'End If
-
-            ''EXIT Button
-            'auxIconName = GetIconName("CANCEL")
-            'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
-            '    'BsExitButton.BackgroundImageLayout = ImageLayout.Stretch
-            'End If
+            End If            
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -1302,51 +986,6 @@ Public Class UiThermosAdjustments
                     MyBase.DisplayMessage(Messages.SRV_ADJUSTMENTS_SAVED.ToString)
                     MyClass.PrepareSavedMode()
 
-                    'Case ADJUSTMENT_MODES.PRIME_NEEDLE
-                    '    MyClass.PrepareNeedlesPrimingMode()
-
-                    'Case ADJUSTMENT_MODES.PRIME_NEEDLE_DONE
-                    '    MyClass.PrepareNeedlesPrimedMode()
-
-                    'Case ADJUSTMENT_MODES.DISPENSE_WS
-                    '    MyClass.PrepareNeedlesConditioningMode()
-
-                    'Case ADJUSTMENT_MODES.DISPENSE_WS_DONE
-                    '    MyClass.PrepareNeedlesConditionedMode()
-
-
-                    '    'SGM 01/12/2011
-                    'Case ADJUSTMENT_MODES.THERMO_ARM_TO_PARKING
-                    '    MyClass.DisableAll()
-                    '    If Me.Tab2RadioButtonR1.Checked Then
-                    '        MyBase.DisplayMessage(Messages.SRV_R1_TO_PARKING.ToString)
-                    '    Else
-                    '        MyBase.DisplayMessage(Messages.SRV_R2_TO_PARKING.ToString)
-                    '    End If
-
-                    'Case ADJUSTMENT_MODES.THERMO_ARM_IN_PARKING
-                    '    MyClass.DisableAll()
-                    '    Me.Tab2AuxButton.Enabled = True
-                    '    MyClass.IsNeedleArmOutOfWashing = True
-                    '    MyBase.DisplayMessage("")
-
-                    'Case ADJUSTMENT_MODES.THERMO_ARM_TO_WASHING
-                    '    MyClass.DisableAll()
-                    '    If Me.Tab2RadioButtonR1.Checked Then
-                    '        MyBase.DisplayMessage(Messages.SRV_R1_TO_WASHING.ToString)
-                    '    Else
-                    '        MyBase.DisplayMessage(Messages.SRV_R2_TO_WASHING.ToString)
-                    '    End If
-
-                    'Case ADJUSTMENT_MODES.THERMO_ARM_IN_WASHING
-                    '    MyBase.DisplayMessage("")
-                    '    MyBase.CurrentMode = ADJUSTMENT_MODES.LOADED ' MyClass.CurrentModeBeforeNeedlesArmsOut
-                    '    MyClass.PrepareArea()
-                    '    MyClass.IsNeedleArmOutOfWashing = False
-                    '    Me.Tab2AuxButton.Enabled = True
-                    '    'end SGM 01/12/2011
-
-
                     ' XBC 20/04/2012
                 Case ADJUSTMENT_MODES.PARKING
                     Me.PrepareParkingMode()
@@ -1390,11 +1029,8 @@ Public Class UiThermosAdjustments
                 ' Manage FwScripts must to be sent at load screen
                 If MyBase.SimulationMode Then
                     ' simulating...
-                    'MyBase.DisplaySimulationMessage("Request Adjustments from Instrument...")
-                    'Me.Cursor = Cursors.WaitCursor
                     System.Threading.Thread.Sleep(SimulationProcessTime)
                     MyBase.myServiceMDI.Focus()
-                    'Me.Cursor = Cursors.Default
                     MyClass.CurrentMode = ADJUSTMENT_MODES.ADJUSTMENTS_READED
                     PrepareArea()
                 Else
@@ -1463,20 +1099,6 @@ Public Class UiThermosAdjustments
             Me.Tab2TextBoxTemp.Enabled = False
             Me.Tab2CorrectionTextBox.Enabled = False
             'Me.Tab2AuxButton.Enabled = True 'SGM 01/12/2011
-
-            ' XBC 27/10/2011
-            'If myScreenDelegate.ReagentNeedleConditioningDone Then
-            '    Me.Tab2MeasureButton.Enabled = True
-            'End If
-            'If myScreenDelegate.ReagentNeedleMeasuredTempDone Then
-            '    Me.Tab2TextBoxTemp.Enabled = True
-
-            '    If Tab2TextBoxTemp.Text.Length > 0 Then
-            '        Me.Tab2CorrectionTextBox.Enabled = True
-            '        'Me.Tab2AdjustButton.Enabled = True
-            '    End If
-
-            'End If 
 
             Dim isPrimed As Boolean = myScreenDelegate.ReagentNeedleConditioningDone
             Me.Tab2MeasureButton.Enabled = isPrimed
