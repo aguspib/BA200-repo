@@ -1034,7 +1034,7 @@ Public Class UiBarCodesConfig
                 Dim myUserSettingsDlg As New UserSettingsDelegate
                 resultData = myUserSettingsDlg.GetCurrentValueBySettingID(Nothing, UserSettingsEnum.AUTO_WS_WITH_LIS_MODE.ToString)
                 If Not resultData.HasError AndAlso resultData.SetDatos IsNot Nothing Then
-                    Dim isEnabled As Boolean = CBool(IIf(CInt(resultData.SetDatos) > 0, True, False))
+                    Dim isEnabled As Boolean = CInt(resultData.SetDatos) > 0
                     If isEnabled Then
                         Dim res As DialogResult = MyBase.ShowMessage(Me.Name, Messages.BARCODE_AUTOLIS_WARNING.ToString)
                         If res = Windows.Forms.DialogResult.OK Then
