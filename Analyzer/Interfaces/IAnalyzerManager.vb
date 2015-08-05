@@ -141,7 +141,6 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Property AnalyzerSwParameters As ParametersDS
         Property IsBlExpired As Boolean
         ReadOnly Property GenericDefaultAnalyzer As String
-        ReadOnly Property IsConnectedWithRightModel As Boolean
         ReadOnly Property FirmwareFileExtension As String
 
 #End Region
@@ -303,6 +302,7 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Sub startListenerExpiration()
         Function ExistBaseLineFinished() As Boolean
         Function BaseLineNotStarted() As Boolean
+        Function IsConnectedWithRightModel() As Boolean
 
 #End Region
 

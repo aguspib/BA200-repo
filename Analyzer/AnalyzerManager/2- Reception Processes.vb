@@ -2437,23 +2437,21 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="_alarm"></param>
         ''' <remarks></remarks>
         Public Sub PrepareUINewAlarmType(ByVal _alarm As AlarmEnumerates.Alarms) Implements IAnalyzerManager.PrepareUINewAlarmType
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlConnection
+            Dim dbConnection As TypedGlobalDataTo(Of SqlConnection) = Nothing
             Try
-                resultData = GetOpenDBConnection(Nothing)
-                If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
+                dbConnection = GetSafeOpenDBConnection(Nothing)
+                If (Not dbConnection.HasError And Not dbConnection.SetDatos Is Nothing) Then
 
-                        Dim alarmIsCreated = (From a In myUI_RefreshDS.ReceivedAlarms Where a.AlarmID = _alarm.ToString And a.AlarmStatus = True).ToList().Count()
-                        If alarmIsCreated = 0 Then
-                            resultData = PrepareUIRefreshEvent(dbConnection, UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, _alarm.ToString, True)
-                        End If
+                    Dim alarmIsCreated = (From a In myUI_RefreshDS.ReceivedAlarms Where a.AlarmID = _alarm.ToString And a.AlarmStatus = True).ToList().Count()
+                    If alarmIsCreated = 0 Then
+                        PrepareUIRefreshEvent(dbConnection.SetDatos, UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, _alarm.ToString, True)
                     End If
                 End If
 
             Catch ex As Exception
                 GlobalBase.CreateLogActivity(ex)
+            Finally
+                CloseConnection(dbConnection)
             End Try
         End Sub
 
