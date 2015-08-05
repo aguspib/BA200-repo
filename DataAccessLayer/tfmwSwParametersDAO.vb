@@ -8,7 +8,8 @@ Imports Biosystems.Ax00.Types.ParametersDS
 Namespace Biosystems.Ax00.DAL.DAO
 
     Public Class tfmwSwParametersDAO
-          
+        Implements ItfmwSwParameters
+
 
 #Region "CRUD Methods"
 
@@ -23,7 +24,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' Created by: DL 19/02/2010
         ''' </remarks>
         Public Function ReadByParameterName(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pParameterName As String, _
-                                            ByVal pAnalyzerModel As String) As GlobalDataTO
+                                            ByVal pAnalyzerModel As String) As GlobalDataTO Implements ItfmwSwParameters.ReadByParameterName
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
 
@@ -62,7 +63,6 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tfmwSwParametersDAO.ReadByParameterName", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -85,7 +85,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''                              defined for the model of the specified Analyzer plus those defined for all models
         ''' </remarks>
         Public Function ReadByAnalyzerModel(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerModel As String, _
-                                            Optional ByVal pAnalyzerID As String = "") As GlobalDataTO
+                                            Optional ByVal pAnalyzerID As String = "") As GlobalDataTO Implements ItfmwSwParameters.ReadByAnalyzerModel
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -126,7 +126,6 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tfmwSwParametersDAO.ReadByAnalyzerModel", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -149,7 +148,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' Modified by: SA 21/10/2011 - Changed the function template
         ''' </remarks>
         Public Function GetParameterByAnalyzer(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-                                               ByVal pParameterName As String, ByVal pDependOnModel As Boolean) As GlobalDataTO
+                                               ByVal pParameterName As String, ByVal pDependOnModel As Boolean) As GlobalDataTO Implements ItfmwSwParameters.GetParameterByAnalyzer
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -189,7 +188,6 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tfmwSwParametersDAO.GetParameterByAnalyzer", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -206,7 +204,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <remarks>
         ''' Created by:  
         ''' </remarks>
-        Public Function GetAllList(ByVal pDBConnection As SqlClient.SqlConnection, Optional ByVal pAnalyzerModel As String = "") As GlobalDataTO
+        Public Function GetAllList(ByVal pDBConnection As SqlClient.SqlConnection, Optional ByVal pAnalyzerModel As String = "") As GlobalDataTO Implements ItfmwSwParameters.GetAllList
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
 
@@ -240,8 +238,56 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tfmwSwParametersDAO.GetAllList", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+        ''' <summary>
+        ''' Gets only ISE related parameters
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pAnalyzerModel">Analyzer Identifier</param>
+        ''' <returns></returns>
+        ''' <remarks>Created by SGM 01/02/2012</remarks>
+        Public Function GetAllISEList(ByVal pDBConnection As SqlClient.SqlConnection, Optional ByVal pAnalyzerModel As String = "") As GlobalDataTO Implements ItfmwSwParameters.GetAllISEList
+            Dim resultData As New GlobalDataTO
+            Dim dbConnection As New SqlClient.SqlConnection
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError) And (Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = ""
+                        cmdText &= "SELECT ParameterID, ParameterName, DependByModel, AnalyzerModel, ValueNumeric, ValueText, Description " & vbCrLf
+                        cmdText &= "  FROM tfmwSwParameters " & vbCrLf
+                        cmdText &= " WHERE ParameterName LIKE 'ISE_%' "
+
+                        If pAnalyzerModel <> "" Then cmdText &= " AND AnalyzerModel = '" & pAnalyzerModel & "' "
+
+                        Dim dbCmd As New SqlClient.SqlCommand
+                        dbCmd.Connection = dbConnection
+                        dbCmd.CommandText = cmdText
+
+                        'Fill the DataSet to return 
+                        Dim myParameterDS As New ParametersDS
+                        Dim dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                        dbDataAdapter.Fill(myParameterDS.tfmwSwParameters)
+
+                        resultData.SetDatos = myParameterDS
+                        resultData.HasError = False
+                    End If
+                End If
+
+            Catch ex As Exception
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                GlobalBase.CreateLogActivity(ex.Message, "tfmwSwParametersDAO.GetAllISEList", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -257,7 +303,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <remarks>
         ''' Created by:  DL 11/07/2011
         ''' </remarks>
-        Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pParameterRow As tfmwSwParametersRow) As GlobalDataTO
+        Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pParameterRow As tfmwSwParametersRow) As GlobalDataTO Implements ItfmwSwParameters.Update
             Dim resultData As New GlobalDataTO
 
             Try
@@ -296,58 +342,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tfmwFieldLimitsDAO.Update", EventLogEntryType.Error, False)
-            End Try
-            Return resultData
-        End Function
-
-        ''' <summary>
-        ''' Gets only ISE related parameters
-        ''' </summary>
-        ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pAnalyzerModel">Analyzer Identifier</param>
-        ''' <returns></returns>
-        ''' <remarks>Created by SGM 01/02/2012</remarks>
-        Public Function GetAllISEList(ByVal pDBConnection As SqlClient.SqlConnection, Optional ByVal pAnalyzerModel As String = "") As GlobalDataTO
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
-
-            Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-                If (Not resultData.HasError) And (Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        Dim cmdText As String = ""
-                        cmdText &= "SELECT ParameterID, ParameterName, DependByModel, AnalyzerModel, ValueNumeric, ValueText, Description " & vbCrLf
-                        cmdText &= "  FROM tfmwSwParameters " & vbCrLf
-                        cmdText &= " WHERE ParameterName LIKE 'ISE_%' "
-
-                        If pAnalyzerModel <> "" Then cmdText &= " AND AnalyzerModel = '" & pAnalyzerModel & "' "
-
-                        Dim dbCmd As New SqlClient.SqlCommand
-                        dbCmd.Connection = dbConnection
-                        dbCmd.CommandText = cmdText
-
-                        'Fill the DataSet to return 
-                        Dim myParameterDS As New ParametersDS
-                        Dim dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-                        dbDataAdapter.Fill(myParameterDS.tfmwSwParameters)
-
-                        resultData.SetDatos = myParameterDS
-                        resultData.HasError = False
-                    End If
-                End If
-
-            Catch ex As Exception
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                resultData.ErrorMessage = ex.Message
-
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "tfmwSwParametersDAO.GetAllISEList", EventLogEntryType.Error, False)
-            Finally
-                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return resultData
         End Function

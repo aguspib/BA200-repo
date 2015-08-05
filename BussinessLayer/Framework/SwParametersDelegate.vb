@@ -3,10 +3,9 @@ Option Strict On
 
 Imports System.Data.SqlClient
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.DAL.DAO
 Imports Biosystems.Ax00.Global
-
+Imports System.Linq
 
 Namespace Biosystems.Ax00.BL
     Public Class SwParametersDelegate
@@ -23,19 +22,19 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pAnalyzerModel">Execution identifier></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function ReadByParameterName(ByVal pDBConnection As SqlClient.SqlConnection, _
+        Public Function ReadByParameterName(ByVal pDBConnection As SqlConnection, _
                                             ByVal pParameterName As String, _
                                             ByVal pAnalyzerModel As String) As GlobalDataTO
 
             Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim dbConnection As New SqlConnection
 
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
                 If (Not resultData.HasError) Then
-                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = CType(resultData.SetDatos, SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim mytfmwSwParametersDAO As New tfmwSwParametersDAO
+                        Dim mytfmwSwParametersDAO As ItfmwSwParameters = GettfmwSwParametersDAO()
                         resultData = mytfmwSwParametersDAO.ReadByParameterName(dbConnection, pParameterName, pAnalyzerModel)
                     End If
                 End If
@@ -45,13 +44,18 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "SwParametersDelegate.ReadByParameterName", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return resultData
         End Function
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <remarks></remarks>
+        Public Shared GettfmwSwParametersDAO As Func(Of ItfmwSwParameters) = Function() New tfmwSwParametersDAO
 
         ''' <summary>
         ''' Get details of all Parameters that are not dependend on the Analyzer Model plus:
@@ -87,15 +91,12 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "SwParametersDelegate.ReadByAnalyzerModel", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return myGlobalDataTO
         End Function
-
-
 
         ''' <summary>
         ''' Get value of the specified Software Parameter. If value of Parameter depends on an Analyzer Model, then the function
@@ -138,7 +139,6 @@ Namespace Biosystems.Ax00.BL
             Return resultData
         End Function
 
-
         ''' <summary>
         ''' Get the values of a parameter in tfmwSwParameters by AnalyzerID
         ''' </summary>
@@ -167,7 +167,6 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzersDelegate.GetAllList", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -260,7 +259,6 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "SwParametersDelegate.ReadNumValueByParameterName", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -268,6 +266,14 @@ Namespace Biosystems.Ax00.BL
             Return resultData
         End Function
 
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="parameter"></param>
+        ''' <param name="pAnalyzerModel"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
         Public Shared Function ReadIntValue(ByVal pDBConnection As SqlClient.SqlConnection, parameter As GlobalEnumerates.SwParameters, pAnalyzerModel As String) As TypedGlobalDataTo(Of Integer)
             Dim resultData As New TypedGlobalDataTo(Of Integer)
             Dim connection As TypedGlobalDataTo(Of SqlConnection) = Nothing
@@ -292,12 +298,10 @@ Namespace Biosystems.Ax00.BL
                 End If
 
             Catch ex As Exception
-                'resultData = New GlobalDataTO()
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex)
             Finally
                 If connection IsNot Nothing AndAlso pDBConnection Is Nothing Then CloseConnection(connection)
@@ -351,7 +355,6 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "FieldLimitsDelegate.SaveLimits", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -366,15 +369,15 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pAnalyzerModel"></param>
         ''' <returns>GlobalDataTo with data as ParametersDS</returns>
         ''' <remarks>Created by SGM 01/02/2012</remarks>
-        Public Function GetAllISEList(ByVal pDBConnection As SqlClient.SqlConnection, Optional ByVal pAnalyzerModel As String = "") As GlobalDataTO
+        Public Function GetAllISEList(ByVal pDBConnection As SqlConnection, Optional ByVal pAnalyzerModel As String = "") As GlobalDataTO
             Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim dbConnection As New SqlConnection
 
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
 
                 If (Not resultData.HasError) And (Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = CType(resultData.SetDatos, SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then
                         Dim myDAO As New tfmwSwParametersDAO
@@ -387,7 +390,6 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzersDelegate.GetAllList", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()

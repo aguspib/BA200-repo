@@ -632,14 +632,16 @@ Public Class UiBarCodeAdjustments
                 ' simulating
                 Me.Cursor = Cursors.WaitCursor
                 Thread.Sleep(SimulationProcessTime)
-                myServiceMDI.Focus()
-                Me.Cursor = Cursors.Default
-                CurrentMode = ADJUSTMENT_MODES.TEST_EXITED
-                PrepareArea()
             Else
                 ' Manage FwScripts must to be sent to adjusting
                 Me.SendFwScript(Me.CurrentMode, EditedValue.AdjustmentID)
             End If
+
+            ' Close current window and prepare Area for the change
+            myServiceMDI.Focus()
+            Me.Cursor = Cursors.Default
+            CurrentMode = ADJUSTMENT_MODES.TEST_EXITED
+            PrepareArea()
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PreviousFinishExitScreen", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)

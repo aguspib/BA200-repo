@@ -194,11 +194,11 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                     'cmdText &= " DBRevisionDate = N'" & pDBRevisionDate & "'" & vbCrLf 'yyyy-MM-dd'
 
-                    If (pDBCommonRevisionNumber > 0 And IsDBVersionRevisable(pDBConnection)) Then
+                    If (pDBCommonRevisionNumber >= 0 And IsDBVersionRevisable(pDBConnection)) Then
                         cmdText &= " DBCommonRevisionNumber = N'" & pDBCommonRevisionNumber & "',"
                     End If
 
-                    If (pDBDataRevisionNumber > 0 And IsDBVersionRevisable(pDBConnection)) Then
+                    If (pDBDataRevisionNumber >= 0 And IsDBVersionRevisable(pDBConnection)) Then
                         cmdText &= " DBDataRevisionNumber = N'" & pDBDataRevisionNumber & "'"
                     End If
 

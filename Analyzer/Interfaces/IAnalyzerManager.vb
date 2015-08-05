@@ -141,6 +141,8 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Property AnalyzerSwParameters As ParametersDS
         Property IsBlExpired As Boolean
         ReadOnly Property GenericDefaultAnalyzer As String
+        ReadOnly Property FirmwareFileExtension As String
+
 #End Region
 
 #Region "Events definition & methods"

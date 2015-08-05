@@ -5,7 +5,6 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.Global.GlobalEnumerates
-'Imports Biosystems.Ax00.PresentationCOM
 Imports Biosystems.Ax00.FwScriptsManagement
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Controls.UserControls
@@ -223,6 +222,9 @@ Public Class UiMotorsPumpsValvesTest
 #End Region
 
 #Region "Flags"
+
+    Private AllItemsToDefaultPending As Boolean = False
+
     Private ManageTabPages As Boolean = False
     Private IsLoaded As Boolean = False
     Private IsInternalDosingSourceChanging As Boolean = False
@@ -4077,6 +4079,7 @@ Public Class UiMotorsPumpsValvesTest
     ''' Modified by: XB 15/10/2014 - Use NROTOR when Wash Station is down - BA-2004
     ''' </remarks>
     Private Sub PrepareArea()
+
         Try
             Application.DoEvents()
 
@@ -4101,8 +4104,13 @@ Public Class UiMotorsPumpsValvesTest
                     MyClass.WashingStationToDownAfterNRotor()
 
                 Case ADJUSTMENT_MODES.MBEV_WASHING_STATION_IS_DOWN
-                    MyClass.PrepareWashingStationIsDownMode()
-
+                    If AllItemsToDefaultPending AndAlso AnalyzerController.Instance.IsBA200 Then
+                        Me.CurrentMode = ADJUSTMENT_MODES.MBEV_ALL_ARMS_IN_WASHING
+                        AllItemsToDefaultPending = False
+                        PrepareArea()
+                    Else
+                        Me.PrepareWashingStationIsDownMode()
+                    End If
                 Case ADJUSTMENT_MODES.MBEV_WASHING_STATION_IS_UP
                     MyClass.PrepareWashingStationIsUpMode()
 
@@ -4110,7 +4118,8 @@ Public Class UiMotorsPumpsValvesTest
                     MyClass.PrepareAllArmsInParkingMode()
 
                 Case ADJUSTMENT_MODES.MBEV_ALL_SWITCHED_OFF
-                    MyClass.PrepareAllSwitchedOffMode()
+
+                    Me.PrepareAllSwitchedOffMode()
 
                 Case ADJUSTMENT_MODES.LOADED
                     MyClass.PrepareLoadedMode()
@@ -4485,7 +4494,9 @@ Public Class UiMotorsPumpsValvesTest
     ''' <summary>
     ''' Prepare GUI for Fw Events Enabled Mode
     ''' </summary>
-    ''' <remarks>Created by SGM 11/07/2011</remarks>
+    ''' <remarks>
+    ''' Created by: SGM 11/07/2011
+    ''' </remarks>
     Private Sub PrepareCollisionTestEnabledMode()
 
         Dim myGlobal As New GlobalDataTO
@@ -4507,7 +4518,10 @@ Public Class UiMotorsPumpsValvesTest
     ''' <summary>
     ''' Prepare GUI for Fw Events Disabling Mode
     ''' </summary>
-    ''' <remarks>Created by SGM 11/07/2011</remarks>
+    ''' <remarks>
+    ''' Created by: SGM 11/07/2011
+    ''' Modified by: IT 30/07/2015 - BA-2743
+    ''' </remarks>
     Private Sub PrepareCollisionTestDisablingMode()
 
         Dim myGlobal As New GlobalDataTO
@@ -4515,7 +4529,12 @@ Public Class UiMotorsPumpsValvesTest
         Try
             'myGlobal = MyBase.DisplayMessage(Messages.SRV_DISABLING_FW_EVENTS.ToString)
             'Me.Col_StartButton.Enabled = False
+
             Me.Col_StartStopButton.Enabled = False
+            Me.IsCollisionTestEnabled = False
+            If MyBase.SimulationMode Then
+                Me.BsCollisionSimulationTimer.Enabled = False
+            End If
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareCollisionTestDisablingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -4768,14 +4787,15 @@ Public Class UiMotorsPumpsValvesTest
 
                 Else
 
-                    If Not MyClass.IsLoaded Then
-                        MyClass.AllItemsToDefault()
-                    Else
+                    Me.AllItemsToDefault()
+                    'If Not MyClass.IsLoaded Then
 
-                        MyBase.CurrentMode = ADJUSTMENT_MODES.LOADED
-                        MyClass.PrepareArea()
+                    'Else
 
-                    End If
+                    '    MyBase.CurrentMode = ADJUSTMENT_MODES.LOADED
+                    '    MyClass.PrepareArea()
+
+                    'End If
                 End If
 
             Else
@@ -5035,8 +5055,6 @@ Public Class UiMotorsPumpsValvesTest
                     'while asuming Open Loop
                     MyClass.AsumeAllSwitchOff() 'we asume that all elements are switched off
 
-                    'MyClass.myScreenDelegate.IsWashingStationDown = False
-
                     If Not MyClass.IsScreenCloseRequested Then
                         ' XBC 10/11/2011
 
@@ -5048,35 +5066,15 @@ Public Class UiMotorsPumpsValvesTest
 
                         ElseIf MyClass.IsActionRequested And Not MyClass.IsReading Then
                             MyClass.StartReadingTimer()
-
                         Else
                             If MyClass.SelectedPage = TEST_PAGES.WS_ASPIRATION Or MyClass.SelectedPage = TEST_PAGES.WS_DISPENSATION Then
                                 MyClass.myScreenDelegate.IsWashingStationDown = False
                                 MyClass.WashingStationToDown()
                             Else
-                                If MyClass.SelectedPage = TEST_PAGES.WS_ASPIRATION Or MyClass.SelectedPage = TEST_PAGES.WS_DISPENSATION Then
-                                    MyClass.myScreenDelegate.IsWashingStationDown = False
-                                    MyClass.WashingStationToDown()
-                                Else
-                                    MyClass.myScreenDelegate.IsWashingStationDown = True
-                                    MyClass.WashingStationToUp()
-                                End If
-                                'MyBase.CurrentMode = ADJUSTMENT_MODES.LOADED
-                                'MyClass.PrepareArea()
+                                MyClass.myScreenDelegate.IsWashingStationDown = True
+                                MyClass.WashingStationToUp()
                             End If
-
                         End If
-
-
-
-                        'If Not MyClass.IsFirstReadingDone Then
-                        '    MyBase.CurrentMode = ADJUSTMENT_MODES.LOADED
-                        '    MyClass.PrepareArea()
-                        'Else
-                        '    If MyClass.IsActionRequested And Not MyClass.IsReading Then
-                        '        MyClass.StartReadingTimer()
-                        '    End If
-                        'End If
                         ' XBC 10/11/2011
                     Else
                         If MyClass.myScreenDelegate.IsWashingStationDown Then
@@ -5157,7 +5155,7 @@ Public Class UiMotorsPumpsValvesTest
     Private Sub WashingStationToDown()
         Dim myGlobal As New GlobalDataTO
         Try
-            If MyClass.myScreenDelegate.IsWashingStationDown Then Exit Sub
+            If Me.myScreenDelegate.IsWashingStationDown Then Exit Sub
 
             'SGM 18/05/2012
             Me.WSAsp_UpDownButton.Enabled = False
@@ -5165,16 +5163,16 @@ Public Class UiMotorsPumpsValvesTest
 
 
             'in case some motor selected
-            MyClass.UnSelectMotor()
+            Me.UnSelectMotor()
 
-            MyBase.DisplayMessage(Messages.SRV_WS_TO_DOWN.ToString)
+            Me.DisplayMessage(Messages.SRV_WS_TO_DOWN.ToString)
 
-            MyClass.myScreenDelegate.IsWashingStationDown = True
+            Me.myScreenDelegate.IsWashingStationDown = True
 
-            MyClass.DisableCurrentPage()
+            Me.DisableCurrentPage()
 
             'MyClass.StartWashingStationToDownTimer()
-            MyClass.StartWashingStationToNRotorTimer()
+            Me.StartWashingStationToNRotorTimer()
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".WashingStationToDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -5208,7 +5206,10 @@ Public Class UiMotorsPumpsValvesTest
         Try
             If MyBase.SimulationMode Then Exit Sub
 
-            If Not MyClass.myScreenDelegate.IsWashingStationDown Then Exit Sub
+            If Not MyClass.myScreenDelegate.IsWashingStationDown Then
+                Exit Sub
+            End If
+
 
             'SGM 18/05/2012
             Me.WSAsp_UpDownButton.Enabled = False
@@ -5239,20 +5240,28 @@ Public Class UiMotorsPumpsValvesTest
     Private Sub AllItemsToDefault()
         Dim myGlobal As New GlobalDataTO
         Try
-            'in case some motor selected
-            MyClass.UnSelectMotor()
+            If Not Me.myScreenDelegate.IsWashingStationDown AndAlso AnalyzerController.Instance.IsBA200 Then
+                Me.WashingStationToDown()
+                AllItemsToDefaultPending = True
+            Else
+                'in case some motor selected
+                MyClass.UnSelectMotor()
 
-            MyClass.CurrentMode = ADJUSTMENT_MODES.MBEV_ALL_SWITCHING_OFF
-            MyClass.PrepareCommonAreas()
 
-            MyClass.IsSettingDefaultStates = True
+                MyClass.CurrentMode = ADJUSTMENT_MODES.MBEV_ALL_SWITCHING_OFF
+                MyClass.PrepareCommonAreas()
 
-            ' XBC 11/11/2011
-            'If Not MyBase.SimulationMode Then
-            '    MyClass.StartSettingDefaultTimer()
-            'End If
-            MyClass.StartSettingDefaultTimer()
-            ' XBC 11/11/2011
+                MyClass.IsSettingDefaultStates = True
+
+                ' XBC 11/11/2011
+                'If Not MyBase.SimulationMode Then
+                '    MyClass.StartSettingDefaultTimer()
+                'End If
+                MyClass.StartSettingDefaultTimer()
+                ' XBC 11/11/2011
+            End If
+
+
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".AllItemsToDefault ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -6641,7 +6650,10 @@ Public Class UiMotorsPumpsValvesTest
     ''' Enables Needle Collision test
     ''' </summary>
     ''' <returns></returns>
-    ''' <remarks>Created SGM 04/10/2012</remarks>
+    ''' <remarks>
+    ''' Created by: SGM 04/10/2012
+    ''' Modified by: IT 30/07/2015 - BA-2743
+    ''' </remarks>
     Private Function Col_EnableTest() As GlobalDataTO
 
         Dim myGlobal As New GlobalDataTO
@@ -6654,8 +6666,11 @@ Public Class UiMotorsPumpsValvesTest
                 myGlobal = MyBase.myServiceMDI.SEND_INFO_STOP
                 System.Threading.Thread.Sleep(MyBase.SimulationProcessTime)
                 myGlobal = MyBase.myServiceMDI.SEND_INFO_STOP
-                Col_SimulateCollision()
+                'Col_SimulateCollision()
                 'myGlobal = MyBase.DisplayMessage(Messages.SRV_COLLISION_TEST_READY.ToString)
+
+                MyBase.CurrentMode = ADJUSTMENT_MODES.COLLISION_TEST_ENABLED
+                PrepareArea()
 
             Else
 
@@ -6696,6 +6711,12 @@ Public Class UiMotorsPumpsValvesTest
 
     End Function
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks>
+    ''' Modified by: IT 30/07/2015 - BA-2743
+    ''' </remarks>
     Private Function Col_DisableTest() As GlobalDataTO
 
         Dim myGlobal As New GlobalDataTO
@@ -6705,9 +6726,12 @@ Public Class UiMotorsPumpsValvesTest
             myGlobal = MyBase.DisplayMessage(Messages.SRV_DISABLING_FW_EVENTS.ToString)
 
             If MyBase.SimulationMode Then
-                System.Threading.Thread.Sleep(MyBase.SimulationProcessTime)
+                MyBase.CurrentMode = ADJUSTMENT_MODES.COLLISION_TEST_DISABLING
+                PrepareArea()
+
                 myGlobal = MyBase.DisplayMessage(Messages.SRV_TEST_COMPLETED.ToString)
-                MyBase.CurrentMode = ADJUSTMENT_MODES.LOADED
+                System.Threading.Thread.Sleep(MyBase.SimulationProcessTime)
+
             Else
 
                 If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
@@ -6747,31 +6771,49 @@ Public Class UiMotorsPumpsValvesTest
 
     End Function
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks>
+    ''' Modified by: IT 30/07/2015 - BA-2743
+    ''' </remarks>
     Private Sub Col_SimulateCollision()
         Try
+            Dim result As Integer = 0
 
-
-            If Now.Second > 0 And Now.Second <= 15 Then
+            If Not AnalyzerController.Instance.IsBA200 Then
+                Math.DivRem(Now.Second, 4, result)
+                If result = 1 Then
+                    Me.Col_SamplesLED.CurrentStatus = ConvertFwStringToCollisionStatus("1")
+                    Me.Col_Reagent1LED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
+                    Me.Col_Reagent2LED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
+                    Me.Col_WashingStationLED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
+                End If
+                If result = 2 Then
+                    Me.Col_SamplesLED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
+                    Me.Col_Reagent1LED.CurrentStatus = ConvertFwStringToCollisionStatus("1")
+                    Me.Col_Reagent2LED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
+                    Me.Col_WashingStationLED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
+                End If
+                If result = 3 Then
+                    Me.Col_SamplesLED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
+                    Me.Col_Reagent1LED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
+                    Me.Col_Reagent2LED.CurrentStatus = ConvertFwStringToCollisionStatus("1")
+                    Me.Col_WashingStationLED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
+                End If
+                If result = 4 Then
+                    Me.Col_SamplesLED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
+                    Me.Col_Reagent1LED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
+                    Me.Col_Reagent2LED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
+                    Me.Col_WashingStationLED.CurrentStatus = ConvertFwStringToCollisionStatus("1")
+                End If
+            Else
                 Me.Col_SamplesLED.CurrentStatus = ConvertFwStringToCollisionStatus("1")
                 Me.Col_Reagent1LED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
                 Me.Col_Reagent2LED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
                 Me.Col_WashingStationLED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
-            ElseIf Now.Second > 15 And Now.Second <= 30 Then
-                Me.Col_SamplesLED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
-                Me.Col_Reagent1LED.CurrentStatus = ConvertFwStringToCollisionStatus("1")
-                Me.Col_Reagent2LED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
-                Me.Col_WashingStationLED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
-            ElseIf Now.Second > 30 And Now.Second <= 45 Then
-                Me.Col_SamplesLED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
-                Me.Col_Reagent1LED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
-                Me.Col_Reagent2LED.CurrentStatus = ConvertFwStringToCollisionStatus("1")
-                Me.Col_WashingStationLED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
-            ElseIf Now.Second > 45 And Now.Second <= 60 Then
-                Me.Col_SamplesLED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
-                Me.Col_Reagent1LED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
-                Me.Col_Reagent2LED.CurrentStatus = ConvertFwStringToCollisionStatus("0")
-                Me.Col_WashingStationLED.CurrentStatus = ConvertFwStringToCollisionStatus("1")
             End If
+
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Col_SimulateCollision ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -7730,7 +7772,11 @@ Public Class UiMotorsPumpsValvesTest
             '    MyClass.IsSettingDefaultStates = True
             '    MyClass.WashingStationToUp()
             'Else
-            MyClass.AllItemsToDefault()
+           
+                Me.AllItemsToDefault()
+
+
+
             'End If
 
         Catch ex As Exception
@@ -8596,11 +8642,11 @@ Public Class UiMotorsPumpsValvesTest
     Private Sub BsCollisionSimulationTimer_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsCollisionSimulationTimer.Tick
         Try
 
-            BsCollisionSimulationTimer.Enabled = False
+            'BsCollisionSimulationTimer.Enabled = False
 
             MyClass.Col_SimulateCollision()
 
-            BsCollisionSimulationTimer.Enabled = True
+            'BsCollisionSimulationTimer.Enabled = True
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsHomingSimulationTimer_Tick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)

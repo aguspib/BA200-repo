@@ -23,14 +23,15 @@ Public Class BaseLineEntityExpiration
     ''' <remarks></remarks>
     Public ReadOnly Property IsBlExpired As Boolean Implements IBaseLineExpiration.IsBlExpired
         Get
+            Dim result As Boolean = True
             Try
-                IsBlExpired = GetBlParameter()
+                result = IsBLExpiredFunction()
             Catch e As Exception
                 CreateLogActivity(e)
-                Return True
             Finally
-                _analyzer.IsBlExpired = IsBlExpired
+                _analyzer.IsBlExpired = result
             End Try
+            Return result
         End Get
     End Property
 
@@ -39,33 +40,33 @@ Public Class BaseLineEntityExpiration
     ''' </summary>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Private Function GetBlParameter() As Boolean
+    Private Function IsBLExpiredFunction() As Boolean
         Dim result = False
         Dim mins As Integer = -1
         Dim datelastBl As Date
         Dim datelastBLstr As String = String.Empty
 
-            Dim dtrSwParam = (From a As ParametersDS.tfmwSwParametersRow In _analyzer.AnalyzerSwParameters.tfmwSwParameters
-                              Where a.ParameterName = GlobalEnumerates.SwParameters.BL_LIFETIME.ToString()).First()
+        Dim dtrSwParam = (From a As ParametersDS.tfmwSwParametersRow In _analyzer.AnalyzerSwParameters.tfmwSwParameters
+                          Where a.ParameterName = GlobalEnumerates.SwParameters.BL_LIFETIME.ToString()).First()
 
-            If dtrSwParam IsNot Nothing Then mins = CInt(dtrSwParam.ValueNumeric)
+        If dtrSwParam IsNot Nothing Then mins = CInt(dtrSwParam.ValueNumeric)
 
-            Dim dtrAnalyzerSettings = (From a As AnalyzerSettingsDS.tcfgAnalyzerSettingsRow In _analyzer.AnalyzerSettings.tcfgAnalyzerSettings
-                                       Where a.SettingID = GlobalEnumerates.AnalyzerSettingsEnum.BL_DATETIME.ToString()).First()
+        Dim dtrAnalyzerSettings = (From a As AnalyzerSettingsDS.tcfgAnalyzerSettingsRow In _analyzer.AnalyzerSettings.tcfgAnalyzerSettings
+                                   Where a.SettingID = GlobalEnumerates.AnalyzerSettingsEnum.BL_DATETIME.ToString()).First()
 
-            If dtrAnalyzerSettings IsNot Nothing Then
+        If dtrAnalyzerSettings IsNot Nothing Then
 
-                If Not dtrAnalyzerSettings.IsCurrentValueNull() Then
-                    datelastBLstr = CStr(dtrAnalyzerSettings.CurrentValue)
-                End If
+            If Not dtrAnalyzerSettings.IsCurrentValueNull() Then
+                datelastBLstr = CStr(dtrAnalyzerSettings.CurrentValue)
+            End If
 
-                If datelastBLstr.Equals(String.Empty) Then
+            If datelastBLstr.Equals(String.Empty) Then
+                result = True
+            Else
+                datelastBl = DateTime.Parse(dtrAnalyzerSettings.CurrentValue, CultureInfo.InvariantCulture)
+                If DateDiff(DateInterval.Minute, datelastBl, Now) > mins Then
                     result = True
-                Else
-                    datelastBl = DateTime.Parse(dtrAnalyzerSettings.CurrentValue, CultureInfo.InvariantCulture)
-                    If DateDiff(DateInterval.Minute, datelastBl, Now) > mins Then
-                        result = True
-                    End If
+                End If
             End If
         Else
             'Analyzer can't loaded the default parameters, means are nothing.

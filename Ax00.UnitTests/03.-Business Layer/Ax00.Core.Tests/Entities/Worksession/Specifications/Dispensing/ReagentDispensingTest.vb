@@ -155,16 +155,25 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
 
 
         <Test()>
-        Sub BA200DispensingSerialization()
-            Dim disp As New BA200Dispensing
+        Sub BA200DispensingSerializationAndDeserialization()
 
+            Dim disp As New BA200Dispensing
             Dim serializer = New XmlSerializer(disp.GetType)
             Dim stream As New System.IO.MemoryStream
-            serializer.Serialize(stream, disp)
+            Try
+                serializer.Serialize(stream, disp)
+            Catch e As Exception
+                Assert.Fail("Unable to serialize BA200Dispensing. Error: " & e.Message)
+            End Try
             stream.Position = 0
             Dim reader As New StreamReader(stream)
-            Dim contents = reader.ReadToEnd()
-            MsgBox(contents)
+            'Dim contents = reader.ReadToEnd()
+            Try
+                Dim disp2 = TryCast(serializer.Deserialize(reader), BA200Dispensing)
+                Assert.IsNotNull(disp2)
+            Catch e As Exception
+                Assert.Fail("Unable to deserialize BA200Dispensing. Error: " & e.Message)
+            End Try
         End Sub
     End Class
 
