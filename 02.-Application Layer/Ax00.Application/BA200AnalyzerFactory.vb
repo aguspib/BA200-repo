@@ -32,6 +32,9 @@ Namespace Biosystems.Ax00.App
                                                                             .ActiveWorkSession = workSessionIDAttribute, _
                                                                             .ActiveAnalyzer = analyzerIDAttribute, _
                                                                             .ActiveFwVersion = fwVersionAttribute}
+            If analyzerIDAttribute = "" Then
+                analyzer.ActiveAnalyzer = analyzer.GenericDefaultAnalyzer()
+            End If
 
             iseAnalyzer = New ISEManager(analyzer, analyzerIDAttribute, analyzerModel, False)
             analyzer.ISEAnalyzer = iseAnalyzer

@@ -472,6 +472,7 @@
   <ItemGroup>
     <None Include="..\PresentationCOM\app.config">
       <Link>app.config</Link>
+      <SubType>Designer</SubType>
     </None>
     <None Include="BioSystems.pfx" />
     <None Include="My Project\app.manifest" />

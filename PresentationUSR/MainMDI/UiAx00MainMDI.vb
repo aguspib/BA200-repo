@@ -6297,8 +6297,6 @@ Partial Public Class UiAx00MainMDI
                     AutoConnectFailsTitle = myTitle
                 End If
 
-
-
                 'AG 23/11/2011 - The endsound is sent as a part of the connect process, after send the config instruction
                 ''TR 28/10/2011 -Send the stop Ringing.
                 'If AnalyzerController.Instance.Analyzer.Connected Then

@@ -87,6 +87,13 @@ Partial Public Class UiAx00MainMDI
             'GlobalBase.CreateLogActivity("START BLOCK 0.", Me.Name & ".ManageReceptionEvent ", _
             '                                EventLogEntryType.FailureAudit, False)
 
+            'AJG Gestionar si el analizador conectado es compatible con el software
+            If Not AnalyzerController.Instance.Analyzer.IsConnectedWithRightModel() Then
+                MessageBox.Show("mensajito")
+                QuitBecauseWrongAnalyzer = True
+                Close()
+            End If
+
             ' XB 30/08/2013
             If AnalyzerController.Instance.Analyzer.InstructionTypeReceived = AnalyzerManagerSwActionList.ANSFCP_RECEIVED Then
                 GlobalBase.CreateLogActivity("START ANSFCP received with pTreated value as [" & pTreated & "] ", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.Information, False)
@@ -674,13 +681,6 @@ Partial Public Class UiAx00MainMDI
                 ''TR 18/09/2012 -Log to trace incase Exception error is race TO DELETE.
                 'GlobalBase.CreateLogActivity("END BLOCK 3.", Me.Name & ".ManageReceptionEvent ", _
                 '                                 EventLogEntryType.FailureAudit, False)
-            End If
-
-            'AJG Gestionar si el analizador conectado es compatible con el software
-            If Not AnalyzerController.Instance.Analyzer.IsConnectedWithRightModel() Then
-                MessageBox.Show("mensajito")
-                QuitBecauseWrongAnalyzer = True
-                Close()
             End If
 
             'Debug.Print("IAx00MainMDI.ManageReceptionEvent: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0)) 'AG 12/06/2012 - time estimation
