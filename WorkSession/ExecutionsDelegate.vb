@@ -4456,6 +4456,12 @@ Namespace Biosystems.Ax00.BL
 #Region "CREATE EXECUTIONS - NEW 19-03-2014"
 
         ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <remarks></remarks>
+        Public Shared GettcfgAnalyzersDAO As Func(Of ItcfgAnalyzers) = Function() New tcfgAnalyzersDAO
+
+        ''' <summary>
         ''' Gets the active analyzer model
         ''' </summary>
         ''' <param name="dbConnection">Connection to db</param>
@@ -4465,7 +4471,7 @@ Namespace Biosystems.Ax00.BL
         ''' </remarks>
         Public Function GetActiveAnalyzer(ByVal dbConnection As SqlConnection) As String
             Dim resultData As GlobalDataTO = Nothing
-            Dim myAnalyzerDAO As New tcfgAnalyzersDAO
+            Dim myAnalyzerDAO As ItcfgAnalyzers = GettcfgAnalyzersDAO()
             Dim activeAnalyzer As String = ""
             resultData = myAnalyzerDAO.ReadByAnalyzerActive(dbConnection)
             If Not resultData.HasError AndAlso resultData.SetDatos IsNot Nothing Then
@@ -4485,7 +4491,7 @@ Namespace Biosystems.Ax00.BL
         ''' </remarks>
         Public Function GetActiveAnalyzerId(ByVal dbConnection As SqlConnection) As String
             Dim resultData As GlobalDataTO = Nothing
-            Dim myAnalyzerDAO As New tcfgAnalyzersDAO
+            Dim myAnalyzerDAO As ItcfgAnalyzers = GettcfgAnalyzersDAO()
             Dim activeAnalyzer As String = ""
             resultData = myAnalyzerDAO.ReadByAnalyzerActive(dbConnection)
             If Not resultData.HasError AndAlso resultData.SetDatos IsNot Nothing Then

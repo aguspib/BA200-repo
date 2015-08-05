@@ -8,7 +8,7 @@ Imports Biosystems.Ax00.Global
 Namespace Biosystems.Ax00.DAL.DAO
 
     Public Class twksWSAnalyzersAlarmsDAO
-
+        Implements ItwksWSAnalyzerAlarms
 
 #Region "CRUD Methods"
         ''' <summary>
@@ -22,7 +22,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' Modified by: AG 25/03/2011 - Added field AlarmStatus; allow NULL values in field WorkSessionID
         '''              AG 23/07/2012 - Added field OKDateTime
         ''' </remarks>
-        Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerAlarmsDS As WSAnalyzerAlarmsDS) As GlobalDataTO
+        Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerAlarmsDS As WSAnalyzerAlarmsDS) As GlobalDataTO Implements ItwksWSAnalyzerAlarms.Create
             Dim dbConnection As SqlClient.SqlConnection = Nothing
             Dim myGlobalDataTO As GlobalDataTO = Nothing
 
@@ -83,7 +83,6 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSAnalyzersAlarmsDAO.Create", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -100,7 +99,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <remarks>
         ''' Created by:  AG 23/07/2012
         ''' </remarks>
-        Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerAlarmsDS As WSAnalyzerAlarmsDS) As GlobalDataTO
+        Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerAlarmsDS As WSAnalyzerAlarmsDS) As GlobalDataTO Implements ItwksWSAnalyzerAlarms.Update
             Dim dbConnection As SqlClient.SqlConnection = Nothing
             Dim myGlobalDataTO As GlobalDataTO = Nothing
 
@@ -156,7 +155,6 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSAnalyzersAlarmsDAO.Update", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -177,7 +175,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              AG 23/07/2012 - Added field OKDateTime
         ''' </remarks>
         Public Function GetByWS(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, _
-                                Optional ByVal pAnalyzerID As String = "") As GlobalDataTO
+                                Optional ByVal pAnalyzerID As String = "") As GlobalDataTO Implements ItwksWSAnalyzerAlarms.GetByWS
             Dim myGlobalDataTO As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -209,7 +207,6 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSAnalyzersAlarmsDAO.GetByWS", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -230,7 +227,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              AG 23/07/2012 - Added field OKDateTime
         ''' </remarks>
         Public Function GetByAnalyzer(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-                                      Optional ByVal pWorkSessionID As String = "") As GlobalDataTO
+                                      Optional ByVal pWorkSessionID As String = "") As GlobalDataTO Implements ItwksWSAnalyzerAlarms.GetByAnalyzer
             Dim myGlobalDataTO As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -262,7 +259,6 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSAnalyzersAlarmsDAO.GetByAnalyzer", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -282,7 +278,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' Modified by: AG 17/07/2012 - Changed the SQL 
         ''' </remarks>
         Public Function GetCurrentActiveAlarms(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-                                               ByVal pWorkSessionID As String) As GlobalDataTO
+                                               ByVal pWorkSessionID As String) As GlobalDataTO Implements ItwksWSAnalyzerAlarms.GetCurrentActiveAlarms
             Dim myGlobalDataTO As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -316,7 +312,6 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSAnalyzersAlarmsDAO.GetCurrentActiveAlarms", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -338,7 +333,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              AG 23/07/2012 - Added field OKDateTime
         ''' </remarks>
         Public Function GetByTime(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pInitialDate As Date, ByVal pFinalDate As Date, _
-                                  Optional ByVal pAnalyzerID As String = "") As GlobalDataTO
+                                  Optional ByVal pAnalyzerID As String = "") As GlobalDataTO Implements ItwksWSAnalyzerAlarms.GetByTime
             Dim myGlobalDataTO As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -372,7 +367,6 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSAnalyzersAlarmsDAO.GetByTime", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -398,7 +392,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' </remarks>
         Public Function GetByAlarmID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAlarmID As String, _
                                      Optional ByVal pInitialDate As Date = Nothing, Optional ByVal pFinalDate As Date = Nothing, _
-                                     Optional ByVal pAnalyzerID As String = Nothing, Optional ByVal pWorkSessionID As String = Nothing) As GlobalDataTO
+                                     Optional ByVal pAnalyzerID As String = Nothing, Optional ByVal pWorkSessionID As String = Nothing) As GlobalDataTO Implements ItwksWSAnalyzerAlarms.GetByAlarmID
             Dim myGlobalDataTO As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -445,7 +439,6 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSAnalyzersAlarmsDAO.GetByAlarmID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -471,7 +464,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''                                           when the optional parameter is informed
         ''' </remarks>
         Public Function GetAlarmsMonitor(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-                                         Optional ByVal pWorkSessionID As String = "") As GlobalDataTO
+                                         Optional ByVal pWorkSessionID As String = "") As GlobalDataTO Implements ItwksWSAnalyzerAlarms.GetAlarmsMonitor
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -507,7 +500,6 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSAnalyzersAlarmsDAO.GetAlarmsMonitor", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -527,7 +519,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' Modified by: SA 12/11/2012 - Changed the SQL to delete also Analyzer Alarms without WorkSessionID informed
         ''' </remarks>
         Public Function ResetWS(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String) _
-                                As GlobalDataTO
+                                As GlobalDataTO Implements ItwksWSAnalyzerAlarms.ResetWS
             Dim resultData As New GlobalDataTO
             Try
                 If (pDBConnection Is Nothing) Then
@@ -549,7 +541,6 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSAnalyzersAlarmsDAO.ResetWS", EventLogEntryType.Error, False)
             End Try
             Return resultData

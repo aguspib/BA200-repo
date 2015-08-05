@@ -752,10 +752,13 @@ Namespace Biosystems.Ax00.Core.Entities
                     _analyzerManager.PrepareLocalAlarmList(Alarms.GLF_BOARD_FBLD_ERR, True, myAlarmList, myAlarmStatusList)
                 Else
                     GlobalBase.CreateLogActivity("Repeat Start Task Instruction [" & _analyzerManager.NumSendingRepetitionsTimeout().ToString & "] because GLF_BOARD_FBLD_ERR", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
-                    myGlobal = _analyzerManager.SendStartTaskinQueue()
-
+                    If _analyzerManager.StartTaskInstructionsQueueCount > 0 Then
+                        myGlobal = _analyzerManager.SendStartTaskinQueue()
+                    Else
+                        _analyzerManager.ClearStartTaskQueueToSend()
+                        GlobalBase.CreateLogActivity("CRITICAL CASE!! Nothing to send when GLF_BOARD_FBLD_ERR repetitions are [" & _analyzerManager.NumSendingRepetitionsTimeout().ToString & "]", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
+                    End If
                 End If
-
             ElseIf errorValue <> 61 Then
                 If _analyzerManager.ISECMDStateIsLost() Then
                     _analyzerManager.ISECMDStateIsLost() = False

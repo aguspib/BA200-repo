@@ -4,6 +4,7 @@ Imports Biosystems.Ax00.Core.Entities
 Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Global
+Imports Biosystems.Ax00.Types
 Imports NUnit.Framework
 Imports Telerik.JustMock
 
@@ -44,20 +45,58 @@ Namespace Biosystems.Ax00.Core.Entities.Tests
 
         <Test()> Public Sub ManageAnalyzerReceivedStatus_StatusErr560RetryWithReset_OK()
 
-            GlobalBase.CreateLogActivityPointer = Sub(str As String, str2 As String, type As EventLogEntryType, sys As Boolean)
-                                                      Dim trace = New StackTrace()
-                                                      Debug.Print("Mocked CreateLogActivity with value: " & str)
-                                                  End Sub
-
-            DAOBase.GetSafeOpenDBConnectionPointer = Function(connection As SqlConnection) As TypedGlobalDataTo(Of SqlConnection)
-                                                         Return New TypedGlobalDataTo(Of SqlConnection) With{.SetDatos= New SqlConnection, .HasError = False}
-                                                     End Function
+            CreateLogActivityPointer = Sub(str As String, str2 As String, type As EventLogEntryType, sys As Boolean) Debug.Print("Mocked CreateLogActivity with value: " & str)
+            GetSafeOpenDBConnectionPointer = Function(connection As SqlConnection) New TypedGlobalDataTo(Of SqlConnection) With {.SetDatos = New SqlConnection, .HasError = False}
+            GetOpenDBTransactionPointer = Function(pDBConnection As SqlConnection) New GlobalDataTO() With {.SetDatos = New SqlConnection, .HasError = False}
+            GetBeginTransactionPointer = Sub(pDBConnection As SqlConnection) Debug.Print("Mocked BeginTransaction")
+            GetCommitTransactionPointer = Sub(pDBConnection As SqlConnection) Debug.Print("Mocked CommitTransaction")
+            GetRollbackTransactionPointer = Sub(pDBConnection As SqlConnection) Debug.Print("Mocked RollbackTransaction")
 
             Dim swParametersMock As ItfmwSwParameters = Mock.Create(Of ItfmwSwParameters)()
-            SwParametersDelegate.GettfmwSwParametersDAO = Function() As ItfmwSwParameters
-                                                              Return swParametersMock
-                                                          End Function
-            Mock.Arrange(Function() swParametersMock.ReadByParameterName(Arg.IsAny(Of SqlConnection), "USB_REGISTRY_KEY", Arg.IsAny(Of String))).Returns(New GlobalDataTO() With {.SetDatos = "SYSTEM\CURRENTCONTROLSET\ENUM\FTDIBUS", .HasError = False})
+            Dim myParamsDS As ParametersDS = New ParametersDS()
+            myParamsDS.tfmwSwParameters.AddtfmwSwParametersRow(1, "STRD_VALUE", False, "", 300, "", "")
+            Mock.Arrange(Function() swParametersMock.ReadByParameterName(Arg.IsAny(Of SqlConnection), "USB_REGISTRY_KEY", Arg.IsAny(Of String))).Returns(New GlobalDataTO() With {.SetDatos = myParamsDS, .HasError = False})
+            Mock.Arrange(Function() swParametersMock.ReadByParameterName(Arg.IsAny(Of SqlConnection), "MAX_TIME_DEPOSIT_WARN", Arg.IsAny(Of String))).Returns(New GlobalDataTO() With {.SetDatos = myParamsDS, .HasError = False})
+            Mock.Arrange(Function() swParametersMock.ReadByParameterName(Arg.IsAny(Of SqlConnection), "MAX_TIME_THERMO_REACTIONS_WARN", Arg.IsAny(Of String))).Returns(New GlobalDataTO() With {.SetDatos = myParamsDS, .HasError = False})
+            Mock.Arrange(Function() swParametersMock.ReadByParameterName(Arg.IsAny(Of SqlConnection), "MAX_TIME_THERMO_FRIDGE_WARN", Arg.IsAny(Of String))).Returns(New GlobalDataTO() With {.SetDatos = myParamsDS, .HasError = False})
+            Mock.Arrange(Function() swParametersMock.ReadByParameterName(Arg.IsAny(Of SqlConnection), "MAX_TIME_THERMO_ARM_REAGENTS_WARN", Arg.IsAny(Of String))).Returns(New GlobalDataTO() With {.SetDatos = myParamsDS, .HasError = False})
+            Mock.Arrange(Function() swParametersMock.ReadByParameterName(Arg.IsAny(Of SqlConnection), "WAITING_TIME_OFF", Arg.IsAny(Of String))).Returns(New GlobalDataTO() With {.SetDatos = myParamsDS, .HasError = False})
+            Mock.Arrange(Function() swParametersMock.ReadByParameterName(Arg.IsAny(Of SqlConnection), "SYSTEM_TIME_OFFSET", Arg.IsAny(Of String))).Returns(New GlobalDataTO() With {.SetDatos = myParamsDS, .HasError = False})
+            Mock.Arrange(Function() swParametersMock.ReadByParameterName(Arg.IsAny(Of SqlConnection), "WAITING_TIME_DEFAULT", Arg.IsAny(Of String))).Returns(New GlobalDataTO() With {.SetDatos = myParamsDS, .HasError = False})
+            Mock.Arrange(Function() swParametersMock.ReadByParameterName(Arg.IsAny(Of SqlConnection), "WAITING_TIME_FAST", Arg.IsAny(Of String))).Returns(New GlobalDataTO() With {.SetDatos = myParamsDS, .HasError = False})
+            Mock.Arrange(Function() swParametersMock.ReadByParameterName(Arg.IsAny(Of SqlConnection), "WAITING_TIME_ISE_FAST", Arg.IsAny(Of String))).Returns(New GlobalDataTO() With {.SetDatos = myParamsDS, .HasError = False})
+            Mock.Arrange(Function() swParametersMock.ReadByParameterName(Arg.IsAny(Of SqlConnection), "WAITING_TIME_ISE_OFFSET", Arg.IsAny(Of String))).Returns(New GlobalDataTO() With {.SetDatos = myParamsDS, .HasError = False})
+            Mock.Arrange(Function() swParametersMock.ReadByParameterName(Arg.IsAny(Of SqlConnection), "PREDILUTION_CYCLES", Arg.IsAny(Of String))).Returns(New GlobalDataTO() With {.SetDatos = myParamsDS, .HasError = False})
+            Mock.Arrange(Function() swParametersMock.ReadByParameterName(Arg.IsAny(Of SqlConnection), "CONTAMIN_REAGENT_PERSIS", Arg.IsAny(Of String))).Returns(New GlobalDataTO() With {.SetDatos = myParamsDS, .HasError = False})
+
+            SwParametersDelegate.GettfmwSwParametersDAO = Function() swParametersMock
+
+            Dim alarmsMock As ItfmwAlarms = Mock.Create(Of ItfmwAlarms)()
+            Dim myAlarmsDS As AlarmsDS = New AlarmsDS()
+            Mock.Arrange(Function() alarmsMock.ReadAll(Arg.IsAny(Of SqlConnection))).Returns(New GlobalDataTO() With {.SetDatos = myAlarmsDS, .HasError = False})
+            AlarmsDelegate.GettfmwtfmwAlarmsDAO = Function() alarmsMock
+
+            Dim analyzerCfgMock As ItcfgAnalyzers = Mock.Create(Of ItcfgAnalyzers)()
+            Dim myConfigDS As AnalyzersDS = New AnalyzersDS()
+            myConfigDS.tcfgAnalyzers.AddtcfgAnalyzersRow("A200", "A200", 1, "1.50.2", False, True, False)
+            Mock.Arrange(Function() analyzerCfgMock.ReadByAnalyzerActive(Arg.IsAny(Of SqlConnection))).Returns(New GlobalDataTO() With {.SetDatos = myConfigDS, .HasError = False})
+            ExecutionsDelegate.GettcfgAnalyzersDAO = Function() analyzerCfgMock
+
+            Dim wsAlarmsMock As ItwksWSAnalyzerAlarms = Mock.Create(Of ItwksWSAnalyzerAlarms)()
+            Dim myWsAlarmsDS As WSAnalyzerAlarmsDS = New WSAnalyzerAlarmsDS()
+            Dim myWsAlarmsDS2 As WSAnalyzerAlarmsDS = New WSAnalyzerAlarmsDS()
+            myWsAlarmsDS2.twksWSAnalyzerAlarms.AddtwksWSAnalyzerAlarmsRow("FBLD_ROTOR_FULL", "A200", Date.Now, 1, "", "", True, Date.Now)
+            Mock.Arrange(Function() wsAlarmsMock.GetAlarmsMonitor(Arg.IsAny(Of SqlConnection), Arg.IsAny(Of String))).Returns(New GlobalDataTO() With {.SetDatos = myWsAlarmsDS, .HasError = False})
+            Mock.Arrange(Function() wsAlarmsMock.GetAlarmsMonitor(Arg.IsAny(Of SqlConnection), Arg.IsAny(Of String), Arg.IsAny(Of String))).Returns(New GlobalDataTO() With {.SetDatos = myWsAlarmsDS, .HasError = False})
+            Mock.Arrange(Function() wsAlarmsMock.GetByAlarmID(Arg.IsAny(Of SqlConnection), "FBLD_ROTOR_FULL", Arg.IsAny(Of Date), Arg.IsAny(Of Date), Arg.IsAny(Of String), Arg.IsAny(Of String))).Returns(New GlobalDataTO() With {.SetDatos = myWsAlarmsDS2, .HasError = False})
+            Mock.Arrange(Function() wsAlarmsMock.GetByAlarmID(Arg.IsAny(Of SqlConnection), "UNKNOW_ROTOR_FULL", Arg.IsAny(Of Date), Arg.IsAny(Of Date), Arg.IsAny(Of String), Arg.IsAny(Of String))).Returns(New GlobalDataTO() With {.SetDatos = myWsAlarmsDS, .HasError = False})
+            Mock.Arrange(Function() wsAlarmsMock.Update(Arg.IsAny(Of SqlConnection), Arg.IsAny(Of WSAnalyzerAlarmsDS))).Returns(New GlobalDataTO() With {.SetDatos = myWsAlarmsDS, .HasError = False})
+            WSAnalyzerAlarmsDelegate.GettwksWSAnalyzersAlarmsDAO = Function() wsAlarmsMock
+
+            Dim analyzerManagerFlagsMock As ItcfgAnalyzerManagerFlags = Mock.Create(Of ItcfgAnalyzerManagerFlags)()
+            Dim myAlarmsFlagsDS As AnalyzerManagerFlagsDS = New AnalyzerManagerFlagsDS()
+            Mock.Arrange(Function() analyzerManagerFlagsMock.Update(Arg.IsAny(Of SqlConnection), Arg.IsAny(Of AnalyzerManagerFlagsDS))).Returns(New GlobalDataTO() With {.SetDatos = myAlarmsFlagsDS, .HasError = False})
+            AnalyzerManagerFlagsDelegate.GettcfgAnalyzerManagerFlagsDAO = Function() analyzerManagerFlagsMock
 
             Dim analyzerManager As IAnalyzerManager = New BA200AnalyzerEntity(String.Empty, String.Empty, Nothing)
 

@@ -4,12 +4,17 @@ Option Explicit On
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.DAL.DAO
-Imports Biosystems.Ax00.DAL
 
 Namespace Biosystems.Ax00.BL
 
     Public Class AnalyzerManagerFlagsDelegate
         Implements IAnalyzerManagerFlagsDelegate
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <remarks></remarks>
+        Public Shared GettcfgAnalyzerManagerFlagsDAO As Func(Of ItcfgAnalyzerManagerFlags) = Function() New tcfgAnalyzerManagerFlagsDAO
 
         ''' <summary>
         ''' 
@@ -30,7 +35,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then
-                        Dim myDAO As New tcfgAnalyzerManagerFlagsDAO
+                        Dim myDAO As ItcfgAnalyzerManagerFlags = GettcfgAnalyzerManagerFlagsDAO()
                         resultData = myDAO.ReadValue(dbConnection, pAnalyzerID, pFlagID)
                     End If
                 End If
@@ -39,7 +44,6 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManagerFlagsDelegate.Read", EventLogEntryType.Error, False)
 
             Finally
@@ -64,7 +68,7 @@ Namespace Biosystems.Ax00.BL
                 If (Not resultData.HasError) And (Not resultData.SetDatos Is Nothing) Then
                     dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim myDAO As New tcfgAnalyzerManagerFlagsDAO
+                        Dim myDAO As ItcfgAnalyzerManagerFlags = GettcfgAnalyzerManagerFlagsDAO()
                         resultData = myDAO.ReadByAnalyzerID(dbConnection, pAnalyzerID)
 
                         If (Not resultData.HasError) Then
@@ -86,7 +90,6 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManagerFlagsDelegate.ReadByAnalyzerID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -110,7 +113,7 @@ Namespace Biosystems.Ax00.BL
                 If (Not resultData.HasError) And (Not resultData.SetDatos Is Nothing) Then
                     dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim myDAO As New tcfgAnalyzerManagerFlagsDAO
+                        Dim myDAO As ItcfgAnalyzerManagerFlags = GettcfgAnalyzerManagerFlagsDAO()
                         resultData = myDAO.Create(dbConnection, pAnalyzerFlagsDS)
 
                         If (Not resultData.HasError) Then
@@ -131,7 +134,6 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManagerFlagsDelegate.Create", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -154,7 +156,7 @@ Namespace Biosystems.Ax00.BL
                 If (Not resultData.HasError) And (Not resultData.SetDatos Is Nothing) Then
                     dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim myDAO As New tcfgAnalyzerManagerFlagsDAO
+                        Dim myDAO As ItcfgAnalyzerManagerFlags = GettcfgAnalyzerManagerFlagsDAO()
                         resultData = myDAO.Update(dbConnection, pAnalyzerFlagsDS)
 
                         If (Not resultData.HasError) Then
@@ -175,7 +177,6 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManagerFlagsDelegate.Update", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -202,7 +203,7 @@ Namespace Biosystems.Ax00.BL
                 If (Not resultData.HasError) And (Not resultData.SetDatos Is Nothing) Then
                     dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim myDAO As New tcfgAnalyzerManagerFlagsDAO
+                        Dim myDAO As ItcfgAnalyzerManagerFlags = GettcfgAnalyzerManagerFlagsDAO()
                         resultData = myDAO.UpdateFlag(dbConnection, pAnalyzerID, pFlagID, pNewValue)
 
                         If (Not resultData.HasError) Then
@@ -223,7 +224,6 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManagerFlagsDelegate.UpdateFlag", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -248,7 +248,7 @@ Namespace Biosystems.Ax00.BL
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim myDAO As New tcfgAnalyzerManagerFlagsDAO
+                        Dim myDAO As ItcfgAnalyzerManagerFlags = GettcfgAnalyzerManagerFlagsDAO()
                         resultData = myDAO.ResetFlags(dbConnection, pAnalyzerID, pLeaveConnectFlag)
 
                         If (Not resultData.HasError) Then
@@ -270,7 +270,6 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManagerFlagsDelegate.ResetFlags", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -300,7 +299,7 @@ Namespace Biosystems.Ax00.BL
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim myDAO As New tcfgAnalyzerManagerFlagsDAO
+                        Dim myDAO As ItcfgAnalyzerManagerFlags = GettcfgAnalyzerManagerFlagsDAO()
                         resultData = myDAO.ReadByStatus(dbConnection, pAnalyzerID, pValue, pReadWithSameValue)
                     End If
                 End If
@@ -311,7 +310,6 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManagerFlagsDelegate.ReadByStatus", EventLogEntryType.Error, False)
 
             Finally
@@ -339,7 +337,7 @@ Namespace Biosystems.Ax00.BL
                     If (Not dbConnection Is Nothing) Then
                         If Not pAnalyzerID Is Nothing Then
                             If pAnalyzerID <> "" Then
-                                Dim myDAO As New tcfgAnalyzerManagerFlagsDAO
+                                Dim myDAO As ItcfgAnalyzerManagerFlags = GettcfgAnalyzerManagerFlagsDAO()
                                 resultData = myDAO.Delete(dbConnection, pAnalyzerID)
                             End If
                         End If
@@ -362,7 +360,6 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManagerFlagsDelegate.Delete", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
