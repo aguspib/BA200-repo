@@ -59,6 +59,16 @@ Public NotInheritable Class StartupSRV
         'Copyright info
         Copyright.Text = My.Application.Info.Copyright
 
+        'AJG. Modif. 03/08/2015.
+        If My.Application.CommandLineArgs.Any() Then
+            Dim inputArgument = "/model="
+            For Each s In My.Application.CommandLineArgs
+                If s.ToLower.StartsWith(inputArgument) Then
+                    AllowedAnalyzer = s.Remove(0, inputArgument.Length)
+                End If
+            Next
+        End If
+
         'Note that IAx00Login validates DB existence, create it if concern, and loads Application Current Language
 
         Using myLoginForm As New UiAx00Login()

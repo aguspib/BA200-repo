@@ -1590,7 +1590,7 @@ Namespace Biosystems.Ax00.Core.Entities
         Public MustOverride ReadOnly Property GenericDefaultAnalyzer() As String Implements IAnalyzerManager.GenericDefaultAnalyzer
 
         Public Function IsConnectedWithRightModel() As Boolean Implements IAnalyzerManager.IsConnectedWithRightModel
-            _connectedRightModel = (AllowedAnalyzer = GetModelValue(AnalyzerIDAttribute))
+            _connectedRightModel = (AllowedAnalyzer = GetModelValue(AnalyzerIDAttribute) OrElse AllowedAnalyzer = "")
             Return _connectedRightModel
         End Function
 #End Region

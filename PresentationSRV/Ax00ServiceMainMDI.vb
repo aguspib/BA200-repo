@@ -99,6 +99,8 @@ Public Class Ax00ServiceMainMDI
     Private ManageAlarmTypeAttr As GlobalEnumerates.ManagementAlarmTypes = ManagementAlarmTypes.NONE
     Private mySpecialSimpleErrors As New List(Of String)
 
+    Private QuitBecauseWrongAnalyzer As Boolean = False  'AJG 28/07/2015
+
 #End Region
 
 #Region "Attributes"
@@ -653,6 +655,13 @@ Public Class Ax00ServiceMainMDI
             Dim lockThis As New Object()
             Dim copyRefreshDS As UIRefreshDS = Nothing
             Dim copyRefreshEventList As New List(Of GlobalEnumerates.UI_RefreshEvents)
+
+            'AJG Gestionar si el analizador conectado es compatible con el software
+            If Not AnalyzerController.Instance.Analyzer.IsConnectedWithRightModel() Then
+                MessageBox.Show("mensajito")
+                QuitBecauseWrongAnalyzer = True
+                Close()
+            End If
 
             SyncLock lockThis
                 copyRefreshDS = CType(pRefreshDS.Copy(), UIRefreshDS)
@@ -6567,7 +6576,7 @@ Public Class Ax00ServiceMainMDI
             If Not Me.IsFinalClosing Then
 
                 ' XBC 05/06/2012
-                If SkipQuestionExitProgram Then
+                If SkipQuestionExitProgram OrElse QuitBecauseWrongAnalyzer Then
                     Me.CloseApplication()
                     Exit Try
                 End If
