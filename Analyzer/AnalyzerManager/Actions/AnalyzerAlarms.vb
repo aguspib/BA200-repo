@@ -1182,7 +1182,6 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Dim connection = GetSafeOpenDBConnection()
             Try
-                'Dim dbConnection = connection.SetDatos
                 If (connection IsNot Nothing AndAlso connection.SetDatos IsNot Nothing) Then
                     _myGlobal = _alarmsDelg.GetByAlarmID(Nothing, alarmName, Nothing, Nothing, _analyzerManager.ActiveAnalyzer(), "")
                     If Not _myGlobal.HasError AndAlso Not _myGlobal.SetDatos Is Nothing Then
@@ -1231,23 +1230,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 wsAlarmsDs.AcceptChanges()
 
                 _myGlobal = _alarmsDelg.Save(Nothing, wsAlarmsDs, alarmsDefintionTableDS)
-                'Else
-                '    _myGlobal = _alarmsDelg.GetByAlarmID(Nothing, alarmName, Nothing, Nothing, _analyzerManager.ActiveAnalyzer(), "")
-                '    If Not _myGlobal.HasError AndAlso Not _myGlobal.SetDatos Is Nothing Then
-                '        Dim updateAlarmsDS = DirectCast(_myGlobal.SetDatos, WSAnalyzerAlarmsDS)
-
-                '        If (updateAlarmsDS.twksWSAnalyzerAlarms.Rows.Count > 0) Then
-                '            For Each alarmToUpdate As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In updateAlarmsDS.twksWSAnalyzerAlarms.Rows
-                '                alarmToUpdate.AlarmStatus = True
-                '                alarmToUpdate.AdditionalInfo = "SILENT_ALARM"
-                '                alarmToUpdate.AlarmDateTime = Now
-                '            Next
-                '            updateAlarmsDS.AcceptChanges()
-
-                '            _myGlobal = _alarmsDelg.Update(Nothing, updateAlarmsDS)
-
-                '        End If
-                '    End If
             End If
         End Sub
 

@@ -158,7 +158,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BarCodesDAO.vb" />
+    <Compile Include="CRUD interfaces\ItcfgAnalyzerManagerFlags.vb" />
+    <Compile Include="CRUD interfaces\ItcfgAnalyzers.vb" />
+    <Compile Include="CRUD interfaces\ItfmwAlarms.vb" />
     <Compile Include="CRUD interfaces\ItfmwSwParameters.vb" />
+    <Compile Include="CRUD interfaces\ItwksWSAnalyzerAlarms.vb" />
     <Compile Include="CRUD interfaces\IWSBLinesDelegateCRUD.vb" />
     <Compile Include="History\thisAdjustBaseLinesDAO.vb" />
     <Compile Include="History\thisAnalyzerWorkSessionsDAO.vb" />
