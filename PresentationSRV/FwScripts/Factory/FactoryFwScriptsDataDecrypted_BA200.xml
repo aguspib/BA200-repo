@@ -2333,7 +2333,7 @@
         <InstructionTO>
           <InstructionID>25</InstructionID>
           <Sequence>25</Sequence>
-          <Timer>20000</Timer>
+          <Timer>22000</Timer>
           <Code>END</Code>
           <Params />
           <EnableEdition>true</EnableEdition>

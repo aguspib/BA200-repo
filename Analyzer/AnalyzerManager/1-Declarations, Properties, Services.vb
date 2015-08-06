@@ -411,10 +411,6 @@ Namespace Biosystems.Ax00.Core.Entities
                             InitBaseLineCalculations(Nothing, StartingApplicationAttr)
                         End If
                         ' XBC 14/06/2012
-
-                        If previousValue <> "" Then
-                            _connectedRightModel = (GetModelValue(previousValue) = GetModelValue(value))
-                        End If
                     End If 'AG 20/11/2014 BA-2133
 
                 End If
@@ -1593,11 +1589,10 @@ Namespace Biosystems.Ax00.Core.Entities
 
         Public MustOverride ReadOnly Property GenericDefaultAnalyzer() As String Implements IAnalyzerManager.GenericDefaultAnalyzer
 
-        Public ReadOnly Property IsConnectedWithRightModel() As Boolean Implements IAnalyzerManager.IsConnectedWithRightModel
-            Get
-                Return _connectedRightModel
-            End Get
-        End Property
+        Public Function IsConnectedWithRightModel() As Boolean Implements IAnalyzerManager.IsConnectedWithRightModel
+            _connectedRightModel = (AllowedAnalyzer = GetModelValue(AnalyzerIDAttribute) OrElse AllowedAnalyzer = "")
+            Return _connectedRightModel
+        End Function
 #End Region
 
 #Region "Events definition & methods"
