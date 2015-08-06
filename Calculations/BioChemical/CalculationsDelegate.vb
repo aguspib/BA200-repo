@@ -5183,7 +5183,6 @@ Namespace Biosystems.Ax00.Calculations
             Dim myGlobal As New GlobalDataTO
 
             Try
-                Dim item As Integer = 0
                 '1.- Incorrect curve [Average remark]
                 If calibrator.NumberOfCalibrators > 1 Then
                     If calibrator.ErrorCalibration <> "" Then
@@ -5221,21 +5220,29 @@ Namespace Biosystems.Ax00.Calculations
                     If test.FactorLimit.InUse And calibrator.Factor <> ERROR_VALUE Then
                         If calibrator.Factor < test.FactorLimit.Minimum Or calibrator.Factor > test.FactorLimit.Maximum Then
                             'Calculated factor is beyond limits
-                            Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, Alarms.CALIB_REMARK2.ToString)
+                            For item = 0 To UBound(preparation)
+                                Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, Alarms.CALIB_REMARK2.ToString)
+                            Next
+
                         End If
                     End If
 
                     '3.- Calculated factor NOT calculated [Average remark]
                     If calibrator.Factor = ERROR_VALUE Then
                         'Calculated factor NOT calculated
-                        Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, Alarms.CALIB_REMARK3.ToString)
+                        For item = 0 To UBound(preparation)
+                            Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, Alarms.CALIB_REMARK3.ToString)
+                        Next
+
                     End If
 
                 End If
 
                 'AG 08/11/2010 - Calibration expiration date [Average remark]
                 If Not calibrator.ManualFactorFlag And calibrator.ExpirationDate < Now Then
-                    Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, Alarms.CALIB_REMARK4.ToString)
+                    For item = 0 To UBound(preparation)
+                        Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, Alarms.CALIB_REMARK4.ToString)
+                    Next
                 End If
                 'END AG 08/11/2010
 
