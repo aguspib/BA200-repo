@@ -6,12 +6,11 @@ Imports Biosystems.Ax00.Global
 
 Namespace Biosystems.Ax00.DAL.DAO
 
-
     Public Class tcfgAnalyzerManagerFlagsDAO
-          
+        Implements ItcfgAnalyzerManagerFlags
 
         ''' <summary>
-        ''' '
+        ''' 
         ''' </summary>
         ''' <param name="pDBConnection"></param>
         ''' <param name="pAnalyzerID"></param>
@@ -19,7 +18,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <returns></returns>
         ''' <remarks>AG 25/02/2011 - Tested pending</remarks>
         Public Function ReadValue(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-                             ByVal pFlagID As String) As GlobalDataTO
+                             ByVal pFlagID As String) As GlobalDataTO Implements ItcfgAnalyzerManagerFlags.ReadValue
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
 
@@ -54,7 +53,6 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tcfgAnalyzerManagerFlagsDAO.ReadValue", EventLogEntryType.Error, False)
 
             Finally
@@ -71,7 +69,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pAnalyzerID"></param>
         ''' <returns></returns>
         ''' <remarks>AG 25/02/2011 - tested OK</remarks>
-        Public Function ReadByAnalyzerID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String) As GlobalDataTO
+        Public Function ReadByAnalyzerID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String) As GlobalDataTO Implements ItcfgAnalyzerManagerFlags.ReadByAnalyzerID
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
 
@@ -105,7 +103,6 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tcfgAnalyzerManagerFlagsDAO.ReadByAnalyzerID", EventLogEntryType.Error, False)
 
             Finally
@@ -122,7 +119,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pAnalyzerFlagsDS"></param>
         ''' <returns></returns>
         ''' <remarks>AG 25/02/2011 - Tested OK</remarks>
-        Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerFlagsDS As AnalyzerManagerFlagsDS) As GlobalDataTO
+        Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerFlagsDS As AnalyzerManagerFlagsDS) As GlobalDataTO Implements ItcfgAnalyzerManagerFlags.Create
             Dim myGlobalDataTO As New GlobalDataTO
 
             Try
@@ -162,7 +159,6 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tcfgAnalyzerManagerFlagsDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -175,7 +171,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pAnalyzerFlagsDS"></param>
         ''' <returns></returns>
         ''' <remarks>AG 25/02/2011 - Tested pending</remarks>
-        Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerFlagsDS As AnalyzerManagerFlagsDS) As GlobalDataTO
+        Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerFlagsDS As AnalyzerManagerFlagsDS) As GlobalDataTO Implements ItcfgAnalyzerManagerFlags.Update
             Dim myGlobalDataTO As New GlobalDataTO
 
             Try
@@ -215,7 +211,6 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tcfgAnalyzerManagerFlagsDAO.Update", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -232,7 +227,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <returns></returns>
         ''' <remarks>AG 25/02/2011 - Tested pending</remarks>
         Public Function UpdateFlag(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-                                   ByVal pFlagID As String, ByVal pValue As String) As GlobalDataTO
+                                   ByVal pFlagID As String, ByVal pValue As String) As GlobalDataTO Implements ItcfgAnalyzerManagerFlags.UpdateFlag
             Dim myGlobalDataTO As New GlobalDataTO
 
             Try
@@ -269,7 +264,6 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tcfgAnalyzerManagerFlagsDAO.UpdateFlag", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -284,7 +278,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pLeaveConnectFlag" ></param>
         ''' <returns></returns>
         ''' <remarks>Modified AG 21/06/2012 - add parameter pLeaveConnectFlag</remarks>
-        Public Function ResetFlags(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pLeaveConnectFlag As Boolean) As GlobalDataTO
+        Public Function ResetFlags(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pLeaveConnectFlag As Boolean) As GlobalDataTO Implements ItcfgAnalyzerManagerFlags.ResetFlags
             Dim resultData As New GlobalDataTO
             Try
                 If (pDBConnection Is Nothing OrElse pDBConnection.State = ConnectionState.Closed) Then
@@ -315,7 +309,6 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tcfgAnalyzerManagerFlagsDAO.ResetFlags", EventLogEntryType.Error, False)
             End Try
             Return resultData
@@ -333,7 +326,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <returns></returns>
         ''' <remarks>AG 09/03/2012</remarks>
         Public Function ReadByStatus(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pValue As String, _
-                                     ByVal pReadWithSameValue As Boolean) As GlobalDataTO
+                                     ByVal pReadWithSameValue As Boolean) As GlobalDataTO Implements ItcfgAnalyzerManagerFlags.ReadByStatus
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -384,7 +377,6 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tcfgAnalyzerManagerFlagsDAO.ReadByStatus", EventLogEntryType.Error, False)
 
             Finally
@@ -402,7 +394,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pAnalyzerID"></param>
         ''' <returns></returns>
         ''' <remarks>Created by XB 03/05/2013</remarks>
-        Public Function Delete(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String) As GlobalDataTO
+        Public Function Delete(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String) As GlobalDataTO Implements ItcfgAnalyzerManagerFlags.Delete
             Dim myGlobalDataTO As New GlobalDataTO
 
             Try
@@ -428,12 +420,10 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tcfgAnalyzerManagerFlagsDAO.Delete", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
-
 
     End Class
 

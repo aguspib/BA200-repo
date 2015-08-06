@@ -12,6 +12,12 @@ Namespace Biosystems.Ax00.BL
 
 #Region "Public Methods"
         ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <remarks></remarks>
+        Public Shared GettwksWSAnalyzersAlarmsDAO As Func(Of ItwksWSAnalyzerAlarms) = Function() New twksWSAnalyzersAlarmsDAO
+
+        ''' <summary>
         ''' Creates analyzer alarms (alarms with status TRUE)
         ''' Updates analyzer alarms (alarms with status FALSE
         ''' </summary>
@@ -33,7 +39,7 @@ Namespace Biosystems.Ax00.BL
                 If (Not resultData.HasError) AndAlso (Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim myDAO As New twksWSAnalyzersAlarmsDAO
+                        Dim myDAO As ItwksWSAnalyzerAlarms = GettwksWSAnalyzersAlarmsDAO()
 
                         If (pAnalyzerAlarmsDS.twksWSAnalyzerAlarms.Rows.Count > 0) Then
                             'AG 12/12/2011
@@ -87,32 +93,6 @@ Namespace Biosystems.Ax00.BL
                                 'Get the alarms defined with OKType = False (never are marked as solved)
                                 Dim alarmsWithOKTypeFalse As List(Of String) = (From a As AlarmsDS.tfmwAlarmsRow In pAlarmsDefinitionTable.tfmwAlarms _
                                                                                Where a.OKType = False Select a.AlarmID).ToList
-
-                                'DL 28/11/2012. BUG & TRACKING: 927. When alarms solved its appear in gray color but duplicate. BEGIN ¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡
-                                'AG 23/11/2012 - comment this code START
-                                'SA 12/11/2012
-                                'Get the AnalyzerID 
-                                'Dim myAnalyzerID As String = (From a As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In pAnalyzerAlarmsDS.twksWSAnalyzerAlarms _
-                                '                             Where Not a.IsAnalyzerIDNull _
-                                '                            Select a.AnalyzerID Distinct).ToString
-
-                                'Get the WorkSessionID 
-                                'Dim myWorkSessionID As String = (From a As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In pAnalyzerAlarmsDS.twksWSAnalyzerAlarms _
-                                '                                Where Not a.IsWorkSessionIDNull _
-                                '                               Select a.WorkSessionID Distinct).ToString
-
-                                ''DL 06/06/2012. Begin
-                                'Dim myAnalyzerID As String = ""
-                                'Dim myWorkSessionID As String
-
-                                'With = DirectCast(resultData.SetDatos, WSAnalyzerAlarmsDS)
-                                '    If (.Rows.Count > 0) Then
-                                '        If Not .First.IsAnalyzerIDNull Then myAnalyzerID = .First.AnalyzerID
-                                '        If Not .First.IsWorkSessionIDNull Then myWorkSessionID = .First.WorkSessionID
-                                '    End If
-                                'End With
-                                'SA 12/11/2012
-                                'AG 23/11/2012 - comment this code END
 
                                 'AG 23/11/2012 - activate this code START
                                 Dim myAnalyzerID As String = String.Empty
@@ -276,7 +256,7 @@ Namespace Biosystems.Ax00.BL
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim myDao As New twksWSAnalyzersAlarmsDAO
+                        Dim myDao As ItwksWSAnalyzerAlarms = GettwksWSAnalyzersAlarmsDAO()
                         resultData = myDao.Create(dbConnection, pAnalyzerAlarmsDS)
 
                         If (Not resultData.HasError) Then
@@ -324,7 +304,7 @@ Namespace Biosystems.Ax00.BL
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim myDao As New twksWSAnalyzersAlarmsDAO
+                        Dim myDao As ItwksWSAnalyzerAlarms = GettwksWSAnalyzersAlarmsDAO()
                         resultData = myDao.Update(dbConnection, pAnalyzerAlarmsDS)
 
                         If (Not resultData.HasError) Then
@@ -374,7 +354,7 @@ Namespace Biosystems.Ax00.BL
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim myDAO As New twksWSAnalyzersAlarmsDAO
+                        Dim myDAO As ItwksWSAnalyzerAlarms = GettwksWSAnalyzersAlarmsDAO()
                         resultData = myDAO.GetByWS(dbConnection, pWorkSessionID, pAnalyzerID)
                     End If
                 End If
@@ -412,7 +392,7 @@ Namespace Biosystems.Ax00.BL
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim myDAO As New twksWSAnalyzersAlarmsDAO
+                        Dim myDAO As ItwksWSAnalyzerAlarms = GettwksWSAnalyzersAlarmsDAO()
                         resultData = myDAO.GetByAnalyzer(dbConnection, pAnalyzerID, pWorkSessionID)
                     End If
                 End If
@@ -452,7 +432,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then
-                        Dim myDAO As New twksWSAnalyzersAlarmsDAO
+                        Dim myDAO As ItwksWSAnalyzerAlarms = GettwksWSAnalyzersAlarmsDAO()
                         resultData = myDAO.GetByTime(dbConnection, pInitialDate, pFinalDate, pAnalyzerID)
                     End If
                 End If
@@ -496,7 +476,7 @@ Namespace Biosystems.Ax00.BL
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim myDAO As New twksWSAnalyzersAlarmsDAO
+                        Dim myDAO As ItwksWSAnalyzerAlarms = GettwksWSAnalyzersAlarmsDAO()
                         resultData = myDAO.GetByAlarmID(dbConnection, pAlarmID, pInitialDate, pFinalDate, pAnalyzerID, pWorkSessionID)
                     End If
                 End If
@@ -536,7 +516,7 @@ Namespace Biosystems.Ax00.BL
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim myDAO As New twksWSAnalyzersAlarmsDAO
+                        Dim myDAO As ItwksWSAnalyzerAlarms = GettwksWSAnalyzersAlarmsDAO()
                         resultData = myDAO.GetAlarmsMonitor(dbConnection, pAnalyzerID, pWorkSessionID)
                     End If
                 End If
@@ -574,7 +554,7 @@ Namespace Biosystems.Ax00.BL
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim myDAO As New twksWSAnalyzersAlarmsDAO
+                        Dim myDAO As ItwksWSAnalyzerAlarms = GettwksWSAnalyzersAlarmsDAO()
                         resultData = myDAO.ResetWS(dbConnection, pAnalyzerID, pWorkSessionID)
 
                         If (Not resultData.HasError) Then

@@ -12,7 +12,11 @@ Namespace Biosystems.Ax00.BL
 
 
 #Region "Methods"
-
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <remarks></remarks>
+        Public Shared GettfmwSwParametersDAO As Func(Of ItfmwSwParameters) = Function() New tfmwSwParametersDAO
 
         ''' <summary>
         ''' Get number of multiitem 
@@ -52,12 +56,6 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
-        ''' 
-        ''' </summary>
-        ''' <remarks></remarks>
-        Public Shared GettfmwSwParametersDAO As Func(Of ItfmwSwParameters) = Function() New tfmwSwParametersDAO
-
-        ''' <summary>
         ''' Get details of all Parameters that are not dependend on the Analyzer Model plus:
         ''' ** All Parameters defined for the specified Analyzer Model (pAnalyzerModel is informed) OR
         ''' ** All Parameters defined for the model of the specified Analyzer Identifier (pAnalyzerID is informed)
@@ -81,7 +79,7 @@ Namespace Biosystems.Ax00.BL
                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim mytfmwSwParametersDAO As New tfmwSwParametersDAO
+                        Dim mytfmwSwParametersDAO As ItfmwSwParameters = GettfmwSwParametersDAO()
                         myGlobalDataTO = mytfmwSwParametersDAO.ReadByAnalyzerModel(dbConnection, pAnalyzerModel, pAnalyzerID)
                     End If
                 End If
@@ -121,7 +119,7 @@ Namespace Biosystems.Ax00.BL
                 If (Not resultData.HasError) AndAlso (Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim myDAO As New tfmwSwParametersDAO
+                        Dim myDAO As ItfmwSwParameters = GettfmwSwParametersDAO()
                         resultData = myDAO.GetParameterByAnalyzer(dbConnection, pAnalyzerID, pParameterName, pDependOnModel)
                     End If
                 End If
@@ -131,7 +129,6 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "SwParametersDelegate.GetParameterByAnalyzer", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -157,7 +154,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then
-                        Dim myDAO As New tfmwSwParametersDAO
+                        Dim myDAO As ItfmwSwParameters = GettfmwSwParametersDAO()
                         resultData = myDAO.GetAllList(dbConnection, pAnalyzerModel)
                     End If
                 End If
@@ -194,7 +191,7 @@ Namespace Biosystems.Ax00.BL
                 If (Not resultData.HasError) Then
                     dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim mytfmwSwParametersDAO As New tfmwSwParametersDAO
+                        Dim mytfmwSwParametersDAO As ItfmwSwParameters = GettfmwSwParametersDAO()
                         resultData = mytfmwSwParametersDAO.ReadByParameterName(dbConnection, pParameterName, pAnalyzerModel)
                         If Not resultData.HasError And resultData.SetDatos IsNot Nothing Then
                             Dim myParamsDS As ParametersDS
@@ -209,7 +206,6 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "SwParametersDelegate.ReadTextValueByParameterName", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -237,7 +233,7 @@ Namespace Biosystems.Ax00.BL
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim mySwParametersDAO As New tfmwSwParametersDAO
+                        Dim mySwParametersDAO As ItfmwSwParameters = GettfmwSwParametersDAO()
 
                         resultData = mySwParametersDAO.ReadByParameterName(dbConnection, pParameterName, pAnalyzerModel)
                         If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
@@ -281,7 +277,7 @@ Namespace Biosystems.Ax00.BL
                 connection = DAOBase.GetSafeOpenDBConnection(pDBConnection)   'Database connections are pulled.
                 If (Not connection.HasError AndAlso Not connection.SetDatos Is Nothing) Then
                     If (Not connection.SetDatos Is Nothing) Then
-                        Dim mySwParametersDAO As New tfmwSwParametersDAO
+                        Dim mySwParametersDAO As ItfmwSwParameters = GettfmwSwParametersDAO()
 
                         Dim parameterValuesDS = mySwParametersDAO.ReadByParameterName(connection.SetDatos, parameter.ToString, pAnalyzerModel)
                         If (Not parameterValuesDS.HasError AndAlso Not parameterValuesDS.SetDatos Is Nothing) Then
@@ -331,7 +327,7 @@ Namespace Biosystems.Ax00.BL
                         For Each ParametersRow As ParametersDS.tfmwSwParametersRow In pParametersDS.tfmwSwParameters.Rows
                             'Update data of the existing Test/Control
 
-                            Dim myParameters As New tfmwSwParametersDAO
+                            Dim myParameters As ItfmwSwParameters = GettfmwSwParametersDAO()
                             myGlobalDataTO = myParameters.Update(dbConnection, ParametersRow)
 
                             If (myGlobalDataTO.HasError) Then Exit For
@@ -380,7 +376,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = CType(resultData.SetDatos, SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then
-                        Dim myDAO As New tfmwSwParametersDAO
+                        Dim myDAO As ItfmwSwParameters = GettfmwSwParametersDAO()
                         resultData = myDAO.GetAllISEList(dbConnection, pAnalyzerModel)
                     End If
                 End If
