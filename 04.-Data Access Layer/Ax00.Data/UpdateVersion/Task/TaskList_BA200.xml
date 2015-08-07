@@ -1238,6 +1238,18 @@ WHERE [LimitID] IN ('SRV_MIXER1_POLAR_LIMIT','SRV_MIXER1_Z_FINE_LIMIT','SRV_MIXE
           <IntegrityScript>
           </IntegrityScript>
         </DataRevision>
+        <DataRevision JiraID="BA-2735" SequenceNumber="2">
+          <PrerequisiteScript>
+          </PrerequisiteScript>
+          <DataScript>
+            IF (SELECT COUNT(*) FROM tfmwSwParameters WHERE AnalyzerModel = 'A400') > 0
+            BEGIN
+                DELETE FROM tfmwSwParameters WHERE AnalyzerModel = 'A400'
+            END
+          </DataScript>
+          <IntegrityScript>
+          </IntegrityScript>
+        </DataRevision>
       </DataRevisions>
     </Release>
     <!-- 
