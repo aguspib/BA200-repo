@@ -33,6 +33,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         'Private WithEvents cls_notifier As New CommunicationsAx00.ReceptionNotifier
         Private WithEvents cls_notifier As ReceptionNotifier
 
+        Private commAx00_ProcessID As Integer
+
 #End Region
 
 #Region "Declarations"
@@ -80,13 +82,19 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     'GlobalBase.CreateLogActivity("[Link][Start] --->> CloseMainWindow OK", "Link.Start", EventLogEntryType.Information, False)
 
                 Else
-                    p.Kill()
+                    ' p.Kill()
                     'GlobalBase.CreateLogActivity("[Link][Start] --->> Kill", "Link.Start", EventLogEntryType.Information, False)
                 End If
             Next
 
             'cls_serialPort = CreateObject("CommunicationsAx00.Channel") 'AG 21/04/2010
-            cls_serialPort = New Channel 'RH 14/10/2010
+            cls_serialPort = New Channel() 'RH 14/10/2010
+
+            Try : cls_serialPort.StopComm() : Catch : End Try
+
+            'DGM 06/08/2015
+            'Save [ProcessID] number for kill process by ID when application is clossing
+            Me.commAx00_ProcessID = 1
 
             If Not cls_serialPort.Init() Then
                 Throw New Exception("[Link][Start] --->> Exception: Not cls_serialPort.Init()") 'RH 07/03/2012
@@ -115,6 +123,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             'End Try 
 
         End Function
+
+
+
+
+
 
 
         'Public Function Abrir(ByVal in_channel) As Boolean
@@ -391,11 +404,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Public Sub Terminate()
 
             Try
+
                 'GlobalBase.CreateLogActivity("[Link][Terminate] --->> Closing...", "Link.Terminate", EventLogEntryType.Information, False)
                 Me.StopComm()
 
                 Me.Close()
                 'GlobalBase.CreateLogActivity("[Link][Terminate] --->> Closing cls_serialPort...", "Link.Terminate", EventLogEntryType.Information, False)
+
+
+
 
                 'If Not cls_serialPort Is Nothing Then
                 cls_serialPort = Nothing
@@ -413,11 +430,19 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'Force killing the CommAx00 process from tasks administrator
                 For Each p As Process In Process.GetProcessesByName("CommAx00")
+
+
                     If p.CloseMainWindow() Then
                         'GlobalBase.CreateLogActivity("[Link][Terminate] --->> CloseMainWindow OK", "Link.Terminate", EventLogEntryType.Information, False)
                     Else
-                        p.Kill()
+
+                        'If (p.Id = Me.commAx00_ProcessID) Then
+
+                        'p.Kill()
                         'GlobalBase.CreateLogActivity("[Link][Terminate] --->> Kill", "Link.Terminate", EventLogEntryType.Information, False)
+
+                        'End If
+
                     End If
                 Next
 
@@ -455,5 +480,35 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 #End Region
 
     End Class
+
+
+    Module ProcessExtensions
+
+        Private Function FindIndexedProcessName(pid As Integer) As String
+            Dim processName = Process.GetProcessById(pid).ProcessName
+            Dim processesByName = Process.GetProcessesByName(processName)
+            Dim processIndexdName As String = Nothing
+
+            For index As Integer = 0 To processesByName.Length - 1
+                processIndexdName = If(index = 0, processName, processName + "#" + index)
+                Dim processId = New PerformanceCounter("Process", "ID Process", processIndexdName)
+                If CInt(processId.NextValue()) = pid Then
+                    Return processIndexdName
+                End If
+            Next
+
+            Return processIndexdName
+        End Function
+
+        Private Function FindPidFromIndexedProcessName(indexedProcessName As String) As Process
+            Dim parentId = New PerformanceCounter("Process", "Creating Process ID", indexedProcessName)
+            Return Process.GetProcessById(CInt(parentId.NextValue()))
+        End Function
+
+        <System.Runtime.CompilerServices.Extension> _
+        Public Function Parent(process As Process) As Process
+            Return FindPidFromIndexedProcessName(FindIndexedProcessName(process.Id))
+        End Function
+    End Module
 
 End Namespace
