@@ -1207,6 +1207,494 @@ WHERE [LimitID] IN ('SRV_MIXER1_POLAR_LIMIT','SRV_MIXER1_Z_FINE_LIMIT','SRV_MIXE
           <IntegrityScript>
           </IntegrityScript>
         </DataRevision>
+        <DataRevision JiraID="BA-2798" SequenceNumber="10">
+          <PrerequisiteScript>
+          </PrerequisiteScript>
+          <DataScript>
+            SET IDENTITY_INSERT tfmwSWParameters ON
+            DECLARE @maxParamID INT = (SELECT MAX(ParameterID)+1 FROM tfmwSwParameters)
+
+            IF NOT EXISTS (SELECT * FROM [tfmwSWParameters] WHERE UPPER(ParameterName) = 'BL_LIFETIME' AND UPPER(AnalyzerModel) = 'A200')
+            BEGIN
+            INSERT INTO tfmwSWParameters (ParameterID, ParameterName, DependByModel, AnalyzerModel, ValueNumeric, ValueText, Description)
+            VALUES (@maxParamID, 'BL_LIFETIME',1,'A200', 480, NULL, 'dynamic base line lifetime, in minutes')
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwSWParameters SET ValueNumeric = 480 WHERE UPPER(ParameterName) = 'BL_LIFETIME' AND UPPER(AnalyzerModel) = 'A200'
+            END
+            SET IDENTITY_INSERT tfmwSWParameters OFF
+            GO
+
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'ENG'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('BASELINE_EXPIRED', 'ENG', N'Expired Baseline', 0, convert(datetime,'20150701 07:40:29',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:40:29',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Expired Baseline', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:40:29',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'BASELINE_EXPIRED' AND UPPER(LanguageID) = 'ENG'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'FRE'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('BASELINE_EXPIRED', 'FRE', N'Expired Baseline', 0, convert(datetime,'20150701 07:40:29',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:40:29',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Expired Baseline', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:40:29',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'BASELINE_EXPIRED' AND UPPER(LanguageID) = 'FRE'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'GRE'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('BASELINE_EXPIRED', 'GRE', N'Expired Baseline', 0, convert(datetime,'20150701 07:40:29',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:40:29',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Expired Baseline', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:40:29',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'BASELINE_EXPIRED' AND UPPER(LanguageID) = 'GRE'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'HUN'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('BASELINE_EXPIRED', 'HUN', N'Expired Baseline', 0, convert(datetime,'20150701 07:40:29',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:40:29',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Expired Baseline', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:40:29',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'BASELINE_EXPIRED' AND UPPER(LanguageID) = 'HUN'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'IND'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('BASELINE_EXPIRED', 'IND', N'Expired Baseline', 0, convert(datetime,'20150701 07:40:29',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:40:29',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Expired Baseline', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:40:29',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'BASELINE_EXPIRED' AND UPPER(LanguageID) = 'IND'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'ITA'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('BASELINE_EXPIRED', 'ITA', N'Expired Baseline', 0, convert(datetime,'20150701 07:40:29',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:40:29',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Expired Baseline', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:40:29',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'BASELINE_EXPIRED' AND UPPER(LanguageID) = 'ITA'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'KOR'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('BASELINE_EXPIRED', 'KOR', N'Expired Baseline', 0, convert(datetime,'20150701 07:40:29',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:40:29',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Expired Baseline', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:40:29',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'BASELINE_EXPIRED' AND UPPER(LanguageID) = 'KOR'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'POL'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('BASELINE_EXPIRED', 'POL', N'Expired Baseline', 0, convert(datetime,'20150701 07:40:29',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:40:29',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Expired Baseline', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:40:29',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'BASELINE_EXPIRED' AND UPPER(LanguageID) = 'POL'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'POR'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('BASELINE_EXPIRED', 'POR', N'Expired Baseline', 0, convert(datetime,'20150701 07:40:29',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:40:29',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Expired Baseline', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:40:29',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'BASELINE_EXPIRED' AND UPPER(LanguageID) = 'POR'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'ROM'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('BASELINE_EXPIRED', 'ROM', N'Expired Baseline', 0, convert(datetime,'20150701 07:40:29',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:40:29',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Expired Baseline', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:40:29',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'BASELINE_EXPIRED' AND UPPER(LanguageID) = 'ROM'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'RUS'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('BASELINE_EXPIRED', 'RUS', N'Expired Baseline', 0, convert(datetime,'20150701 07:40:29',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:40:29',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Expired Baseline', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:40:29',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'BASELINE_EXPIRED' AND UPPER(LanguageID) = 'RUS'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'SCH'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('BASELINE_EXPIRED', 'SCH', N'Expired Baseline', 0, convert(datetime,'20150701 07:40:29',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:40:29',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Expired Baseline', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:40:29',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'BASELINE_EXPIRED' AND UPPER(LanguageID) = 'SCH'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'SER'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('BASELINE_EXPIRED', 'SER', N'Expired Baseline', 0, convert(datetime,'20150701 07:40:29',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:40:29',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Expired Baseline', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:40:29',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'BASELINE_EXPIRED' AND UPPER(LanguageID) = 'SER'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'SPA'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('BASELINE_EXPIRED', 'SPA', N'Expired Baseline', 0, convert(datetime,'20150701 07:40:29',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:40:29',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Expired Baseline', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:40:29',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'BASELINE_EXPIRED' AND UPPER(LanguageID) = 'SPA'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'TCH'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('BASELINE_EXPIRED', 'TCH', N'Expired Baseline', 0, convert(datetime,'20150701 07:40:29',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:40:29',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Expired Baseline', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:40:29',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'BASELINE_EXPIRED' AND UPPER(LanguageID) = 'TCH'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'TUR'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('BASELINE_EXPIRED', 'TUR', N'Expired Baseline', 0, convert(datetime,'20150701 07:40:29',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:40:29',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Expired Baseline', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:40:29',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'BASELINE_EXPIRED' AND UPPER(LanguageID) = 'TUR'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'SPA'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('BASELINE_EXPIRED', 'SPA', N'Linea Base expirada', 0, convert(datetime,'20150701 07:41:14',112) ,  '', '03.00.09',  0, NULL, '', 'SA', convert(datetime,'20150701 07:41:14',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Linea Base expirada', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:41:14',112) , Translated = 0, TranslatedUser = 'SA', ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'BASELINE_EXPIRED' AND UPPER(LanguageID) = 'SPA'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'ALM_BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'ENG'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('ALM_BASELINE_EXPIRED', 'ENG', N'Baseline is expired', 0, convert(datetime,'20150701 07:42:08',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:42:08',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Baseline is expired', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:42:08',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'ALM_BASELINE_EXPIRED' AND UPPER(LanguageID) = 'ENG'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'ALM_BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'FRE'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('ALM_BASELINE_EXPIRED', 'FRE', N'Baseline is expired', 0, convert(datetime,'20150701 07:42:08',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:42:08',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Baseline is expired', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:42:08',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'ALM_BASELINE_EXPIRED' AND UPPER(LanguageID) = 'FRE'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'ALM_BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'GRE'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('ALM_BASELINE_EXPIRED', 'GRE', N'Baseline is expired', 0, convert(datetime,'20150701 07:42:08',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:42:08',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Baseline is expired', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:42:08',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'ALM_BASELINE_EXPIRED' AND UPPER(LanguageID) = 'GRE'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'ALM_BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'HUN'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('ALM_BASELINE_EXPIRED', 'HUN', N'Baseline is expired', 0, convert(datetime,'20150701 07:42:08',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:42:08',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Baseline is expired', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:42:08',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'ALM_BASELINE_EXPIRED' AND UPPER(LanguageID) = 'HUN'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'ALM_BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'IND'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('ALM_BASELINE_EXPIRED', 'IND', N'Baseline is expired', 0, convert(datetime,'20150701 07:42:08',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:42:08',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Baseline is expired', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:42:08',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'ALM_BASELINE_EXPIRED' AND UPPER(LanguageID) = 'IND'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'ALM_BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'ITA'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('ALM_BASELINE_EXPIRED', 'ITA', N'Baseline is expired', 0, convert(datetime,'20150701 07:42:08',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:42:08',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Baseline is expired', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:42:08',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'ALM_BASELINE_EXPIRED' AND UPPER(LanguageID) = 'ITA'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'ALM_BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'KOR'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('ALM_BASELINE_EXPIRED', 'KOR', N'Baseline is expired', 0, convert(datetime,'20150701 07:42:08',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:42:08',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Baseline is expired', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:42:08',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'ALM_BASELINE_EXPIRED' AND UPPER(LanguageID) = 'KOR'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'ALM_BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'POL'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('ALM_BASELINE_EXPIRED', 'POL', N'Baseline is expired', 0, convert(datetime,'20150701 07:42:08',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:42:08',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Baseline is expired', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:42:08',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'ALM_BASELINE_EXPIRED' AND UPPER(LanguageID) = 'POL'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'ALM_BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'POR'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('ALM_BASELINE_EXPIRED', 'POR', N'Baseline is expired', 0, convert(datetime,'20150701 07:42:08',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:42:08',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Baseline is expired', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:42:08',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'ALM_BASELINE_EXPIRED' AND UPPER(LanguageID) = 'POR'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'ALM_BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'ROM'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('ALM_BASELINE_EXPIRED', 'ROM', N'Baseline is expired', 0, convert(datetime,'20150701 07:42:08',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:42:08',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Baseline is expired', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:42:08',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'ALM_BASELINE_EXPIRED' AND UPPER(LanguageID) = 'ROM'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'ALM_BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'RUS'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('ALM_BASELINE_EXPIRED', 'RUS', N'Baseline is expired', 0, convert(datetime,'20150701 07:42:08',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:42:08',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Baseline is expired', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:42:08',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'ALM_BASELINE_EXPIRED' AND UPPER(LanguageID) = 'RUS'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'ALM_BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'SCH'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('ALM_BASELINE_EXPIRED', 'SCH', N'Baseline is expired', 0, convert(datetime,'20150701 07:42:08',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:42:08',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Baseline is expired', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:42:08',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'ALM_BASELINE_EXPIRED' AND UPPER(LanguageID) = 'SCH'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'ALM_BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'SER'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('ALM_BASELINE_EXPIRED', 'SER', N'Baseline is expired', 0, convert(datetime,'20150701 07:42:08',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:42:08',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Baseline is expired', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:42:08',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'ALM_BASELINE_EXPIRED' AND UPPER(LanguageID) = 'SER'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'ALM_BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'SPA'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('ALM_BASELINE_EXPIRED', 'SPA', N'Baseline is expired', 0, convert(datetime,'20150701 07:42:08',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:42:08',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Baseline is expired', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:42:08',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'ALM_BASELINE_EXPIRED' AND UPPER(LanguageID) = 'SPA'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'ALM_BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'TCH'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('ALM_BASELINE_EXPIRED', 'TCH', N'Baseline is expired', 0, convert(datetime,'20150701 07:42:08',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:42:08',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Baseline is expired', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:42:08',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'ALM_BASELINE_EXPIRED' AND UPPER(LanguageID) = 'TCH'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'ALM_BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'TUR'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('ALM_BASELINE_EXPIRED', 'TUR', N'Baseline is expired', 0, convert(datetime,'20150701 07:42:08',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:42:08',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Baseline is expired', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:42:08',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'ALM_BASELINE_EXPIRED' AND UPPER(LanguageID) = 'TUR'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'ALM_BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'SPA'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('ALM_BASELINE_EXPIRED', 'SPA', N'Linea Base ha expirado', 0, convert(datetime,'20150701 07:42:40',112) ,  '', '03.00.09',  0, NULL, '', 'SA', convert(datetime,'20150701 07:42:40',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Linea Base ha expirado', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:42:40',112) , Translated = 0, TranslatedUser = 'SA', ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'ALM_BASELINE_EXPIRED' AND UPPER(LanguageID) = 'SPA'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'SOL_BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'ENG'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('SOL_BASELINE_EXPIRED', 'ENG', N'Baseline will be repeated automatically before next start or continue workession or during next start of analyzer', 0, convert(datetime,'20150701 07:43:36',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:43:36',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Baseline will be repeated automatically before next start or continue workession or during next start of analyzer', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:43:36',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'SOL_BASELINE_EXPIRED' AND UPPER(LanguageID) = 'ENG'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'SOL_BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'FRE'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('SOL_BASELINE_EXPIRED', 'FRE', N'Baseline will be repeated automatically before next start or continue workession or during next start of analyzer', 0, convert(datetime,'20150701 07:43:36',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:43:36',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Baseline will be repeated automatically before next start or continue workession or during next start of analyzer', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:43:36',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'SOL_BASELINE_EXPIRED' AND UPPER(LanguageID) = 'FRE'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'SOL_BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'GRE'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('SOL_BASELINE_EXPIRED', 'GRE', N'Baseline will be repeated automatically before next start or continue workession or during next start of analyzer', 0, convert(datetime,'20150701 07:43:36',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:43:36',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Baseline will be repeated automatically before next start or continue workession or during next start of analyzer', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:43:36',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'SOL_BASELINE_EXPIRED' AND UPPER(LanguageID) = 'GRE'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'SOL_BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'HUN'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('SOL_BASELINE_EXPIRED', 'HUN', N'Baseline will be repeated automatically before next start or continue workession or during next start of analyzer', 0, convert(datetime,'20150701 07:43:36',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:43:36',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Baseline will be repeated automatically before next start or continue workession or during next start of analyzer', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:43:36',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'SOL_BASELINE_EXPIRED' AND UPPER(LanguageID) = 'HUN'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'SOL_BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'IND'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('SOL_BASELINE_EXPIRED', 'IND', N'Baseline will be repeated automatically before next start or continue workession or during next start of analyzer', 0, convert(datetime,'20150701 07:43:36',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:43:36',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Baseline will be repeated automatically before next start or continue workession or during next start of analyzer', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:43:36',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'SOL_BASELINE_EXPIRED' AND UPPER(LanguageID) = 'IND'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'SOL_BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'ITA'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('SOL_BASELINE_EXPIRED', 'ITA', N'Baseline will be repeated automatically before next start or continue workession or during next start of analyzer', 0, convert(datetime,'20150701 07:43:36',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:43:36',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Baseline will be repeated automatically before next start or continue workession or during next start of analyzer', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:43:36',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'SOL_BASELINE_EXPIRED' AND UPPER(LanguageID) = 'ITA'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'SOL_BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'KOR'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('SOL_BASELINE_EXPIRED', 'KOR', N'Baseline will be repeated automatically before next start or continue workession or during next start of analyzer', 0, convert(datetime,'20150701 07:43:36',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:43:36',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Baseline will be repeated automatically before next start or continue workession or during next start of analyzer', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:43:36',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'SOL_BASELINE_EXPIRED' AND UPPER(LanguageID) = 'KOR'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'SOL_BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'POL'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('SOL_BASELINE_EXPIRED', 'POL', N'Baseline will be repeated automatically before next start or continue workession or during next start of analyzer', 0, convert(datetime,'20150701 07:43:36',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:43:36',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Baseline will be repeated automatically before next start or continue workession or during next start of analyzer', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:43:36',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'SOL_BASELINE_EXPIRED' AND UPPER(LanguageID) = 'POL'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'SOL_BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'POR'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('SOL_BASELINE_EXPIRED', 'POR', N'Baseline will be repeated automatically before next start or continue workession or during next start of analyzer', 0, convert(datetime,'20150701 07:43:36',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:43:36',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Baseline will be repeated automatically before next start or continue workession or during next start of analyzer', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:43:36',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'SOL_BASELINE_EXPIRED' AND UPPER(LanguageID) = 'POR'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'SOL_BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'ROM'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('SOL_BASELINE_EXPIRED', 'ROM', N'Baseline will be repeated automatically before next start or continue workession or during next start of analyzer', 0, convert(datetime,'20150701 07:43:36',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:43:36',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Baseline will be repeated automatically before next start or continue workession or during next start of analyzer', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:43:36',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'SOL_BASELINE_EXPIRED' AND UPPER(LanguageID) = 'ROM'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'SOL_BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'RUS'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('SOL_BASELINE_EXPIRED', 'RUS', N'Baseline will be repeated automatically before next start or continue workession or during next start of analyzer', 0, convert(datetime,'20150701 07:43:36',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:43:36',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Baseline will be repeated automatically before next start or continue workession or during next start of analyzer', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:43:36',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'SOL_BASELINE_EXPIRED' AND UPPER(LanguageID) = 'RUS'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'SOL_BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'SCH'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('SOL_BASELINE_EXPIRED', 'SCH', N'Baseline will be repeated automatically before next start or continue workession or during next start of analyzer', 0, convert(datetime,'20150701 07:43:36',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:43:36',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Baseline will be repeated automatically before next start or continue workession or during next start of analyzer', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:43:36',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'SOL_BASELINE_EXPIRED' AND UPPER(LanguageID) = 'SCH'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'SOL_BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'SER'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('SOL_BASELINE_EXPIRED', 'SER', N'Baseline will be repeated automatically before next start or continue workession or during next start of analyzer', 0, convert(datetime,'20150701 07:43:36',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:43:36',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Baseline will be repeated automatically before next start or continue workession or during next start of analyzer', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:43:36',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'SOL_BASELINE_EXPIRED' AND UPPER(LanguageID) = 'SER'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'SOL_BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'SPA'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('SOL_BASELINE_EXPIRED', 'SPA', N'Baseline will be repeated automatically before next start or continue workession or during next start of analyzer', 0, convert(datetime,'20150701 07:43:36',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:43:36',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Baseline will be repeated automatically before next start or continue workession or during next start of analyzer', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:43:36',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'SOL_BASELINE_EXPIRED' AND UPPER(LanguageID) = 'SPA'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'SOL_BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'TCH'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('SOL_BASELINE_EXPIRED', 'TCH', N'Baseline will be repeated automatically before next start or continue workession or during next start of analyzer', 0, convert(datetime,'20150701 07:43:36',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:43:36',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Baseline will be repeated automatically before next start or continue workession or during next start of analyzer', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:43:36',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'SOL_BASELINE_EXPIRED' AND UPPER(LanguageID) = 'TCH'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'SOL_BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'TUR'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('SOL_BASELINE_EXPIRED', 'TUR', N'Baseline will be repeated automatically before next start or continue workession or during next start of analyzer', 0, convert(datetime,'20150701 07:43:36',112) ,  'SA', '03.00.09',  0, NULL, NULL, 'SA', convert(datetime,'20150701 07:43:36',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'Baseline will be repeated automatically before next start or continue workession or during next start of analyzer', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:43:36',112) , Translated = 0, ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'SOL_BASELINE_EXPIRED' AND UPPER(LanguageID) = 'TUR'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwMultiLanguageResources] WHERE (UPPER([ResourceID]) = 'SOL_BASELINE_EXPIRED') AND (UPPER([LanguageID]) = 'SPA'))
+            BEGIN
+            INSERT INTO tfmwMultiLanguageResources (ResourceID, LanguageID, ResourceText, OnlyService,CreationDate, CreationUser, ApplicationVersion, Translated,TranslatedDate, TranslatedUser, TS_User, TS_DateTime)  VALUES('SOL_BASELINE_EXPIRED', 'SPA', N'La Línea Base se repetirá automáticamente antes de iniciar o continuar el próximo workession o durante el próximo inicio del analizador', 0, convert(datetime,'20150701 07:44:08',112) ,  '', '03.00.09',  0, NULL, '', 'SA', convert(datetime,'20150701 07:44:08',112) )
+            END
+            ELSE
+            BEGIN
+            UPDATE tfmwMultiLanguageResources SET ResourceText = N'La Línea Base se repetirá automáticamente antes de iniciar o continuar el próximo workession o durante el próximo inicio del analizador', OnlyService  = 0, TS_User = 'SA', TS_DateTime  = convert(datetime,'20150701 07:44:08',112) , Translated = 0, TranslatedUser = 'SA', ApplicationVersion = '03.00.09' WHERE  UPPER(ResourceID) = 'SOL_BASELINE_EXPIRED' AND UPPER(LanguageID) = 'SPA'
+            END
+            GO
+            IF NOT EXISTS (SELECT * FROM [tfmwAlarms] WHERE (UPPER([AlarmID]) = 'BASELINE_EXPIRED'))
+            BEGIN
+            INSERT INTO tfmwAlarms (AlarmID, AlarmSource, AlarmType, Name, NameResourceID, Description, DescResourceID, Solution, SolResourceID,Sound, OnRunningSound, Freeze, OKType, LISValue)
+            VALUES('BASELINE_EXPIRED', 'VAL', 'WARNING','Expired Baseline','BASELINE_EXPIRED','Baseline is expired', 'ALM_BASELINE_EXPIRED','Baseline will be repeated automatically before next start or continue workession or during next start of analyzer', 'SOL_BASELINE_EXPIRED',0, 0, NULL, 0, NULL)
+            END
+            GO
+          </DataScript>
+          <IntegrityScript>
+          </IntegrityScript>
+        </DataRevision>
       </DataRevisions>
     </Release>
     <Release Version="03.00.10">
