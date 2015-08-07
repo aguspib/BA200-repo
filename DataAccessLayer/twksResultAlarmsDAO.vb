@@ -74,20 +74,20 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' </remarks>
         Public Function Add(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pResultAlarms As ResultAlarmsDS) As GlobalDataTO
             Dim resultData As New GlobalDataTO
-
+            Dim cmdText As String = ""
             Try
                 If (pDBConnection Is Nothing) Then
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
                     For Each resultAlarmRow As ResultAlarmsDS.twksResultAlarmsRow In pResultAlarms.twksResultAlarms
-                        Dim cmdText As String = ""
+
                         cmdText = " INSERT INTO twksResultAlarms(OrderTestID, RerunNumber, MultipointNumber, AlarmID, AlarmDateTime) " & _
-                                  " VALUES(" & resultAlarmRow.OrderTestID & ", " & _
-                                         " " & resultAlarmRow.RerunNumber & ", " & _
-                                         " " & resultAlarmRow.MultiPointNumber & ", " & _
-                                        " '" & resultAlarmRow.AlarmID & "', " & _
-                                        " '" & Convert.ToDateTime(resultAlarmRow.AlarmDateTime.ToString).ToString("yyyyMMdd HH:mm:ss") & "')"
+                                                          " VALUES(" & resultAlarmRow.OrderTestID & ", " & _
+                                                                 " " & resultAlarmRow.RerunNumber & ", " & _
+                                                                 " " & resultAlarmRow.MultiPointNumber & ", " & _
+                                                                " '" & resultAlarmRow.AlarmID & "', " & _
+                                                                " '" & Convert.ToDateTime(resultAlarmRow.AlarmDateTime.ToString).ToString("yyyyMMdd HH:mm:ss") & "')"
 
                         'Execute the SQL Sentence
                         Dim dbCmd As New SqlCommand
@@ -112,7 +112,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "twksResultAlarmsDAO.Add", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message & " SQL Statement: " & cmdText, "twksResultAlarmsDAO.Add", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
