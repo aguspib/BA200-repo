@@ -2180,7 +2180,7 @@ Public Class UiResultsCalibCurve
 
     'Private DSNumber As Integer = 0
 
-    Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As Biosystems.Ax00.Types.UIRefreshDS)
+    Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDs As Biosystems.Ax00.Types.UIRefreshDS)
         Try
             'RH 30/05/2011 Not needed, because Executions and Results are loaded before calling RefreshScreen()
             'Me.LoadExecutionsResults()

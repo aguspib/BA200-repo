@@ -120,7 +120,7 @@ Public Class UiHisResults
     ''' Created by:  AG 16/04/2013
     ''' </remarks>
     Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), _
-                                       ByVal pRefreshDS As Biosystems.Ax00.Types.UIRefreshDS)
+                                       ByVal pRefreshDs As Biosystems.Ax00.Types.UIRefreshDS)
         Try
             If (isClosingFlag) Then Return
             FindHistoricalResults()

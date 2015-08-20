@@ -296,7 +296,7 @@ Public Class UiWSSampleRequest
     ''' Modified by: AG    15/03/2012 - When FREEZE appears while UI is disabled because screen is working Sw must reactivate UI
     '''              AG    28/03/2012 - When new alarms appears, check the covers to activate or not the Scan BarCode button
     ''' </remarks>
-    Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As Biosystems.Ax00.Types.UIRefreshDS)
+    Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDs As Biosystems.Ax00.Types.UIRefreshDS)
         Try
             If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
             RefreshDoneField = False

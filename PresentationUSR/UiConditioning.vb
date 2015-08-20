@@ -259,10 +259,10 @@ Public Class UiConditioning
     ''' Activate or deactivate control depending the current condtioning process state
     ''' </summary>
     ''' <param name="pRefreshEventType"></param>
-    ''' <param name="pRefreshDS"></param>
+    ''' <param name="pRefreshDs"></param>
     ''' <remarks>DL 05/06/2012</remarks>
     Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), _
-                                       ByVal pRefreshDS As Biosystems.Ax00.Types.UIRefreshDS)
+                                       ByVal pRefreshDs As Biosystems.Ax00.Types.UIRefreshDS)
         Try
             'RefreshDoneField = False
             If isClosingFlag Then Return 'AG 03/08/2012

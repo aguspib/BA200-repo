@@ -145,9 +145,9 @@ Public Class UiConfigGeneral
     ''' This method is called when the USB cable is unplugged while the configuration screen is active
     ''' </summary>
     ''' <param name="pRefreshEventType"></param>
-    ''' <param name="pRefreshDS"></param>
+    ''' <param name="pRefreshDs"></param>
     ''' <remarks></remarks>
-    Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As Biosystems.Ax00.Types.UIRefreshDS)
+    Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDs As Biosystems.Ax00.Types.UIRefreshDS)
         Try
             If isClosingFlag Then Return 'AG 03/08/2012
 

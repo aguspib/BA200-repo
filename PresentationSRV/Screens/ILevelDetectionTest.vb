@@ -195,12 +195,12 @@ Public Class UiLevelDetectionTest
     ''' Refresh this specified screen with the information received from the Instrument
     ''' </summary>
     ''' <param name="pRefreshEventType"></param>
-    ''' <param name="pRefreshDS"></param>
+    ''' <param name="pRefreshDs"></param>
     ''' <remarks>
     ''' Created by SGM 23/05/2011
     ''' Modified by XB 04/02/2013 - Upper conversions must use Invariant Culture Info (Bugs tracking #1112)
     ''' </remarks>
-    Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As Biosystems.Ax00.Types.UIRefreshDS)
+    Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDs As Biosystems.Ax00.Types.UIRefreshDS)
         Dim myGlobal As New GlobalDataTO
         Try
 

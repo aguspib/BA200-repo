@@ -5137,12 +5137,12 @@ Public Class UiResults
     ''' Updates the Results gridview
     ''' </summary>
     ''' <param name="pRefreshEventType">RefreshEventType</param>
-    ''' <param name="pRefreshDS">UIRefreshDS with info to update</param>
+    ''' <param name="pRefreshDs">UIRefreshDS with info to update</param>
     ''' <remarks>
     ''' Created by:  RH 10/01/2011
     ''' Modified by: AG 12/04/2011 - Rename for RefreshScreen method (use the same method name in all screen)
     ''' </remarks>
-    Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As UIRefreshDS)
+    Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDs As UIRefreshDS)
         Try
             Dim startTime As DateTime = Now 'AG 26/06/2012 - time estimation
 

@@ -840,12 +840,12 @@ Public Class UiMonitor
     ''' 
     ''' </summary>
     ''' <param name="pRefreshEventType"></param>
-    ''' <param name="pRefreshDS"></param>
+    ''' <param name="pRefreshDs"></param>
     ''' <remarks>
     ''' Modified by AG 05/03/2014 - #1524, inform UpdateWSState when new results are calculated
     '''             IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
-    Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As Biosystems.Ax00.Types.UIRefreshDS)
+    Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDs As Biosystems.Ax00.Types.UIRefreshDS)
         Try
             RefreshDoneField = False 'RH 28/03/2012
 

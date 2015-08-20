@@ -267,7 +267,7 @@ Public Class BSBaseForm
         End Try
     End Sub
 
-    Public Overridable Sub RefreshScreen(ByVal pRefreshEventType As List(Of UI_RefreshEvents), ByVal pRefreshDS As UIRefreshDS)
+    Public Overridable Sub RefreshScreen(ByVal pRefreshEventType As List(Of UI_RefreshEvents), ByVal pRefreshDs As UIRefreshDS)
 
     End Sub
 
