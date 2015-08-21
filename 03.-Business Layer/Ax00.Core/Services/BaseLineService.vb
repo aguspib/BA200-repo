@@ -703,7 +703,7 @@ Namespace Biosystems.Ax00.Core.Services
 
             'We provide results callback
             If (_analyzer.BaseLineTypeForCalculations = BaseLineType.DYNAMIC) Then
-                If (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = "END") Then
+                If (_analyzer.SessionFlag(AnalyzerManagerFlags.DynamicBL_Empty) = "END") AndAlso Me._dynamicBaseLineValid Then
                     Status = ServiceStatusEnum.EndSuccess
                 Else
                     Status = ServiceStatusEnum.EndError

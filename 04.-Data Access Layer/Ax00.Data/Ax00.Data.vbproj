@@ -112,7 +112,6 @@
     </None>
     <None Include="vWSExecutionsDS.xsd">
       <Generator>MSDataSetGenerator</Generator>
-      <LastGenOutput>vWSExecutionsDS.Designer.vb</LastGenOutput>
       <SubType>Designer</SubType>
     </None>
     <None Include="vWSExecutionsDS.xss">
