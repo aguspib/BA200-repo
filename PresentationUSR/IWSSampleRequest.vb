@@ -5284,7 +5284,7 @@ Public Class UiWSSampleRequest
 
         Try
             'If there are not items in the three grids, then the WS is resetted
-            SetPropertyThreadSafe("Cursor", Cursors.WaitCursor)
+            BeginInvoke(Sub() Cursor = Cursors.WaitCursor)
 
             If (bsBlkCalibDataGridView.Rows.Count = 0 AndAlso bsControlOrdersDataGridView.Rows.Count = 0 AndAlso _
                 bsPatientOrdersDataGridView.Rows.Count = 0) Then
@@ -5299,7 +5299,7 @@ Public Class UiWSSampleRequest
 
                             If (myGlobalDataTO.HasError) Then
                                 'Show the error message
-                                SetPropertyThreadSafe("Cursor", Cursors.Default)
+                                BeginInvoke(Sub() Cursor = Cursors.Default)
                                 ErrorOnSavingWS = String.Format("{0}|{1}", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage)
                             End If
                         End If
@@ -5313,7 +5313,7 @@ Public Class UiWSSampleRequest
                             WSStatusAttribute = "EMPTY"
                         Else
                             'Show the error message
-                            SetPropertyThreadSafe("Cursor", Cursors.Default)
+                            BeginInvoke(Sub() Cursor = Cursors.Default)
                             ErrorOnSavingWS = String.Format("{0}|{1}", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage)
                         End If
                     Else
@@ -5326,7 +5326,7 @@ Public Class UiWSSampleRequest
                             WSStatusAttribute = ""
                         Else
                             'Show the error message
-                            SetPropertyThreadSafe("Cursor", Cursors.Default)
+                            BeginInvoke(Sub() Cursor = Cursors.Default)
                             ErrorOnSavingWS = String.Format("{0}|{1}", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage)
                         End If
                     End If
@@ -5384,19 +5384,19 @@ Public Class UiWSSampleRequest
                         myGlobalDataTO = VerifyChangesInCalibrationFactor()
                         If (myGlobalDataTO.HasError) Then
                             'Inform the error message
-                            SetPropertyThreadSafe("Cursor", Cursors.Default)
+                            BeginInvoke(Sub() Cursor = Cursors.Default)
                             ErrorOnSavingWS = String.Format("{0}|{1}", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage)
                         End If
                     End If
                 Else
                     'Inform the error message
-                    SetPropertyThreadSafe("Cursor", Cursors.Default)
+                    BeginInvoke(Sub() Cursor = Cursors.Default)
                     ErrorOnSavingWS = String.Format("{0}|{1}", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage)
                 End If
             End If
 
         Catch ex As Exception
-            SetPropertyThreadSafe("Cursor", Cursors.Default)
+            BeginInvoke(Sub() Cursor = Cursors.Default)
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareOrderTestsForWS", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             'DL 15/05/2013
             'ShowMessage(Name & ".PrepareOrderTestsForWS", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -5405,7 +5405,7 @@ Public Class UiWSSampleRequest
         Finally
             SavingWS = False
             ScreenWorkingProcess = False 'AG 08/11/2012 - inform this flag because the MDI requires it
-            SetPropertyThreadSafe("Cursor", Cursors.Default)
+            BeginInvoke(Sub() Cursor = Cursors.Default)
         End Try
     End Sub
 
