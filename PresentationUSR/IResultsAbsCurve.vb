@@ -1236,7 +1236,7 @@ Public Class UiResultsAbsCurve
     '''             AG 13/06/2012 - simplify and try improve code performance
     ''' </remarks>
     Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), _
-                                       ByVal pRefreshDS As UIRefreshDS)
+                                       ByVal pRefreshDs As UIRefreshDS)
         Try
             If isClosingFlag Then Return 'AG 03/08/2012
 

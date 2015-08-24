@@ -6630,7 +6630,7 @@ Public Class UiWSRotorPositions
     ''' <summary>
     ''' 'On-line' Refresh rotor position screen with information received from Analyzer. 
     ''' </summary>
-    ''' <param name="pRefreshDS"></param>
+    ''' <param name="pRefreshDs"></param>
     ''' <remarks>
     ''' Created by:  AG 12/04/2011
     ''' Modified by: TR            - Function adapted for Barcode reception (using ROTORPOSITION_CHANGED)
@@ -6640,7 +6640,7 @@ Public Class UiWSRotorPositions
     '''              XB 28/02/2014 - BA-1523 ==> No refresh if screen is closing
     '''              IT 03/06/2014 - BA-1644 ==> No refresh if screen is disposed
     ''' </remarks>
-    Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As Biosystems.Ax00.Types.UIRefreshDS)
+    Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDs As Biosystems.Ax00.Types.UIRefreshDS)
         Try
             If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
             If (isClosingFlag) Then Return 'AG 03/08/2012

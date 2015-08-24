@@ -18,7 +18,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             MyBase.New(pAnalyzerID) 'SGM 20/01/2012
             myFwScriptDelegate = pFwScriptsDelegate
 
-            Me.Initializations()
+            Initializations()
         End Sub
 
         Public Sub New()
@@ -29,66 +29,62 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 #Region "Declarations"
 
         Public CurrentOperation As OPERATIONS                  ' controls the operation which is currently executed in each time
-        Private RecommendationsList As New List(Of HISTORY_RECOMMENDATIONS)
-        Private ReportCountTimeout As Integer
-        Private RecommendationsReport() As HISTORY_RECOMMENDATIONS
-        Private myDecimalSeparator As String = SystemInfoManager.OSDecimalSeparator 'RH 15/02/2012 Get the static version
-        Private myGroupSeparator As String = SystemInfoManager.OSGroupSeparator 'RH 15/02/2012 Get the static version
+        Private _reportCountTimeout As Integer
+        Private _recommendationsReport() As HISTORY_RECOMMENDATIONS
+        Private ReadOnly _myGroupSeparator As String = SystemInfoManager.OSGroupSeparator 'RH 15/02/2012 Get the static version
 
 #End Region
 
 #Region "Attributes"
         ' Language
-        Private currentLanguageAttr As String
-        Private ReadSignalOkAttr As Integer
+        Private _currentLanguageAttr As String
+        Private _readSignalOkAttr As Integer
 
-        Private SamplesRotorBCPositionAttr As String
-        Private ReagentsRotorBCPositionAttr As String
+        Private _samplesRotorBcPositionAttr As String
+        Private _reagentsRotorBcPositionAttr As String
 
-        Private pAxisAdjustAttr As AXIS
-        Private pMovAdjustAttr As MOVEMENT
-        Private pValueAdjustAttr As String = ""
+        Private _pAxisAdjustAttr As AXIS
+        Private _pMovAdjustAttr As MOVEMENT
+        Private _pValueAdjustAttr As String = ""
 
         ' Operations done
-        Private LoadAdjDoneAttr As Boolean
-        Private HomesDoneAttr As Boolean
-        Private TestDoneAttr As Boolean
-        Private TestModeDoneAttr As Boolean
-        Private TestModeEndedAttr As Boolean
+        Private _loadAdjDoneAttr As Boolean
+        Private _homesDoneAttr As Boolean
+        Private _testDoneAttr As Boolean
+        Private _testModeDoneAttr As Boolean
+        Private _testModeEndedAttr As Boolean
 
-        Private NoneInstructionToSendAttr As Boolean
+        Private _noneInstructionToSendAttr As Boolean
 
         ' Time expected for current operation
-        Private CurrentTimeOperationAttr As Integer
+        Private _currentTimeOperationAttr As Integer
 
-        'Private AnalyzerIDAttr As String
-
-        Private AdjustmentIDAttr As ADJUSTMENT_GROUPS
-        Private AdjustmentBCPointAttr As Single
-        Private BcResultsAttr As BarCodeResults()
+        Private _adjustmentIDAttr As ADJUSTMENT_GROUPS
+        Private _adjustmentBcPointAttr As Single
+        Private _bcResultsAttr As BarCodeResults()
 #End Region
 
 #Region "Properties"
-        Public Property currentLanguage As String
+        Public Property CurrentLanguage As String
             Get
-                Return Me.currentLanguageAttr
+                Return _currentLanguageAttr
             End Get
             Set(value As String)
-                Me.currentLanguageAttr = value
+                _currentLanguageAttr = value
             End Set
         End Property
 
-        Private BarcodeLaserEnabled_ As Boolean
+        Private _barcodeLaserEnabled As Boolean
         Public Property BarcodeLaserEnabled As Boolean
             Get
-                Return BarcodeLaserEnabled_
+                Return _barcodeLaserEnabled
             End Get
             Set(value As Boolean)
                 Dim myResultData As New GlobalDataTO
                 Dim myFwScript1 As New FwScriptQueueItem
                 Try
                     ' Initializations 
-                    BcResultsAttr = Nothing
+                    _bcResultsAttr = Nothing
 
                     If myFwScriptDelegate.CurrentFwScriptsQueue IsNot Nothing Then myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
 
@@ -123,149 +119,139 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                         myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                     End If
 
-                    'Dim myLogAcciones As New ApplicationLogManager()
                     CreateLogActivity(ex)
                 End Try
-                BarcodeLaserEnabled_ = value
+                _barcodeLaserEnabled = value
             End Set
         End Property
 
 
         Public Property ReadSignalOk As Integer
             Get
-                Return Me.ReadSignalOkAttr
+                Return _readSignalOkAttr
             End Get
             Set(value As Integer)
-                Me.ReadSignalOkAttr = value
+                _readSignalOkAttr = value
             End Set
         End Property
 
-        Public Property SamplesRotorBCPosition As String
+        Public Property SamplesRotorBcPosition As String
             Get
-                Return Me.SamplesRotorBCPositionAttr
+                Return _samplesRotorBcPositionAttr
             End Get
             Set(value As String)
-                Me.SamplesRotorBCPositionAttr = value
+                _samplesRotorBcPositionAttr = value
             End Set
         End Property
 
-        Public Property ReagentsRotorBCPosition As String
+        Public Property ReagentsRotorBcPosition As String
             Get
-                Return Me.ReagentsRotorBCPositionAttr
+                Return _reagentsRotorBcPositionAttr
             End Get
             Set(value As String)
-                Me.ReagentsRotorBCPositionAttr = value
+                _reagentsRotorBcPositionAttr = value
             End Set
         End Property
 
-        Public Property pAxisAdjust As AXIS
+        Public Property PAxisAdjust As AXIS
             Get
-                Return Me.pAxisAdjustAttr
+                Return _pAxisAdjustAttr
             End Get
             Set(value As AXIS)
-                Me.pAxisAdjustAttr = value
+                _pAxisAdjustAttr = value
             End Set
         End Property
 
-        Public Property pMovAdjust As MOVEMENT
+        Public Property PMovAdjust As MOVEMENT
             Get
-                Return Me.pMovAdjustAttr
+                Return _pMovAdjustAttr
             End Get
             Set(value As MOVEMENT)
-                Me.pMovAdjustAttr = value
+                _pMovAdjustAttr = value
             End Set
         End Property
 
-        Public Property pValueAdjust As String
+        Public Property PValueAdjust As String
             Get
-                Return Me.pValueAdjustAttr
+                Return _pValueAdjustAttr
             End Get
             Set(value As String)
-                Me.pValueAdjustAttr = value
+                _pValueAdjustAttr = value
             End Set
         End Property
 
         Public Property LoadAdjDone As Boolean
             Get
-                Return Me.LoadAdjDoneAttr
+                Return _loadAdjDoneAttr
             End Get
             Set(value As Boolean)
-                Me.LoadAdjDoneAttr = value
+                _loadAdjDoneAttr = value
             End Set
         End Property
 
         Public Property NoneInstructionToSend As Boolean
             Get
-                Return NoneInstructionToSendAttr
+                Return _noneInstructionToSendAttr
             End Get
             Set(value As Boolean)
-                NoneInstructionToSendAttr = value
+                _noneInstructionToSendAttr = value
             End Set
         End Property
 
         Public Property HomesDone As Boolean
             Get
-                Return HomesDoneAttr
+                Return _homesDoneAttr
             End Get
             Set(value As Boolean)
-                HomesDoneAttr = value
+                _homesDoneAttr = value
             End Set
         End Property
 
         Public Property TestDone As Boolean
             Get
-                Return Me.TestDoneAttr
+                Return _testDoneAttr
             End Get
             Set(value As Boolean)
-                Me.TestDoneAttr = value
+                _testDoneAttr = value
             End Set
         End Property
 
         Public Property TestModeDone As Boolean
             Get
-                Return Me.TestModeDoneAttr
+                Return _testModeDoneAttr
             End Get
             Set(value As Boolean)
-                Me.TestModeDoneAttr = value
+                _testModeDoneAttr = value
             End Set
         End Property
 
         Public Property TestModeEnded As Boolean
             Get
-                Return Me.TestModeEndedAttr
+                Return _testModeEndedAttr
             End Get
             Set(value As Boolean)
-                Me.TestModeEndedAttr = value
+                _testModeEndedAttr = value
             End Set
         End Property
 
         Public ReadOnly Property CurrentTimeOperation As Integer
             Get
-                Return CurrentTimeOperationAttr
+                Return _currentTimeOperationAttr
             End Get
         End Property
-
-        'Public Property AnalyzerId() As String
-        '    Get
-        '        Return Me.AnalyzerIDAttr
-        '    End Get
-        '    Set(ByVal value As String)
-        '        Me.AnalyzerIDAttr = value
-        '    End Set
-        'End Property
 
         Public Property AdjustmentID As ADJUSTMENT_GROUPS
             Get
-                Return Me.AdjustmentIDAttr
+                Return _adjustmentIDAttr
             End Get
             Set(value As ADJUSTMENT_GROUPS)
-                Me.AdjustmentIDAttr = value
+                _adjustmentIDAttr = value
             End Set
         End Property
 
-        Public WriteOnly Property AdjustmentBCPoint As Single
+        Public WriteOnly Property AdjustmentBcPoint As Single
             Set(value As Single)
-                Me.AdjustmentBCPointAttr = value
+                _adjustmentBcPointAttr = value
             End Set
         End Property
 
@@ -273,10 +259,10 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Get
                 Dim returnValue As Integer
 
-                If Me.BcResultsAttr Is Nothing Then
+                If _bcResultsAttr Is Nothing Then
                     returnValue = 0
                 Else
-                    returnValue = UBound(Me.BcResultsAttr) + 1
+                    returnValue = UBound(_bcResultsAttr) + 1
                 End If
 
                 Return returnValue
@@ -285,14 +271,14 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
         Public ReadOnly Property BcResults As BarCodeResults()
             Get
-                Return Me.BcResultsAttr
+                Return _bcResultsAttr
             End Get
         End Property
 
 #End Region
 
 #Region "Enumerations"
-        Public Enum OPERATIONS
+        Public Enum Operations
             NONE
             HOMES
             SAVE_ADJUSMENTS
@@ -318,23 +304,21 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         ''' <param name="pData">data received</param>
         ''' <remarks>Created by XBC 15/12/2011</remarks>
         Private Sub ScreenReceptionLastFwScriptEvent(pResponse As RESPONSE_TYPES, pData As Object) Handles Me.ReceivedLastFwScriptEvent
-            Dim myGlobal As New GlobalDataTO
             Try
                 'manage special operations according to the screen characteristics
-
                 ' timeout limit repetitions
                 If pResponse = RESPONSE_TYPES.TIMEOUT Or _
                    pResponse = RESPONSE_TYPES.EXCEPTION Then
 
-                    If Me.ReportCountTimeout = 0 Then
-                        Me.ReportCountTimeout += 1
+                    If _reportCountTimeout = 0 Then
+                        _reportCountTimeout += 1
                         ' registering the incidence in historical reports activity
-                        If Me.RecommendationsReport Is Nothing Then
-                            ReDim Me.RecommendationsReport(0)
+                        If _recommendationsReport Is Nothing Then
+                            ReDim _recommendationsReport(0)
                         Else
-                            ReDim Preserve Me.RecommendationsReport(UBound(Me.RecommendationsReport) + 1)
+                            ReDim Preserve _recommendationsReport(UBound(_recommendationsReport) + 1)
                         End If
-                        Me.RecommendationsReport(UBound(Me.RecommendationsReport)) = HISTORY_RECOMMENDATIONS.ERR_COMM
+                        _recommendationsReport(UBound(_recommendationsReport)) = HISTORY_RECOMMENDATIONS.ERR_COMM
                     End If
 
 
@@ -342,55 +326,54 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End If
                 ' timeout limit repetitions
 
-                Select Case Me.CurrentOperation
+                Select Case CurrentOperation
 
-                    Case OPERATIONS.SAVE_ADJUSMENTS
+                    Case Operations.SAVE_ADJUSMENTS
                         Select Case pResponse
                             Case RESPONSE_TYPES.START
                                 ' Nothing by now
                             Case RESPONSE_TYPES.OK
-                                myGlobal = ManageSavingBC()
+                                Dim myGlobal = ManageSavingBC()
                                 If Not myGlobal.HasError Then
-                                    Me.LoadAdjDoneAttr = True
+                                    _loadAdjDoneAttr = True
                                 End If
                         End Select
 
 
-                    Case OPERATIONS.HOMES
+                    Case Operations.HOMES
                         Select Case pResponse
                             Case RESPONSE_TYPES.OK
-                                Me.HomesDoneAttr = True
+                                _homesDoneAttr = True
                         End Select
 
 
-                    Case OPERATIONS.TEST
-                        Select Case pResponse
-                            Case RESPONSE_TYPES.START
-                                CurrentTimeOperationAttr = AnalyzerController.Instance.Analyzer.MaxWaitTime '#REFACTORING
-                            Case RESPONSE_TYPES.OK
-                                Me.TestDoneAttr = True
-                        End Select
-
-                    Case OPERATIONS.TEST_MODE
+                    Case Operations.TEST
                         Select Case pResponse
                             Case RESPONSE_TYPES.START
-                                ' Nothing to do
+                                _currentTimeOperationAttr = AnalyzerController.Instance.Analyzer.MaxWaitTime '#REFACTORING
                             Case RESPONSE_TYPES.OK
-                                Me.TestModeDoneAttr = True
+                                _testDoneAttr = True
                         End Select
 
-                    Case OPERATIONS.TEST_MODE_END
+                    Case Operations.TEST_MODE
                         Select Case pResponse
                             Case RESPONSE_TYPES.START
                                 ' Nothing to do
                             Case RESPONSE_TYPES.OK
-                                Me.TestModeEndedAttr = True
+                                _testModeDoneAttr = True
+                        End Select
+
+                    Case Operations.TEST_MODE_END
+                        Select Case pResponse
+                            Case RESPONSE_TYPES.START
+                                ' Nothing to do
+                            Case RESPONSE_TYPES.OK
+                                _testModeEndedAttr = True
                         End Select
 
                 End Select
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.ScreenReceptionLastFwScriptEvent", EventLogEntryType.Error, False)
             End Try
         End Sub
@@ -414,22 +397,22 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
                 Select Case pMode
                     Case ADJUSTMENT_MODES.ADJUSTMENTS_READING
-                        myResultData = MyBase.SendQueueForREADINGADJUSTMENTS()
+                        myResultData = SendQueueForREADINGADJUSTMENTS()
 
                     Case ADJUSTMENT_MODES.LOADING
-                        myResultData = Me.SendQueueForLOADING()
+                        myResultData = SendQueueForLOADING()
 
                     Case ADJUSTMENT_MODES.TEST_EXITING
-                        myResultData = Me.SendQueueForTEST_EXITING()
+                        myResultData = SendQueueForTEST_EXITING()
 
                     Case ADJUSTMENT_MODES.ADJUST_PREPARING
-                        myResultData = Me.SendQueueForADJUST_PREPARING(pAdjustmentGroup)
+                        myResultData = SendQueueForADJUST_PREPARING(pAdjustmentGroup)
 
                     Case ADJUSTMENT_MODES.ADJUSTING
-                        myResultData = Me.SendQueueForADJUSTING(pAdjustmentGroup)
+                        myResultData = SendQueueForADJUSTING(pAdjustmentGroup)
 
                     Case ADJUSTMENT_MODES.TESTING
-                        myResultData = Me.SendQueueForTESTING(pAdjustmentGroup)
+                        myResultData = SendQueueForTESTING(pAdjustmentGroup)
 
                 End Select
 
@@ -438,7 +421,6 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.SendFwScriptsQueueList", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -457,13 +439,12 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         Public Function GetParameters(pAnalyzerModel As String) As GlobalDataTO
             Dim myResultData As New GlobalDataTO
             Dim myParams As New SwParametersDelegate
-            Dim myParametersDS As New ParametersDS
             Try
                 ' Read Signal Quality recommendation
                 myResultData = myParams.ReadByParameterName(Nothing, SwParameters.SRV_BARCODE_READ_SIGNAL_OK.ToString, pAnalyzerModel)
                 If Not myResultData.HasError And Not myResultData.SetDatos Is Nothing Then
-                    myParametersDS = CType(myResultData.SetDatos, ParametersDS)
-                    Me.ReadSignalOkAttr = CInt(myParametersDS.tfmwSwParameters.Item(0).ValueNumeric)
+                    Dim myParametersDs = CType(myResultData.SetDatos, ParametersDS)
+                    _readSignalOkAttr = CInt(myParametersDs.tfmwSwParameters.Item(0).ValueNumeric)
                 Else
                     myResultData.HasError = True
                     Exit Try
@@ -474,7 +455,6 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.GetParameters", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -488,15 +468,14 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         Public Function SendLoad_Adjustments() As GlobalDataTO
             Dim myResultData As New GlobalDataTO
             Try
-                Me.CurrentOperation = OPERATIONS.SAVE_ADJUSMENTS
-                myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(AnalyzerManagerSwActionList.LOADADJ, True, Nothing, Me.pValueAdjustAttr) '#REFACTORING
+                CurrentOperation = Operations.SAVE_ADJUSMENTS
+                myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(AnalyzerManagerSwActionList.LOADADJ, True, Nothing, _pValueAdjustAttr) '#REFACTORING
 
             Catch ex As Exception
                 myResultData.HasError = True
                 myResultData.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.SendLOAD_ADJUSTMENTS", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -507,10 +486,10 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by XBC 16/12/2011</remarks>
-        Public Function SendBARCODE_REQUEST(pBarCodeDS As AnalyzerManagerDS, pOperation As OPERATIONS) As GlobalDataTO
+        Public Function SendBARCODE_REQUEST(pBarCodeDs As AnalyzerManagerDS, pOperation As Operations) As GlobalDataTO
             Dim myResultData As New GlobalDataTO
             Try
-                Me.CurrentOperation = pOperation
+                CurrentOperation = pOperation
                 myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(AnalyzerManagerSwActionList.BARCODE_REQUEST, True, Nothing, pBarCodeDS, "") '#REFACTORING
 
             Catch ex As Exception
@@ -518,7 +497,6 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.SendBARCODE_REQUEST", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -528,37 +506,36 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         ''' Refresh this specified delegate with the information received from the Instrument
         ''' </summary>
         ''' <param name="pRefreshEventType"></param>
-        ''' <param name="pRefreshDS"></param>
+        ''' <param name="pRefreshDs"></param>
         ''' <remarks>Created by XBC 16/12/2011</remarks>
-        Public Sub RefreshDelegate(pRefreshEventType As List(Of UI_RefreshEvents), pRefreshDS As UIRefreshDS)
+        Public Sub RefreshDelegate(pRefreshEventType As List(Of UI_RefreshEvents), pRefreshDs As UIRefreshDS)
             Dim myResultData As New GlobalDataTO
             Try
                 If pRefreshDS.RotorPositionsChanged.Rows.Count > 0 Then
                     For Each updatedRow As UIRefreshDS.RotorPositionsChangedRow In pRefreshDS.RotorPositionsChanged.Rows
-                        If Me.CurrentOperation = OPERATIONS.TEST Then
+                        If CurrentOperation = Operations.TEST Then
                             If updatedRow.BarcodeStatus = "OK" Then
-                                Me.BcResultsAdd(updatedRow.CellNumber, updatedRow.BarCodeInfo)
+                                BcResultsAdd(updatedRow.CellNumber, updatedRow.BarCodeInfo)
                             End If
                         Else
-                            Me.BcResultsAttr = Nothing ' XBC 09/10/2012 - Correction - into test mode the value to read always is the first who overwrite the before read value
-                            Me.BcResultsAdd(updatedRow.CellNumber, updatedRow.BarCodeInfo)
+                            _bcResultsAttr = Nothing ' XBC 09/10/2012 - Correction - into test mode the value to read always is the first who overwrite the before read value
+                            BcResultsAdd(updatedRow.CellNumber, updatedRow.BarCodeInfo)
                         End If
                     Next
                 End If
 
-                If Me.CurrentOperation = OPERATIONS.TEST Then
+                If CurrentOperation = Operations.TEST Then
                     ' Insert the new activity into Historic reports
                     myResultData = InsertReport("TEST", "BARCODE")
                 End If
 
-                Me.ScreenReceptionLastFwScriptEvent(RESPONSE_TYPES.OK, Nothing)
+                ScreenReceptionLastFwScriptEvent(RESPONSE_TYPES.OK, Nothing)
 
             Catch ex As Exception
                 myResultData.HasError = True
                 myResultData.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.RefreshDelegate", EventLogEntryType.Error, False)
             End Try
         End Sub
@@ -566,20 +543,19 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         Public Sub BcResultsAdd(pPosition As Integer, pValue As String)
             Dim myResultData As New GlobalDataTO
             Try
-                If Me.BcResultsAttr Is Nothing Then
-                    ReDim Me.BcResultsAttr(0)
+                If _bcResultsAttr Is Nothing Then
+                    ReDim _bcResultsAttr(0)
                 Else
-                    ReDim Preserve Me.BcResultsAttr(UBound(Me.BcResultsAttr) + 1)
+                    ReDim Preserve _bcResultsAttr(UBound(_bcResultsAttr) + 1)
                 End If
-                Me.BcResultsAttr(UBound(Me.BcResultsAttr)).Position = pPosition
-                Me.BcResultsAttr(UBound(Me.BcResultsAttr)).Value = pValue
+                _bcResultsAttr(UBound(_bcResultsAttr)).Position = pPosition
+                _bcResultsAttr(UBound(_bcResultsAttr)).Value = pValue
 
             Catch ex As Exception
                 myResultData.HasError = True
                 myResultData.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.BcResultsAdd", EventLogEntryType.Error, False)
             End Try
         End Sub
@@ -597,18 +573,10 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Dim myResultData As New GlobalDataTO
             Try
                 Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
-                'Dim Utilities As New Utilities()
                 Dim text1 As String
                 Dim text = ""
-
-                'myResultData = Me.GetCultureInfo()
-                'If myResultData.HasError Then
-                '    'Dim myLogAcciones As New ApplicationLogManager()
-                '    GlobalBase.CreateLogActivity(myResultData.ErrorMessage, "BarCodeAdjustmentDelegate.DecodeDataReport", EventLogEntryType.Error, False)
-                '    Exit Try
-                'End If
-
                 Dim j = 0
+
                 Select Case pTask
                     Case "ADJUST"
 
@@ -704,7 +672,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End Select
 
                 ' put separator as a group thousands separator
-                text = text.Replace(Me.myGroupSeparator.ToString, " ")
+                text = text.Replace(_myGroupSeparator.ToString, " ")
 
                 myResultData.SetDatos = text
 
@@ -713,7 +681,6 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.DecodeDataReport", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -726,12 +693,12 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by XBC 30/30/2012</remarks>
-        Private Function SendQueueForLOADING() As GlobalDataTO
+        Private Function SendQueueForLoading() As GlobalDataTO
             Dim myResultData As New GlobalDataTO
             Dim myFwScript1 As New FwScriptQueueItem
             Try
                 ' Initializations 
-                Me.BcResultsAttr = Nothing
+                _bcResultsAttr = Nothing
 
                 If myFwScriptDelegate.CurrentFwScriptsQueue IsNot Nothing Then
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
@@ -761,7 +728,6 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.SendQueueForLOADING", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -804,7 +770,6 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.SendQueueForTEST_EXITING", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -826,16 +791,16 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
                 'get the pending Homes  
                 Dim myHomes As New tadjPreliminaryHomesDAO
-                Dim myHomesDS As SRVPreliminaryHomesDS
+                Dim myHomesDs As SRVPreliminaryHomesDS
                 myResultData = myHomes.GetPreliminaryHomesByAdjID(Nothing, AnalyzerId, pAdjustment.ToString)
                 If myResultData IsNot Nothing AndAlso Not myResultData.HasError Then
-                    myHomesDS = CType(myResultData.SetDatos, SRVPreliminaryHomesDS)
+                    myHomesDs = CType(myResultData.SetDatos, SRVPreliminaryHomesDS)
 
                     Dim myPendingHomesList As List(Of SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow) = _
-                                    (From a As SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow In myHomesDS.srv_tadjPreliminaryHomes _
+                                    (From a As SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow In myHomesDs.srv_tadjPreliminaryHomes _
                                     Where a.Done = False Select a).ToList
 
-                    For Each H As SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow In myPendingHomesList
+                    For Each H In myPendingHomesList
                         Dim myFwScript As New FwScriptQueueItem
                         myListFwScript.Add(myFwScript)
                     Next
@@ -892,7 +857,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                         .NextOnError = Nothing
                         ' expects 1 param
                         .ParamList = New List(Of String)
-                        .ParamList.Add(Me.SamplesRotorBCPositionAttr)
+                        .ParamList.Add(_samplesRotorBcPositionAttr)
                     End With
 
                     For i = 0 To myListFwScript.Count - 1
@@ -924,7 +889,6 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.SendQueueForADJUST_PREPARING", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -935,7 +899,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by XBC 15/12/2011</remarks>
-        Private Function SendQueueForADJUSTING(pAdjustment As ADJUSTMENT_GROUPS) As GlobalDataTO
+        Private Function SendQueueForAdjusting(pAdjustment As ADJUSTMENT_GROUPS) As GlobalDataTO
             Dim myResultData As New GlobalDataTO
             Dim myFwScript1 As New FwScriptQueueItem
             Try
@@ -955,7 +919,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     Select Case pAdjustment
 
                         Case ADJUSTMENT_GROUPS.SAMPLES_ROTOR_BC
-                            Select Case pMovAdjust
+                            Select Case PMovAdjust
                                 Case MOVEMENT.HOME
                                     ' samples rotor Home
                                     .FwScriptID = FwSCRIPTS_IDS.SAMPLES_HOME_ROTOR.ToString
@@ -966,18 +930,18 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                     .FwScriptID = FwSCRIPTS_IDS.SAMPLES_ABS_ROTOR.ToString
                                     ' expects 1 param
                                     .ParamList = New List(Of String)
-                                    .ParamList.Add(Me.pValueAdjustAttr)
+                                    .ParamList.Add(_pValueAdjustAttr)
                                 Case MOVEMENT.RELATIVE
                                     ' Mov REL
                                     ' Relative positioning of the samples rotor for x steps
                                     .FwScriptID = FwSCRIPTS_IDS.SAMPLES_REL_ROTOR.ToString
                                     ' expects 1 param
                                     .ParamList = New List(Of String)
-                                    .ParamList.Add(Me.pValueAdjustAttr)
+                                    .ParamList.Add(_pValueAdjustAttr)
                             End Select
 
                         Case ADJUSTMENT_GROUPS.REAGENTS_ROTOR_BC
-                            Select Case pMovAdjust
+                            Select Case PMovAdjust
                                 Case MOVEMENT.HOME
                                     ' reagents rotor Home
                                     .FwScriptID = FwSCRIPTS_IDS.REAGENTS_HOME_ROTOR.ToString
@@ -988,14 +952,14 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                     .FwScriptID = FwSCRIPTS_IDS.REAGENTS_ABS_ROTOR.ToString
                                     ' expects 1 param
                                     .ParamList = New List(Of String)
-                                    .ParamList.Add(Me.pValueAdjustAttr)
+                                    .ParamList.Add(_pValueAdjustAttr)
                                 Case MOVEMENT.RELATIVE
                                     ' Mov REL
                                     ' Relative positioning of the reagents rotor for x steps
                                     .FwScriptID = FwSCRIPTS_IDS.REAGENTS_REL_ROTOR.ToString
                                     ' expects 1 param
                                     .ParamList = New List(Of String)
-                                    .ParamList.Add(Me.pValueAdjustAttr)
+                                    .ParamList.Add(_pValueAdjustAttr)
                             End Select
 
 
@@ -1015,7 +979,6 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.SendQueueForADJUSTING", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -1026,13 +989,13 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by XBC 16/12/11</remarks>
-        Private Function SendQueueForTESTING(pAdjustment As ADJUSTMENT_GROUPS) As GlobalDataTO
+        Private Function SendQueueForTesting(pAdjustment As ADJUSTMENT_GROUPS) As GlobalDataTO
             Dim myResultData As New GlobalDataTO
             Dim myListFwScript As New List(Of FwScriptQueueItem)
             Dim myFwScript1 As New FwScriptQueueItem
             Try
                 ' Initializations 
-                Me.BcResultsAttr = Nothing
+                _bcResultsAttr = Nothing
 
                 If myFwScriptDelegate.CurrentFwScriptsQueue IsNot Nothing Then
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
@@ -1040,29 +1003,29 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
                 'get the pending Homes
                 Dim myHomes As New tadjPreliminaryHomesDAO
-                Dim myHomesDS As SRVPreliminaryHomesDS
+                Dim myHomesDs As SRVPreliminaryHomesDS
                 myResultData = myHomes.GetPreliminaryHomesByAdjID(Nothing, AnalyzerId, pAdjustment.ToString)
                 If myResultData IsNot Nothing AndAlso Not myResultData.HasError Then
-                    myHomesDS = CType(myResultData.SetDatos, SRVPreliminaryHomesDS)
+                    myHomesDs = CType(myResultData.SetDatos, SRVPreliminaryHomesDS)
 
                     Dim myPendingHomesList As List(Of SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow) = _
-                                    (From a As SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow In myHomesDS.srv_tadjPreliminaryHomes _
+                                    (From a As SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow In myHomesDs.srv_tadjPreliminaryHomes _
                                     Where a.Done = False Select a).ToList
 
 
-                    For Each H As SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow In myPendingHomesList
+                    For Each H In myPendingHomesList
                         Dim myFwScript As New FwScriptQueueItem
                         myListFwScript.Add(myFwScript)
                     Next
 
                     Dim i = 0
-                    For Each H As SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow In myPendingHomesList
+                    For Each h As SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow In myPendingHomesList
 
                         'GET EACH PENDING HOME'S FWSCRIPT FROM FWSCRIPT DATA AND ADD TO THE FWSCRIPT QUEUE
                         If i = myListFwScript.Count - 1 Then
                             'Last index
                             With myListFwScript(i)
-                                .FwScriptID = H.RequiredHomeID.ToString
+                                .FwScriptID = h.RequiredHomeID.ToString
                                 .EvaluateType = EVALUATE_TYPES.NUM_VALUE
                                 .EvaluateValue = 1
                                 .NextOnResultOK = myFwScript1
@@ -1073,7 +1036,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                             End With
                         Else
                             With myListFwScript(i)
-                                .FwScriptID = H.RequiredHomeID.ToString
+                                .FwScriptID = h.RequiredHomeID.ToString
                                 .EvaluateType = EVALUATE_TYPES.NUM_VALUE
                                 .EvaluateValue = 1
                                 .NextOnResultOK = myListFwScript(i + 1)
@@ -1103,7 +1066,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End With
 
                 myListFwScript.Add(myFwScript1)
-                Me.CurrentOperation = OPERATIONS.HOMES
+                CurrentOperation = Operations.HOMES
 
                 'add to the queue list
                 If myListFwScript.Count > 0 Then
@@ -1119,9 +1082,6 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, False)
                 Else
                     If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, True)
-                    'Else
-                    '    Me.HomesDoneAttr = True
-                    '    Me.NoneInstructionToSend = False
                 End If
 
 
@@ -1134,7 +1094,6 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.SendQueueForTESTING", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -1147,10 +1106,9 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         ''' <remarks>
         ''' Created by XBC 20/12/2011
         ''' </remarks>
-        Private Function ManageSavingBC() As GlobalDataTO
+        Private Function ManageSavingBc() As GlobalDataTO
             Dim myResultData As New GlobalDataTO
             Try
-
                 ' Insert the new activity into Historic reports
                 myResultData = InsertReport("ADJUST", "BARCODE")
 
@@ -1159,7 +1117,6 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.ManageSavingBC", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -1183,18 +1140,17 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData = myHistoricalReportsDelegate.Add(Nothing, myHistoricReportRow)
                 If (Not myResultData.HasError AndAlso Not myResultData.SetDatos Is Nothing) Then
                     'Get the generated ID from the dataset returned 
-                    Dim generatedID As Integer = -1
-                    generatedID = DirectCast(myResultData.SetDatos, SRVResultsServiceDS.srv_thrsResultsServiceRow).ResultServiceID
+                    Dim generatedID = DirectCast(myResultData.SetDatos, SRVResultsServiceDS.srv_thrsResultsServiceRow).ResultServiceID
 
                     ' Insert recommendations if existing
-                    If RecommendationsReport IsNot Nothing Then
+                    If _recommendationsReport IsNot Nothing Then
                         Dim myRecommendationsList As New SRVRecommendationsServiceDS
                         Dim myRecommendationsRow As SRVRecommendationsServiceDS.srv_thrsRecommendationsServiceRow
 
-                        For i = 0 To RecommendationsReport.Length - 1
+                        For i = 0 To _recommendationsReport.Length - 1
                             myRecommendationsRow = myRecommendationsList.srv_thrsRecommendationsService.Newsrv_thrsRecommendationsServiceRow
                             myRecommendationsRow.ResultServiceID = generatedID
-                            myRecommendationsRow.RecommendationID = CInt(Me.RecommendationsReport(i))
+                            myRecommendationsRow.RecommendationID = CInt(_recommendationsReport(i))
                             myRecommendationsList.srv_thrsRecommendationsService.Rows.Add(myRecommendationsRow)
                         Next
 
@@ -1202,7 +1158,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                         If myResultData.HasError Then
                             myResultData.HasError = True
                         End If
-                        RecommendationsReport = Nothing
+                        _recommendationsReport = Nothing
                     End If
                 Else
                     myResultData.HasError = True
@@ -1213,7 +1169,6 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.InsertReport", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -1239,16 +1194,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         ''' BarCode value (x)
         ''' </remarks>
         Private Function GenerateDataReport(pTask As String, pAction As String) As String
-            'Dim myResultData As New GlobalDataTO
             Dim returnValue = ""
             Try
-                'myResultData = Me.GetCultureInfo()
-                'If myResultData.HasError Then
-                '    'Dim myLogAcciones As New ApplicationLogManager()
-                '    GlobalBase.CreateLogActivity(myResultData.ErrorMessage, "BarCodeAdjustmentDelegate.GenerateDataReport", EventLogEntryType.Error, False)
-                '    Exit Try
-                'End If
-
                 Select Case pTask
                     Case "ADJUST"
 
@@ -1257,13 +1204,13 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
                                 returnValue = ""
                                 ' Selected rotor
-                                If Me.AdjustmentIDAttr = ADJUSTMENT_GROUPS.SAMPLES_ROTOR_BC Then
+                                If _adjustmentIDAttr = ADJUSTMENT_GROUPS.SAMPLES_ROTOR_BC Then
                                     returnValue += "1"
                                 Else
                                     returnValue += "2"
                                 End If
                                 ' BarCode point value
-                                returnValue += Me.AdjustmentBCPointAttr.ToString("00000")
+                                returnValue += _adjustmentBcPointAttr.ToString("00000")
 
                         End Select
 
@@ -1275,23 +1222,23 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
                                 returnValue = ""
                                 ' Selected rotor
-                                If Me.AdjustmentIDAttr = ADJUSTMENT_GROUPS.SAMPLES_ROTOR_BC Then
+                                If _adjustmentIDAttr = ADJUSTMENT_GROUPS.SAMPLES_ROTOR_BC Then
                                     returnValue += "1"
                                 Else
                                     returnValue += "2"
                                 End If
                                 ' Number of tube codebar detected
-                                If Me.BcResultsAttr Is Nothing Then
+                                If _bcResultsAttr Is Nothing Then
                                     returnValue += "0"
                                 Else
-                                    returnValue += Me.BcResultsAttr.Count.ToString("000")
+                                    returnValue += _bcResultsAttr.Count.ToString("000")
 
-                                    For i = 0 To Me.BcResultsAttr.Count - 1
+                                    For i = 0 To _bcResultsAttr.Count - 1
                                         ' Tube position
-                                        returnValue += Me.BcResultsAttr(i).Position.ToString("000")
+                                        returnValue += _bcResultsAttr(i).Position.ToString("000")
 
                                         ' BarCode value
-                                        returnValue += Me.BcResultsAttr(i).Value.ToString()
+                                        returnValue += _bcResultsAttr(i).Value.ToString()
                                         ' Separator
                                         returnValue += "#%#"
                                     Next
@@ -1301,7 +1248,6 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End Select
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.GenerateDataReport", EventLogEntryType.Error, False)
             End Try
             Return returnValue

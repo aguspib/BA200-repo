@@ -321,11 +321,11 @@ Public Class TestISEMonitor
     ''' Refresh this specified screen with the information received from the Instrument
     ''' </summary>
     ''' <param name="pRefreshEventType"></param>
-    ''' <param name="pRefreshDS"></param>
+    ''' <param name="pRefreshDs"></param>
     ''' <remarks>Created by SGM 09/03/2012
     ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
-    Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of UI_RefreshEvents), ByVal pRefreshDS As UIRefreshDS)
+    Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of UI_RefreshEvents), ByVal pRefreshDs As UIRefreshDS)
         Dim myGlobal As New GlobalDataTO
         Try
             If pRefreshEventType.Contains(UI_RefreshEvents.SENSORVALUE_CHANGED) Then

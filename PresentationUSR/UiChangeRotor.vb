@@ -674,7 +674,7 @@ Public Class UiChangeRotor
     ''' Activate or deactivate control depending the current change rotor process state
     ''' </summary>
     ''' <param name="pRefreshEventType"></param>
-    ''' <param name="pRefreshDS"></param>
+    ''' <param name="pRefreshDs"></param>
     ''' <remarks>
     ''' Created by:  AG 29/06/2011
     ''' Modified by: SA 16/04/2014 - BT #1595 ==> Call to function EnableButtons has been commented to avoid bad enabling of the screen buttons
@@ -684,7 +684,7 @@ Public Class UiChangeRotor
     '''              IT 30/01/2015 - BA-2216
     '''              IT 13/02/2015 - BA-2266
     ''' </remarks>
-    Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As Biosystems.Ax00.Types.UIRefreshDS)
+    Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDs As Biosystems.Ax00.Types.UIRefreshDS)
         Try
             RefreshDoneField = False 'RH 28/03/2012
             If (isClosingFlag) Then Return 'AG 03/08/2012

@@ -233,7 +233,7 @@ Public Class UiHQBarcode
     '''              SA 25/07/2013 - Changed the function that get data to fill the grid: WSRotorContentByPositionDelegate.GetAllPatientTubesForHQ
     '''                              instead of BarcodePositionsWithNoRequestsDelegate.ReadByAnalyzerAndWorkSession
     ''' </remarks>
-    Public Overrides Sub RefreshScreen(pRefreshEventType As List(Of UI_RefreshEvents), pRefreshDS As UIRefreshDS)
+    Public Overrides Sub RefreshScreen(pRefreshEventType As List(Of UI_RefreshEvents), pRefreshDs As UIRefreshDS)
         Try
             'If the screen is closing, the Refresh is not executed
             If (isClosingFlag) Then Return
