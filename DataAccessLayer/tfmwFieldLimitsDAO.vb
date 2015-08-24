@@ -9,7 +9,7 @@ Imports Biosystems.Ax00.Types.FieldLimitsDS
 Namespace Biosystems.Ax00.DAL.DAO
 
     Public Class tfmwFieldLimitsDAO
-          
+        Implements ItfmwFieldLimits
 
 #Region "CRUD Methods"
 
@@ -26,8 +26,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' Modified by: SA 25/02/2010 - Changed datatype of parameter pLimitID 
         '''              SA 16/02/2012 - Changed the function template
         ''' </remarks>
-        Public Function Read(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pLimitID As FieldLimitsEnum, Optional ByVal pAnalyzerModel As String = "") As GlobalDataTO
-            Dim resultData As GlobalDataTO = Nothing
+        Public Function Read(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pLimitID As FieldLimitsEnum, Optional ByVal pAnalyzerModel As String = "") As GlobalDataTO Implements ItfmwFieldLimits.Read
+            Dim resultData As GlobalDataTO
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
             Try
@@ -56,11 +56,10 @@ Namespace Biosystems.Ax00.DAL.DAO
             Catch ex As Exception
                 resultData = New GlobalDataTO()
                 resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "tfmwFieldLimitsDAO.Read", EventLogEntryType.Error, False)
+                CreateLogActivity(ex.Message, "tfmwFieldLimitsDAO.Read", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -80,8 +79,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' Modified by: DL 07/07/2011 - Added optional parameter for the AnalyzerModel and filter data for it when informed
         '''              SA 16/02/2012 - Changed the function template
         ''' </remarks>
-        Public Function ReadAll(ByVal pDBConnection As SqlClient.SqlConnection, Optional ByVal pAnalyzerModel As String = "") As GlobalDataTO
-            Dim resultData As GlobalDataTO = Nothing
+        Public Function ReadAll(ByVal pDBConnection As SqlClient.SqlConnection, Optional ByVal pAnalyzerModel As String = "") As GlobalDataTO Implements ItfmwFieldLimits.ReadAll
+            Dim resultData As GlobalDataTO
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
             Try
@@ -106,17 +105,15 @@ Namespace Biosystems.Ax00.DAL.DAO
             Catch ex As Exception
                 resultData = New GlobalDataTO()
                 resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "tfmwFieldLimitsDAO.ReadAll", EventLogEntryType.Error, False)
+                CreateLogActivity(ex.Message, "tfmwFieldLimitsDAO.ReadAll", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return resultData
         End Function
-
 
         ''' <summary>
         ''' Update values for an specific Limit
@@ -128,13 +125,13 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' Created by:  DL 11/07/2011
         ''' Modified by: SA 16/02/2012 - Changed the function template
         ''' </remarks>
-        Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pLimitRow As tfmwFieldLimitsRow) As GlobalDataTO
+        Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pLimitRow As tfmwFieldLimitsRow) As GlobalDataTO Implements ItfmwFieldLimits.Update
             Dim resultData As New GlobalDataTO
 
             Try
                 If (pDBConnection Is Nothing) Then
                     resultData.HasError = True
-                    resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
+                    resultData.ErrorCode = Messages.DB_CONNECTION_ERROR.ToString
                 Else
                     Dim cmdText As String = " UPDATE tfmwFieldLimits " & vbCrLf & _
                                             " SET    MinValue = " & ReplaceNumericString(pLimitRow.MinValue) & vbCrLf & _
@@ -154,11 +151,10 @@ Namespace Biosystems.Ax00.DAL.DAO
                 End If
             Catch ex As Exception
                 resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "tfmwFieldLimitsDAO.Update", EventLogEntryType.Error, False)
+                CreateLogActivity(ex.Message, "tfmwFieldLimitsDAO.Update", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function

@@ -8,7 +8,6 @@ Namespace Biosystems.Ax00.DAL.DAO
 
     Public Class tfmwScreensDAO
           
-
         ''' <summary>
         ''' Readtable tfmwScreens Table by the ScreenID
         ''' </summary>
@@ -46,8 +45,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "tfmwScreensDAO.Read", EventLogEntryType.Error, False)
+                CreateLogActivity(ex.Message, "tfmwScreensDAO.Read", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

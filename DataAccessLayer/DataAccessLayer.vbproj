@@ -161,6 +161,8 @@
     <Compile Include="CRUD interfaces\ItcfgAnalyzerManagerFlags.vb" />
     <Compile Include="CRUD interfaces\ItcfgAnalyzers.vb" />
     <Compile Include="CRUD interfaces\ItfmwAlarms.vb" />
+    <Compile Include="CRUD interfaces\ItfmwFieldLimits.vb" />
+    <Compile Include="CRUD interfaces\ItfmwGeneralSettings.vb" />
     <Compile Include="CRUD interfaces\ItfmwSwParameters.vb" />
     <Compile Include="CRUD interfaces\ItwksWSAnalyzerAlarms.vb" />
     <Compile Include="CRUD interfaces\IWSBLinesDelegateCRUD.vb" />

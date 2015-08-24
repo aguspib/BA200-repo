@@ -6,7 +6,7 @@ Imports Biosystems.Ax00.Global
 Namespace Biosystems.Ax00.DAL.DAO
 
     Partial Public Class tfmwGeneralSettingsDAO
-          
+        Implements ItfmwGeneralSettings
 
 #Region "CRUD Methods"
 
@@ -19,7 +19,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <returns></returns>
         ''' <remarks>CREATED BY TR 24/11/2011</remarks>
         Public Function UpdateCurrValBySettingID(ByVal pDBConnection As SqlClient.SqlConnection, _
-                                            ByVal pSetingID As String, ByVal pCurrentValue As String) As GlobalDataTO
+                                            ByVal pSetingID As String, ByVal pCurrentValue As String) As GlobalDataTO Implements ItfmwGeneralSettings.UpdateCurrValBySettingID
 
             Dim myGlobalDataTO As New GlobalDataTO
             Try
@@ -28,7 +28,6 @@ Namespace Biosystems.Ax00.DAL.DAO
                     myGlobalDataTO.HasError = True
                     myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
-                    ''Dim myGlobalbase As New GlobalBase
                     Dim cmdText As String = String.Empty
                     cmdText &= " UPDATE tfmwGeneralSettings" & Environment.NewLine
                     cmdText &= " SET  CurrentValue = '" & pCurrentValue & "'" & Environment.NewLine
@@ -47,8 +46,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "tfmwGeneralSettingsDAO.UpdateCurrValBySettingID", EventLogEntryType.Error, False)
+                CreateLogActivity(ex.Message, "tfmwGeneralSettingsDAO.UpdateCurrValBySettingID", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobalDataTO
@@ -79,12 +77,11 @@ Namespace Biosystems.Ax00.DAL.DAO
             Dim dbConnection As New SqlClient.SqlConnection
 
             Try
-                Dim connection = DAOBase.GetSafeOpenDBConnection(pDBConnection)
+                Dim connection = GetSafeOpenDBConnection(pDBConnection)
                 If (Not connection.HasError And Not connection.SetDatos Is Nothing) Then
                     dbConnection = connection.SetDatos 'CType(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim cmdText As String = ""
-                        cmdText = " SELECT CurrentValue " & _
+                        Dim cmdText = " SELECT CurrentValue " & _
                                   " FROM   tfmwGeneralSettings " & _
                                   " WHERE  SettingID = '" & pGeneralSettingID.Trim & "' " & _
                                   " AND    Status = 1 "
@@ -117,8 +114,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "tfmwGeneralSettingsDAO.ReadBySettingIDAndStatus", EventLogEntryType.Error, False)
+                CreateLogActivity(ex.Message, "tfmwGeneralSettingsDAO.ReadBySettingIDAndStatus", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing And Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

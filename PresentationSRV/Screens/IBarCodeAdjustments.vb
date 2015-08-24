@@ -1598,7 +1598,6 @@ Public Class UiBarCodeAdjustments
     ''' <summary>
     ''' updates all a temporal dataset with changed current adjustments
     ''' </summary>
-    ''' <returns></returns>
     ''' <remarks>XBC 14/12/2011</remarks>
     Private Sub UpdateTemporalAdjustmentsDs()
         Try

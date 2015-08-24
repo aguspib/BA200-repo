@@ -28,7 +28,7 @@ Namespace Biosystems.Ax00.DAL.DAO
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
             Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                resultData = GetOpenDBConnection(pDBConnection)
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
@@ -52,7 +52,6 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tfmwReagentTubeTypesDAO.ReadByTubeCode", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -102,8 +101,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "tfmwReagentTubeTypesDAO.GetBottleByVolume", EventLogEntryType.Error, False)
+                CreateLogActivity(ex.Message, "tfmwReagentTubeTypesDAO.GetBottleByVolume", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -157,7 +155,6 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tfmwReagentTubeTypesDAO.GetBottleInformationByRotorPosition", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -186,10 +183,10 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim cmdText As String = " SELECT MAX(TubeVolume) AS MaxBottleSize " & vbCrLf & _
-                                                " FROM   tfmwReagentTubeTypes " & vbCrLf & _
-                                                " WHERE  ManualUseFlag = 0 " & vbCrLf & _
-                                                " AND    Status = 1 " & vbCrLf
+                        Const cmdText As String = " SELECT MAX(TubeVolume) AS MaxBottleSize " & vbCrLf & _
+                                                  " FROM   tfmwReagentTubeTypes " & vbCrLf & _
+                                                  " WHERE  ManualUseFlag = 0 " & vbCrLf & _
+                                                  " AND    Status = 1 " & vbCrLf
 
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
                             resultData.SetDatos = dbCmd.ExecuteScalar()
@@ -203,8 +200,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "tfmwReagentTubeTypesDAO.GetMaximumBottleSize", EventLogEntryType.Error, False)
+                CreateLogActivity(ex.Message, "tfmwReagentTubeTypesDAO.GetMaximumBottleSize", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -251,8 +247,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "tfmwReagentTubeTypesDAO.GetMinimumBottleSize", EventLogEntryType.Error, False)
+                CreateLogActivity(ex.Message, "tfmwReagentTubeTypesDAO.GetMinimumBottleSize", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -311,7 +306,6 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tfmwReagentTubeTypesDAO.GetReagentBottles", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
