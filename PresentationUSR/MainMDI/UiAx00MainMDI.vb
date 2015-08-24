@@ -6248,7 +6248,8 @@ Partial Public Class UiAx00MainMDI
 
             If (AnalyzerController.IsAnalyzerInstantiated) Then
                 'RH 27/05/2011 Make this assignment run in the Main Thread
-                SetPropertyThreadSafe("Cursor", Cursors.WaitCursor)
+                BeginInvoke(Sub() Cursor = Cursors.WaitCursor)
+
 
                 If (Not AutoConnectProcess) Then
                     EnableButtonAndMenus(False) ' TR 20/09/2012 -disable menus.
@@ -6284,7 +6285,8 @@ Partial Public Class UiAx00MainMDI
 
                 If (Not AutoConnectProcess) Then
                     'RH 20/03/2012 Make this assignment run in the Main Thread
-                    SetPropertyThreadSafe("Cursor", Cursors.Default)
+                    BeginInvoke(Sub() Cursor = Cursors.Default)
+
 
                     'AG 14/10/2011 - Message is shown in method ShowAlarmWarningMessages
                     'If Not myGlobal.ErrorCode Is Nothing Then ShowMessage(myTitle, myGlobal.ErrorCode)
@@ -6315,7 +6317,8 @@ Partial Public Class UiAx00MainMDI
             'AG 28/07/2010 - Close AutoConnect Thread
             If (Not AutoConnectProcess) Then
                 'RH 27/05/2011 Make this assignment run in the Main Thread
-                SetPropertyThreadSafe("Cursor", Cursors.Default)
+                BeginInvoke(Sub() Cursor = Cursors.Default)
+
                 'StopMarqueeProgressBar()
             End If
             'END AG 28/07/2010

@@ -153,10 +153,10 @@ Public Class UiAx00Login
                 'wfPreload.WaitText = "Please wait..." 'AG - Not multilanguage text
 
                 'RH 27/05/2011 Make this assignment run in the Main Thread
-                Ax00StartUp.SetPropertyThreadSafe("Title", "Checking database availability and application version...")
-                Ax00StartUp.SetPropertyThreadSafe("WaitText", "Please wait...")
-
-                'TR 22/06/2010 -belong to the installation proccess
+                Invoke(Sub()
+                           Ax00StartUp.Title = "Checking database availability and application version..."
+                           Ax00StartUp.WaitText = "Please wait..."
+                       End Sub)
                 'AG 16/01/2013 v1.0.1 - InstallUpdateProcess returns a globaldatato
                 resultData = InstallUpdateProcess() 'TR Installation
 

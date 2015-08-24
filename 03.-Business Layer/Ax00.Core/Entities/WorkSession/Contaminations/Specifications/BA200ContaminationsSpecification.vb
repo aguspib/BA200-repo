@@ -184,6 +184,9 @@ Namespace Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specification
                 lastestBireactives.Any) Then
                 Dim auxContext As Context.Context = GetHistoricalBireactivesContext()
                 result = auxContext.ActionRequiredForDispensing(dispensing)
+                If result.Action = IContaminationsAction.RequiredAction.Skip Then
+                    Dim a = 0
+                End If
             End If
 
             Return result
