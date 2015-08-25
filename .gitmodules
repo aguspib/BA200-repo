@@ -1,0 +1,3 @@
+[submodule "BAx00Framework"]
+	path = BAx00Framework
+	url = http://stash.ginper.local:7990/scm/ba/bax00framework.git
