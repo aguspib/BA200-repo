@@ -353,4 +353,9 @@ Public Class Ax00MainForm
         mr_form.ShowDialog()
 
     End Sub
+
+    Private Sub btnCommunicationTestings_Click(sender As Object, e As EventArgs) Handles btnCommunicationTestings.Click
+        Dim CommunicationsTestForm As New CommunicationsTest
+        CommunicationsTestForm.Show()
+    End Sub
 End Class
