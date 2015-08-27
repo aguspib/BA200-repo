@@ -24,6 +24,7 @@ Partial Class Ax00MainForm
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.Panel1 = New System.Windows.Forms.Panel()
+        Me.Btn_Meritxell = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.MITestProcess = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.bsTestUpdateVersionProcessButton = New System.Windows.Forms.Button()
         Me.bsLogFileViewButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
@@ -45,7 +46,7 @@ Partial Class Ax00MainForm
         Me.Button4 = New System.Windows.Forms.Button()
         Me.butTestSergio = New System.Windows.Forms.Button()
         Me.Button6 = New System.Windows.Forms.Button()
-        Me.Btn_Meritxell = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.btnCommunicationTestings = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.Panel1.SuspendLayout()
         Me.Panel2.SuspendLayout()
         Me.Panel3.SuspendLayout()
@@ -53,6 +54,7 @@ Partial Class Ax00MainForm
         '
         'Panel1
         '
+        Me.Panel1.Controls.Add(Me.btnCommunicationTestings)
         Me.Panel1.Controls.Add(Me.Btn_Meritxell)
         Me.Panel1.Controls.Add(Me.MITestProcess)
         Me.Panel1.Controls.Add(Me.bsTestUpdateVersionProcessButton)
@@ -64,6 +66,16 @@ Partial Class Ax00MainForm
         Me.Panel1.Name = "Panel1"
         Me.Panel1.Size = New System.Drawing.Size(182, 702)
         Me.Panel1.TabIndex = 9
+        '
+        'Btn_Meritxell
+        '
+        Me.Btn_Meritxell.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
+        Me.Btn_Meritxell.Location = New System.Drawing.Point(12, 232)
+        Me.Btn_Meritxell.Name = "Btn_Meritxell"
+        Me.Btn_Meritxell.Size = New System.Drawing.Size(142, 38)
+        Me.Btn_Meritxell.TabIndex = 27
+        Me.Btn_Meritxell.Text = "MR Testings"
+        Me.Btn_Meritxell.UseVisualStyleBackColor = True
         '
         'MITestProcess
         '
@@ -274,15 +286,15 @@ Partial Class Ax00MainForm
         Me.Button6.Text = "ISE Test"
         Me.Button6.UseVisualStyleBackColor = True
         '
-        'Btn_Meritxell
+        'btnCommunicationTestings
         '
-        Me.Btn_Meritxell.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.Btn_Meritxell.Location = New System.Drawing.Point(12, 232)
-        Me.Btn_Meritxell.Name = "Btn_Meritxell"
-        Me.Btn_Meritxell.Size = New System.Drawing.Size(142, 38)
-        Me.Btn_Meritxell.TabIndex = 27
-        Me.Btn_Meritxell.Text = "MR Testings"
-        Me.Btn_Meritxell.UseVisualStyleBackColor = True
+        Me.btnCommunicationTestings.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
+        Me.btnCommunicationTestings.Location = New System.Drawing.Point(12, 276)
+        Me.btnCommunicationTestings.Name = "btnCommunicationTestings"
+        Me.btnCommunicationTestings.Size = New System.Drawing.Size(142, 38)
+        Me.btnCommunicationTestings.TabIndex = 29
+        Me.btnCommunicationTestings.Text = "Communication Testings"
+        Me.btnCommunicationTestings.UseVisualStyleBackColor = True
         '
         'Ax00MainForm
         '
@@ -332,5 +344,6 @@ Partial Class Ax00MainForm
     Friend WithEvents SimpleButton2 As DevExpress.XtraEditors.SimpleButton
     Friend WithEvents MITestProcess As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents Btn_Meritxell As Biosystems.Ax00.Controls.UserControls.BSButton
+    Friend WithEvents btnCommunicationTestings As Biosystems.Ax00.Controls.UserControls.BSButton
 
 End Class
