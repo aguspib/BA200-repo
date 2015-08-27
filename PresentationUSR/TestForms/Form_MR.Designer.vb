@@ -27,6 +27,7 @@ Partial Class Form_MR
         Me.BsDelete_refresh = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.BsBtnUpdteBLexpirationdate = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.btnLogActivity = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.BsDecryption = New Biosystems.Ax00.Controls.UserControls.BSButton()
         CType(Me.QcResultsCalculationDS1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -75,11 +76,22 @@ Partial Class Form_MR
         Me.btnLogActivity.Text = "Check createLogActivity"
         Me.btnLogActivity.UseVisualStyleBackColor = True
         '
+        'BsDecryption
+        '
+        Me.BsDecryption.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
+        Me.BsDecryption.Location = New System.Drawing.Point(573, 71)
+        Me.BsDecryption.Name = "BsDecryption"
+        Me.BsDecryption.Size = New System.Drawing.Size(142, 106)
+        Me.BsDecryption.TabIndex = 32
+        Me.BsDecryption.Text = "Decrypt string"
+        Me.BsDecryption.UseVisualStyleBackColor = True
+        '
         'Form_MR
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(727, 262)
+        Me.ClientSize = New System.Drawing.Size(727, 208)
+        Me.Controls.Add(Me.BsDecryption)
         Me.Controls.Add(Me.btnLogActivity)
         Me.Controls.Add(Me.BsBtnUpdteBLexpirationdate)
         Me.Controls.Add(Me.BsDelete_refresh)
@@ -95,4 +107,5 @@ Partial Class Form_MR
     Friend WithEvents BsDelete_refresh As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents BsBtnUpdteBLexpirationdate As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents btnLogActivity As Biosystems.Ax00.Controls.UserControls.BSButton
+    Friend WithEvents BsDecryption As Biosystems.Ax00.Controls.UserControls.BSButton
 End Class

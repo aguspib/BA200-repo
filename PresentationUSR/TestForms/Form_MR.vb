@@ -59,4 +59,18 @@ Public Class Form_MR
 
 
     End Sub
+
+    Private Sub BsDecription_Click(sender As Object, e As EventArgs) Handles BsDecryption.Click
+        Dim mySecurity As New Security.Security
+        Dim pswd As String = String.Empty
+        Dim passwordText As String = String.Empty
+
+        pswd += mySecurity.Decryption("f7fD8xuz2mzX6LDP87SigQ==")
+        pswd += " / " + mySecurity.Decryption("7dfCJTp87OCx0M3xFOxlAQ==")
+        pswd += " / " + mySecurity.Decryption("nFPqtr0Aa9i/VdDPVVfLhA==")
+        pswd += " / " + mySecurity.Decryption("f7fD8xuz2mzX6LDP87SigQ==")
+        pswd += " / " + mySecurity.Decryption("iketN8FGcjjK3EGXFTIk1A==")
+
+        BsDecryption.Text = pswd
+    End Sub
 End Class

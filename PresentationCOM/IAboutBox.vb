@@ -142,9 +142,11 @@ Public NotInheritable Class UiAboutBox
             Dim iconPath As String = IconsPath
 
             If IsUser Then
-                auxIconName = GetIconName("ABT_BA4")
+                'auxIconName = GetIconName("ABT_BA4")
+                auxIconName = GetIconName("About")
             Else
-                auxIconName = GetIconName("ABT_BA4SRV")
+                'auxIconName = GetIconName("ABT_BA4SRV")
+                auxIconName = GetIconName("About_SRV")
             End If
 
             If (auxIconName <> String.Empty) Then

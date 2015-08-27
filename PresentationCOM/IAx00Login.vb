@@ -818,7 +818,7 @@ Public Class UiAx00Login
                     AddHandler Me.Shown, Sub() bsLoginButton.PerformClick()
                 Else
                     bsUserIDTextBox.Text = "SERVICE"
-                    bsPasswordTextBox.Text = "BA400"
+                    bsPasswordTextBox.Text = "BA200"
                 End If
             Else
                 bsUserIDTextBox.Text = "BIOSYSTEMS"

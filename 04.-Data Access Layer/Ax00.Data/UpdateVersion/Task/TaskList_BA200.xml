@@ -1738,6 +1738,44 @@ WHERE [LimitID] IN ('SRV_MIXER1_POLAR_LIMIT','SRV_MIXER1_Z_FINE_LIMIT','SRV_MIXE
           <IntegrityScript>
           </IntegrityScript>
         </DataRevision>
+        <DataRevision JiraID="BA-2545" SequenceNumber="3">
+          <PrerequisiteScript>
+          </PrerequisiteScript>
+          <DataScript>
+            IF EXISTS (SELECT * FROM [dbo].[tfmwPreloadedMasterData] where ItemID like 'ABT_BA4')
+            BEGIN
+            UPDATE [tfmwPreloadedMasterData] SET ItemID = 'ABOUT',FixedItemDesc='About.png' WHERE ItemID='ABT_BA4'
+            END
+            GO
+            IF EXISTS (SELECT * FROM [dbo].[tfmwPreloadedMasterData] where ItemID like 'ABT_BA4SRV')
+            BEGIN
+            UPDATE [tfmwPreloadedMasterData] SET ItemID = 'ABOUT_SRV',FixedItemDesc='About_SRV.png' WHERE ItemID='ABT_BA4SRV'
+            END
+            GO
+            IF EXISTS (SELECT * FROM [dbo].[tfmwSwParameters] where ParameterName = 'MAX_APP_MEMORYUSAGE')
+            BEGIN
+            UPDATE [tfmwSwParameters] SET Description = 'Max memory usage (in MBytes) allowed for the application' WHERE ParameterName = 'MAX_APP_MEMORYUSAGE'
+            END
+            GO
+            IF EXISTS (SELECT * FROM [dbo].[tfmwGeneralSettings] where SettingID = 'INITIAL_KEY')
+            BEGIN
+            UPDATE [tfmwGeneralSettings] SET CurrentValue = 'BA200' WHERE  SettingID = 'INITIAL_KEY'
+            END
+            GO
+            IF EXISTS (SELECT * FROM [dbo].[tcfgUsers] where Username = 'ADMIN')
+            BEGIN
+            UPDATE [tcfgUsers] SET Password = 'f7fD8xuz2mzX6LDP87SigQ==' WHERE Username = 'ADMIN'
+            END
+            GO
+            IF EXISTS (SELECT * FROM [dbo].[tcfgUsers] where Username = 'SERVICE')
+            BEGIN
+            UPDATE [tcfgUsers] SET Password = 'f7fD8xuz2mzX6LDP87SigQ==' WHERE Username = 'SERVICE'
+            END
+            GO
+          </DataScript>
+          <IntegrityScript>
+          </IntegrityScript>
+        </DataRevision>
       </DataRevisions>
     </Release>
     <!-- 
