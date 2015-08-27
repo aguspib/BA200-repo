@@ -1744,12 +1744,12 @@ WHERE [LimitID] IN ('SRV_MIXER1_POLAR_LIMIT','SRV_MIXER1_Z_FINE_LIMIT','SRV_MIXE
           <DataScript>
             IF EXISTS (SELECT * FROM [dbo].[tfmwPreloadedMasterData] where ItemID like 'ABT_BA4')
             BEGIN
-            UPDATE [tfmwPreloadedMasterData] SET ItemID = 'ABOUT',FixedItemDesc='About.png' WHERE ItemID='ABT_BA4'
+            UPDATE [tfmwPreloadedMasterData] SET ItemID = 'ABOUT',FixedItemDesc='AboutBA2.png' WHERE ItemID='ABT_BA4'
             END
             GO
             IF EXISTS (SELECT * FROM [dbo].[tfmwPreloadedMasterData] where ItemID like 'ABT_BA4SRV')
             BEGIN
-            UPDATE [tfmwPreloadedMasterData] SET ItemID = 'ABOUT_SRV',FixedItemDesc='About_SRV.png' WHERE ItemID='ABT_BA4SRV'
+            UPDATE [tfmwPreloadedMasterData] SET ItemID = 'ABOUT_SRV',FixedItemDesc='AboutBA2SRV.png' WHERE ItemID='ABT_BA4SRV'
             END
             GO
             IF EXISTS (SELECT * FROM [dbo].[tfmwSwParameters] where ParameterName = 'MAX_APP_MEMORYUSAGE')
