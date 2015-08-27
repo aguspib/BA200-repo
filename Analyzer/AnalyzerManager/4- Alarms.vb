@@ -16,6 +16,9 @@ Namespace Biosystems.Ax00.Core.Entities
 
     Partial Public Class AnalyzerManager
 
+        Public Shared SimulatingFillWaterAlarm As Boolean = False
+
+
 #Region "Main Manage Alarms treatment"
         ''' <summary>
         ''' Indicate if the Alarm Sound is enable on the Analyzer configuration.
@@ -369,7 +372,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                     Case AlarmEnumerates.Alarms.GLF_BOARD_FBLD_ERR
                         If myAlarmListAttribute.Contains(AlarmEnumerates.Alarms.GLF_BOARD_FBLD_ERR) Or (CanManageRetryAlarm AndAlso NumSendingRepetitionsTimeout < 2) Then
-                            addFlag = False                        
+                            addFlag = False
                         End If
                 End Select
                 'AG 10/02/2012 - While start instrument is inprocess only generate the alarms that affect the process
@@ -645,38 +648,38 @@ Namespace Biosystems.Ax00.Core.Entities
                         Dim updateRowFlag = False
                         Dim alarmsDelg As New WSAnalyzerAlarmsDelegate
 
-                        myGlobal = alarmsDelg.GetByAlarmID(dbConnection, pAlarmID, Nothing, Nothing, AnalyzerIDAttribute, String.Empty)
+                        myGlobal = alarmsDelg.GetByAlarmID(dbConnection, pAlarmId, Nothing, Nothing, AnalyzerIDAttribute, String.Empty)
                         If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                             Dim temporalDs = DirectCast(myGlobal.SetDatos, WSAnalyzerAlarmsDS)
 
-                            If (temporalDS.twksWSAnalyzerAlarms.Rows.Count > 0) Then
-                                If (Not String.IsNullOrEmpty(temporalDS.twksWSAnalyzerAlarms.First.AdditionalInfo)) Then
+                            If (temporalDs.twksWSAnalyzerAlarms.Rows.Count > 0) Then
+                                If (Not String.IsNullOrEmpty(temporalDs.twksWSAnalyzerAlarms.First.AdditionalInfo)) Then
                                     Dim existingFwCodes = temporalDs.twksWSAnalyzerAlarms.First.AdditionalInfo.Split(","c)
 
                                     Dim codeExist = False
                                     Dim receivedFwCodes = pAdditionalInfo.Split(","c)
-                                    For Each receivedCode As String In receivedFWCodes
-                                        For Each existingCode As String In existingFWCodes
+                                    For Each receivedCode As String In receivedFwCodes
+                                        For Each existingCode As String In existingFwCodes
                                             codeExist = (receivedCode = existingCode)
                                             If (codeExist) Then Exit For
                                         Next
 
                                         If (Not codeExist) Then
-                                            temporalDS.twksWSAnalyzerAlarms.First.BeginEdit()
-                                            temporalDS.twksWSAnalyzerAlarms.First.AdditionalInfo &= "," & receivedCode
-                                            temporalDS.twksWSAnalyzerAlarms.First.EndEdit()
+                                            temporalDs.twksWSAnalyzerAlarms.First.BeginEdit()
+                                            temporalDs.twksWSAnalyzerAlarms.First.AdditionalInfo &= "," & receivedCode
+                                            temporalDs.twksWSAnalyzerAlarms.First.EndEdit()
                                             updateRowFlag = True
                                         End If
                                     Next
                                 Else
-                                    temporalDS.twksWSAnalyzerAlarms.First.BeginEdit()
-                                    temporalDS.twksWSAnalyzerAlarms.First.AdditionalInfo = pAdditionalInfo
-                                    temporalDS.twksWSAnalyzerAlarms.First.EndEdit()
+                                    temporalDs.twksWSAnalyzerAlarms.First.BeginEdit()
+                                    temporalDs.twksWSAnalyzerAlarms.First.AdditionalInfo = pAdditionalInfo
+                                    temporalDs.twksWSAnalyzerAlarms.First.EndEdit()
                                     updateRowFlag = True
                                 End If
 
                                 If (updateRowFlag) Then
-                                    myGlobal = alarmsDelg.Update(dbConnection, temporalDS)
+                                    myGlobal = alarmsDelg.Update(dbConnection, temporalDs)
                                 End If
                             End If
                         End If
@@ -1285,9 +1288,19 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 'Get System liquid sensor (parameter index 7)
                 If pSensors.ContainsKey(AnalyzerSensors.WATER_DEPOSIT) Then
+
+#If DEBUG Then
+                    'Simulates and Forces Water Deposit Error
+                    If SimulatingFillWaterAlarm Then
+                        pSensors(AnalyzerSensors.WATER_DEPOSIT) = 0
+                    End If
+#End If
+
                     'AG 01/12/2011 - Sw do not generates the alarm WATER_DEPOSIT_ERR now, it activates a timer it is who generates the alarm if the time expires
                     alarmID = AlarmEnumerates.Alarms.WATER_DEPOSIT_ERR
                     myIntValue = CInt(pSensors(AnalyzerSensors.WATER_DEPOSIT))
+
+
 
                     If myIntValue = 0 Or myIntValue = 2 Then 'Empty or impossible status
                         alarmStatus = True
@@ -1300,6 +1313,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             alarmStatus = True ' Keep alarm until user clicks confirmation
                         End If
                         'AG 29/05/2014 - BT #1630
+
                     End If
 
                     'Update the class attribute SensorValuesAttribute
@@ -2852,7 +2866,7 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim toReturnAlarmList As New List(Of Alarms)
 
             Try
-                resultData = GetOpenDBConnection(pDBConnection)
+                resultData = GetOpenDBConnection(pDbConnection)
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
                     If (Not dbConnection Is Nothing) Then
@@ -2961,7 +2975,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.TranslateErrorCodeToAlarmID", EventLogEntryType.Error, False)
 
             Finally
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+                If (pDbConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return (toReturnAlarmList)
         End Function

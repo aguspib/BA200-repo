@@ -4,6 +4,7 @@ Option Infer On
 
 Imports Biosystems.Ax00.App
 Imports Biosystems.Ax00.Core.Interfaces
+Imports Biosystems.Ax00.Core.Entities
 
 Public Class CommunicationsTest
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
@@ -14,7 +15,8 @@ Public Class CommunicationsTest
 
 #End Region
 
-#Region "Receiving"
+    
+#Region "Frame Receiving"
 
 
     ''' <summary>
@@ -32,6 +34,21 @@ Public Class CommunicationsTest
                 'Short instructions
                 AnalyzerController.Instance.Analyzer.SimulateInstructionReception(SimulatedFrameReceived.Text.Trim)
             End If
+        End If
+
+    End Sub
+
+#End Region
+
+#Region "Alarms"
+
+    Private Sub BsButton1_Click(sender As Object, e As EventArgs) Handles btnWaterDepositErrAlarm.Click
+        Biosystems.Ax00.Core.Entities.AnalyzerManager.SimulatingFillWaterAlarm = Not Biosystems.Ax00.Core.Entities.AnalyzerManager.SimulatingFillWaterAlarm
+
+        If Biosystems.Ax00.Core.Entities.AnalyzerManager.SimulatingFillWaterAlarm Then
+            btnWaterDepositErrAlarm.Text = "Disable Simulate Alarm"
+        Else
+            btnWaterDepositErrAlarm.Text = "Enable Simulate Alarm"
         End If
 
     End Sub
