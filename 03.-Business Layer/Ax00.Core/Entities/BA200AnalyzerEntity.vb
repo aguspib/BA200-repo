@@ -1,6 +1,7 @@
 ﻿Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Global
 Imports System.Data
+Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Core.Entities.WorkSession
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Contaminations.Specifications
 Imports Biosystems.Ax00.Core.Entities.WorkSession.Interfaces

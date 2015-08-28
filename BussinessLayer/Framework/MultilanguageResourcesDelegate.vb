@@ -1,6 +1,8 @@
 ﻿Option Strict On
 Option Explicit On
 
+Imports System.Collections.Concurrent
+Imports System.Text
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.DAL.DAO
@@ -12,6 +14,100 @@ Namespace Biosystems.Ax00.BL
         'RH 02/05/2011
         Private Shared MultiLanguageResources As MultiLanguageDS = Nothing
         Private Shared CurrentLanguage As String = "ENG"
+
+
+        Private Shared mlResourceDictionary As New ConcurrentDictionary(Of String, Func(Of String))
+        Const CSTART = "["
+        Const CEND = "]"
+
+        Public Sub New()
+            RegisterKeyword("MODEL", Function() "BA200")
+        End Sub
+
+#Region "Parser Methods"
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="key"></param>
+        ''' <param name="address"></param>
+        ''' <remarks></remarks>
+        Public Shared Sub RegisterKeyword(key As String, address As Func(Of String))
+
+            If key IsNot Nothing And Not mlResourceDictionary.ContainsKey(key) Then
+
+                Dim cont As Int32 = 0
+                While Not mlResourceDictionary.TryAdd(key.ToUpper(), address)
+                    If cont <= 3 Then
+                        Throw New MultiLanguageParseException("The Pair of Key/value parameters can't be added to this dictionary collection.")
+                        Exit While
+                    End If
+                    cont = CInt(cont + 1)
+                End While
+
+            End If
+        End Sub
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="originalText"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Shared Function ParseKeywords(originalText As String) As String
+            Dim getKeyValue As String
+            Dim oword As New StringBuilder
+            Dim resvWord As Boolean = False
+
+            If originalText IsNot Nothing Then
+                If originalText.Contains(CSTART) Then
+
+                    For i As Integer = 0 To originalText.Length - 1
+                        Dim c As Char = originalText(i)
+                        If resvWord Then
+                            If c = CEND Then
+                                i = +1
+                                Dim c2 As Char = originalText(i)
+                                If c2 = CEND Then
+                                    'If oword.Length > 0 Then
+                                    If mlResourceDictionary.ContainsKey(oword.ToString().ToUpper()) Then
+                                        getKeyValue = mlResourceDictionary(oword.ToString().ToUpper())()
+                                        originalText = originalText.Replace(CSTART & CSTART & oword.ToString() & CEND & CEND, getKeyValue)
+                                    Else
+                                        Throw New MultiLanguageParseException("The " & oword.ToString() & " word is not registered in the reserved dictionary.")
+                                    End If
+                                    'Else
+                                    ''Error cadena vacia?
+                                    'End If
+                                    resvWord = False
+                                Else
+                                    Throw New MultiLanguageParseException("The " & oword.ToString() & " has a sintaxis error.")
+                                End If
+                            Else
+                                oword.Append(c)
+                            End If
+                        Else
+                            If c = CSTART Then
+                                i = +1
+                                Dim c2 As Char = originalText(i)
+                                If c2 = CSTART Then
+                                    resvWord = True
+                                End If
+                            End If
+
+                        End If
+                        i = +1
+                    Next
+
+
+                End If
+            End If
+
+            Return originalText
+
+        End Function
+
+#End Region
 
 #Region "Methods"
 
@@ -452,6 +548,21 @@ Namespace Biosystems.Ax00.BL
 
 #End Region
 
+    End Class
+
+    Friend Class MultiLanguageParseException
+        Inherits Exception
+
+        Public Sub New()
+        End Sub
+
+        Public Sub New(message As String)
+            MyBase.New(message)
+        End Sub
+
+        Public Sub New(message As String, inner As Exception)
+            MyBase.New(message, inner)
+        End Sub
     End Class
 
 End Namespace
