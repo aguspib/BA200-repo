@@ -16,12 +16,20 @@ Namespace Biosystems.Ax00.BL
         Private Shared CurrentLanguage As String = "ENG"
 
 
-        Private Shared mlResourceDictionary As New ConcurrentDictionary(Of String, Func(Of String))
-        Const CSTART = "["
-        Const CEND = "]"
+        Public Shared mlResourceDictionary As New ConcurrentDictionary(Of String, Func(Of String))
+
+        Const CSTART = "["c
+        Const CEND = "]"c
+
+        'RegularText / PosibleKeywordStart / IdentifierText
+        Private Enum ParserStatus
+            RegularText
+            PosibleKeywordStart
+            IdentifierText
+        End Enum
 
         Public Sub New()
-            RegisterKeyword("MODEL", Function() "BA200")
+            'RegisterKeyword("MODEL", Function() "BA200")
         End Sub
 
 #Region "Parser Methods"
@@ -37,7 +45,7 @@ Namespace Biosystems.Ax00.BL
             If key IsNot Nothing And Not mlResourceDictionary.ContainsKey(key) Then
 
                 Dim cont As Int32 = 0
-                While Not mlResourceDictionary.TryAdd(key.ToUpper(), address)
+                While Not mlResourceDictionary.TryAdd(key.ToUpperInvariant(), address)
                     If cont <= 3 Then
                         Throw New MultiLanguageParseException("The Pair of Key/value parameters can't be added to this dictionary collection.")
                         Exit While
@@ -56,54 +64,79 @@ Namespace Biosystems.Ax00.BL
         ''' <remarks></remarks>
         Public Shared Function ParseKeywords(originalText As String) As String
             Dim getKeyValue As String
-            Dim oword As New StringBuilder
-            Dim resvWord As Boolean = False
+            Dim oword As New StringBuilder, strResult As New StringBuilder(1024)
+            Dim identWord As Boolean = False
+            Dim resvCharStart As Boolean = False
+            Dim IsChardEnd As Boolean = False
+            Dim lastChar As Boolean = False
+            Dim conIndex As Integer = 0
+
+            'RegularText / PosibleKeywordStart / IdentifierText
+            Dim statusText As ParserStatus = ParserStatus.RegularText
+
+            'Try
 
             If originalText IsNot Nothing Then
                 If originalText.Contains(CSTART) Then
+                    For Each c As Char In originalText
 
-                    For i As Integer = 0 To originalText.Length - 1
-                        Dim c As Char = originalText(i)
-                        If resvWord Then
-                            If c = CEND Then
-                                i = +1
-                                Dim c2 As Char = originalText(i)
-                                If c2 = CEND Then
-                                    'If oword.Length > 0 Then
-                                    If mlResourceDictionary.ContainsKey(oword.ToString().ToUpper()) Then
-                                        getKeyValue = mlResourceDictionary(oword.ToString().ToUpper())()
-                                        originalText = originalText.Replace(CSTART & CSTART & oword.ToString() & CEND & CEND, getKeyValue)
-                                    Else
-                                        Throw New MultiLanguageParseException("The " & oword.ToString() & " word is not registered in the reserved dictionary.")
-                                    End If
-                                    'Else
-                                    ''Error cadena vacia?
-                                    'End If
-                                    resvWord = False
-                                Else
-                                    Throw New MultiLanguageParseException("The " & oword.ToString() & " has a sintaxis error.")
-                                End If
-                            Else
-                                oword.Append(c)
-                            End If
-                        Else
-                            If c = CSTART Then
-                                i = +1
-                                Dim c2 As Char = originalText(i)
-                                If c2 = CSTART Then
-                                    resvWord = True
-                                End If
-                            End If
-
+                        conIndex += 1
+                        If conIndex = originalText.Length Then
+                            lastChar = True
                         End If
-                        i = +1
+
+                        Select Case (statusText)
+                            Case ParserStatus.RegularText
+
+                                If c = CSTART Then statusText = ParserStatus.PosibleKeywordStart Else strResult.Append(c)
+
+                            Case ParserStatus.PosibleKeywordStart
+                                If c = CSTART Then
+                                    If lastChar Then
+                                        Throw New MultiLanguageParseException("The " & originalText & " has a sintaxis error.")
+                                    Else
+                                        statusText = ParserStatus.IdentifierText
+                                    End If
+                                Else
+                                    strResult.Append(c)
+                                    statusText = ParserStatus.RegularText
+                                End If
+
+                            Case ParserStatus.IdentifierText
+                                If c = CEND Then
+                                    If Not IsChardEnd Then
+                                        If lastChar Then
+                                            'CASE [[asdjkhgdf]. --> end
+                                            Throw New MultiLanguageParseException("The " & originalText & " has a sintaxis error.")
+                                        Else
+                                            IsChardEnd = True
+                                        End If
+                                    Else
+                                        'second ]
+                                        If oword.Length > 0 Or Not oword.Length.ToString.Equals(" ") Then
+                                            If mlResourceDictionary.ContainsKey(oword.ToString()) Then
+                                                getKeyValue = mlResourceDictionary(oword.ToString())()
+                                                strResult.Append(" " & getKeyValue & " ")
+                                                statusText = ParserStatus.RegularText
+                                            Else
+                                                'CASE Key not in Dictionary
+                                                Throw New MultiLanguageParseException("The " & originalText & " word is not registered in the reserved dictionary.")
+                                            End If
+                                        Else
+                                            'CASE [[]] or [[ ]]
+                                            Throw New MultiLanguageParseException("The " & originalText & " has a sintaxis error.")
+                                        End If
+                                    End If
+                                Else
+                                    oword.Append(Char.ToUpper(c))
+                                End If
+                        End Select
+
                     Next
-
-
                 End If
             End If
+            Return strResult.ToString()
 
-            Return originalText
 
         End Function
 
@@ -550,7 +583,7 @@ Namespace Biosystems.Ax00.BL
 
     End Class
 
-    Friend Class MultiLanguageParseException
+    Public Class MultiLanguageParseException
         Inherits Exception
 
         Public Sub New()
