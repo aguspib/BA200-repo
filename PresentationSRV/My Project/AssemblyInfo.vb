@@ -8,10 +8,10 @@ Imports System.Runtime.InteropServices
 
 ' Revisar los valores de los atributos del ensamblado
 
-<Assembly: AssemblyTitle("BA400 Service Software")> 
-<Assembly: AssemblyDescription("Service Application for BA400 Equipment")> 
+<Assembly: AssemblyTitle("BA200 Service Software")> 
+<Assembly: AssemblyDescription("Service Application for BA200 Equipment")> 
 <Assembly: AssemblyCompany("BioSystems")> 
-<Assembly: AssemblyProduct("BA400 Service")> 
+<Assembly: AssemblyProduct("BA200 Service")> 
 <Assembly: AssemblyCopyright("Copyright© 2015 BioSystems, SA")> 
 <Assembly: AssemblyTrademark("")> 
 
