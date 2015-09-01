@@ -58,7 +58,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         Private ReadSFXInfoDoneAttr As Boolean
         Private ReadCPUInfoDoneAttr As Boolean
 
-        Private myLocalRefreshDS As New UIRefreshDS
+        Public myLocalRefreshDS As New UIRefreshDS
 
         Private MaxPOLLHWAttr As Integer = 14
         Private NumPOLLHWAttr As Integer
@@ -346,67 +346,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                    pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.FWMANIFOLDVALUE_CHANGED) Or _
                    pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.FWFLUIDICSVALUE_CHANGED) Then
 
-                    ' TODO - PENDING when FW ready to manage this !!!
-                    'If myLocalRefreshDS.FirmwareValueChanged.Rows.Count > 0 Then
-                    '    If myLocalRefreshDS.FirmwareValueChanged.Rows.Contains(pRefreshDS.FirmwareValueChanged.Rows(0).Item(GlobalEnumerates.FW_INFO.ID)) Then
-                    '        For Each myRow As UIRefreshDS.FirmwareValueChangedRow In myLocalRefreshDS.FirmwareValueChanged.Rows
-                    '            If myRow.ElementID = pRefreshDS.FirmwareValueChanged.Rows(0).Item(GlobalEnumerates.FW_INFO.ID).ToString Then
-                    '                ' Already exists
-                    '                isAlreadyInserted = True
-                    '                With myRow
-                    '                    .BeginEdit()
-                    '                    .BoardSerialNumber = pRefreshDS.FirmwareValueChanged.Rows(0).Item(GlobalEnumerates.FW_INFO.SMC).ToString
-
-                    '                    .RepositoryVersion = pRefreshDS.FirmwareValueChanged.Rows(0).Item(GlobalEnumerates.FW_INFO.RV).ToString
-                    '                    .RepositoryCRCResult = pRefreshDS.FirmwareValueChanged.Rows(0).Item(GlobalEnumerates.FW_INFO.CRC).ToString
-                    '                    .RepositoryCRCValue = pRefreshDS.FirmwareValueChanged.Rows(0).Item(GlobalEnumerates.FW_INFO.CRCV).ToString
-                    '                    .RepositoryCRCSize = pRefreshDS.FirmwareValueChanged.Rows(0).Item(GlobalEnumerates.FW_INFO.CRCS).ToString
-
-                    '                    .BoardFirmwareVersion = pRefreshDS.FirmwareValueChanged.Rows(0).Item(GlobalEnumerates.FW_INFO.FWV).ToString
-                    '                    .BoardFirmwareCRCResult = pRefreshDS.FirmwareValueChanged.Rows(0).Item(GlobalEnumerates.FW_INFO.FWCRC).ToString
-                    '                    .BoardFirmwareCRCValue = pRefreshDS.FirmwareValueChanged.Rows(0).Item(GlobalEnumerates.FW_INFO.FWCRCV).ToString
-                    '                    .BoardFirmwareCRCSize = pRefreshDS.FirmwareValueChanged.Rows(0).Item(GlobalEnumerates.FW_INFO.FWCRCS).ToString
-
-                    '                    .BoardHardwareVersion = pRefreshDS.FirmwareValueChanged.Rows(0).Item(GlobalEnumerates.FW_INFO.HWV).ToString
-                    '                    .AnalyzerSerialNumber = pRefreshDS.FirmwareValueChanged.Rows(0).Item(GlobalEnumerates.FW_INFO.ASN).ToString
-                    '                    .EndEdit()
-                    '                End With
-                    '                Exit For
-                    '            End If
-                    '        Next
-                    '    End If
-                    'End If
-
-                    'If Not isAlreadyInserted Then
-                    '    'Generate UI_Refresh Firmware values dataset
-                    '    Dim myNewFirmwareValuesRow As UIRefreshDS.FirmwareValueChangedRow
-                    '    myNewFirmwareValuesRow = myLocalRefreshDS.FirmwareValueChanged.NewFirmwareValueChangedRow
-                    '    With myNewFirmwareValuesRow
-                    '        .BeginEdit()
-                    '        .ElementID = pRefreshDS.FirmwareValueChanged.Rows(0).Item(GlobalEnumerates.FW_INFO.ID).ToString
-                    '        .BoardSerialNumber = pRefreshDS.FirmwareValueChanged.Rows(0).Item(GlobalEnumerates.FW_INFO.SMC).ToString
-
-                    '        .RepositoryVersion = pRefreshDS.FirmwareValueChanged.Rows(0).Item(GlobalEnumerates.FW_INFO.RV).ToString
-                    '        .RepositoryCRCResult = pRefreshDS.FirmwareValueChanged.Rows(0).Item(GlobalEnumerates.FW_INFO.CRC).ToString
-                    '        .RepositoryCRCValue = pRefreshDS.FirmwareValueChanged.Rows(0).Item(GlobalEnumerates.FW_INFO.CRCV).ToString
-                    '        .RepositoryCRCSize = pRefreshDS.FirmwareValueChanged.Rows(0).Item(GlobalEnumerates.FW_INFO.CRCS).ToString
-
-                    '        .BoardFirmwareVersion = pRefreshDS.FirmwareValueChanged.Rows(0).Item(GlobalEnumerates.FW_INFO.FWV).ToString
-                    '        .BoardFirmwareCRCResult = pRefreshDS.FirmwareValueChanged.Rows(0).Item(GlobalEnumerates.FW_INFO.FWCRC).ToString
-                    '        .BoardFirmwareCRCValue = pRefreshDS.FirmwareValueChanged.Rows(0).Item(GlobalEnumerates.FW_INFO.FWCRCV).ToString
-                    '        .BoardFirmwareCRCSize = pRefreshDS.FirmwareValueChanged.Rows(0).Item(GlobalEnumerates.FW_INFO.FWCRCS).ToString
-
-                    '        .BoardHardwareVersion = pRefreshDS.FirmwareValueChanged.Rows(0).Item(GlobalEnumerates.FW_INFO.HWV).ToString
-                    '        .AnalyzerSerialNumber = pRefreshDS.FirmwareValueChanged.Rows(0).Item(GlobalEnumerates.FW_INFO.ASN).ToString
-                    '        .EndEdit()
-                    '    End With
-                    '    myLocalRefreshDS.FirmwareValueChanged.AddFirmwareValueChangedRow(myNewFirmwareValuesRow)
-                    'End If
-
-                    'myLocalRefreshDS.AcceptChanges()
-                    ' TODO - PENDING when FW ready to manage this !!!
-
-
+                    AddOrUpdateFirmwareInfoFromInstrument(pRefreshDS)
 
                     For Each S As UIRefreshDS.FirmwareValueChangedRow In pRefreshDS.FirmwareValueChanged
                         Select Case S.ElementID
@@ -823,6 +763,49 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerInfoDelegate.RefreshDelegate", EventLogEntryType.Error, False)
             End Try
         End Sub
+
+        Private Sub AddOrUpdateFirmwareInfoFromInstrument(pRefreshDS As UIRefreshDS)
+
+            If myLocalRefreshDS.FirmwareValueChanged.Rows.Count > 0 AndAlso myLocalRefreshDS.FirmwareValueChanged.Rows.Contains(pRefreshDS.FirmwareValueChanged.Rows(0).Item(GlobalEnumerates.FW_INFO.ID)) Then
+
+                Dim RowToUpdate As UIRefreshDS.FirmwareValueChangedRow = CType(myLocalRefreshDS.FirmwareValueChanged.Rows.Find(GlobalEnumerates.FW_INFO.ID), UIRefreshDS.FirmwareValueChangedRow)
+                UpdateUIRefreshDS(RowToUpdate, pRefreshDS.FirmwareValueChanged.Rows(0))
+              
+            Else
+                'Generate UI_Refresh Firmware values dataset
+                Dim NewRowToUpdate As UIRefreshDS.FirmwareValueChangedRow
+                NewRowToUpdate = myLocalRefreshDS.FirmwareValueChanged.NewFirmwareValueChangedRow
+                UpdateUIRefreshDS(NewRowToUpdate, pRefreshDS.FirmwareValueChanged.Rows(0))
+
+                myLocalRefreshDS.FirmwareValueChanged.AddFirmwareValueChangedRow(NewRowToUpdate)
+            End If
+
+            myLocalRefreshDS.AcceptChanges()
+          
+        End Sub
+
+        Private Sub UpdateUIRefreshDS(destinationRow As UIRefreshDS.FirmwareValueChangedRow, sourceRow As System.Data.DataRow)
+
+            destinationRow.BeginEdit()
+            destinationRow.ElementID = sourceRow.Item(GlobalEnumerates.FW_INFO.ID).ToString
+            destinationRow.BoardSerialNumber = sourceRow.Item(GlobalEnumerates.FW_INFO.SMC).ToString
+
+            destinationRow.RepositoryVersion = sourceRow.Item(GlobalEnumerates.FW_INFO.RV).ToString
+            destinationRow.RepositoryCRCResult = sourceRow.Item(GlobalEnumerates.FW_INFO.CRC).ToString
+            destinationRow.RepositoryCRCValue = sourceRow.Item(GlobalEnumerates.FW_INFO.CRCV).ToString
+            destinationRow.RepositoryCRCSize = sourceRow.Item(GlobalEnumerates.FW_INFO.CRCS).ToString
+
+            destinationRow.BoardFirmwareVersion = sourceRow.Item(GlobalEnumerates.FW_INFO.FWV).ToString
+            destinationRow.BoardFirmwareCRCResult = sourceRow.Item(GlobalEnumerates.FW_INFO.FWCRC).ToString
+            destinationRow.BoardFirmwareCRCValue = sourceRow.Item(GlobalEnumerates.FW_INFO.FWCRCV).ToString
+            destinationRow.BoardFirmwareCRCSize = sourceRow.Item(GlobalEnumerates.FW_INFO.FWCRCS).ToString
+
+            destinationRow.BoardHardwareVersion = sourceRow.Item(GlobalEnumerates.FW_INFO.HWV).ToString
+            destinationRow.AnalyzerSerialNumber = sourceRow.Item(GlobalEnumerates.FW_INFO.ASN).ToString
+            destinationRow.EndEdit()
+
+        End Sub
+
 
         '''' <summary>
         '''' Save Serial Number with UTIL High Level Instruction to save values into the instrument 
@@ -2426,6 +2409,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         'End Function
 #End Region
 
+    
     End Class
 
 End Namespace
