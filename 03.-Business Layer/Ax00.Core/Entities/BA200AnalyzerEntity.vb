@@ -22,6 +22,8 @@ Namespace Biosystems.Ax00.Core.Entities
 
             BL_expListener = New BaseLineExpirationListener(Me, New BaseLineEntityExpiration(_currentAnalyzer), New AnalyzerAlarms(_currentAnalyzer))
 
+            MultilanguageResourcesDelegate.RegisterKeyword("AX00", Function() analyzerModel)
+
         End Sub
 
         ''' <summary>

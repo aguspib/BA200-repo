@@ -7,10 +7,13 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.DAL.DAO
 Imports Biosystems.Ax00.Global
+Imports Biosystems.Ax00.Global.Interfaces
 
 Namespace Biosystems.Ax00.BL
 
     Public Class MultilanguageResourcesDelegate
+        Implements ITextParser
+
         'RH 02/05/2011
         Private Shared MultiLanguageResources As MultiLanguageDS = Nothing
         Private Shared CurrentLanguage As String = "ENG"
@@ -30,6 +33,7 @@ Namespace Biosystems.Ax00.BL
 
         Public Sub New()
             'RegisterKeyword("MODEL", Function() "BA200")
+            If GlobalBase.TextParser Is Nothing Then GlobalBase.TextParser = Me
         End Sub
 
 #Region "Parser Methods"
@@ -47,7 +51,7 @@ Namespace Biosystems.Ax00.BL
                 Dim cont As Int32 = 0
                 While Not mlResourceDictionary.TryAdd(key.ToUpperInvariant(), address)
                     If cont <= 3 Then
-                        Throw New MultiLanguageParseException("The Pair of Key/value parameters can't be added to this dictionary collection.")
+                        CreateLogActivity("The Pair of Key/value parameters can't be added to this dictionary collection.", EventLogEntryType.Error)
                         Exit While
                     End If
                     cont = CInt(cont + 1)
@@ -56,18 +60,21 @@ Namespace Biosystems.Ax00.BL
             End If
         End Sub
 
+        Public Function ParseKeywords(originalText As String) As String
+            Return ParseKeywords(originalText, True)
+        End Function
+
+
         ''' <summary>
         ''' 
         ''' </summary>
         ''' <param name="originalText"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Shared Function ParseKeywords(originalText As String) As String
+        Public Function ParseKeywords(originalText As String, logOnError As Boolean) As String Implements ITextParser.ParseText
             Dim getKeyValue As String
             Dim oword As New StringBuilder, strResult As New StringBuilder(1024)
-            Dim identWord As Boolean = False
-            Dim resvCharStart As Boolean = False
-            Dim IsChardEnd As Boolean = False
+            Dim isChardEnd As Boolean = False
             Dim lastChar As Boolean = False
             Dim conIndex As Integer = 0
 
@@ -93,46 +100,55 @@ Namespace Biosystems.Ax00.BL
                             Case ParserStatus.PosibleKeywordStart
                                 If c = CSTART Then
                                     If lastChar Then
-                                        Throw New MultiLanguageParseException("The " & originalText & " has a sintaxis error.")
+                                        If logOnError Then CreateLogActivity("The following text:  " & originalText & " has a sintaxis error.", EventLogEntryType.Information)
+                                        strResult.Append("[[")
                                     Else
                                         statusText = ParserStatus.IdentifierText
                                     End If
                                 Else
-                                    strResult.Append(c)
+                                    strResult.Append("[" & c)
                                     statusText = ParserStatus.RegularText
                                 End If
 
                             Case ParserStatus.IdentifierText
                                 If c = CEND Then
-                                    If Not IsChardEnd Then
+                                    If Not isChardEnd Then
                                         If lastChar Then
                                             'CASE [[asdjkhgdf]. --> end
-                                            Throw New MultiLanguageParseException("The " & originalText & " has a sintaxis error.")
+                                            If logOnError Then CreateLogActivity("The following text:  " & originalText & " has a sintaxis error.", EventLogEntryType.Information)
+                                            strResult.Append(oword)
                                         Else
-                                            IsChardEnd = True
+                                            isChardEnd = True
                                         End If
                                     Else
                                         'second ]
-                                        If oword.Length > 0 Or Not oword.Length.ToString.Equals(" ") Then
-                                            If mlResourceDictionary.ContainsKey(oword.ToString()) Then
-                                                getKeyValue = mlResourceDictionary(oword.ToString())()
-                                                strResult.Append(" " & getKeyValue & " ")
-                                                statusText = ParserStatus.RegularText
+                                        If oword.Length > 0 AndAlso Not oword.Length.ToString.Equals(" ") Then
+                                            If mlResourceDictionary.ContainsKey(oword.ToString().ToUpper()) Then
+                                                getKeyValue = mlResourceDictionary(oword.ToString().ToUpper())()
+                                                strResult.Append(getKeyValue)
                                             Else
                                                 'CASE Key not in Dictionary
-                                                Throw New MultiLanguageParseException("The " & originalText & " word is not registered in the reserved dictionary.")
+                                                If logOnError Then CreateLogActivity("The Key word of this Text: " & originalText & " is not registered in the reserved dictionary.", EventLogEntryType.Error)
+                                                strResult.Append(oword)
                                             End If
                                         Else
                                             'CASE [[]] or [[ ]]
-                                            Throw New MultiLanguageParseException("The " & originalText & " has a sintaxis error.")
+                                            If logOnError Then CreateLogActivity("The following text:  " & originalText & " has a sintaxis error.", EventLogEntryType.Information)
+                                            strResult.Append(oword)
                                         End If
+                                        isChardEnd = False
+                                        oword.Clear()
+                                        statusText = ParserStatus.RegularText
                                     End If
                                 Else
-                                    oword.Append(Char.ToUpper(c))
+                                    'oword.Append(Char.ToUpper(c))
+                                    oword.Append(c)
                                 End If
                         End Select
 
                     Next
+                Else
+                    strResult.Append(originalText)
                 End If
             End If
             Return strResult.ToString()
@@ -581,21 +597,6 @@ Namespace Biosystems.Ax00.BL
 
 #End Region
 
-    End Class
-
-    Public Class MultiLanguageParseException
-        Inherits Exception
-
-        Public Sub New()
-        End Sub
-
-        Public Sub New(message As String)
-            MyBase.New(message)
-        End Sub
-
-        Public Sub New(message As String, inner As Exception)
-            MyBase.New(message, inner)
-        End Sub
     End Class
 
 End Namespace
