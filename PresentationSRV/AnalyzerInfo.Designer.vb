@@ -45,31 +45,31 @@ Partial Class AnalyzerInfo
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(AnalyzerInfo))
-        Me.BsExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.BsRichTextBox1 = New Biosystems.Ax00.Controls.UserControls.BSRichTextBox
-        Me.bsPrintButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsInfoDetailsGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.MoreInfoButton = New System.Windows.Forms.Button
-        Me.BsTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsMessageImage = New Biosystems.Ax00.Controls.UserControls.BSPictureBox
-        Me.BsMessageLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bwPreload = New System.ComponentModel.BackgroundWorker
-        Me.TestProcessTimer = New Biosystems.Ax00.Controls.UserControls.BSTimer
-        Me.PrintDialog1 = New System.Windows.Forms.PrintDialog
-        Me.PrintDocument1 = New System.Drawing.Printing.PrintDocument
-        Me.BsMessagesPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.ProgressBar1 = New System.Windows.Forms.ProgressBar
-        Me.bsLanguageSelectionGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.bsFwVersionLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsModelTextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsSerialTextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsSerialLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsEditSNButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsSaveSNButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsCancelSNButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.DetailsButton = New System.Windows.Forms.Button
-        Me.BsErrorProvider1 = New Biosystems.Ax00.Controls.UserControls.BSErrorProvider
-        Me.bsFwVersionLabel2 = New Biosystems.Ax00.Controls.UserControls.BSLabel
+        Me.BsExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.BsRichTextBox1 = New Biosystems.Ax00.Controls.UserControls.BSRichTextBox()
+        Me.bsPrintButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsInfoDetailsGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.MoreInfoButton = New System.Windows.Forms.Button()
+        Me.BsTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsMessageImage = New Biosystems.Ax00.Controls.UserControls.BSPictureBox()
+        Me.BsMessageLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bwPreload = New System.ComponentModel.BackgroundWorker()
+        Me.TestProcessTimer = New Biosystems.Ax00.Controls.UserControls.BSTimer()
+        Me.PrintDialog1 = New System.Windows.Forms.PrintDialog()
+        Me.PrintDocument1 = New System.Drawing.Printing.PrintDocument()
+        Me.BsMessagesPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.ProgressBar1 = New System.Windows.Forms.ProgressBar()
+        Me.bsLanguageSelectionGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.bsFwVersionLabel2 = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsFwVersionLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsModelTextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsSerialTextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsSerialLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsEditSNButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsSaveSNButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsCancelSNButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.DetailsButton = New System.Windows.Forms.Button()
+        Me.BsErrorProvider1 = New Biosystems.Ax00.Controls.UserControls.BSErrorProvider()
         Me.bsInfoDetailsGroupBox.SuspendLayout()
         CType(Me.BsMessageImage, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.BsMessagesPanel.SuspendLayout()
@@ -128,7 +128,6 @@ Partial Class AnalyzerInfo
         Me.MoreInfoButton.TabIndex = 67
         Me.MoreInfoButton.Text = "+ Request Info"
         Me.MoreInfoButton.UseVisualStyleBackColor = True
-        Me.MoreInfoButton.Visible = False
         '
         'BsTitleLabel
         '
@@ -179,7 +178,7 @@ Partial Class AnalyzerInfo
         'BsMessagesPanel
         '
         Me.BsMessagesPanel.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsMessagesPanel.BackColor = System.Drawing.Color.WhiteSmoke
         Me.BsMessagesPanel.Controls.Add(Me.ProgressBar1)
         Me.BsMessagesPanel.Controls.Add(Me.BsMessageLabel)
@@ -215,6 +214,18 @@ Partial Class AnalyzerInfo
         Me.bsLanguageSelectionGroupBox.Size = New System.Drawing.Size(511, 153)
         Me.bsLanguageSelectionGroupBox.TabIndex = 64
         Me.bsLanguageSelectionGroupBox.TabStop = False
+        '
+        'bsFwVersionLabel2
+        '
+        Me.bsFwVersionLabel2.BackColor = System.Drawing.Color.Transparent
+        Me.bsFwVersionLabel2.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsFwVersionLabel2.ForeColor = System.Drawing.Color.Black
+        Me.bsFwVersionLabel2.Location = New System.Drawing.Point(155, 85)
+        Me.bsFwVersionLabel2.Name = "bsFwVersionLabel2"
+        Me.bsFwVersionLabel2.Size = New System.Drawing.Size(85, 19)
+        Me.bsFwVersionLabel2.TabIndex = 87
+        Me.bsFwVersionLabel2.Text = "v.0.0.0"
+        Me.bsFwVersionLabel2.Title = False
         '
         'bsFwVersionLabel
         '
@@ -317,23 +328,10 @@ Partial Class AnalyzerInfo
         '
         Me.BsErrorProvider1.ContainerControl = Me
         '
-        'bsFwVersionLabel2
-        '
-        Me.bsFwVersionLabel2.BackColor = System.Drawing.Color.Transparent
-        Me.bsFwVersionLabel2.Font = New System.Drawing.Font("Verdana", 8.25!)
-        Me.bsFwVersionLabel2.ForeColor = System.Drawing.Color.Black
-        Me.bsFwVersionLabel2.Location = New System.Drawing.Point(155, 85)
-        Me.bsFwVersionLabel2.Name = "bsFwVersionLabel2"
-        Me.bsFwVersionLabel2.Size = New System.Drawing.Size(85, 19)
-        Me.bsFwVersionLabel2.TabIndex = 87
-        Me.bsFwVersionLabel2.Text = "v.0.0.0"
-        Me.bsFwVersionLabel2.Title = False
-        '
         'AnalyzerInfo
         '
         Me.AcceptButton = Me.BsExitButton
         Me.Appearance.BackColor = System.Drawing.Color.Gainsboro
-        Me.Appearance.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Appearance.ForeColor = System.Drawing.Color.Black
         Me.Appearance.GradientMode = System.Drawing.Drawing2D.LinearGradientMode.ForwardDiagonal
         Me.Appearance.Options.UseBackColor = True
@@ -347,6 +345,7 @@ Partial Class AnalyzerInfo
         Me.Controls.Add(Me.BsExitButton)
         Me.Controls.Add(Me.bsLanguageSelectionGroupBox)
         Me.Controls.Add(Me.bsInfoDetailsGroupBox)
+        Me.Cursor = System.Windows.Forms.Cursors.Default
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
         Me.LookAndFeel.SkinName = "Blue"
         Me.LookAndFeel.UseDefaultLookAndFeel = False
