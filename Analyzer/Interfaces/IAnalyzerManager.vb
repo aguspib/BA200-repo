@@ -142,6 +142,7 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Property IsBlExpired As Boolean
         ReadOnly Property GenericDefaultAnalyzer As String
         ReadOnly Property FirmwareFileExtension As String
+        Function CommercialModelName() As String
 
 #End Region
 

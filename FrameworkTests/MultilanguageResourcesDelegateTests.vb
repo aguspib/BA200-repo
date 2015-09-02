@@ -25,8 +25,6 @@ Namespace Biosystems.Ax00.BL.Tests
             MultilanguageResourcesDelegate.RegisterKeyword("NUMPOS200", Function() "34")
             MultilanguageResourcesDelegate.RegisterKeyword("NUMPOS400", Function() "98")
 
-            Assert.AreEqual(MultilanguageResourcesDelegate.mlResourceDictionary.Count, 3)
-
             '2.- Que se parsea bien el texto
 
             'Palabra clave correcta
@@ -68,7 +66,9 @@ Namespace Biosystems.Ax00.BL.Tests
             Assert.IsTrue(ErrorLogged)
 
         End Sub
+
         Private ErrorLogged As Boolean = False
+
         Sub MyCreateLogActivity(param1 As String, param2 As String, myEvent As EventLogEntryType, flag As Boolean)
             ErrorLogged = True
             Console.WriteLine(param1)
@@ -76,12 +76,6 @@ Namespace Biosystems.Ax00.BL.Tests
 
         Sub CreateScenario()
             GlobalBase.CreateLogActivityPointer = AddressOf MyCreateLogActivity
-
-            Dim analyzer = Mock.Create(Of IAnalyzerManager)()
-            AnalyzerManager._currentAnalyzer = analyzer
-
-            Dim analyzerEntity = New BA200AnalyzerEntity(String.Empty, String.Empty, Nothing)
-
         End Sub
 
     End Class

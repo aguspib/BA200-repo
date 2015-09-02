@@ -11,6 +11,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
 
+
         Private WithEvents _baseLine As IBaseLineEntity
         Private WithEvents _iseAnalyzer As IISEManager
 
@@ -83,5 +84,6 @@ Namespace Biosystems.Ax00.Core.Entities
 
         Public MustOverride ReadOnly Property FirmwareFileExtension As String Implements IAnalyzerManager.FirmwareFileExtension
 
+        Public MustOverride Function CommercialModelName() As String Implements IAnalyzerManager.CommercialModelName
     End Class
 End Namespace

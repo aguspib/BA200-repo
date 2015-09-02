@@ -24,7 +24,6 @@ Namespace Biosystems.Ax00.BL
         Const CSTART = "["c
         Const CEND = "]"c
 
-        'RegularText / PosibleKeywordStart / IdentifierText
         Private Enum ParserStatus
             RegularText
             PosibleKeywordStart
@@ -32,7 +31,6 @@ Namespace Biosystems.Ax00.BL
         End Enum
 
         Public Sub New()
-            'RegisterKeyword("MODEL", Function() "BA200")
             If GlobalBase.TextParser Is Nothing Then GlobalBase.TextParser = Me
         End Sub
 
@@ -60,11 +58,16 @@ Namespace Biosystems.Ax00.BL
             End If
         End Sub
 
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="originalText"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
         Public Function ParseKeywords(originalText As String) As String
             Return ParseKeywords(originalText, True)
         End Function
-
-
+        
         ''' <summary>
         ''' 
         ''' </summary>

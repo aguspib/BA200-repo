@@ -2099,6 +2099,8 @@ Namespace Biosystems.Ax00.Core.Entities
                     SetValuesOnSaveRotorStatusFromActiveAlarms(temporalDs, StatusParameters.RotorStates.UNKNOW_ROTOR_FULL, False)
                 End If
 
+                MultilanguageResourcesDelegate.RegisterKeyword("AX00", AddressOf CommercialModelName)
+
             Catch ex As Exception
                 classInitializationErrorAttribute = True
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.New", EventLogEntryType.Error, False)
