@@ -387,7 +387,8 @@ Namespace Biosystems.Ax00.BL
                             Select row).ToList()
 
                 If Resource.Count > 0 Then
-                    Return Resource(0).ResourceText 'The resource we are looking for in the Current Language
+
+                    Return ParseKeywords(Resource(0).ResourceText) 'The resource we are looking for in the Current Language
                 Else
                     'Resource in Current Language not Found
                     'Search for the English version
@@ -425,7 +426,7 @@ Namespace Biosystems.Ax00.BL
                         myMultiLanguageDS = DirectCast(myGlobalDataTO.SetDatos, MultiLanguageDS)
 
                         If (myMultiLanguageDS.tfmwMultiLanguageResources.Rows.Count = 1) Then
-                            Return myMultiLanguageDS.tfmwMultiLanguageResources(0).ResourceText 'The Resource, English version
+                            Return ParseKeywords(myMultiLanguageDS.tfmwMultiLanguageResources(0).ResourceText) 'The Resource, English version
                         Else
                             Return String.Empty
                         End If

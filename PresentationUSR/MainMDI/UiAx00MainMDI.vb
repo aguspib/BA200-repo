@@ -2005,7 +2005,7 @@ Partial Public Class UiAx00MainMDI
 
                     'SG 07/11/2012 - Inform the Application is closing in the LOG
                     'Dim myLogAcciones As New ApplicationLogManager()
-                    GlobalBase.CreateLogActivity(My.Application.Info.ProductName & " - Application END", "IAx00MainMDI_FormClosing", EventLogEntryType.Information, False)
+                    GlobalBase.CreateLogActivity("[[AX00]] - Application END", "IAx00MainMDI_FormClosing", EventLogEntryType.Information, False)
 
                     'TR 10/07/2013 - Shrink the Database before close the application
                     DataBaseManagerDelegate.ShrinkDatabase(Biosystems.Ax00.Global.DAOBase.CurrentDB, Nothing) 'BA-2471: IT 08/05/2015
