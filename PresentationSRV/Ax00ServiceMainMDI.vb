@@ -100,7 +100,13 @@ Public Class Ax00ServiceMainMDI
     Private mySpecialSimpleErrors As New List(Of String)
 
     Private QuitBecauseWrongAnalyzer As Boolean = False  'AJG 28/07/2015
+    Private CurrentScenarioForMenusAndButtons As ScenariosForMenusAndButtons = ScenariosForMenusAndButtons.NotSetYet
 
+    Private Enum ScenariosForMenusAndButtons
+        NotSetYet = 0
+        ConnectedAndAllFullAccess = 1
+        RecoverNeeded = 2
+    End Enum
 #End Region
 
 #Region "Attributes"
@@ -625,6 +631,7 @@ Public Class Ax00ServiceMainMDI
                                       pRefreshEvent As List(Of GlobalEnumerates.UI_RefreshEvents), pRefreshDS As UIRefreshDS, pMainThread As Boolean) _
                                       Handles MDIAnalyzerManager.ReceptionEvent
 
+        System.Diagnostics.Debug.WriteLine("Message received and send to Main Thread: " & pInstructionReceived)
         Me.UIThread(Function() ManageReceptionEvent(pInstructionReceived, pTreated, pRefreshEvent, pRefreshDS, pMainThread))
 
     End Sub
@@ -4075,7 +4082,6 @@ Public Class Ax00ServiceMainMDI
 
                         Else
 
-
                             Me.WithShutToolStripMenuItem.Enabled = isStandby
                             Me.ChangeRotorToolStripMenuItem.Enabled = isStandby
 
@@ -4136,8 +4142,9 @@ Public Class Ax00ServiceMainMDI
                             End If
                             'end SGM 08/11/2012
 
-                        End If
+                            If CurrentScenarioForMenusAndButtons = ScenariosForMenusAndButtons.RecoverNeeded Then SetRecoverOptionsScenario()
 
+                        End If
                     Else
                         Me.ConfigurationToolStripMenuItem.Enabled = pEnable
                         Me.AdjustmentsTestsToolStripMenuItem.Enabled = False
@@ -4198,28 +4205,7 @@ Public Class Ax00ServiceMainMDI
                         Me.ProductionToolStripMenuItem.Enabled = False
 
                     Case ManagementAlarmTypes.RECOVER_ERROR
-                        If Not RecoverRequested Then
-                            Me.ConfigurationToolStripMenuItem.Enabled = True
-
-                            ' XBC 07/11/2012 - Correction : Firmware is able to receive LOADADJ, CONFIG or BARCODE
-                            'Me.GeneralToolStripMenuItem.Enabled = False
-                            'Me.LanguageToolStripMenuItem.Enabled = True
-                            'Me.BarcodesConfigToolStripMenuItem.Enabled = False
-                            'Me.UserToolStripMenuItem.Enabled = True
-                            'Me.ChangeUserToolStripMenuItem.Enabled = True
-                            ' XBC 07/11/2012 
-
-                            Me.AdjustmentsTestsToolStripMenuItem.Enabled = False
-                            Me.UtilitiesToolStripMenuItem.Enabled = False
-
-                            Me.RegistryMaintenanceToolStripMenuItem.Enabled = True
-
-                            Me.ExitToolStripMenuItem.Enabled = True
-                            Me.WithShutToolStripMenuItem.Enabled = False
-                            Me.WithOutShutDownToolStripMenuItem.Enabled = True
-
-                            Me.HelpToolStripMenuItem.Enabled = True
-                        End If
+                        SetRecoverOptionsScenario()
 
                     Case ManagementAlarmTypes.SIMPLE_ERROR
                         Me.ConfigurationToolStripMenuItem.Enabled = pEnable
@@ -4251,6 +4237,29 @@ Public Class Ax00ServiceMainMDI
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
 
+    End Sub
+
+    ''' <summary>
+    ''' Enables and disables menu items and buttons for a recover needed
+    ''' </summary>
+    ''' <remarks></remarks>
+    Private Sub SetRecoverOptionsScenario()
+        If Not RecoverRequested Then
+            Me.ConfigurationToolStripMenuItem.Enabled = True
+            Me.AdjustmentsTestsToolStripMenuItem.Enabled = False
+            Me.UtilitiesToolStripMenuItem.Enabled = False
+            Me.RegistryMaintenanceToolStripMenuItem.Enabled = True
+            Me.ExitToolStripMenuItem.Enabled = True
+            Me.WithShutToolStripMenuItem.Enabled = False
+            Me.WithOutShutDownToolStripMenuItem.Enabled = True
+            Me.HelpToolStripMenuItem.Enabled = True
+
+            Me.bsTSConnectButton.Enabled = False
+            Me.bsTSShutdownButton.Enabled = False
+            Me.bsTSRecoverButton.Enabled = True
+        End If
+
+       
     End Sub
 
     ''' <summary>
@@ -4409,6 +4418,9 @@ Public Class Ax00ServiceMainMDI
 
             End If
             ' XBC 24/10/2012
+
+            If CurrentScenarioForMenusAndButtons = ScenariosForMenusAndButtons.RecoverNeeded Then SetRecoverOptionsScenario()
+
 
 
         Catch ex As Exception
@@ -7976,7 +7988,7 @@ Public Class Ax00ServiceMainMDI
 
                 'Enable Recover Button
                 Me.bsTSRecoverButton.Enabled = True
-
+                Me.CurrentScenarioForMenusAndButtons = ScenariosForMenusAndButtons.RecoverNeeded
 
             ElseIf pAlarmType = ManagementAlarmTypes.SIMPLE_ERROR Then
 
@@ -8028,7 +8040,7 @@ Public Class Ax00ServiceMainMDI
 
                     Me.BsMonitor.DisableAllSensors() 'SGM 08/11/2012
                     Me.bsTSRecoverButton.Enabled = False
-
+                    Me.CurrentScenarioForMenusAndButtons = ScenariosForMenusAndButtons.NotSetYet
                     'Reset all analyzer flags
                     Dim myFlags As New AnalyzerManagerFlagsDelegate
                     myGlobal = myFlags.ResetFlags(Nothing, AnalyzerIDAttribute)
@@ -8056,6 +8068,8 @@ Public Class Ax00ServiceMainMDI
                             Me.RecoverRequested = False
                             Me.isWaitingForRecover = False
                             Me.bsAnalyzerStatus.Text = ""
+
+                            Me.CurrentScenarioForMenusAndButtons = ScenariosForMenusAndButtons.RecoverNeeded
                         End If
 
                     End If
