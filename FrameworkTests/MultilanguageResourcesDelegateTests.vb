@@ -31,6 +31,9 @@ Namespace Biosystems.Ax00.BL.Tests
             strResult = MlRdObject.ParseKeywords("Este es el analizador Modelo :[[MODEL]]")
             Assert.AreEqual(strResult, "Este es el analizador Modelo :BA200")
 
+            strResult = MlRdObject.ParseKeywords("Este es el analizador Modelo :[[ MODEL]]")
+            Assert.AreEqual(strResult, "Este es el analizador Modelo :BA200")
+
             'Mas de una Palabra clave
             strResult = MlRdObject.ParseKeywords("Este es el analizador Modelo : [[ModeL]][[ModeL]]")
             Assert.AreEqual(strResult, "Este es el analizador Modelo : BA200BA200")

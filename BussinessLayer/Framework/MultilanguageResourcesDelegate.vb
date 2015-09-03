@@ -81,6 +81,7 @@ Namespace Biosystems.Ax00.BL
             Dim lastChar As Boolean = False
             Dim conIndex As Integer = 0
             Dim conEnd As Integer = 0
+            Dim casci As Integer = 0
 
             'RegularText / PosibleKeywordStart / IdentifierText
             Dim statusText As ParserStatus = ParserStatus.RegularText
@@ -158,8 +159,8 @@ Namespace Biosystems.Ax00.BL
                                         statusText = ParserStatus.RegularText
                                     End If
                                 Else
-                                    'oword.Append(Char.ToUpper(c))
-                                    oword.Append(c)
+                                    casci = Char.ConvertToUtf32(c, 0)
+                                    If casci <> 9 AndAlso casci <> 32 Then oword.Append(c)
                                 End If
                         End Select
 
