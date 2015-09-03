@@ -80,6 +80,7 @@ Namespace Biosystems.Ax00.BL
             Dim isChardEnd As Boolean = False
             Dim lastChar As Boolean = False
             Dim conIndex As Integer = 0
+            Dim conEnd As Integer = 0
 
             'RegularText / PosibleKeywordStart / IdentifierText
             Dim statusText As ParserStatus = ParserStatus.RegularText
@@ -98,7 +99,18 @@ Namespace Biosystems.Ax00.BL
                         Select Case (statusText)
                             Case ParserStatus.RegularText
 
-                                If c = CSTART Then statusText = ParserStatus.PosibleKeywordStart Else strResult.Append(c)
+                                If c = CSTART Then
+                                    statusText = ParserStatus.PosibleKeywordStart
+                                Else
+                                    If c = CEND Then
+                                        conEnd += 1
+                                        If conEnd = 2 Then
+                                            If logOnError Then CreateLogActivity("The following text:  " & originalText & " has a sintaxis error.", EventLogEntryType.Information)
+                                            conEnd = 0
+                                        End If
+                                    End If
+                                    strResult.Append(c)
+                                End If
 
                             Case ParserStatus.PosibleKeywordStart
                                 If c = CSTART Then
@@ -109,6 +121,7 @@ Namespace Biosystems.Ax00.BL
                                         statusText = ParserStatus.IdentifierText
                                     End If
                                 Else
+
                                     strResult.Append("[" & c)
                                     statusText = ParserStatus.RegularText
                                 End If
@@ -139,6 +152,7 @@ Namespace Biosystems.Ax00.BL
                                             If logOnError Then CreateLogActivity("The following text:  " & originalText & " has a sintaxis error.", EventLogEntryType.Information)
                                             strResult.Append(oword)
                                         End If
+                                        conEnd = 0
                                         isChardEnd = False
                                         oword.Clear()
                                         statusText = ParserStatus.RegularText

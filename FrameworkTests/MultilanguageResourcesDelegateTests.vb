@@ -35,9 +35,17 @@ Namespace Biosystems.Ax00.BL.Tests
             strResult = MlRdObject.ParseKeywords("Este es el analizador Modelo : [[ModeL]][[ModeL]]")
             Assert.AreEqual(strResult, "Este es el analizador Modelo : BA200BA200")
 
+            'Solo un [ de apertura y para cerrar.
+            strResult = MlRdObject.ParseKeywords("Este es el analizador Modelo : [Model]")
+            Assert.AreEqual(strResult, "Este es el analizador Modelo : [Model]")
+
             'Solo un [ de apertura.
             strResult = MlRdObject.ParseKeywords("Este es el analizador Modelo : [Model]]")
             Assert.AreEqual(strResult, "Este es el analizador Modelo : [Model]]")
+
+            'Solo un [ de apertura.
+            strResult = MlRdObject.ParseKeywords("Este es el analizador Modelo : [Model]] y este [[Model]]")
+            Assert.AreEqual(strResult, "Este es el analizador Modelo : [Model]] y este BA200")
 
             ' Primera palabra clave correcta, segunda no existe en el diccionario.
             strResult = MlRdObject.ParseKeywords("Este es el analizador [[MODEL]]  y tiene [[Posiciones]] en el rotor de muestras.")
