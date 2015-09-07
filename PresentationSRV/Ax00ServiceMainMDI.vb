@@ -106,6 +106,7 @@ Public Class Ax00ServiceMainMDI
         NotSetYet = 0
         ConnectedAndAllFullAccess = 1
         RecoverNeeded = 2
+        DoingRecover = 3
     End Enum
 #End Region
 
@@ -631,7 +632,6 @@ Public Class Ax00ServiceMainMDI
                                       pRefreshEvent As List(Of GlobalEnumerates.UI_RefreshEvents), pRefreshDS As UIRefreshDS, pMainThread As Boolean) _
                                       Handles MDIAnalyzerManager.ReceptionEvent
 
-        System.Diagnostics.Debug.WriteLine("Message received and send to Main Thread: " & pInstructionReceived)
         Me.UIThread(Function() ManageReceptionEvent(pInstructionReceived, pTreated, pRefreshEvent, pRefreshDS, pMainThread))
 
     End Sub
@@ -1224,21 +1224,26 @@ Public Class Ax00ServiceMainMDI
                                 isWaitingForRecover = False
                                 RecoverCompleted = True
 
-                                'SGM 08/11/2012
-                                AnalyzerController.Instance.Analyzer.IsAutoInfoActivated = False
-                                Me.SEND_INFO_START()
-                                System.Threading.Thread.Sleep(500)
-                                Me.BsMonitor.EnableAllSensors()
+                                If Not Me.AdjustmentsReaded Then ' Read Adjustments if it they are not readed yet
+                                    
+                                    OpenMDIChildForm(AnalyzerInfo)
 
-                                AnalyzerController.Instance.Analyzer.IsUserConnectRequested = False
-                                Me.ActivateActionButtonBar(True)
-                                Me.ActivateMenus(True)
-                                Me.bsAnalyzerStatus.Text = AnalyzerController.Instance.Analyzer.AnalyzerStatus.ToString
-                                Me.BsMonitor.RefreshSensorValue(AnalyzerSensors.CONNECTED.ToString, 1, True, Me.ConnectedText)
-                                Me.bsAnalyzerStatus.Text = AnalyzerController.Instance.Analyzer.AnalyzerStatus.ToString
-                                AnalyzerController.Instance.Analyzer.ClearQueueToSend()
-                                'end SGM 08/11/2012
+                                Else
+                                    'SGM 08/11/2012
+                                    AnalyzerController.Instance.Analyzer.IsAutoInfoActivated = False
+                                    Me.SEND_INFO_START()
+                                    System.Threading.Thread.Sleep(500)
+                                    Me.BsMonitor.EnableAllSensors()
 
+                                    AnalyzerController.Instance.Analyzer.IsUserConnectRequested = False
+                                    Me.ActivateActionButtonBar(True)
+                                    Me.ActivateMenus(True)
+                                    Me.bsAnalyzerStatus.Text = AnalyzerController.Instance.Analyzer.AnalyzerStatus.ToString
+                                    Me.BsMonitor.RefreshSensorValue(AnalyzerSensors.CONNECTED.ToString, 1, True, Me.ConnectedText)
+                                    Me.bsAnalyzerStatus.Text = AnalyzerController.Instance.Analyzer.AnalyzerStatus.ToString
+                                    AnalyzerController.Instance.Analyzer.ClearQueueToSend()
+                                    'end SGM 08/11/2012
+                                End If
 
 
                         End Select
@@ -7990,6 +7995,8 @@ Public Class Ax00ServiceMainMDI
                 Me.bsTSRecoverButton.Enabled = True
                 Me.CurrentScenarioForMenusAndButtons = ScenariosForMenusAndButtons.RecoverNeeded
 
+                SetRecoverOptionsScenario()
+
             ElseIf pAlarmType = ManagementAlarmTypes.SIMPLE_ERROR Then
 
                 MyClass.ActivateMenus(True)
@@ -8061,6 +8068,7 @@ Public Class Ax00ServiceMainMDI
                                 Me.wfWaitScreen.Focus() 'SGM 08/11/2012
                             End If
 
+                        End If
                         ElseIf myGlobal.HasError Then
                             ShowMessage("Error", myGlobal.ErrorMessage)
                             Me.bsTSRecoverButton.Enabled = True
@@ -8074,7 +8082,6 @@ Public Class Ax00ServiceMainMDI
 
                     End If
                 End If
-            End If
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Name & ".RecoverInstrument", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
