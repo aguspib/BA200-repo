@@ -6274,7 +6274,7 @@ Public Class Ax00ServiceMainMDI
 
             If Not isLogged Then
                 'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(My.Application.Info.ProductName & " - Application END", "Ax00ServiceMainMDI_FormClosed", EventLogEntryType.Information, False)
+                GlobalBase.CreateLogActivity("[[Ax00]] - Application END", "Ax00ServiceMainMDI_FormClosed", EventLogEntryType.Information, False)
                 isLogged = True
             End If
 

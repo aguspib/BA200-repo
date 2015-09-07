@@ -86,7 +86,7 @@ Public NotInheritable Class StartupSRV
 
         'AG 21/02/2014 - #1516 at this point services are running. Do not use here the method RuntimePolicyHelper.LegacyV2RuntimeEnabledSuccessfully because fails
         'Dim myLogAcciones As New ApplicationLogManager()
-        GlobalBase.CreateLogActivity(My.Application.Info.ProductName & " - ApplicationSRV STARTUP", "Startup_Load (service)", EventLogEntryType.Information, False)
+        GlobalBase.CreateLogActivity("[[Ax00]] - ApplicationSRV STARTUP", "Startup_Load (service)", EventLogEntryType.Information, False)
 
         Me.Close()
     End Sub

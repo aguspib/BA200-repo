@@ -639,7 +639,7 @@ Public Class UiAx00Login
 
                     'SGM 07/11/2012 - log app ends
                     'Dim myLogAcciones As New ApplicationLogManager()
-                    GlobalBase.CreateLogActivity(My.Application.Info.ProductName & " - Application END", Name & ".ExitApplication", EventLogEntryType.Information, False)
+                    GlobalBase.CreateLogActivity(" [[Ax00]] - Application END", Name & ".ExitApplication", EventLogEntryType.Information, False)
 
                     Close()
                 End If

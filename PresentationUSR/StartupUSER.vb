@@ -125,7 +125,7 @@ Public NotInheritable Class StartupUSER
 
         'AG 21/02/2014 - #1516 at this point services are running. Do not use here the method RuntimePolicyHelper.LegacyV2RuntimeEnabledSuccessfully because fails
         'Dim myLogAcciones As New ApplicationLogManager()
-        GlobalBase.CreateLogActivity(My.Application.Info.ProductName & " - ApplicationUSR STARTUP", "Startup_Load (User)", EventLogEntryType.Information, False)
+        GlobalBase.CreateLogActivity("[[Ax00]] - ApplicationUSR STARTUP", "Startup_Load (User)", EventLogEntryType.Information, False)
 
         If Not Ax00StartUp Is Nothing Then
             Ax00StartUp.Close()

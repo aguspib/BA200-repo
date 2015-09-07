@@ -12,6 +12,7 @@ Namespace Biosystems.Ax00.Core.Entities
     Public Class BA200AnalyzerEntity
         Inherits AnalyzerManager
 
+
         Private BL_expListener As BaseLineExpirationListener
 
         Public Sub New(assemblyName As String, analyzerModel As String, baseLine As IBaseLineEntity)
@@ -22,7 +23,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
             BL_expListener = New BaseLineExpirationListener(Me, New BaseLineEntityExpiration(_currentAnalyzer), New AnalyzerAlarms(_currentAnalyzer))
 
-            MultilanguageResourcesDelegate.RegisterKeyword("AX00", Function() analyzerModel)
+            'MultilanguageResourcesDelegate.RegisterKeyword("AX00", Function() Model)
 
         End Sub
 
@@ -114,6 +115,10 @@ Namespace Biosystems.Ax00.Core.Entities
                 Return "*.ba2"
             End Get
         End Property
+
+        Public Overrides Function CommercialModelName() As String
+            Return "BA200"
+        End Function
     End Class
 
 End Namespace

@@ -24,7 +24,6 @@ Namespace Biosystems.Ax00.BL
         Const CSTART = "["c
         Const CEND = "]"c
 
-        'RegularText / PosibleKeywordStart / IdentifierText
         Private Enum ParserStatus
             RegularText
             PosibleKeywordStart
@@ -32,7 +31,6 @@ Namespace Biosystems.Ax00.BL
         End Enum
 
         Public Sub New()
-            'RegisterKeyword("MODEL", Function() "BA200")
             If GlobalBase.TextParser Is Nothing Then GlobalBase.TextParser = Me
         End Sub
 
@@ -60,11 +58,16 @@ Namespace Biosystems.Ax00.BL
             End If
         End Sub
 
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="originalText"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
         Public Function ParseKeywords(originalText As String) As String
             Return ParseKeywords(originalText, True)
         End Function
-
-
+        
         ''' <summary>
         ''' 
         ''' </summary>
@@ -77,6 +80,8 @@ Namespace Biosystems.Ax00.BL
             Dim isChardEnd As Boolean = False
             Dim lastChar As Boolean = False
             Dim conIndex As Integer = 0
+            Dim conEnd As Integer = 0
+            Dim casci As Integer = 0
 
             'RegularText / PosibleKeywordStart / IdentifierText
             Dim statusText As ParserStatus = ParserStatus.RegularText
@@ -95,7 +100,18 @@ Namespace Biosystems.Ax00.BL
                         Select Case (statusText)
                             Case ParserStatus.RegularText
 
-                                If c = CSTART Then statusText = ParserStatus.PosibleKeywordStart Else strResult.Append(c)
+                                If c = CSTART Then
+                                    statusText = ParserStatus.PosibleKeywordStart
+                                Else
+                                    If c = CEND Then
+                                        conEnd += 1
+                                        If conEnd = 2 Then
+                                            If logOnError Then CreateLogActivity("The following text:  " & originalText & " has a sintaxis error.", EventLogEntryType.Information)
+                                            conEnd = 0
+                                        End If
+                                    End If
+                                    strResult.Append(c)
+                                End If
 
                             Case ParserStatus.PosibleKeywordStart
                                 If c = CSTART Then
@@ -106,6 +122,7 @@ Namespace Biosystems.Ax00.BL
                                         statusText = ParserStatus.IdentifierText
                                     End If
                                 Else
+
                                     strResult.Append("[" & c)
                                     statusText = ParserStatus.RegularText
                                 End If
@@ -136,13 +153,14 @@ Namespace Biosystems.Ax00.BL
                                             If logOnError Then CreateLogActivity("The following text:  " & originalText & " has a sintaxis error.", EventLogEntryType.Information)
                                             strResult.Append(oword)
                                         End If
+                                        conEnd = 0
                                         isChardEnd = False
                                         oword.Clear()
                                         statusText = ParserStatus.RegularText
                                     End If
                                 Else
-                                    'oword.Append(Char.ToUpper(c))
-                                    oword.Append(c)
+                                    casci = Char.ConvertToUtf32(c, 0)
+                                    If casci <> 9 AndAlso casci <> 32 Then oword.Append(c)
                                 End If
                         End Select
 
@@ -384,7 +402,8 @@ Namespace Biosystems.Ax00.BL
                             Select row).ToList()
 
                 If Resource.Count > 0 Then
-                    Return Resource(0).ResourceText 'The resource we are looking for in the Current Language
+
+                    Return ParseKeywords(Resource(0).ResourceText) 'The resource we are looking for in the Current Language
                 Else
                     'Resource in Current Language not Found
                     'Search for the English version
@@ -422,7 +441,7 @@ Namespace Biosystems.Ax00.BL
                         myMultiLanguageDS = DirectCast(myGlobalDataTO.SetDatos, MultiLanguageDS)
 
                         If (myMultiLanguageDS.tfmwMultiLanguageResources.Rows.Count = 1) Then
-                            Return myMultiLanguageDS.tfmwMultiLanguageResources(0).ResourceText 'The Resource, English version
+                            Return ParseKeywords(myMultiLanguageDS.tfmwMultiLanguageResources(0).ResourceText) 'The Resource, English version
                         Else
                             Return String.Empty
                         End If
