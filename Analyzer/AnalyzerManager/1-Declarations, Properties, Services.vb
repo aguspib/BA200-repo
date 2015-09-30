@@ -932,6 +932,8 @@ Namespace Biosystems.Ax00.Core.Entities
             End Get
         End Property
 
+        Public MustOverride ReadOnly Property GetModelCode() As String Implements IAnalyzerManager.GetModelCode
+
 
         Public Property Ringing() As Boolean Implements IAnalyzerManager.Ringing
             Get

@@ -64,6 +64,7 @@ Namespace Biosystems.Ax00.Core.Interfaces
         ReadOnly Property GetModelValue(ByVal pAnalyzerID As String) As String
         ReadOnly Property GetUpperPartSN(ByVal pAnalyzerID As String) As String
         ReadOnly Property GetLowerPartSN(ByVal pAnalyzerID As String) As String
+        ReadOnly Property GetModelCode() As String
         Property Ringing() As Boolean
         Property IsAutoInfoActivated() As Boolean
         Property IsAlarmInfoRequested() As Boolean
