@@ -2033,7 +2033,23 @@
         <InstructionTO>
           <InstructionID>9</InstructionID>
           <Sequence>9</Sequence>
-          <Timer>9000</Timer>
+          <Timer>10000</Timer>
+          <Code>BR1.MV.MMA</Code>
+          <Params>#5@</Params>
+          <EnableEdition>false</EnableEdition>
+        </InstructionTO>
+        <InstructionTO>
+          <InstructionID>10</InstructionID>
+          <Sequence>10</Sequence>
+          <Timer>10010</Timer>
+          <Code>BA1.MV.MMA</Code>
+          <Params>#6@</Params>
+          <EnableEdition>false</EnableEdition>
+        </InstructionTO>
+        <InstructionTO>
+          <InstructionID>11</InstructionID>
+          <Sequence>11</Sequence>
+          <Timer>12000</Timer>
           <Code>END</Code>
           <Params />
           <EnableEdition>false</EnableEdition>

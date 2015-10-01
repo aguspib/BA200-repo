@@ -2695,10 +2695,10 @@ Public Class UiMotorsPumpsValvesTest
 
             resultData = MyBase.myAdjustmentsDelegate.ReadAdjustmentsByGroupIDs(myAdjustmentsGroups)
             If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-                MyClass.SelectedAdjustmentsDS = CType(resultData.SetDatos, SRVAdjustmentsDS)
+                Me.SelectedAdjustmentsDS = CType(resultData.SetDatos, SRVAdjustmentsDS)
 
                 'update screen delagate's parameters
-                With MyClass.myScreenDelegate
+                With Me.myScreenDelegate
 
                     'washing
                     .ArmSamplesWashingPolar = CInt(ReadArmPositionData(ADJUSTMENT_GROUPS.SAMPLES_ARM_WASH, AXIS.POLAR).Value)
@@ -2735,6 +2735,7 @@ Public Class UiMotorsPumpsValvesTest
 
                     .ArmSamplesParkingPolar = CInt(ReadArmPositionData(ADJUSTMENT_GROUPS.SAMPLES_ARM_PARK, AXIS.POLAR).Value)
                     .ArmSamplesSecurityZ = CInt(ReadArmPositionData(ADJUSTMENT_GROUPS.SAMPLES_ARM_VSEC, AXIS.Z).Value)
+                    .ArmSamplesParkingZ = CInt(ReadArmPositionData(ADJUSTMENT_GROUPS.SAMPLES_ARM_PARK, AXIS.Z).Value)
 
                     .ArmReagent1ParkingPolar = CInt(ReadArmPositionData(ADJUSTMENT_GROUPS.REAGENT1_ARM_PARK, AXIS.POLAR).Value)
                     .ArmReagent1SecurityZ = CInt(ReadArmPositionData(ADJUSTMENT_GROUPS.REAGENT1_ARM_VSEC, AXIS.Z).Value)
@@ -2744,6 +2745,7 @@ Public Class UiMotorsPumpsValvesTest
 
                     .ArmMixer1ParkingPolar = CInt(ReadArmPositionData(ADJUSTMENT_GROUPS.MIXER1_ARM_PARK, AXIS.POLAR).Value)
                     .ArmMixer1SecurityZ = CInt(ReadArmPositionData(ADJUSTMENT_GROUPS.MIXER1_ARM_VSEC, AXIS.Z).Value)
+                    .ArmMixer1ParkingZ = CInt(ReadArmPositionData(ADJUSTMENT_GROUPS.MIXER1_ARM_PARK, AXIS.Z).Value)
 
                     .ArmMixer2ParkingPolar = CInt(ReadArmPositionData(ADJUSTMENT_GROUPS.MIXER2_ARM_PARK, AXIS.POLAR).Value)
                     .ArmMixer2SecurityZ = CInt(ReadArmPositionData(ADJUSTMENT_GROUPS.MIXER2_ARM_VSEC, AXIS.Z).Value)

@@ -140,12 +140,15 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         'Public ArmMixer2ParkingPolar As Integer = -1
         'Public ArmMixer2ParkingZ As Integer = -1
         Public ArmSamplesParkingPolar As Integer = -1
+        Public ArmSamplesParkingZ As Integer = -1
         Public ArmSamplesSecurityZ As Integer = -1
+
         Public ArmReagent1ParkingPolar As Integer = -1
         Public ArmReagent1SecurityZ As Integer = -1
         Public ArmReagent2ParkingPolar As Integer = -1
         Public ArmReagent2SecurityZ As Integer = -1
         Public ArmMixer1ParkingPolar As Integer = -1
+        Public ArmMixer1ParkingZ As Integer = -1
         Public ArmMixer1SecurityZ As Integer = -1
         Public ArmMixer2ParkingPolar As Integer = -1
         Public ArmMixer2SecurityZ As Integer = -1
@@ -930,24 +933,27 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
 
                     If AnalyzerController.Instance.IsBA200 Then
-                        .ParamList.Add(MyClass.ArmSamplesSecurityZ.ToString)
-                        .ParamList.Add(MyClass.ArmMixer1SecurityZ.ToString)
+                        .ParamList.Add(Me.ArmSamplesSecurityZ.ToString)
+                        .ParamList.Add(Me.ArmMixer1SecurityZ.ToString)
 
-                        .ParamList.Add(MyClass.ArmSamplesParkingPolar.ToString)
-                        .ParamList.Add(MyClass.ArmMixer1ParkingPolar.ToString)
+                        .ParamList.Add(Me.ArmSamplesParkingPolar.ToString)
+                        .ParamList.Add(Me.ArmMixer1ParkingPolar.ToString)
+
+                        .ParamList.Add(Me.ArmSamplesParkingZ.ToString)
+                        .ParamList.Add(Me.ArmMixer1ParkingZ.ToString)
                     Else
                         ' XBC 09/11/2011
-                        .ParamList.Add(MyClass.ArmSamplesSecurityZ.ToString)
-                        .ParamList.Add(MyClass.ArmReagent1SecurityZ.ToString)
-                        .ParamList.Add(MyClass.ArmReagent2SecurityZ.ToString)
-                        .ParamList.Add(MyClass.ArmMixer1SecurityZ.ToString)
-                        .ParamList.Add(MyClass.ArmMixer2SecurityZ.ToString)
+                        .ParamList.Add(Me.ArmSamplesSecurityZ.ToString)
+                        .ParamList.Add(Me.ArmReagent1SecurityZ.ToString)
+                        .ParamList.Add(Me.ArmReagent2SecurityZ.ToString)
+                        .ParamList.Add(Me.ArmMixer1SecurityZ.ToString)
+                        .ParamList.Add(Me.ArmMixer2SecurityZ.ToString)
 
-                        .ParamList.Add(MyClass.ArmSamplesParkingPolar.ToString)
-                        .ParamList.Add(MyClass.ArmReagent1ParkingPolar.ToString)
-                        .ParamList.Add(MyClass.ArmReagent2ParkingPolar.ToString)
-                        .ParamList.Add(MyClass.ArmMixer1ParkingPolar.ToString)
-                        .ParamList.Add(MyClass.ArmMixer2ParkingPolar.ToString)
+                        .ParamList.Add(Me.ArmSamplesParkingPolar.ToString)
+                        .ParamList.Add(Me.ArmReagent1ParkingPolar.ToString)
+                        .ParamList.Add(Me.ArmReagent2ParkingPolar.ToString)
+                        .ParamList.Add(Me.ArmMixer1ParkingPolar.ToString)
+                        .ParamList.Add(Me.ArmMixer2ParkingPolar.ToString)
                         ' XBC 09/11/2011
                     End If
 
