@@ -2,6 +2,7 @@
 Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Core.Entities
 Imports Biosystems.Ax00.Calculations
+Imports Biosystems.Ax00.Global
 
 Namespace Biosystems.Ax00.App
 
@@ -36,14 +37,18 @@ Namespace Biosystems.Ax00.App
                 analyzer.ActiveAnalyzer = analyzer.GenericDefaultAnalyzer()
             End If
 
-            iseAnalyzer = New ISEManager(analyzer, analyzerIDAttribute, analyzerModel, False)
-            analyzer.ISEAnalyzer = iseAnalyzer
+            If analyzer.Model = "" Then
+                analyzer.Model = A400
+            End If
 
-            LoadAnalyzerConfiguration(analyzer)
+                iseAnalyzer = New ISEManager(analyzer, analyzerIDAttribute, analyzerModel, False)
+                analyzer.ISEAnalyzer = iseAnalyzer
 
-            baseLine.BaseLineTypeForWellReject = analyzer.BaseLineTypeForWellReject 'AG 11/11/2014 BA-2065 - Inform the base line type for well rejection for this analyzer
+                LoadAnalyzerConfiguration(analyzer)
 
-            Return analyzer
+                baseLine.BaseLineTypeForWellReject = analyzer.BaseLineTypeForWellReject 'AG 11/11/2014 BA-2065 - Inform the base line type for well rejection for this analyzer
+
+                Return analyzer
 
         End Function
 

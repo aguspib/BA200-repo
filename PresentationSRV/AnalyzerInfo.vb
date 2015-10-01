@@ -3288,43 +3288,46 @@ Public Class AnalyzerInfo
             bsModelTextBox.Enabled = False
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Name & ".bsCancelSNButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".bsCancelSNButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
+            ShowMessage(Name & ".bsCancelSNButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
 
     Private Sub bsSaveSNButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsSaveSNButton.Click
         Dim myGlobal As New GlobalDataTO
         Try
-            Me.BsErrorProvider1.Clear()
+            BsErrorProvider1.Clear()
 
             Dim SNValidated As Boolean = False
-            If Me.bsSerialTextBox.Text.Length > 0 Then
-                If IsNumeric(Me.bsSerialTextBox.Text) Then
-                    If CLng(Me.bsSerialTextBox.Text) > 0 Then
+            If bsSerialTextBox.Text.Length > 0 Then
+                If IsNumeric(bsSerialTextBox.Text) Then
+                    If CLng(bsSerialTextBox.Text) > 0 Then
                         SNValidated = True
                     End If
                 End If
             End If
 
             If SNValidated Then
-                If bsModelTextBox.Text <> "" AndAlso IsNumeric(bsModelTextBox.Text) AndAlso (bsModelTextBox.Text.Length = 3) Then
-                    If AnalyzerController.Instance.Analyzer.GetModelCode() <> bsModelTextBox.Text Then
+                If bsModelTextBox.Text <> "" AndAlso (bsModelTextBox.Text.Length = 3) Then
+                    If Not (AnalyzerController.Instance.Analyzer.GetModelCode() = bsModelTextBox.Text OrElse
+                        AnalyzerController.Instance.Analyzer.GetUpperPartSN(AnalyzerController.Instance.Analyzer.GenericDefaultAnalyzer) = bsModelTextBox.Text) Then
                         SNValidated = False
                     End If
+                Else
+                    SNValidated = False
                 End If
             End If
 
             If Not SNValidated Then
-                Me.BsErrorProvider1.SetError(Me.bsSerialTextBox, GetMessageText(GlobalEnumerates.Messages.SRV_INVALID_SN.ToString, currentLanguage))
+                BsErrorProvider1.SetError(bsSerialTextBox, GetMessageText(Messages.SRV_INVALID_SN.ToString, currentLanguage))
                 Exit Try
             End If
 
-            MyClass.IsEditingSN = False
+            IsEditingSN = False
 
-            Me.Cursor = Cursors.WaitCursor
+            Cursor = Cursors.WaitCursor
             ' Saving Serial number
-            Me.bsSaveSNButton.Enabled = False
-            MyBase.CurrentMode = ADJUSTMENT_MODES.SN_SAVING 'SGM 15/10/2012
+            bsSaveSNButton.Enabled = False
+            CurrentMode = ADJUSTMENT_MODES.SN_SAVING 'SGM 15/10/2012
             'myGlobal = MyBase.Save()
             PrepareArea()
 
@@ -3332,13 +3335,13 @@ Public Class AnalyzerInfo
                 PrepareErrorMode()
             Else
                 ' Manage FwScripts must to be sent at load screen
-                If MyBase.SimulationMode Then
+                If SimulationMode Then
                     ' simulating...
                     'MyBase.DisplaySimulationMessage("Saving serial number Instrument...")
                     'System.Threading.Thread.Sleep(SimulationProcessTime)
-                    MyClass.WaitProcessSimulation() 'SGM 04/01/2012
-                    MyBase.myServiceMDI.Focus()
-                    MyClass.CurrentMode = ADJUSTMENT_MODES.SAVED
+                    WaitProcessSimulation() 'SGM 04/01/2012
+                    myServiceMDI.Focus()
+                    CurrentMode = ADJUSTMENT_MODES.SAVED
                     PrepareArea()
                 Else
                     If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
@@ -3347,7 +3350,7 @@ Public Class AnalyzerInfo
                         Dim myUtilCommand As New UTILCommandTO()
                         With myUtilCommand
                             .ActionType = UTILInstructionTypes.SaveSerialNumber
-                            .SerialNumberToSave = Me.bsModelTextBox.Text.Trim & Me.bsSerialTextBox.Text.Trim
+                            .SerialNumberToSave = bsModelTextBox.Text.Trim & bsSerialTextBox.Text.Trim
                             .TanksActionType = UTILIntermediateTanksTestActions.NothingToDo
                             .CollisionTestActionType = UTILCollisionTestActions.Disable
                             .SaveSerialAction = UTILSaveSerialNumberActions.SaveSerialNumber
@@ -3360,14 +3363,14 @@ Public Class AnalyzerInfo
                 End If
 
                 If myGlobal.HasError Then
-                    Me.PrepareErrorMode()
+                    PrepareErrorMode()
                 End If
 
             End If
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Name & ".bsSaveSNButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".bsSaveSNButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
+            ShowMessage(Name & ".bsSaveSNButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
 
@@ -3376,28 +3379,28 @@ Public Class AnalyzerInfo
         Try
             If Not myScreenDelegate Is Nothing Then
                 myScreenDelegate.SerialNumber = Me.bsModelTextBox.Text + Me.bsSerialTextBox.Text
-                Me.bsSaveSNButton.Enabled = (myScreenDelegate.SerialNumber.Length = SpecifiedSerialNumberLength) 'SGM 15/10/2012
-                MyClass.IsEditingSN = True
+                bsSaveSNButton.Enabled = (myScreenDelegate.SerialNumber.Length = SpecifiedSerialNumberLength) 'SGM 15/10/2012
+                IsEditingSN = True
             End If
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Name & ".bsSerialTextBox_TextChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".bsSerialTextBox_TextChanged ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
+            ShowMessage(Name & ".bsSerialTextBox_TextChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
 
     Private Sub DetailsButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles DetailsButton.Click
-        Me.Details = Not Me.Details
-        ShowDetails(Me.Details)
+        Details = Not Details
+        ShowDetails(Details)
     End Sub
 
     Private Sub MoreInfoButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MoreInfoButton.Click
         Try
-            Me.RequestMoreInfo = True
+            RequestMoreInfo = True
             PrepareReadingAnalyzerInfoMode()
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Name & ".MoreInfoButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".MoreInfoButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
+            ShowMessage(Name & ".MoreInfoButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
 

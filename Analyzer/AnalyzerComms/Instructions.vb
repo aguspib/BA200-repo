@@ -1986,7 +1986,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 If Not pBarCodeDS Is Nothing Then
                     If pBarCodeDS.barCodeRequests.Rows.Count > 0 Then
 
-                        If AnalyzerManager.GetCurrentAnalyzerManager.Model = "A200" AndAlso pBarCodeDS.barCodeRequests.Any Then
+                        If AnalyzerManager.GetCurrentAnalyzerManager.Model = A200 AndAlso pBarCodeDS.barCodeRequests.Any Then
                             pBarCodeDS.barCodeRequests(0).RotorType = "SAMPLESANDREAGENTS"
                         End If
 
