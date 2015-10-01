@@ -663,12 +663,8 @@ Public Class Ax00ServiceMainMDI
             Dim copyRefreshDS As UIRefreshDS = Nothing
             Dim copyRefreshEventList As New List(Of GlobalEnumerates.UI_RefreshEvents)
 
-            'AJG Gestionar si el analizador conectado es compatible con el software
-            If Not AnalyzerController.Instance.Analyzer.IsConnectedWithRightModel() Then
-                MessageBox.Show("mensajito")
-                QuitBecauseWrongAnalyzer = True
-                Close()
-            End If
+            'AJG Check if the connected analyzer is compatible with the software
+            CheckAnalyzerCompatibility()
 
             SyncLock lockThis
                 copyRefreshDS = CType(pRefreshDS.Copy(), UIRefreshDS)
@@ -2210,6 +2206,26 @@ Public Class Ax00ServiceMainMDI
 
         Return True
     End Function
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by AJG 01/10/2015
+    ''' </remarks>
+    Public Sub CheckAnalyzerCompatibility() Implements IMainMDI.CheckAnalyzerCompatibility
+        'AJG Gestionar si el analizador conectado es compatible con el software
+        If Not AnalyzerController.Instance.Analyzer.IsConnectedWithRightModel() Then
+            Dim auxtxt = New MultilanguageResourcesDelegate().GetResourceText(Nothing, "Para comunicar con el analizador debe utilizar la aplicación de B{0}. El programa actual se cerrará de forma automática", CurrentLanguageAttribute)
+            If auxtxt = "" Then
+                auxtxt = "Para comunicar con el analizador debe utilizar la aplicación de B{0}. El programa actual se cerrará de forma automática"
+            End If
+            Dim msgTxt = String.Format(auxtxt, AnalyzerController.Instance.Analyzer.GetModelNotCompatible)
+            MessageBox.Show(msgTxt)
+            QuitBecauseWrongAnalyzer = True
+            Close()
+        End If
+    End Sub
 
 
     ''' <summary>
@@ -6333,6 +6349,8 @@ Public Class Ax00ServiceMainMDI
 
             'Option3: Use Background worker control
             'Me.Enabled = False 'AG 03/08/2010
+
+            CheckAnalyzerCompatibility()
 
             If MyClass.FwScriptsLoadedOK Then
                 'only buttons bar and menus SGM 28/09/2011

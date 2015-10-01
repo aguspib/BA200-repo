@@ -87,12 +87,7 @@ Partial Public Class UiAx00MainMDI
             'GlobalBase.CreateLogActivity("START BLOCK 0.", Me.Name & ".ManageReceptionEvent ", _
             '                                EventLogEntryType.FailureAudit, False)
 
-            'AJG Gestionar si el analizador conectado es compatible con el software
-            If Not AnalyzerController.Instance.Analyzer.IsConnectedWithRightModel() Then
-                MessageBox.Show("mensajito")
-                QuitBecauseWrongAnalyzer = True
-                Close()
-            End If
+            CheckAnalyzerCompatibility()
 
             ' XB 30/08/2013
             If AnalyzerController.Instance.Analyzer.InstructionTypeReceived = AnalyzerManagerSwActionList.ANSFCP_RECEIVED Then
@@ -2791,5 +2786,24 @@ Partial Public Class UiAx00MainMDI
 
 #End Region
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by AJG 01/10/2015
+    ''' </remarks>
+    Public Sub CheckAnalyzerCompatibility() Implements IMainMDI.CheckAnalyzerCompatibility
+        'AJG Gestionar si el analizador conectado es compatible con el software
+        If Not AnalyzerController.Instance.Analyzer.IsConnectedWithRightModel() Then
+            Dim auxtxt = New MultilanguageResourcesDelegate().GetResourceText(Nothing, "Para comunicar con el analizador debe utilizar la aplicación de B{0}. El programa actual se cerrará de forma automática", CurrentLanguageAttribute)
+            If auxtxt = "" Then
+                auxtxt = "Para comunicar con el analizador debe utilizar la aplicación de B{0}. El programa actual se cerrará de forma automática"
+            End If
+            Dim msgTxt = String.Format(auxtxt, AnalyzerController.Instance.Analyzer.GetModelNotCompatible)
+            MessageBox.Show(msgTxt)
+            QuitBecauseWrongAnalyzer = True
+            Close()
+        End If
+    End Sub
 
 End Class

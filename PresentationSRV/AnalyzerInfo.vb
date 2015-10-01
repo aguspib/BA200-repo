@@ -3297,24 +3297,10 @@ Public Class AnalyzerInfo
         Try
             BsErrorProvider1.Clear()
 
-            Dim SNValidated As Boolean = False
-            If bsSerialTextBox.Text.Length > 0 Then
-                If IsNumeric(bsSerialTextBox.Text) Then
-                    If CLng(bsSerialTextBox.Text) > 0 Then
-                        SNValidated = True
-                    End If
-                End If
-            End If
+            Dim SNValidated = ValidateLowerPart()
 
             If SNValidated Then
-                If bsModelTextBox.Text <> "" AndAlso (bsModelTextBox.Text.Length = 3) Then
-                    If Not (AnalyzerController.Instance.Analyzer.GetModelCode() = bsModelTextBox.Text OrElse
-                        AnalyzerController.Instance.Analyzer.GetUpperPartSN(AnalyzerController.Instance.Analyzer.GenericDefaultAnalyzer) = bsModelTextBox.Text) Then
-                        SNValidated = False
-                    End If
-                Else
-                    SNValidated = False
-                End If
+                SNValidated = ValidateUpperPart()
             End If
 
             If Not SNValidated Then
@@ -3406,4 +3392,36 @@ Public Class AnalyzerInfo
 
 #End Region
 
+    Private Function ValidateLowerPart() As Boolean
+        Dim SNValidated As Boolean = False
+
+        If bsSerialTextBox.Text.Length > 0 Then
+            If IsNumeric(bsSerialTextBox.Text) Then
+                If CLng(bsSerialTextBox.Text) > 0 Then
+                    SNValidated = True
+                End If
+            End If
+        End If
+        Return SNValidated
+    End Function
+
+    Private Function ValidateUpperPart() As Boolean
+        Dim SNValidated = True
+
+        If bsModelTextBox.Text <> "" AndAlso (bsModelTextBox.Text.Length = 3) Then
+            If Not (AnalyzerController.Instance.Analyzer.GetModelCode() = bsModelTextBox.Text OrElse
+                AnalyzerController.Instance.Analyzer.GetUpperPartSN(AnalyzerController.Instance.Analyzer.GenericDefaultAnalyzer) = bsModelTextBox.Text) Then
+                SNValidated = False
+            End If
+        Else
+            SNValidated = False
+        End If
+        If SNValidated Then
+            If Not (AllowedAnalyzer = AnalyzerController.Instance.Analyzer.GetModelValue(bsModelTextBox.Text + bsSerialTextBox.Text) OrElse AllowedAnalyzer = "") Then
+                SNValidated = False
+            End If
+        End If
+
+        Return SNValidated
+    End Function
 End Class

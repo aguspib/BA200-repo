@@ -41,14 +41,13 @@ Namespace Biosystems.Ax00.App
                 analyzer.Model = A400
             End If
 
-                iseAnalyzer = New ISEManager(analyzer, analyzerIDAttribute, analyzerModel, False)
-                analyzer.ISEAnalyzer = iseAnalyzer
+            iseAnalyzer = New ISEManager(analyzer, analyzerIDAttribute, analyzerModel, False)
+            analyzer.ISEAnalyzer = iseAnalyzer
 
-                LoadAnalyzerConfiguration(analyzer)
+            LoadAnalyzerConfiguration(analyzer)
+            baseLine.BaseLineTypeForWellReject = analyzer.BaseLineTypeForWellReject 'AG 11/11/2014 BA-2065 - Inform the base line type for well rejection for this analyzer
 
-                baseLine.BaseLineTypeForWellReject = analyzer.BaseLineTypeForWellReject 'AG 11/11/2014 BA-2065 - Inform the base line type for well rejection for this analyzer
-
-                Return analyzer
+            Return analyzer
 
         End Function
 

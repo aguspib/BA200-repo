@@ -14,5 +14,5 @@ Public Interface IMainMDI
     Sub SetActionButtonsEnableProperty(ByVal pEnable As Boolean)
     Sub OpenMonitorForm(ByRef FormToClose As Form, Optional ByVal pAutomaticProcessFlag As Boolean = False)
     Sub CloseForm(FormToClose As Biosystems.Ax00.PresentationCOM.BSBaseForm)
-
+    Sub CheckAnalyzerCompatibility()
 End Interface

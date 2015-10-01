@@ -46,6 +46,7 @@ Namespace Biosystems.Ax00.App
 
             LoadAnalyzerConfiguration(analyzer)
             baseLine.BaseLineTypeForWellReject = analyzer.BaseLineTypeForWellReject 'AG 11/11/2014 BA-2065 - Inform the base line type for well rejection for this analyzer
+
             Return analyzer
 
         End Function

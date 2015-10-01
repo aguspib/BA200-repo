@@ -1030,6 +1030,8 @@ Partial Public Class UiAx00MainMDI
             'Application.DoEvents()
             'StopMarqueeProgressBar()
 
+            CheckAnalyzerCompatibility()
+
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".Ax00MainMDI_Shown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".Ax00MainMDI_Shown ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -8344,6 +8346,7 @@ Partial Public Class UiAx00MainMDI
             End If
             'AG 23/09/2011
 
+            AnalyzerModelAttribute = AnalyzerController.Instance.Analyzer.Model
             UiMonitor.ActiveAnalyzer = AnalyzerIDAttribute
             UiMonitor.ActiveWorkSession = WorkSessionIDAttribute
             UiMonitor.CurrentWorkSessionStatus = WSStatusAttribute
@@ -8355,7 +8358,7 @@ Partial Public Class UiAx00MainMDI
             UiMonitor.applicationMaxMemoryUsage = myApplicationMaxMemoryUsage 'AG 24/02/2014 - #1520 inform new property
             UiMonitor.SQLMaxMemoryUsage = mySQLMaxMemoryUsage 'AG 24/02/2014 - #1520 inform new property
             UiMonitor.Show()
-            Application.DoEvents()
+            'Application.DoEvents()
 
             MyClass.IsISEUtilClosing = False 'SGM 11/05/2012
 
