@@ -4570,7 +4570,7 @@ Public Class UiTankLevelsAdjustments
             ResetBorderSRV()
 
             'remove until this Test is available
-            Me.BsTabPagesControl.TabPages.Remove(Me.BsIntermediateTabPage)
+            '' ''Me.BsTabPagesControl.TabPages.Remove(Me.BsIntermediateTabPage)
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -4653,17 +4653,17 @@ Public Class UiTankLevelsAdjustments
     Private Sub BsTabPagesControl_Selecting(ByVal sender As Object, ByVal e As System.Windows.Forms.TabControlCancelEventArgs) Handles BsTabPagesControl.Selecting
 
         Try
-
-            If Not MyClass.ManageTabPages Then
-                e.Cancel = True
-                Exit Sub
-            End If
+            'TODO: BA-2946
+            '' ''If Not MyClass.ManageTabPages Then
+            '' ''    e.Cancel = True
+            '' ''    Exit Sub
+            '' ''End If
 
             'disable for PROTO 4
-            If e.TabPage Is Me.BsIntermediateTabPage Then
-                e.Cancel = True
-                Exit Sub
-            End If
+            '' ''If e.TabPage Is Me.BsIntermediateTabPage Then
+            '' ''    e.Cancel = True
+            '' ''    Exit Sub
+            '' ''End If
 
             MyClass.IsInfoExpanded = False
 
