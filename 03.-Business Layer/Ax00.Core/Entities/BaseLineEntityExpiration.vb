@@ -47,23 +47,23 @@ Public Class BaseLineEntityExpiration
         Dim datelastBLstr As String = String.Empty
 
         Dim dtrSwParam = (From a As ParametersDS.tfmwSwParametersRow In _analyzer.AnalyzerSwParameters.tfmwSwParameters
-                          Where a.ParameterName = GlobalEnumerates.SwParameters.BL_LIFETIME.ToString()).First()
+                          Where a.ParameterName = GlobalEnumerates.SwParameters.BL_LIFETIME.ToString()).ToList()
 
-        If dtrSwParam IsNot Nothing Then mins = CInt(dtrSwParam.ValueNumeric)
+        If dtrSwParam.Any() Then mins = CInt(dtrSwParam(0).ValueNumeric)
 
         Dim dtrAnalyzerSettings = (From a As AnalyzerSettingsDS.tcfgAnalyzerSettingsRow In _analyzer.AnalyzerSettings.tcfgAnalyzerSettings
-                                   Where a.SettingID = GlobalEnumerates.AnalyzerSettingsEnum.BL_DATETIME.ToString()).First()
+                                   Where a.SettingID = GlobalEnumerates.AnalyzerSettingsEnum.BL_DATETIME.ToString()).ToList()
 
-        If dtrAnalyzerSettings IsNot Nothing Then
+        If dtrAnalyzerSettings.Any() Then
 
-            If Not dtrAnalyzerSettings.IsCurrentValueNull() Then
-                datelastBLstr = CStr(dtrAnalyzerSettings.CurrentValue)
+            If Not dtrAnalyzerSettings(0).IsCurrentValueNull() Then
+                datelastBLstr = CStr(dtrAnalyzerSettings(0).CurrentValue)
             End If
 
             If datelastBLstr.Equals(String.Empty) Then
                 result = True
             Else
-                datelastBl = DateTime.Parse(dtrAnalyzerSettings.CurrentValue, CultureInfo.InvariantCulture)
+                datelastBl = DateTime.Parse(dtrAnalyzerSettings(0).CurrentValue, CultureInfo.InvariantCulture)
                 If DateDiff(DateInterval.Minute, datelastBl, Now) > mins Then
                     result = True
                 End If

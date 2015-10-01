@@ -2,6 +2,7 @@
 Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Core.Entities
 Imports Biosystems.Ax00.Calculations
+Imports Biosystems.Ax00.Global
 
 Namespace Biosystems.Ax00.App
 
@@ -34,6 +35,10 @@ Namespace Biosystems.Ax00.App
                                                                             .ActiveFwVersion = fwVersionAttribute}
             If analyzerIDAttribute = "" Then
                 analyzer.ActiveAnalyzer = analyzer.GenericDefaultAnalyzer()
+            End If
+
+            If analyzer.Model = "" Then
+                analyzer.Model = A200
             End If
 
             iseAnalyzer = New ISEManager(analyzer, analyzerIDAttribute, analyzerModel, False)

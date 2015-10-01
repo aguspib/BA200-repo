@@ -588,7 +588,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             .Action = Ax00CodeBarAction.CONFIG
                             .Position = 0
                         End With
-                        If Me.Model = "A200" Then
+                        If Model = A200 Then
                             rowBarCode.RotorType = "SAMPLESANDREAGENTS"
                         End If
                         BarCodeDS.barCodeRequests.AddbarCodeRequestsRow(rowBarCode)
