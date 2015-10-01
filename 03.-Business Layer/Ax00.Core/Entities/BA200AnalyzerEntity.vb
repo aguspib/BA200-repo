@@ -100,6 +100,12 @@ Namespace Biosystems.Ax00.Core.Entities
             End Get
         End Property
 
+        Public Overrides ReadOnly Property GetModelCode() As String
+            Get
+                Return BA200ModelID
+            End Get
+        End Property
+
 #End Region
 
         Public Overrides ReadOnly Property WashingIDRequired As Boolean

@@ -251,7 +251,6 @@ Partial Class AnalyzerInfo
         Me.bsModelTextBox.Mandatory = False
         Me.bsModelTextBox.MaxLength = 9
         Me.bsModelTextBox.Name = "bsModelTextBox"
-        Me.bsModelTextBox.ReadOnly = True
         Me.bsModelTextBox.Size = New System.Drawing.Size(37, 27)
         Me.bsModelTextBox.TabIndex = 85
         Me.bsModelTextBox.WordWrap = False

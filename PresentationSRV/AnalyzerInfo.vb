@@ -438,17 +438,19 @@ Public Class AnalyzerInfo
     ''' <remarks>Created by: XBC 24/05/2011</remarks>
     Private Sub DisableAll()
         Try
-            Me.bsSerialTextBox.Enabled = False
-            Me.bsEditSNButton.Enabled = False
-            Me.bsSaveSNButton.Enabled = False
-            Me.bsCancelSNButton.Enabled = False
-            Me.BsRichTextBox1.Enabled = False
-            Me.bsPrintButton.Enabled = False
-            Me.DetailsButton.Enabled = False
-            Me.MoreInfoButton.Enabled = False
+            bsSerialTextBox.Enabled = False
+            'AJG. BA-2132
+            bsModelTextBox.Enabled = False
+            bsEditSNButton.Enabled = False
+            bsSaveSNButton.Enabled = False
+            bsCancelSNButton.Enabled = False
+            BsRichTextBox1.Enabled = False
+            bsPrintButton.Enabled = False
+            DetailsButton.Enabled = False
+            MoreInfoButton.Enabled = False
 
             ' Disable Area Buttons
-            Me.BsExitButton.Enabled = False
+            BsExitButton.Enabled = False
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".DisableAll ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -915,9 +917,9 @@ Public Class AnalyzerInfo
         Try
             DisableAll()
             ' Initializating Analyzer
-            MyBase.InitAnalyzer()
+            InitAnalyzer()
 
-            Me.Cursor = Cursors.WaitCursor
+            Cursor = Cursors.WaitCursor
             ' Manage FwScripts must to be sent at load screen
             If MyBase.SimulationMode Then
                 ' simulating...
@@ -955,6 +957,7 @@ Public Class AnalyzerInfo
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareInitiatingAnalyzerMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareInitiatingAnalyzerMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
+        Cursor = Cursors.Default
     End Sub
 
     Private Sub PrepareWaitingMode()
@@ -3259,12 +3262,14 @@ Public Class AnalyzerInfo
 
     Private Sub bsEditSNButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsEditSNButton.Click
         Try
-            Me.bsEditSNButton.Visible = False
-            Me.bsSaveSNButton.Visible = True
-            Me.bsCancelSNButton.Visible = True
-            Me.bsCancelSNButton.Enabled = True
-            Me.bsSerialTextBox.Enabled = True
-            Me.bsSerialTextBox.Focus()
+            bsEditSNButton.Visible = False
+            bsSaveSNButton.Visible = True
+            bsCancelSNButton.Visible = True
+            bsCancelSNButton.Enabled = True
+            bsSerialTextBox.Enabled = True
+            'AJG BA-2132
+            bsModelTextBox.Enabled = True
+            bsSerialTextBox.Focus()
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Name & ".bsEditSNButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsEditSNButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
@@ -3273,12 +3278,14 @@ Public Class AnalyzerInfo
 
     Private Sub bsCancelSNButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsCancelSNButton.Click
         Try
-            MyClass.IsEditingSN = False
-            Me.bsEditSNButton.Visible = True
-            Me.bsSaveSNButton.Visible = False
-            Me.bsCancelSNButton.Visible = False
-            Me.bsSaveSNButton.Enabled = False
-            Me.bsSerialTextBox.Enabled = False
+            IsEditingSN = False
+            bsEditSNButton.Visible = True
+            bsSaveSNButton.Visible = False
+            bsCancelSNButton.Visible = False
+            bsSaveSNButton.Enabled = False
+            bsSerialTextBox.Enabled = False
+            'AJG BA-2132
+            bsModelTextBox.Enabled = False
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Name & ".bsCancelSNButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsCancelSNButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
@@ -3295,6 +3302,14 @@ Public Class AnalyzerInfo
                 If IsNumeric(Me.bsSerialTextBox.Text) Then
                     If CLng(Me.bsSerialTextBox.Text) > 0 Then
                         SNValidated = True
+                    End If
+                End If
+            End If
+
+            If SNValidated Then
+                If bsModelTextBox.Text <> "" AndAlso IsNumeric(bsModelTextBox.Text) AndAlso (bsModelTextBox.Text.Length = 3) Then
+                    If AnalyzerController.Instance.Analyzer.GetModelCode() <> bsModelTextBox.Text Then
+                        SNValidated = False
                     End If
                 End If
             End If
