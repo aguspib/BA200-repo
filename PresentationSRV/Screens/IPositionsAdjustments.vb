@@ -5422,21 +5422,36 @@ Public Class UiPositionsAdjustments
     ''' <summary>
     ''' Update some value in the specific adjustments ds
     ''' </summary>
-    ''' <param name="pCodew"></param>
+    ''' <param name="pCodesFw"></param>
     ''' <param name="pValue"></param>
     ''' <returns></returns>
     ''' <remarks>XBC 01/02/11</remarks>
-    Private Function UpdateLocalSavedSpecificAdjustmentsDS(ByVal pCodew As String, ByVal pValue As String) As GlobalDataTO
+    Private Function UpdateLocalSavedSpecificAdjustmentsDS(ByVal pCodesFw As List(Of String), ByVal pValue As String) As GlobalDataTO
         Dim myGlobal As New GlobalDataTO
         Try
-            For Each SR As SRVAdjustmentsDS.srv_tfmwAdjustmentsRow In Me.LocalSavedAdjustmentsDS.srv_tfmwAdjustments.Rows
-                If SR.CodeFw.Trim = pCodew.Trim Then
-                    SR.BeginEdit()
-                    SR.Value = pValue
-                    SR.EndEdit()
-                    Exit For
+
+            For Each pCodeFw In pCodesFw
+                Dim AdjustmentRowToChangeValue As SRVAdjustmentsDS.srv_tfmwAdjustmentsRow
+                AdjustmentRowToChangeValue = Me.LocalSavedAdjustmentsDS.srv_tfmwAdjustments.FindByAnalyzerIDCodeFw(AnalyzerController.Instance.Analyzer.ActiveAnalyzer, pCodeFw.Trim)
+
+                If AdjustmentRowToChangeValue IsNot Nothing Then
+                    AdjustmentRowToChangeValue.BeginEdit()
+                    AdjustmentRowToChangeValue.Value = pValue
+                    AdjustmentRowToChangeValue.EndEdit()
+                Else
+                    GlobalBase.CreateLogActivity("Adjustment " & pCodeFw.Trim & " didn't found on LocalSavedAdjustmentsDS.srv_tfmwAdjustments, for Analyzer " & AnalyzerController.Instance.Analyzer.ActiveAnalyzer,
+                                                 Me.Name & ".UpdateLocalSavedSpecificAdjustmentsDS ", EventLogEntryType.Warning, GetApplicationInfoSession().ActivateSystemLog)
                 End If
             Next
+
+            '' ''For Each SR As SRVAdjustmentsDS.srv_tfmwAdjustmentsRow In Me.LocalSavedAdjustmentsDS.srv_tfmwAdjustments.Rows
+            '' ''    If SR.CodeFw.Trim = pCodew.Trim Then
+            '' ''        SR.BeginEdit()
+            '' ''        SR.Value = pValue
+            '' ''        SR.EndEdit()
+            '' ''        Exit For
+            '' ''    End If
+            '' ''Next
         Catch ex As Exception
             myGlobal.HasError = True
             myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
@@ -5464,37 +5479,37 @@ Public Class UiPositionsAdjustments
                 Select Case Me.SelectedPage
                     Case ADJUSTMENT_PAGES.OPTIC_CENTERING
                         If .canSaveRotorValue Then
-                            Me.UpdateLocalSavedSpecificAdjustmentsDS(ReadSpecificAdjustmentData(GlobalEnumerates.AXIS.ROTOR).CodeFw, .NewRotorValue.ToString)
+                            Me.UpdateLocalSavedSpecificAdjustmentsDS(GetAllAdjustmentCodeFws(GlobalEnumerates.AXIS.ROTOR), .NewRotorValue.ToString)
 
                             ' XBC 03/01/2012 - Add Encoder functionality
-                            Me.UpdateLocalSavedSpecificAdjustmentsDS(ReadSpecificAdjustmentData(GlobalEnumerates.AXIS.ENCODER).CodeFw, .NewEncoderValue.ToString)
+                            Me.UpdateLocalSavedSpecificAdjustmentsDS(GetAllAdjustmentCodeFws(GlobalEnumerates.AXIS.ENCODER), .NewEncoderValue.ToString)
                         End If
 
                     Case ADJUSTMENT_PAGES.WASHING_STATION
                         If .canSaveZValue Then
-                            Me.UpdateLocalSavedSpecificAdjustmentsDS(ReadSpecificAdjustmentData(GlobalEnumerates.AXIS.Z).CodeFw, (.NewZValue).ToString)
+                            Me.UpdateLocalSavedSpecificAdjustmentsDS(GetAllAdjustmentCodeFws(GlobalEnumerates.AXIS.Z), (.NewZValue).ToString)
                         End If
 
                     Case ADJUSTMENT_PAGES.ARM_POSITIONS
                         If .canSavePolarValue Then
-                            Me.UpdateLocalSavedSpecificAdjustmentsDS(ReadSpecificAdjustmentData(GlobalEnumerates.AXIS.POLAR).CodeFw, .NewPolarValue.ToString)
+                            Me.UpdateLocalSavedSpecificAdjustmentsDS(GetAllAdjustmentCodeFws(GlobalEnumerates.AXIS.POLAR), .NewPolarValue.ToString)
                         End If
                         If .canSaveZValue Then
-                            Me.UpdateLocalSavedSpecificAdjustmentsDS(ReadSpecificAdjustmentData(GlobalEnumerates.AXIS.Z).CodeFw, .NewZValue.ToString)
+                            Me.UpdateLocalSavedSpecificAdjustmentsDS(GetAllAdjustmentCodeFws(GlobalEnumerates.AXIS.Z), .NewZValue.ToString)
 
                             If ReadSpecificAdjustmentData(GlobalEnumerates.AXIS.Z).GroupID = ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1.ToString AndAlso AnalyzerController.Instance.IsBA200 Then
-                                Me.UpdateLocalSavedSpecificAdjustmentsDS(Ax00Adjustsments.R1PV2.ToString, .NewZValue.ToString)
+                                Me.UpdateLocalSavedSpecificAdjustmentsDS(New List(Of String) From {Ax00Adjustsments.R1PV2.ToString}, .NewZValue.ToString)
                             End If
 
                             ' XBC 12/09/2011 - By now ZTube 2 & 3 takes the value of ZTube1
                             If ReadSpecificAdjustmentData(GlobalEnumerates.AXIS.Z).GroupID = ADJUSTMENT_GROUPS.SAMPLES_ARM_ZTUBE1.ToString Then
-                                Me.UpdateLocalSavedSpecificAdjustmentsDS(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_ZTUBE2.ToString, GlobalEnumerates.AXIS.Z).CodeFw, .NewZValue.ToString)
-                                Me.UpdateLocalSavedSpecificAdjustmentsDS(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_ZTUBE3.ToString, GlobalEnumerates.AXIS.Z).CodeFw, .NewZValue.ToString)
+                                Me.UpdateLocalSavedSpecificAdjustmentsDS(GetAllAdjustmentCodeFws(GlobalEnumerates.AXIS.Z, ADJUSTMENT_GROUPS.SAMPLES_ARM_ZTUBE2.ToString), .NewZValue.ToString)
+                                Me.UpdateLocalSavedSpecificAdjustmentsDS(GetAllAdjustmentCodeFws(GlobalEnumerates.AXIS.Z, ADJUSTMENT_GROUPS.SAMPLES_ARM_ZTUBE3.ToString), .NewZValue.ToString)
                             End If
 
                         End If
                         If .canSaveRotorValue Then
-                            Me.UpdateLocalSavedSpecificAdjustmentsDS(ReadSpecificAdjustmentData(GlobalEnumerates.AXIS.ROTOR).CodeFw, .NewRotorValue.ToString)
+                            Me.UpdateLocalSavedSpecificAdjustmentsDS(GetAllAdjustmentCodeFws(GlobalEnumerates.AXIS.ROTOR), .NewRotorValue.ToString)
                         End If
                 End Select
 
@@ -6177,6 +6192,47 @@ Public Class UiPositionsAdjustments
 
         Return myAdjustmentRowData
     End Function
+
+    ''' <summary>
+    ''' Gets all CodeFw from SelectedAdjustmentsDS.srv_tfmwAdjustments datatable, that corresponts to the AxisID passed as parameter
+    ''' </summary>
+    ''' <param name="pAxis"></param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Private Function GetAllAdjustmentCodeFws(ByVal pAxis As GlobalEnumerates.AXIS, Optional ByVal pGroupID As String = Nothing) As List(Of String)
+        Dim CodeFws As New List(Of String)
+        Try
+            Dim myAxis As String = pAxis.ToString
+            If myAxis.ToString = "NONE" Then myAxis = ""
+
+            Dim myAdjustmentRows As New List(Of SRVAdjustmentsDS.srv_tfmwAdjustmentsRow)
+            If pGroupID Is Nothing Then
+
+                myAdjustmentRows = (From a As SRVAdjustmentsDS.srv_tfmwAdjustmentsRow _
+                                                In Me.SelectedAdjustmentsDS.srv_tfmwAdjustments _
+                                                Where a.AxisID.Trim = myAxis.Trim _
+                                                Select a).ToList
+            Else
+                'Dim myGroup As String = pGroupID
+                If pGroupID = "_NONE" Then pGroupID = ""
+                myAdjustmentRows = (From a As SRVAdjustmentsDS.srv_tfmwAdjustmentsRow _
+                     In MyBase.myAllAdjustmentsDS.srv_tfmwAdjustments _
+                     Where a.GroupID.Trim = pGroupID.Trim _
+                     And a.AxisID.Trim = myAxis.Trim _
+                     Select a).ToList
+            End If
+
+
+            For Each row In myAdjustmentRows
+                CodeFws.Add(row.CodeFw)
+            Next
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetAllSpecificAdjustmentCodeFws ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            MyBase.ShowMessage(Me.Name & ".GetAllSpecificAdjustmentCodeFws ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+        End Try
+        Return CodeFws
+    End Function
+
 
     ''' <summary>
     ''' Gets the Dataset that corresponds to the editing adjustments
