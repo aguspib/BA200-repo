@@ -606,6 +606,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Try
                 ' Create the list of Scripts which are need to initialize this Adjustment
 
+                Debug.Print("Send Script for current mode: " & pMode.ToString)
+
                 Select Case pMode
                     Case ADJUSTMENT_MODES.ADJUSTMENTS_READING
                         myResultData = MyBase.SendQueueForREADINGADJUSTMENTS()
@@ -695,6 +697,10 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
                     Case ADJUSTMENT_MODES.MBEV_ARM_TO_WASHING
                         myResultData = MyClass.SendQueueForARMTOWASHING
+                    Case ADJUSTMENT_MODES.MBEV_WASHING_STATION_TO_EMPTY_WELLS
+                        myResultData = MyClass.SendQueueParameterLessScript(FwSCRIPTS_IDS.ACTIVE_ALL_ASPIRATION_PUMPS.ToString)
+                    Case ADJUSTMENT_MODES.MBEV_WASHING_STATION_TO_STOP_EMPTY_WELLS
+                        myResultData = MyClass.SendQueueParameterLessScript(FwSCRIPTS_IDS.DEACTIVE_ALL_ASPIRATION_PUMPS.ToString)
                 End Select
 
             Catch ex As Exception
@@ -840,6 +846,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             End Try
             Return myResultData
         End Function
+
+
 
 
 #End Region
@@ -1064,6 +1072,43 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
                 'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "MotorsTestDelegate.SendQueueForALLARMSHOMING", EventLogEntryType.Error, False)
+            End Try
+            Return myResultData
+        End Function
+
+        Private Function SendQueueParameterLessScript(ScriptName As String) As GlobalDataTO
+            Dim myResultData As New GlobalDataTO
+            Dim myListFwScript As New List(Of FwScriptQueueItem)
+            Dim myFwScript1 As New FwScriptQueueItem
+            Try
+                If myFwScriptDelegate.CurrentFwScriptsQueue IsNot Nothing Then
+                    myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
+                End If
+
+                With myFwScript1
+                    .FwScriptID = ScriptName
+                    .EvaluateType = EVALUATE_TYPES.NUM_VALUE
+                    .EvaluateValue = 1
+                    .NextOnResultOK = Nothing
+                    .NextOnResultNG = Nothing
+                    .NextOnTimeOut = Nothing
+                    .NextOnError = Nothing
+                    .ParamList = Nothing
+                End With
+
+                'add to the queue list
+                If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, True)
+
+            Catch ex As Exception
+                myResultData.HasError = True
+                myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myResultData.ErrorMessage = ex.Message
+
+                If myFwScriptDelegate.CurrentFwScriptsQueue IsNot Nothing Then
+                    myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
+                End If
+
+                GlobalBase.CreateLogActivity(ex)
             End Try
             Return myResultData
         End Function
