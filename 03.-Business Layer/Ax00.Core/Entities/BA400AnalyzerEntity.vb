@@ -53,7 +53,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
         Public Overrides ReadOnly Property GetModelValue(ByVal pAnalyzerID As String) As String
             Get
-                Dim returnValue As String = ""
+                Dim returnValue As String = "" 'AJG. Assigned a default value to avoid a MasterData error while loading an analyzer on the User SW
 
                 If pAnalyzerID.Length > 0 Then
 
