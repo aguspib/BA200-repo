@@ -164,6 +164,8 @@ Public Class UiMotorsPumpsValvesTest
         ' This call is required by the Windows Form Designer.
         InitializeComponent()
 
+        aspirationLimitationTimer.Interval = WashStationAspirationLimit
+
         DefineScreenLayout()
 
         ' Add any initialization after the InitializeComponent() call.
@@ -219,6 +221,8 @@ Public Class UiMotorsPumpsValvesTest
     Private Const SimPreActivationDelay As Integer = 500 '50ms
     Private Const SimPostActivationDelay As Integer = 500 '50ms
 
+    Private Const WashStationAspirationLimit As Integer = 20 * 1000
+
 #End Region
 
 #Region "Flags"
@@ -247,6 +251,7 @@ Public Class UiMotorsPumpsValvesTest
     Private IsReadyToCloseAttr As Boolean
     Private IsAllToDefaultRequested As Boolean = False
 
+    Private emptyingWells As Boolean = False
 #End Region
 
 #Region "Declarations"
@@ -280,6 +285,8 @@ Public Class UiMotorsPumpsValvesTest
     Private SelectedElementGroup As ItemGroups = ItemGroups._NONE
 
     Private myTooltip As ToolTip
+
+    Private myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
     'ADJUSTMENTS
     Private SelectedAdjustmentsDS As New SRVAdjustmentsDS
@@ -371,6 +378,9 @@ Public Class UiMotorsPumpsValvesTest
 
     Private IsWorkingAttr As Boolean = False
 
+    'Wash Station Dispensation
+    'Timer to stop wash station aspiration
+    Private WithEvents aspirationLimitationTimer As New Timer()
 
 #End Region
 
@@ -427,6 +437,7 @@ Public Class UiMotorsPumpsValvesTest
         End Set
     End Property
     Private CurrentActivationModeAttr As ACTIVATION_MODES = ACTIVATION_MODES._NONE
+
 
     ''' <summary>
     ''' 
@@ -1041,6 +1052,7 @@ Public Class UiMotorsPumpsValvesTest
             MyBase.SetButtonImage(WSAsp_UpDownButton, "UPDOWN")
             MyBase.SetButtonImage(WSDisp_UpDownButton, "UPDOWN")
 
+            MyBase.SetButtonImage(EmptyWellsButton, "ESPIRAL")
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareButtons", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
@@ -1259,7 +1271,6 @@ Public Class UiMotorsPumpsValvesTest
     ''' </remarks>
     Private Sub GetScreenTooltip(ByVal pLanguageID As String)
         Try
-            Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
             ' For Tooltips...
             bsScreenToolTips2.SetToolTip(InDo_StopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", pLanguageID))
@@ -1281,6 +1292,7 @@ Public Class UiMotorsPumpsValvesTest
             MyBase.bsScreenToolTipsControl.SetToolTip(WSAsp_UpDownButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_UPDOWN_WS", pLanguageID))
             MyBase.bsScreenToolTipsControl.SetToolTip(WSDisp_UpDownButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_UPDOWN_WS", pLanguageID))
 
+            MyBase.bsScreenToolTipsControl.SetToolTip(EmptyWellsButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_EMPTY_WELLS", pLanguageID))
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Name & ".GetScreenTooltip ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Name & ".GetScreenTooltip ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
@@ -2220,7 +2232,7 @@ Public Class UiMotorsPumpsValvesTest
                     Me.WsDisp_GE5_Valve.Enabled = isWSDown
                     Me.WsDisp_M1_Motor.Enabled = isWSDown
                     Me.WSDisp_UpDownButton.Enabled = True
-
+                    Me.EmptyWellsButton.Enabled = True
                 End If
 
 
@@ -2594,6 +2606,7 @@ Public Class UiMotorsPumpsValvesTest
                 'MyClass.CurrentMotorAdjustControl.Enabled = False
 
                 Me.WSDisp_UpDownButton.Enabled = False
+                Me.EmptyWellsButton.Enabled = False
 
                 If MyBase.SimulationMode Then
 
@@ -3185,7 +3198,7 @@ Public Class UiMotorsPumpsValvesTest
             'SGM 18/05/2012
             Me.WSAsp_UpDownButton.Enabled = False
             Me.WSDisp_UpDownButton.Enabled = False
-
+            Me.EmptyWellsButton.Enabled = False
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".DeactivateAll ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -3398,6 +3411,7 @@ Public Class UiMotorsPumpsValvesTest
                 MyClass.CurrentContinuousStopButton = Me.WsDisp_StopButton
                 MyBase.myScreenLayout.ButtonsPanel.CancelButton.Visible = True
                 Me.WSDisp_UpDownButton.Enabled = False
+                Me.EmptyWellsButton.Enabled = False
                 MyClass.DisableCurrentPage()
 
             ElseIf MyClass.NewSelectedTab Is bsInOutTabPage Then
@@ -4116,6 +4130,14 @@ Public Class UiMotorsPumpsValvesTest
                 Case ADJUSTMENT_MODES.MBEV_WASHING_STATION_IS_UP
                     MyClass.PrepareWashingStationIsUpMode()
 
+                Case ADJUSTMENT_MODES.MBEV_WASHING_STATION_EMPTYING_WELLS
+                    'TODO: deshabilitar tots els botons menys el de parar
+                    Me.Cursor = Cursors.WaitCursor
+                    Me.EmptyWellsButton.Cursor = Cursors.Default
+
+                Case ADJUSTMENT_MODES.MBEV_WASHING_STATION_STOPED_EMPTYING_WELLS
+                    MyBase.CurrentMode = ADJUSTMENT_MODES.LOADED
+                    PrepareArea()
                 Case ADJUSTMENT_MODES.MBEV_ALL_ARMS_IN_PARKING
                     MyClass.PrepareAllArmsInParkingMode()
 
@@ -4125,7 +4147,7 @@ Public Class UiMotorsPumpsValvesTest
 
                 Case ADJUSTMENT_MODES.LOADED
                     MyClass.PrepareLoadedMode()
-                    If Not MyClass.IsContinuousSwitching Then
+                    If Not Me.IsContinuousSwitching Or Not emptyingWells Then
                         MyBase.ActivateMDIMenusButtons(MyClass.CurrentTestPanel.Enabled)
                         If Not MyClass.CurrentTestPanel.Enabled Then MyClass.EnableCurrentPage()
                     End If
@@ -4597,6 +4619,7 @@ Public Class UiMotorsPumpsValvesTest
                         End If
                         If MyClass.CurrentTestPanel Is Me.BsWSDispensationTestPanel Then
                             Me.WSDisp_UpDownButton.Enabled = True ' MyClass.DefaultStatesDone
+                            Me.EmptyWellsButton.Enabled = True
                         End If
                     End If
                     MyClass.ReportHistory(MotorsPumpsValvesTestDelegate.HISTORY_RESULTS.OK)
@@ -4850,6 +4873,7 @@ Public Class UiMotorsPumpsValvesTest
                     End If
                     If MyClass.CurrentTestPanel Is Me.BsWSDispensationTestPanel Then
                         Me.WSDisp_UpDownButton.Enabled = True ' MyClass.DefaultStatesDone
+                        Me.EmptyWellsButton.Enabled = True
                     End If
 
                 End If
@@ -4883,6 +4907,7 @@ Public Class UiMotorsPumpsValvesTest
 
                 Me.WSAsp_UpDownButton.Enabled = False
                 Me.WSDisp_UpDownButton.Enabled = False
+                Me.EmptyWellsButton.Enabled = False
 
                 If MyBase.SimulationMode Then
                     myGlobal = MyBase.DisplayMessage(Messages.SRV_WS_TO_DOWN.ToString)
@@ -5162,7 +5187,7 @@ Public Class UiMotorsPumpsValvesTest
             'SGM 18/05/2012
             Me.WSAsp_UpDownButton.Enabled = False
             Me.WSDisp_UpDownButton.Enabled = False
-
+            Me.EmptyWellsButton.Enabled = False
 
             'in case some motor selected
             Me.UnSelectMotor()
@@ -5216,6 +5241,7 @@ Public Class UiMotorsPumpsValvesTest
             'SGM 18/05/2012
             Me.WSAsp_UpDownButton.Enabled = False
             Me.WSDisp_UpDownButton.Enabled = False
+            Me.EmptyWellsButton.Enabled = False
 
             'in case some motor selected
             MyClass.UnSelectMotor()
@@ -5673,6 +5699,54 @@ Public Class UiMotorsPumpsValvesTest
         End Try
     End Sub
 
+    ''' <summary>
+    ''' Sends Stop Empty Wells instruction
+    ''' </summary>
+    ''' <remarks>
+    ''' </remarks>
+    Private Sub OnStopWashingStationToEmptyWells()
+        Dim myGlobal As New GlobalDataTO
+        Try
+            If Not myGlobal.HasError Then
+                Me.Cursor = Cursors.WaitCursor
+                Me.SendFwScript(Me.CurrentMode)
+            Else
+                MyBase.CurrentMode = ADJUSTMENT_MODES.ERROR_MODE
+                MyClass.PrepareArea()
+            End If
+        Catch ex As Exception
+            myGlobal.HasError = True
+            myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+            myGlobal.ErrorMessage = ex.Message
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " OnWashingStationToNRotorTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            MyBase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Sends Empty Wells instruction
+    ''' </summary>
+    ''' <remarks>
+    ''' </remarks>
+    Private Sub OnWashingStationToEmptyWells()
+        Dim myGlobal As New GlobalDataTO
+        Try
+            If Not myGlobal.HasError Then
+                Me.Cursor = Cursors.WaitCursor
+                Me.SendFwScript(Me.CurrentMode)
+            Else
+                MyBase.CurrentMode = ADJUSTMENT_MODES.ERROR_MODE
+                MyClass.PrepareArea()
+            End If
+        Catch ex As Exception
+            myGlobal.HasError = True
+            myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+            myGlobal.ErrorMessage = ex.Message
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " OnWashingStationToNRotorTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            MyBase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
+        End Try
+    End Sub
+
     'SGM 21/11/2011
     Private Sub OnWashingStationToDownTimerTick()
         Dim myGlobal As New GlobalDataTO
@@ -5749,6 +5823,7 @@ Public Class UiMotorsPumpsValvesTest
 
             Me.WSAsp_UpDownButton.Enabled = False
             Me.WSDisp_UpDownButton.Enabled = False
+            Me.EmptyWellsButton.Enabled = False
 
             myGlobal = MyBase.DisplayMessage(Messages.SRV_ALL_ITEMS_TO_DEFAULT.ToString)
 
@@ -7815,6 +7890,115 @@ Public Class UiMotorsPumpsValvesTest
         End Try
     End Sub
 
+    Private Sub EmptyWellsButton_Click(sender As Object, e As EventArgs) Handles EmptyWellsButton.Click
+        Try
+            ChangeAspiratingWells()
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex)
+            MyBase.ShowMessage(Me.Name & ".EmptyWellsButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+        End Try
+    End Sub
+
+    Private Sub ChangeAspiratingWells()
+        Try
+
+            If emptyingWells Then
+                aspirationLimitationTimer.Stop()
+                MyBase.SetButtonImage(EmptyWellsButton, "ESPIRAL")
+                MyBase.bsScreenToolTipsControl.SetToolTip(EmptyWellsButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_EMPTY_WELLS", LanguageID))
+                stopEmptyingWashStationWells()
+            Else
+                aspirationLimitationTimer.Start()
+                MyBase.DisplayMessage(Messages.SRV_MEBV_WS_EMPTYING_WELLS.ToString)
+                MyBase.bsScreenToolTipsControl.SetToolTip(EmptyWellsButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_STOP_EMPTY_WELLS", LanguageID))
+                MyBase.SetButtonImage(EmptyWellsButton, "STOP")
+                Me.DeactivateAll()
+                Me.EmptyWellsButton.Enabled = True
+
+                startEmptyingWashStationWells()
+            End If
+            emptyingWells = Not emptyingWells
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex)
+            MyBase.ShowMessage(Me.Name & ".ChangeAspiratingWells", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Timer event to call ChangeAspiratingWells to prevent forgeting disable aspiration pumps.
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks></remarks>
+    Private Sub aspirationLimitationTimer_Tick(sender As Object, e As EventArgs) Handles aspirationLimitationTimer.Tick
+        ChangeAspiratingWells()
+    End Sub
+
+    ''' <summary>
+    ''' Previous step to WASHING_STATION_IS_DOWN
+    ''' </summary>
+    ''' <returns></returns>
+    ''' <remarks>
+    ''' </remarks>
+    Private Function startEmptyingWashStationWells() As GlobalDataTO
+        Dim myGlobal As New GlobalDataTO
+        Try
+
+            MyClass.DisableCurrentPage()
+
+            MyClass.CurrentMode = ADJUSTMENT_MODES.MBEV_WASHING_STATION_TO_EMPTY_WELLS
+            MyClass.PrepareArea()
+
+            If MyBase.SimulationMode Then
+
+                System.Threading.Thread.Sleep(SimulationProcessTime)
+
+                MyBase.CurrentMode = ADJUSTMENT_MODES.MBEV_WASHING_STATION_EMPTYING_WELLS
+                MyClass.PrepareArea()
+            Else
+                Me.OnWashingStationToEmptyWells()
+            End If
+
+        Catch ex As Exception
+            myGlobal.HasError = True
+            myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+            myGlobal.ErrorMessage = ex.Message
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " StartWashingStationToNRotorTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            MyBase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
+        End Try
+        Return myGlobal
+    End Function
+
+
+    Private Function stopEmptyingWashStationWells() As GlobalDataTO
+        Dim myGlobal As New GlobalDataTO
+        Try
+
+            MyClass.DisableCurrentPage()
+
+            MyClass.CurrentMode = ADJUSTMENT_MODES.MBEV_WASHING_STATION_TO_STOP_EMPTY_WELLS
+            MyClass.PrepareArea()
+
+            If MyBase.SimulationMode Then
+
+                System.Threading.Thread.Sleep(SimulationProcessTime)
+
+                MyBase.CurrentMode = ADJUSTMENT_MODES.MBEV_WASHING_STATION_STOPED_EMPTYING_WELLS
+                MyClass.PrepareArea()
+            Else
+                Me.OnStopWashingStationToEmptyWells()
+            End If
+
+        Catch ex As Exception
+            myGlobal.HasError = True
+            myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+            myGlobal.ErrorMessage = ex.Message
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " StartWashingStationToNRotorTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            MyBase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
+        End Try
+        Return myGlobal
+    End Function
+
 #End Region
 
 
@@ -8306,7 +8490,7 @@ Public Class UiMotorsPumpsValvesTest
 
 
             Me.WSDisp_UpDownButton.Enabled = True
-
+            Me.EmptyWellsButton.Enabled = True
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".WSDisp_MotorAdjustControl_SetABSPointReleased ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -8344,6 +8528,7 @@ Public Class UiMotorsPumpsValvesTest
             End If
 
             Me.WSDisp_UpDownButton.Enabled = True
+            Me.EmptyWellsButton.Enabled = True
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ". WSDisp_MotorAdjustControl_SetRELPointReleased ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -8382,7 +8567,7 @@ Public Class UiMotorsPumpsValvesTest
             End If
 
             Me.WSDisp_UpDownButton.Enabled = True
-
+            Me.EmptyWellsButton.Enabled = True
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".WSDisp_MotorAdjustControl_HomeRequestReleased ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".WSDisp_MotorAdjustControl_HomeRequestReleased ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
@@ -8397,6 +8582,8 @@ Public Class UiMotorsPumpsValvesTest
         Try
             MyBase.DisplayMessage(Messages.SRV_OUTOFRANGE.ToString)
             Me.WSDisp_UpDownButton.Enabled = True
+            Me.EmptyWellsButton.Enabled = True
+
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".WSDisp_MotorAdjustControl_SetPointOutOfRange ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".WSDisp_MotorAdjustControl_SetPointOutOfRange ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
@@ -8716,7 +8903,7 @@ Public Class UiMotorsPumpsValvesTest
             Application.DoEvents()
 
             If MyBase.SimulationMode Then Exit Function
-
+            Debug.Print("Event Received from current mode: " & MyBase.CurrentMode.ToString)
             'if needed manage the event in the Base Form
             MyBase.OnReceptionLastFwScriptEvent(pResponse, pData)
             'MyClass.myFwScriptDelegate.IsWaitingForResponse = False
@@ -8770,6 +8957,22 @@ Public Class UiMotorsPumpsValvesTest
                     'SGM 21/11/2011
                 Case ADJUSTMENT_MODES.MBEV_WASHING_STATION_IS_DOWN
                     If pResponse = RESPONSE_TYPES.OK Then
+                        PrepareArea()
+                    Else
+                        PrepareErrorMode()
+                        Exit Function
+                    End If
+                Case ADJUSTMENT_MODES.MBEV_WASHING_STATION_TO_EMPTY_WELLS
+                    If pResponse = RESPONSE_TYPES.START Or pResponse = RESPONSE_TYPES.OK Then
+                        MyBase.CurrentMode = ADJUSTMENT_MODES.MBEV_WASHING_STATION_EMPTYING_WELLS
+                        PrepareArea()
+                    Else
+                        PrepareErrorMode()
+                        Exit Function
+                    End If
+                Case ADJUSTMENT_MODES.MBEV_WASHING_STATION_TO_STOP_EMPTY_WELLS
+                    If pResponse = RESPONSE_TYPES.START Or pResponse = RESPONSE_TYPES.OK Then
+                        MyBase.CurrentMode = ADJUSTMENT_MODES.MBEV_WASHING_STATION_STOPED_EMPTYING_WELLS
                         PrepareArea()
                     Else
                         PrepareErrorMode()
@@ -8829,6 +9032,7 @@ Public Class UiMotorsPumpsValvesTest
                     PrepareErrorMode()
             End Select
 
+            Debug.Print("Event Received have been changed current mode to : " & MyBase.CurrentMode.ToString)
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ScreenReceptionLastFwScriptEvent ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ScreenReceptionLastFwScriptEvent", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, myGlobal.ErrorMessage, Me)
@@ -8839,4 +9043,5 @@ Public Class UiMotorsPumpsValvesTest
 
 #End Region
 
+   
 End Class

@@ -209,6 +209,7 @@ Partial Class UiMotorsPumpsValvesTest
         Me.BsWSAspirationInfoLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
         Me.bsDispensationTabPage = New DevExpress.XtraTab.XtraTabPage()
         Me.BsWSDispensationTestPanel = New System.Windows.Forms.Panel()
+        Me.EmptyWellsButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.WSDisp_UpDownButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.WsDisp_SwitchGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
         Me.WsDisp_StopButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
@@ -4297,7 +4298,7 @@ Partial Class UiMotorsPumpsValvesTest
         Me.BsInfoWsAspXPSViewer.FitToHeightButtonVisible = True
         Me.BsInfoWsAspXPSViewer.FitToWidthButtonCaption = "Fit To Width"
         Me.BsInfoWsAspXPSViewer.FitToWidthButtonVisible = True
-        Me.BsInfoWsAspXPSViewer.HorizontalPageMargin = 10
+        Me.BsInfoWsAspXPSViewer.HorizontalPageMargin = 0
         Me.BsInfoWsAspXPSViewer.IncreaseZoomButtonCaption = "Zoom In"
         Me.BsInfoWsAspXPSViewer.IncreaseZoomButtonVisible = True
         Me.BsInfoWsAspXPSViewer.IsLoaded = False
@@ -4313,7 +4314,7 @@ Partial Class UiMotorsPumpsValvesTest
         Me.BsInfoWsAspXPSViewer.TabIndex = 87
         Me.BsInfoWsAspXPSViewer.TwoPagesButtonCaption = "Two Pages"
         Me.BsInfoWsAspXPSViewer.TwoPagesButtonVisible = True
-        Me.BsInfoWsAspXPSViewer.VerticalPageMargin = 10
+        Me.BsInfoWsAspXPSViewer.VerticalPageMargin = 0
         Me.BsInfoWsAspXPSViewer.WholePageButtonCaption = "Whole Page"
         Me.BsInfoWsAspXPSViewer.WholePageButtonVisible = True
         '
@@ -4358,6 +4359,7 @@ Partial Class UiMotorsPumpsValvesTest
         '
         Me.BsWSDispensationTestPanel.BackColor = System.Drawing.Color.Gainsboro
         Me.BsWSDispensationTestPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.BsWSDispensationTestPanel.Controls.Add(Me.EmptyWellsButton)
         Me.BsWSDispensationTestPanel.Controls.Add(Me.WSDisp_UpDownButton)
         Me.BsWSDispensationTestPanel.Controls.Add(Me.WsDisp_SwitchGroupBox)
         Me.BsWSDispensationTestPanel.Controls.Add(Me.WsDisp_GE5_Valve)
@@ -4435,6 +4437,16 @@ Partial Class UiMotorsPumpsValvesTest
         Me.BsWSDispensationTestPanel.Name = "BsWSDispensationTestPanel"
         Me.BsWSDispensationTestPanel.Size = New System.Drawing.Size(739, 529)
         Me.BsWSDispensationTestPanel.TabIndex = 84
+        '
+        'EmptyWellsButton
+        '
+        Me.EmptyWellsButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.EmptyWellsButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
+        Me.EmptyWellsButton.Location = New System.Drawing.Point(692, 130)
+        Me.EmptyWellsButton.Name = "EmptyWellsButton"
+        Me.EmptyWellsButton.Size = New System.Drawing.Size(32, 32)
+        Me.EmptyWellsButton.TabIndex = 209
+        Me.EmptyWellsButton.UseVisualStyleBackColor = True
         '
         'WSDisp_UpDownButton
         '
@@ -6179,7 +6191,7 @@ Partial Class UiMotorsPumpsValvesTest
         Me.BsInfoWsDispXPSViewer.FitToHeightButtonVisible = True
         Me.BsInfoWsDispXPSViewer.FitToWidthButtonCaption = "Fit To Width"
         Me.BsInfoWsDispXPSViewer.FitToWidthButtonVisible = True
-        Me.BsInfoWsDispXPSViewer.HorizontalPageMargin = 10
+        Me.BsInfoWsDispXPSViewer.HorizontalPageMargin = 0
         Me.BsInfoWsDispXPSViewer.IncreaseZoomButtonCaption = "Zoom In"
         Me.BsInfoWsDispXPSViewer.IncreaseZoomButtonVisible = True
         Me.BsInfoWsDispXPSViewer.IsLoaded = False
@@ -6195,7 +6207,7 @@ Partial Class UiMotorsPumpsValvesTest
         Me.BsInfoWsDispXPSViewer.TabIndex = 87
         Me.BsInfoWsDispXPSViewer.TwoPagesButtonCaption = "Two Pages"
         Me.BsInfoWsDispXPSViewer.TwoPagesButtonVisible = True
-        Me.BsInfoWsDispXPSViewer.VerticalPageMargin = 10
+        Me.BsInfoWsDispXPSViewer.VerticalPageMargin = 0
         Me.BsInfoWsDispXPSViewer.WholePageButtonCaption = "Whole Page"
         Me.BsInfoWsDispXPSViewer.WholePageButtonVisible = True
         '
@@ -6247,7 +6259,7 @@ Partial Class UiMotorsPumpsValvesTest
         Me.BsInfoInOutXPSViewer.FitToHeightButtonVisible = True
         Me.BsInfoInOutXPSViewer.FitToWidthButtonCaption = "Fit To Width"
         Me.BsInfoInOutXPSViewer.FitToWidthButtonVisible = True
-        Me.BsInfoInOutXPSViewer.HorizontalPageMargin = 10
+        Me.BsInfoInOutXPSViewer.HorizontalPageMargin = 0
         Me.BsInfoInOutXPSViewer.IncreaseZoomButtonCaption = "Zoom In"
         Me.BsInfoInOutXPSViewer.IncreaseZoomButtonVisible = True
         Me.BsInfoInOutXPSViewer.IsLoaded = False
@@ -6263,7 +6275,7 @@ Partial Class UiMotorsPumpsValvesTest
         Me.BsInfoInOutXPSViewer.TabIndex = 87
         Me.BsInfoInOutXPSViewer.TwoPagesButtonCaption = "Two Pages"
         Me.BsInfoInOutXPSViewer.TwoPagesButtonVisible = True
-        Me.BsInfoInOutXPSViewer.VerticalPageMargin = 10
+        Me.BsInfoInOutXPSViewer.VerticalPageMargin = 0
         Me.BsInfoInOutXPSViewer.WholePageButtonCaption = "Whole Page"
         Me.BsInfoInOutXPSViewer.WholePageButtonVisible = True
         '
@@ -7958,6 +7970,7 @@ Partial Class UiMotorsPumpsValvesTest
     Friend WithEvents BsInfoWsDispXPSViewer As BsXPSViewer
     Friend WithEvents BsInfoInOutXPSViewer As BsXPSViewer
     Friend WithEvents BsInfoColXPSViewer As BsXPSViewer
+    Friend WithEvents EmptyWellsButton As Biosystems.Ax00.Controls.UserControls.BSButton
 
 
 End Class
