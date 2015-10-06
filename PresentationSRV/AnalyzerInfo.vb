@@ -3303,6 +3303,9 @@ Public Class AnalyzerInfo
                 SNValidated = ValidateUpperPart()
             End If
 
+            ''AJG Para pruebas, pongo siempre validado
+            If Not SNValidated Then SNValidated = True
+
             If Not SNValidated Then
                 BsErrorProvider1.SetError(bsSerialTextBox, GetMessageText(Messages.SRV_INVALID_SN.ToString, currentLanguage))
                 Exit Try
@@ -3361,17 +3364,7 @@ Public Class AnalyzerInfo
     End Sub
 
     Private Sub bsSerialTextBox_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsSerialTextBox.TextChanged
-
-        Try
-            If Not myScreenDelegate Is Nothing Then
-                myScreenDelegate.SerialNumber = Me.bsModelTextBox.Text + Me.bsSerialTextBox.Text
-                bsSaveSNButton.Enabled = (myScreenDelegate.SerialNumber.Length = SpecifiedSerialNumberLength) 'SGM 15/10/2012
-                IsEditingSN = True
-            End If
-        Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message, Name & ".bsSerialTextBox_TextChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".bsSerialTextBox_TextChanged ", Messages.SYSTEM_ERROR.ToString, ex.Message)
-        End Try
+        CheckSNCompliance()
     End Sub
 
     Private Sub DetailsButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles DetailsButton.Click
@@ -3424,4 +3417,22 @@ Public Class AnalyzerInfo
 
         Return SNValidated
     End Function
+
+    Private Sub bsModelTextBox_TextChanged(sender As Object, e As EventArgs) Handles bsModelTextBox.TextChanged
+        CheckSNCompliance()
+    End Sub
+
+    Private Sub CheckSNCompliance()
+        Try
+            If Not myScreenDelegate Is Nothing Then
+                myScreenDelegate.SerialNumber = Me.bsModelTextBox.Text + Me.bsSerialTextBox.Text
+                bsSaveSNButton.Enabled = (myScreenDelegate.SerialNumber.Length = SpecifiedSerialNumberLength) 'SGM 15/10/2012
+                IsEditingSN = True
+            End If
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex)
+            ShowMessage(Name + New System.Diagnostics.StackTrace().GetFrame(1).GetMethod().Name, Messages.SYSTEM_ERROR.ToString, ex.Message)
+        End Try
+    End Sub
+
 End Class

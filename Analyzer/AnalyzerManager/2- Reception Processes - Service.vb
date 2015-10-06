@@ -1735,6 +1735,11 @@ Namespace Biosystems.Ax00.Core.Entities
                     myAnalyzersRow.AnalyzerModel = GetModelValue(AnalyzerID)
                     myAnalyzersRow.FirmwareVersion = FwVersion
 
+                    'AJG OJO!!!!
+                    If myAnalyzersRow.AnalyzerModel = "" Then
+                        myAnalyzersRow.AnalyzerModel = AllowedAnalyzer
+                    End If
+
                     IsFwReaded = True 'SGM 21/06/2012
 
                     'Validate the SW-FW Compatibility

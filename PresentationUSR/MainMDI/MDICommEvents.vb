@@ -2786,6 +2786,8 @@ Partial Public Class UiAx00MainMDI
 
 #End Region
 
+    Private Mostrado As Boolean
+
     ''' <summary>
     ''' 
     ''' </summary>
@@ -2800,9 +2802,12 @@ Partial Public Class UiAx00MainMDI
                 auxtxt = "Para comunicar con el analizador debe utilizar la aplicación de B{0}. El programa actual se cerrará de forma automática"
             End If
             Dim msgTxt = String.Format(auxtxt, AnalyzerController.Instance.Analyzer.GetModelNotCompatible)
-            MessageBox.Show(msgTxt)
-            QuitBecauseWrongAnalyzer = True
-            Close()
+            If Not Mostrado Then
+                Mostrado = True
+                MessageBox.Show(msgTxt)
+                QuitBecauseWrongAnalyzer = True
+                Close()
+            End If
         End If
     End Sub
 

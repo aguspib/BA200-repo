@@ -2216,17 +2216,26 @@ Public Class Ax00ServiceMainMDI
     Public Sub CheckAnalyzerCompatibility() Implements IMainMDI.CheckAnalyzerCompatibility
         'AJG Gestionar si el analizador conectado es compatible con el software
         If Not AnalyzerController.Instance.Analyzer.IsConnectedWithRightModel() Then
-            Dim auxtxt = New MultilanguageResourcesDelegate().GetResourceText(Nothing, "Para comunicar con el analizador debe utilizar la aplicación de B{0}. El programa actual se cerrará de forma automática", CurrentLanguageAttribute)
-            If auxtxt = "" Then
-                auxtxt = "Para comunicar con el analizador debe utilizar la aplicación de B{0}. El programa actual se cerrará de forma automática"
+            If GlobalBase.GetSessionInfo.UserName.ToUpperInvariant() <> "BIOSRV" Then
+                MessageAndClose()
+            Else
+                If AnalyzerController.Instance.Analyzer.Model <> AllowedAnalyzer Then
+                    MessageAndClose()
+                End If
             End If
-            Dim msgTxt = String.Format(auxtxt, AnalyzerController.Instance.Analyzer.GetModelNotCompatible)
-            MessageBox.Show(msgTxt)
-            QuitBecauseWrongAnalyzer = True
-            Close()
         End If
     End Sub
 
+    Private Sub MessageAndClose()
+        Dim auxtxt = New MultilanguageResourcesDelegate().GetResourceText(Nothing, "Para comunicar con el analizador debe utilizar la aplicación de B{0}. El programa actual se cerrará de forma automática", CurrentLanguageAttribute)
+        If auxtxt = "" Then
+            auxtxt = "Para comunicar con el analizador debe utilizar la aplicación de B{0}. El programa actual se cerrará de forma automática"
+        End If
+        Dim msgTxt = String.Format(auxtxt, AnalyzerController.Instance.Analyzer.GetModelNotCompatible)
+        MessageBox.Show(msgTxt)
+        QuitBecauseWrongAnalyzer = True
+        Close()
+    End Sub
 
     ''' <summary>
     ''' Search in the DB if there is an Active WorkSession for the active Analyzer and if there is one, set
@@ -6468,6 +6477,10 @@ Public Class Ax00ServiceMainMDI
                 'IMPORTANT NOTE: Unti the service Sw is adapted we must use 'A400' instead of Me.AnalyzerModel
                 'MDIAnalyzerManager = AnalyzerController.Instance.CreateAnalyzer(My.Application.Info.AssemblyName, Me.AnalyzerModel, True, String.Empty, AnalyzerIDAttribute, FwVersionAttribute)
                 MDIAnalyzerManager = AnalyzerController.Instance.CreateAnalyzer(My.Application.Info.AssemblyName, AnalyzerModel, True, String.Empty, AnalyzerIDAttribute, FwVersionAttribute)
+
+                If AllowedAnalyzer = "" Then
+                    AllowedAnalyzer = AnalyzerModel
+                End If
 
                 Dim blnStartComm = False
                 blnStartComm = AnalyzerController.Instance.Analyzer.Start(False)   'AG 21/04/2010 Start the CommAx00 process'blnStartComm = GlobalAnalyzerManager.Start(False)   'AG 21/04/2010 Start the CommAx00 process

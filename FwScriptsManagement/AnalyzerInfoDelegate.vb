@@ -346,6 +346,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                    pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.FWMANIFOLDVALUE_CHANGED) Or _
                    pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.FWFLUIDICSVALUE_CHANGED) Then
 
+                    'AJG Commented just because in the BA400 version (v3.2.0) it's still pending to do
                     AddOrUpdateFirmwareInfoFromInstrument(pRefreshDS)
 
                     For Each S As UIRefreshDS.FirmwareValueChangedRow In pRefreshDS.FirmwareValueChanged
@@ -768,7 +769,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
             If myLocalRefreshDS.FirmwareValueChanged.Rows.Count > 0 AndAlso myLocalRefreshDS.FirmwareValueChanged.Rows.Contains(pRefreshDS.FirmwareValueChanged.Rows(0).Item(GlobalEnumerates.FW_INFO.ID)) Then
 
-                Dim RowToUpdate As UIRefreshDS.FirmwareValueChangedRow = CType(myLocalRefreshDS.FirmwareValueChanged.Rows.Find(GlobalEnumerates.FW_INFO.ID), UIRefreshDS.FirmwareValueChangedRow)
+                Dim RowToUpdate As UIRefreshDS.FirmwareValueChangedRow = CType(myLocalRefreshDS.FirmwareValueChanged.Rows.Find(pRefreshDS.FirmwareValueChanged.Rows(0).Item(GlobalEnumerates.FW_INFO.ID)), UIRefreshDS.FirmwareValueChangedRow)
                 UpdateUIRefreshDS(RowToUpdate, pRefreshDS.FirmwareValueChanged.Rows(0))
               
             Else

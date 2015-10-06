@@ -1602,6 +1602,13 @@ Namespace Biosystems.Ax00.Core.Entities
             _connectedRightModel = (AllowedAnalyzer = GetModelValue(AnalyzerIDAttribute) OrElse AllowedAnalyzer = "")
             If Not _connectedRightModel Then
                 _modelNotCompatible = GetModelValue(AnalyzerIDAttribute)
+                If _modelNotCompatible = "" Then
+                    If Model = A200 Then
+                        _modelNotCompatible = A400
+                    Else
+                        _modelNotCompatible = A200
+                    End If
+                End If
             End If
 
             Return _connectedRightModel
