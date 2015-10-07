@@ -11,6 +11,7 @@ Imports Biosystems.Ax00.Global.GlobalEnumerates
 'Imports System.Configuration
 'Imports Biosystems.Ax00.DAL
 Imports System.IO
+Imports Biosystems.Ax00.App
 
 Imports System.Drawing 'SG 03/12/10
 Imports System.Text.RegularExpressions
@@ -116,7 +117,12 @@ Public Class BSBaseForm
     'SG 04/03/11
     Public Property AnalyzerModel() As String
         Get
-            Return AnalyzerModelAttr
+            If AnalyzerController.Instance.Analyzer Is Nothing Then
+                Return AnalyzerModelAttr
+            Else
+                Return AnalyzerController.Instance.Analyzer.Model
+            End If
+
         End Get
         Set(ByVal value As String)
             AnalyzerModelAttr = value

@@ -7293,7 +7293,6 @@ Public Class UiMotorsPumpsValvesTest
 
             ' MyBase.SimulationMode = False 'QUITAR
 
-
             myScreenDelegate.InitializeHistoryElements()
             myScreenDelegate.GetParameters(MyBase.AnalyzerModel)
 

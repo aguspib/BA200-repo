@@ -2588,7 +2588,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Dim myInstructionToSend As String
                 myGlobal = myLAX00.WriteFwScript(myInstructionsList)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-                    myInstructionToSend = String.Format("{0};COMMAND;{1}", AnalyzerManager.GetCurrentAnalyzerManager().GetModelValue(AnalyzerManager.GetCurrentAnalyzerManager().ActiveAnalyzer), CType(myGlobal.SetDatos, String))
+                    myInstructionToSend = String.Format("{0};COMMAND;{1}", AnalyzerManager.GetCurrentAnalyzerManager().Model, CType(myGlobal.SetDatos, String))
 
                     If String.Compare(myInstructionToSend, "", False) <> 0 Then
                         myGlobal = Me.SendGenericalInstructions(myInstructionToSend)
