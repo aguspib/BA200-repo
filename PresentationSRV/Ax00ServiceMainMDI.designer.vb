@@ -192,8 +192,8 @@ Partial Class Ax00ServiceMainMDI
         '
         'LevelDetectionToolStripMenuItem
         '
-        resources.ApplyResources(Me.LevelDetectionToolStripMenuItem, "LevelDetectionToolStripMenuItem")
         Me.LevelDetectionToolStripMenuItem.Name = "LevelDetectionToolStripMenuItem"
+        resources.ApplyResources(Me.LevelDetectionToolStripMenuItem, "LevelDetectionToolStripMenuItem")
         '
         'BarCodeToolStripMenuItem
         '
@@ -640,7 +640,6 @@ Partial Class Ax00ServiceMainMDI
         'Ax00ServiceMainMDI
         '
         Me.Appearance.BackColor = CType(resources.GetObject("Ax00ServiceMainMDI.Appearance.BackColor"), System.Drawing.Color)
-        Me.Appearance.Font = CType(resources.GetObject("Ax00ServiceMainMDI.Appearance.Font"), System.Drawing.Font)
         Me.Appearance.GradientMode = CType(resources.GetObject("Ax00ServiceMainMDI.Appearance.GradientMode"), System.Drawing.Drawing2D.LinearGradientMode)
         Me.Appearance.Options.UseBackColor = True
         Me.Appearance.Options.UseFont = True

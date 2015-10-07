@@ -221,6 +221,12 @@
     <Compile Include="IErrorCodes.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Screens\ILevelDetectionReactionsRotorTest.Designer.vb">
+      <DependentUpon>ILevelDetectionReactionsRotorTest.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Screens\ILevelDetectionReactionsRotorTest.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Screens\IChangeRotorSRV.Designer.vb">
       <DependentUpon>IChangeRotorSRV.vb</DependentUpon>
     </Compile>
@@ -233,10 +239,10 @@
     <Compile Include="Screens\IInstrumentUpdateUtil.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Screens\ILevelDetectionTest.Designer.vb">
-      <DependentUpon>ILevelDetectionTest.vb</DependentUpon>
+    <Compile Include="Screens\ILevelDetectionSampAndReagRotorTest.Designer.vb">
+      <DependentUpon>ILevelDetectionSampAndReagRotorTest.vb</DependentUpon>
     </Compile>
-    <Compile Include="Screens\ILevelDetectionTest.vb">
+    <Compile Include="Screens\ILevelDetectionSampAndReagRotorTest.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Screens\IBarCodeAdjustments.Designer.vb">
@@ -392,6 +398,9 @@
       <DependentUpon>IErrorCodes.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\licenses.licx" />
+    <EmbeddedResource Include="Screens\ILevelDetectionReactionsRotorTest.resx">
+      <DependentUpon>ILevelDetectionReactionsRotorTest.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Screens\IChangeRotorSRV.resx">
       <DependentUpon>IChangeRotorSRV.vb</DependentUpon>
       <SubType>Designer</SubType>
@@ -399,8 +408,8 @@
     <EmbeddedResource Include="Screens\IInstrumentUpdateUtil.resx">
       <DependentUpon>IInstrumentUpdateUtil.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Screens\ILevelDetectionTest.resx">
-      <DependentUpon>ILevelDetectionTest.vb</DependentUpon>
+    <EmbeddedResource Include="Screens\ILevelDetectionSampAndReagRotorTest.resx">
+      <DependentUpon>ILevelDetectionSampAndReagRotorTest.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Screens\IBarCodeAdjustments.resx">
       <DependentUpon>IBarCodeAdjustments.vb</DependentUpon>

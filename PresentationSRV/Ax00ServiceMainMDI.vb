@@ -7283,7 +7283,7 @@ Public Class Ax00ServiceMainMDI
             'The form to be opened should be assigned its AcceptButton property to its default exit button
             Application.DoEvents()
             Me.Cursor = Cursors.WaitCursor
-            OpenMDIChildForm(UiLevelDetectionTest)
+            OpenMDIChildForm(ILevelDetectionReactionsRotorTest)
 
             Me.Text = My.Application.Info.ProductName & " - " & LevelDetectionToolStripMenuItem.Text 'SGM 22/02/2012
 

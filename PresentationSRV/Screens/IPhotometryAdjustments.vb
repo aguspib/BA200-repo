@@ -85,14 +85,7 @@ Public Class UiPhotometryAdjustments
         End Set
     End Property
 
-    Public Property ActiveAnalyzerModel() As String
-        Get
-            Return Me.ActiveAnalyzerModelAttr
-        End Get
-        Set(ByVal value As String)
-            Me.ActiveAnalyzerModelAttr = value
-        End Set
-    End Property
+    
 #End Region
 
 #Region "Enumerations"
@@ -890,9 +883,8 @@ Public Class UiPhotometryAdjustments
 
             ' Get common Parameters
             If Not myResultData.HasError Then
-                Me.ActiveAnalyzerModel = Ax00ServiceMainMDI.ActiveAnalyzerModel
-                Me.ActiveAnalyzer = Ax00ServiceMainMDI.ActiveAnalyzer
-                myResultData = GetParameters(Me.ActiveAnalyzerModel)
+
+                myResultData = GetParameters(MyBase.AnalyzerModel)
             End If
 
             ' Prepare main TAB - Baseline & Darnkness Counts tests

@@ -153,7 +153,8 @@
     </Compile>
     <Compile Include="Screen Delegates\BarCodeAdjustmentDelegate.vb" />
     <Compile Include="Screen Delegates\ChangeRotorDelegate.vb" />
-    <Compile Include="Screen Delegates\LevelDetectionTestDelegate.vb" />
+    <Compile Include="Screen Delegates\LevelDetectionReactionsRotorTestDelegate.vb" />
+    <Compile Include="Screen Delegates\LevelDetectionSampAndReagRotorTestDelegate.vb" />
     <Compile Include="Screen Delegates\MotorsPumpsValvesTestDelegate.vb" />
     <Compile Include="Screen Delegates\CycleCountDelegate.vb" />
     <Compile Include="Screen Delegates\InstrumentUpdateUtilDelegate.vb" />
