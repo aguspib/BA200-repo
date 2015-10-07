@@ -40,6 +40,9 @@ Namespace Biosystems.Ax00.Core.Entities
 
         Property Model As String Implements IAnalyzerManager.Model
             Get
+                If myAnalyzerModel = "" Then
+                    Return GetModelValue(GenericDefaultAnalyzer)
+                End If
                 Return myAnalyzerModel
             End Get
             Set(value As String)

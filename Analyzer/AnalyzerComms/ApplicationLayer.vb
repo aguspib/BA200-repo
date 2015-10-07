@@ -2641,7 +2641,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Dim myInstructionToSend As String
                 myGlobal = myLAX00.WriteFwScript(myInstructionsList)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-                    myInstructionToSend = String.Format("{0};COMMAND;{1}", AnalyzerManager.GetCurrentAnalyzerManager().GetModelValue(AnalyzerManager.GetCurrentAnalyzerManager().ActiveAnalyzer), CType(myGlobal.SetDatos, String))
+                    myInstructionToSend = String.Format("{0};COMMAND;{1}", AnalyzerManager.GetCurrentAnalyzerManager().Model, CType(myGlobal.SetDatos, String))
                     If String.Compare(myInstructionToSend, "", False) <> 0 Then
                         myGlobal = Me.SendGenericalInstructions(myInstructionToSend)
                         If myGlobal.HasError Then
@@ -3373,7 +3373,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                     'Dim myUtilities As New Utilities
                     'Dim myCommand As String = "A400;FWUTIL;A:2;N:" & pFWAction.DataBlockIndex.ToString & ";S:" & pFWAction.DataBlockSize.ToString & ";"
-                    Dim myCommand As String = AnalyzerManager.GetCurrentAnalyzerManager().GetModelValue(AnalyzerManager.GetCurrentAnalyzerManager().ActiveAnalyzer) & ";FWUTIL;A:2;N:" & pFWAction.DataBlockIndex.ToString & ";S:" & pFWAction.DataBlockSize.ToString & ";"
+                    Dim myCommand As String = AnalyzerManager.GetCurrentAnalyzerManager().Model & ";FWUTIL;A:2;N:" & pFWAction.DataBlockIndex.ToString & ";S:" & pFWAction.DataBlockSize.ToString & ";"
                     myGlobal = Utilities.ConvertStringToAscii(myCommand, True)
                     If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                         Dim myCommandInBytes() As Byte = CType(myGlobal.SetDatos, Byte())

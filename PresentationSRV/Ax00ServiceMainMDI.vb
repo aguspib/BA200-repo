@@ -2226,15 +2226,20 @@ Public Class Ax00ServiceMainMDI
         End If
     End Sub
 
+    Private MostrarTodo As Boolean
+
     Private Sub MessageAndClose()
         Dim auxtxt = New MultilanguageResourcesDelegate().GetResourceText(Nothing, "Para comunicar con el analizador debe utilizar la aplicación de B{0}. El programa actual se cerrará de forma automática", CurrentLanguageAttribute)
         If auxtxt = "" Then
             auxtxt = "Para comunicar con el analizador debe utilizar la aplicación de B{0}. El programa actual se cerrará de forma automática"
         End If
         Dim msgTxt = String.Format(auxtxt, AnalyzerController.Instance.Analyzer.GetModelNotCompatible)
-        MessageBox.Show(msgTxt)
-        QuitBecauseWrongAnalyzer = True
-        Close()
+        If Not MostrarTodo Then
+            MostrarTodo = True
+            MessageBox.Show(msgTxt)
+            QuitBecauseWrongAnalyzer = True
+            Close()
+        End If
     End Sub
 
     ''' <summary>
