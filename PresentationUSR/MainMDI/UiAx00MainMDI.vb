@@ -1964,6 +1964,13 @@ Partial Public Class UiAx00MainMDI
                         End Using
                     End If
 
+                    'AJG. Leave table tcfgAnalyzerManagerFlags values to NULL, for the current AnalyzerID
+                    If QuitBecauseWrongAnalyzer Then
+                        Dim auxAnalyzerManagerFlagsDelegate As New AnalyzerManagerFlagsDelegate()
+                        auxAnalyzerManagerFlagsDelegate.ResetFlags(Nothing, AnalyzerController.Instance.Analyzer.ActiveAnalyzer)
+                    End If
+
+
                     'FOR FUTURE IMPLEMENTATION OF BT #1588 - Release the LIS Manager; wait until all channels have been released ==> Change previous code for this 
                     'Dim releaseLISManagerThread As Thread
                     'Using wfPreloadWait As New WaitScreen(Me)
