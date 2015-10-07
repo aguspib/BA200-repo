@@ -68,11 +68,6 @@ Public Class UiBackground
             myMDI.Focus()
             Me.Cursor = System.Windows.Forms.Cursors.Default 'IT 18/11/2014: BA-2025
 
-            'Dim aux = TryCast(myMDI, IMainMDI)
-            'If aux IsNot Nothing Then
-            '    aux.CheckAnalyzerCompatibility()
-            'End If
-
         Catch ex As Exception
             RaiseEvent ExceptionHappened(ex)
         End Try

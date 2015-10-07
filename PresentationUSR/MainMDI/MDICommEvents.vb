@@ -2789,7 +2789,7 @@ Partial Public Class UiAx00MainMDI
 
 #End Region
 
-    Private Mostrado As Boolean
+    Private Mostrado As Boolean = False
 
     ''' <summary>
     ''' 
@@ -2807,7 +2807,7 @@ Partial Public Class UiAx00MainMDI
             Dim msgTxt = String.Format(auxtxt, AnalyzerController.Instance.Analyzer.GetModelNotCompatible)
             If Not Mostrado Then
                 Mostrado = True
-                MessageBox.Show(msgTxt)
+                BeginInvoke(Sub() MessageBox.Show(msgTxt))
                 QuitBecauseWrongAnalyzer = True
                 Close()
             End If
