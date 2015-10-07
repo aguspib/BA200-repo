@@ -301,15 +301,6 @@ Public Class UiPositionsAdjustments
         End Set
     End Property
 
-    Public Property ActiveAnalyzerModel() As String
-        Get
-            Return Me.ActiveAnalyzerModelAttr
-        End Get
-        Set(ByVal value As String)
-            Me.ActiveAnalyzerModelAttr = value
-        End Set
-    End Property
-
     Private Property IsStirrerTesting() As Boolean
         Get
             Return IsStirrerTestingAttr
@@ -2027,8 +2018,7 @@ Public Class UiPositionsAdjustments
 
             ' Get common Parameters
             If Not myResultData.HasError Then
-                Me.ActiveAnalyzerModel = MyBase.myServiceMDI.ActiveAnalyzerModel
-                myResultData = GetParameters(Me.ActiveAnalyzerModel)
+                myResultData = GetParameters(MyBase.AnalyzerModel)
             End If
 
             Me.InitializeChart()
