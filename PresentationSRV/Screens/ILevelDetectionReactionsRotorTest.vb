@@ -380,8 +380,8 @@ Public Class ILevelDetectionReactionsRotorTest
         Try
             MyBase.SetButtonImage(Me.btnStartTest, "ADJUSTMENT")
             MyBase.SetButtonImage(Me.btnShowLevel, "ACCEPT1")
-            MyBase.SetButtonImage(Me.BsExitButton, "CANCEL")
-            MyBase.SetButtonImage(Me.btnCancel, "CANCEL")
+            MyBase.SetButtonImage(Me.BsExitButton, "BTN_CloseScreen")
+            MyBase.SetButtonImage(Me.btnCancel, "BTN_Cancel")
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareButtons", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
@@ -399,7 +399,7 @@ Public Class ILevelDetectionReactionsRotorTest
 
             Me.btnStartTest.Enabled = False
             Me.btnShowLevel.Enabled = False
-
+            Me.btnCancel.Enabled = False
             Me.BsExitButton.Enabled = False
 
             MyBase.ActivateMDIMenusButtons(False)
@@ -1148,11 +1148,11 @@ Public Class ILevelDetectionReactionsRotorTest
     End Sub
 
     Private Sub btnStartTest_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnStartTest.Click
-
         Dim myGlobal As New GlobalDataTO
         Try
             myGlobal = MyClass.ReadFrequencies()
 
+            DisableAll()
             If myGlobal.HasError Then
                 MyBase.CurrentMode = ADJUSTMENT_MODES.ERROR_MODE
                 MyClass.PrepareArea()
