@@ -2217,29 +2217,38 @@ Public Class Ax00ServiceMainMDI
         'AJG Gestionar si el analizador conectado es compatible con el software
         If Not AnalyzerController.Instance.Analyzer.IsConnectedWithRightModel() Then
             If GlobalBase.GetSessionInfo.UserName.ToUpperInvariant() <> "BIOSRV" Then
+                Debug.Print("===>CheckAnalyzerCompatibility. Entro por usuario <> BIOSRV")
                 MessageAndClose()
+                Debug.Print("<===CheckAnalyzerCompatibility. Salgo por usuario <> BIOSRV")
             Else
                 If AnalyzerController.Instance.Analyzer.Model <> AllowedAnalyzer Then
+                    Debug.Print("===>CheckAnalyzerCompatibility. Entro por modelo de analyzer <> allowedAnalyzer")
                     MessageAndClose()
+                    Debug.Print("<===CheckAnalyzerCompatibility. Salgo por usuario <> BIOSRV")
                 End If
             End If
         End If
     End Sub
 
     Private Mostrado As Boolean = False
+    Private thisLock As New Object
 
     Private Sub MessageAndClose()
-        Dim auxtxt = New MultilanguageResourcesDelegate().GetResourceText(Nothing, "Para comunicar con el analizador debe utilizar la aplicación de B{0}. El programa actual se cerrará de forma automática", CurrentLanguageAttribute)
-        If auxtxt = "" Then
-            auxtxt = "Para comunicar con el analizador debe utilizar la aplicación de B{0}. El programa actual se cerrará de forma automática"
-        End If
-        Dim msgTxt = String.Format(auxtxt, AnalyzerController.Instance.Analyzer.GetModelNotCompatible)
-        If Not Mostrado Then
-            Mostrado = True
-            BeginInvoke(Sub() MessageBox.Show(msgTxt))
-            QuitBecauseWrongAnalyzer = True
-            Close()
-        End If
+        SyncLock thisLock
+            Dim auxtxt = New MultilanguageResourcesDelegate().GetResourceText(Nothing, "Para comunicar con el analizador debe utilizar la aplicación de B{0}. El programa actual se cerrará de forma automática", CurrentLanguageAttribute)
+            If auxtxt = "" Then
+                auxtxt = "Para comunicar con el analizador debe utilizar la aplicación de B{0}. El programa actual se cerrará de forma automática"
+            End If
+            Dim msgTxt = String.Format(auxtxt, AnalyzerController.Instance.Analyzer.GetModelNotCompatible)
+            If Not Mostrado Then
+                Mostrado = True
+                Debug.Print("!!! Voy a mostrar el mensajito")
+                BeginInvoke(Sub() MessageBox.Show(msgTxt))
+                QuitBecauseWrongAnalyzer = True
+                Close()
+                Debug.Print("!!! He llamado al close")
+            End If
+        End SyncLock
     End Sub
 
     ''' <summary>

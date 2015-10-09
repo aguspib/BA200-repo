@@ -2790,6 +2790,7 @@ Partial Public Class UiAx00MainMDI
 #End Region
 
     Private Mostrado As Boolean = False
+    Private thisLock As New Object
 
     ''' <summary>
     ''' 
@@ -2800,17 +2801,19 @@ Partial Public Class UiAx00MainMDI
     Public Sub CheckAnalyzerCompatibility() Implements IMainMDI.CheckAnalyzerCompatibility
         'AJG Gestionar si el analizador conectado es compatible con el software
         If Not AnalyzerController.Instance.Analyzer.IsConnectedWithRightModel() Then
-            Dim auxtxt = New MultilanguageResourcesDelegate().GetResourceText(Nothing, "Para comunicar con el analizador debe utilizar la aplicación de B{0}. El programa actual se cerrará de forma automática", CurrentLanguageAttribute)
-            If auxtxt = "" Then
-                auxtxt = "Para comunicar con el analizador debe utilizar la aplicación de B{0}. El programa actual se cerrará de forma automática"
-            End If
-            Dim msgTxt = String.Format(auxtxt, AnalyzerController.Instance.Analyzer.GetModelNotCompatible)
-            If Not Mostrado Then
-                Mostrado = True
-                BeginInvoke(Sub() MessageBox.Show(msgTxt))
-                QuitBecauseWrongAnalyzer = True
-                Close()
-            End If
+            SyncLock thisLock
+                Dim auxtxt = New MultilanguageResourcesDelegate().GetResourceText(Nothing, "Para comunicar con el analizador debe utilizar la aplicación de B{0}. El programa actual se cerrará de forma automática", CurrentLanguageAttribute)
+                If auxtxt = "" Then
+                    auxtxt = "Para comunicar con el analizador debe utilizar la aplicación de B{0}. El programa actual se cerrará de forma automática"
+                End If
+                Dim msgTxt = String.Format(auxtxt, AnalyzerController.Instance.Analyzer.GetModelNotCompatible)
+                If Not Mostrado Then
+                    Mostrado = True
+                    BeginInvoke(Sub() MessageBox.Show(msgTxt))
+                    QuitBecauseWrongAnalyzer = True
+                    Close()
+                End If
+            End SyncLock
         End If
     End Sub
 
