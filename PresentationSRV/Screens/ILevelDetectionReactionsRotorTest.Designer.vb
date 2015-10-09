@@ -29,7 +29,7 @@ Partial Class ILevelDetectionReactionsRotorTest
         Me.BsButtonsPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
         Me.BsExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.BsTitleLabel = New System.Windows.Forms.Label()
-        Me.BsLevelDetectionInfoTitle = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsInfoTitle = New Biosystems.Ax00.Controls.UserControls.BSLabel()
         Me.BsLevelDetectionInfoPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
         Me.BsInfoXPSViewer = New BsXPSViewer()
         Me.BsInfoExpandButton = New Biosystems.Ax00.Controls.UserControls.BSPanel()
@@ -39,10 +39,10 @@ Partial Class ILevelDetectionReactionsRotorTest
         Me.BsTestTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
         Me.BsLevelDetectionTestPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
         Me.gpbLevelDetection = New System.Windows.Forms.GroupBox()
+        Me.btnCancel = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.btnShowLevel = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.lblLdmem = New System.Windows.Forms.Label()
         Me.lblLdmemValue = New System.Windows.Forms.Label()
-        Me.btnCancel = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.BsMessagesPanel.SuspendLayout()
         CType(Me.BsMessageImage, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.BsButtonsPanel.SuspendLayout()
@@ -120,23 +120,23 @@ Partial Class ILevelDetectionReactionsRotorTest
         Me.BsTitleLabel.Font = New System.Drawing.Font("Verdana", 10.0!)
         Me.BsTitleLabel.Location = New System.Drawing.Point(2, 2)
         Me.BsTitleLabel.Name = "BsTitleLabel"
-        Me.BsTitleLabel.Size = New System.Drawing.Size(115, 17)
+        Me.BsTitleLabel.Size = New System.Drawing.Size(90, 17)
         Me.BsTitleLabel.TabIndex = 65
-        Me.BsTitleLabel.Text = "Level Detection"
+        Me.BsTitleLabel.Text = "Screen Title"
         '
-        'BsLevelDetectionInfoTitle
+        'BsInfoTitle
         '
-        Me.BsLevelDetectionInfoTitle.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.BsInfoTitle.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.BsLevelDetectionInfoTitle.BackColor = System.Drawing.Color.LightSteelBlue
-        Me.BsLevelDetectionInfoTitle.Font = New System.Drawing.Font("Verdana", 10.0!)
-        Me.BsLevelDetectionInfoTitle.ForeColor = System.Drawing.Color.Black
-        Me.BsLevelDetectionInfoTitle.Location = New System.Drawing.Point(0, 0)
-        Me.BsLevelDetectionInfoTitle.Name = "BsLevelDetectionInfoTitle"
-        Me.BsLevelDetectionInfoTitle.Size = New System.Drawing.Size(231, 20)
-        Me.BsLevelDetectionInfoTitle.TabIndex = 22
-        Me.BsLevelDetectionInfoTitle.Text = "Information"
-        Me.BsLevelDetectionInfoTitle.Title = True
+        Me.BsInfoTitle.BackColor = System.Drawing.Color.LightSteelBlue
+        Me.BsInfoTitle.Font = New System.Drawing.Font("Verdana", 10.0!)
+        Me.BsInfoTitle.ForeColor = System.Drawing.Color.Black
+        Me.BsInfoTitle.Location = New System.Drawing.Point(0, 0)
+        Me.BsInfoTitle.Name = "BsInfoTitle"
+        Me.BsInfoTitle.Size = New System.Drawing.Size(231, 20)
+        Me.BsInfoTitle.TabIndex = 22
+        Me.BsInfoTitle.Text = "Information"
+        Me.BsInfoTitle.Title = True
         '
         'BsLevelDetectionInfoPanel
         '
@@ -144,7 +144,7 @@ Partial Class ILevelDetectionReactionsRotorTest
         Me.BsLevelDetectionInfoPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.BsLevelDetectionInfoPanel.Controls.Add(Me.BsInfoXPSViewer)
         Me.BsLevelDetectionInfoPanel.Controls.Add(Me.BsInfoExpandButton)
-        Me.BsLevelDetectionInfoPanel.Controls.Add(Me.BsLevelDetectionInfoTitle)
+        Me.BsLevelDetectionInfoPanel.Controls.Add(Me.BsInfoTitle)
         Me.BsLevelDetectionInfoPanel.Location = New System.Drawing.Point(4, 25)
         Me.BsLevelDetectionInfoPanel.Name = "BsLevelDetectionInfoPanel"
         Me.BsLevelDetectionInfoPanel.Size = New System.Drawing.Size(232, 532)
@@ -216,6 +216,7 @@ Partial Class ILevelDetectionReactionsRotorTest
         Me.lblLdminValue.Name = "lblLdminValue"
         Me.lblLdminValue.Size = New System.Drawing.Size(110, 34)
         Me.lblLdminValue.TabIndex = 76
+        Me.lblLdminValue.Text = "0"
         Me.lblLdminValue.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'btnStartTest
@@ -237,7 +238,7 @@ Partial Class ILevelDetectionReactionsRotorTest
         Me.BsTestTitleLabel.Name = "BsTestTitleLabel"
         Me.BsTestTitleLabel.Size = New System.Drawing.Size(739, 20)
         Me.BsTestTitleLabel.TabIndex = 59
-        Me.BsTestTitleLabel.Text = "Level Detection Test"
+        Me.BsTestTitleLabel.Text = "Test Title"
         Me.BsTestTitleLabel.Title = True
         '
         'BsLevelDetectionTestPanel
@@ -268,6 +269,16 @@ Partial Class ILevelDetectionReactionsRotorTest
         Me.gpbLevelDetection.Size = New System.Drawing.Size(705, 161)
         Me.gpbLevelDetection.TabIndex = 73
         Me.gpbLevelDetection.TabStop = False
+        '
+        'btnCancel
+        '
+        Me.btnCancel.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
+        Me.btnCancel.Enabled = False
+        Me.btnCancel.Location = New System.Drawing.Point(654, 109)
+        Me.btnCancel.Name = "btnCancel"
+        Me.btnCancel.Size = New System.Drawing.Size(32, 32)
+        Me.btnCancel.TabIndex = 80
+        Me.btnCancel.UseVisualStyleBackColor = True
         '
         'btnShowLevel
         '
@@ -301,25 +312,16 @@ Partial Class ILevelDetectionReactionsRotorTest
         Me.lblLdmemValue.Name = "lblLdmemValue"
         Me.lblLdmemValue.Size = New System.Drawing.Size(110, 34)
         Me.lblLdmemValue.TabIndex = 78
+        Me.lblLdmemValue.Text = "0"
         Me.lblLdmemValue.TextAlign = System.Drawing.ContentAlignment.MiddleRight
-        '
-        'btnCancel
-        '
-        Me.btnCancel.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
-        Me.btnCancel.Enabled = False
-        Me.btnCancel.Location = New System.Drawing.Point(654, 109)
-        Me.btnCancel.Name = "btnCancel"
-        Me.btnCancel.Size = New System.Drawing.Size(32, 32)
-        Me.btnCancel.TabIndex = 80
-        Me.btnCancel.UseVisualStyleBackColor = True
         '
         'ILevelDetectionReactionsRotorTest
         '
         Me.AcceptButton = Me.BsExitButton
         Me.Appearance.BackColor = System.Drawing.Color.Gainsboro
         Me.Appearance.GradientMode = System.Drawing.Drawing2D.LinearGradientMode.ForwardDiagonal
-        Me.Appearance.Options.UseBackColor = true
-        Me.Appearance.Options.UseFont = true
+        Me.Appearance.Options.UseBackColor = True
+        Me.Appearance.Options.UseFont = True
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None
         Me.ClientSize = New System.Drawing.Size(978, 593)
         Me.Controls.Add(Me.BsTitleLabel)
@@ -329,20 +331,20 @@ Partial Class ILevelDetectionReactionsRotorTest
         Me.Controls.Add(Me.BsLevelDetectionTestPanel)
         Me.Cursor = System.Windows.Forms.Cursors.Default
         Me.LookAndFeel.SkinName = "Blue"
-        Me.LookAndFeel.UseDefaultLookAndFeel = false
+        Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.Name = "ILevelDetectionReactionsRotorTest"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "StressModeTest"
-        Me.BsMessagesPanel.ResumeLayout(false)
-        CType(Me.BsMessageImage,System.ComponentModel.ISupportInitialize).EndInit
-        Me.BsButtonsPanel.ResumeLayout(false)
-        Me.BsLevelDetectionInfoPanel.ResumeLayout(false)
-        Me.BsLevelDetectionTestPanel.ResumeLayout(false)
-        Me.gpbLevelDetection.ResumeLayout(false)
-        Me.ResumeLayout(false)
-        Me.PerformLayout
+        Me.BsMessagesPanel.ResumeLayout(False)
+        CType(Me.BsMessageImage, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.BsButtonsPanel.ResumeLayout(False)
+        Me.BsLevelDetectionInfoPanel.ResumeLayout(False)
+        Me.BsLevelDetectionTestPanel.ResumeLayout(False)
+        Me.gpbLevelDetection.ResumeLayout(False)
+        Me.ResumeLayout(False)
+        Me.PerformLayout()
 
-End Sub
+    End Sub
     Friend WithEvents BsButtonsPanel As Biosystems.Ax00.Controls.UserControls.BSPanel
     Friend WithEvents BsExitButton As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents BsMessagesPanel As Biosystems.Ax00.Controls.UserControls.BSPanel
@@ -350,7 +352,7 @@ End Sub
     Friend WithEvents BsMessageImage As Biosystems.Ax00.Controls.UserControls.BSPictureBox
     Friend WithEvents BsMessageLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
     Friend WithEvents BsTitleLabel As System.Windows.Forms.Label
-    Friend WithEvents BsLevelDetectionInfoTitle As Biosystems.Ax00.Controls.UserControls.BSLabel
+    Friend WithEvents BsInfoTitle As Biosystems.Ax00.Controls.UserControls.BSLabel
     Friend WithEvents BsLevelDetectionInfoPanel As Biosystems.Ax00.Controls.UserControls.BSPanel
     Friend WithEvents BsInfoExpandButton As Biosystems.Ax00.Controls.UserControls.BSPanel
     Friend WithEvents BsInfoXPSViewer As BsXPSViewer
