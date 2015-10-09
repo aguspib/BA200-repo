@@ -6,6 +6,7 @@ Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.BL
+Imports Biosystems.Ax00.App
 
 Namespace Biosystems.Ax00.FwScriptsManagement
 
@@ -26,10 +27,12 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
 #Region "Enumerations"
         Public Enum OPERATIONS
-            _NONE = 0
             READ_FREQUENCY = 1
             START_DETECTION_TEST = 2
             END_DETECTION_TEST = 3
+            NONE
+            WASHING_STATION_UP
+            WASHING_STATION_DOWN
         End Enum
 
         Public Enum Arms
@@ -88,88 +91,88 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
 #Region "Attributes"
 
-        'Frequency Read
-        Private ReadDM1FreqRequestedAttr As Boolean
-        Private ReadDR1FreqRequestedAttr As Boolean
-        Private ReadDR2FreqRequestedAttr As Boolean
+        ' '' ''Frequency Read
+        '' ''Private ReadDM1FreqRequestedAttr As Boolean
+        '' ''Private ReadDR1FreqRequestedAttr As Boolean
+        '' ''Private ReadDR2FreqRequestedAttr As Boolean
 
-        Private SampleFreqMaxLimitAttr As Single
-        Private SampleFreqMinLimitAttr As Single
+        '' ''Private SampleFreqMaxLimitAttr As Single
+        '' ''Private SampleFreqMinLimitAttr As Single
 
-        Private ReagentsFreqMaxLimitAttr As Single
-        Private ReagentsFreqMinLimitAttr As Single
+        '' ''Private ReagentsFreqMaxLimitAttr As Single
+        '' ''Private ReagentsFreqMinLimitAttr As Single
 
-        Private SampleFrequencyValueAttr As Single = -1
-        Private Reagent1FrequencyValueAttr As Single = -1
-        Private Reagent2FrequencyValueAttr As Single = -1
+        '' ''Private SampleFrequencyValueAttr As Single = -1
+        '' ''Private Reagent1FrequencyValueAttr As Single = -1
+        '' ''Private Reagent2FrequencyValueAttr As Single = -1
 
-        'Level Detection
-        Private CurrentArmAttr As Arms = Arms._NONE
-        Private CurrentRotorAttr As Rotors = Rotors._NONE
-        Private CurrentRotorPositionAttr As Integer = 0
-        Private CurrentRingAttr As Rings = Rings._NONE
+        ' '' ''Level Detection
+        '' ''Private CurrentArmAttr As Arms = Arms._NONE
+        '' ''Private CurrentRotorAttr As Rotors = Rotors._NONE
+        '' ''Private CurrentRotorPositionAttr As Integer = 0
+        '' ''Private CurrentRingAttr As Rings = Rings._NONE
 
-        'Sample
-        Private S1RotorRing1HorPosAttr As Integer
-        Private S1RotorRing1DetMaxVerPosAttr As Integer
-        Private S1RotorRing2HorPosAttr As Integer
-        Private S1RotorRing2DetMaxVerPosAttr As Integer
-        Private S1RotorRing3HorPosAttr As Integer
-        Private S1RotorRing3DetMaxVerPosAttr As Integer
-        Private S1VerticalSafetyPosAttr As Integer
-        Private S1RotorPosRing1Attr As Integer
-        Private S1RotorPosRing2Attr As Integer
-        Private S1RotorPosRing3Attr As Integer
-        Private S1ParkingZAttr As Integer
-        Private S1ParkingPolarAttr As Integer
+        ' '' ''Sample
+        '' ''Private S1RotorRing1HorPosAttr As Integer
+        '' ''Private S1RotorRing1DetMaxVerPosAttr As Integer
+        '' ''Private S1RotorRing2HorPosAttr As Integer
+        '' ''Private S1RotorRing2DetMaxVerPosAttr As Integer
+        '' ''Private S1RotorRing3HorPosAttr As Integer
+        '' ''Private S1RotorRing3DetMaxVerPosAttr As Integer
+        '' ''Private S1VerticalSafetyPosAttr As Integer
+        '' ''Private S1RotorPosRing1Attr As Integer
+        '' ''Private S1RotorPosRing2Attr As Integer
+        '' ''Private S1RotorPosRing3Attr As Integer
+        '' ''Private S1ParkingZAttr As Integer
+        '' ''Private S1ParkingPolarAttr As Integer
 
-        'Reagent 1
-        Private R1RotorRing1HorPosAttr As Integer
-        Private R1RotorRing1DetMaxVerPosAttr As Integer
-        Private R1RotorRing2HorPosAttr As Integer
-        Private R1RotorRing2DetMaxVerPosAttr As Integer
-        Private R1VerticalSafetyPosAttr As Integer
-        Private R1RotorPosRing1Attr As Integer
-        Private R1RotorPosRing2Attr As Integer
-        Private R1ParkingZAttr As Integer
-        Private R1ParkingPolarAttr As Integer
+        ' '' ''Reagent 1
+        '' ''Private R1RotorRing1HorPosAttr As Integer
+        '' ''Private R1RotorRing1DetMaxVerPosAttr As Integer
+        '' ''Private R1RotorRing2HorPosAttr As Integer
+        '' ''Private R1RotorRing2DetMaxVerPosAttr As Integer
+        '' ''Private R1VerticalSafetyPosAttr As Integer
+        '' ''Private R1RotorPosRing1Attr As Integer
+        '' ''Private R1RotorPosRing2Attr As Integer
+        '' ''Private R1ParkingZAttr As Integer
+        '' ''Private R1ParkingPolarAttr As Integer
 
-        'Reagent 2
-        Private R2RotorRing1HorPosAttr As Integer
-        Private R2RotorRing1DetMaxVerPosAttr As Integer
-        Private R2RotorRing2HorPosAttr As Integer
-        Private R2RotorRing2DetMaxVerPosAttr As Integer
-        Private R2VerticalSafetyPosAttr As Integer
-        Private R2RotorPosRing1Attr As Integer
-        Private R2RotorPosRing2Attr As Integer
-        Private R2ParkingZAttr As Integer
-        Private R2ParkingPolarAttr As Integer
+        ' '' ''Reagent 2
+        '' ''Private R2RotorRing1HorPosAttr As Integer
+        '' ''Private R2RotorRing1DetMaxVerPosAttr As Integer
+        '' ''Private R2RotorRing2HorPosAttr As Integer
+        '' ''Private R2RotorRing2DetMaxVerPosAttr As Integer
+        '' ''Private R2VerticalSafetyPosAttr As Integer
+        '' ''Private R2RotorPosRing1Attr As Integer
+        '' ''Private R2RotorPosRing2Attr As Integer
+        '' ''Private R2ParkingZAttr As Integer
+        '' ''Private R2ParkingPolarAttr As Integer
 
-        ''washing???
-        'Private S1WSVerticalRefPosAttr As Integer
-        'Private S1WSHorizontalPosAttr As Integer
-        'Private R1WSVerticalRefPosAttr As Integer
-        'Private R1WSHorizontalPosAttr As Integer
-        'Private R2WSVerticalRefPosAttr As Integer
-        'Private R2WSHorizontalPosAttr As Integer
+        '' '' ''washing???
+        ' '' ''Private S1WSVerticalRefPosAttr As Integer
+        ' '' ''Private S1WSHorizontalPosAttr As Integer
+        ' '' ''Private R1WSVerticalRefPosAttr As Integer
+        ' '' ''Private R1WSHorizontalPosAttr As Integer
+        ' '' ''Private R2WSVerticalRefPosAttr As Integer
+        ' '' ''Private R2WSHorizontalPosAttr As Integer
 
-        'Rotors positions
-        Private SampleRotorFirstPositionAttr As Integer
-        Private SampleRotorLastPositionAttr As Integer
-        Private ReagentsRotorFirstPositionAttr As Integer
-        Private ReagentsRotorLastPositionAttr As Integer
+        ' '' ''Rotors positions
+        '' ''Private SampleRotorFirstPositionAttr As Integer
+        '' ''Private SampleRotorLastPositionAttr As Integer
+        '' ''Private ReagentsRotorFirstPositionAttr As Integer
+        '' ''Private ReagentsRotorLastPositionAttr As Integer
 
-        'Private currentLanguageAttr As String
+        ' '' ''Private currentLanguageAttr As String
 
-        Private HomesDoneAttr As Boolean = False
+        '' ''Private HomesDoneAttr As Boolean = False
 
 
-        'History
-        Private SampleFrequencyReadResultAttr As HISTORY_RESULTS
-        Private Reagent1FrequencyReadResultAttr As HISTORY_RESULTS
-        Private Reagent2FrequencyReadResultAttr As HISTORY_RESULTS
+        ' '' ''History
+        '' ''Private SampleFrequencyReadResultAttr As HISTORY_RESULTS
+        '' ''Private Reagent1FrequencyReadResultAttr As HISTORY_RESULTS
+        '' ''Private Reagent2FrequencyReadResultAttr As HISTORY_RESULTS
 
-        Private DetectionTestResultAttr As HISTORY_RESULTS
+        '' ''Private DetectionTestResultAttr As HISTORY_RESULTS
 
 #End Region
 
@@ -179,16 +182,16 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
         Public Property currentLanguage() As String
 
-        Public Property HomesDone() As Boolean
-            Get
-                Return HomesDoneAttr
-            End Get
-            Set(ByVal value As Boolean)
-                If HomesDoneAttr <> value Then
-                    HomesDoneAttr = value
-                End If
-            End Set
-        End Property
+        '' ''Public Property HomesDone() As Boolean
+        '' ''    Get
+        '' ''        Return HomesDoneAttr
+        '' ''    End Get
+        '' ''    Set(ByVal value As Boolean)
+        '' ''        If HomesDoneAttr <> value Then
+        '' ''            HomesDoneAttr = value
+        '' ''        End If
+        '' ''    End Set
+        '' ''End Property
 
         Public Property CurrentOperation() As OPERATIONS
             Get
@@ -201,364 +204,365 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             End Set
         End Property
 
-        Public Property CurrentHistoryArea() As HISTORY_AREAS
+
+        Private _IsWashingStationDown As Boolean
+        Public Property IsWashingStationDown() As Boolean
             Get
-                Return CurrentHistoryAreaAttr
+                Return _IsWashingStationDown
             End Get
-            Set(ByVal value As HISTORY_AREAS)
-                If CurrentHistoryAreaAttr <> value Then
-                    CurrentHistoryAreaAttr = value
-                End If
+            Set(ByVal value As Boolean)
+                _IsWashingStationDown = value
             End Set
         End Property
+
 #End Region
 
 #Region "Detection Test"
 
-        Public Property CurrentArm() As Arms
-            Get
-                Return CurrentArmAttr
-            End Get
-            Set(ByVal value As Arms)
-                CurrentArmAttr = value
-            End Set
-        End Property
+        '' ''Public Property CurrentArm() As Arms
+        '' ''    Get
+        '' ''        Return CurrentArmAttr
+        '' ''    End Get
+        '' ''    Set(ByVal value As Arms)
+        '' ''        CurrentArmAttr = value
+        '' ''    End Set
+        '' ''End Property
 
-        Public Property CurrentRotor() As Rotors
-            Get
-                Return CurrentRotorAttr
-            End Get
-            Set(ByVal value As Rotors)
-                CurrentRotorAttr = value
-            End Set
-        End Property
+        '' ''Public Property CurrentRotor() As Rotors
+        '' ''    Get
+        '' ''        Return CurrentRotorAttr
+        '' ''    End Get
+        '' ''    Set(ByVal value As Rotors)
+        '' ''        CurrentRotorAttr = value
+        '' ''    End Set
+        '' ''End Property
 
-        Public Property CurrentRotorPosition() As Integer
-            Get
-                Return CurrentRotorPositionAttr
-            End Get
-            Set(ByVal value As Integer)
-                CurrentRotorPositionAttr = value
-            End Set
-        End Property
+        '' ''Public Property CurrentRotorPosition() As Integer
+        '' ''    Get
+        '' ''        Return CurrentRotorPositionAttr
+        '' ''    End Get
+        '' ''    Set(ByVal value As Integer)
+        '' ''        CurrentRotorPositionAttr = value
+        '' ''    End Set
+        '' ''End Property
 
-        Public ReadOnly Property CurrentRing() As Rings
-            Get
-                Dim myGlobal As New GlobalDataTO
-                Dim myRing As Rings = Rings._NONE
-                myGlobal = MyClass.GetRotorRingByPosition(MyClass.CurrentRotor, MyClass.CurrentRotorPosition)
-                If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
-                    myRing = CType(myGlobal.SetDatos, Rings)
-                End If
-                Return myRing
-            End Get
-        End Property
-
-
-        'Rotors Positions
-        Public ReadOnly Property SampleRotorFirstPosition() As Integer
-            Get
-                Return SampleRotorFirstPositionAttr
-            End Get
-        End Property
-
-        Public ReadOnly Property SampleRotorLastPosition() As Integer
-            Get
-                Return SampleRotorLastPositionAttr
-            End Get
-        End Property
-
-        Public ReadOnly Property ReagentsRotorFirstPosition() As Integer
-            Get
-                Return ReagentsRotorFirstPositionAttr
-            End Get
-        End Property
-
-        Public ReadOnly Property ReagentsRotorLastPosition() As Integer
-            Get
-                Return ReagentsRotorLastPositionAttr
-            End Get
-        End Property
+        '' ''Public ReadOnly Property CurrentRing() As Rings
+        '' ''    Get
+        '' ''        Dim myGlobal As New GlobalDataTO
+        '' ''        Dim myRing As Rings = Rings._NONE
+        '' ''        myGlobal = MyClass.GetRotorRingByPosition(MyClass.CurrentRotor, MyClass.CurrentRotorPosition)
+        '' ''        If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
+        '' ''            myRing = CType(myGlobal.SetDatos, Rings)
+        '' ''        End If
+        '' ''        Return myRing
+        '' ''    End Get
+        '' ''End Property
 
 
-        Public Property S1RotorRing1HorPos() As Integer
-            Get
-                Return S1RotorRing1HorPosAttr
-            End Get
-            Set(ByVal value As Integer)
-                S1RotorRing1HorPosAttr = value
-            End Set
-        End Property
+        ' '' ''Rotors Positions
+        '' ''Public ReadOnly Property SampleRotorFirstPosition() As Integer
+        '' ''    Get
+        '' ''        Return SampleRotorFirstPositionAttr
+        '' ''    End Get
+        '' ''End Property
 
-        Public Property S1RotorRing1DetMaxVerPos() As Integer
-            Get
-                Return S1RotorRing1DetMaxVerPosAttr
-            End Get
-            Set(ByVal value As Integer)
-                S1RotorRing1DetMaxVerPosAttr = value
-            End Set
-        End Property
+        '' ''Public ReadOnly Property SampleRotorLastPosition() As Integer
+        '' ''    Get
+        '' ''        Return SampleRotorLastPositionAttr
+        '' ''    End Get
+        '' ''End Property
 
+        '' ''Public ReadOnly Property ReagentsRotorFirstPosition() As Integer
+        '' ''    Get
+        '' ''        Return ReagentsRotorFirstPositionAttr
+        '' ''    End Get
+        '' ''End Property
 
-        Public Property S1RotorRing2HorPos() As Integer
-            Get
-                Return S1RotorRing2HorPosAttr
-            End Get
-            Set(ByVal value As Integer)
-                S1RotorRing2HorPosAttr = value
-            End Set
-        End Property
-
-        Public Property S1RotorRing2DetMaxVerPos() As Integer
-            Get
-                Return S1RotorRing2DetMaxVerPosAttr
-            End Get
-            Set(ByVal value As Integer)
-                S1RotorRing2DetMaxVerPosAttr = value
-            End Set
-        End Property
-
-        Public Property S1RotorRing3HorPos() As Integer
-            Get
-                Return S1RotorRing3HorPosAttr
-            End Get
-            Set(ByVal value As Integer)
-                S1RotorRing3HorPosAttr = value
-            End Set
-        End Property
-
-        Public Property S1RotorRing3DetMaxVerPos() As Integer
-            Get
-                Return S1RotorRing3DetMaxVerPosAttr
-            End Get
-            Set(ByVal value As Integer)
-                S1RotorRing3DetMaxVerPosAttr = value
-            End Set
-        End Property
-
-        Public Property S1VerticalSafetyPos() As Integer
-            Get
-                Return S1VerticalSafetyPosAttr
-            End Get
-            Set(ByVal value As Integer)
-                S1VerticalSafetyPosAttr = value
-            End Set
-        End Property
+        '' ''Public ReadOnly Property ReagentsRotorLastPosition() As Integer
+        '' ''    Get
+        '' ''        Return ReagentsRotorLastPositionAttr
+        '' ''    End Get
+        '' ''End Property
 
 
-        Public Property S1RotorPosRing1() As Integer
-            Get
-                Return S1RotorPosRing1Attr
-            End Get
-            Set(ByVal value As Integer)
-                S1RotorPosRing1Attr = value
-            End Set
-        End Property
+        '' ''Public Property S1RotorRing1HorPos() As Integer
+        '' ''    Get
+        '' ''        Return S1RotorRing1HorPosAttr
+        '' ''    End Get
+        '' ''    Set(ByVal value As Integer)
+        '' ''        S1RotorRing1HorPosAttr = value
+        '' ''    End Set
+        '' ''End Property
 
-        Public Property S1RotorPosRing2() As Integer
-            Get
-                Return S1RotorPosRing2Attr
-            End Get
-            Set(ByVal value As Integer)
-                S1RotorPosRing2Attr = value
-            End Set
-        End Property
-
-        Public Property S1RotorPosRing3() As Integer
-            Get
-                Return S1RotorPosRing3Attr
-            End Get
-            Set(ByVal value As Integer)
-                S1RotorPosRing3Attr = value
-            End Set
-        End Property
+        '' ''Public Property S1RotorRing1DetMaxVerPos() As Integer
+        '' ''    Get
+        '' ''        Return S1RotorRing1DetMaxVerPosAttr
+        '' ''    End Get
+        '' ''    Set(ByVal value As Integer)
+        '' ''        S1RotorRing1DetMaxVerPosAttr = value
+        '' ''    End Set
+        '' ''End Property
 
 
-        Public Property R1RotorRing1HorPos() As Integer
-            Get
-                Return R1RotorRing1HorPosAttr
-            End Get
-            Set(ByVal value As Integer)
-                R1RotorRing1HorPosAttr = value
-            End Set
-        End Property
+        '' ''Public Property S1RotorRing2HorPos() As Integer
+        '' ''    Get
+        '' ''        Return S1RotorRing2HorPosAttr
+        '' ''    End Get
+        '' ''    Set(ByVal value As Integer)
+        '' ''        S1RotorRing2HorPosAttr = value
+        '' ''    End Set
+        '' ''End Property
 
-        Public Property R1RotorRing1DetMaxVerPos() As Integer
-            Get
-                Return R1RotorRing1DetMaxVerPosAttr
-            End Get
-            Set(ByVal value As Integer)
-                R1RotorRing1DetMaxVerPosAttr = value
-            End Set
-        End Property
+        '' ''Public Property S1RotorRing2DetMaxVerPos() As Integer
+        '' ''    Get
+        '' ''        Return S1RotorRing2DetMaxVerPosAttr
+        '' ''    End Get
+        '' ''    Set(ByVal value As Integer)
+        '' ''        S1RotorRing2DetMaxVerPosAttr = value
+        '' ''    End Set
+        '' ''End Property
 
-        Public Property R1RotorRing2HorPos() As Integer
-            Get
-                Return R1RotorRing2HorPosAttr
-            End Get
-            Set(ByVal value As Integer)
-                R1RotorRing2HorPosAttr = value
-            End Set
-        End Property
+        '' ''Public Property S1RotorRing3HorPos() As Integer
+        '' ''    Get
+        '' ''        Return S1RotorRing3HorPosAttr
+        '' ''    End Get
+        '' ''    Set(ByVal value As Integer)
+        '' ''        S1RotorRing3HorPosAttr = value
+        '' ''    End Set
+        '' ''End Property
 
-        Public Property R1RotorRing2DetMaxVerPos() As Integer
-            Get
-                Return R1RotorRing2DetMaxVerPosAttr
-            End Get
-            Set(ByVal value As Integer)
-                R1RotorRing1DetMaxVerPosAttr = value
-            End Set
-        End Property
+        '' ''Public Property S1RotorRing3DetMaxVerPos() As Integer
+        '' ''    Get
+        '' ''        Return S1RotorRing3DetMaxVerPosAttr
+        '' ''    End Get
+        '' ''    Set(ByVal value As Integer)
+        '' ''        S1RotorRing3DetMaxVerPosAttr = value
+        '' ''    End Set
+        '' ''End Property
 
-
-        Public Property R1VerticalSafetyPos() As Integer
-            Get
-                Return R1VerticalSafetyPosAttr
-            End Get
-            Set(ByVal value As Integer)
-                R1VerticalSafetyPosAttr = value
-            End Set
-        End Property
-
-
-        Public Property R1RotorPosRing1() As Integer
-            Get
-                Return R1RotorPosRing1Attr
-            End Get
-            Set(ByVal value As Integer)
-                R1RotorPosRing1Attr = value
-            End Set
-        End Property
-
-        Public Property R1RotorPosRing2() As Integer
-            Get
-                Return R1RotorPosRing2Attr
-            End Get
-            Set(ByVal value As Integer)
-                R1RotorPosRing2Attr = value
-            End Set
-        End Property
-
-        Public Property R2RotorRing1HorPos() As Integer
-            Get
-                Return R2RotorRing1HorPosAttr
-            End Get
-            Set(ByVal value As Integer)
-                R2RotorRing1HorPosAttr = value
-            End Set
-        End Property
-
-        Public Property R2RotorRing1DetMaxVerPos() As Integer
-            Get
-                Return R2RotorRing1DetMaxVerPosAttr
-            End Get
-            Set(ByVal value As Integer)
-                R2RotorRing1DetMaxVerPosAttr = value
-            End Set
-        End Property
-
-        Public Property R2RotorRing2HorPos() As Integer
-            Get
-                Return R2RotorRing2HorPosAttr
-            End Get
-            Set(ByVal value As Integer)
-                R2RotorRing2HorPosAttr = value
-            End Set
-        End Property
-
-        Public Property R2RotorRing2DetMaxVerPos() As Integer
-            Get
-                Return R2RotorRing2DetMaxVerPosAttr
-            End Get
-            Set(ByVal value As Integer)
-                R1RotorRing1DetMaxVerPosAttr = value
-            End Set
-        End Property
-
-        Public Property R2VerticalSafetyPos() As Integer
-            Get
-                Return R2VerticalSafetyPosAttr
-            End Get
-            Set(ByVal value As Integer)
-                R2VerticalSafetyPosAttr = value
-            End Set
-        End Property
+        '' ''Public Property S1VerticalSafetyPos() As Integer
+        '' ''    Get
+        '' ''        Return S1VerticalSafetyPosAttr
+        '' ''    End Get
+        '' ''    Set(ByVal value As Integer)
+        '' ''        S1VerticalSafetyPosAttr = value
+        '' ''    End Set
+        '' ''End Property
 
 
-        Public Property R2RotorPosRing1() As Integer
-            Get
-                Return R2RotorPosRing1Attr
-            End Get
-            Set(ByVal value As Integer)
-                R2RotorPosRing1Attr = value
-            End Set
-        End Property
+        '' ''Public Property S1RotorPosRing1() As Integer
+        '' ''    Get
+        '' ''        Return S1RotorPosRing1Attr
+        '' ''    End Get
+        '' ''    Set(ByVal value As Integer)
+        '' ''        S1RotorPosRing1Attr = value
+        '' ''    End Set
+        '' ''End Property
 
-        Public Property R2RotorPosRing2() As Integer
-            Get
-                Return R2RotorPosRing2Attr
-            End Get
-            Set(ByVal value As Integer)
-                R2RotorPosRing2Attr = value
-            End Set
-        End Property
+        '' ''Public Property S1RotorPosRing2() As Integer
+        '' ''    Get
+        '' ''        Return S1RotorPosRing2Attr
+        '' ''    End Get
+        '' ''    Set(ByVal value As Integer)
+        '' ''        S1RotorPosRing2Attr = value
+        '' ''    End Set
+        '' ''End Property
+
+        '' ''Public Property S1RotorPosRing3() As Integer
+        '' ''    Get
+        '' ''        Return S1RotorPosRing3Attr
+        '' ''    End Get
+        '' ''    Set(ByVal value As Integer)
+        '' ''        S1RotorPosRing3Attr = value
+        '' ''    End Set
+        '' ''End Property
+
+
+        '' ''Public Property R1RotorRing1HorPos() As Integer
+        '' ''    Get
+        '' ''        Return R1RotorRing1HorPosAttr
+        '' ''    End Get
+        '' ''    Set(ByVal value As Integer)
+        '' ''        R1RotorRing1HorPosAttr = value
+        '' ''    End Set
+        '' ''End Property
+
+        '' ''Public Property R1RotorRing1DetMaxVerPos() As Integer
+        '' ''    Get
+        '' ''        Return R1RotorRing1DetMaxVerPosAttr
+        '' ''    End Get
+        '' ''    Set(ByVal value As Integer)
+        '' ''        R1RotorRing1DetMaxVerPosAttr = value
+        '' ''    End Set
+        '' ''End Property
+
+        '' ''Public Property R1RotorRing2HorPos() As Integer
+        '' ''    Get
+        '' ''        Return R1RotorRing2HorPosAttr
+        '' ''    End Get
+        '' ''    Set(ByVal value As Integer)
+        '' ''        R1RotorRing2HorPosAttr = value
+        '' ''    End Set
+        '' ''End Property
+
+        '' ''Public Property R1RotorRing2DetMaxVerPos() As Integer
+        '' ''    Get
+        '' ''        Return R1RotorRing2DetMaxVerPosAttr
+        '' ''    End Get
+        '' ''    Set(ByVal value As Integer)
+        '' ''        R1RotorRing1DetMaxVerPosAttr = value
+        '' ''    End Set
+        '' ''End Property
+
+
+        '' ''Public Property R1VerticalSafetyPos() As Integer
+        '' ''    Get
+        '' ''        Return R1VerticalSafetyPosAttr
+        '' ''    End Get
+        '' ''    Set(ByVal value As Integer)
+        '' ''        R1VerticalSafetyPosAttr = value
+        '' ''    End Set
+        '' ''End Property
+
+
+        '' ''Public Property R1RotorPosRing1() As Integer
+        '' ''    Get
+        '' ''        Return R1RotorPosRing1Attr
+        '' ''    End Get
+        '' ''    Set(ByVal value As Integer)
+        '' ''        R1RotorPosRing1Attr = value
+        '' ''    End Set
+        '' ''End Property
+
+        '' ''Public Property R1RotorPosRing2() As Integer
+        '' ''    Get
+        '' ''        Return R1RotorPosRing2Attr
+        '' ''    End Get
+        '' ''    Set(ByVal value As Integer)
+        '' ''        R1RotorPosRing2Attr = value
+        '' ''    End Set
+        '' ''End Property
+
+        '' ''Public Property R2RotorRing1HorPos() As Integer
+        '' ''    Get
+        '' ''        Return R2RotorRing1HorPosAttr
+        '' ''    End Get
+        '' ''    Set(ByVal value As Integer)
+        '' ''        R2RotorRing1HorPosAttr = value
+        '' ''    End Set
+        '' ''End Property
+
+        '' ''Public Property R2RotorRing1DetMaxVerPos() As Integer
+        '' ''    Get
+        '' ''        Return R2RotorRing1DetMaxVerPosAttr
+        '' ''    End Get
+        '' ''    Set(ByVal value As Integer)
+        '' ''        R2RotorRing1DetMaxVerPosAttr = value
+        '' ''    End Set
+        '' ''End Property
+
+        '' ''Public Property R2RotorRing2HorPos() As Integer
+        '' ''    Get
+        '' ''        Return R2RotorRing2HorPosAttr
+        '' ''    End Get
+        '' ''    Set(ByVal value As Integer)
+        '' ''        R2RotorRing2HorPosAttr = value
+        '' ''    End Set
+        '' ''End Property
+
+        '' ''Public Property R2RotorRing2DetMaxVerPos() As Integer
+        '' ''    Get
+        '' ''        Return R2RotorRing2DetMaxVerPosAttr
+        '' ''    End Get
+        '' ''    Set(ByVal value As Integer)
+        '' ''        R1RotorRing1DetMaxVerPosAttr = value
+        '' ''    End Set
+        '' ''End Property
+
+        '' ''Public Property R2VerticalSafetyPos() As Integer
+        '' ''    Get
+        '' ''        Return R2VerticalSafetyPosAttr
+        '' ''    End Get
+        '' ''    Set(ByVal value As Integer)
+        '' ''        R2VerticalSafetyPosAttr = value
+        '' ''    End Set
+        '' ''End Property
+
+
+        '' ''Public Property R2RotorPosRing1() As Integer
+        '' ''    Get
+        '' ''        Return R2RotorPosRing1Attr
+        '' ''    End Get
+        '' ''    Set(ByVal value As Integer)
+        '' ''        R2RotorPosRing1Attr = value
+        '' ''    End Set
+        '' ''End Property
+
+        '' ''Public Property R2RotorPosRing2() As Integer
+        '' ''    Get
+        '' ''        Return R2RotorPosRing2Attr
+        '' ''    End Get
+        '' ''    Set(ByVal value As Integer)
+        '' ''        R2RotorPosRing2Attr = value
+        '' ''    End Set
+        '' ''End Property
 
 
 #Region "Parking"
 
-        Public Property S1ParkingZ() As Integer
-            Get
-                Return S1ParkingZAttr
-            End Get
-            Set(ByVal value As Integer)
-                S1ParkingZAttr = value
-            End Set
-        End Property
+        '' ''Public Property S1ParkingZ() As Integer
+        '' ''    Get
+        '' ''        Return S1ParkingZAttr
+        '' ''    End Get
+        '' ''    Set(ByVal value As Integer)
+        '' ''        S1ParkingZAttr = value
+        '' ''    End Set
+        '' ''End Property
 
-        Public Property S1ParkingPolar() As Integer
-            Get
-                Return S1ParkingPolarAttr
-            End Get
-            Set(ByVal value As Integer)
-                S1ParkingPolarAttr = value
-            End Set
-        End Property
+        '' ''Public Property S1ParkingPolar() As Integer
+        '' ''    Get
+        '' ''        Return S1ParkingPolarAttr
+        '' ''    End Get
+        '' ''    Set(ByVal value As Integer)
+        '' ''        S1ParkingPolarAttr = value
+        '' ''    End Set
+        '' ''End Property
 
-        Public Property R1ParkingZ() As Integer
-            Get
-                Return R1ParkingZAttr
-            End Get
-            Set(ByVal value As Integer)
-                R1ParkingZAttr = value
-            End Set
-        End Property
+        '' ''Public Property R1ParkingZ() As Integer
+        '' ''    Get
+        '' ''        Return R1ParkingZAttr
+        '' ''    End Get
+        '' ''    Set(ByVal value As Integer)
+        '' ''        R1ParkingZAttr = value
+        '' ''    End Set
+        '' ''End Property
 
-        Public Property R1ParkingPolar() As Integer
-            Get
-                Return R1ParkingPolarAttr
-            End Get
-            Set(ByVal value As Integer)
-                R1ParkingPolarAttr = value
-            End Set
-        End Property
+        '' ''Public Property R1ParkingPolar() As Integer
+        '' ''    Get
+        '' ''        Return R1ParkingPolarAttr
+        '' ''    End Get
+        '' ''    Set(ByVal value As Integer)
+        '' ''        R1ParkingPolarAttr = value
+        '' ''    End Set
+        '' ''End Property
 
-        Public Property R2ParkingZ() As Integer
-            Get
-                Return R2ParkingZAttr
-            End Get
-            Set(ByVal value As Integer)
-                R2ParkingZAttr = value
-            End Set
-        End Property
+        '' ''Public Property R2ParkingZ() As Integer
+        '' ''    Get
+        '' ''        Return R2ParkingZAttr
+        '' ''    End Get
+        '' ''    Set(ByVal value As Integer)
+        '' ''        R2ParkingZAttr = value
+        '' ''    End Set
+        '' ''End Property
 
-        Public Property R2ParkingPolar() As Integer
-            Get
-                Return R2ParkingPolarAttr
-            End Get
-            Set(ByVal value As Integer)
-                R2ParkingPolarAttr = value
-            End Set
-        End Property
+        '' ''Public Property R2ParkingPolar() As Integer
+        '' ''    Get
+        '' ''        Return R2ParkingPolarAttr
+        '' ''    End Get
+        '' ''    Set(ByVal value As Integer)
+        '' ''        R2ParkingPolarAttr = value
+        '' ''    End Set
+        '' ''End Property
 
 #End Region
 
@@ -623,137 +627,87 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
 #Region "Frequency Read"
 
-        'requesting flags
-        Public Property ReadDM1FreqRequested() As Boolean
-            Get
-                Return MyClass.ReadDM1FreqRequestedAttr
-            End Get
-            Set(ByVal value As Boolean)
-                MyClass.ReadDM1FreqRequestedAttr = value
-            End Set
-        End Property
+        ' '' ''requesting flags
+        '' ''Public Property ReadDM1FreqRequested() As Boolean
+        '' ''    Get
+        '' ''        Return MyClass.ReadDM1FreqRequestedAttr
+        '' ''    End Get
+        '' ''    Set(ByVal value As Boolean)
+        '' ''        MyClass.ReadDM1FreqRequestedAttr = value
+        '' ''    End Set
+        '' ''End Property
 
-        Public Property ReadDR1FreqRequested() As Boolean
-            Get
-                Return MyClass.ReadDR1FreqRequestedAttr
-            End Get
-            Set(ByVal value As Boolean)
-                MyClass.ReadDR1FreqRequestedAttr = value
-            End Set
-        End Property
+        '' ''Public Property ReadDR1FreqRequested() As Boolean
+        '' ''    Get
+        '' ''        Return MyClass.ReadDR1FreqRequestedAttr
+        '' ''    End Get
+        '' ''    Set(ByVal value As Boolean)
+        '' ''        MyClass.ReadDR1FreqRequestedAttr = value
+        '' ''    End Set
+        '' ''End Property
 
-        Public Property ReadDR2FreqRequested() As Boolean
-            Get
-                Return MyClass.ReadDR2FreqRequestedAttr
-            End Get
-            Set(ByVal value As Boolean)
-                MyClass.ReadDR2FreqRequestedAttr = value
-            End Set
-        End Property
+        '' ''Public Property ReadDR2FreqRequested() As Boolean
+        '' ''    Get
+        '' ''        Return MyClass.ReadDR2FreqRequestedAttr
+        '' ''    End Get
+        '' ''    Set(ByVal value As Boolean)
+        '' ''        MyClass.ReadDR2FreqRequestedAttr = value
+        '' ''    End Set
+        '' ''End Property
 
-        Public ReadOnly Property SampleFreqMinLimit() As Single
-            Get
-                Return SampleFreqMinLimitAttr
-            End Get
-        End Property
+        '' ''Public ReadOnly Property SampleFreqMinLimit() As Single
+        '' ''    Get
+        '' ''        Return SampleFreqMinLimitAttr
+        '' ''    End Get
+        '' ''End Property
 
-        Public ReadOnly Property SampleFreqMaxLimit() As Single
-            Get
-                Return SampleFreqMaxLimitAttr
-            End Get
-        End Property
+        '' ''Public ReadOnly Property SampleFreqMaxLimit() As Single
+        '' ''    Get
+        '' ''        Return SampleFreqMaxLimitAttr
+        '' ''    End Get
+        '' ''End Property
 
-        Public ReadOnly Property ReagentsFreqMinLimit() As Single
-            Get
-                Return ReagentsFreqMinLimitAttr
-            End Get
-        End Property
+        '' ''Public ReadOnly Property ReagentsFreqMinLimit() As Single
+        '' ''    Get
+        '' ''        Return ReagentsFreqMinLimitAttr
+        '' ''    End Get
+        '' ''End Property
 
-        Public ReadOnly Property ReagentsFreqMaxLimit() As Single
-            Get
-                Return ReagentsFreqMaxLimitAttr
-            End Get
-        End Property
-
-
-        Public Property SampleFrequencyValue() As Single
-            Get
-                Return SampleFrequencyValueAttr
-            End Get
-            Set(ByVal value As Single)
-                SampleFrequencyValueAttr = value
-            End Set
-        End Property
-
-        Public Property Reagent1FrequencyValue() As Single
-            Get
-                Return Reagent1FrequencyValueAttr
-            End Get
-            Set(ByVal value As Single)
-                Reagent1FrequencyValueAttr = value
-            End Set
-        End Property
-
-        Public Property Reagent2FrequencyValue() As Single
-            Get
-                Return Reagent2FrequencyValueAttr
-            End Get
-            Set(ByVal value As Single)
-                Reagent2FrequencyValueAttr = value
-            End Set
-        End Property
-
-#End Region
-
-#Region "History"
+        '' ''Public ReadOnly Property ReagentsFreqMaxLimit() As Single
+        '' ''    Get
+        '' ''        Return ReagentsFreqMaxLimitAttr
+        '' ''    End Get
+        '' ''End Property
 
 
-        Public Property SampleFrequencyReadResult() As HISTORY_RESULTS
-            Get
-                Return SampleFrequencyReadResultAttr
-            End Get
-            Set(ByVal value As HISTORY_RESULTS)
-                If SampleFrequencyReadResultAttr <> value Then
-                    SampleFrequencyReadResultAttr = value
-                End If
-            End Set
-        End Property
+        '' ''Public Property SampleFrequencyValue() As Single
+        '' ''    Get
+        '' ''        Return SampleFrequencyValueAttr
+        '' ''    End Get
+        '' ''    Set(ByVal value As Single)
+        '' ''        SampleFrequencyValueAttr = value
+        '' ''    End Set
+        '' ''End Property
 
-        Public Property Reagent1FrequencyReadResult() As HISTORY_RESULTS
-            Get
-                Return Reagent1FrequencyReadResultAttr
-            End Get
-            Set(ByVal value As HISTORY_RESULTS)
-                If Reagent1FrequencyReadResultAttr <> value Then
-                    Reagent1FrequencyReadResultAttr = value
-                End If
-            End Set
-        End Property
+        '' ''Public Property Reagent1FrequencyValue() As Single
+        '' ''    Get
+        '' ''        Return Reagent1FrequencyValueAttr
+        '' ''    End Get
+        '' ''    Set(ByVal value As Single)
+        '' ''        Reagent1FrequencyValueAttr = value
+        '' ''    End Set
+        '' ''End Property
 
-        Public Property Reagent2FrequencyReadResult() As HISTORY_RESULTS
-            Get
-                Return Reagent2FrequencyReadResultAttr
-            End Get
-            Set(ByVal value As HISTORY_RESULTS)
-                If Reagent2FrequencyReadResultAttr <> value Then
-                    Reagent2FrequencyReadResultAttr = value
-                End If
-            End Set
-        End Property
-
-        Public Property DetectionTestResult() As HISTORY_RESULTS
-            Get
-                Return DetectionTestResult
-            End Get
-            Set(ByVal value As HISTORY_RESULTS)
-                If DetectionTestResultAttr <> value Then
-                    DetectionTestResultAttr = value
-                End If
-            End Set
-        End Property
+        '' ''Public Property Reagent2FrequencyValue() As Single
+        '' ''    Get
+        '' ''        Return Reagent2FrequencyValueAttr
+        '' ''    End Get
+        '' ''    Set(ByVal value As Single)
+        '' ''        Reagent2FrequencyValueAttr = value
+        '' ''    End Set
+        '' ''End Property
 
 #End Region
-
 
 #End Region
 
@@ -819,6 +773,30 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 #End Region
 
 #Region "Public Methods"
+
+        ''' <summary>
+        ''' NRotor High Level Instruction
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks>Created by XB 14/10/2014 - Use NROTOR instead WSCTRL when Wash Station is down - BA-2004</remarks>
+        Public Function SendNEW_ROTOR() As GlobalDataTO
+            Dim myResultData As New GlobalDataTO
+            Dim myParams As New List(Of String)
+            Try
+                CurrentOperation = OPERATIONS.WASHING_STATION_DOWN
+                myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.NROTOR, True)
+            Catch ex As Exception
+                myResultData.HasError = True
+                myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myResultData.ErrorMessage = ex.Message
+
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.SendNEW_ROTOR", EventLogEntryType.Error, False)
+            End Try
+            Return myResultData
+        End Function
+
+
         ''' <summary>
         ''' Create the corresponding Script list according to the Screen Mode
         ''' </summary>
@@ -831,11 +809,11 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Dim myResultData As New GlobalDataTO
             Try
                 Dim myAdjGroup As ADJUSTMENT_GROUPS
-                Select Case CurrentArm
-                    Case Arms.SAMPLE : myAdjGroup = ADJUSTMENT_GROUPS.SAMPLE_LEVEL_DET
-                    Case Arms.REAGENT1 : myAdjGroup = ADJUSTMENT_GROUPS.REAGENT1_LEVEL_DET
-                    Case Arms.REAGENT2 : myAdjGroup = ADJUSTMENT_GROUPS.REAGENT2_LEVEL_DET
-                End Select
+                '' ''Select Case CurrentArm
+                '' ''    Case Arms.SAMPLE : myAdjGroup = ADJUSTMENT_GROUPS.SAMPLE_LEVEL_DET
+                '' ''    Case Arms.REAGENT1 : myAdjGroup = ADJUSTMENT_GROUPS.REAGENT1_LEVEL_DET
+                '' ''    Case Arms.REAGENT2 : myAdjGroup = ADJUSTMENT_GROUPS.REAGENT2_LEVEL_DET
+                '' ''End Select
 
                 ' Create the list of Scripts which are need to initialize this Adjustment
                 Select Case pMode
@@ -856,6 +834,35 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
                 'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.SendFwScriptsQueueList", EventLogEntryType.Error, False)
+            End Try
+            Return myResultData
+        End Function
+
+        ''' <summary>
+        ''' Manages the Washing Station (copied from Positions)
+        ''' </summary>
+        ''' <param name="pAction"></param>
+        ''' <returns></returns>
+        ''' <remarks>Created by SGM 21/05/2012</remarks>
+        Public Function SendWASH_STATION_CTRL(ByVal pAction As Ax00WashStationControlModes) As GlobalDataTO
+            'TODO:Extract to a class that any form can call
+            Dim myResultData As New GlobalDataTO
+            Try
+                Select Case pAction
+                    Case Ax00WashStationControlModes.UP
+                        MyClass.CurrentOperation = OPERATIONS.WASHING_STATION_UP
+                    Case Ax00WashStationControlModes.DOWN
+                        MyClass.CurrentOperation = OPERATIONS.WASHING_STATION_DOWN
+                End Select
+                myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.WASH_STATION_CTRL, True, Nothing, pAction) '#REFACTORING
+
+            Catch ex As Exception
+                myResultData.HasError = True
+                myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myResultData.ErrorMessage = ex.Message
+
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "MotorsTestDelegate.SendWASH_STATION_CTRL", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -885,92 +892,92 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myHomeScriptsList = CType(myResultData.SetDatos, List(Of FwScriptQueueItem))
                 End If
 
-                If Not myResultData.HasError Then
+                '' ''If Not myResultData.HasError Then
 
-                    Dim myRing As Rings = MyClass.CurrentRing
+                '' ''    Dim myRing As Rings = MyClass.CurrentRing
 
-                    If myRing <> Rings._NONE Then
+                '' ''    If myRing <> Rings._NONE Then
 
-                        With myFwScript1
-                            Select Case pAdjustment
-                                Case ADJUSTMENT_GROUPS.SAMPLE_LEVEL_DET : .FwScriptID = FwSCRIPTS_IDS.SAMPLE_LEVEL_DET.ToString
-                                Case ADJUSTMENT_GROUPS.REAGENT1_LEVEL_DET : .FwScriptID = FwSCRIPTS_IDS.REAGENT1_LEVEL_DET.ToString
-                                Case ADJUSTMENT_GROUPS.REAGENT2_LEVEL_DET : .FwScriptID = FwSCRIPTS_IDS.REAGENT2_LEVEL_DET.ToString
+                '' ''        With myFwScript1
+                '' ''            Select Case pAdjustment
+                '' ''                Case ADJUSTMENT_GROUPS.SAMPLE_LEVEL_DET : .FwScriptID = FwSCRIPTS_IDS.SAMPLE_LEVEL_DET.ToString
+                '' ''                Case ADJUSTMENT_GROUPS.REAGENT1_LEVEL_DET : .FwScriptID = FwSCRIPTS_IDS.REAGENT1_LEVEL_DET.ToString
+                '' ''                Case ADJUSTMENT_GROUPS.REAGENT2_LEVEL_DET : .FwScriptID = FwSCRIPTS_IDS.REAGENT2_LEVEL_DET.ToString
 
-                            End Select
+                '' ''            End Select
 
-                            .EvaluateType = EVALUATE_TYPES.NUM_VALUE
-                            .EvaluateValue = 1
-                            .NextOnResultOK = Nothing
-                            .NextOnResultNG = Nothing
-                            .NextOnTimeOut = Nothing
-                            .NextOnError = Nothing
+                '' ''            .EvaluateType = EVALUATE_TYPES.NUM_VALUE
+                '' ''            .EvaluateValue = 1
+                '' ''            .NextOnResultOK = Nothing
+                '' ''            .NextOnResultNG = Nothing
+                '' ''            .NextOnTimeOut = Nothing
+                '' ''            .NextOnError = Nothing
 
-                            .ParamList = New List(Of String)
-                            .ParamList.Add(MyClass.CurrentRotorPositionAttr.ToString)
-                            .ParamList.Add(MyClass.S1VerticalSafetyPosAttr.ToString)
+                '' ''            .ParamList = New List(Of String)
+                '' ''            .ParamList.Add(MyClass.CurrentRotorPositionAttr.ToString)
+                '' ''            .ParamList.Add(MyClass.S1VerticalSafetyPosAttr.ToString)
 
-                            Select Case pAdjustment
-                                Case ADJUSTMENT_GROUPS.SAMPLE_LEVEL_DET
+                '' ''            Select Case pAdjustment
+                '' ''                Case ADJUSTMENT_GROUPS.SAMPLE_LEVEL_DET
 
-                                    Select Case myRing
-                                        Case Rings.RING1
-                                            .ParamList.Add(MyClass.S1RotorRing1HorPosAttr.ToString)
-                                            .ParamList.Add(MyClass.S1RotorRing1DetMaxVerPosAttr.ToString)
+                '' ''                    Select Case myRing
+                '' ''                        Case Rings.RING1
+                '' ''                            .ParamList.Add(MyClass.S1RotorRing1HorPosAttr.ToString)
+                '' ''                            .ParamList.Add(MyClass.S1RotorRing1DetMaxVerPosAttr.ToString)
 
-                                        Case Rings.RING2
-                                            .ParamList.Add(MyClass.S1RotorRing2HorPosAttr.ToString)
-                                            .ParamList.Add(MyClass.S1RotorRing2DetMaxVerPosAttr.ToString)
+                '' ''                        Case Rings.RING2
+                '' ''                            .ParamList.Add(MyClass.S1RotorRing2HorPosAttr.ToString)
+                '' ''                            .ParamList.Add(MyClass.S1RotorRing2DetMaxVerPosAttr.ToString)
 
-                                        Case Rings.RING3
-                                            .ParamList.Add(MyClass.S1RotorRing3HorPosAttr.ToString)
-                                            .ParamList.Add(MyClass.S1RotorRing3DetMaxVerPosAttr.ToString)
+                '' ''                        Case Rings.RING3
+                '' ''                            .ParamList.Add(MyClass.S1RotorRing3HorPosAttr.ToString)
+                '' ''                            .ParamList.Add(MyClass.S1RotorRing3DetMaxVerPosAttr.ToString)
 
-                                    End Select
+                '' ''                    End Select
 
-                                Case ADJUSTMENT_GROUPS.REAGENT1_LEVEL_DET
-                                    Select Case myRing
-                                        Case Rings.RING1
-                                            .ParamList.Add(MyClass.R1RotorRing1HorPosAttr.ToString)
-                                            .ParamList.Add(MyClass.R1RotorRing1DetMaxVerPosAttr.ToString)
+                '' ''                Case ADJUSTMENT_GROUPS.REAGENT1_LEVEL_DET
+                '' ''                    Select Case myRing
+                '' ''                        Case Rings.RING1
+                '' ''                            .ParamList.Add(MyClass.R1RotorRing1HorPosAttr.ToString)
+                '' ''                            .ParamList.Add(MyClass.R1RotorRing1DetMaxVerPosAttr.ToString)
 
-                                        Case Rings.RING2
-                                            .ParamList.Add(MyClass.R1RotorRing2HorPosAttr.ToString)
-                                            .ParamList.Add(MyClass.R1RotorRing2DetMaxVerPosAttr.ToString)
+                '' ''                        Case Rings.RING2
+                '' ''                            .ParamList.Add(MyClass.R1RotorRing2HorPosAttr.ToString)
+                '' ''                            .ParamList.Add(MyClass.R1RotorRing2DetMaxVerPosAttr.ToString)
 
-                                    End Select
+                '' ''                    End Select
 
-                                Case ADJUSTMENT_GROUPS.REAGENT2_LEVEL_DET
-                                    Select Case myRing
-                                        Case Rings.RING1
-                                            .ParamList.Add(MyClass.R2RotorRing1HorPosAttr.ToString)
-                                            .ParamList.Add(MyClass.R2RotorRing1DetMaxVerPosAttr.ToString)
+                '' ''                Case ADJUSTMENT_GROUPS.REAGENT2_LEVEL_DET
+                '' ''                    Select Case myRing
+                '' ''                        Case Rings.RING1
+                '' ''                            .ParamList.Add(MyClass.R2RotorRing1HorPosAttr.ToString)
+                '' ''                            .ParamList.Add(MyClass.R2RotorRing1DetMaxVerPosAttr.ToString)
 
-                                        Case Rings.RING2
-                                            .ParamList.Add(MyClass.R2RotorRing2HorPosAttr.ToString)
-                                            .ParamList.Add(MyClass.R2RotorRing2DetMaxVerPosAttr.ToString)
+                '' ''                        Case Rings.RING2
+                '' ''                            .ParamList.Add(MyClass.R2RotorRing2HorPosAttr.ToString)
+                '' ''                            .ParamList.Add(MyClass.R2RotorRing2DetMaxVerPosAttr.ToString)
 
-                                    End Select
+                '' ''                    End Select
 
-                            End Select
-                        End With
+                '' ''            End Select
+                '' ''        End With
 
-                        'add to the queue list
-                        If myHomeScriptsList IsNot Nothing And myHomeScriptsList.Count > 0 Then
-                            For i As Integer = 0 To myHomeScriptsList.Count - 1
-                                If i = 0 Then
-                                    ' First Script
-                                    If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myHomeScriptsList(i), True)
-                                Else
-                                    If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myHomeScriptsList(i), False)
-                                End If
-                            Next
-                            If myFwScript1 IsNot Nothing AndAlso Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, False)
-                        Else
-                            If myFwScript1 IsNot Nothing AndAlso Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, True)
-                        End If
-                    End If
-                End If
+                '' ''        'add to the queue list
+                '' ''        If myHomeScriptsList IsNot Nothing And myHomeScriptsList.Count > 0 Then
+                '' ''            For i As Integer = 0 To myHomeScriptsList.Count - 1
+                '' ''                If i = 0 Then
+                '' ''                    ' First Script
+                '' ''                    If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myHomeScriptsList(i), True)
+                '' ''                Else
+                '' ''                    If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myHomeScriptsList(i), False)
+                '' ''                End If
+                '' ''            Next
+                '' ''            If myFwScript1 IsNot Nothing AndAlso Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, False)
+                '' ''        Else
+                '' ''            If myFwScript1 IsNot Nothing AndAlso Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, True)
+                '' ''        End If
+                '' ''    End If
+                '' ''End If
 
             Catch ex As Exception
                 myResultData.HasError = True
@@ -1013,33 +1020,33 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     .NextOnTimeOut = Nothing
                     .NextOnError = Nothing
 
-                    Select Case pAdjustment
-                        Case ADJUSTMENT_GROUPS.SAMPLE_LEVEL_DET
-                            ' sample arm Parking
-                            .FwScriptID = FwSCRIPTS_IDS.SAMPLE_TEST_END.ToString
-                            ' expects 2 params
-                            .ParamList = New List(Of String)
-                            .ParamList.Add(Me.S1VerticalSafetyPosAttr.ToString)
-                            .ParamList.Add(Me.S1ParkingPolarAttr.ToString)
+                    '' ''Select Case pAdjustment
+                    '' ''    Case ADJUSTMENT_GROUPS.SAMPLE_LEVEL_DET
+                    '' ''        ' sample arm Parking
+                    '' ''        .FwScriptID = FwSCRIPTS_IDS.SAMPLE_TEST_END.ToString
+                    '' ''        ' expects 2 params
+                    '' ''        .ParamList = New List(Of String)
+                    '' ''        .ParamList.Add(Me.S1VerticalSafetyPosAttr.ToString)
+                    '' ''        .ParamList.Add(Me.S1ParkingPolarAttr.ToString)
 
-                        Case ADJUSTMENT_GROUPS.REAGENT1_LEVEL_DET
-                            ' reagent1 arm Parking
-                            .FwScriptID = FwSCRIPTS_IDS.REAGENT1_TEST_END.ToString
-                            ' expects 2 params
-                            .ParamList = New List(Of String)
-                            .ParamList.Add(Me.R1VerticalSafetyPosAttr.ToString)
-                            .ParamList.Add(Me.R1ParkingPolarAttr.ToString)
+                    '' ''    Case ADJUSTMENT_GROUPS.REAGENT1_LEVEL_DET
+                    '' ''        ' reagent1 arm Parking
+                    '' ''        .FwScriptID = FwSCRIPTS_IDS.REAGENT1_TEST_END.ToString
+                    '' ''        ' expects 2 params
+                    '' ''        .ParamList = New List(Of String)
+                    '' ''        .ParamList.Add(Me.R1VerticalSafetyPosAttr.ToString)
+                    '' ''        .ParamList.Add(Me.R1ParkingPolarAttr.ToString)
 
-                        Case ADJUSTMENT_GROUPS.REAGENT2_LEVEL_DET
-                            ' reagent2 arm Parking
-                            .FwScriptID = FwSCRIPTS_IDS.REAGENT2_TEST_END.ToString
-                            ' expects 2 params
-                            .ParamList = New List(Of String)
-                            .ParamList.Add(Me.R2VerticalSafetyPosAttr.ToString)
-                            .ParamList.Add(Me.R2ParkingPolarAttr.ToString)
+                    '' ''    Case ADJUSTMENT_GROUPS.REAGENT2_LEVEL_DET
+                    '' ''        ' reagent2 arm Parking
+                    '' ''        .FwScriptID = FwSCRIPTS_IDS.REAGENT2_TEST_END.ToString
+                    '' ''        ' expects 2 params
+                    '' ''        .ParamList = New List(Of String)
+                    '' ''        .ParamList.Add(Me.R2VerticalSafetyPosAttr.ToString)
+                    '' ''        .ParamList.Add(Me.R2ParkingPolarAttr.ToString)
 
 
-                    End Select
+                    '' ''End Select
 
                 End With
                 'add to the queue list
@@ -1068,28 +1075,28 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         Public Function GetFrequencyLimits() As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
             Try
-                ' Get Value limit ranges
-                Dim myFieldLimitsDS As New FieldLimitsDS
-                Dim myFieldLimitsDelegate As New FieldLimitsDelegate()
+                ' '' '' Get Value limit ranges
+                '' ''Dim myFieldLimitsDS As New FieldLimitsDS
+                '' ''Dim myFieldLimitsDelegate As New FieldLimitsDelegate()
 
-                myGlobalDataTO = myFieldLimitsDelegate.GetList(Nothing, FieldLimitsEnum.SRV_SAMPLE_LEVEL_DET_FREQ)
-                If (Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing) Then
-                    myFieldLimitsDS = CType(myGlobalDataTO.SetDatos, FieldLimitsDS)
-                    If myFieldLimitsDS.tfmwFieldLimits.Rows.Count > 0 Then
-                        MyClass.SampleFreqMinLimitAttr = CType(myFieldLimitsDS.tfmwFieldLimits(0).MinValue, Decimal)
-                        MyClass.SampleFreqMaxLimitAttr = CType(myFieldLimitsDS.tfmwFieldLimits(0).MaxValue, Decimal)
-                    End If
-                End If
+                '' ''myGlobalDataTO = myFieldLimitsDelegate.GetList(Nothing, FieldLimitsEnum.SRV_SAMPLE_LEVEL_DET_FREQ)
+                '' ''If (Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing) Then
+                '' ''    myFieldLimitsDS = CType(myGlobalDataTO.SetDatos, FieldLimitsDS)
+                '' ''    If myFieldLimitsDS.tfmwFieldLimits.Rows.Count > 0 Then
+                '' ''        MyClass.SampleFreqMinLimitAttr = CType(myFieldLimitsDS.tfmwFieldLimits(0).MinValue, Decimal)
+                '' ''        MyClass.SampleFreqMaxLimitAttr = CType(myFieldLimitsDS.tfmwFieldLimits(0).MaxValue, Decimal)
+                '' ''    End If
+                '' ''End If
 
 
-                myGlobalDataTO = myFieldLimitsDelegate.GetList(Nothing, FieldLimitsEnum.SRV_REAGENTS_LEVEL_DET_FREQ)
-                If (Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing) Then
-                    myFieldLimitsDS = CType(myGlobalDataTO.SetDatos, FieldLimitsDS)
-                    If myFieldLimitsDS.tfmwFieldLimits.Rows.Count > 0 Then
-                        MyClass.ReagentsFreqMinLimitAttr = CType(myFieldLimitsDS.tfmwFieldLimits(0).MinValue, Decimal)
-                        MyClass.ReagentsFreqMaxLimitAttr = CType(myFieldLimitsDS.tfmwFieldLimits(0).MaxValue, Decimal)
-                    End If
-                End If
+                '' ''myGlobalDataTO = myFieldLimitsDelegate.GetList(Nothing, FieldLimitsEnum.SRV_REAGENTS_LEVEL_DET_FREQ)
+                '' ''If (Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing) Then
+                '' ''    myFieldLimitsDS = CType(myGlobalDataTO.SetDatos, FieldLimitsDS)
+                '' ''    If myFieldLimitsDS.tfmwFieldLimits.Rows.Count > 0 Then
+                '' ''        MyClass.ReagentsFreqMinLimitAttr = CType(myFieldLimitsDS.tfmwFieldLimits(0).MinValue, Decimal)
+                '' ''        MyClass.ReagentsFreqMaxLimitAttr = CType(myFieldLimitsDS.tfmwFieldLimits(0).MaxValue, Decimal)
+                '' ''    End If
+                '' ''End If
 
             Catch ex As Exception
                 myGlobalDataTO.HasError = True
@@ -1178,16 +1185,16 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
                         If myRowRing1 IsNot Nothing And myRowRing2 IsNot Nothing Then
 
-                            Select Case pRotor
-                                Case Rotors.SAMPLES
-                                    MyClass.SampleRotorFirstPositionAttr = myRowRing1.FirstCellNumber
-                                    MyClass.SampleRotorLastPositionAttr = myRowRing2.LastCellNumber
+                            '' ''Select Case pRotor
+                            '' ''    Case Rotors.SAMPLES
+                            '' ''        MyClass.SampleRotorFirstPositionAttr = myRowRing1.FirstCellNumber
+                            '' ''        MyClass.SampleRotorLastPositionAttr = myRowRing2.LastCellNumber
 
-                                Case Rotors.REAGENTS
-                                    MyClass.ReagentsRotorFirstPositionAttr = myRowRing1.FirstCellNumber
-                                    MyClass.ReagentsRotorLastPositionAttr = myRowRing2.LastCellNumber
+                            '' ''    Case Rotors.REAGENTS
+                            '' ''        MyClass.ReagentsRotorFirstPositionAttr = myRowRing1.FirstCellNumber
+                            '' ''        MyClass.ReagentsRotorLastPositionAttr = myRowRing2.LastCellNumber
 
-                            End Select
+                            '' ''End Select
 
                         End If
                     End If
@@ -1265,20 +1272,20 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Dim myResultData As New GlobalDataTO
             Try
                 If pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.PROBESVALUE_CHANGED) Then
-                    If MyClass.ReadDM1FreqRequested Then
-                        ' sample
-                        MyClass.ReadDM1FreqRequested = False
-                    End If
+                    '' ''If MyClass.ReadDM1FreqRequested Then
+                    '' ''    ' sample
+                    '' ''    MyClass.ReadDM1FreqRequested = False
+                    '' ''End If
 
-                    If MyClass.ReadDR1FreqRequested Then
-                        ' Reagent 1
-                        MyClass.ReadDR1FreqRequested = False
-                    End If
+                    '' ''If MyClass.ReadDR1FreqRequested Then
+                    '' ''    ' Reagent 1
+                    '' ''    MyClass.ReadDR1FreqRequested = False
+                    '' ''End If
 
-                    If MyClass.ReadDR2FreqRequested Then
-                        ' Reagent 2
-                        MyClass.ReadDR2FreqRequested = False
-                    End If
+                    '' ''If MyClass.ReadDR2FreqRequested Then
+                    '' ''    ' Reagent 2
+                    '' ''    MyClass.ReadDR2FreqRequested = False
+                    '' ''End If
 
                 End If
             Catch ex As Exception
@@ -1291,42 +1298,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             End Try
         End Sub
 
-        ''' <summary>
-        ''' Sends POLL instruction for reading the informed Arm related detector's frequency
-        ''' </summary>
-        ''' <param name="pArm"></param>
-        ''' <returns></returns>
-        ''' <remarks>Created by SGM 15/12/2012</remarks>
-        Public Function REQUEST_FREQUENCY_INFO(ByVal pArm As Arms) As GlobalDataTO
-            Dim myResultData As New GlobalDataTO
-            Try
-                MyClass.CurrentOperation = OPERATIONS.READ_FREQUENCY
 
-                Select Case pArm
-                    Case Arms.SAMPLE
-                        MyClass.ReadDM1FreqRequested = True
-                        myResultData = MyBase.SendPOLLHW(POLL_IDs.DM1)
-
-                    Case Arms.REAGENT1
-                        MyClass.ReadDR1FreqRequested = True
-                        myResultData = MyBase.SendPOLLHW(POLL_IDs.DR1)
-
-                    Case Arms.REAGENT2
-                        MyClass.ReadDR2FreqRequested = True
-                        myResultData = MyBase.SendPOLLHW(POLL_IDs.DR2)
-
-                End Select
-
-            Catch ex As Exception
-                myResultData.HasError = True
-                myResultData.ErrorCode = Messages.SYSTEM_ERROR.ToString
-                myResultData.ErrorMessage = ex.Message
-
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.REQUEST_ANALYZER_INFO", EventLogEntryType.Error, False)
-            End Try
-            Return myResultData
-        End Function
 
 #End Region
 
@@ -1345,76 +1317,76 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Dim myResultData As New GlobalDataTO
             Dim myHistoryDelegate As New HistoricalReportsDelegate
 
-            Try
+            ' '' ''Try
 
-                If MyClass.CurrentHistoryArea <> HISTORY_AREAS.NONE Then
+            ' '' ''    If MyClass.CurrentHistoryArea <> HISTORY_AREAS.NONE Then
 
-                    Dim myHistoricReportDS As New SRVResultsServiceDS
-                    Dim myHistoricReportRow As SRVResultsServiceDS.srv_thrsResultsServiceRow
+            ' '' ''        Dim myHistoricReportDS As New SRVResultsServiceDS
+            ' '' ''        Dim myHistoricReportRow As SRVResultsServiceDS.srv_thrsResultsServiceRow
 
-                    Dim myTask As String = "TEST"
-                    Dim myAction As String = ""
+            ' '' ''        Dim myTask As String = "TEST"
+            ' '' ''        Dim myAction As String = ""
 
-                    myAction = MyClass.CurrentHistoryArea.ToString.Trim
+            ' '' ''        myAction = MyClass.CurrentHistoryArea.ToString.Trim
 
-                    'Fill the data
-                    myHistoricReportRow = myHistoricReportDS.srv_thrsResultsService.Newsrv_thrsResultsServiceRow
-                    With myHistoricReportRow
-                        .BeginEdit()
-                        .TaskID = myTask
-                        .ActionID = myAction
-                        .Data = MyClass.GenerateResultData()
-                        .AnalyzerID = MyClass.AnalyzerId
-                        .EndEdit()
-                    End With
+            ' '' ''        'Fill the data
+            ' '' ''        myHistoricReportRow = myHistoricReportDS.srv_thrsResultsService.Newsrv_thrsResultsServiceRow
+            ' '' ''        With myHistoricReportRow
+            ' '' ''            .BeginEdit()
+            ' '' ''            .TaskID = myTask
+            ' '' ''            .ActionID = myAction
+            ' '' ''            .Data = MyClass.GenerateResultData()
+            ' '' ''            .AnalyzerID = MyClass.AnalyzerId
+            ' '' ''            .EndEdit()
+            ' '' ''        End With
 
-                    'save to history
-                    myResultData = myHistoryDelegate.Add(Nothing, myHistoricReportRow)
-
-
-                    If (Not myResultData.HasError AndAlso Not myResultData.SetDatos Is Nothing) Then
-                        'Get the generated ID from the dataset returned 
-                        Dim generatedID As Integer = -1
-                        generatedID = DirectCast(myResultData.SetDatos, SRVResultsServiceDS.srv_thrsResultsServiceRow).ResultServiceID
-
-                        'PDT!!
-                        ' pending implementation for add possibles Recommendations usings in case of INCIDENCE!!!
-                        If generatedID >= 0 Then
-                            ' Insert recommendations if existing
-                            If MyClass.RecommendationsList IsNot Nothing Then
-                                Dim myRecommendationsList As New SRVRecommendationsServiceDS
-                                Dim myRecommendationsRow As SRVRecommendationsServiceDS.srv_thrsRecommendationsServiceRow
-
-                                For Each R As HISTORY_RECOMMENDATIONS In MyClass.RecommendationsList
-                                    myRecommendationsRow = myRecommendationsList.srv_thrsRecommendationsService.Newsrv_thrsRecommendationsServiceRow
-                                    myRecommendationsRow.ResultServiceID = generatedID
-                                    myRecommendationsRow.RecommendationID = CInt(R)
-                                    myRecommendationsList.srv_thrsRecommendationsService.Rows.Add(myRecommendationsRow)
-                                Next
-
-                                myResultData = myHistoryDelegate.AddRecommendations(Nothing, myRecommendationsList)
-                                If myResultData.HasError Then
-                                    myResultData.HasError = True
-                                End If
-                                MyClass.RecommendationsList = Nothing
-                            End If
-                        End If
-
-                    End If
-
-                Else
-                    myResultData.HasError = True
-                    myResultData.ErrorCode = GlobalEnumerates.Messages.MASTER_DATA_MISSING.ToString
-                End If
+            ' '' ''        'save to history
+            ' '' ''        myResultData = myHistoryDelegate.Add(Nothing, myHistoricReportRow)
 
 
-            Catch ex As Exception
-                myResultData.HasError = True
-                myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                myResultData.ErrorMessage = ex.Message
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.ManageHistoryResults", EventLogEntryType.Error, False)
-            End Try
+            ' '' ''        If (Not myResultData.HasError AndAlso Not myResultData.SetDatos Is Nothing) Then
+            ' '' ''            'Get the generated ID from the dataset returned 
+            ' '' ''            Dim generatedID As Integer = -1
+            ' '' ''            generatedID = DirectCast(myResultData.SetDatos, SRVResultsServiceDS.srv_thrsResultsServiceRow).ResultServiceID
+
+            ' '' ''            'PDT!!
+            ' '' ''            ' pending implementation for add possibles Recommendations usings in case of INCIDENCE!!!
+            ' '' ''            If generatedID >= 0 Then
+            ' '' ''                ' Insert recommendations if existing
+            ' '' ''                If MyClass.RecommendationsList IsNot Nothing Then
+            ' '' ''                    Dim myRecommendationsList As New SRVRecommendationsServiceDS
+            ' '' ''                    Dim myRecommendationsRow As SRVRecommendationsServiceDS.srv_thrsRecommendationsServiceRow
+
+            ' '' ''                    For Each R As HISTORY_RECOMMENDATIONS In MyClass.RecommendationsList
+            ' '' ''                        myRecommendationsRow = myRecommendationsList.srv_thrsRecommendationsService.Newsrv_thrsRecommendationsServiceRow
+            ' '' ''                        myRecommendationsRow.ResultServiceID = generatedID
+            ' '' ''                        myRecommendationsRow.RecommendationID = CInt(R)
+            ' '' ''                        myRecommendationsList.srv_thrsRecommendationsService.Rows.Add(myRecommendationsRow)
+            ' '' ''                    Next
+
+            ' '' ''                    myResultData = myHistoryDelegate.AddRecommendations(Nothing, myRecommendationsList)
+            ' '' ''                    If myResultData.HasError Then
+            ' '' ''                        myResultData.HasError = True
+            ' '' ''                    End If
+            ' '' ''                    MyClass.RecommendationsList = Nothing
+            ' '' ''                End If
+            ' '' ''            End If
+
+            ' '' ''        End If
+
+            ' '' ''    Else
+            ' '' ''        myResultData.HasError = True
+            ' '' ''        myResultData.ErrorCode = GlobalEnumerates.Messages.MASTER_DATA_MISSING.ToString
+            ' '' ''    End If
+
+
+            ' '' ''Catch ex As Exception
+            ' '' ''    myResultData.HasError = True
+            ' '' ''    myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+            ' '' ''    myResultData.ErrorMessage = ex.Message
+            ' '' ''    'Dim myLogAcciones As New ApplicationLogManager()
+            ' '' ''    GlobalBase.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.ManageHistoryResults", EventLogEntryType.Error, False)
+            ' '' ''End Try
 
             Return myResultData
 
@@ -1704,44 +1676,44 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
 #Region "Private"
 
-        ''' <summary>
-        ''' Reports the History data to DB. Encodes the result data to history
-        ''' </summary>
-        ''' <returns></returns>
-        ''' <remarks>Created by SGM 21/12/2011</remarks>
-        Private Function GenerateResultData() As String
+        '' '' ''' <summary>
+        '' '' ''' Reports the History data to DB. Encodes the result data to history
+        '' '' ''' </summary>
+        '' '' ''' <returns></returns>
+        '' '' ''' <remarks>Created by SGM 21/12/2011</remarks>
+        ' '' ''Private Function GenerateResultData() As String
 
-            Dim myData As String = ""
+        ' '' ''    Dim myData As String = ""
 
-            Try
+        ' '' ''    Try
 
-                Select Case MyClass.CurrentHistoryArea
+        ' '' ''        Select Case MyClass.CurrentHistoryArea
 
-                    Case HISTORY_AREAS.LEVEL_FREQ_READ
-                        myData &= MyClass.EncodeHistoryResult(CInt(MyClass.SampleFrequencyReadResultAttr))
-                        myData &= MyClass.EncodeHistoryValue(CInt(MyClass.SampleFrequencyValue))
-                        myData &= MyClass.EncodeHistoryResult(CInt(MyClass.Reagent1FrequencyReadResultAttr))
-                        myData &= MyClass.EncodeHistoryValue(CInt(MyClass.Reagent1FrequencyValue))
-                        myData &= MyClass.EncodeHistoryResult(CInt(MyClass.Reagent2FrequencyReadResultAttr))
-                        myData &= MyClass.EncodeHistoryValue(CInt(MyClass.Reagent2FrequencyValue))
+        ' '' ''            Case HISTORY_AREAS.LEVEL_FREQ_READ
+        ' '' ''                myData &= MyClass.EncodeHistoryResult(CInt(MyClass.SampleFrequencyReadResultAttr))
+        ' '' ''                myData &= MyClass.EncodeHistoryValue(CInt(MyClass.SampleFrequencyValue))
+        ' '' ''                myData &= MyClass.EncodeHistoryResult(CInt(MyClass.Reagent1FrequencyReadResultAttr))
+        ' '' ''                myData &= MyClass.EncodeHistoryValue(CInt(MyClass.Reagent1FrequencyValue))
+        ' '' ''                myData &= MyClass.EncodeHistoryResult(CInt(MyClass.Reagent2FrequencyReadResultAttr))
+        ' '' ''                myData &= MyClass.EncodeHistoryValue(CInt(MyClass.Reagent2FrequencyValue))
 
-                    Case HISTORY_AREAS.LEVEL_DET_TEST
-                        myData &= CInt(MyClass.CurrentArmAttr).ToString
-                        myData &= MyClass.CurrentRotorPositionAttr.ToString("000")
-                        myData &= CInt(MyClass.CurrentRing).ToString
-                        myData &= MyClass.EncodeHistoryResult(CInt(MyClass.DetectionTestResultAttr))
+        ' '' ''            Case HISTORY_AREAS.LEVEL_DET_TEST
+        ' '' ''                myData &= CInt(MyClass.CurrentArmAttr).ToString
+        ' '' ''                myData &= MyClass.CurrentRotorPositionAttr.ToString("000")
+        ' '' ''                myData &= CInt(MyClass.CurrentRing).ToString
+        ' '' ''                myData &= MyClass.EncodeHistoryResult(CInt(MyClass.DetectionTestResultAttr))
 
-                End Select
+        ' '' ''        End Select
 
 
-            Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.GenerateResultData", EventLogEntryType.Error, False)
-            End Try
+        ' '' ''    Catch ex As Exception
+        ' '' ''        'Dim myLogAcciones As New ApplicationLogManager()
+        ' '' ''        GlobalBase.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.GenerateResultData", EventLogEntryType.Error, False)
+        ' '' ''    End Try
 
-            Return myData
+        ' '' ''    Return myData
 
-        End Function
+        ' '' ''End Function
 
         ''' <summary>
         ''' Encodes History Result

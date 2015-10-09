@@ -802,6 +802,23 @@ Public Class Ax00ServiceMainMDI
                         Next
 
 
+                        If Not ActiveMdiChild Is Nothing Then
+                            If (TypeOf ActiveMdiChild Is ILevelDetectionReactionsRotorTest) Then
+                                Dim CurrentMdiChild = CType(ActiveMdiChild, ILevelDetectionReactionsRotorTest)
+
+                                Select Case AnalyzerController.Instance.Analyzer.AnalyzerCurrentAction
+                                    Case AnalyzerManagerAx00Actions.WASHSTATION_CTRL_START
+                                        ' Nothing by now
+                                    Case AnalyzerManagerAx00Actions.WASHSTATION_CTRL_END
+                                        CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
+                                    Case AnalyzerManagerAx00Actions.NEW_ROTOR_END
+
+                                        CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
+
+                                End Select
+                            End If
+                        End If
+
 
                         ' Refresh Instrument Update Utility screen
                         If Not ActiveMdiChild Is Nothing Then
@@ -1221,7 +1238,7 @@ Public Class Ax00ServiceMainMDI
                                 RecoverCompleted = True
 
                                 If Not Me.AdjustmentsReaded Then ' Read Adjustments if it they are not readed yet
-                                    
+
                                     OpenMDIChildForm(AnalyzerInfo)
 
                                 Else

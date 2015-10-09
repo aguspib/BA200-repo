@@ -38,19 +38,6 @@ Public Class ILevelDetectionReactionsRotorTest
     Private IsAlreadyLoadedAttr As Boolean = False
 #End Region
 
-#Region "Properties"
-    Public Property ActiveAnalyzerModel() As String
-        Get
-            Return Me.ActiveAnalyzerModelAttr
-        End Get
-        Set(ByVal value As String)
-            Me.ActiveAnalyzerModelAttr = value
-        End Set
-    End Property
-
-
-#End Region
-
 #Region "Constructor"
     Sub New()
         ' This call is required by the Windows Form Designer.
@@ -92,7 +79,7 @@ Public Class ILevelDetectionReactionsRotorTest
                 End Select
                 Exit Function
             ElseIf pResponse = RESPONSE_TYPES.EXCEPTION Then
-                MyClass.ReportHistoryError()
+                '' ''MyClass.ReportHistoryError()
                 MyClass.PrepareErrorMode()
                 Exit Function
             End If
@@ -156,7 +143,7 @@ Public Class ILevelDetectionReactionsRotorTest
                     End If
 
                 Case ADJUSTMENT_MODES.ERROR_MODE
-                    MyClass.ReportHistoryError()
+                    '' ''MyClass.ReportHistoryError()
                     MyBase.DisplayMessage(Messages.FWSCRIPT_DATA_ERROR.ToString)
                     PrepareErrorMode()
 
@@ -203,51 +190,52 @@ Public Class ILevelDetectionReactionsRotorTest
     Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDs As Biosystems.Ax00.Types.UIRefreshDS)
         Dim myGlobal As New GlobalDataTO
         Try
+            myScreenDelegate.RefreshDelegate(pRefreshEventType, pRefreshDs)
 
-            myScreenDelegate.RefreshDelegate(pRefreshEventType, pRefreshDS)
+            MyBase.OnReceptionLastFwScriptEvent(RESPONSE_TYPES.OK, Nothing)
+            PrepareArea()
 
+            '' ''If pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.PROBESVALUE_CHANGED) Then
 
-            If pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.PROBESVALUE_CHANGED) Then
+            '' ''    Dim myProbeValueChangedDT As New UIRefreshDS.ProbeValueChangedDataTable
+            '' ''    myProbeValueChangedDT = pRefreshDs.ProbeValueChanged
+            '' ''    For Each P As UIRefreshDS.ProbeValueChangedRow In myProbeValueChangedDT.Rows
 
-                Dim myProbeValueChangedDT As New UIRefreshDS.ProbeValueChangedDataTable
-                myProbeValueChangedDT = pRefreshDS.ProbeValueChanged
-                For Each P As UIRefreshDS.ProbeValueChangedRow In myProbeValueChangedDT.Rows
+            '' ''        Dim myFreqValue As Single = P.DetectionFrequency
+            '' ''        Dim myDisplayLabel As Label = Nothing
+            '' ''        Dim myArm As LevelDetectionTestDelegate.Arms
 
-                    Dim myFreqValue As Single = P.DetectionFrequency
-                    Dim myDisplayLabel As Label = Nothing
-                    Dim myArm As LevelDetectionTestDelegate.Arms
+            '' ''        Select Case P.ProbeID.ToUpperBS.Trim  ' ToUpper.Trim
 
-                    Select Case P.ProbeID.ToUpperBS.Trim  ' ToUpper.Trim
-
-                        'SAMPLE
-                        Case POLL_IDs.DM1.ToString
-                            myArm = LevelDetectionTestDelegate.Arms.SAMPLE
-                            '' ''myDisplayLabel = Me.BsFreqSampleValueLabel
-
-
-                            'REAGENT 1
-                        Case POLL_IDs.DR1.ToString
-                            myArm = LevelDetectionTestDelegate.Arms.REAGENT1
-                            myDisplayLabel = Me.lblLdminValue
+            '' ''            'SAMPLE
+            '' ''            Case POLL_IDs.DM1.ToString
+            '' ''                myArm = LevelDetectionTestDelegate.Arms.SAMPLE
+            '' ''                '' ''myDisplayLabel = Me.BsFreqSampleValueLabel
 
 
-                            'REAGENT 2
-                        Case POLL_IDs.DR2.ToString
-                            myArm = LevelDetectionTestDelegate.Arms.REAGENT2
-                            '' ''myDisplayLabel = Me.BsFreqReagent2ValueLabel
-
-                    End Select
-
-                    MyClass.CheckFrequencyLimits(myArm, myDisplayLabel, myFreqValue)
-
-                    If myArm = LevelDetectionTestDelegate.Arms.REAGENT2 Then
-                        MyBase.CurrentMode = ADJUSTMENT_MODES.FREQUENCY_READED
-                        MyClass.PrepareArea()
-                    End If
-                Next
+            '' ''                'REAGENT 1
+            '' ''            Case POLL_IDs.DR1.ToString
+            '' ''                myArm = LevelDetectionTestDelegate.Arms.REAGENT1
+            '' ''                myDisplayLabel = Me.lblLdminValue
 
 
-            End If
+            '' ''                'REAGENT 2
+            '' ''            Case POLL_IDs.DR2.ToString
+            '' ''                myArm = LevelDetectionTestDelegate.Arms.REAGENT2
+            '' ''                '' ''myDisplayLabel = Me.BsFreqReagent2ValueLabel
+
+            '' ''        End Select
+
+            '' ''        '' ''MyClass.CheckFrequencyLimits(myArm, myDisplayLabel, myFreqValue)
+
+            '' ''        If myArm = LevelDetectionTestDelegate.Arms.REAGENT2 Then
+            '' ''            MyBase.CurrentMode = ADJUSTMENT_MODES.FREQUENCY_READED
+            '' ''            MyClass.PrepareArea()
+            '' ''        End If
+            '' ''    Next
+
+
+            '' ''End If
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".RefreshScreen ", EventLogEntryType.Error, _
@@ -263,27 +251,6 @@ Public Class ILevelDetectionReactionsRotorTest
 #Region "Private Methods"
 
 #Region "Common"
-
-    '' '' ''' <summary>
-    '' '' ''' reset all homes
-    '' '' ''' </summary>
-    '' '' ''' <returns></returns>
-    '' '' ''' <remarks>SGM 10/03/11</remarks>
-    '' ''Private Function InitializeHomes() As GlobalDataTO
-    '' ''    Dim myGlobal As New GlobalDataTO
-    '' ''    Try
-    '' ''        myGlobal = myScreenDelegate.ResetAllPreliminaryHomes(MyBase.myServiceMDI.ActiveAnalyzer)
-
-    '' ''    Catch ex As Exception
-    '' ''        myGlobal.HasError = True
-    '' ''        myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-    '' ''        myGlobal.ErrorMessage = ex.Message
-    '' ''        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeHomes ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-    '' ''        MyBase.ShowMessage(Me.Name & ".InitializeHomes", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
-    '' ''    End Try
-    '' ''    Return myGlobal
-    '' ''End Function
-
 
     ''' <summary>
     ''' Generic function to send FwScripts to the Instrument through own delegates
@@ -327,6 +294,12 @@ Public Class ILevelDetectionReactionsRotorTest
     Private Sub GetScreenLabels()
         Try
             Dim MLRD As New MultilanguageResourcesDelegate
+
+            Me.BsTestTitleLabel.Text = MLRD.GetResourceText(Nothing, "MSG_SRV_LEVEL_DETECTION_TEST", currentLanguage)
+            Me.BsTitleLabel.Text = MLRD.GetResourceText(Nothing, "LBL_SRV_LEV_DET", currentLanguage)
+
+            'TODO: ACR Pass to the Base Class
+            Me.BsInfoTitle.Text = MLRD.GetResourceText(Nothing, "LBL_SRV_INFO_TITLE", currentLanguage)
 
             '' ''Me.gpbLevelDetection.Text = MLRD.GetResourceText(Nothing, "LBL_SRV_FREQUENCY_READ", currentLanguage) & " (" & LevelDetectionTestDelegate.FREQ_UNIT & ")"
             '' ''Me.BsFreqSampleLabel.Text = MLRD.GetResourceText(Nothing, "LBL_SRV_SAMPLE", currentLanguage)
@@ -380,15 +353,13 @@ Public Class ILevelDetectionReactionsRotorTest
         Try
             MyBase.SetButtonImage(Me.btnStartTest, "ADJUSTMENT")
             MyBase.SetButtonImage(Me.btnShowLevel, "ACCEPT1")
-            MyBase.SetButtonImage(Me.BsExitButton, "BTN_CloseScreen")
-            MyBase.SetButtonImage(Me.btnCancel, "BTN_Cancel")
+            MyBase.SetButtonImage(Me.BsExitButton, "CANCEL")
+            MyBase.SetButtonImage(Me.btnCancel, "UNDO")
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareButtons", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
-
-
 
     ''' <summary>
     ''' Set all the screen elements to disabled
@@ -431,6 +402,15 @@ Public Class ILevelDetectionReactionsRotorTest
 
                 Case ADJUSTMENT_MODES.LOADED
                     MyClass.PrepareLoadedMode()
+
+                Case ADJUSTMENT_MODES.MBEV_WASHING_STATION_IS_UP
+                    MyClass.PrepareWashingStationIsUpMode()
+
+                Case ADJUSTMENT_MODES.LD_WASH_STATION_IS_UP_TO_START
+                    SetToStartedTestState()
+                    '' ''MyClass.PrepareWashingStationIsUpMode()
+                Case ADJUSTMENT_MODES.LD_WASH_STATION_NROTOR_DONE
+                    WashStationToDown()
 
                 Case ADJUSTMENT_MODES.FREQUENCY_READING
                     MyClass.PrepareFrequencyReading()
@@ -512,23 +492,13 @@ Public Class ILevelDetectionReactionsRotorTest
     ''' <remarks>Created by XBC 22/03/2011</remarks>
     Private Sub PrepareLoadedMode()
         Try
-            '' ''If myScreenDelegate.CurrentHistoryArea = LevelDetectionReactionsRotorTestDelegate.HISTORY_AREAS.LEVEL_FREQ_READ Or _
-            '' ''myScreenDelegate.CurrentHistoryArea = LevelDetectionReactionsRotorTestDelegate.HISTORY_AREAS.LEVEL_DET_TEST Then
-            '' ''    MyClass.ReportHistory()
-            '' ''End If
-
-            '' ''MyClass.myScreenDelegate.CurrentOperation = LevelDetectionReactionsRotorTestDelegate.OPERATIONS._NONE
-            '' ''MyClass.myScreenDelegate.CurrentHistoryArea = LevelDetectionReactionsRotorTestDelegate.HISTORY_AREAS.NONE
 
             Me.btnStartTest.Enabled = True
-
-            '' ''Me.BsDetectionMonitorLED.CurrentStatus = Biosystems.Ax00.Controls.UserControls.BSMonitorControlBase.Status.DISABLED
             Me.btnShowLevel.Enabled = False
             Me.btnCancel.Enabled = False
-            '' ''Me.BsDetectionArmComboBox.Enabled = True
-            '' ''Me.BsDetectionPosUpDown.Enabled = True
-
             Me.BsExitButton.Enabled = True
+            Me.lblLdminValue.Text = ""
+            Me.lblLdmemValue.Text = ""
 
             MyBase.ActivateMDIMenusButtons(True)
 
@@ -541,6 +511,73 @@ Public Class ILevelDetectionReactionsRotorTest
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareLoadedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareLoadedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
+    End Sub
+
+    ''' <summary>
+    ''' Prepare GUI to Started test Mode
+    ''' </summary>
+    ''' <remarks></remarks>
+    Private Sub SetToStartedTestState()
+        DisableAll()
+
+        Me.btnShowLevel.Enabled = True
+        Me.btnCancel.Enabled = True
+        Me.lblLdminValue.Text = ""
+        Me.lblLdmemValue.Text = ""
+        Me.btnShowLevel.Cursor = Cursors.Default
+        Me.btnCancel.Cursor = Cursors.Default
+        Me.Cursor = Cursors.Default
+    End Sub
+
+    ''' <summary>
+    ''' Prepare GUI for Washing Station is Up Mode
+    ''' </summary>
+    ''' <remarks>Created by SGM 21/11/2011</remarks>
+    Private Sub PrepareWashingStationIsUpMode()
+        Try
+            MyClass.myScreenDelegate.IsWashingStationDown = False
+
+            If MyBase.SimulationMode Then
+
+                '' ''MyClass.DisableCurrentPage()
+                '' ''MyClass.CurrentMode = ADJUSTMENT_MODES.MBEV_ALL_SWITCHING_OFF
+                '' ''myGlobal = MyBase.DisplayMessage(Messages.SRV_ALL_ITEMS_TO_DEFAULT.ToString)
+                '' ''MyClass.PrepareArea()
+
+                '' ''Me.Cursor = Cursors.WaitCursor
+                '' ''System.Threading.Thread.Sleep(MyBase.SimulationProcessTime)
+                '' ''System.Threading.Thread.Sleep(MyBase.SimulationProcessTime)
+
+                '' ''MyBase.CurrentMode = ADJUSTMENT_MODES.LOADED
+                '' ''MyClass.PrepareArea()
+
+
+            Else
+
+                ' '' ''    MyClass.EnableCurrentPage()
+
+                ' '' ''    MyBase.CurrentMode = ADJUSTMENT_MODES.LOADED
+                ' '' ''    MyClass.PrepareArea()
+
+                ' '' ''    'WS Aspiration or Dispensation SGM 18/05/2012
+                ' '' ''    If MyClass.CurrentTestPanel Is Me.BsWSAspirationTestPanel Or MyClass.CurrentTestPanel Is Me.BsWSDispensationTestPanel Then
+                ' '' ''        MyBase.DisplayMessage(Messages.SRV_MEBV_WS_IS_UP.ToString)
+                ' '' ''    Else
+                ' '' ''        MyBase.DisplayMessage(Messages.SRV_TEST_READY.ToString)
+                ' '' ''    End If
+
+                ' '' ''        Else
+                ' '' ''    MyClass.AllArmsToParking()
+                ' '' ''End If
+            End If
+
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareWashingStationIsUpMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            MyBase.ShowMessage(Me.Name & ".PrepareWashingStationIsUpMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+        End Try
+
+
+
     End Sub
 
     ''' <summary>
@@ -560,7 +597,6 @@ Public Class ILevelDetectionReactionsRotorTest
         End Try
     End Sub
 
-
     ''' <summary>
     ''' Assigns the specific screen's elements to the common screen layout structure
     ''' </summary>
@@ -577,7 +613,6 @@ Public Class ILevelDetectionReactionsRotorTest
             MyBase.ShowMessage(Me.Name & ".DefineScreenLayout ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
-
 
     ''' <summary>
     ''' 
@@ -637,41 +672,41 @@ Public Class ILevelDetectionReactionsRotorTest
     Private Sub LoadAdjustmentsData()
         Try
 
-            myScreenDelegate.S1VerticalSafetyPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_VSEC.ToString, GlobalEnumerates.AXIS.Z, True).Value)
-            myScreenDelegate.S1RotorPosRing1 = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1.ToString, GlobalEnumerates.AXIS.ROTOR, True).Value)
-            myScreenDelegate.S1RotorPosRing2 = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING2.ToString, GlobalEnumerates.AXIS.ROTOR, True).Value)
-            myScreenDelegate.S1RotorPosRing3 = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING3.ToString, GlobalEnumerates.AXIS.ROTOR, True).Value)
-            myScreenDelegate.S1RotorRing1HorPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1.ToString, GlobalEnumerates.AXIS.POLAR, True).Value)
-            myScreenDelegate.S1RotorRing2HorPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING2.ToString, GlobalEnumerates.AXIS.POLAR, True).Value)
-            myScreenDelegate.S1RotorRing3HorPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING3.ToString, GlobalEnumerates.AXIS.POLAR, True).Value)
-            myScreenDelegate.S1RotorRing1DetMaxVerPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1.ToString, GlobalEnumerates.AXIS.Z, True).Value)
-            myScreenDelegate.S1RotorRing2DetMaxVerPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING2.ToString, GlobalEnumerates.AXIS.Z, True).Value)
-            myScreenDelegate.S1RotorRing3DetMaxVerPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING3.ToString, GlobalEnumerates.AXIS.Z, True).Value)
-            myScreenDelegate.S1VerticalSafetyPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_VSEC.ToString, GlobalEnumerates.AXIS.Z, True).Value)
-            myScreenDelegate.S1ParkingPolar = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_PARK.ToString, GlobalEnumerates.AXIS.POLAR, True).Value)
-            myScreenDelegate.S1ParkingZ = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_PARK.ToString, GlobalEnumerates.AXIS.Z, True).Value)
+            '' ''myScreenDelegate.S1VerticalSafetyPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_VSEC.ToString, GlobalEnumerates.AXIS.Z, True).Value)
+            '' ''myScreenDelegate.S1RotorPosRing1 = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1.ToString, GlobalEnumerates.AXIS.ROTOR, True).Value)
+            '' ''myScreenDelegate.S1RotorPosRing2 = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING2.ToString, GlobalEnumerates.AXIS.ROTOR, True).Value)
+            '' ''myScreenDelegate.S1RotorPosRing3 = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING3.ToString, GlobalEnumerates.AXIS.ROTOR, True).Value)
+            '' ''myScreenDelegate.S1RotorRing1HorPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1.ToString, GlobalEnumerates.AXIS.POLAR, True).Value)
+            '' ''myScreenDelegate.S1RotorRing2HorPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING2.ToString, GlobalEnumerates.AXIS.POLAR, True).Value)
+            '' ''myScreenDelegate.S1RotorRing3HorPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING3.ToString, GlobalEnumerates.AXIS.POLAR, True).Value)
+            '' ''myScreenDelegate.S1RotorRing1DetMaxVerPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1.ToString, GlobalEnumerates.AXIS.Z, True).Value)
+            '' ''myScreenDelegate.S1RotorRing2DetMaxVerPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING2.ToString, GlobalEnumerates.AXIS.Z, True).Value)
+            '' ''myScreenDelegate.S1RotorRing3DetMaxVerPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING3.ToString, GlobalEnumerates.AXIS.Z, True).Value)
+            '' ''myScreenDelegate.S1VerticalSafetyPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_VSEC.ToString, GlobalEnumerates.AXIS.Z, True).Value)
+            '' ''myScreenDelegate.S1ParkingPolar = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_PARK.ToString, GlobalEnumerates.AXIS.POLAR, True).Value)
+            '' ''myScreenDelegate.S1ParkingZ = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_PARK.ToString, GlobalEnumerates.AXIS.Z, True).Value)
 
-            myScreenDelegate.R1VerticalSafetyPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_VSEC.ToString, GlobalEnumerates.AXIS.Z, True).Value)
-            myScreenDelegate.R1RotorPosRing1 = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1.ToString, GlobalEnumerates.AXIS.ROTOR, True).Value)
-            myScreenDelegate.R1RotorPosRing2 = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_RING2.ToString, GlobalEnumerates.AXIS.ROTOR, True).Value)
-            myScreenDelegate.R1RotorRing1HorPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1.ToString, GlobalEnumerates.AXIS.POLAR, True).Value)
-            myScreenDelegate.R1RotorRing2HorPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_RING2.ToString, GlobalEnumerates.AXIS.POLAR, True).Value)
-            myScreenDelegate.R1RotorRing1DetMaxVerPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1.ToString, GlobalEnumerates.AXIS.Z, True).Value)
-            myScreenDelegate.R1RotorRing2DetMaxVerPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_RING2.ToString, GlobalEnumerates.AXIS.Z, True).Value)
-            myScreenDelegate.R1VerticalSafetyPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_VSEC.ToString, GlobalEnumerates.AXIS.Z, True).Value)
-            myScreenDelegate.R1ParkingPolar = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_PARK.ToString, GlobalEnumerates.AXIS.POLAR, True).Value)
-            myScreenDelegate.R1ParkingZ = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_PARK.ToString, GlobalEnumerates.AXIS.Z, True).Value)
+            '' ''myScreenDelegate.R1VerticalSafetyPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_VSEC.ToString, GlobalEnumerates.AXIS.Z, True).Value)
+            '' ''myScreenDelegate.R1RotorPosRing1 = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1.ToString, GlobalEnumerates.AXIS.ROTOR, True).Value)
+            '' ''myScreenDelegate.R1RotorPosRing2 = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_RING2.ToString, GlobalEnumerates.AXIS.ROTOR, True).Value)
+            '' ''myScreenDelegate.R1RotorRing1HorPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1.ToString, GlobalEnumerates.AXIS.POLAR, True).Value)
+            '' ''myScreenDelegate.R1RotorRing2HorPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_RING2.ToString, GlobalEnumerates.AXIS.POLAR, True).Value)
+            '' ''myScreenDelegate.R1RotorRing1DetMaxVerPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_RING1.ToString, GlobalEnumerates.AXIS.Z, True).Value)
+            '' ''myScreenDelegate.R1RotorRing2DetMaxVerPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_RING2.ToString, GlobalEnumerates.AXIS.Z, True).Value)
+            '' ''myScreenDelegate.R1VerticalSafetyPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_VSEC.ToString, GlobalEnumerates.AXIS.Z, True).Value)
+            '' ''myScreenDelegate.R1ParkingPolar = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_PARK.ToString, GlobalEnumerates.AXIS.POLAR, True).Value)
+            '' ''myScreenDelegate.R1ParkingZ = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_PARK.ToString, GlobalEnumerates.AXIS.Z, True).Value)
 
-            myScreenDelegate.R2VerticalSafetyPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_VSEC.ToString, GlobalEnumerates.AXIS.Z, True).Value)
-            myScreenDelegate.R2RotorPosRing1 = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_RING1.ToString, GlobalEnumerates.AXIS.ROTOR, True).Value)
-            myScreenDelegate.R2RotorPosRing2 = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_RING2.ToString, GlobalEnumerates.AXIS.ROTOR, True).Value)
-            myScreenDelegate.R2RotorRing1HorPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_RING1.ToString, GlobalEnumerates.AXIS.POLAR, True).Value)
-            myScreenDelegate.R2RotorRing2HorPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_RING2.ToString, GlobalEnumerates.AXIS.POLAR, True).Value)
-            myScreenDelegate.R2RotorRing1DetMaxVerPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_RING1.ToString, GlobalEnumerates.AXIS.Z, True).Value)
-            myScreenDelegate.R2RotorRing2DetMaxVerPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_RING2.ToString, GlobalEnumerates.AXIS.Z, True).Value)
-            myScreenDelegate.R2VerticalSafetyPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_VSEC.ToString, GlobalEnumerates.AXIS.Z, True).Value)
-            myScreenDelegate.R2ParkingPolar = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_PARK.ToString, GlobalEnumerates.AXIS.POLAR, True).Value)
-            myScreenDelegate.R2ParkingZ = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_PARK.ToString, GlobalEnumerates.AXIS.Z, True).Value)
+            '' ''myScreenDelegate.R2VerticalSafetyPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_VSEC.ToString, GlobalEnumerates.AXIS.Z, True).Value)
+            '' ''myScreenDelegate.R2RotorPosRing1 = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_RING1.ToString, GlobalEnumerates.AXIS.ROTOR, True).Value)
+            '' ''myScreenDelegate.R2RotorPosRing2 = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_RING2.ToString, GlobalEnumerates.AXIS.ROTOR, True).Value)
+            '' ''myScreenDelegate.R2RotorRing1HorPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_RING1.ToString, GlobalEnumerates.AXIS.POLAR, True).Value)
+            '' ''myScreenDelegate.R2RotorRing2HorPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_RING2.ToString, GlobalEnumerates.AXIS.POLAR, True).Value)
+            '' ''myScreenDelegate.R2RotorRing1DetMaxVerPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_RING1.ToString, GlobalEnumerates.AXIS.Z, True).Value)
+            '' ''myScreenDelegate.R2RotorRing2DetMaxVerPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_RING2.ToString, GlobalEnumerates.AXIS.Z, True).Value)
+            '' ''myScreenDelegate.R2VerticalSafetyPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_VSEC.ToString, GlobalEnumerates.AXIS.Z, True).Value)
+            '' ''myScreenDelegate.R2ParkingPolar = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_PARK.ToString, GlobalEnumerates.AXIS.POLAR, True).Value)
+            '' ''myScreenDelegate.R2ParkingZ = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_PARK.ToString, GlobalEnumerates.AXIS.Z, True).Value)
 
             ''Washing NEEDED?
             'myScreenDelegate.S1WSHorizontalPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_WASH.ToString, GlobalEnumerates.AXIS.POLAR, True).Value)
@@ -686,8 +721,6 @@ Public Class ILevelDetectionReactionsRotorTest
             MyBase.ShowMessage(Me.Name & ".LoadAdjustmentsData ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
-
-
 
     Private Sub ExitScreen()
         Try
@@ -714,7 +747,7 @@ Public Class ILevelDetectionReactionsRotorTest
 
             Me.lblLdmemValue.ForeColor = Color.Gray
             Me.lblLdminValue.ForeColor = Color.Gray
-           
+
             MyBase.DisplayMessage(Messages.SRV_FREQUENCY_READING.ToString)
 
         Catch ex As Exception
@@ -751,123 +784,60 @@ Public Class ILevelDetectionReactionsRotorTest
         End Try
     End Sub
 
+    '' ''Private Function ReadFrequencies() As GlobalDataTO
+
+    '' ''    Dim myGlobal As New GlobalDataTO
+
+    '' ''    Try
+    '' ''        MyClass.myScreenDelegate.CurrentHistoryArea = LevelDetectionReactionsRotorTestDelegate.HISTORY_AREAS.LEVEL_FREQ_READ
+    '' ''        MyBase.CurrentMode = ADJUSTMENT_MODES.FREQUENCY_READING
+    '' ''        MyClass.PrepareArea()
+
+    '' ''        If MyBase.SimulationMode Then
+    '' ''            '' ''Dim myFreqValue As Single
+
+    '' ''            '' ''System.Threading.Thread.Sleep(100)
+    '' ''            '' ''myFreqValue = 1880 + (85 * Rnd(999) * Rnd(1))
+    '' ''            '' ''MyClass.CheckFrequencyLimits(LevelDetectionTestDelegate.Arms.SAMPLE, Me.BsFreqSampleValueLabel, myFreqValue)
+
+    '' ''            '' ''System.Threading.Thread.Sleep(100)
+    '' ''            '' ''myFreqValue = 883 + (102 * Rnd(939) * Rnd(2))
+    '' ''            '' ''MyClass.CheckFrequencyLimits(LevelDetectionTestDelegate.Arms.REAGENT1, Me.lblLdminValue, myFreqValue)
 
 
+    '' ''            '' ''System.Threading.Thread.Sleep(100)
+    '' ''            '' ''myFreqValue = 805 + (152 * Rnd(299) * Rnd(9))
+    '' ''            '' ''MyClass.CheckFrequencyLimits(LevelDetectionTestDelegate.Arms.REAGENT2, Me.BsFreqReagent2ValueLabel, myFreqValue)
 
 
+    '' ''            '' ''MyBase.myServiceMDI.SEND_INFO_START()
 
-    Private Function ReadFrequencies() As GlobalDataTO
+    '' ''            '' ''MyBase.CurrentMode = ADJUSTMENT_MODES.FREQUENCY_READED
+    '' ''            '' ''MyClass.PrepareArea()
 
-        Dim myGlobal As New GlobalDataTO
+    '' ''        Else
 
-        Try
-            MyClass.myScreenDelegate.CurrentHistoryArea = LevelDetectionReactionsRotorTestDelegate.HISTORY_AREAS.LEVEL_FREQ_READ
-            MyBase.CurrentMode = ADJUSTMENT_MODES.FREQUENCY_READING
-            MyClass.PrepareArea()
+    '' ''            myGlobal = MyClass.myScreenDelegate.REQUEST_FREQUENCY_INFO(LevelDetectionReactionsRotorTestDelegate.Arms.SAMPLE)
+    '' ''            Application.DoEvents()
+    '' ''            'System.Threading.Thread.Sleep(100)
+    '' ''            myGlobal = MyClass.myScreenDelegate.REQUEST_FREQUENCY_INFO(LevelDetectionReactionsRotorTestDelegate.Arms.REAGENT1)
+    '' ''            Application.DoEvents()
+    '' ''            'System.Threading.Thread.Sleep(100)
+    '' ''            myGlobal = MyClass.myScreenDelegate.REQUEST_FREQUENCY_INFO(LevelDetectionReactionsRotorTestDelegate.Arms.REAGENT2)
 
-            If MyBase.SimulationMode Then
-                '' ''Dim myFreqValue As Single
+    '' ''        End If
 
-                '' ''System.Threading.Thread.Sleep(100)
-                '' ''myFreqValue = 1880 + (85 * Rnd(999) * Rnd(1))
-                '' ''MyClass.CheckFrequencyLimits(LevelDetectionTestDelegate.Arms.SAMPLE, Me.BsFreqSampleValueLabel, myFreqValue)
-
-                '' ''System.Threading.Thread.Sleep(100)
-                '' ''myFreqValue = 883 + (102 * Rnd(939) * Rnd(2))
-                '' ''MyClass.CheckFrequencyLimits(LevelDetectionTestDelegate.Arms.REAGENT1, Me.lblLdminValue, myFreqValue)
-
-
-                '' ''System.Threading.Thread.Sleep(100)
-                '' ''myFreqValue = 805 + (152 * Rnd(299) * Rnd(9))
-                '' ''MyClass.CheckFrequencyLimits(LevelDetectionTestDelegate.Arms.REAGENT2, Me.BsFreqReagent2ValueLabel, myFreqValue)
-
-
-                '' ''MyBase.myServiceMDI.SEND_INFO_START()
-
-                '' ''MyBase.CurrentMode = ADJUSTMENT_MODES.FREQUENCY_READED
-                '' ''MyClass.PrepareArea()
-
-            Else
-
-                myGlobal = MyClass.myScreenDelegate.REQUEST_FREQUENCY_INFO(LevelDetectionReactionsRotorTestDelegate.Arms.SAMPLE)
-                Application.DoEvents()
-                'System.Threading.Thread.Sleep(100)
-                myGlobal = MyClass.myScreenDelegate.REQUEST_FREQUENCY_INFO(LevelDetectionReactionsRotorTestDelegate.Arms.REAGENT1)
-                Application.DoEvents()
-                'System.Threading.Thread.Sleep(100)
-                myGlobal = MyClass.myScreenDelegate.REQUEST_FREQUENCY_INFO(LevelDetectionReactionsRotorTestDelegate.Arms.REAGENT2)
-
-            End If
-
-        Catch ex As Exception
-            myGlobal.HasError = True
-            myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-            myGlobal.ErrorMessage = ex.Message
-            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " ReadHardwareValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
-        End Try
-        Return myGlobal
-    End Function
+    '' ''    Catch ex As Exception
+    '' ''        myGlobal.HasError = True
+    '' ''        myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+    '' ''        myGlobal.ErrorMessage = ex.Message
+    '' ''        GlobalBase.CreateLogActivity(ex.Message, Me.Name & " ReadHardwareValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '' ''        MyBase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
+    '' ''    End Try
+    '' ''    Return myGlobal
+    '' ''End Function
 
 
-    Private Sub CheckFrequencyLimits(ByVal pArm As LevelDetectionTestDelegate.Arms, ByVal pLabel As Label, ByVal pValue As Single)
-
-        Dim myResult As LevelDetectionReactionsRotorTestDelegate.HISTORY_RESULTS = LevelDetectionReactionsRotorTestDelegate.HISTORY_RESULTS.NOT_DONE
-
-        Try
-            If pLabel IsNot Nothing Then
-
-                Dim isOK As Boolean
-
-                Select Case pArm
-                    Case LevelDetectionTestDelegate.Arms.SAMPLE
-                        isOK = (pValue > MyClass.myScreenDelegate.SampleFreqMinLimit And pValue < MyClass.myScreenDelegate.SampleFreqMaxLimit)
-                        myScreenDelegate.SampleFrequencyValue = pValue
-
-                    Case LevelDetectionTestDelegate.Arms.REAGENT1
-                        isOK = (pValue > MyClass.myScreenDelegate.ReagentsFreqMinLimit And pValue < MyClass.myScreenDelegate.ReagentsFreqMaxLimit)
-                        myScreenDelegate.Reagent1FrequencyValue = pValue
-
-                    Case LevelDetectionTestDelegate.Arms.REAGENT2
-                        isOK = (pValue > MyClass.myScreenDelegate.ReagentsFreqMinLimit And pValue < MyClass.myScreenDelegate.ReagentsFreqMaxLimit)
-                        myScreenDelegate.Reagent2FrequencyValue = pValue
-
-                    Case Else
-                        Exit Sub
-
-                End Select
-
-                pLabel.Text = CInt(pValue).ToString
-
-
-                If isOK Then
-                    pLabel.ForeColor = Color.LimeGreen
-                    myResult = LevelDetectionReactionsRotorTestDelegate.HISTORY_RESULTS.FREQ_OK
-                Else
-                    pLabel.ForeColor = Color.Red
-                    myResult = LevelDetectionReactionsRotorTestDelegate.HISTORY_RESULTS.FREQ_NOK
-                End If
-
-                Select Case pArm
-                    Case LevelDetectionTestDelegate.Arms.SAMPLE : MyClass.myScreenDelegate.SampleFrequencyReadResult = myResult
-                    Case LevelDetectionTestDelegate.Arms.REAGENT1 : MyClass.myScreenDelegate.Reagent1FrequencyReadResult = myResult
-                    Case LevelDetectionTestDelegate.Arms.REAGENT2 : MyClass.myScreenDelegate.Reagent2FrequencyReadResult = myResult
-                End Select
-
-                pLabel.Refresh()
-
-                MyClass.SetFrequencyTooltip(pArm, Not isOK)
-
-                MyBase.myServiceMDI.Focus()
-
-            End If
-        Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " CheckFrequencyLimits ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
-
-        End Try
-
-    End Sub
 
     Private Sub SetFrequencyTooltip(ByVal pArm As LevelDetectionTestDelegate.Arms, ByVal pIsOut As Boolean)
         Try
@@ -894,13 +864,10 @@ Public Class ILevelDetectionReactionsRotorTest
         End Try
     End Sub
 
-
 #End Region
 
 
 #Region "Detection Test"
-
-   
 
     Private Sub PrepareDetectingMode()
         Try
@@ -922,7 +889,6 @@ Public Class ILevelDetectionReactionsRotorTest
             MyBase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
-
 
     Private Sub PrepareDetectedMode()
 
@@ -967,66 +933,6 @@ Public Class ILevelDetectionReactionsRotorTest
         End Try
     End Sub
 
-
-#End Region
-
-
-#Region "History Methods"
-
-
-    ''' <summary>
-    ''' Updates the screen delegate's properties used for History management
-    ''' </summary>
-    ''' <param name="pResult"></param>
-    ''' <remarks>Created by SGM 02/08/2011</remarks>
-    Private Sub ReportHistory(Optional ByVal pResult As LevelDetectionReactionsRotorTestDelegate.HISTORY_RESULTS = LevelDetectionReactionsRotorTestDelegate.HISTORY_RESULTS.NOT_DONE, _
-                              Optional ByVal pArm As LevelDetectionTestDelegate.Arms = LevelDetectionTestDelegate.Arms._NONE)
-        Try
-
-
-            Select Case MyClass.myScreenDelegate.CurrentHistoryArea
-
-                Case LevelDetectionReactionsRotorTestDelegate.HISTORY_AREAS.LEVEL_FREQ_READ
-                    If pResult <> LevelDetectionTestDelegate.HISTORY_RESULTS.NOT_DONE Then
-                        Select Case pArm
-                            Case LevelDetectionTestDelegate.Arms.SAMPLE : MyClass.myScreenDelegate.SampleFrequencyReadResult = pResult
-                            Case LevelDetectionTestDelegate.Arms.REAGENT1 : MyClass.myScreenDelegate.Reagent1FrequencyReadResult = pResult
-                            Case LevelDetectionTestDelegate.Arms.REAGENT2 : MyClass.myScreenDelegate.Reagent2FrequencyReadResult = pResult
-                        End Select
-                    End If
-
-                Case LevelDetectionReactionsRotorTestDelegate.HISTORY_AREAS.LEVEL_DET_TEST
-                    If pResult <> LevelDetectionTestDelegate.HISTORY_RESULTS.NOT_DONE Then
-                        MyClass.myScreenDelegate.DetectionTestResult = pResult
-                    End If
-
-            End Select
-
-
-            MyClass.myScreenDelegate.ManageHistoryResults()
-
-        Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ReportHistory ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".ReportHistory ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
-        End Try
-
-    End Sub
-
-    ''' <summary>
-    ''' Report Task not performed successfully to History
-    ''' </summary>
-    ''' <remarks>Created by SGM 02/08/2011</remarks>
-    Private Sub ReportHistoryError()
-        Try
-
-            MyClass.ReportHistory(LevelDetectionReactionsRotorTestDelegate.HISTORY_RESULTS._ERROR)
-
-        Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ReportHistoryError ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".ReportHistoryError ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
-        End Try
-    End Sub
-
 #End Region
 
 #Region "Must Inherited"
@@ -1054,6 +960,9 @@ Public Class ILevelDetectionReactionsRotorTest
 
 #Region "Events"
 
+    Private Sub btnCancel_Click(sender As Object, e As EventArgs) Handles btnCancel.Click
+        PrepareLoadedMode()
+    End Sub
 
 
     ''' <summary>
@@ -1097,7 +1006,7 @@ Public Class ILevelDetectionReactionsRotorTest
 
             MyClass.PrepareButtons()
 
-          
+
             'Screen delegate SGM 20/01/2012
             MyClass.myScreenDelegate = New LevelDetectionReactionsRotorTestDelegate(MyBase.AnalyzerModel, myFwScriptDelegate)
             '' ''MyClass.myScreenDelegate.CurrentRotorPosition = CInt(Me.BsDetectionPosUpDown.Value)
@@ -1147,22 +1056,81 @@ Public Class ILevelDetectionReactionsRotorTest
         End Try
     End Sub
 
+    Private Sub btnShowLevel_Click(sender As Object, e As EventArgs) Handles btnShowLevel.Click
+        Me.StartLevelDetectionTest()
+    End Sub
+
     Private Sub btnStartTest_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnStartTest.Click
         Dim myGlobal As New GlobalDataTO
         Try
-            myGlobal = MyClass.ReadFrequencies()
-
-            DisableAll()
-            If myGlobal.HasError Then
-                MyBase.CurrentMode = ADJUSTMENT_MODES.ERROR_MODE
-                MyClass.PrepareArea()
-            End If
-
+            Me.StartingLevelDetectionTest()
         Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsFrequencyButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".BsFrequencyButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".btnStartTest_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            MyBase.ShowMessage(Me.Name & ".btnStartTest_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
+
+    Private Sub StartLevelDetectionTest()
+        DisableAll()
+        Me.CurrentMode = ADJUSTMENT_MODES.LD_WASH_STATION_TO_NROTOR
+        myScreenDelegate.SendNEW_ROTOR()
+    End Sub
+
+    Private Sub WashStationToDown()
+
+    End Sub
+
+
+    ''' <summary>
+    ''' Brings the Washing Station Up, disable screen and displays Info
+    ''' </summary>
+    ''' <remarks>SGM 21/11/2011</remarks>
+    Private Sub StartingLevelDetectionTest()
+        Try
+            If MyBase.SimulationMode Then Exit Sub
+
+            MyBase.DisplayMessage(Messages.SRV_WS_TO_UP.ToString)
+
+            Me.myScreenDelegate.IsWashingStationDown = False
+
+            Me.DisableAll()
+
+            Me.CurrentMode = ADJUSTMENT_MODES.LD_WASH_STATION_TO_UP_TO_START
+
+            '' ''Me.OnWashingStationToUpTimerTick()
+            myScreenDelegate.SendWASH_STATION_CTRL(Ax00WashStationControlModes.UP)
+
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".WashingStationToDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            MyBase.ShowMessage(Me.Name & ".WashingStationToDown ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+        End Try
+    End Sub
+
+
+
+    '' ''Private Sub OnWashingStationToUpTimerTick()
+    '' ''    Dim myGlobal As New GlobalDataTO
+    '' ''    Try
+    '' ''        'MyClass.IsActionRequested = True
+
+    '' ''        If Not myGlobal.HasError Then
+    '' ''            myScreenDelegate.SendWASH_STATION_CTRL(Ax00WashStationControlModes.UP)
+    '' ''            'MyClass.SendFwScript(Me.CurrentMode)
+    '' ''            'Me.Cursor = Cursors.WaitCursor
+    '' ''        Else
+    '' ''            MyBase.CurrentMode = ADJUSTMENT_MODES.ERROR_MODE
+    '' ''            MyClass.PrepareArea()
+    '' ''        End If
+
+    '' ''    Catch ex As Exception
+    '' ''        myGlobal.HasError = True
+    '' ''        myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+    '' ''        myGlobal.ErrorMessage = ex.Message
+    '' ''        GlobalBase.CreateLogActivity(ex.Message, Me.Name & " OnWashingStationToUpTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '' ''        MyBase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
+    '' ''    End Try
+    '' ''End Sub
+
 
     Private Sub BsExitButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsExitButton.Click
         Try
@@ -1173,65 +1141,6 @@ Public Class ILevelDetectionReactionsRotorTest
             MyBase.ShowMessage(Me.Name & ".BsExitButton.Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
-
-
-
-   
-
-   
-
-    Private Sub BsDetectionButton_Click(ByVal sender As Object, ByVal e As System.EventArgs)
-
-        Dim myGlobal As New GlobalDataTO
-
-        Try
-            MyClass.myScreenDelegate.CurrentHistoryArea = LevelDetectionReactionsRotorTestDelegate.HISTORY_AREAS.LEVEL_DET_TEST
-            MyBase.CurrentMode = ADJUSTMENT_MODES.LEVEL_DETECTING
-            MyClass.PrepareArea()
-
-            If MyBase.SimulationMode Then
-
-                System.Threading.Thread.Sleep(2000)
-                Dim myDetected As Integer = CInt(Rnd(1))
-
-                If myDetected > 0 Then
-                    MyClass.myScreenDelegate.DetectionTestResult = LevelDetectionReactionsRotorTestDelegate.HISTORY_RESULTS.DETECTED
-                    '' '' Me.BsDetectionMonitorLED.CurrentStatus = Biosystems.Ax00.Controls.UserControls.BSMonitorControlBase.Status._ON
-                    MyBase.DisplayMessage(Messages.SRV_LEVEL_DETECTED.ToString)
-                Else
-                    MyClass.myScreenDelegate.DetectionTestResult = LevelDetectionReactionsRotorTestDelegate.HISTORY_RESULTS.NOT_DETECTED
-                    '' ''Me.BsDetectionMonitorLED.CurrentStatus = Biosystems.Ax00.Controls.UserControls.BSMonitorControlBase.Status._OFF
-                    MyBase.DisplayMessage(Messages.SRV_LEVEL_NOT_DETECTED.ToString)
-                End If
-
-                System.Threading.Thread.Sleep(1000)
-                MyBase.CurrentMode = ADJUSTMENT_MODES.LEVEL_DETECTED
-                MyClass.PrepareArea()
-
-                MyBase.CurrentMode = ADJUSTMENT_MODES.LOADED
-                MyClass.PrepareArea()
-                MyBase.myServiceMDI.SEND_INFO_START()
-
-
-            Else
-
-                If MyClass.myScreenDelegate.CurrentArm = LevelDetectionTestDelegate.Arms._NONE Or _
-                MyClass.myScreenDelegate.CurrentRotor = LevelDetectionTestDelegate.Rotors._NONE Then
-                    MyClass.SetCurrentArmRotor()
-                End If
-                '' ''MyClass.myScreenDelegate.CurrentRotorPosition = CInt(Me.BsDetectionPosUpDown.Value)
-
-                ' Manage FwScripts must to be sent to send Conditioning instructions to Instrument
-                SendFwScript(Me.CurrentMode)
-
-            End If
-
-        Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsDetectionButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".BsDetectionButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
-        End Try
-    End Sub
-
 
     ''' <summary>
     ''' When the  ESC key is pressed, the screen is closed 
@@ -1257,5 +1166,7 @@ Public Class ILevelDetectionReactionsRotorTest
 
 
 #End Region
+
+
 
 End Class
