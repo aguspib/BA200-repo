@@ -2798,7 +2798,7 @@ Partial Public Class UiAx00MainMDI
     ''' <remarks>
     ''' Created by AJG 01/10/2015
     ''' </remarks>
-    Public Sub CheckAnalyzerCompatibility() Implements IMainMDI.CheckAnalyzerCompatibility
+    Public Function CheckAnalyzerCompatibility() As Boolean Implements IMainMDI.CheckAnalyzerCompatibility
         'AJG Gestionar si el analizador conectado es compatible con el software
         If Not AnalyzerController.Instance.Analyzer.IsConnectedWithRightModel() Then
             SyncLock thisLock
@@ -2814,7 +2814,9 @@ Partial Public Class UiAx00MainMDI
                     Close()
                 End If
             End SyncLock
+            Return False
         End If
-    End Sub
+        Return True
+    End Function
 
 End Class

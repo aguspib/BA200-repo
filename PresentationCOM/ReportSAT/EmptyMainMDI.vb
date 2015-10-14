@@ -63,8 +63,8 @@ Public Class EmptyMainMDI
         End If
     End Sub
 
-    Public Sub CheckAnalyzerCompatibility() Implements IMainMDI.CheckAnalyzerCompatibility
+    Public Function CheckAnalyzerCompatibility() As Boolean Implements IMainMDI.CheckAnalyzerCompatibility
 
-    End Sub
+    End Function
 End Class
 

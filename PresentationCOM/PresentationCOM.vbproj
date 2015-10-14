@@ -460,6 +460,12 @@
     <Compile Include="Reports\GenericTableReport.vb">
       <SubType>Component</SubType>
     </Compile>
+    <Content Include="Images\AboutBA2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\AboutBA2SRV.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\BtlInProcessAddSolBigR2.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

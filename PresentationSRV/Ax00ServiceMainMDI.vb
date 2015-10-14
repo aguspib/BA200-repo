@@ -664,7 +664,9 @@ Public Class Ax00ServiceMainMDI
             Dim copyRefreshEventList As New List(Of GlobalEnumerates.UI_RefreshEvents)
 
             'AJG Check if the connected analyzer is compatible with the software
-            CheckAnalyzerCompatibility()
+            If Not CheckAnalyzerCompatibility() Then
+                Exit Function
+            End If
 
             SyncLock lockThis
                 copyRefreshDS = CType(pRefreshDS.Copy(), UIRefreshDS)
@@ -2230,42 +2232,51 @@ Public Class Ax00ServiceMainMDI
     ''' <remarks>
     ''' Created by AJG 01/10/2015
     ''' </remarks>
-    Public Sub CheckAnalyzerCompatibility() Implements IMainMDI.CheckAnalyzerCompatibility
+    Public Function CheckAnalyzerCompatibility() As Boolean Implements IMainMDI.CheckAnalyzerCompatibility
         'AJG Gestionar si el analizador conectado es compatible con el software
         If Not AnalyzerController.Instance.Analyzer.IsConnectedWithRightModel() Then
-            If GlobalBase.GetSessionInfo.UserName.ToUpperInvariant() <> "BIOSRV" Then
-                Debug.Print("===>CheckAnalyzerCompatibility. Entro por usuario <> BIOSRV")
-                MessageAndClose()
-                Debug.Print("<===CheckAnalyzerCompatibility. Salgo por usuario <> BIOSRV")
-            Else
-                If AnalyzerController.Instance.Analyzer.Model <> AllowedAnalyzer Then
-                    Debug.Print("===>CheckAnalyzerCompatibility. Entro por modelo de analyzer <> allowedAnalyzer")
+            SyncLock thisLock
+                If GlobalBase.GetSessionInfo.UserName.ToUpperInvariant() <> "BIOSRV" Then
+                    Debug.Print("===>CheckAnalyzerCompatibility. Entro por usuario <> BIOSRV" + " Thread #" + Threading.Thread.CurrentThread.ManagedThreadId.ToString)
                     MessageAndClose()
-                    Debug.Print("<===CheckAnalyzerCompatibility. Salgo por usuario <> BIOSRV")
+                    Debug.Print("<===CheckAnalyzerCompatibility. Salgo por usuario <> BIOSRV" + " Thread #" + Threading.Thread.CurrentThread.ManagedThreadId.ToString)
+                Else
+                    If AnalyzerController.Instance.Analyzer.Model <> AllowedAnalyzer Then
+                        Debug.Print("===>CheckAnalyzerCompatibility. Entro por modelo de analyzer <> allowedAnalyzer" + " Thread #" + Threading.Thread.CurrentThread.ManagedThreadId.ToString)
+                        MessageAndClose()
+                        Debug.Print("<===CheckAnalyzerCompatibility. Salgo por usuario <> BIOSRV" + " Thread #" + Threading.Thread.CurrentThread.ManagedThreadId.ToString)
+                    Else
+                        Return True
+                    End If
                 End If
-            End If
+            End SyncLock
+            Return False
         End If
-    End Sub
+        Return True
+    End Function
 
     Private Mostrado As Boolean = False
     Private thisLock As New Object
 
     Private Sub MessageAndClose()
-        SyncLock thisLock
-            Dim auxtxt = New MultilanguageResourcesDelegate().GetResourceText(Nothing, "Para comunicar con el analizador debe utilizar la aplicación de B{0}. El programa actual se cerrará de forma automática", CurrentLanguageAttribute)
-            If auxtxt = "" Then
-                auxtxt = "Para comunicar con el analizador debe utilizar la aplicación de B{0}. El programa actual se cerrará de forma automática"
-            End If
-            Dim msgTxt = String.Format(auxtxt, AnalyzerController.Instance.Analyzer.GetModelNotCompatible)
-            If Not Mostrado Then
-                Mostrado = True
-                Debug.Print("!!! Voy a mostrar el mensajito")
-                BeginInvoke(Sub() MessageBox.Show(msgTxt))
-                QuitBecauseWrongAnalyzer = True
-                Close()
-                Debug.Print("!!! He llamado al close")
-            End If
-        End SyncLock
+        Dim auxtxt = New MultilanguageResourcesDelegate().GetResourceText(Nothing, "Para comunicar con el analizador debe utilizar la aplicación de B{0}. El programa actual se cerrará de forma automática", CurrentLanguageAttribute)
+        If auxtxt = "" Then
+            auxtxt = "Para comunicar con el analizador debe utilizar la aplicación de B{0}. El programa actual se cerrará de forma automática"
+        End If
+        Dim msgTxt = String.Format(auxtxt, AnalyzerController.Instance.Analyzer.GetModelNotCompatible)
+        If Not Mostrado Then
+            Mostrado = True
+            Debug.Print("!!! Voy a mostrar el mensajito" + " Thread #" + Threading.Thread.CurrentThread.ManagedThreadId.ToString)
+            'AJG. No quitar este DoEvents sin antes haber probado otras alternativas que funcionen!!!
+            Application.DoEvents()
+            MessageBox.Show(msgTxt)
+            'AJG. No quitar este DoEvents sin antes haber probado otras alternativas que funcionen!!!
+            Application.DoEvents()
+            QuitBecauseWrongAnalyzer = True
+            Close()
+            Debug.Print("!!! He llamado al close" + " Thread #" + Threading.Thread.CurrentThread.ManagedThreadId.ToString)
+        End If
+        Mostrado = True
     End Sub
 
     ''' <summary>
@@ -6390,7 +6401,9 @@ Public Class Ax00ServiceMainMDI
             'Option3: Use Background worker control
             'Me.Enabled = False 'AG 03/08/2010
 
-            CheckAnalyzerCompatibility()
+            If Not CheckAnalyzerCompatibility() Then
+                Exit Sub
+            End If
 
             If MyClass.FwScriptsLoadedOK Then
                 'only buttons bar and menus SGM 28/09/2011
