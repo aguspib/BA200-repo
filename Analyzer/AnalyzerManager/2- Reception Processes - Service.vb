@@ -1370,14 +1370,8 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <returns></returns>
         ''' <remarks>SGM 23/05/2011 - creation</remarks>
         Private Function ProcessHwPhotometricsStatusReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
-
             Dim myGlobal As New GlobalDataTO
-
             Try
-                'Dim myUtilities As New Utilities
-                'Dim myInstParamTO As New InstructionParameterTO
-                'Dim myElements As New Dictionary(Of GlobalEnumerates.PHOTOMETRICS_ELEMENTS, String) 'Local structure
-
                 ' Set Waiting Timer Current Instruction OFF
                 'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                 'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
@@ -1390,7 +1384,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 'Board temperature------------------------------------------------------------------
                 myGlobal = UpdateHwElement(pInstructionReceived, PHOTOMETRICS_ELEMENTS.GLF_TEMP)
 
-
                 'Reactions Rotor Motor------------------------------------------------------
                 myGlobal = UpdateHwElement(pInstructionReceived, PHOTOMETRICS_ELEMENTS.GLF_MR)
                 myGlobal = UpdateHwElement(pInstructionReceived, PHOTOMETRICS_ELEMENTS.GLF_MRH)
@@ -1398,19 +1391,13 @@ Namespace Biosystems.Ax00.Core.Entities
                 myGlobal = UpdateHwElement(pInstructionReceived, PHOTOMETRICS_ELEMENTS.GLF_MRE)
                 myGlobal = UpdateHwElement(pInstructionReceived, PHOTOMETRICS_ELEMENTS.GLF_MRED)
 
-
-
                 'Washing Station Vertical Motor (Pinta)---------------------------------------------
                 myGlobal = UpdateHwElement(pInstructionReceived, PHOTOMETRICS_ELEMENTS.GLF_MW)
                 myGlobal = UpdateHwElement(pInstructionReceived, PHOTOMETRICS_ELEMENTS.GLF_MWH)
                 myGlobal = UpdateHwElement(pInstructionReceived, PHOTOMETRICS_ELEMENTS.GLF_MWA)
 
-
-
                 'Washing Station Collision Detector-----------------------------------------------
                 myGlobal = UpdateHwElement(pInstructionReceived, PHOTOMETRICS_ELEMENTS.GLF_CD)
-
-
 
                 'Rotor Thermistor--------------------------------------------------------------
                 myGlobal = UpdateHwElement(pInstructionReceived, PHOTOMETRICS_ELEMENTS.GLF_PTH)
@@ -1452,7 +1439,14 @@ Namespace Biosystems.Ax00.Core.Entities
                 'Photometry Flash Memory State----------------------------------------
                 myGlobal = UpdateHwElement(pInstructionReceived, PHOTOMETRICS_ELEMENTS.GLF_PHFM)
 
+                'Level Detector. Average measure----------------------------------------
+                myGlobal = UpdateHwElement(pInstructionReceived, PHOTOMETRICS_ELEMENTS.GLF_LDMED)
 
+                'Level Detector. Minimum measure--------------------------------------------
+                myGlobal = UpdateHwElement(pInstructionReceived, PHOTOMETRICS_ELEMENTS.GLF_LDMIN)
+
+                'Level Detector. State------------------------------------------------------
+                myGlobal = UpdateHwElement(pInstructionReceived, PHOTOMETRICS_ELEMENTS.GLF_LD)
             Catch ex As Exception
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"

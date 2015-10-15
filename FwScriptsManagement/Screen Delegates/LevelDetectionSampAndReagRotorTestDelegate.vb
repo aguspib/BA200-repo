@@ -842,11 +842,11 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     Case ADJUSTMENT_MODES.ADJUSTMENTS_READING
                         myResultData = MyBase.SendQueueForREADINGADJUSTMENTS()
 
-                    Case ADJUSTMENT_MODES.LEVEL_DETECTING
-                        myResultData = MyClass.SendQueueForLEVEL_DETECTION_START(myAdjGroup)
+                        '' ''Case ADJUSTMENT_MODES.LEVEL_DETECTING
+                        '' ''    myResultData = MyClass.SendQueueForLEVEL_DETECTION_START(myAdjGroup)
 
-                    Case ADJUSTMENT_MODES.LEVEL_DETECTED
-                        myResultData = MyClass.SendQueueForLEVEL_DETECTION_END(myAdjGroup)
+                        '' ''Case ADJUSTMENT_MODES.LEVEL_DETECTED
+                        '' ''    myResultData = MyClass.SendQueueForLEVEL_DETECTION_END(myAdjGroup)
 
                 End Select
             Catch ex As Exception

@@ -1786,12 +1786,19 @@ Public Class Ax00ServiceMainMDI
                         If Not bsAnalyzerStatus Is Nothing Then
                             If copyRefreshEventList.Contains(GlobalEnumerates.UI_RefreshEvents.PHOTOMETRICSVALUE_CHANGED) Then
 
-                                ' Refresh Motors Pumps screen
+                               
                                 If Not ActiveMdiChild Is Nothing Then
+                                    'Refresh UiMotorsPumpsValvesTest screen
                                     If (TypeOf ActiveMdiChild Is UiPhotometryAdjustments) Or _
                                     (TypeOf ActiveMdiChild Is UiMotorsPumpsValvesTest) Then
 
                                         Dim CurrentMdiChild = CType(ActiveMdiChild, UiMotorsPumpsValvesTest)
+                                        CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
+                                    End If
+                                    'Refresh ILevelDetectionReactionsRotorTest
+                                    If (TypeOf ActiveMdiChild Is ILevelDetectionReactionsRotorTest) Then
+
+                                        Dim CurrentMdiChild = CType(ActiveMdiChild, ILevelDetectionReactionsRotorTest)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
                                 End If

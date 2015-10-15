@@ -151,6 +151,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 GetDetailsPOLLSNInstruction(Instructions) ' XBC 30/07/2012
                 GetDetailsPOLLRDInstruction(Instructions) 'AG 31/07/2012
 
+                GetDetailsPOLLGNFInstruction(Instructions)
+
                 GetANSFBLDInstruction(Instructions) 'AG 28/10/2014 BA-2062
 
             Catch ex As Exception
@@ -3793,6 +3795,24 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myInstructionTO.ParameterIndex = 28
                 Instructions.Add(myInstructionTO)
 
+                myInstructionTO = New InstructionParameterTO
+                myInstructionTO.InstructionType = "ANSGLF"
+                myInstructionTO.Parameter = "LDMED"   'Level Detector. Average measure
+                myInstructionTO.ParameterIndex = 29
+                Instructions.Add(myInstructionTO)
+
+                myInstructionTO = New InstructionParameterTO
+                myInstructionTO.InstructionType = "ANSGLF"
+                myInstructionTO.Parameter = "LDMIN"   'Level Detector Minimum measure
+                myInstructionTO.ParameterIndex = 30
+                Instructions.Add(myInstructionTO)
+
+                myInstructionTO = New InstructionParameterTO
+                myInstructionTO.InstructionType = "ANSGLF"
+                myInstructionTO.Parameter = "LD"   'Level Detector State, 0 OK 1 se ha detectado un desbordamiento 2 No se detecta la placa 3 Valor fuera de rango
+                myInstructionTO.ParameterIndex = 31
+                Instructions.Add(myInstructionTO)
+
                 myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496
 
             Catch ex As Exception
@@ -5066,6 +5086,110 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             End Try
         End Sub
+
+        ''' <summary>
+        ''' POLLGNF instructions definition (ask + answer)
+        ''' </summary>
+        ''' <param name="Instructions"></param>
+        ''' <remarks>
+        ''' Created by AG 31/07/2012
+        ''' </remarks>
+        Private Sub GetDetailsPOLLGNFInstruction(ByRef Instructions As List(Of InstructionParameterTO))
+            Try
+                Dim myInstructionTO As New InstructionParameterTO
+
+                'POLLGNF INSTRUCTION (Sw -> Fw)
+                ''''''''''''''''''''''''''''''
+                '"A"
+                myInstructionTO = New InstructionParameterTO
+                myInstructionTO.InstructionType = "POLLGNF"
+                myInstructionTO.Parameter = ""
+                myInstructionTO.ParameterIndex = 1
+                Instructions.Add(myInstructionTO)
+
+                '"TYPE"
+                myInstructionTO = New InstructionParameterTO
+                myInstructionTO.InstructionType = "POLLGNF"
+                myInstructionTO.Parameter = ""
+                myInstructionTO.ParameterIndex = 2
+                Instructions.Add(myInstructionTO)
+
+                '"LD field"
+                myInstructionTO = New InstructionParameterTO
+                myInstructionTO.InstructionType = "POLLGNF"
+                myInstructionTO.Parameter = "LD"
+                myInstructionTO.ParameterIndex = 3
+                Instructions.Add(myInstructionTO)
+
+                ''''''''
+                'ANSGNF - Firmware answers level detection data
+                ''''''''
+                myInstructionTO = New InstructionParameterTO
+                myInstructionTO.InstructionType = "ANSGNF"
+                myInstructionTO.Parameter = ""
+                myInstructionTO.ParameterIndex = 1
+                Instructions.Add(myInstructionTO)
+
+                myInstructionTO = New InstructionParameterTO
+                myInstructionTO.InstructionType = "ANSGNF"
+                myInstructionTO.Parameter = ""
+                myInstructionTO.ParameterIndex = 2
+                Instructions.Add(myInstructionTO)
+
+                '' ''myInstructionTO = New InstructionParameterTO
+                '' ''myInstructionTO.InstructionType = "ANSPRD"
+                '' ''myInstructionTO.Parameter = "A" 'Action
+                '' ''myInstructionTO.ParameterIndex = 3
+                '' ''Instructions.Add(myInstructionTO)
+
+                '' ''myInstructionTO = New InstructionParameterTO
+                '' ''myInstructionTO.InstructionType = "ANSPRD"
+                '' ''myInstructionTO.Parameter = "S" 'State
+                '' ''myInstructionTO.ParameterIndex = 4
+                '' ''Instructions.Add(myInstructionTO)
+
+                '' '' ''''''''
+                ' '' ''ANSTIN - Firmware answers PREPARATIONS with problems
+                '' '' ''''''''
+                '' ''myInstructionTO = New InstructionParameterTO
+                '' ''myInstructionTO.InstructionType = "ANSTIN"
+                '' ''myInstructionTO.Parameter = ""
+                '' ''myInstructionTO.ParameterIndex = 1
+                '' ''Instructions.Add(myInstructionTO)
+
+                '' ''myInstructionTO = New InstructionParameterTO
+                '' ''myInstructionTO.InstructionType = "ANSTIN"
+                '' ''myInstructionTO.Parameter = ""
+                '' ''myInstructionTO.ParameterIndex = 2
+                '' ''Instructions.Add(myInstructionTO)
+
+                '' ''myInstructionTO = New InstructionParameterTO
+                '' ''myInstructionTO.InstructionType = "ANSTIN"
+                '' ''myInstructionTO.Parameter = "N" 'Number
+                '' ''myInstructionTO.ParameterIndex = 3
+                '' ''Instructions.Add(myInstructionTO)
+
+                '' ''myInstructionTO = New InstructionParameterTO
+                '' ''myInstructionTO.InstructionType = "ANSTIN"
+                '' ''myInstructionTO.Parameter = "ID" 'Identificator
+                '' ''myInstructionTO.ParameterIndex = 4
+                '' ''Instructions.Add(myInstructionTO)
+
+                '' ''myInstructionTO = New InstructionParameterTO
+                '' ''myInstructionTO.InstructionType = "ANSTIN"
+                '' ''myInstructionTO.Parameter = "EC" 'Error code
+                '' ''myInstructionTO.ParameterIndex = 5
+                '' ''Instructions.Add(myInstructionTO)
+
+                '' ''myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496
+
+            Catch ex As Exception
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "InstructionTypesList.GetDetailsPOLLGNFInstruction", EventLogEntryType.Error, False)
+
+            End Try
+        End Sub
+
 
         ''' <summary>
         ''' Definition instruction ANSFBLD (based on rev47)

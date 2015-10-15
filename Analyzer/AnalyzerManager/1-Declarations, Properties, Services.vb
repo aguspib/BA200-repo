@@ -2828,6 +2828,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             Case AnalyzerManagerSwActionList.POLLSN
                                 myGlobal = PollSnSendEvent(myGlobal)
 
+
                                 ' SERVICE SOFTWARE END--------------------
                                 ''''''''''''''''''''''''''''''''''''''''
                                 'TIME OUT: HOW ARE YOU? <SEND EVENTS!!!>
