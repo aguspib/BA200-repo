@@ -174,6 +174,12 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
         '' ''Private DetectionTestResultAttr As HISTORY_RESULTS
 
+
+        Public WSReadyRefPos As Integer = -1
+        Public WSFinalPos As Integer = -1
+        Public WSReferencePos As Integer = -1
+
+        Public myLocalRefreshDS As New UIRefreshDS
 #End Region
 
 #Region "Properties"
@@ -205,7 +211,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         End Property
 
 
-        Private _IsWashingStationDown As Boolean
+        Private _IsWashingStationDown As Boolean = True
         Public Property IsWashingStationDown() As Boolean
             Get
                 Return _IsWashingStationDown
@@ -808,23 +814,16 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         Public Function SendFwScriptsQueueList(ByVal pMode As ADJUSTMENT_MODES) As GlobalDataTO
             Dim myResultData As New GlobalDataTO
             Try
-                Dim myAdjGroup As ADJUSTMENT_GROUPS
-                '' ''Select Case CurrentArm
-                '' ''    Case Arms.SAMPLE : myAdjGroup = ADJUSTMENT_GROUPS.SAMPLE_LEVEL_DET
-                '' ''    Case Arms.REAGENT1 : myAdjGroup = ADJUSTMENT_GROUPS.REAGENT1_LEVEL_DET
-                '' ''    Case Arms.REAGENT2 : myAdjGroup = ADJUSTMENT_GROUPS.REAGENT2_LEVEL_DET
-                '' ''End Select
-
                 ' Create the list of Scripts which are need to initialize this Adjustment
                 Select Case pMode
                     Case ADJUSTMENT_MODES.ADJUSTMENTS_READING
                         myResultData = MyBase.SendQueueForREADINGADJUSTMENTS()
 
-                    Case ADJUSTMENT_MODES.LEVEL_DETECTING
-                        myResultData = MyClass.SendQueueForLEVEL_DETECTION_START(myAdjGroup)
+                    Case ADJUSTMENT_MODES.LD_REQUESTING
+                        '' ''myResultData = Me.SendQueueForREAD_LEVEL_DETECTION_VALUES()
 
-                    Case ADJUSTMENT_MODES.LEVEL_DETECTED
-                        myResultData = MyClass.SendQueueForLEVEL_DETECTION_END(myAdjGroup)
+                    Case ADJUSTMENT_MODES.LD_WASH_STATION_TO_DOWN
+                        myResultData = Me.SendQueueForWASHING_STATION_DOWN
 
                 End Select
             Catch ex As Exception
@@ -834,6 +833,105 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
                 'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.SendFwScriptsQueueList", EventLogEntryType.Error, False)
+            End Try
+            Return myResultData
+        End Function
+
+
+        '' ''Private Function SendQueueForREAD_LEVEL_DETECTION_VALUES() As GlobalDataTO
+        '' ''    Dim myResultData As New GlobalDataTO
+        '' ''    Dim myListFwScript As New List(Of FwScriptQueueItem)
+        '' ''    Dim myFwScript1 As New FwScriptQueueItem
+        '' ''    Try
+        '' ''        If myFwScriptDelegate.CurrentFwScriptsQueue IsNot Nothing Then
+        '' ''            myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
+        '' ''        End If
+
+        '' ''        If Not myResultData.HasError Then
+        '' ''            With myFwScript1
+        '' ''                .FwScriptID = FwSCRIPTS_IDS.WASHING_STATION_ABS_Z.ToString
+        '' ''                .EvaluateType = EVALUATE_TYPES.NUM_VALUE
+        '' ''                .EvaluateValue = 1
+        '' ''                .NextOnResultOK = Nothing
+        '' ''                .NextOnResultNG = Nothing
+        '' ''                .NextOnTimeOut = Nothing
+        '' ''                .NextOnError = Nothing
+
+        '' ''                .ParamList = New List(Of String)
+        '' ''                '.ParamList.Add(MyClass.WSReadyRefPos.ToString)
+        '' ''                .ParamList.Add(MyClass.WSFinalPos.ToString)
+        '' ''                '.ParamList.Add(MyClass.WSReferencePos.ToString)
+
+        '' ''            End With
+
+        '' ''            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, True)
+
+        '' ''        End If
+
+
+        '' ''    Catch ex As Exception
+        '' ''        myResultData.HasError = True
+        '' ''        myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+        '' ''        myResultData.ErrorMessage = ex.Message
+
+        '' ''        If myFwScriptDelegate.CurrentFwScriptsQueue IsNot Nothing Then
+        '' ''            myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
+        '' ''        End If
+
+        '' ''        'Dim myLogAcciones As New ApplicationLogManager()
+        '' ''        GlobalBase.CreateLogActivity(ex.Message, "MotorsTestDelegate.SendQueueForWASHING_STATION_DOWN", EventLogEntryType.Error, False)
+        '' ''    End Try
+        '' ''    Return myResultData
+        '' ''End Function
+
+        ''' <summary>
+        ''' Sends the script for moving down the Washing Station
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks>Created by SGM 21/11/2011</remarks>
+        Private Function SendQueueForWASHING_STATION_DOWN() As GlobalDataTO
+            Dim myResultData As New GlobalDataTO
+            Dim myListFwScript As New List(Of FwScriptQueueItem)
+            Dim myFwScript1 As New FwScriptQueueItem
+
+            Try
+                If myFwScriptDelegate.CurrentFwScriptsQueue IsNot Nothing Then
+                    myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
+                End If
+
+                If Not myResultData.HasError Then
+                    With myFwScript1
+                        .FwScriptID = FwSCRIPTS_IDS.WASHING_STATION_ABS_Z.ToString
+                        .EvaluateType = EVALUATE_TYPES.NUM_VALUE
+                        .EvaluateValue = 1
+                        .NextOnResultOK = Nothing
+                        .NextOnResultNG = Nothing
+                        .NextOnTimeOut = Nothing
+                        .NextOnError = Nothing
+
+                        .ParamList = New List(Of String)
+                        '.ParamList.Add(MyClass.WSReadyRefPos.ToString)
+                        .ParamList.Add(MyClass.WSFinalPos.ToString)
+                        '.ParamList.Add(MyClass.WSReferencePos.ToString)
+
+                    End With
+
+                    If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, True)
+
+                End If
+
+
+            Catch ex As Exception
+                myResultData.HasError = True
+                myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myResultData.ErrorMessage = ex.Message
+
+                If myFwScriptDelegate.CurrentFwScriptsQueue IsNot Nothing Then
+                    myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
+                End If
+
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "MotorsTestDelegate.SendQueueForWASHING_STATION_DOWN", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -861,12 +959,25 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "MotorsTestDelegate.SendWASH_STATION_CTRL", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex)
             End Try
             Return myResultData
         End Function
 
+
+        Public Function SendPollHwGFL() As GlobalDataTO
+            Dim myResultData As New GlobalDataTO
+            Try
+                myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.POLLHW, True, Nothing, POLL_IDs.GLF) '#REFACTORING
+            Catch ex As Exception
+                myResultData.HasError = True
+                myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myResultData.ErrorMessage = ex.Message
+
+                GlobalBase.CreateLogActivity(ex)
+            End Try
+            Return myResultData
+        End Function
 
 
         ''' <summary>
@@ -1271,23 +1382,31 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         Public Sub RefreshDelegate(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As UIRefreshDS)
             Dim myResultData As New GlobalDataTO
             Try
-                If pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.PROBESVALUE_CHANGED) Then
-                    '' ''If MyClass.ReadDM1FreqRequested Then
-                    '' ''    ' sample
-                    '' ''    MyClass.ReadDM1FreqRequested = False
-                    '' ''End If
+                If pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.PHOTOMETRICSVALUE_CHANGED) Then
+                    '
+                    ' PHOTOMETRICS VALUES
+                    '
+                    'Generate UI_Refresh Photometrics values dataset
+                    myLocalRefreshDS.PhotometricsValueChanged.Rows.Clear()
 
-                    '' ''If MyClass.ReadDR1FreqRequested Then
-                    '' ''    ' Reagent 1
-                    '' ''    MyClass.ReadDR1FreqRequested = False
-                    '' ''End If
+                    For Each myRow As UIRefreshDS.PhotometricsValueChangedRow In pRefreshDS.PhotometricsValueChanged.Rows
+                        Dim myNewPhotometricsValuesRow As UIRefreshDS.PhotometricsValueChangedRow
+                        myNewPhotometricsValuesRow = myLocalRefreshDS.PhotometricsValueChanged.NewPhotometricsValueChangedRow
+                        With myNewPhotometricsValuesRow
+                            .BeginEdit()
+                            .ElementID = myRow.ElementID
+                            .Value = myRow.Value
+                            .EndEdit()
+                        End With
+                        myLocalRefreshDS.PhotometricsValueChanged.AddPhotometricsValueChangedRow(myNewPhotometricsValuesRow)
+                    Next
+                    myLocalRefreshDS.AcceptChanges()
+                    ' TODO - PENDING when FW ready to manage this !!!
 
-                    '' ''If MyClass.ReadDR2FreqRequested Then
-                    '' ''    ' Reagent 2
-                    '' ''    MyClass.ReadDR2FreqRequested = False
-                    '' ''End If
-
+                    '' ''Me.ReadGLFInfoDoneAttr = True
                 End If
+
+               
             Catch ex As Exception
                 myResultData.HasError = True
                 myResultData.ErrorCode = Messages.SYSTEM_ERROR.ToString

@@ -38,16 +38,20 @@ Partial Class ILevelDetectionReactionsRotorTest
         Me.btnStartTest = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.BsTestTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
         Me.BsLevelDetectionTestPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.BSWSWSGroupBox = New System.Windows.Forms.GroupBox()
+        Me.BsWSWSLabel = New System.Windows.Forms.Label()
+        Me.UpDownWSButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.BsButton3 = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.gpbLevelDetection = New System.Windows.Forms.GroupBox()
-        Me.btnCancel = New Biosystems.Ax00.Controls.UserControls.BSButton()
-        Me.btnShowLevel = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.lblLdmem = New System.Windows.Forms.Label()
         Me.lblLdmemValue = New System.Windows.Forms.Label()
+        Me.lblStatus = New System.Windows.Forms.Label()
         Me.BsMessagesPanel.SuspendLayout()
         CType(Me.BsMessageImage, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.BsButtonsPanel.SuspendLayout()
         Me.BsLevelDetectionInfoPanel.SuspendLayout()
         Me.BsLevelDetectionTestPanel.SuspendLayout()
+        Me.BSWSWSGroupBox.SuspendLayout()
         Me.gpbLevelDetection.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -196,13 +200,13 @@ Partial Class ILevelDetectionReactionsRotorTest
         '
         'lblLdmin
         '
-        Me.lblLdmin.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblLdmin.Location = New System.Drawing.Point(35, 46)
+        Me.lblLdmin.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblLdmin.Location = New System.Drawing.Point(35, 93)
         Me.lblLdmin.Margin = New System.Windows.Forms.Padding(3)
         Me.lblLdmin.Name = "lblLdmin"
         Me.lblLdmin.Size = New System.Drawing.Size(68, 24)
         Me.lblLdmin.TabIndex = 61
-        Me.lblLdmin.Text = "LDMIN"
+        Me.lblLdmin.Text = "LDMIN:"
         Me.lblLdmin.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
         'lblLdminValue
@@ -210,8 +214,8 @@ Partial Class ILevelDetectionReactionsRotorTest
         Me.lblLdminValue.BackColor = System.Drawing.Color.WhiteSmoke
         Me.lblLdminValue.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.lblLdminValue.Font = New System.Drawing.Font("Digiface", 20.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblLdminValue.ForeColor = System.Drawing.Color.LimeGreen
-        Me.lblLdminValue.Location = New System.Drawing.Point(121, 42)
+        Me.lblLdminValue.ForeColor = System.Drawing.Color.Black
+        Me.lblLdminValue.Location = New System.Drawing.Point(121, 89)
         Me.lblLdminValue.Margin = New System.Windows.Forms.Padding(40, 5, 40, 40)
         Me.lblLdminValue.Name = "lblLdminValue"
         Me.lblLdminValue.Size = New System.Drawing.Size(110, 34)
@@ -223,7 +227,7 @@ Partial Class ILevelDetectionReactionsRotorTest
         '
         Me.btnStartTest.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
         Me.btnStartTest.Enabled = False
-        Me.btnStartTest.Location = New System.Drawing.Point(559, 109)
+        Me.btnStartTest.Location = New System.Drawing.Point(676, 114)
         Me.btnStartTest.Name = "btnStartTest"
         Me.btnStartTest.Size = New System.Drawing.Size(32, 32)
         Me.btnStartTest.TabIndex = 55
@@ -248,6 +252,7 @@ Partial Class ILevelDetectionReactionsRotorTest
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsLevelDetectionTestPanel.BackColor = System.Drawing.Color.Gainsboro
         Me.BsLevelDetectionTestPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.BsLevelDetectionTestPanel.Controls.Add(Me.BSWSWSGroupBox)
         Me.BsLevelDetectionTestPanel.Controls.Add(Me.gpbLevelDetection)
         Me.BsLevelDetectionTestPanel.Controls.Add(Me.BsTestTitleLabel)
         Me.BsLevelDetectionTestPanel.Location = New System.Drawing.Point(234, 25)
@@ -255,50 +260,70 @@ Partial Class ILevelDetectionReactionsRotorTest
         Me.BsLevelDetectionTestPanel.Size = New System.Drawing.Size(740, 532)
         Me.BsLevelDetectionTestPanel.TabIndex = 32
         '
+        'BSWSWSGroupBox
+        '
+        Me.BSWSWSGroupBox.Controls.Add(Me.BsWSWSLabel)
+        Me.BSWSWSGroupBox.Controls.Add(Me.UpDownWSButton)
+        Me.BSWSWSGroupBox.Controls.Add(Me.BsButton3)
+        Me.BSWSWSGroupBox.Location = New System.Drawing.Point(7, 21)
+        Me.BSWSWSGroupBox.Name = "BSWSWSGroupBox"
+        Me.BSWSWSGroupBox.Size = New System.Drawing.Size(725, 45)
+        Me.BSWSWSGroupBox.TabIndex = 77
+        Me.BSWSWSGroupBox.TabStop = False
+        '
+        'BsWSWSLabel
+        '
+        Me.BsWSWSLabel.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.BsWSWSLabel.Location = New System.Drawing.Point(6, 18)
+        Me.BsWSWSLabel.Name = "BsWSWSLabel"
+        Me.BsWSWSLabel.Size = New System.Drawing.Size(679, 19)
+        Me.BsWSWSLabel.TabIndex = 108
+        Me.BsWSWSLabel.Text = "Text"
+        Me.BsWSWSLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'UpDownWSButton
+        '
+        Me.UpDownWSButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.UpDownWSButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
+        Me.UpDownWSButton.Location = New System.Drawing.Point(690, 10)
+        Me.UpDownWSButton.Name = "UpDownWSButton"
+        Me.UpDownWSButton.Size = New System.Drawing.Size(32, 32)
+        Me.UpDownWSButton.TabIndex = 41
+        Me.UpDownWSButton.UseVisualStyleBackColor = True
+        '
+        'BsButton3
+        '
+        Me.BsButton3.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.BsButton3.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
+        Me.BsButton3.Location = New System.Drawing.Point(690, 228)
+        Me.BsButton3.Name = "BsButton3"
+        Me.BsButton3.Size = New System.Drawing.Size(30, 30)
+        Me.BsButton3.TabIndex = 106
+        Me.BsButton3.UseVisualStyleBackColor = True
+        '
         'gpbLevelDetection
         '
-        Me.gpbLevelDetection.Controls.Add(Me.btnCancel)
-        Me.gpbLevelDetection.Controls.Add(Me.btnShowLevel)
         Me.gpbLevelDetection.Controls.Add(Me.lblLdmem)
         Me.gpbLevelDetection.Controls.Add(Me.btnStartTest)
         Me.gpbLevelDetection.Controls.Add(Me.lblLdmemValue)
         Me.gpbLevelDetection.Controls.Add(Me.lblLdmin)
         Me.gpbLevelDetection.Controls.Add(Me.lblLdminValue)
-        Me.gpbLevelDetection.Location = New System.Drawing.Point(16, 23)
+        Me.gpbLevelDetection.Controls.Add(Me.lblStatus)
+        Me.gpbLevelDetection.Location = New System.Drawing.Point(7, 68)
         Me.gpbLevelDetection.Name = "gpbLevelDetection"
-        Me.gpbLevelDetection.Size = New System.Drawing.Size(705, 161)
+        Me.gpbLevelDetection.Size = New System.Drawing.Size(725, 161)
         Me.gpbLevelDetection.TabIndex = 73
         Me.gpbLevelDetection.TabStop = False
         '
-        'btnCancel
-        '
-        Me.btnCancel.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
-        Me.btnCancel.Enabled = False
-        Me.btnCancel.Location = New System.Drawing.Point(654, 109)
-        Me.btnCancel.Name = "btnCancel"
-        Me.btnCancel.Size = New System.Drawing.Size(32, 32)
-        Me.btnCancel.TabIndex = 80
-        Me.btnCancel.UseVisualStyleBackColor = True
-        '
-        'btnShowLevel
-        '
-        Me.btnShowLevel.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
-        Me.btnShowLevel.Enabled = False
-        Me.btnShowLevel.Location = New System.Drawing.Point(606, 109)
-        Me.btnShowLevel.Name = "btnShowLevel"
-        Me.btnShowLevel.Size = New System.Drawing.Size(32, 32)
-        Me.btnShowLevel.TabIndex = 79
-        Me.btnShowLevel.UseVisualStyleBackColor = True
-        '
         'lblLdmem
         '
-        Me.lblLdmem.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblLdmem.Location = New System.Drawing.Point(35, 93)
+        Me.lblLdmem.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblLdmem.Location = New System.Drawing.Point(35, 46)
         Me.lblLdmem.Margin = New System.Windows.Forms.Padding(3)
         Me.lblLdmem.Name = "lblLdmem"
         Me.lblLdmem.Size = New System.Drawing.Size(68, 24)
         Me.lblLdmem.TabIndex = 77
-        Me.lblLdmem.Text = "LDMEM"
+        Me.lblLdmem.Text = "LDMEM:"
         Me.lblLdmem.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
         'lblLdmemValue
@@ -306,14 +331,24 @@ Partial Class ILevelDetectionReactionsRotorTest
         Me.lblLdmemValue.BackColor = System.Drawing.Color.WhiteSmoke
         Me.lblLdmemValue.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.lblLdmemValue.Font = New System.Drawing.Font("Digiface", 20.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblLdmemValue.ForeColor = System.Drawing.Color.LimeGreen
-        Me.lblLdmemValue.Location = New System.Drawing.Point(121, 89)
+        Me.lblLdmemValue.ForeColor = System.Drawing.Color.Black
+        Me.lblLdmemValue.Location = New System.Drawing.Point(121, 42)
         Me.lblLdmemValue.Margin = New System.Windows.Forms.Padding(40, 5, 40, 40)
         Me.lblLdmemValue.Name = "lblLdmemValue"
         Me.lblLdmemValue.Size = New System.Drawing.Size(110, 34)
         Me.lblLdmemValue.TabIndex = 78
         Me.lblLdmemValue.Text = "0"
         Me.lblLdmemValue.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'lblStatus
+        '
+        Me.lblStatus.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblStatus.Location = New System.Drawing.Point(35, 131)
+        Me.lblStatus.Margin = New System.Windows.Forms.Padding(3)
+        Me.lblStatus.Name = "lblStatus"
+        Me.lblStatus.Size = New System.Drawing.Size(418, 24)
+        Me.lblStatus.TabIndex = 81
+        Me.lblStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
         'ILevelDetectionReactionsRotorTest
         '
@@ -340,11 +375,12 @@ Partial Class ILevelDetectionReactionsRotorTest
         Me.BsButtonsPanel.ResumeLayout(False)
         Me.BsLevelDetectionInfoPanel.ResumeLayout(False)
         Me.BsLevelDetectionTestPanel.ResumeLayout(False)
+        Me.BSWSWSGroupBox.ResumeLayout(False)
         Me.gpbLevelDetection.ResumeLayout(False)
         Me.ResumeLayout(False)
-        Me.PerformLayout()
+        Me.PerformLayout
 
-    End Sub
+End Sub
     Friend WithEvents BsButtonsPanel As Biosystems.Ax00.Controls.UserControls.BSPanel
     Friend WithEvents BsExitButton As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents BsMessagesPanel As Biosystems.Ax00.Controls.UserControls.BSPanel
@@ -362,8 +398,11 @@ Partial Class ILevelDetectionReactionsRotorTest
     Friend WithEvents lblLdmin As System.Windows.Forms.Label
     Friend WithEvents gpbLevelDetection As System.Windows.Forms.GroupBox
     Friend WithEvents lblLdminValue As System.Windows.Forms.Label
-    Friend WithEvents btnShowLevel As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents lblLdmem As System.Windows.Forms.Label
     Friend WithEvents lblLdmemValue As System.Windows.Forms.Label
-    Friend WithEvents btnCancel As Biosystems.Ax00.Controls.UserControls.BSButton
+    Friend WithEvents lblStatus As System.Windows.Forms.Label
+    Friend WithEvents BSWSWSGroupBox As System.Windows.Forms.GroupBox
+    Friend WithEvents BsWSWSLabel As System.Windows.Forms.Label
+    Friend WithEvents UpDownWSButton As Biosystems.Ax00.Controls.UserControls.BSButton
+    Friend WithEvents BsButton3 As Biosystems.Ax00.Controls.UserControls.BSButton
 End Class

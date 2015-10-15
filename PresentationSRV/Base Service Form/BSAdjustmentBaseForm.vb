@@ -2340,9 +2340,9 @@ Public Class BSAdjustmentBaseForm
                     End If
 
                     '****REACTIONS ROTOR LEVEL DETECTION*********************************************
-                Case ADJUSTMENT_MODES.LD_WASH_STATION_TO_UP_TO_START
+                Case ADJUSTMENT_MODES.LD_WASH_STATION_TO_UP
                     If pResponse = RESPONSE_TYPES.OK Then
-                        MyClass.CurrentMode = ADJUSTMENT_MODES.LD_WASH_STATION_IS_UP_TO_START
+                        MyClass.CurrentMode = ADJUSTMENT_MODES.LD_WASH_STATION_IS_UP
                     ElseIf pResponse = RESPONSE_TYPES.EXCEPTION Then
                         MyClass.ErrorMode()
                     End If
@@ -2358,9 +2358,9 @@ Public Class BSAdjustmentBaseForm
                     ElseIf pResponse = RESPONSE_TYPES.EXCEPTION Then
                         MyClass.ErrorMode()
                     End If
-                Case ADJUSTMENT_MODES.LD_REQUESTED
+                Case ADJUSTMENT_MODES.LD_REQUESTING
                     If pResponse = RESPONSE_TYPES.OK Then
-                        MyClass.CurrentMode = ADJUSTMENT_MODES.LD_READED
+                        MyClass.CurrentMode = ADJUSTMENT_MODES.LD_REQUESTED
                     ElseIf pResponse = RESPONSE_TYPES.EXCEPTION Then
                         MyClass.ErrorMode()
                     End If

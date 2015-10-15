@@ -11,6 +11,33 @@ Imports Biosystems.Ax00.App
 Public Class ILevelDetectionReactionsRotorTest
     Inherits PesentationLayer.BSAdjustmentBaseForm
 
+    Private Structure ArmAdjustmentRowData
+
+        Public CodeFw As String
+        Public Value As String
+        Public CanMove As Boolean
+        Public AxisID As String
+        Public GroupID As String
+
+
+        Public Sub New(ByVal pCodeFw As String)
+            CodeFw = pCodeFw
+            Value = ""
+            CanMove = False
+            GroupID = ""
+            AxisID = ""
+        End Sub
+
+        Public Sub Clear()
+            CodeFw = ""
+            Value = ""
+            CanMove = False
+            GroupID = ""
+            AxisID = ""
+        End Sub
+    End Structure
+
+
 #Region "Declarations"
     'Screen's business delegate
     Private WithEvents myScreenDelegate As LevelDetectionReactionsRotorTestDelegate
@@ -103,44 +130,10 @@ Public Class ILevelDetectionReactionsRotorTest
                             Exit Function
                         End If
                     End If
+                Case ADJUSTMENT_MODES.LD_WASH_STATION_IS_DOWN
+                    Me.SetScreenToWashStationIsDownState()
+                Case ADJUSTMENT_MODES.LD_REQUESTED
 
-                Case ADJUSTMENT_MODES.LEVEL_DETECTING
-                    If pResponse = RESPONSE_TYPES.START Then
-                        ' Nothing by now
-                    End If
-                    If pResponse = RESPONSE_TYPES.OK Then
-                        If pData IsNot Nothing Then
-                            Dim myDetected As Boolean = AnalyzerController.Instance.Analyzer.LevelDetected '#REFACTORING
-                            If myDetected Then
-                                '' ''MyClass.myScreenDelegate.DetectionTestResult = LevelDetectionTestDelegate.HISTORY_RESULTS.DETECTED
-                                '' ''Me.BsDetectionMonitorLED.CurrentStatus = Biosystems.Ax00.Controls.UserControls.BSMonitorControlBase.Status._ON
-                                MyBase.DisplayMessage(Messages.SRV_LEVEL_DETECTED.ToString)
-                            Else
-                                '' ''MyClass.myScreenDelegate.DetectionTestResult = LevelDetectionTestDelegate.HISTORY_RESULTS.NOT_DETECTED
-                                '' ''Me.BsDetectionMonitorLED.CurrentStatus = Biosystems.Ax00.Controls.UserControls.BSMonitorControlBase.Status._OFF
-                                MyBase.DisplayMessage(Messages.SRV_LEVEL_NOT_DETECTED.ToString)
-                            End If
-                            AnalyzerController.Instance.Analyzer.LevelDetected = False '#REFACTORING
-                            MyBase.CurrentMode = ADJUSTMENT_MODES.LEVEL_DETECTED
-                            MyClass.PrepareArea()
-
-                            System.Threading.Thread.Sleep(1000)
-
-                            SendFwScript(MyBase.CurrentMode)
-                        End If
-
-
-                    End If
-
-                Case ADJUSTMENT_MODES.LEVEL_DETECTED
-                    If pResponse = RESPONSE_TYPES.START Then
-                        ' Nothing by now
-                    End If
-                    If pResponse = RESPONSE_TYPES.OK Then
-                        MyBase.CurrentMode = ADJUSTMENT_MODES.LOADED
-                        MyClass.PrepareArea()
-                        MyBase.myServiceMDI.SEND_INFO_START()
-                    End If
 
                 Case ADJUSTMENT_MODES.ERROR_MODE
                     '' ''MyClass.ReportHistoryError()
@@ -174,7 +167,6 @@ Public Class ILevelDetectionReactionsRotorTest
         End Try
     End Sub
 #End Region
-
 
 #Region "Refresh Event Handler"
 
@@ -247,197 +239,281 @@ Public Class ILevelDetectionReactionsRotorTest
 #End Region
 
 
+#Region "Events"
 
-#Region "Private Methods"
-
-#Region "Common"
-
-    ''' <summary>
-    ''' Generic function to send FwScripts to the Instrument through own delegates
-    ''' </summary>
-    ''' <param name="pMode"></param>
-    ''' <remarks>Created by: XBC 22/03/2011</remarks>
-    Private Sub SendFwScript(ByVal pMode As ADJUSTMENT_MODES)
+    Private Sub IlevelDetectionTest_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Dim myGlobal As New GlobalDataTO
+        'Dim myGlobalbase As New GlobalBase
         Try
-            If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
-                myGlobal = myScreenDelegate.SendFwScriptsQueueList(pMode)
-                If Not myGlobal.HasError Then
-                    ' Send FwScripts
-                    myGlobal = myFwScriptDelegate.StartFwScriptQueue
-                End If
-            Else
+
+            MyBase.MyBase_Load(sender, e)
+
+            '' ''MyBase.GetUserNumericalLevel()
+
+            'Get the current Language from the current Application Session
+            Me.currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
+
+            'Load the multilanguage texts for all Screen Labels and get Icons for graphical Buttons
+            Me.GetScreenLabels()
+
+            Me.PrepareButtons()
+
+
+            'Screen delegate SGM 20/01/2012
+            Me.myScreenDelegate = New LevelDetectionReactionsRotorTestDelegate(MyBase.AnalyzerModel, myFwScriptDelegate)
+            '' ''MyClass.myScreenDelegate.CurrentRotorPosition = CInt(Me.BsDetectionPosUpDown.Value)
+
+            'Frequency Limits
+            '' ''MyClass.myScreenDelegate.GetFrequencyLimits()
+
+            ' '' ''Rotors' positions
+            '' ''myGlobal = MyClass.myScreenDelegate.LoadRotorsConfiguration()
+            '' ''If Not myGlobal.HasError Then
+            '' ''    myGlobal = MyClass.myScreenDelegate.LoadRotorPositions(LevelDetectionTestDelegate.Rotors.SAMPLES)
+            '' ''    myGlobal = MyClass.myScreenDelegate.LoadRotorPositions(LevelDetectionTestDelegate.Rotors.REAGENTS)
+            '' ''End If
+
+            '' ''Me.BsDetectionArmComboBox.SelectedIndex = 0
+
+            MyClass.DisableAll()
+
+            'Initialize homes SGM 20/09/2011
+            '' ''MyClass.InitializeHomes()
+
+            '' ''Me.BsDetectionArmComboBox.SelectedIndex = 0
+
+            ' Check communications with Instrument
+            If Not AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
+                myGlobal.ErrorCode = "ERROR_COMM"
                 myGlobal.HasError = True
+            Else
+                PrepareAdjustReadingMode()
             End If
+
+            'Information
+            MyBase.DisplayInformation(APPLICATION_PAGES.LEVEL_DETECTION, Me.BsInfoXPSViewer)
 
             If myGlobal.HasError Then
                 PrepareErrorMode()
-                If myFwScriptDelegate.CurrentFwScriptsQueue IsNot Nothing Then
-                    myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
-                End If
-                GlobalBase.CreateLogActivity(myGlobal.ErrorCode, Me.Name & ".SendFwScript ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-                MyBase.ShowMessage(Me.Name & ".SendFwScript ", myGlobal.ErrorCode, myGlobal.ErrorMessage, Me)
+                MyBase.ShowMessage(Me.Name & ".Load", myGlobal.ErrorCode, myGlobal.ErrorMessage, Me)
+            End If
+
+            MyBase.ResetBorderSRV()
+
+            MyClass.IsAlreadyLoadedAttr = True
+
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            MyBase.ShowMessage(Me.Name & ".Load ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+        End Try
+    End Sub
+
+    Private Sub btnCancel_Click(sender As Object, e As EventArgs)
+        PrepareLoadedMode()
+    End Sub
+
+    ''' <summary>
+    ''' IDisposable functionality to force the releasing of the objects which wasn't totally closed by default
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>Created by SGM 15/12/2011</remarks>
+    Private Sub ILevelDetectionTest_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
+        Try
+            If e.CloseReason = CloseReason.MdiFormClosing Then
+                e.Cancel = True
+            Else
+                MyClass.myScreenDelegate.Dispose()
+                MyClass.myScreenDelegate = Nothing
+                Me.Dispose()
+
+                MyBase.ActivateMDIMenusButtons(True)
+
+            End If
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".FormClosing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            MyBase.ShowMessage(Me.Name & ".FormClosing ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+        End Try
+    End Sub
+
+    Private Sub UpDownWSButton_Click(sender As Object, e As EventArgs) Handles UpDownWSButton.Click
+
+        If MyClass.myScreenDelegate.IsWashingStationDown Then
+            Me.WashingStationToUp()
+        Else
+            Me.WashingStationToNRotor()
+        End If
+    End Sub
+
+    Private Sub btnStartTest_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnStartTest.Click
+        Try
+            Me.StartingLevelDetectionTest()
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".btnStartTest_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            MyBase.ShowMessage(Me.Name & ".btnStartTest_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+        End Try
+    End Sub
+
+    Private Sub BsExitButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsExitButton.Click
+        Try
+            Me.ExitScreen()
+
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsExitButton.Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            MyBase.ShowMessage(Me.Name & ".BsExitButton.Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' When the  ESC key is pressed, the screen is closed 
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by XBC 07/06/2011
+    ''' </remarks>
+    Private Sub Escape_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        Try
+            If (e.KeyCode = Keys.Escape) Then
+                'If (Me.BsExitButton.Enabled) Then
+                '    Me.ExitScreen()
+                'End If
+
+                'RH 04/07/2011 Escape key should do exactly the same operations as bsExitButton_Click()
+                BsExitButton.PerformClick()
+            End If
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            MyBase.ShowMessage(Me.Name & ".KeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+        End Try
+    End Sub
+
+#End Region
+
+#Region "Private Methods"
+
+#Region "Prepare Screen Areas"
+
+    ''' <summary>
+    ''' Prepare GUI for Loaded Mode
+    ''' </summary>
+    ''' <remarks>Created by XBC 22/03/2011</remarks>
+    Private Sub PrepareLoadedMode()
+        Try
+            EnableALL()
+            ResetLdminLdmedScreenInfo()
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareLoadedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            MyBase.ShowMessage(Me.Name & ".PrepareLoadedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Prepare GUI for when Wash Station is on down state
+    ''' </summary>
+    ''' <remarks></remarks>
+    Private Sub SetScreenToWashStationIsDownState()
+        EnableALL()
+        ResetLdminLdmedScreenInfo()
+    End Sub
+
+    ''' <summary>
+    ''' Prepare GUI for when Wash Station is on up state
+    ''' </summary>
+    ''' <remarks></remarks>
+    Private Sub SetScreenToWashStationIsUpState()
+        EnableALL()
+        ResetLdminLdmedScreenInfo()
+        Me.myScreenDelegate.IsWashingStationDown = False
+        MyBase.CurrentMode = ADJUSTMENT_MODES.LOADED
+        MyBase.DisplayMessage(Messages.SRV_MEBV_WS_IS_UP.ToString)
+    End Sub
+
+    ''' <summary>
+    ''' Prepare GUI for Washing Station is Up Mode
+    ''' </summary>
+    ''' <remarks>Created by SGM 21/11/2011</remarks>
+    Private Sub PrepareWashingStationIsUpMode()
+        Try
+
+
+            If MyBase.SimulationMode Then
+
+                '' ''MyClass.DisableCurrentPage()
+                '' ''MyClass.CurrentMode = ADJUSTMENT_MODES.MBEV_ALL_SWITCHING_OFF
+                '' ''myGlobal = MyBase.DisplayMessage(Messages.SRV_ALL_ITEMS_TO_DEFAULT.ToString)
+                '' ''MyClass.PrepareArea()
+
+                '' ''Me.Cursor = Cursors.WaitCursor
+                '' ''System.Threading.Thread.Sleep(MyBase.SimulationProcessTime)
+                '' ''System.Threading.Thread.Sleep(MyBase.SimulationProcessTime)
+
+                '' ''MyBase.CurrentMode = ADJUSTMENT_MODES.LOADED
+                '' ''MyClass.PrepareArea()
+
+
+            Else
+
+                ' '' ''    MyClass.EnableCurrentPage()
+
+                ' '' ''    MyBase.CurrentMode = ADJUSTMENT_MODES.LOADED
+                ' '' ''    MyClass.PrepareArea()
+
+                ' '' ''    'WS Aspiration or Dispensation SGM 18/05/2012
+                ' '' ''    If MyClass.CurrentTestPanel Is Me.BsWSAspirationTestPanel Or MyClass.CurrentTestPanel Is Me.BsWSDispensationTestPanel Then
+                ' '' ''        MyBase.DisplayMessage(Messages.SRV_MEBV_WS_IS_UP.ToString)
+                ' '' ''    Else
+                ' '' ''        MyBase.DisplayMessage(Messages.SRV_TEST_READY.ToString)
+                ' '' ''    End If
+
+                ' '' ''        Else
+                ' '' ''    MyClass.AllArmsToParking()
+                ' '' ''End If
             End If
 
         Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SendFwScript ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".SendFwScript ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareWashingStationIsUpMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            MyBase.ShowMessage(Me.Name & ".PrepareWashingStationIsUpMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
+
+
+
+    End Sub
+
+
+    ''' <summary>
+    ''' Enables all permited buttons,menus and set cursor to default
+    ''' </summary>
+    ''' <remarks></remarks>
+    Private Sub EnableALL()
+        Try
+            Me.btnStartTest.Enabled = True
+            Me.BsExitButton.Enabled = True
+            MyBase.ActivateMDIMenusButtons(True)
+
+            Me.Cursor = Cursors.Default
+
+            MyBase.myServiceMDI.Focus()
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex)
+            MyBase.ShowMessage(Me.Name & ".EnableALL ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+        End Try
+
     End Sub
 
     ''' <summary>
-    ''' Get texts in the current application language for all screen controls
+    ''' Reset LDMIN/LDMED and level detection status screen info
     ''' </summary>
-    ''' <remarks>
-    ''' Created by: XBC 22/03/2011
-    ''' </remarks>
-    Private Sub GetScreenLabels()
+    ''' <remarks></remarks>
+    Private Sub ResetLdminLdmedScreenInfo()
         Try
-            Dim MLRD As New MultilanguageResourcesDelegate
-
-            Me.BsTestTitleLabel.Text = MLRD.GetResourceText(Nothing, "MSG_SRV_LEVEL_DETECTION_TEST", currentLanguage)
-            Me.BsTitleLabel.Text = MLRD.GetResourceText(Nothing, "LBL_SRV_LEV_DET", currentLanguage)
-
-            'TODO: ACR Pass to the Base Class
-            Me.BsInfoTitle.Text = MLRD.GetResourceText(Nothing, "LBL_SRV_INFO_TITLE", currentLanguage)
-
-            '' ''Me.gpbLevelDetection.Text = MLRD.GetResourceText(Nothing, "LBL_SRV_FREQUENCY_READ", currentLanguage) & " (" & LevelDetectionTestDelegate.FREQ_UNIT & ")"
-            '' ''Me.BsFreqSampleLabel.Text = MLRD.GetResourceText(Nothing, "LBL_SRV_SAMPLE", currentLanguage)
-            '' ''Me.lblLdmin.Text = MLRD.GetResourceText(Nothing, "LBL_SRV_Reagent1", currentLanguage)
-            '' ''Me.BsFreqReagent2Label.Text = MLRD.GetResourceText(Nothing, "LBL_SRV_Reagent2", currentLanguage)
-
-            '' ''Me.BsDetectionGroupBox.Text = MLRD.GetResourceText(Nothing, "LBL_SRV_DETECTION_TEST", currentLanguage)
-            '' ''Me.BsDetectionArmLabel.Text = MLRD.GetResourceText(Nothing, "LBL_SRV_ARM", currentLanguage)
-            '' ''Me.BsDetectionPosLabel.Text = MLRD.GetResourceText(Nothing, "LBL_SRV_POSITION", currentLanguage)
-            '' ''Me.BsDetectedLabel.Text = MLRD.GetResourceText(Nothing, "LBL_SRV_DETECTED", currentLanguage)
-
-
-            ' Tooltips
-            GetScreenTooltip()
-
+            lblLdminValue.Text = ""
+            lblLdmemValue.Text = ""
+            lblStatus.Text = ""
         Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message, Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Name & ".GetScreenLabels", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            GlobalBase.CreateLogActivity(ex)
+            MyBase.ShowMessage(Me.Name & ".EnableALL ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
-    ''' <summary>
-    ''' Get texts in the current application language for all screen controls
-    ''' </summary>
-    ''' <remarks>
-    ''' Created by: XBC 26/07/11
-    ''' Modified by XBC 24/11/2011 - Unify buttons Start and Stop Test Stress
-    ''' </remarks>
-    Private Sub GetScreenTooltip()
-        Try
-            Dim MLRD As New MultilanguageResourcesDelegate
-
-            ' For Tooltips...
-            MyBase.bsScreenToolTipsControl.SetToolTip(Me.btnStartTest, MLRD.GetResourceText(Nothing, "SRV_BTN_TestStart", currentLanguage))
-            MyBase.bsScreenToolTipsControl.SetToolTip(Me.btnShowLevel, MLRD.GetResourceText(Nothing, "SRV_BTN_Test", currentLanguage))
-            MyBase.bsScreenToolTipsControl.SetToolTip(Me.btnCancel, MLRD.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
-
-        Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message, Name & ".GetScreenTooltip ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Name & ".GetScreenTooltip ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
-        End Try
-    End Sub
-
-    ''' <summary>
-    ''' Loads the icons and tooltips used for painting the buttons
-    ''' </summary>
-    ''' <remarks>Created by: XBC 22/03/2011</remarks>
-    Private Sub PrepareButtons()
-        Dim auxIconName As String = ""
-        Dim iconPath As String = MyBase.IconsPath
-        Try
-            MyBase.SetButtonImage(Me.btnStartTest, "ADJUSTMENT")
-            MyBase.SetButtonImage(Me.btnShowLevel, "ACCEPT1")
-            MyBase.SetButtonImage(Me.BsExitButton, "CANCEL")
-            MyBase.SetButtonImage(Me.btnCancel, "UNDO")
-        Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".PrepareButtons", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
-        End Try
-    End Sub
-
-    ''' <summary>
-    ''' Set all the screen elements to disabled
-    ''' </summary>
-    ''' <remarks>Created by: SGM 15/12/2011</remarks>
-    Private Sub DisableAll()
-        Try
-
-            Me.btnStartTest.Enabled = False
-            Me.btnShowLevel.Enabled = False
-            Me.btnCancel.Enabled = False
-            Me.BsExitButton.Enabled = False
-
-            MyBase.ActivateMDIMenusButtons(False)
-
-        Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".DisableAll ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".DisableAll ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
-        End Try
-    End Sub
-
-    ''' <summary>
-    ''' Prepare Tab Area according with current operations
-    ''' </summary>
-    ''' <remarks>Created by: XBC 22/03/2011</remarks>
-    Private Sub PrepareArea()
-        Try
-            Application.DoEvents()
-
-            ' Enabling/desabling form components to this child screen
-            Select Case MyBase.CurrentMode
-
-                Case ADJUSTMENT_MODES.ADJUSTMENTS_READING
-                    MyBase.DisplayMessage(Messages.SRV_READ_ADJUSTMENTS.ToString)
-
-                Case ADJUSTMENT_MODES.ADJUSTMENTS_READED
-                    MyBase.DisplayMessage(Messages.SRV_ADJUSTMENTS_READED.ToString)
-                    MyClass.PrepareLoadedMode()
-                    MyClass.LoadAdjustmentsData()
-
-                Case ADJUSTMENT_MODES.LOADED
-                    MyClass.PrepareLoadedMode()
-
-                Case ADJUSTMENT_MODES.MBEV_WASHING_STATION_IS_UP
-                    MyClass.PrepareWashingStationIsUpMode()
-
-                Case ADJUSTMENT_MODES.LD_WASH_STATION_IS_UP_TO_START
-                    SetToStartedTestState()
-                    '' ''MyClass.PrepareWashingStationIsUpMode()
-                Case ADJUSTMENT_MODES.LD_WASH_STATION_NROTOR_DONE
-                    WashStationToDown()
-
-                Case ADJUSTMENT_MODES.FREQUENCY_READING
-                    MyClass.PrepareFrequencyReading()
-
-                Case ADJUSTMENT_MODES.FREQUENCY_READED
-                    MyClass.PrepareFrequencyReaded()
-
-                Case ADJUSTMENT_MODES.LEVEL_DETECTING
-                    MyClass.PrepareDetectingMode()
-
-                Case ADJUSTMENT_MODES.LEVEL_DETECTED
-                    MyClass.PrepareDetectedMode()
-
-                Case ADJUSTMENT_MODES.ERROR_MODE
-                    PrepareErrorMode()
-            End Select
-
-            If Not MyBase.SimulationMode And AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING Then '#REFACTORING
-                MyClass.PrepareErrorMode()
-                MyBase.DisplayMessage("")
-            End If
-
-        Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareArea ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".PrepareArea ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
-        End Try
-    End Sub
 
     ''' <summary>
     ''' Prepare GUI for Adjustments Reading Mode
@@ -486,98 +562,138 @@ Public Class ILevelDetectionReactionsRotorTest
         End Try
     End Sub
 
+
+#End Region
+
+    Private Sub AskWashStationPosToUpOrDown()
+
+    End Sub
+
+    Private Sub ReadLevelDetection()
+
+        Me.CurrentMode = ADJUSTMENT_MODES.LD_REQUESTING
+        myScreenDelegate.SendPollHwGFL()
+
+    End Sub
+
     ''' <summary>
-    ''' Prepare GUI for Loaded Mode
+    ''' Brings the Washing Station Up, disable screen and displays Info
     ''' </summary>
-    ''' <remarks>Created by XBC 22/03/2011</remarks>
-    Private Sub PrepareLoadedMode()
+    ''' <remarks>SGM 21/11/2011</remarks>
+    Private Sub StartingLevelDetectionTest()
         Try
+            If MyBase.SimulationMode Then Exit Sub
 
+            If myScreenDelegate.IsWashingStationDown Then
+                ReadLevelDetection()
+            Else
+                '' '' MyBase.DisplayMessage(Messages.SRV_WS_TO_UP.ToString)
+                WashingStationToNRotor()
+            End If
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".WashingStationToDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            MyBase.ShowMessage(Me.Name & ".WashingStationToDown ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Brings the Washing Station Up
+    ''' </summary>
+    ''' <remarks>SGM 21/11/2011</remarks>
+    Private Sub WashingStationToUp()
+        Try
+            If MyBase.SimulationMode Or Not MyClass.myScreenDelegate.IsWashingStationDown Then Exit Sub
+
+            MyBase.DisplayMessage(Messages.SRV_WS_TO_UP.ToString)
+            Me.myScreenDelegate.IsWashingStationDown = False
+            Me.DisableAll()
+            Me.CurrentMode = ADJUSTMENT_MODES.LD_WASH_STATION_TO_UP
+            myScreenDelegate.SendWASH_STATION_CTRL(Ax00WashStationControlModes.UP)
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".WashingStationToDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            MyBase.ShowMessage(Me.Name & ".WashingStationToDown ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Brings the Washing Station Down
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by SGM 21/11/2011
+    ''' Modified by XB 15/10/2014 - Use NROTOR when Wash Station is down - BA-2004
+    ''' </remarks>
+    Private Sub WashingStationToNRotor()
+        Dim myGlobal As New GlobalDataTO
+        Try
+            If Me.myScreenDelegate.IsWashingStationDown Then Exit Sub
+
+            Me.DisplayMessage(Messages.SRV_WS_TO_DOWN.ToString)
+            Me.myScreenDelegate.IsWashingStationDown = True
+            Me.DisableAll()
+
+            Me.CurrentMode = ADJUSTMENT_MODES.LD_WASH_STATION_TO_NROTOR
+            myScreenDelegate.SendNEW_ROTOR()
+
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".WashingStationToDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            MyBase.ShowMessage(Me.Name & ".WashingStationToDown ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+        End Try
+    End Sub
+
+    Private Sub WashStationToDown()
+        MyClass.CurrentMode = ADJUSTMENT_MODES.LD_WASH_STATION_TO_DOWN
+        MyClass.SendFwScript(Me.CurrentMode)
+    End Sub
+
+  
+
+    ''' <summary>
+    ''' Prepare Screen when Detection Level has been read
+    ''' </summary>
+    ''' <remarks></remarks>
+    Private Sub PrepareLevelDetectionReaded()
+        Dim levelDetectionStatus As Integer = 0
+        Try
             Me.btnStartTest.Enabled = True
-            Me.btnShowLevel.Enabled = False
-            Me.btnCancel.Enabled = False
             Me.BsExitButton.Enabled = True
-            Me.lblLdminValue.Text = ""
-            Me.lblLdmemValue.Text = ""
 
+
+            If Not myScreenDelegate.myLocalRefreshDS.PhotometricsValueChanged.FindByElementID("GLF_LDMIN") Is Nothing Then
+                Me.lblLdminValue.Text = myScreenDelegate.myLocalRefreshDS.PhotometricsValueChanged.FindByElementID("GLF_LDMIN").Value
+            End If
+            If Not myScreenDelegate.myLocalRefreshDS.PhotometricsValueChanged.FindByElementID("GLF_LDMED") Is Nothing Then
+                Me.lblLdmemValue.Text = myScreenDelegate.myLocalRefreshDS.PhotometricsValueChanged.FindByElementID("GLF_LDMED").Value
+            End If
+            If Not myScreenDelegate.myLocalRefreshDS.PhotometricsValueChanged.FindByElementID("GLF_LD") Is Nothing Then
+                If Integer.TryParse(myScreenDelegate.myLocalRefreshDS.PhotometricsValueChanged.FindByElementID("GLF_LD").Value, levelDetectionStatus) Then
+                    Dim MLRD As New MultilanguageResourcesDelegate
+
+                    Select Case levelDetectionStatus
+                        Case 0
+                            lblStatus.Text = MLRD.GetResourceText(Nothing, "MSG_OVERFLOW_NOT_DETECTED", currentLanguage)
+                        Case 1
+                            lblStatus.Text = MLRD.GetResourceText(Nothing, "MSG_OVERFLOW_DETECTED", currentLanguage)
+                        Case 2
+                            lblStatus.Text = MLRD.GetResourceText(Nothing, "MSG_BOARD_NOT_DETECTED", currentLanguage)
+                        Case 3
+                            lblStatus.Text = MLRD.GetResourceText(Nothing, "MSG_VALUE_OUT_RANGE", currentLanguage)
+                        Case Else
+                            lblStatus.Text = ""
+                    End Select
+                Else
+
+                    GlobalBase.CreateLogActivity("GLF_LD cannot be readed", Me.Name & ".PrepareLevelDetectionReaded ", EventLogEntryType.Warning, GetApplicationInfoSession().ActivateSystemLog)
+                End If
+            End If
             MyBase.ActivateMDIMenusButtons(True)
 
             Me.Cursor = Cursors.Default
 
             MyBase.myServiceMDI.Focus()
-            '' ''Me.BsDetectionArmComboBox.SelectionLength = 0
-
         Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareLoadedMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".PrepareLoadedMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareLevelDetectionReaded ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            MyBase.ShowMessage(Me.Name & ".PrepareLevelDetectionReaded ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
-    End Sub
-
-    ''' <summary>
-    ''' Prepare GUI to Started test Mode
-    ''' </summary>
-    ''' <remarks></remarks>
-    Private Sub SetToStartedTestState()
-        DisableAll()
-
-        Me.btnShowLevel.Enabled = True
-        Me.btnCancel.Enabled = True
-        Me.lblLdminValue.Text = ""
-        Me.lblLdmemValue.Text = ""
-        Me.btnShowLevel.Cursor = Cursors.Default
-        Me.btnCancel.Cursor = Cursors.Default
-        Me.Cursor = Cursors.Default
-    End Sub
-
-    ''' <summary>
-    ''' Prepare GUI for Washing Station is Up Mode
-    ''' </summary>
-    ''' <remarks>Created by SGM 21/11/2011</remarks>
-    Private Sub PrepareWashingStationIsUpMode()
-        Try
-            MyClass.myScreenDelegate.IsWashingStationDown = False
-
-            If MyBase.SimulationMode Then
-
-                '' ''MyClass.DisableCurrentPage()
-                '' ''MyClass.CurrentMode = ADJUSTMENT_MODES.MBEV_ALL_SWITCHING_OFF
-                '' ''myGlobal = MyBase.DisplayMessage(Messages.SRV_ALL_ITEMS_TO_DEFAULT.ToString)
-                '' ''MyClass.PrepareArea()
-
-                '' ''Me.Cursor = Cursors.WaitCursor
-                '' ''System.Threading.Thread.Sleep(MyBase.SimulationProcessTime)
-                '' ''System.Threading.Thread.Sleep(MyBase.SimulationProcessTime)
-
-                '' ''MyBase.CurrentMode = ADJUSTMENT_MODES.LOADED
-                '' ''MyClass.PrepareArea()
-
-
-            Else
-
-                ' '' ''    MyClass.EnableCurrentPage()
-
-                ' '' ''    MyBase.CurrentMode = ADJUSTMENT_MODES.LOADED
-                ' '' ''    MyClass.PrepareArea()
-
-                ' '' ''    'WS Aspiration or Dispensation SGM 18/05/2012
-                ' '' ''    If MyClass.CurrentTestPanel Is Me.BsWSAspirationTestPanel Or MyClass.CurrentTestPanel Is Me.BsWSDispensationTestPanel Then
-                ' '' ''        MyBase.DisplayMessage(Messages.SRV_MEBV_WS_IS_UP.ToString)
-                ' '' ''    Else
-                ' '' ''        MyBase.DisplayMessage(Messages.SRV_TEST_READY.ToString)
-                ' '' ''    End If
-
-                ' '' ''        Else
-                ' '' ''    MyClass.AllArmsToParking()
-                ' '' ''End If
-            End If
-
-        Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareWashingStationIsUpMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".PrepareWashingStationIsUpMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
-        End Try
-
-
-
     End Sub
 
     ''' <summary>
@@ -594,6 +710,244 @@ Public Class ILevelDetectionReactionsRotorTest
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareErrorMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareErrorMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+        End Try
+    End Sub
+
+
+
+
+#Region "Abel"
+
+#End Region
+
+
+    ''' <summary>
+    ''' Gets the value corresponding to informed Axis from the selected adjustments dataset
+    ''' </summary>
+    ''' <param name="pAxis"></param>
+    ''' <returns></returns>
+    ''' <remarks>
+    ''' Created by SGM 28/01/11
+    ''' Modified by XB 04/02/2013 - Upper conversions redundants because the value is already in UpperCase must delete to avoid Regional Settings problems (Bugs tracking #1112)
+    ''' </remarks>
+    Private Function ReadPositionData(ByVal pGroup As ADJUSTMENT_GROUPS, ByVal pAxis As GlobalEnumerates.AXIS) As ArmAdjustmentRowData
+        Dim myGlobal As New GlobalDataTO
+        Dim myArmRowData As New ArmAdjustmentRowData("")
+        Try
+            Dim myAxis As String = pAxis.ToString
+            If myAxis = "NONE" Then myAxis = ""
+
+            Dim myAdjustmentRows As New List(Of SRVAdjustmentsDS.srv_tfmwAdjustmentsRow)
+            myAdjustmentRows = (From a As SRVAdjustmentsDS.srv_tfmwAdjustmentsRow _
+                                In MyClass.SelectedAdjustmentsDS.srv_tfmwAdjustments _
+                                Where a.GroupID.Trim = pGroup.ToString And _
+                                a.AxisID.Trim = myAxis.Trim _
+                                Select a).ToList
+            'Where a.GroupID.Trim.ToUpper = pGroup.ToString And _
+            'a.AxisID.Trim.ToUpper = myAxis.Trim.ToUpper _
+
+            If myAdjustmentRows.Count > 0 Then
+                With myArmRowData
+                    .CodeFw = myAdjustmentRows(0).CodeFw
+                    .Value = myAdjustmentRows(0).Value
+                    .AxisID = myAdjustmentRows(0).AxisID
+                    .GroupID = myAdjustmentRows(0).GroupID
+                    .CanMove = myAdjustmentRows(0).CanMove
+                End With
+            End If
+
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ReadArmPositionData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            MyBase.ShowMessage(Me.Name & ".ReadArmPositionData ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+        End Try
+
+        If myArmRowData.Value = "" Then myArmRowData.Value = "0"
+
+        Return myArmRowData
+    End Function
+
+#Region "Common"
+
+    ''' <summary>
+    ''' Generic function to send FwScripts to the Instrument through own delegates
+    ''' </summary>
+    ''' <param name="pMode"></param>
+    ''' <remarks>Created by: XBC 22/03/2011</remarks>
+    Private Sub SendFwScript(ByVal pMode As ADJUSTMENT_MODES)
+        Dim myGlobal As New GlobalDataTO
+        Try
+            If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
+                myGlobal = myScreenDelegate.SendFwScriptsQueueList(pMode)
+                If Not myGlobal.HasError Then
+                    ' Send FwScripts
+                    myGlobal = myFwScriptDelegate.StartFwScriptQueue
+                End If
+            Else
+                myGlobal.HasError = True
+            End If
+
+            If myGlobal.HasError Then
+                PrepareErrorMode()
+                If myFwScriptDelegate.CurrentFwScriptsQueue IsNot Nothing Then
+                    myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
+                End If
+                GlobalBase.CreateLogActivity(myGlobal.ErrorCode, Me.Name & ".SendFwScript ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+                MyBase.ShowMessage(Me.Name & ".SendFwScript ", myGlobal.ErrorCode, myGlobal.ErrorMessage, Me)
+            End If
+
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SendFwScript ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            MyBase.ShowMessage(Me.Name & ".SendFwScript ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Get texts in the current application language for all screen controls
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by: XBC 22/03/2011
+    ''' </remarks>
+    Private Sub GetScreenLabels()
+        Try
+            Dim MLRD As New MultilanguageResourcesDelegate
+
+            Me.BsTestTitleLabel.Text = MLRD.GetResourceText(Nothing, "MSG_SRV_LEVEL_DETECTION_TEST", currentLanguage)
+            Me.BsTitleLabel.Text = MLRD.GetResourceText(Nothing, "LBL_SRV_LEV_DET", currentLanguage)
+            Me.BsWSWSLabel.Text = MLRD.GetResourceText(Nothing, "LBL_WASH_STATION_UPDOWN", currentLanguage)
+            'TODO: ACR Pass to the Base Class
+            Me.BsInfoTitle.Text = MLRD.GetResourceText(Nothing, "LBL_SRV_INFO_TITLE", currentLanguage)
+
+            '' ''Me.gpbLevelDetection.Text = MLRD.GetResourceText(Nothing, "LBL_SRV_FREQUENCY_READ", currentLanguage) & " (" & LevelDetectionTestDelegate.FREQ_UNIT & ")"
+            '' ''Me.BsFreqSampleLabel.Text = MLRD.GetResourceText(Nothing, "LBL_SRV_SAMPLE", currentLanguage)
+            '' ''Me.lblLdmin.Text = MLRD.GetResourceText(Nothing, "LBL_SRV_Reagent1", currentLanguage)
+            '' ''Me.BsFreqReagent2Label.Text = MLRD.GetResourceText(Nothing, "LBL_SRV_Reagent2", currentLanguage)
+
+            '' ''Me.BsDetectionGroupBox.Text = MLRD.GetResourceText(Nothing, "LBL_SRV_DETECTION_TEST", currentLanguage)
+            '' ''Me.BsDetectionArmLabel.Text = MLRD.GetResourceText(Nothing, "LBL_SRV_ARM", currentLanguage)
+            '' ''Me.BsDetectionPosLabel.Text = MLRD.GetResourceText(Nothing, "LBL_SRV_POSITION", currentLanguage)
+            '' ''Me.BsDetectedLabel.Text = MLRD.GetResourceText(Nothing, "LBL_SRV_DETECTED", currentLanguage)
+
+
+            ' Tooltips
+            GetScreenTooltip()
+
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            MyBase.ShowMessage(Name & ".GetScreenLabels", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Get texts in the current application language for all screen controls
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by: XBC 26/07/11
+    ''' Modified by XBC 24/11/2011 - Unify buttons Start and Stop Test Stress
+    ''' </remarks>
+    Private Sub GetScreenTooltip()
+        Try
+            Dim MLRD As New MultilanguageResourcesDelegate
+
+            ' For Tooltips...
+            MyBase.bsScreenToolTipsControl.SetToolTip(Me.btnStartTest, MLRD.GetResourceText(Nothing, "SRV_BTN_TestStart", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(Me.UpDownWSButton, MLRD.GetResourceText(Nothing, "BTN_UPDOWN_WS", currentLanguage))
+
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".GetScreenTooltip ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            MyBase.ShowMessage(Name & ".GetScreenTooltip ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Loads the icons and tooltips used for painting the buttons
+    ''' </summary>
+    ''' <remarks>Created by: XBC 22/03/2011</remarks>
+    Private Sub PrepareButtons()
+        Dim auxIconName As String = ""
+        Dim iconPath As String = MyBase.IconsPath
+        Try
+            MyBase.SetButtonImage(Me.UpDownWSButton, "UPDOWN")
+            MyBase.SetButtonImage(Me.btnStartTest, "ADJUSTMENT")
+            MyBase.SetButtonImage(Me.BsExitButton, "CANCEL")
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            MyBase.ShowMessage(Me.Name & ".PrepareButtons", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Set all the screen elements to disabled
+    ''' </summary>
+    ''' <remarks>Created by: SGM 15/12/2011</remarks>
+    Private Sub DisableAll()
+        Try
+
+            Me.btnStartTest.Enabled = False
+            Me.BsExitButton.Enabled = False
+
+            MyBase.ActivateMDIMenusButtons(False)
+
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".DisableAll ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            MyBase.ShowMessage(Me.Name & ".DisableAll ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Prepare Tab Area according with current operations
+    ''' </summary>
+    ''' <remarks>Created by: XBC 22/03/2011</remarks>
+    Private Sub PrepareArea()
+        Try
+            Application.DoEvents()
+
+            ' Enabling/desabling form components to this child screen
+            Select Case MyBase.CurrentMode
+
+                Case ADJUSTMENT_MODES.ADJUSTMENTS_READING
+                    MyBase.DisplayMessage(Messages.SRV_READ_ADJUSTMENTS.ToString)
+
+                Case ADJUSTMENT_MODES.ADJUSTMENTS_READED
+                    MyBase.DisplayMessage(Messages.SRV_ADJUSTMENTS_READED.ToString)
+                    Me.PrepareLoadedMode()
+                    Me.LoadAdjustmentsData()
+
+                Case ADJUSTMENT_MODES.LOADED
+                    Me.PrepareLoadedMode()
+                Case ADJUSTMENT_MODES.LD_WASH_STATION_IS_UP
+                    Me.SetScreenToWashStationIsUpState()
+                    '' ''MyClass.PrepareWashingStationIsUpMode()
+                Case ADJUSTMENT_MODES.LD_WASH_STATION_NROTOR_DONE
+                    Me.WashStationToDown()
+
+                Case ADJUSTMENT_MODES.LD_WASH_STATION_IS_DOWN
+                    Me.SetScreenToWashStationIsDownState()
+                Case ADJUSTMENT_MODES.LD_REQUESTED
+                    '' ''myScreenDelegate.myLocalRefreshDS.PhotometricsValueChanged.
+                    '' ''Case ADJUSTMENT_MODES.FREQUENCY_READING
+                    '' ''    MyClass.PrepareFrequencyReading()
+
+                    '' ''Case ADJUSTMENT_MODES.FREQUENCY_READED
+                    '' ''    MyClass.PrepareFrequencyReaded()
+
+                    '' ''Case ADJUSTMENT_MODES.LEVEL_DETECTING
+                    '' ''    MyClass.PrepareDetectingMode()
+
+                    '' ''Case ADJUSTMENT_MODES.LEVEL_DETECTED
+                    '' ''    MyClass.PrepareDetectedMode()
+                    Me.PrepareLevelDetectionReaded()
+                Case ADJUSTMENT_MODES.ERROR_MODE
+                    PrepareErrorMode()
+            End Select
+
+            If Not MyBase.SimulationMode And AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING Then '#REFACTORING
+                MyClass.PrepareErrorMode()
+                MyBase.DisplayMessage("")
+            End If
+
+        Catch ex As Exception
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareArea ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            MyBase.ShowMessage(Me.Name & ".PrepareArea ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
@@ -670,8 +1024,14 @@ Public Class ILevelDetectionReactionsRotorTest
     End Function
 
     Private Sub LoadAdjustmentsData()
+        Dim resultData As New GlobalDataTO
+        Dim aGroupIDs As New List(Of String)
         Try
-
+            aGroupIDs.Add("WASHING_STATION")
+            resultData = MyBase.myAdjustmentsDelegate.ReadAdjustmentsByGroupIDs(aGroupIDs)
+            If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
+                SelectedAdjustmentsDS = CType(resultData.SetDatos, SRVAdjustmentsDS)
+            End If
             '' ''myScreenDelegate.S1VerticalSafetyPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_VSEC.ToString, GlobalEnumerates.AXIS.Z, True).Value)
             '' ''myScreenDelegate.S1RotorPosRing1 = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING1.ToString, GlobalEnumerates.AXIS.ROTOR, True).Value)
             '' ''myScreenDelegate.S1RotorPosRing2 = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.SAMPLES_ARM_RING2.ToString, GlobalEnumerates.AXIS.ROTOR, True).Value)
@@ -715,6 +1075,10 @@ Public Class ILevelDetectionReactionsRotorTest
             'myScreenDelegate.R1WSVerticalRefPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT1_ARM_WASH.ToString, GlobalEnumerates.AXIS.Z, True).Value)
             'myScreenDelegate.R2WSHorizontalPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_WASH.ToString, GlobalEnumerates.AXIS.POLAR, True).Value)
             'myScreenDelegate.R2WSVerticalRefPos = CInt(ReadGlobalAdjustmentData(ADJUSTMENT_GROUPS.REAGENT2_ARM_WASH.ToString, GlobalEnumerates.AXIS.Z, True).Value)
+
+            myScreenDelegate.WSReadyRefPos = CInt(ReadPositionData(ADJUSTMENT_GROUPS.WASHING_STATION, GlobalEnumerates.AXIS.REL_Z).Value)
+            myScreenDelegate.WSFinalPos = CInt(ReadPositionData(ADJUSTMENT_GROUPS.WASHING_STATION, GlobalEnumerates.AXIS.Z).Value)
+            myScreenDelegate.WSReferencePos = CInt(ReadPositionData(ADJUSTMENT_GROUPS.WASHING_STATION_PARK, GlobalEnumerates.AXIS.Z).Value)
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".LoadAdjustmentsData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -957,216 +1321,5 @@ Public Class ILevelDetectionReactionsRotorTest
 #End Region
 
 #End Region
-
-#Region "Events"
-
-    Private Sub btnCancel_Click(sender As Object, e As EventArgs) Handles btnCancel.Click
-        PrepareLoadedMode()
-    End Sub
-
-
-    ''' <summary>
-    ''' IDisposable functionality to force the releasing of the objects which wasn't totally closed by default
-    ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
-    ''' <remarks>Created by SGM 15/12/2011</remarks>
-    Private Sub ILevelDetectionTest_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
-        Try
-            If e.CloseReason = CloseReason.MdiFormClosing Then
-                e.Cancel = True
-            Else
-                MyClass.myScreenDelegate.Dispose()
-                MyClass.myScreenDelegate = Nothing
-                Me.Dispose()
-
-                MyBase.ActivateMDIMenusButtons(True)
-
-            End If
-        Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".FormClosing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".FormClosing ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
-        End Try
-    End Sub
-
-    Private Sub IlevelDetectionTest_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
-        Dim myGlobal As New GlobalDataTO
-        'Dim myGlobalbase As New GlobalBase
-        Try
-
-            MyBase.MyBase_Load(sender, e)
-
-            '' ''MyBase.GetUserNumericalLevel()
-
-            'Get the current Language from the current Application Session
-            MyClass.currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
-
-            'Load the multilanguage texts for all Screen Labels and get Icons for graphical Buttons
-            MyClass.GetScreenLabels()
-
-            MyClass.PrepareButtons()
-
-
-            'Screen delegate SGM 20/01/2012
-            MyClass.myScreenDelegate = New LevelDetectionReactionsRotorTestDelegate(MyBase.AnalyzerModel, myFwScriptDelegate)
-            '' ''MyClass.myScreenDelegate.CurrentRotorPosition = CInt(Me.BsDetectionPosUpDown.Value)
-
-            'Frequency Limits
-            '' ''MyClass.myScreenDelegate.GetFrequencyLimits()
-
-            ' '' ''Rotors' positions
-            '' ''myGlobal = MyClass.myScreenDelegate.LoadRotorsConfiguration()
-            '' ''If Not myGlobal.HasError Then
-            '' ''    myGlobal = MyClass.myScreenDelegate.LoadRotorPositions(LevelDetectionTestDelegate.Rotors.SAMPLES)
-            '' ''    myGlobal = MyClass.myScreenDelegate.LoadRotorPositions(LevelDetectionTestDelegate.Rotors.REAGENTS)
-            '' ''End If
-
-            '' ''Me.BsDetectionArmComboBox.SelectedIndex = 0
-
-            MyClass.DisableAll()
-
-            'Initialize homes SGM 20/09/2011
-            '' ''MyClass.InitializeHomes()
-
-            '' ''Me.BsDetectionArmComboBox.SelectedIndex = 0
-
-            ' Check communications with Instrument
-            If Not AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
-                myGlobal.ErrorCode = "ERROR_COMM"
-                myGlobal.HasError = True
-            Else
-                PrepareAdjustReadingMode()
-            End If
-
-            'Information
-            MyBase.DisplayInformation(APPLICATION_PAGES.LEVEL_DETECTION, Me.BsInfoXPSViewer)
-
-            If myGlobal.HasError Then
-                PrepareErrorMode()
-                MyBase.ShowMessage(Me.Name & ".Load", myGlobal.ErrorCode, myGlobal.ErrorMessage, Me)
-            End If
-
-            MyBase.ResetBorderSRV()
-
-            MyClass.IsAlreadyLoadedAttr = True
-
-        Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".Load ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
-        End Try
-    End Sub
-
-    Private Sub btnShowLevel_Click(sender As Object, e As EventArgs) Handles btnShowLevel.Click
-        Me.StartLevelDetectionTest()
-    End Sub
-
-    Private Sub btnStartTest_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnStartTest.Click
-        Dim myGlobal As New GlobalDataTO
-        Try
-            Me.StartingLevelDetectionTest()
-        Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".btnStartTest_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".btnStartTest_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
-        End Try
-    End Sub
-
-    Private Sub StartLevelDetectionTest()
-        DisableAll()
-        Me.CurrentMode = ADJUSTMENT_MODES.LD_WASH_STATION_TO_NROTOR
-        myScreenDelegate.SendNEW_ROTOR()
-    End Sub
-
-    Private Sub WashStationToDown()
-
-    End Sub
-
-
-    ''' <summary>
-    ''' Brings the Washing Station Up, disable screen and displays Info
-    ''' </summary>
-    ''' <remarks>SGM 21/11/2011</remarks>
-    Private Sub StartingLevelDetectionTest()
-        Try
-            If MyBase.SimulationMode Then Exit Sub
-
-            MyBase.DisplayMessage(Messages.SRV_WS_TO_UP.ToString)
-
-            Me.myScreenDelegate.IsWashingStationDown = False
-
-            Me.DisableAll()
-
-            Me.CurrentMode = ADJUSTMENT_MODES.LD_WASH_STATION_TO_UP_TO_START
-
-            '' ''Me.OnWashingStationToUpTimerTick()
-            myScreenDelegate.SendWASH_STATION_CTRL(Ax00WashStationControlModes.UP)
-
-        Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".WashingStationToDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".WashingStationToDown ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
-        End Try
-    End Sub
-
-
-
-    '' ''Private Sub OnWashingStationToUpTimerTick()
-    '' ''    Dim myGlobal As New GlobalDataTO
-    '' ''    Try
-    '' ''        'MyClass.IsActionRequested = True
-
-    '' ''        If Not myGlobal.HasError Then
-    '' ''            myScreenDelegate.SendWASH_STATION_CTRL(Ax00WashStationControlModes.UP)
-    '' ''            'MyClass.SendFwScript(Me.CurrentMode)
-    '' ''            'Me.Cursor = Cursors.WaitCursor
-    '' ''        Else
-    '' ''            MyBase.CurrentMode = ADJUSTMENT_MODES.ERROR_MODE
-    '' ''            MyClass.PrepareArea()
-    '' ''        End If
-
-    '' ''    Catch ex As Exception
-    '' ''        myGlobal.HasError = True
-    '' ''        myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-    '' ''        myGlobal.ErrorMessage = ex.Message
-    '' ''        GlobalBase.CreateLogActivity(ex.Message, Me.Name & " OnWashingStationToUpTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-    '' ''        MyBase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
-    '' ''    End Try
-    '' ''End Sub
-
-
-    Private Sub BsExitButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsExitButton.Click
-        Try
-            Me.ExitScreen()
-
-        Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsExitButton.Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".BsExitButton.Click ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
-        End Try
-    End Sub
-
-    ''' <summary>
-    ''' When the  ESC key is pressed, the screen is closed 
-    ''' </summary>
-    ''' <remarks>
-    ''' Created by XBC 07/06/2011
-    ''' </remarks>
-    Private Sub Escape_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
-        Try
-            If (e.KeyCode = Keys.Escape) Then
-                'If (Me.BsExitButton.Enabled) Then
-                '    Me.ExitScreen()
-                'End If
-
-                'RH 04/07/2011 Escape key should do exactly the same operations as bsExitButton_Click()
-                BsExitButton.PerformClick()
-            End If
-        Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".KeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
-        End Try
-    End Sub
-
-
-#End Region
-
-
 
 End Class
