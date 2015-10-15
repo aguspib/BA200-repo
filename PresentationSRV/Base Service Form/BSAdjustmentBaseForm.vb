@@ -101,7 +101,6 @@ Public Class BSAdjustmentBaseForm
             MyClass.myFwScriptDelegate = New SendFwScriptsDelegate() '#REFACTORING
         End If
 
-
     End Sub
 #End Region
 
@@ -268,7 +267,8 @@ Public Class BSAdjustmentBaseForm
             ''SGM 02/03/11
             'MyClass.myBaseScreenDelegate = New BaseFwScriptDelegate()
             'MyClass.myBaseScreenDelegate.myFwScriptDelegate = MyClass.myFwScriptDelegate
-
+            myServiceMDI.AnalyzerModel = AnalyzerController.Instance.Analyzer.Model
+            myServiceMDI.ActiveAnalyzer = AnalyzerController.Instance.Analyzer.ActiveAnalyzer
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & " MyBase_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
