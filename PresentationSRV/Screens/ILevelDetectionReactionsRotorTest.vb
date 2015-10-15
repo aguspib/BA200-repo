@@ -19,7 +19,6 @@ Public Class ILevelDetectionReactionsRotorTest
         Public AxisID As String
         Public GroupID As String
 
-
         Public Sub New(ByVal pCodeFw As String)
             CodeFw = pCodeFw
             Value = ""
@@ -245,10 +244,7 @@ Public Class ILevelDetectionReactionsRotorTest
         Dim myGlobal As New GlobalDataTO
         'Dim myGlobalbase As New GlobalBase
         Try
-
             MyBase.MyBase_Load(sender, e)
-
-            '' ''MyBase.GetUserNumericalLevel()
 
             'Get the current Language from the current Application Session
             Me.currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
@@ -261,27 +257,10 @@ Public Class ILevelDetectionReactionsRotorTest
 
             'Screen delegate SGM 20/01/2012
             Me.myScreenDelegate = New LevelDetectionReactionsRotorTestDelegate(MyBase.AnalyzerModel, myFwScriptDelegate)
-            '' ''MyClass.myScreenDelegate.CurrentRotorPosition = CInt(Me.BsDetectionPosUpDown.Value)
-
-            'Frequency Limits
-            '' ''MyClass.myScreenDelegate.GetFrequencyLimits()
-
-            ' '' ''Rotors' positions
-            '' ''myGlobal = MyClass.myScreenDelegate.LoadRotorsConfiguration()
-            '' ''If Not myGlobal.HasError Then
-            '' ''    myGlobal = MyClass.myScreenDelegate.LoadRotorPositions(LevelDetectionTestDelegate.Rotors.SAMPLES)
-            '' ''    myGlobal = MyClass.myScreenDelegate.LoadRotorPositions(LevelDetectionTestDelegate.Rotors.REAGENTS)
-            '' ''End If
-
-            '' ''Me.BsDetectionArmComboBox.SelectedIndex = 0
 
             MyClass.DisableAll()
 
             'Initialize homes SGM 20/09/2011
-            '' ''MyClass.InitializeHomes()
-
-            '' ''Me.BsDetectionArmComboBox.SelectedIndex = 0
-
             ' Check communications with Instrument
             If Not AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                 myGlobal.ErrorCode = "ERROR_COMM"
