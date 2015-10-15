@@ -154,6 +154,10 @@ Public Class UiPhotometryAdjustments
 
         ' Add any initialization after the InitializeComponent() call.
         DefineScreenLayout(PHOTOMETRY_PAGES.STEP1)
+
+        'AJG. Added for right initialization
+        ActiveAnalyzer = AnalyzerController.Instance.Analyzer.ActiveAnalyzer
+        ActiveAnalyzerModelAttr = AnalyzerController.Instance.Analyzer.Model
     End Sub
 #End Region
 
