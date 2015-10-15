@@ -273,7 +273,7 @@
         <InstructionTO>
           <InstructionID>2</InstructionID>
           <Sequence>2</Sequence>
-          <Timer>4000</Timer>
+          <Timer>5000</Timer>
           <Code>END</Code>
           <Params />
           <EnableEdition>true</EnableEdition>
